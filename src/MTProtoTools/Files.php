@@ -42,6 +42,7 @@ use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\RPCError\FloodWaitError;
@@ -50,6 +51,7 @@ use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\StreamEof;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -310,35 +312,56 @@ trait Files
         $resPromises = [];
         $start = microtime(true);
         while ($part_num < $part_total_num || !$size) {
-            try {
-                $writePromise = async(
-                    $this->methodCallAsyncWrite(...),
-                    $method,
-                    $seekable ? fn () => $callable($part_num) + ['cancellation' => $cancellation] : ($callable($part_num) + ['cancellation' => $cancellation]),
-                    $datacenter
-                );
-            } catch (StreamEof) {
-                break;
-            }
-            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation): void {
-                $readFuture = $writePromise->await($cancellation);
-                $d = new DeferredFuture;
-                $resPromises[] = $d->getFuture();
+            if ($seekable) {
+                $writeCb = function () use ($method, $callable, $part_num, $cancellation, &$datacenter): WrappedFuture {
+                    return $this->methodCallAsyncWrite(
+                        $method,
+                        $callable($part_num) + ['cancellation' => $cancellation],
+                        $datacenter
+                    );
+                };
+            } else {
                 try {
-                    // Wrote chunk!
-                    if (!$readFuture->await($cancellation)) {
-                        throw new Exception('Upload of part '.$part_num.' failed');
-                    }
-                    // Got OK from server for chunk!
-                    if ($size) {
-                        $cb();
-                    }
-                    $d->complete();
-                } catch (Throwable $e) {
-                    $this->logger("Got exception while uploading $part_num: {$e}");
-                    $d->error($e);
-                    throw $e;
+                    $part = $callable($part_num) + ['cancellation' => $cancellation];
+                } catch (StreamEof) {
+                    break;
                 }
+                $writeCb = function () use ($method, $part, &$datacenter): WrappedFuture {
+                    return $this->methodCallAsyncWrite(
+                        $method,
+                        $part,
+                        $datacenter
+                    );
+                };
+            }
+            $writePromise = async($writeCb);
+            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter): void {
+                do {
+                    $readFuture = $writePromise->await($cancellation);
+                    $d = new DeferredFuture;
+                    $resPromises[] = $d->getFuture();
+                    try {
+                        // Wrote chunk!
+                        if (!$readFuture->await($cancellation)) {
+                            throw new Exception('Upload of part '.$part_num.' failed');
+                        }
+                        // Got OK from server for chunk!
+                        if ($size) {
+                            $cb();
+                        }
+                        $d->complete();
+                        return;
+                    } catch (FileRedirect $e) {
+                        $datacenter = $e->dc;
+                        $this->logger("Got redirect while uploading $part_num: {$datacenter}");
+                        $writePromise = async($writeCb);
+                    } catch (Throwable $e) {
+                        $cancellation->throwIfRequested();
+                        $this->logger("Got exception while uploading $part_num: {$e}");
+                        $d->error($e);
+                        $writePromise = async($writeCb);
+                    }
+                } while (true);
             });
             $promises[] = $writePromise;
             ++$part_num;
@@ -1158,6 +1181,8 @@ trait Files
                         $datacenter
                     );
                     break;
+                } catch (FileRedirect $e) {
+                    $datacenter = $e->dc;
                 } catch (FloodWaitError $e) {
                     Tools::sleep(1);
                     continue;
@@ -1209,7 +1234,12 @@ trait Files
                 $datacenter = 0;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
-                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, $datacenter);
+                try {
+                    $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, $datacenter);
+                } catch (FileRedirect $e) {
+                    $datacenter = $e->dc;
+                    break;
+                }
             }
             $cancellation?->throwIfRequested();
             $res['bytes'] = (string) $res['bytes'];

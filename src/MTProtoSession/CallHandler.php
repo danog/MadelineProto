@@ -88,10 +88,10 @@ trait CallHandler
     /**
      * Call method and wait asynchronously for response.
      *
-     * @param string                    $method Method name
-     * @param array|(callable(): array) $args   Arguments
+     * @param string $method Method name
+     * @param array  $args   Arguments
      */
-    public function methodCallAsyncRead(string $method, array|callable $args)
+    public function methodCallAsyncRead(string $method, array $args)
     {
         $readFuture = $this->methodCallAsyncWrite($method, $args);
         return $readFuture->await();
@@ -99,14 +99,14 @@ trait CallHandler
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
-     * @param string                    $method Method name
-     * @param array|(callable(): array) $args   Arguments
+     * @param string $method Method name
+     * @param array  $args   Arguments
      */
-    public function methodCallAsyncWrite(string $method, array|callable $args): WrappedFuture
+    public function methodCallAsyncWrite(string $method, array $args): WrappedFuture
     {
         $cancellation = $args['cancellation'] ?? null;
         $cancellation?->throwIfRequested();
-        if (\is_array($args) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
+        if (isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             return $this->API->methodCallAsyncWrite($method, $args, $args['id']['dc_id']);
         }
         $file = \in_array($method, ['upload.saveFilePart', 'upload.saveBigFilePart', 'upload.getFile', 'upload.getCdnFile'], true);
@@ -114,31 +114,31 @@ trait CallHandler
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
         }
-        if (\is_array($args)) {
-            if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
-                $postpone = $args['postpone'] ?? false;
-                $peer = $args['peer'];
-                $args = $this->API->splitToChunks($args);
-                $promises = [];
-                $queueId = $method.' '.$this->API->getId($peer);
 
-                $promises = [];
-                foreach ($args as $sub) {
-                    $sub['queueId'] = $queueId;
-                    $sub['postpone'] = true;
-                    $promises[] = async($this->methodCallAsyncWrite(...), $method, $sub);
-                }
+        if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+            $postpone = $args['postpone'] ?? false;
+            $peer = $args['peer'];
+            $args = $this->API->splitToChunks($args);
+            $promises = [];
+            $queueId = $method.' '.$this->API->getId($peer);
 
-                if (!$postpone) {
-                    $this->flush();
-                }
-                return new WrappedFuture(async(fn () => array_map(
-                    fn (WrappedFuture $f) => $f->await(),
-                    await($promises)
-                )));
+            $promises = [];
+            foreach ($args as $sub) {
+                $sub['queueId'] = $queueId;
+                $sub['postpone'] = true;
+                $promises[] = async($this->methodCallAsyncWrite(...), $method, $sub);
             }
-            $args = $this->API->botAPIToMTProto($args);
+
+            if (!$postpone) {
+                $this->flush();
+            }
+            return new WrappedFuture(async(fn () => array_map(
+                fn (WrappedFuture $f) => $f->await(),
+                await($promises)
+            )));
         }
+        $args = $this->API->botAPIToMTProto($args);
+
         $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
@@ -148,13 +148,10 @@ trait CallHandler
             $encrypted = true;
         }
         $response = new DeferredFuture;
-        // Closures only used for upload.saveFilePart
-        if (\is_array($args)) {
-            $this->methodAbstractions($method, $args);
-            if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
-                $args['method'] = $method;
-                $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
-            }
+        $this->methodAbstractions($method, $args);
+        if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
+            $args['method'] = $method;
+            $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
         }
         $message = new MTProtoOutgoingMessage(
             body: $args,

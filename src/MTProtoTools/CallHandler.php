@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\WrappedFuture;
 
 /**
  * Manages method and object calls.
@@ -36,10 +37,10 @@ trait CallHandler
      *
      * @internal
      *
-     * @param string                    $method Method name
-     * @param array|(callable(): array) $args   Arguments
+     * @param string $method Method name
+     * @param array  $args   Arguments
      */
-    public function methodCallAsyncRead(string $method, array|callable $args, ?int $datacenter = null)
+    public function methodCallAsyncRead(string $method, array $args, ?int $datacenter = null)
     {
         return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
     }
@@ -48,10 +49,10 @@ trait CallHandler
      *
      * @internal
      *
-     * @param string                    $method Method name
-     * @param array|(callable(): array) $args   Arguments
+     * @param string $method Method name
+     * @param array  $args   Arguments
      */
-    public function methodCallAsyncWrite(string $method, array|callable $args, ?int $datacenter = null)
+    public function methodCallAsyncWrite(string $method, array $args, ?int $datacenter = null): WrappedFuture
     {
         return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
     }

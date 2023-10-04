@@ -69,13 +69,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     private ?DeferredFuture $sendDeferred = null;
 
     /**
-     * Message body.
-     *
-     * @var array|(callable(): array)|null
-     */
-    private $body = null;
-
-    /**
      * Serialized body.
      */
     private ?string $serializedBody = null;
@@ -110,14 +103,14 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Create outgoing message.
      *
-     * @param array|callable(): array $body        Body
+     * @param array $body        Body
      * @param string                  $constructor Constructor name
      * @param string                  $type        Constructor type
      * @param boolean                 $isMethod    Is this a method?
      * @param boolean                 $unencrypted Is this an unencrypted message?
      */
     public function __construct(
-        array|callable $body,
+        private ?array $body,
         public readonly string $constructor,
         public readonly string $type,
         public readonly bool $isMethod,
@@ -138,7 +131,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         private ?DeferredFuture $resultDeferred = null,
         ?Cancellation $cancellation = null
     ) {
-        $this->body = $body;
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
@@ -225,7 +217,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     public function getBody()
     {
-        return \is_callable($this->body) ? ($this->body)() : $this->body;
+        return $this->body;
     }
 
     /**
@@ -233,7 +225,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     public function getBodyOrEmpty(): array
     {
-        return \is_array($this->body) ? $this->body : [];
+        return (array) $this->body;
     }
     /**
      * Check if we have a body.

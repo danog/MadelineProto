@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\SignalException;
+use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -340,11 +341,14 @@ trait ResponseHandler
                 if ($this->API->isTestMode()) {
                     $datacenter += 10_000;
                 }
-                if ($request->fileRelated && $this->API->datacenter->has(-$datacenter)) {
-                    $datacenter = -$datacenter;
-                } else {
-                    $this->API->datacenter->currentDatacenter = $datacenter;
+                if ($request->fileRelated) {
+                    return fn () => new FileRedirect(
+                        $this->API->datacenter->has(-$datacenter)
+                            ? -$datacenter
+                            : $datacenter
+                    );
                 }
+                $this->API->datacenter->currentDatacenter = $datacenter;
                 if ($request->userRelated) {
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
