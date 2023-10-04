@@ -1303,7 +1303,7 @@ final class MTProto implements TLCallback, LoggerGetter
     public function getCdnConfig(): void
     {
         try {
-            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], ['datacenter' => $this->authorized_dc]))['public_keys'] as $curkey) {
+            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], $this->authorized_dc))['public_keys'] as $curkey) {
                 $curkey = RSA::load($this->TL, $curkey['public_key']);
                 $this->cdn_rsa_keys[$curkey->fp] = $curkey;
             }

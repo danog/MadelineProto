@@ -41,9 +41,9 @@ final class ActionForward implements Action
                     'from_peer' => $this->from_peer,
                     'to_peer' => $peer,
                     'id' => $this->ids,
-                    'drop_author' => $this->drop_author
+                    'drop_author' => $this->drop_author,
+                    'floodWaitLimit' => 2*86400,
                 ],
-                ['FloodWaitLimit' => 2*86400]
             );
             if ($this->pin) {
                 $updates = $this->API->extractUpdates($updates);
@@ -56,8 +56,13 @@ final class ActionForward implements Action
                 try {
                     $this->API->methodCallAsyncRead(
                         'messages.updatePinnedMessage',
-                        ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false],
-                        ['FloodWaitLimit' => 2*86400]
+                        [
+                            'peer' => $peer,
+                            'id' => $id,
+                            'unpin' => false,
+                            'pm_oneside' => false,
+                            'floodWaitLimit' => 2*86400
+                        ],
                     );
                 } catch (RPCErrorException) {
                 }

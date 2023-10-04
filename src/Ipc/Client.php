@@ -223,7 +223,7 @@ final class Client extends ClientAbstract
             $cb = $media;
             $media = $media->getFile();
         }
-        $params = [$media, &$cb, $encrypted];
+        $params = [$media, &$cb, $encrypted, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
@@ -232,13 +232,10 @@ final class Client extends ClientAbstract
     /**
      * Call method and wait asynchronously for response.
      *
-     * If the $aargs['noResponse'] is true, will not wait for a response.
-     *
      * @param string $method Method name
      * @param array  $args   Arguments
-     * @param array  $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, array $args = [], array $aargs = [])
+    public function methodCallAsyncRead(string $method, array $args, ?int $dcId = null)
     {
         if ((
             $method === 'messages.editInlineBotMessage' ||
@@ -254,7 +251,13 @@ final class Client extends ClientAbstract
                 }
             }
         }
-        return $this->__call('methodCallAsyncRead', [$method, $args, $aargs]);
+        if (isset($args['cancellation']) && $args['cancellation'] instanceof Cancellation) {
+            $params = [$method, &$args, $dcId];
+            $wrapper = Wrapper::create($params, $this->session, $this->logger);
+            $wrapper->wrap($args['cancellation']);
+            return $this->__call('methodCallAsyncRead', $params);
+        }
+        return $this->__call('methodCallAsyncRead', [$method, $args, $dcId]);
     }
     /**
      * Download file to directory.

@@ -314,8 +314,8 @@ trait Files
                 $writePromise = async(
                     $this->methodCallAsyncWrite(...),
                     $method,
-                    $seekable ? fn () => $callable($part_num) : $callable($part_num),
-                    ['heavy' => true, 'datacenter' => &$datacenter, 'cancellation' => $cancellation]
+                    $seekable ? fn () => $callable($part_num) + ['cancellation' => $cancellation] : ($callable($part_num) + ['cancellation' => $cancellation]),
+                    $datacenter
                 );
             } catch (StreamEof) {
                 break;
@@ -1144,9 +1144,9 @@ trait Files
     {
         do {
             if (!$cdn) {
-                $basic_param = ['location' => $messageMedia['InputFileLocation'], 'cdn_supported' => true];
+                $basic_param = ['location' => $messageMedia['InputFileLocation'], 'cdn_supported' => true, 'floodWaitLimit' => 0, 'cancellation' => $cancellation];
             } else {
-                $basic_param = ['file_token' => $messageMedia['file_token']];
+                $basic_param = ['file_token' => $messageMedia['file_token'], 'floodWaitLimit' => 0, 'cancellation' => $cancellation];
             }
             //$x = 0;
             while (true) {
@@ -1155,7 +1155,7 @@ trait Files
                     $res = $this->methodCallAsyncRead(
                         $cdn ? 'upload.getCdnFile' : 'upload.getFile',
                         $basic_param + $offset,
-                        ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => &$datacenter, 'cancellation' => $cancellation]
+                        $datacenter
                     );
                     break;
                 } catch (FloodWaitError $e) {
@@ -1191,7 +1191,7 @@ trait Files
                 $this->config['expires'] = 0;
                 $this->getConfig();
                 try {
-                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token']], ['heavy' => true, 'datacenter' => $old_dc, 'cancellation' => $cancellation]));
+                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $datacenter));
                 } catch (RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
@@ -1209,7 +1209,7 @@ trait Files
                 $datacenter = 0;
             }
             while ($cdn === false && $res['type']['_'] === 'storage.fileUnknown' && $res['bytes'] === '' && $this->datacenter->has(++$datacenter)) {
-                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, ['heavy' => true, 'FloodWaitLimit' => 0, 'datacenter' => $datacenter, 'cancellation' => $cancellation]);
+                $res = $this->methodCallAsyncRead('upload.getFile', $basic_param + $offset, $datacenter);
             }
             $cancellation?->throwIfRequested();
             $res['bytes'] = (string) $res['bytes'];
@@ -1254,7 +1254,7 @@ trait Files
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset], ['datacenter' => $datacenter, 'cancellation' => $cancellation]));
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $datacenter));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);

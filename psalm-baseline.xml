@@ -140,6 +140,9 @@
       <code>tdesktop_md5</code>
       <code>tdesktop_read_bytearray</code>
     </MissingReturnType>
+    <PossiblyNullReference>
+      <code>methodCallAsyncRead</code>
+    </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
       <code>$part_one_md5</code>
       <code>$part_one_md5</code>
@@ -148,9 +151,6 @@
       <code>$dc</code>
       <code>$main_dc_id</code>
     </PossiblyUndefinedVariable>
-    <TooManyArguments>
-      <code>getConfig</code>
-    </TooManyArguments>
   </file>
   <file src="src/DataCenter.php">
     <DocblockTypeContradiction>
@@ -812,6 +812,9 @@
     <MissingParamType>
       <code>$data</code>
     </MissingParamType>
+    <PossiblyInvalidArgument>
+      <code>$callable</code>
+    </PossiblyInvalidArgument>
     <PossiblyInvalidPropertyAssignmentValue>
       <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
       <code><![CDATA[$this->auth ??= new \danog\MadelineProto\Namespace\AbstractAPI('auth')]]></code>
@@ -2248,6 +2251,9 @@
       <code>serializeObject</code>
       <code>serializeParams</code>
     </MissingReturnType>
+    <PossiblyFalseArgument>
+      <code>$value</code>
+    </PossiblyFalseArgument>
     <PossiblyInvalidArgument>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>

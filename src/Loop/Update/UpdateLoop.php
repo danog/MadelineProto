@@ -94,7 +94,7 @@ final class UpdateLoop extends Loop
                 }
                 $request_pts = $state->pts();
                 try {
-                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => DialogId::fromSupergroupOrChannel($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true], ['FloodWaitLimit' => 86400]);
+                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => DialogId::fromSupergroupOrChannel($this->channelId), 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true, 'floodWaitLimit' => 86400]);
                 } catch (RPCErrorException $e) {
                     if ($e->rpc === '-503') {
                         delay(1.0);
@@ -161,7 +161,7 @@ final class UpdateLoop extends Loop
                 $this->API->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
                 do {
                     try {
-                        $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], ['datacenter' => $this->API->authorized_dc]);
+                        $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $this->API->authorized_dc);
                         break;
                     } catch (RPCErrorException $e) {
                         if ($e->rpc !== '-503') {

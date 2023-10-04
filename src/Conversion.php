@@ -45,7 +45,9 @@ final class Conversion
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
         $settings->getAuth()->setPfs(true);
         $MadelineProto = new API($session, $settings);
-        $MadelineProto->help->getConfig([], ['datacenter' => $main_dc_id]);
+        /** @var APIWrapper */
+        $wrapper = Tools::getVar($MadelineProto, 'wrapper');
+        $wrapper->getAPI()->methodCallAsyncRead('help.getConfig', [], $main_dc_id);
         $MadelineProto->logger("About to import auth to DC $main_dc_id!", Logger::FATAL_ERROR);
         $MadelineProto->importAuthorization($authorization, $main_dc_id);
         return $MadelineProto;

@@ -649,13 +649,21 @@ final class TL implements TLInterface
         ]) {
             $arguments[$flag] ??= 0;
             if ($type === 'true') {
-                $arguments[$flag] = isset($arguments[$name]) && $arguments[$name]
-                    ? $arguments[$flag] | $pow
-                    : $arguments[$flag] & ~$pow;
+                if (isset($arguments[$name]) && $arguments[$name]) {
+                    $arguments[$flag] |= $pow;
+                } elseif ($arguments[$flag] & $pow) {
+                    throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
+                } else {
+                    $arguments[$flag] &= ~$pow;
+                }
             } else {
-                $arguments[$flag] = isset($arguments[$name]) && $arguments[$name] !== null
-                    ? $arguments[$flag] | $pow
-                    : $arguments[$flag] & ~$pow;
+                if (isset($arguments[$name])) {
+                    $arguments[$flag] |= $pow;
+                } elseif ($arguments[$flag] & $pow) {
+                    throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
+                } else {
+                    $arguments[$flag] &= ~$pow;
+                }
             }
         }
         foreach ($tl['params'] as $current_argument) {

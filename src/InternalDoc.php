@@ -1938,9 +1938,9 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->upload($file, $fileName, $cb, $encrypted, $cancellation);
     }
     /**
      * Upload file to secret chat.
@@ -1951,9 +1951,9 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null): array
+    public function uploadEncrypted($file, string $fileName = '', ?callable $cb = null, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->uploadEncrypted($file, $fileName, $cb);
+        return $this->wrapper->getAPI()->uploadEncrypted($file, $fileName, $cb, $cancellation);
     }
     /**
      * Upload file from callable.
@@ -1961,19 +1961,19 @@ abstract class InternalDoc
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param callable(int, int): string $callable  Callable (offset, length) => data
-     * @param integer                    $size      File size
-     * @param string                     $mime      Mime type
-     * @param string                     $fileName  File name
-     * @param callable(float, float, float): void $cb        Status callback
-     * @param boolean                    $seekable  Whether chunks can be fetched out of order
-     * @param boolean                    $encrypted Whether to encrypt file for secret chats
+     * @param callable(int, int, ?Cancellation): string $callable  Callable (offset, length) => data
+     * @param integer                                   $size      File size
+     * @param string                                    $mime      Mime type
+     * @param string                                    $fileName  File name
+     * @param callable(float, float, float): void       $cb        Status callback
+     * @param boolean                                   $seekable  Whether chunks can be fetched out of order
+     * @param boolean                                   $encrypted Whether to encrypt file for secret chats
      *
      * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false): array
+    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
     }
     /**
      * Upload file from stream.
@@ -1987,9 +1987,9 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
     }
     /**
      * Reupload telegram file.
@@ -2000,9 +2000,9 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromTgfile(mixed $media, ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted, $cancellation);
     }
     /**
      * Upload file from URL.
@@ -2014,9 +2014,9 @@ abstract class InternalDoc
      * @param  boolean                      $encrypted Whether to encrypt file for secret chats
      * @return array                        InputFile constructor
      */
-    public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false): array
+    public function uploadFromUrl(\danog\MadelineProto\FileCallbackInterface|string $url, int $size = 0, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted);
+        return $this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted, $cancellation);
     }
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.

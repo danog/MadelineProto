@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Wrappers;
 
+use Revolt\EventLoop;
+
 /**
  * Manages clicking buttons.
  *
@@ -36,7 +38,7 @@ trait Button
     public function clickInternal(bool $donotwait, string $method, array $parameters): array|bool
     {
         if ($donotwait) {
-            $this->methodCallAsyncRead($method, $parameters, ['noResponse' => true]);
+            EventLoop::queue($this->methodCallAsyncRead(...), $method, $parameters);
             return true;
         }
         return $this->methodCallAsyncRead($method, $parameters);

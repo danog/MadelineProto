@@ -124,7 +124,7 @@ trait Login
                 $authorization = $this->methodCallAsyncRead(
                     'auth.importLoginToken',
                     $authorization,
-                    ['datacenter' => $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id']]
+                    $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id']
                 );
             }
             $this->processAuthorization($authorization['authorization']);
@@ -151,7 +151,7 @@ trait Login
     {
         if ($this->authorized === API::LOGGED_IN) {
             $this->authorized = API::LOGGED_OUT;
-            $this->methodCallAsyncRead('auth.logOut');
+            $this->methodCallAsyncRead('auth.logOut', []);
         }
         $this->authorized = API::LOGGED_OUT;
         if ($this->hasEventHandler()) {

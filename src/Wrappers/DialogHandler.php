@@ -69,9 +69,9 @@ trait DialogHandler
                     'updates.getDifference',
                     [
                         ...$this->botDialogsUpdatesState,
-                        'pts_total_limit' => 2147483647
+                        'pts_total_limit' => 2147483647,
+                        'floodWaitLimit' => 86400
                     ],
-                    ['FloodWaitLimit' => 86400]
                 );
                 switch ($result['_']) {
                     case 'updates.differenceEmpty':
@@ -109,8 +109,7 @@ trait DialogHandler
                 try {
                     $result = $this->methodCallAsyncRead(
                         'updates.getDifference',
-                        $state,
-                        ['cancellation' => Tools::getTimeoutCancellation(15.0), 'FloodWaitLimit' => 86400]
+                        $state + ['cancellation' => Tools::getTimeoutCancellation(15.0), 'floodWaitLimit' => 86400]
                     )['_'];
                 } catch (Throwable $e) {
                     $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");
@@ -217,7 +216,7 @@ trait DialogHandler
         $dialogs = [];
         $this->logger->logger('Getting dialogs...');
         while ($this->dialog_params['count'] < $res['count']) {
-            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params, ['FloodWaitLimit' => 100]);
+            $res = $this->methodCallAsyncRead('messages.getDialogs', $this->dialog_params + ['floodWaitLimit' => 100]);
             $last_peer = 0;
             $last_date = 0;
             $last_id = 0;

@@ -34,17 +34,14 @@ trait CallHandler
     /**
      * Call method and wait asynchronously for response.
      *
-     * If the $aargs['noResponse'] is true, will not wait for a response.
-     *
      * @internal
      *
      * @param string                    $method Method name
      * @param array|(callable(): array) $args   Arguments
-     * @param array                     $aargs  Additional arguments
      */
-    public function methodCallAsyncRead(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncRead(string $method, array|callable $args, ?int $datacenter = null)
     {
-        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -53,10 +50,9 @@ trait CallHandler
      *
      * @param string                    $method Method name
      * @param array|(callable(): array) $args   Arguments
-     * @param array                     $aargs  Additional arguments
      */
-    public function methodCallAsyncWrite(string $method, array|callable $args = [], array $aargs = ['msg_id' => null])
+    public function methodCallAsyncWrite(string $method, array|callable $args, ?int $datacenter = null)
     {
-        return ($this->datacenter->waitGetConnection($aargs['datacenter'] ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args, $aargs);
+        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
     }
 }

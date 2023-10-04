@@ -46,7 +46,6 @@ class AbstractAPI
         if (!isset($arguments[0])) {
             // Named arguments
             $args = $arguments;
-            $aargs = [];
         } else {
             // Legacy arguments
             $args = $arguments[0] ?? [];
@@ -60,6 +59,7 @@ class AbstractAPI
             ) {
                 throw new InvalidArgumentException('Parameter names must be provided!');
             }
+            $args = $args + $aargs;
         }
 
         $name = $this->namespace.'.'.$name;
@@ -67,6 +67,6 @@ class AbstractAPI
             throw new Exception(Blacklist::BLACKLIST[$name]);
         }
 
-        return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args, $aargs);
+        return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args);
     }
 }
