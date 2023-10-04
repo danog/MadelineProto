@@ -34,6 +34,7 @@ use danog\MadelineProto\Tools;
 use Error;
 use Revolt\EventLoop;
 
+use function Amp\delay;
 use function substr;
 
 /**
@@ -104,7 +105,7 @@ final class ReadLoop extends Loop
                     $this->connection->reconnect();
                 } elseif ($error === -429) {
                     $this->API->logger("Got -429 from DC {$this->datacenter}", Logger::WARNING);
-                    Tools::sleep(3);
+                    delay(3);
                     $this->connection->reconnect();
                 } else {
                     $this->connection->reconnect();

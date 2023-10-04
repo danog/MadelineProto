@@ -58,6 +58,7 @@ use Webmozart\Assert\Assert;
 
 use const LOCK_EX;
 use function Amp\async;
+use function Amp\delay;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -1171,8 +1172,7 @@ trait Files
             } else {
                 $basic_param = ['file_token' => $messageMedia['file_token'], 'floodWaitLimit' => 0, 'cancellation' => $cancellation];
             }
-            //$x = 0;
-            while (true) {
+            do {
                 $cancellation?->throwIfRequested();
                 try {
                     $res = $this->methodCallAsyncRead(
@@ -1184,18 +1184,18 @@ trait Files
                 } catch (FileRedirect $e) {
                     $datacenter = $e->dc;
                 } catch (FloodWaitError $e) {
-                    Tools::sleep(1);
-                    continue;
+                    delay(1, cancellation: $cancellation);
                 } catch (RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
                             $cdn = false;
+                            $datacenter = $this->authorized_dc;
                             continue 3;
                         default:
                             throw $e;
                     }
                 }
-            }
+            } while (true);
             $cancellation?->throwIfRequested();
 
             if ($res['_'] === 'upload.fileCdnRedirect') {
@@ -1222,6 +1222,7 @@ trait Files
                         case 'FILE_TOKEN_INVALID':
                         case 'REQUEST_TOKEN_INVALID':
                             $cdn = false;
+                            $datacenter = $this->authorized_dc;
                             continue 2;
                         default:
                             throw $e;
