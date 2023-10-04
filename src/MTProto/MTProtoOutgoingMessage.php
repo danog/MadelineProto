@@ -88,8 +88,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     private int $tries = 0;
 
-    private ?Cancellation $cancellation = null;
-
     /**
      * Whether this message is related to a user, as in getting a successful reply means we have auth.
      */
@@ -129,12 +127,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
          */
         public readonly ?int $floodWaitLimit = null,
         private ?DeferredFuture $resultDeferred = null,
-        ?Cancellation $cancellation = null
+        public readonly ?Cancellation $cancellation = null
     ) {
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
-        $this->cancellation = $cancellation;
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(fn () => throw $e));
     }
 
@@ -186,6 +183,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         }
         $this->serializedBody = null;
         $this->body = null;
+
+        if (!($this->state & self::STATE_SENT)) {
+            $this->sent();
+        }
 
         $this->state |= self::STATE_REPLIED;
         if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors

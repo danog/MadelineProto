@@ -367,6 +367,15 @@ final class WriteLoop extends Loop
                     $this->connection->new_outgoing[$message_id] = $message;
                 }
                 $message->sent();
+                $message->cancellation?->subscribe(function () use ($message): void {
+                    if ($message->hasMsgId()) {
+                        $this->API->logger("Cancelling $message...");
+                        $this->API->logger($this->connection->methodCallAsyncRead(
+                            'rpc_drop_answer',
+                            ['req_msg_id' => $message->getMsgId()]
+                        ));
+                    }
+                });
             }
         } while ($this->connection->pendingOutgoing && !$skipped);
         if (empty($this->connection->pendingOutgoing)) {
