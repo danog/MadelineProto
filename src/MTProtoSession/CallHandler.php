@@ -139,6 +139,13 @@ trait CallHandler
         }
         $args = $this->API->botAPIToMTProto($args);
 
+        $response = new DeferredFuture;
+        $this->methodAbstractions($method, $args);
+        if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
+            $args['method'] = $method;
+            $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
+        }
+
         $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
         if (!$methodInfo) {
             throw new Exception("Could not find method $method!");
@@ -146,12 +153,6 @@ trait CallHandler
         $encrypted = $methodInfo['encrypted'];
         if (!$encrypted && $this->shared->hasTempAuthKey()) {
             $encrypted = true;
-        }
-        $response = new DeferredFuture;
-        $this->methodAbstractions($method, $args);
-        if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
-            $args['method'] = $method;
-            $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
         }
         $message = new MTProtoOutgoingMessage(
             body: $args,
