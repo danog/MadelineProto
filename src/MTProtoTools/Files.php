@@ -357,7 +357,7 @@ trait Files
                         $this->logger("Got redirect while uploading $part_num: {$datacenter}");
                         $writePromise = async($writeCb);
                     } catch (Throwable $e) {
-                        $cancellation->throwIfRequested();
+                        $cancellation?->throwIfRequested();
                         $this->logger("Got exception while uploading $part_num: {$e}");
                         $d->error($e);
                         $writePromise = async($writeCb);
