@@ -51,6 +51,8 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
+     *
+     * @return int<0, max>
      */
     public static function mbStrlen(string $text): int
     {
