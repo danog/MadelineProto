@@ -395,7 +395,8 @@ trait FilesAbstraction
             $params = [
                 'peer' => $peer,
                 'message' => $message,
-                'file' => $file
+                'file' => $file,
+                'cancellation' => $cancellation,
             ];
         } else {
             $method = 'messages.sendMedia';
@@ -441,7 +442,8 @@ trait FilesAbstraction
                 'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
                 'send_as' => $sendAs,
-                'media' => $media
+                'media' => $media,
+                'cancellation' => $cancellation,
             ];
         }
 

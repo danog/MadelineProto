@@ -600,6 +600,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
+     * Flush all postponed messages.
+     */
+    public function flush(): void
+    {
+        $this->wrapper->getAPI()->flush();
+    }
+    /**
      * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID
@@ -1668,10 +1675,11 @@ abstract class InternalDoc
      * @param boolean        $clearDraft             Clears the draft field
      * @param boolean        $noWebpage              Set this flag to disable generation of the webpage preview
      * @param boolean        $updateStickersetsOrder Whether to move used stickersets to top
+     * @param ?Cancellation  $cancellation           Cancellation
      */
-    public function sendMessage(string|int $peer, string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false): \danog\MadelineProto\EventHandler\Message
+    public function sendMessage(string|int $peer, string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, bool $updateStickersetsOrder = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
-        return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder);
+        return $this->wrapper->getAPI()->sendMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $updateStickersetsOrder, $cancellation);
     }
     /**
      * Sends a message to all report peers (admins of the bot).
@@ -1687,9 +1695,9 @@ abstract class InternalDoc
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */
-    public function sendMessageToAdmins(string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false): array
+    public function sendMessageToAdmins(string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $noWebpage = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->sendMessageToAdmins($message, $parseMode, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage);
+        return $this->wrapper->getAPI()->sendMessageToAdmins($message, $parseMode, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $noWebpage, $cancellation);
     }
     /**
      * Sends a photo.

@@ -78,7 +78,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Manual (bot)](https://docs.madelineproto.xyz/docs/LOGIN.html#manual-bot)
   * [QR code login (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#qr-code-user)
 * [Features](https://docs.madelineproto.xyz/docs/FEATURES.html) - MadelineProto can do everything official clients can do, and more!
-* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, openssl, iconv extensions to function properly.
+* [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, openssl, iconv, gd extensions to function properly.
 * [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html) - MadelineProto offers an official MadelineProto docker image for the linux/amd64, linux/arm64 and linux/riscv64 platforms @ hub.madelineproto.xyz/danog/madelineproto.  
   * [Getting started](https://docs.madelineproto.xyz/docs/DOCKER.html#getting-started)
     * [CLI bot (recommended)](https://docs.madelineproto.xyz/docs/DOCKER.html#cli-bot-recommended)

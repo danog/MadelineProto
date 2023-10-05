@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use Amp\Cancellation;
 use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
@@ -222,6 +223,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         bool $background = false,
         bool $clearDraft = false,
         bool $updateStickersetsOrder = false,
+        ?Cancellation $cancellation = null
     ): Message {
         return $this->getClient()->sendMessage(
             peer: $this->chatId,
@@ -237,7 +239,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             background: $background,
             clearDraft: $clearDraft,
             noWebpage: $noWebpage,
-            updateStickersetsOrder: $updateStickersetsOrder
+            updateStickersetsOrder: $updateStickersetsOrder,
+            cancellation: $cancellation
         );
     }
 

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Http\Client\Request;
@@ -712,6 +713,7 @@ trait UpdateHandler
      * @param boolean        $clearDraft             Clears the draft field
      * @param boolean        $noWebpage              Set this flag to disable generation of the webpage preview
      * @param boolean        $updateStickersetsOrder Whether to move used stickersets to top
+     * @param ?Cancellation  $cancellation           Cancellation
      */
     public function sendMessage(
         int|string $peer,
@@ -728,6 +730,7 @@ trait UpdateHandler
         bool $clearDraft = false,
         bool $noWebpage = false,
         bool $updateStickersetsOrder = false,
+        ?Cancellation $cancellation = null
     ): Message {
         $result = $this->methodCallAsyncRead(
             'messages.sendMessage',
@@ -745,7 +748,8 @@ trait UpdateHandler
                 'background' => $background,
                 'clear_draft' => $clearDraft,
                 'no_webpage' => $noWebpage,
-                'update_stickersets_order' => $updateStickersetsOrder
+                'update_stickersets_order' => $updateStickersetsOrder,
+                'cancellation' => $cancellation
             ]
         );
         if (isset($result['_'])) {

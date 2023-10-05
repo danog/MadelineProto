@@ -1574,6 +1574,16 @@ final class MTProto implements TLCallback, LoggerGetter
         $this->reportDest = $this->sanitizeReportPeers($userOrId);
         $this->admins = array_values(array_filter($this->reportDest, fn (int $v) => $v > 0));
     }
+    /**
+     * Flush all postponed messages.
+     */
+    public function flush(): void
+    {
+        $this->waitForInit();
+        foreach ($this->datacenter->getDataCenterConnections() as $conn) {
+            $conn->flush();
+        }
+    }
     private ?LocalMutex $reportMutex = null;
     /**
      * Sends a message to all report peers (admins of the bot).
@@ -1599,6 +1609,7 @@ final class MTProto implements TLCallback, LoggerGetter
         bool $background = false,
         bool $clearDraft = false,
         bool $noWebpage = false,
+        ?Cancellation $cancellation = null
     ): array {
         $result = [];
         foreach ($this->admins as $report) {
@@ -1612,7 +1623,8 @@ final class MTProto implements TLCallback, LoggerGetter
                 noForwards: $noForwards,
                 background: $background,
                 clearDraft: $clearDraft,
-                noWebpage: $noWebpage
+                noWebpage: $noWebpage,
+                cancellation: $cancellation
             );
         }
         return $result;

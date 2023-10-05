@@ -28,7 +28,6 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
-use Webmozart\Assert\Assert;
 
 use function strlen;
 
@@ -248,7 +247,12 @@ final class WriteLoop extends Loop
                         && !$prev->hasReply()
                     ) {
                         $prevId = $prev->getMsgId();
-                        Assert::notNull($prevId);
+                        if (!$prevId) {
+                            $prev->getResultPromise()->finally(fn () => $this->resume(true));
+                            $this->API->logger("Skipping $message due pending local queue in DC $this->datacenter");
+                            $skipped = true;
+                            continue;
+                        }
                         $MTmessage['body'] = $this->API->getTL()->serializeMethod(
                             'invokeAfterMsg',
                             [

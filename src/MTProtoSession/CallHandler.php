@@ -29,7 +29,6 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
-use Throwable;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -152,16 +151,6 @@ trait CallHandler
             if (isset($this->callQueue[$queueId])
                 && !($prev = $this->callQueue[$queueId])->hasReply()
             ) {
-                /** @var MTProtoOutgoingMessage $prev */
-                if (!$prev->hasMsgId() && $prev->wasSent()) {
-                    // Use client-side queue due to MSG_WAIT_* error, wait...
-                    try {
-                        $prev->getResultPromise()->await($cancellation);
-                    } catch (Throwable) {
-                    }
-                    // Got response, resume order is equal to suspension order
-                    $cancellation?->throwIfRequested();
-                }
                 $this->API->logger("$method to queue with ID $queueId", Logger::ULTRA_VERBOSE);
             } else {
                 $prev = null;
