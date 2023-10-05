@@ -243,11 +243,11 @@ final class Client extends ClientAbstract
             $method === 'messages.sendMedia' ||
             $method === 'messages.editMessage'
         ) && isset($args['media']) && \is_array($args['media'])) {
-            $this->processMedia($args['media'], true);
+            $this->processMedia($args['media'], $args['cancellation'] ?? null, true);
         } elseif ($method === 'messages.sendMultiMedia' && isset($args['multi_media'])) {
             foreach ($args['multi_media'] as &$media) {
                 if (\is_array($media['media'])) {
-                    $this->processMedia($media['media'], true);
+                    $this->processMedia($media['media'], $args['cancellation'] ?? null, true);
                 }
             }
         }

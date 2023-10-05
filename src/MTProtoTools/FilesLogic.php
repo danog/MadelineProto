@@ -264,7 +264,7 @@ trait FilesLogic
     /**
      * @internal
      */
-    public function processMedia(array &$media, bool $upload = false): void
+    public function processMedia(array &$media, ?Cancellation $cancellation, bool $upload = false): void
     {
         if ($media['_'] === 'inputMediaPhotoExternal') {
             $media['_'] = 'inputMediaUploadedPhoto';
@@ -294,7 +294,7 @@ trait FilesLogic
             );
         }
         if ($upload && isset($media['file']) && !\is_array($media['file'])) {
-            $media['file'] = $this->upload($media['file']);
+            $media['file'] = $this->upload($media['file'], cancellation: $cancellation);
         }
     }
     /**
@@ -395,7 +395,7 @@ trait FilesLogic
                 $size = $stream->tell();
                 $stream->seek(0);
             } elseif ($stream instanceof ReadableBuffer) {
-                $stream = buffer($stream);
+                $stream = buffer($stream, $cancellation);
                 $size = \strlen($stream);
                 $stream = new ReadableBuffer($stream);
             }

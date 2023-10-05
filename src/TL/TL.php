@@ -747,11 +747,11 @@ final class TL implements TLInterface
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
-                $value = $this->API->upload($value);
+                $value = $this->API->upload($value, cancellation: $arguments['cancellation'] ?? null);
                 $arguments[$name] = $value;
             }
             if ($type === 'InputEncryptedFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputEncryptedFile'))) {
-                $value = $this->API->uploadEncrypted($value);
+                $value = $this->API->uploadEncrypted($value, cancellation: $arguments['cancellation'] ?? null);
                 $arguments[$name] = $value;
             }
             if ($type === 'InputEncryptedChat' && (!\is_array($value) || isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] !== $type)) {

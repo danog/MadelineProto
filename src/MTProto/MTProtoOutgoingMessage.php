@@ -94,11 +94,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public readonly bool $userRelated;
 
     /**
-     * Previous queued message.
-     */
-    private ?self $previousQueuedMessage = null;
-
-    /**
      * Create outgoing message.
      *
      * @param array $body        Body
@@ -119,9 +114,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
          */
         public readonly bool $fileRelated = false,
         /**
-         * Queue ID.
+         * Previous queued message.
          */
-        public readonly ?string $queueId = null,
+        public readonly ?self $previousQueuedMessage = null,
         /**
          * Custom flood wait limit for this message.
          */
@@ -402,29 +397,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function setSent(int $sent): self
     {
         $this->sent = $sent;
-
-        return $this;
-    }
-
-    /**
-     * Get previous queued message.
-     *
-     * @return ?self
-     */
-    public function getPreviousQueuedMessage(): ?self
-    {
-        return $this->previousQueuedMessage;
-    }
-
-    /**
-     * Set previous queued message.
-     *
-     * @param ?self $previousQueuedMessage Previous queued message.
-     *
-     */
-    public function setPreviousQueuedMessage(?self $previousQueuedMessage): self
-    {
-        $this->previousQueuedMessage = $previousQueuedMessage;
 
         return $this;
     }

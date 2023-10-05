@@ -387,7 +387,7 @@ trait FilesAbstraction
                 $message['media']['iv'] = $file['iv'];
                 $message['media']['size'] = $file['size'];
             } else {
-                $file = $this->uploadEncrypted($file, $fileName ?? '', $callback);
+                $file = $this->uploadEncrypted($file, $fileName ?? '', $callback, $cancellation);
                 $message['media']['key'] = $file['key'];
                 $message['media']['iv'] = $file['iv'];
                 $message['media']['size'] = $file['size'];
@@ -424,7 +424,7 @@ trait FilesAbstraction
                 };
                 $media['id'] = $reuseId;
             } else {
-                $media['file'] = $this->upload($media['file'], $fileName ?? '', $callback);
+                $media['file'] = $this->upload($media['file'], $fileName ?? '', $callback, cancellation: $cancellation);
             }
 
             $params = [

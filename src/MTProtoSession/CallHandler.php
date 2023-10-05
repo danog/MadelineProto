@@ -21,12 +21,15 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
+use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\DataCenterConnection;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
+use Throwable;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -96,6 +99,7 @@ trait CallHandler
         $readFuture = $this->methodCallAsyncWrite($method, $args);
         return $readFuture->await();
     }
+    private LocalKeyedMutex $abstractionQueueMutex;
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
@@ -126,6 +130,8 @@ trait CallHandler
             foreach ($args as $sub) {
                 $sub['queueId'] = $queueId;
                 $sub['postpone'] = true;
+                $sub = $this->API->botAPIToMTProto($sub);
+                $this->methodAbstractions($method, $sub);
                 $promises[] = async($this->methodCallAsyncWrite(...), $method, $sub);
             }
 
@@ -137,6 +143,32 @@ trait CallHandler
                 await($promises)
             )));
         }
+
+        $queueId = $args['queueId'] ?? null;
+        $prev = null;
+        $lock = null;
+        if ($queueId !== null) {
+            $lock = $this->abstractionQueueMutex->acquire($queueId);
+            if (isset($this->callQueue[$queueId])
+                && !($prev = $this->callQueue[$queueId])->hasReply()
+            ) {
+                /** @var MTProtoOutgoingMessage $prev */
+                if (!$prev->hasMsgId() && $prev->wasSent()) {
+                    // Use client-side queue due to MSG_WAIT_* error, wait...
+                    try {
+                        $prev->getResultPromise()->await($cancellation);
+                    } catch (Throwable) {
+                    }
+                    // Got response, resume order is equal to suspension order
+                    $cancellation?->throwIfRequested();
+                }
+                $this->API->logger("$method to queue with ID $queueId", Logger::ULTRA_VERBOSE);
+            } else {
+                $prev = null;
+                $this->API->logger("$method is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
+            }
+        }
+
         $args = $this->API->botAPIToMTProto($args);
 
         $response = new DeferredFuture;
@@ -162,11 +194,15 @@ trait CallHandler
             isMethod: true,
             unencrypted: !$encrypted,
             fileRelated: $file,
-            queueId: $args['queueId'] ?? null,
+            previousQueuedMessage: $prev,
             floodWaitLimit: $args['floodWaitLimit'] ?? null,
             resultDeferred: $response,
             cancellation: $cancellation,
         );
+        if ($queueId !== null) {
+            $this->callQueue[$queueId] = $message;
+            $lock->release();
+        }
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);
         }

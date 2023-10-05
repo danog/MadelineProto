@@ -304,7 +304,7 @@ trait ResponseHandler
             case 500:
             case -500:
             case -503:
-                if ($request->queueId !== null &&
+                if ($request->previousQueuedMessage !== null &&
                     (
                         $response['error_message'] === 'MSG_WAIT_FAILED'
                         || $response['error_message'] === 'MSG_WAIT_TIMEOUT'
@@ -316,7 +316,7 @@ trait ResponseHandler
                     $request->setSent(time() + 5*60);
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $prev = $request->getPreviousQueuedMessage();
+                    $prev = $request->previousQueuedMessage;
                     if ($prev->hasReply()) {
                         $this->methodRecall($msgId);
                     } else {
@@ -356,7 +356,7 @@ trait ResponseHandler
                 EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId(), datacenter: $datacenter);
                 return null;
             case 400:
-                if ($request->queueId &&
+                if ($request->previousQueuedMessage &&
                     (
                         $response['error_message'] === 'MSG_WAIT_FAILED'
                         || $response['error_message'] === 'MSG_WAIT_TIMEOUT'
@@ -369,7 +369,7 @@ trait ResponseHandler
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
-                    $prev = $request->getPreviousQueuedMessage();
+                    $prev = $request->previousQueuedMessage;
                     if ($prev->hasReply()) {
                         $this->methodRecall($msgId);
                     } else {

@@ -244,27 +244,18 @@ final class WriteLoop extends Loop
                         $this->API->logger("Skipping $message due to unimported auth in connection in DC $this->datacenter");
                         $skipped = true;
                         continue;
-                    } elseif ($message->queueId !== null) {
-                        $queueId = $message->queueId;
-                        if (isset($this->connection->callQueue[$queueId])
-                            && !($prev = $this->connection->callQueue[$queueId])->hasReply()
-                        ) {
-                            $this->connection->callQueue[$queueId] = $message;
-                            $message->setPreviousQueuedMessage($prev);
-                            $this->API->logger("Adding $message to queue with ID $queueId", Logger::ULTRA_VERBOSE);
-                            $prev = $prev->getMsgId();
-                            Assert::notNull($prev);
-                            $MTmessage['body'] = $this->API->getTL()->serializeMethod(
-                                'invokeAfterMsg',
-                                [
-                                    'msg_id' => $prev,
-                                    'query' => $MTmessage['body']
-                                ]
-                            );
-                        } else {
-                            $this->connection->callQueue[$queueId] = $message;
-                            $this->API->logger("$message is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
-                        }
+                    } elseif (($prev = $message->previousQueuedMessage)
+                        && !$prev->hasReply()
+                    ) {
+                        $prevId = $prev->getMsgId();
+                        Assert::notNull($prevId);
+                        $MTmessage['body'] = $this->API->getTL()->serializeMethod(
+                            'invokeAfterMsg',
+                            [
+                                'msg_id' => $prevId,
+                                'query' => $MTmessage['body']
+                            ]
+                        );
                     }
                     // TODO
                     /*

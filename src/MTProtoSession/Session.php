@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -161,6 +162,7 @@ trait Session
         if ($this->session_id === null) {
             $this->resetSession();
         }
+        $this->abstractionQueueMutex ??= new LocalKeyedMutex;
     }
     /**
      * Backup eventual unsent messages before session deletion.

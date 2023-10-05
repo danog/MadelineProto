@@ -375,32 +375,63 @@ final class Connection
             } elseif (isset($arguments['message']['reply_to']['reply_to_msg_id'])) {
                 $arguments['message']['reply_to_random_id'] = $arguments['message']['reply_to']['reply_to_msg_id'];
             }
-        } elseif ($method === 'messages.uploadMedia' || $method === 'messages.sendMedia') {
+        } elseif ($method === 'payments.exportInvoice') {
+            if (\is_array($arguments['invoice_media']) && isset($arguments['invoice_media']['_'])) {
+                $this->API->processMedia($arguments['invoice_media'], $arguments['cancellation'] ?? null);
+                if ($arguments['invoice_media']['_'] === 'inputMediaUploadedPhoto'
+                    && (
+                        $arguments['invoice_media']['file'] instanceof ReadableStream
+                        || (
+                            $arguments['invoice_media']['file'] instanceof FileCallbackInterface
+                            && $arguments['invoice_media']['file']->getFile() instanceof ReadableStream
+                        )
+                    )
+                ) {
+                    if ($arguments['invoice_media']['file'] instanceof FileCallbackInterface) {
+                        $arguments['invoice_media']['file'] = new FileCallback(
+                            new ReadableBuffer(buffer($arguments['invoice_media']['file']->getFile(), $arguments['cancellation'] ?? null)),
+                            $arguments['invoice_media']['file']
+                        );
+                    } else {
+                        $arguments['invoice_media']['file'] = new ReadableBuffer(buffer($arguments['invoice_media']['file'], $arguments['cancellation'] ?? null));
+                    }
+                }
+                $this->API->processMedia($arguments['invoice_media'], $arguments['cancellation'] ?? null, true);
+            }
+        } elseif ($method === 'messages.uploadMedia'
+            || $method === 'messages.sendMedia'
+            || $method === 'messages.editMessage'
+            || $method === 'messages.editInlineBotMessage'
+            || $method === 'messages.uploadImportedMedia'
+            || $method === 'stories.sendStory'
+            || $method === 'stories.editStory'
+        ) {
             if ($method === 'messages.uploadMedia') {
                 if (!isset($arguments['peer']) && !$this->API->isSelfBot()) {
                     $arguments['peer'] = 'me';
                 }
             }
             if (\is_array($arguments['media']) && isset($arguments['media']['_'])) {
-                $this->API->processMedia($arguments['media']);
+                $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null);
                 if ($arguments['media']['_'] === 'inputMediaUploadedPhoto'
                     && (
                         $arguments['media']['file'] instanceof ReadableStream
                         || (
-                            $arguments['media']['file'] instanceof FileCallback
-                            && $arguments['media']['file']->file instanceof ReadableStream
+                            $arguments['media']['file'] instanceof FileCallbackInterface
+                            && $arguments['media']['file']->getFile() instanceof ReadableStream
                         )
                     )
                 ) {
-                    if ($arguments['media']['file'] instanceof FileCallback) {
+                    if ($arguments['media']['file'] instanceof FileCallbackInterface) {
                         $arguments['media']['file'] = new FileCallback(
-                            new ReadableBuffer(buffer($arguments['media']['file']->file)),
-                            $arguments['media']['file']->callback
+                            new ReadableBuffer(buffer($arguments['media']['file']->getFile(), $arguments['cancellation'] ?? null)),
+                            $arguments['media']['file']
                         );
                     } else {
-                        $arguments['media']['file'] = new ReadableBuffer(buffer($arguments['media']['file']));
+                        $arguments['media']['file'] = new ReadableBuffer(buffer($arguments['media']['file'], $arguments['cancellation'] ?? null));
                     }
                 }
+                $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null, true);
             }
         } elseif ($method === 'messages.sendMultiMedia') {
             foreach ($arguments['multi_media'] as &$singleMedia) {
@@ -410,7 +441,7 @@ final class Connection
                     || $singleMedia['media']['_'] === 'inputMediaPhotoExternal'
                     || $singleMedia['media']['_'] === 'inputMediaDocumentExternal'
                 ) {
-                    $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media']]);
+                    $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media'], 'cancellation' => $arguments['cancellation'] ?? null]);
                 }
             }
             $this->API->logger($arguments);
@@ -426,7 +457,7 @@ final class Connection
                     )
                     && $this->API->getSettings()->getFiles()->getAllowAutomaticUpload()
                 ) {
-                    $arguments['file'] = ($this->API->uploadEncrypted($arguments['file']));
+                    $arguments['file'] = ($this->API->uploadEncrypted($arguments['file'], cancellation: $arguments['cancellation'] ?? null));
                 }
                 if (isset($arguments['file']['key'])) {
                     $arguments['message']['media']['key'] = $arguments['file']['key'];

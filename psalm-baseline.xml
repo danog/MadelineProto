@@ -812,9 +812,6 @@
     <MissingParamType>
       <code>$data</code>
     </MissingParamType>
-    <PossiblyInvalidArgument>
-      <code>$callable</code>
-    </PossiblyInvalidArgument>
     <PossiblyInvalidPropertyAssignmentValue>
       <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
       <code><![CDATA[$this->auth ??= new \danog\MadelineProto\Namespace\AbstractAPI('auth')]]></code>
@@ -1398,10 +1395,14 @@
     <MissingClosureReturnType>
       <code><![CDATA[fn (WrappedFuture $f) => $f->await()]]></code>
     </MissingClosureReturnType>
+    <MissingConstructor>
+      <code>$abstractionQueueMutex</code>
+    </MissingConstructor>
     <MissingReturnType>
       <code>methodCallAsyncRead</code>
     </MissingReturnType>
     <PossiblyNullReference>
+      <code>release</code>
       <code>resume</code>
     </PossiblyNullReference>
   </file>
@@ -1424,10 +1425,6 @@
       <code>$msgId</code>
       <code>$msgId</code>
     </PossiblyNullArgument>
-    <PossiblyNullReference>
-      <code>hasReply</code>
-      <code>hasReply</code>
-    </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
@@ -1443,7 +1440,6 @@
   <file src="src/MTProtoTools/CallHandler.php">
     <MissingReturnType>
       <code>methodCallAsyncRead</code>
-      <code>methodCallAsyncWrite</code>
     </MissingReturnType>
   </file>
   <file src="src/MTProtoTools/CombinedUpdatesState.php">
@@ -2255,6 +2251,8 @@
       <code>$value</code>
     </PossiblyFalseArgument>
     <PossiblyInvalidArgument>
+      <code><![CDATA[$arguments['cancellation'] ?? null]]></code>
+      <code><![CDATA[$arguments['cancellation'] ?? null]]></code>
       <code><![CDATA[$arguments['id']]]></code>
       <code><![CDATA[$arguments['id']]]></code>
       <code>$value</code>
