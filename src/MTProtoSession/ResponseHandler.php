@@ -439,7 +439,8 @@ trait ResponseHandler
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
-                    EventLoop::delay((float) $seconds, fn () => $this->methodRecall($msgId));
+                    $id = EventLoop::delay((float) $seconds, fn () => $this->methodRecall($msgId));
+                    $request->cancellation?->subscribe(fn () => EventLoop::cancel($id));
                     return null;
                 }
                 if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {

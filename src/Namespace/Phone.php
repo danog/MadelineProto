@@ -14,11 +14,10 @@ interface Phone
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return mixed Any JSON-encodable data
      */
-    public function getCallConfig(?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): mixed;
+    public function getCallConfig(?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): mixed;
 
     /**
      * Optional: notify the server that the user is currently busy in a call: this will automatically refuse all incoming phone calls until the current phone call is ended.
@@ -26,10 +25,9 @@ interface Phone
      * @param array{_: 'inputPhoneCall', id?: int, access_hash?: int} $peer The phone call we're currently in @see https://docs.madelineproto.xyz/API_docs/types/InputPhoneCall.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function receivedCall(array $peer, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function receivedCall(array $peer, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Rate a call, returns info about the rating message sent to the official VoIP bot.
@@ -40,11 +38,10 @@ interface Phone
      * @param string $comment An additional comment
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function setCallRating(array $peer, bool|null $user_initiative = false, int|null $rating = 0, string|null $comment = '', ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function setCallRating(array $peer, bool|null $user_initiative = false, int|null $rating = 0, string|null $comment = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Send phone call debug data to server.
@@ -53,10 +50,9 @@ interface Phone
      * @param mixed $debug Any JSON-encodable data
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function saveCallDebug(array $peer, mixed $debug, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function saveCallDebug(array $peer, mixed $debug, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Send VoIP signaling data.
@@ -65,10 +61,9 @@ interface Phone
      * @param string $data Signaling payload
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function sendSignalingData(array $peer, string|null $data = '', ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function sendSignalingData(array $peer, string|null $data = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Create a group call or livestream.
@@ -79,11 +74,10 @@ interface Phone
      * @param int $schedule_date For scheduled group call or livestreams, the absolute date when the group call will start
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function createGroupCall(bool|null $rtmp_stream = false, array|int|string|null $peer = null, string|null $title = '', int|null $schedule_date = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function createGroupCall(bool|null $rtmp_stream = false, array|int|string|null $peer = null, string|null $title = '', int|null $schedule_date = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Join a group call.
@@ -96,11 +90,10 @@ interface Phone
      * @param string $invite_hash The invitation hash from the [invite link »](https://core.telegram.org/api/links#video-chat-livestream-links), if provided allows speaking in a livestream or muted group chat.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinGroupCall(array $call, mixed $params, bool|null $muted = false, bool|null $video_stopped = false, array|int|string|null $join_as = null, string|null $invite_hash = '', ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function joinGroupCall(array $call, mixed $params, bool|null $muted = false, bool|null $video_stopped = false, array|int|string|null $join_as = null, string|null $invite_hash = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Leave a group call.
@@ -109,11 +102,10 @@ interface Phone
      * @param int $source Your source ID
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function leaveGroupCall(array $call, int|null $source = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function leaveGroupCall(array $call, int|null $source = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Invite a set of users to a group call.
@@ -122,11 +114,10 @@ interface Phone
      * @param list<array|int|string>|array<never, never> $users Array of The users to invite. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function inviteToGroupCall(array $call, array $users = [], ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function inviteToGroupCall(array $call, array $users = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Terminate a group call.
@@ -134,11 +125,10 @@ interface Phone
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call to terminate @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function discardGroupCall(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function discardGroupCall(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Change group call settings.
@@ -148,11 +138,10 @@ interface Phone
      * @param bool $join_muted Whether all users will that join this group call are muted by default upon joining the group call
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function toggleGroupCallSettings(array $call, bool|null $reset_invite_hash = false, bool|null $join_muted = false, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function toggleGroupCallSettings(array $call, bool|null $reset_invite_hash = false, bool|null $join_muted = false, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get info about a group call.
@@ -161,11 +150,10 @@ interface Phone
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCall', call: array{_: 'groupCallDiscarded', id: int, access_hash: int, duration: int}|array{_: 'groupCall', join_muted: bool, can_change_join_muted: bool, join_date_asc: bool, schedule_start_subscribed: bool, can_start_video: bool, record_video_active: bool, rtmp_stream: bool, listeners_hidden: bool, id: int, access_hash: int, participants_count: int, title: string, stream_dc_id: int, record_start_date: int, schedule_date: int, unmuted_video_count: int, unmuted_video_limit: int, version: int}, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date: int, source: int, volume: int, about: string, raise_hand_rating: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}}>, participants_next_offset: string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCall.html
      */
-    public function getGroupCall(array $call, int|null $limit = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getGroupCall(array $call, int|null $limit = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get group call participants.
@@ -177,11 +165,10 @@ interface Phone
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupParticipants', count: int, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date: int, source: int, volume: int, about: string, raise_hand_rating: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source: int}}>, next_offset: string, chats: list<array|int|string>, users: list<array|int|string>, version: int} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupParticipants.html
      */
-    public function getGroupParticipants(array $call, array $ids = [], array $sources = [], string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getGroupParticipants(array $call, array $ids = [], array $sources = [], string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.
@@ -191,11 +178,10 @@ interface Phone
      * @param list<int>|array<never, never> $sources Source IDs
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<int>
      */
-    public function checkGroupCall(array $call, array $sources = [], ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function checkGroupCall(array $call, array $sources = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array|null;
 
     /**
      * Start or stop recording a group call: the recorded audio and video streams will be automatically sent to `Saved messages` (the chat with ourselves).
@@ -207,11 +193,10 @@ interface Phone
      * @param bool $video_portrait If video stream recording is enabled, whether to record in portrait or landscape mode
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function toggleGroupCallRecord(array $call, bool|null $start = false, bool|null $video = false, string|null $title = '', bool|null $video_portrait = false, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function toggleGroupCallRecord(array $call, bool|null $start = false, bool|null $video = false, string|null $title = '', bool|null $video_portrait = false, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Edit information about a given group call participant.
@@ -232,11 +217,10 @@ interface Phone
      * @param bool $presentation_paused Pause or resume the screen sharing stream
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function editGroupCallParticipant(array $call, array|int|string|null $participant = null, bool|null $muted = false, int|null $volume = 0, bool|null $raise_hand = false, bool|null $video_stopped = false, bool|null $video_paused = false, bool|null $presentation_paused = false, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function editGroupCallParticipant(array $call, array|int|string|null $participant = null, bool|null $muted = false, int|null $volume = 0, bool|null $raise_hand = false, bool|null $video_stopped = false, bool|null $video_paused = false, bool|null $presentation_paused = false, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Edit the title of a group call or livestream.
@@ -245,11 +229,10 @@ interface Phone
      * @param string $title New title
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function editGroupCallTitle(array $call, string|null $title = '', ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function editGroupCallTitle(array $call, string|null $title = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get a list of peers that can be used to join a group call, presenting yourself as a specific user/channel.
@@ -257,11 +240,10 @@ interface Phone
      * @param array|int|string $peer The dialog whose group call or livestream we're trying to join @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.joinAsPeers', peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.JoinAsPeers.html
      */
-    public function getGroupCallJoinAs(array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getGroupCallJoinAs(array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get an [invite link](https://core.telegram.org/api/links#video-chat-livestream-links) for a group call or livestream.
@@ -270,11 +252,10 @@ interface Phone
      * @param bool $can_self_unmute For livestreams or muted group chats, if set, users that join using this link will be able to speak without explicitly requesting permission by (for example by raising their hand).
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.exportedGroupCallInvite', link: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.ExportedGroupCallInvite.html
      */
-    public function exportGroupCallInvite(array $call, bool|null $can_self_unmute = false, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function exportGroupCallInvite(array $call, bool|null $can_self_unmute = false, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Subscribe or unsubscribe to a scheduled group call.
@@ -283,11 +264,10 @@ interface Phone
      * @param bool $subscribed Enable or disable subscription
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function toggleGroupCallStartSubscription(array $call, bool $subscribed, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function toggleGroupCallStartSubscription(array $call, bool $subscribed, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Start a scheduled group call.
@@ -295,11 +275,10 @@ interface Phone
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The scheduled group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function startScheduledGroupCall(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function startScheduledGroupCall(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Set the default peer that will be used to join a group call in a specific dialog.
@@ -308,10 +287,9 @@ interface Phone
      * @param array|int|string $join_as The default peer that will be used to join group calls in this dialog, presenting yourself as a specific user/channel. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function saveDefaultGroupCallJoinAs(array|int|string|null $peer = null, array|int|string|null $join_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function saveDefaultGroupCallJoinAs(array|int|string|null $peer = null, array|int|string|null $join_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Start screen sharing in a call.
@@ -320,11 +298,10 @@ interface Phone
      * @param mixed $params Any JSON-encodable data
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function joinGroupCallPresentation(array $call, mixed $params, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function joinGroupCallPresentation(array $call, mixed $params, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Stop screen sharing in a group call.
@@ -332,11 +309,10 @@ interface Phone
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call The group call @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function leaveGroupCallPresentation(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function leaveGroupCallPresentation(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get info about RTMP streams in a group call or livestream.
@@ -346,11 +322,10 @@ interface Phone
      * @param array{_: 'inputGroupCall', id?: int, access_hash?: int} $call Group call or livestream @see https://docs.madelineproto.xyz/API_docs/types/InputGroupCall.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCallStreamChannels', channels: list<array{_: 'groupCallStreamChannel', channel: int, scale: int, last_timestamp_ms: int}>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStreamChannels.html
      */
-    public function getGroupCallStreamChannels(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getGroupCallStreamChannels(array $call, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get RTMP URL and stream key for RTMP livestreams. Can be used even before creating the actual RTMP livestream with [phone.createGroupCall](https://docs.madelineproto.xyz/API_docs/methods/phone.createGroupCall.html) (the `rtmp_stream` flag must be set).
@@ -359,11 +334,10 @@ interface Phone
      * @param array|int|string $peer Peer to livestream into @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCallStreamRtmpUrl', url: string, key: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStreamRtmpUrl.html
      */
-    public function getGroupCallStreamRtmpUrl(bool $revoke, array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getGroupCallStreamRtmpUrl(bool $revoke, array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Save phone call debug information.
@@ -372,8 +346,7 @@ interface Phone
      * @param mixed $file A file name or a file URL. You can also use amphp async streams, amphp HTTP response objects, and [much more](https://docs.madelineproto.xyz/docs/FILES.html#downloading-files)!
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
-     * @param ?string $queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function saveCallLog(array $peer, mixed $file, ?int $floodWaitLimit = null, bool $postpone = false, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function saveCallLog(array $peer, mixed $file, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 }

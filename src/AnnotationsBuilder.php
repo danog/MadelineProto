@@ -365,8 +365,6 @@ final class Blacklist {
         $signature []= "?int \$floodWaitLimit = null";
         $contents .= "     * @param bool \$postpone If true, will postpone execution of this method until the first method call with \$postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \\Amp\\async.\n";
         $signature []= "bool \$postpone = false";
-        $contents .= "     * @param ?string \$queueId Usually, concurrent method calls are executed in arbitrary order: with this option, strict ordering for requests **to the same chat/datacenter** can be enforced by specifying the same queue ID for all methods that require strictly ordered execution.\n";
-        $signature []= "?string \$queueId = null";
         $contents .= "     * @param ?\\Amp\\Cancellation \$cancellation Cancellation\n";
         $signature []= "?\\Amp\\Cancellation \$cancellation = null";
         return [$contents, $signature];

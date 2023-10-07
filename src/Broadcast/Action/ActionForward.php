@@ -43,6 +43,7 @@ final class ActionForward implements Action
                     'id' => $this->ids,
                     'drop_author' => $this->drop_author,
                     'floodWaitLimit' => 2*86400,
+                    'cancellation' => $cancellation,
                 ],
             );
             if ($this->pin) {
@@ -61,7 +62,8 @@ final class ActionForward implements Action
                             'id' => $id,
                             'unpin' => false,
                             'pm_oneside' => false,
-                            'floodWaitLimit' => 2*86400
+                            'floodWaitLimit' => 2*86400,
+                            'cancellation' => $cancellation
                         ],
                     );
                 } catch (RPCErrorException) {

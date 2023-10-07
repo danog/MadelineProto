@@ -44,14 +44,14 @@ final class ActionSend implements Action
                         $message['media']['_'] !== 'messageMediaWebPage'
                         ? 'messages.sendMedia'
                         : 'messages.sendMessage',
-                    array_merge($message, ['peer' => $peer, 'floodWaitLimit' => 2*86400]),
+                    array_merge($message, ['peer' => $peer, 'floodWaitLimit' => 2*86400, 'cancellation' => $cancellation]),
                 ));
             }
             if ($this->pin) {
                 try {
                     $this->API->methodCallAsyncRead(
                         'messages.updatePinnedMessage',
-                        ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false, 'floodWaitLimit' => 2*86400],
+                        ['peer' => $peer, 'id' => $id, 'unpin' => false, 'pm_oneside' => false, 'floodWaitLimit' => 2*86400, 'cancellation' => $cancellation],
                     );
                 } catch (RPCErrorException) {
                 }
