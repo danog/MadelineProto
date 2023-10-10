@@ -157,6 +157,7 @@ class MyEventHandler extends SimpleEventHandler
         }
 
         $this->stories->sendStory(
+            peer: 'me',
             media: $media,
             caption: "This story was posted using [MadelineProto](https://t.me/MadelineProto)!",
             parse_mode: ParseMode::MARKDOWN,
