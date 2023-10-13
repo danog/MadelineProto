@@ -31,6 +31,6 @@ final class DeleteScheduledMessages extends Delete
     public function __construct(MTProto $API, array $rawDelete)
     {
         parent::__construct($API, $rawDelete);
-        $this->chatId = $API->getIdInternal($rawDelete['Peer']);
+        $this->chatId = $API->getIdInternal($rawDelete['peer']);
     }
 }
