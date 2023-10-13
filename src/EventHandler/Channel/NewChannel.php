@@ -14,31 +14,24 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Channel;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * Represents the view counter of a message in a channel has changed.
+ * A new channel is available.
  */
-final class ChannelMessageViews extends Update
+final class NewChannel extends Update
 {
     /** Channel ID */
     public readonly int $chatId;
 
-    /** ID of the message */
-    public readonly int $id;
-
-    /** New view counter */
-    public readonly int $views;
-
     /** @internal */
-    public function __construct(MTProto $API, array $rawDelete)
+    public function __construct(MTProto $API, array $rawMessageViews)
     {
         parent::__construct($API);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawDelete['channel_id']);
-        $this->id = $rawDelete['id'];
-        $this->views = $rawDelete['views'];
+        $this->chatId = DialogId::fromSupergroupOrChannel($rawMessageViews['channel_id']);
     }
 }
