@@ -27,8 +27,17 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Channel\NewChannel;
+use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
+use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
+use danog\MadelineProto\EventHandler\ChatInviteRequester\PendingJoinRequests;
+use danog\MadelineProto\EventHandler\Delete\DeleteChannelMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteScheduledMessages;
 use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Channel\MessageForwards;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
@@ -66,6 +75,8 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Pinned\PinnedChannelMessages;
+use danog\MadelineProto\EventHandler\Pinned\PinnedMessages;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -405,6 +416,17 @@ trait UpdateHandler
                 'updateUserTyping' => new UserTyping($this, $update),
                 'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
                 'updateChatUserTyping' => new ChatUserTyping($this, $update),
+                'updateChannel' => new NewChannel($this, $update),
+                'updateChannelMessageViews' => new MessageViewsChanged($this, $update),
+                'updateChannelMessageForwards' => new MessageForwards($this, $update),
+                'updateDeleteMessages' => new DeleteMessages($this, $update),
+                'updateDeleteChannelMessages' => new DeleteChannelMessages($this, $update),
+                'updateDeleteScheduledMessages' => new DeleteScheduledMessages($this, $update),
+                'updatePendingJoinRequests' => new PendingJoinRequests($this, $update),
+                'updateBotChatInviteRequester' => new BotChatInviteRequest($this, $update),
+                'updatePinnedMessages' => new PinnedMessages($this, $update),
+                'updatePinnedChannelMessages' => new PinnedChannelMessages($this, $update),
+                'updateBotCommands' => new BotCommands($this, $update),
                 default => null
             };
         } catch (\Throwable $e) {
