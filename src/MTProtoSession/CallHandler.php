@@ -109,7 +109,7 @@ trait CallHandler
     {
         $cancellation = $args['cancellation'] ?? null;
         $cancellation?->throwIfRequested();
-        if (isset($args['id']) && is_array($args['id']) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
+        if (isset($args['id']) && \is_array($args['id']) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             return $this->API->methodCallAsyncWrite($method, $args, $args['id']['dc_id']);
         }
         $file = \in_array($method, ['upload.saveFilePart', 'upload.saveBigFilePart', 'upload.getFile', 'upload.getCdnFile'], true);

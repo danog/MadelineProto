@@ -48,7 +48,9 @@ final class Progress extends Update implements JsonSerializable
         public readonly int $failCount,
     ) {
         parent::__construct($API);
-        $this->percent = $pendingCount ? (int) (($successCount+$failCount)*100/$pendingCount) : 0;
+        $this->percent = $status === Status::FINISHED
+            ? 100
+            : ($pendingCount ? (int) (($successCount+$failCount)*100/$pendingCount) : 0);
     }
     public function __toString(): string
     {
