@@ -32,11 +32,15 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
 
     /**
      * Maximum connection limit.
+     *
+     * @var positive-int
      */
     protected int $maxConnections = 100;
 
     /**
      * Idle timeout.
+     *
+     * @var positive-int
      */
     protected int $idleTimeout = 60;
 
@@ -47,6 +51,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
 
     /**
      * Get maximum connection limit.
+     *
+     * @return positive-int
      */
     public function getMaxConnections(): int
     {
@@ -56,7 +62,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
     /**
      * Set maximum connection limit.
      *
-     * @param int $maxConnections Maximum connection limit.
+     * @param positive-int $maxConnections Maximum connection limit.
      */
     public function setMaxConnections(int $maxConnections): static
     {
@@ -67,6 +73,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
 
     /**
      * Get idle timeout.
+     *
+     * @return positive-int
      */
     public function getIdleTimeout(): int
     {
@@ -76,7 +84,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
     /**
      * Set idle timeout.
      *
-     * @param int $idleTimeout Idle timeout.
+     * @param positive-int $idleTimeout Idle timeout.
      */
     public function setIdleTimeout(int $idleTimeout): static
     {

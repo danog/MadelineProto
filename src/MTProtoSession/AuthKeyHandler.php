@@ -370,6 +370,7 @@ trait AuthKeyHandler
                             $this->API->logger('Diffie Hellman key exchange processed successfully!', Logger::VERBOSE);
                             $key = $expires_in < 0 ? new PermAuthKey() : new TempAuthKey();
                             if ($expires_in >= 0) {
+                                \assert($key instanceof TempAuthKey);
                                 $key->expires(time() + $expires_in);
                             }
                             $key->setServerSalt(substr($new_nonce, 0, 8) ^ substr($server_nonce, 0, 8));
