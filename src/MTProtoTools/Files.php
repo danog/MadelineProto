@@ -1100,7 +1100,6 @@ trait Files
         $cdn = false;
         $params[0]['previous_promise'] = true;
         $start = microtime(true);
-        $old_dc = null;
         $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = array_shift($params), $callable, $seekable, $cancellation);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
@@ -1203,7 +1202,6 @@ trait Files
                 $messageMedia['file_token'] = $res['file_token'];
                 $messageMedia['cdn_key'] = $res['encryption_key'];
                 $messageMedia['cdn_iv'] = $res['encryption_iv'];
-                $old_dc = $datacenter;
                 $datacenter = ($this->isTestMode() ? 10_000 : 0) + $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
@@ -1216,7 +1214,7 @@ trait Files
                 $this->config['expires'] = 0;
                 $this->getConfig();
                 try {
-                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $datacenter));
+                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $this->authorized_dc));
                 } catch (RPCErrorException $e) {
                     switch ($e->rpc) {
                         case 'FILE_TOKEN_INVALID':
@@ -1250,7 +1248,7 @@ trait Files
             if (isset($messageMedia['cdn_key'])) {
                 $ivec = substr($messageMedia['cdn_iv'], 0, 12).pack('N', $offset['offset'] >> 4);
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
-                $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $old_dc, $cancellation);
+                $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $cancellation);
             }
             if (isset($messageMedia['key'])) {
                 $res['bytes'] = $ige->decrypt($res['bytes']);
@@ -1281,11 +1279,11 @@ trait Files
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
-    private function checkCdnHash(string $file, int $offset, string $data, int &$datacenter, ?Cancellation $cancellation): void
+    private function checkCdnHash(string $file, int $offset, string $data, ?Cancellation $cancellation): void
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $datacenter));
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $this->authorized_dc));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);
