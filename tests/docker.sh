@@ -11,7 +11,7 @@ if ping -c 1 192.168.69.206; then
 fi
 
 has_x86=0
-for f in 192.168.1.30 192.168.69.236 192.168.69.207; do
+for f in 192.168.1.30 192.168.69.236 192.168.69.207 192.168.69.130; do
 	if ping -c 1 $f; then
 		docker buildx create --append --name wp --driver remote tcp://$f:1234
 		has_x86=1
