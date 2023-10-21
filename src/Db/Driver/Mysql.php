@@ -74,7 +74,7 @@ final class Mysql
                     );
                 }
 
-                assert($config instanceof MysqlConfig);
+                \assert($config instanceof MysqlConfig);
                 self::$connections[$dbKey] = [
                     new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
                     $pdo
