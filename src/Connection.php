@@ -411,7 +411,7 @@ final class Connection
                     $arguments['peer'] = 'me';
                 }
             }
-            if (\is_array($arguments['media']) && isset($arguments['media']['_'])) {
+            if (isset($arguments['media']) && \is_array($arguments['media']) && isset($arguments['media']['_'])) {
                 $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null);
                 if ($arguments['media']['_'] === 'inputMediaUploadedPhoto'
                     && (
