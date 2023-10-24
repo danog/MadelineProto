@@ -529,8 +529,8 @@ final class Connection
                 'reply_to_msg_id' => $arguments['reply_to_msg_id'],
                 'top_msg_id' => $arguments['top_msg_id'] ?? null
             ];
-            unset($arguments['reply_to_msg_id']);
-            unset($arguments['top_msg_id']);
+            unset($arguments['reply_to_msg_id'], $arguments['top_msg_id']);
+
         }
     }
     /**
