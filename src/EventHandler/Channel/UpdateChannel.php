@@ -21,9 +21,9 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * A new channel is available.
+ * A new channel is available, or info about an existing channel was changed.
  */
-final class NewChannel extends Update
+final class UpdateChannel extends Update
 {
     /** Channel ID */
     public readonly int $chatId;
