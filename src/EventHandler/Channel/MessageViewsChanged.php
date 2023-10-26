@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * Represents the view counter of a message in a channel has changed.
+ * Indicates that the view counter of a message in a channel has changed.
  */
 final class MessageViewsChanged extends Update
 {
