@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\ChatInviteRequester;
 
 /**
- * Represents Someone has requested to join a chat or channel (bots only).
+ * Indicates someone has requested to join a chat or channel (bots only).
  */
 final class BotChatInviteRequest extends ChatInviteRequester
 {
