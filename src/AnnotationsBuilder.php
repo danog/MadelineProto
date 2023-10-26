@@ -336,6 +336,14 @@ final class Blacklist {
         $contents = '';
         $signature = [];
         foreach ($params as $name => $param) {
+            if ($name === 'reply_to') {
+                $param['pow'] = true;
+                $contents .= "     * @param int \$reply_to_msg_id ID Of message to reply to\n";
+                $signature []= "int \$reply_to_msg_id = 0";
+                $contents .= "     * @param int \$top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the \"General\" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1). \n";
+                $signature []= "int \$top_msg_id = 0";
+            }
+
             $description = $this->prepareTLTypeDescription($param['type'], $param['description']);
             $psalmType = $this->prepareTLPsalmType($param['type'], true);
             $type = $this->prepareTLType($param['type'], isset($param['pow']));
@@ -353,12 +361,6 @@ final class Blacklist {
             if ($name === 'entities') {
                 $contents .= "     * @param \\danog\\MadelineProto\\ParseMode \$parse_mode Whether to parse HTML or Markdown markup in the message\n";
                 $signature []= "\\danog\\MadelineProto\\ParseMode \$parse_mode = \\danog\\MadelineProto\\ParseMode::TEXT";
-            }
-            if ($name === 'reply_to') {
-                $contents .= "     * @param int \$reply_to_msg_id ID Of message to reply to\n";
-                $signature []= "int \$reply_to_msg_id = 0";
-                $contents .= "     * @param int \$top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the \"General\" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1). \n";
-                $signature []= "int \$top_msg_id = 0";
             }
         }
         $contents .= "     * @param ?int \$floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self\n";

@@ -122,9 +122,9 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array|int|string $peer The destination where the message will be sent @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param string $message The message
      * @param array $reply_markup Reply markup for sending bot buttons @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
      * @param list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>|array<never, never> $entities Array of Message [entities](https://core.telegram.org/api/entities) for sending styled text @see https://docs.madelineproto.xyz/API_docs/types/MessageEntity.html
@@ -136,7 +136,7 @@ interface Messages
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMessage(bool|null $no_webpage = false, bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, string|null $message = '', array|null $reply_markup = null, array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMessage(bool|null $no_webpage = false, bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, string|null $message = '', array|null $reply_markup = null, array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Send a media.
@@ -147,9 +147,9 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array|int|string $peer Destination @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param \danog\MadelineProto\EventHandler\Media|string|array $media Attached media @see https://docs.madelineproto.xyz/API_docs/types/InputMedia.html
      * @param string $message Caption
      * @param array $reply_markup Reply markup for bot keyboards @see https://docs.madelineproto.xyz/API_docs/types/ReplyMarkup.html
@@ -162,7 +162,7 @@ interface Messages
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMedia(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, string|null $message = '', array|null $reply_markup = null, array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMedia(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, string|null $message = '', array|null $reply_markup = null, array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Forwards messages by their IDs.
@@ -642,9 +642,9 @@ interface Messages
      * @param bool $clear_draft Whether to clear the [draft](https://core.telegram.org/api/drafts)
      * @param bool $hide_via Whether to hide the `via @botname` in the resulting message (only for bot usernames encountered in the [config](https://docs.madelineproto.xyz/API_docs/constructors/config.html))
      * @param array|int|string $peer Destination @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $query_id Query ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param string $id Result ID from [messages.getInlineBotResults](https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html)
      * @param int $schedule_date Scheduled message date for scheduled messages
@@ -654,7 +654,7 @@ interface Messages
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendInlineBotResult(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $hide_via = false, array|int|string|null $peer = null, array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, int|null $query_id = 0, string|null $id = '', int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendInlineBotResult(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $hide_via = false, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, int|null $query_id = 0, string|null $id = '', int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Find out if a media message's caption can be edited.
@@ -1015,16 +1015,16 @@ interface Messages
     /**
      * Notify the other user in a private chat that a screenshot of the chat was taken.
      *
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param array|int|string $peer Other user @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendScreenshotNotification(array $reply_to, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendScreenshotNotification(int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get faved stickers.
@@ -1099,9 +1099,9 @@ interface Messages
      * @param bool $noforwards Only for bots, disallows forwarding and saving of the messages, even if the destination chat doesn't have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param bool $update_stickersets_order Whether to move used stickersets to top, [see here for more info on this flag »](https://core.telegram.org/api/stickers#recent-stickersets)
      * @param array|int|string $peer The destination chat @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param list<array{_: 'inputSingleMedia', media?: \danog\MadelineProto\EventHandler\Media|string|array, message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}>}>|array<never, never> $multi_media Array of The medias to send @see https://docs.madelineproto.xyz/API_docs/types/InputSingleMedia.html
      * @param int $schedule_date Scheduled message date for scheduled messages
      * @param array|int|string $send_as Send this message as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
@@ -1110,7 +1110,7 @@ interface Messages
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMultiMedia(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array $multi_media = [], int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMultiMedia(bool|null $silent = false, bool|null $background = false, bool|null $clear_draft = false, bool|null $noforwards = false, bool|null $update_stickersets_order = false, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array $multi_media = [], int|null $schedule_date = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Upload encrypted file and associate it to a secret chat.
@@ -2014,16 +2014,16 @@ interface Messages
      * @param string $start_param If the web app was opened from the attachment menu using a [attachment menu deep link](https://core.telegram.org/api/links#bot-attachment-menu-links), `start_param` should contain the `data` from the `startattach` parameter.
      * @param mixed $theme_params Any JSON-encodable data
      * @param string $platform Short name of the application; 0-64 English letters, digits, and underscores
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param array|int|string $send_as Open the web app as the specified peer, sending the resulting the message as the specified peer. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'webViewResultUrl', query_id: int, url: string} @see https://docs.madelineproto.xyz/API_docs/types/WebViewResult.html
      */
-    public function requestWebView(bool|null $from_bot_menu = false, bool|null $silent = false, array|int|string|null $peer = null, array|int|string|null $bot = null, string|null $url = '', string|null $start_param = '', mixed $theme_params = null, string|null $platform = '', array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+    public function requestWebView(bool|null $from_bot_menu = false, bool|null $silent = false, array|int|string|null $peer = null, array|int|string|null $bot = null, string|null $url = '', string|null $start_param = '', mixed $theme_params = null, string|null $platform = '', int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Indicate to the server (from the user side) that the user is still using a web app.
@@ -2034,15 +2034,15 @@ interface Messages
      * @param array|int|string $peer Dialog where the web app was opened. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param array|int|string $bot Bot that owns the [web app](https://core.telegram.org/api/bots/webapps) @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param int $query_id Web app interaction ID obtained from [messages.requestWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html)
-     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param int $reply_to_msg_id ID Of message to reply to
      * @param int $top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the "General" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1).
+     * @param array{_: 'inputReplyToMessage', reply_to_msg_id?: int, top_msg_id?: int}|array{_: 'inputReplyToStory', user_id?: array|int|string, story_id?: int} $reply_to @see https://docs.madelineproto.xyz/API_docs/types/InputReplyTo.html
      * @param array|int|string $send_as Open the web app as the specified peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function prolongWebView(bool|null $silent = false, array|int|string|null $peer = null, array|int|string|null $bot = null, int|null $query_id = 0, array|null $reply_to = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
+    public function prolongWebView(bool|null $silent = false, array|int|string|null $peer = null, array|int|string|null $bot = null, int|null $query_id = 0, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Open a [bot web app](https://core.telegram.org/api/bots/webapps).
