@@ -197,6 +197,12 @@ foreach ($orderedfiles as $key => $filename) {
             );
             $result = array_filter($result, fn (string $class) => (new ReflectionClass($class))->getAttributes());
             $data = printTypes($result, $match);
+        } elseif ($match === "plugins") {
+            $result = ClassFinder::getClassesInNamespace(
+                \danog\MadelineProto\EventHandler\Plugin::class,
+                ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
+            );
+            $data = printTypes($result, $match);
         } elseif ($match === "mtprotofilters") {
             $data = " * onUpdateCustomEvent: Receives messages sent to the event handler from an API instance using the [`sendCustomEvent` &raquo;](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendcustomevent-mixed-payload-void) method.\n";
             $data .= " * onAny: Catch-all filter, if defined catches all updates that aren't catched by any other filter.\n";

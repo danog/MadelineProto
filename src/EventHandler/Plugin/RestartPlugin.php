@@ -22,10 +22,11 @@ use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\PluginEventHandler;
 
-/** 
+/**
  * Plugin that offers a /restart command to admins that can be used to restart the bot, applying changes.
  */
-final class RestartPlugin extends PluginEventHandler {
+final class RestartPlugin extends PluginEventHandler
+{
     #[FilterCommand('restart')]
     public function cmd(Incoming&Message&FromAdmin $_): void
     {

@@ -26,5 +26,10 @@
         <StringIncrement errorLevel="suppress" />
         <InvalidTraversableImplementation errorLevel="suppress" />
         <RedundantPropertyInitializationCheck errorLevel="suppress" />
+        <MissingConstructor>
+            <errorLevel type="suppress">
+            <file name="src/InternalDoc.php" />
+            </errorLevel>
+        </MissingConstructor>
     </issueHandlers>
 </psalm>
