@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * Represents messages s were pinned/unpinned.
@@ -29,11 +30,17 @@ abstract class Pinned extends Update
     /** @var list<int> List of identifiers of pinned messages. */
     public readonly array $ids;
 
+    /** ID of the chat where the messages were pinned. */
+    public readonly int $chatId;
+
     /** @internal */
     public function __construct(MTProto $API, array $rawPinned)
     {
         parent::__construct($API);
         $this->pinned = $rawPinned['pinned'];
         $this->ids = $rawPinned['messages'];
+        $this->chatId = isset($rawPinned['channel_id'])
+            ? DialogId::fromSupergroupOrChannel($rawPinned['channel_id'])
+            : $API->getIdInternal($rawPinned['peer']);
     }
 }

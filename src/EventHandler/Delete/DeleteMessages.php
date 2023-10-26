@@ -20,7 +20,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Delete;
 
 /**
- * Messages were deleted.
+ * Some messages were deleted in a private chat or simple group
  */
 final class DeleteMessages extends Delete
 {

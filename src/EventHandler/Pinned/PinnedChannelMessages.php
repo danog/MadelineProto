@@ -25,13 +25,9 @@ use danog\MadelineProto\MTProtoTools\DialogId;
  */
 final class PinnedChannelMessages extends Pinned
 {
-    /** Channel ID. */
-    public readonly int $chatId;
-
     /** @internal */
     public function __construct(MTProto $API, array $rawPinned)
     {
         parent::__construct($API, $rawPinned);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawPinned['channel_id']);
     }
 }

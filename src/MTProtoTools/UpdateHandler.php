@@ -76,7 +76,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
 use danog\MadelineProto\EventHandler\Pinned\PinnedChannelMessages;
-use danog\MadelineProto\EventHandler\Pinned\PinnedMessages;
+use danog\MadelineProto\EventHandler\Pinned\PinnedPrivateMessages;
 use danog\MadelineProto\EventHandler\Privacy;
 use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
@@ -424,7 +424,7 @@ trait UpdateHandler
                 'updateDeleteScheduledMessages' => new DeleteScheduledMessages($this, $update),
                 'updatePendingJoinRequests' => new PendingJoinRequests($this, $update),
                 'updateBotChatInviteRequester' => new BotChatInviteRequest($this, $update),
-                'updatePinnedMessages' => new PinnedMessages($this, $update),
+                'updatePinnedMessages' => new PinnedPrivateMessages($this, $update),
                 'updatePinnedChannelMessages' => new PinnedChannelMessages($this, $update),
                 'updateBotCommands' => new BotCommands($this, $update),
                 default => null

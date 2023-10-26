@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents messages that deleted.
+ * Indicates that some messages were deleted.
  */
 abstract class Delete extends Update
 {
