@@ -21,7 +21,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * Represents the forward counter of a message in a channel has changed.
+ * Indicates that the forward counter of a message in a channel has changed.
  */
 final class MessageForwards extends Update
 {
