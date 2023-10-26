@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents someone has requested to join a chat or channel.
+ * Indicates someone has requested to join a chat or channel.
  */
 abstract class ChatInviteRequester extends Update
 {
