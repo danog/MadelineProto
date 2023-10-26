@@ -372,6 +372,10 @@ abstract class EventHandler extends AbstractAPI
         }
 
         self::$pluginCache[$class] = $plugins;
+
+        foreach ($plugins as $plugin) {
+            self::cachePlugins($plugin);
+        }
     }
 
     private static array $checkedPaths = [];
