@@ -58,7 +58,7 @@
         "webmozart/assert": "^1.11",
         "bacon/bacon-qr-code": "^2.0",
         "nikic/php-parser": "^4.16",
-        "revolt/event-loop": "^1.0.3"
+        "revolt/event-loop": "^1.0.4"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "dev-master",

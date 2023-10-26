@@ -411,7 +411,7 @@ final class Connection
                     $arguments['peer'] = 'me';
                 }
             }
-            if (\is_array($arguments['media']) && isset($arguments['media']['_'])) {
+            if (isset($arguments['media']) && \is_array($arguments['media']) && isset($arguments['media']['_'])) {
                 $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null);
                 if ($arguments['media']['_'] === 'inputMediaUploadedPhoto'
                     && (
@@ -529,6 +529,7 @@ final class Connection
                 'reply_to_msg_id' => $arguments['reply_to_msg_id'],
                 'top_msg_id' => $arguments['top_msg_id'] ?? null
             ];
+            unset($arguments['reply_to_msg_id'], $arguments['top_msg_id']);
         }
     }
     /**

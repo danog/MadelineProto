@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@1b12255fb19da5c25413fb0071ab3d1f006bb67b">
+<files psalm-version="dev-master@75fcfe3540e378856b49cf60c8d9cfb1cdc434f2">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -210,10 +210,7 @@
   <file src="src/Db/Driver/Mysql.php">
     <ArgumentTypeCoercion>
       <code>$config</code>
-      <code>$config</code>
       <code><![CDATA[$config->withDatabase(null)]]></code>
-      <code><![CDATA[$settings->getIdleTimeout()]]></code>
-      <code><![CDATA[$settings->getMaxConnections()]]></code>
     </ArgumentTypeCoercion>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$connection->query("SHOW VARIABLES LIKE 'max_connections'")->fetchRow()['Value']]]></code>
@@ -1347,6 +1344,10 @@
       <code>\is_int($dc_id)</code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
+    <UndefinedFunction>
+      <code>memprof_dump_pprof($file)</code>
+      <code>memprof_enabled()</code>
+    </UndefinedFunction>
     <UndefinedThisPropertyFetch>
       <code><![CDATA[$this->full_chats]]></code>
     </UndefinedThisPropertyFetch>
@@ -1385,11 +1386,6 @@
       <code><![CDATA[$this->ack_queue]]></code>
       <code><![CDATA[$this->new_outgoing]]></code>
     </PossiblyNullArrayOffset>
-  </file>
-  <file src="src/MTProtoSession/AuthKeyHandler.php">
-    <PossiblyUndefinedMethod>
-      <code>expires</code>
-    </PossiblyUndefinedMethod>
   </file>
   <file src="src/MTProtoSession/CallHandler.php">
     <MissingClosureReturnType>

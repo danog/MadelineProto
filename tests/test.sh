@@ -16,6 +16,8 @@ mv MadelineProtoDocs-master/ docs
 git submodule init schemas
 git submodule update schemas
 
+export COMPOSER_PROCESS_TIMEOUT=10000
+
 composer update
 composer build
 

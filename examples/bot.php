@@ -30,6 +30,7 @@ use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Filter\FilterTextCaseInsensitive;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Plugin\RestartPlugin;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
@@ -101,6 +102,17 @@ class MyEventHandler extends SimpleEventHandler
         $this->logger($this->getFullInfo('MadelineProto'));
 
         $this->sendMessageToAdmins("The bot was started!");
+    }
+
+    /**
+     * Returns a set of plugins to activate.
+     */
+    public static function getPlugins(): array
+    {
+        return [
+            // Offers a /restart command to admins that can be used to restart the bot, applying changes.
+            RestartPlugin::class
+        ];
     }
 
     /**
