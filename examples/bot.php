@@ -111,6 +111,7 @@ class MyEventHandler extends SimpleEventHandler
     {
         return [
             // Offers a /restart command to admins that can be used to restart the bot, applying changes.
+            // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
             RestartPlugin::class
         ];
     }
@@ -140,16 +141,6 @@ class MyEventHandler extends SimpleEventHandler
                 parseMode: ParseMode::MARKDOWN
             );
         }
-    }
-
-    /**
-     * If the message is a /restart command from an admin, restart to reload changes to the event handler code.
-     */
-    #[FilterCommand('restart')]
-    public function restartCommand(Incoming & Message & FromAdmin $message): void
-    {
-        // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
-        $this->restart();
     }
 
     /**

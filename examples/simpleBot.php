@@ -46,6 +46,7 @@ class MyEventHandler extends SimpleEventHandler
     {
         return [
             // Offers a /restart command to admins that can be used to restart the bot, applying changes.
+            // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
             RestartPlugin::class
         ];
     }
