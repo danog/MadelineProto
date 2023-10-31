@@ -53,7 +53,7 @@ abstract class AuthKey implements JsonSerializable
     public function __construct(array $old = [])
     {
         if (isset($old['auth_key'])) {
-            if (\strlen($old['auth_key']) !== 2048 / 8 && strpos($old['authkey'], 'pony') === 0) {
+            if (\strlen($old['auth_key']) !== 2048 / 8 && strpos($old['auth_key'], 'pony') === 0) {
                 $old['auth_key'] = base64_decode(substr($old['auth_key'], 4));
             }
             $this->setAuthKey($old['auth_key']);
