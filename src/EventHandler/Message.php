@@ -164,11 +164,7 @@ abstract class Message extends AbstractMessage
                 substr($this->message, $space+1)
             );
             $this->commandArgs = $args === [''] ? [] : $args;
-            $this->commandType = match ($this->message[0]) {
-                '.' => CommandType::DOT,
-                '/' => CommandType::SLASH,
-                '!' => CommandType::BANG,
-            };
+            $this->commandType = CommandType::from($this->message[0]);
         } else {
             $this->command = null;
             $this->commandArgs = null;
