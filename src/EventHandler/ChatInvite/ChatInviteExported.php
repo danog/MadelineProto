@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\ChatInvite;
 
 /**
- * Represents exported [chat invite](https://core.telegram.org/api/invites#join-requests).
+ * Represents an exported chat invite
  */
 final class ChatInviteExported extends ChatInvite
 {
@@ -29,7 +29,7 @@ final class ChatInviteExported extends ChatInvite
     /** Whether this chat invite has no expiration. */
     public readonly bool $permanent;
 
-    /** Whether users importing this invite link will have to be approved to join the channel or group. */
+    /** Whether users importing this invite link will have to be [approved to join the channel or group](https://core.telegram.org/api/invites#join-requests). */
     public readonly bool $requestNeeded;
 
     /** Chat invitation link. */
