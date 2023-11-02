@@ -437,7 +437,9 @@ trait UpdateHandler
             return null;
         }
     }
-
+    /**
+     * Wrap a Pin constructor into an abstract Pinned object.
+     */
     public function wrapPin(array $message): ?Pinned
     {
         return match ($this->getInfo($message)['type'])
@@ -448,7 +450,6 @@ trait UpdateHandler
             default => null,
         };
     }
-
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
