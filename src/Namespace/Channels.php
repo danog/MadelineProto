@@ -661,4 +661,12 @@ interface Channels
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
     public function clickSponsoredMessage(array|int|string|null $channel = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     * Returns the list of messages by their IDs.
+     *
+     * @param array|int|string $channel Supergroup ID @see https://docs.madelineproto.xyz/API_docs/types/InputChannel.html
+     * @param array $id Message ID list
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html     */
+    public function getMessages(array|int|string|null $channel = null, array $id = []): array;
 }

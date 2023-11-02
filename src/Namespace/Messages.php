@@ -2331,4 +2331,26 @@ interface Messages
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
     public function setChatWallPaper(array|int|string|null $peer = null, array|null $wallpaper = null, array|null $settings = null, int|null $id = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * Returns the list of messages by their IDs.
+     *
+     * @param array $id Message ID list
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html     */
+    public function getMessages(array $id = []): array;
+
+    /**
+     * Returns the conversation history with one interlocutor / within a chat
+     *
+     * @param array|int|string $peer Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $offset_id [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * @param int $offset_date [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * @param int $add_offset [Offsets for pagination, for more info click here](https://core.telegram.org/api/offsets)
+     * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
+     * @param int $max_id If a positive value was transferred, the method will return only messages with ID smaller than max\_id
+     * @param int $min_id If a positive value was transferred, the method will return only messages with ID bigger than min\_id
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     */
+    public function getHistory(array|int|string|null $peer = null, int|null $offset_id = 0, int|null $offset_date = 0, int|null $add_offset = 0, int $limit = 100, int|null $max_id = 0, int|null $min_id = 0, array $hash = []): array;
 }
