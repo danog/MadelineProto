@@ -29,9 +29,9 @@ final class UpdateChannel extends Update
     public readonly int $chatId;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessageViews)
+    public function __construct(MTProto $API, array $rawUpdateChannel)
     {
         parent::__construct($API);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawMessageViews['channel_id']);
+        $this->chatId = $API->getIdInternal($rawUpdateChannel);
     }
 }

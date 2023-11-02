@@ -18,7 +18,6 @@ namespace danog\MadelineProto\EventHandler\Delete;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Delete;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * Some messages in a [supergroup/channel](https://core.telegram.org/api/channel) were deleted.
@@ -32,6 +31,6 @@ final class DeleteChannelMessages extends Delete
     public function __construct(MTProto $API, array $rawDelete)
     {
         parent::__construct($API, $rawDelete);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawDelete['channel_id']);
+        $this->chatId = $API->getIdInternal($rawDelete);
     }
 }

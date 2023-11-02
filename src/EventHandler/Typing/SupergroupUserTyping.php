@@ -18,7 +18,6 @@ namespace danog\MadelineProto\EventHandler\Typing;
 
 use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
@@ -35,7 +34,7 @@ final class SupergroupUserTyping extends Typing
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawTyping['channel_id']);
+        $this->chatId = $API->getIdInternal($rawTyping);
         $this->topicId = $rawTyping['top_msg_id'] ?? null;
     }
 }

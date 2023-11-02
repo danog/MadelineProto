@@ -38,7 +38,7 @@ final class MessageViewsChanged extends Update
     public function __construct(MTProto $API, array $rawMessageViews)
     {
         parent::__construct($API);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawMessageViews['channel_id']);
+        $this->chatId = $API->getIdInternal($rawMessageViews);
         $this->id = $rawMessageViews['id'];
         $this->views = $rawMessageViews['views'];
     }

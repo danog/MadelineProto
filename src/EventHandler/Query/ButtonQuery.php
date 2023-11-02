@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\EventHandler\Query;
 
 use danog\MadelineProto\EventHandler\CallbackQuery;
-use danog\MadelineProto\EventHandler\Query;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\Types\Bytes;
 use ReflectionClass;
