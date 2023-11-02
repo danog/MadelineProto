@@ -20,103 +20,105 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Throwable;
 use Amp\Cancellation;
-use Amp\CancelledException;
+use Revolt\EventLoop;
 use Amp\DeferredFuture;
-use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
+use function Amp\delay;
 use Amp\TimeoutException;
+use Amp\CancelledException;
+use Amp\Http\Client\Request;
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler\BotCommands;
-use danog\MadelineProto\EventHandler\Channel\NewChannel;
-use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
-use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
-use danog\MadelineProto\EventHandler\ChatInviteRequester\PendingJoinRequests;
-use danog\MadelineProto\EventHandler\Delete\DeleteChannelMessages;
-use danog\MadelineProto\EventHandler\Delete\DeleteMessages;
-use danog\MadelineProto\EventHandler\Delete\DeleteScheduledMessages;
-use danog\MadelineProto\EventHandler\InlineQuery;
-use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\Channel\MessageForwards;
+use Webmozart\Assert\Assert;
+use Amp\Http\Client\Response;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\VoIPController;
+use danog\MadelineProto\TL\Types\Button;
+use danog\MadelineProto\ResponseException;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\UpdateHandlerType;
+use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\VoIP\DiscardReason;
+use danog\MadelineProto\EventHandler\Pinned;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\ChannelMessage;
-use danog\MadelineProto\EventHandler\Message\GroupMessage;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
-use danog\MadelineProto\EventHandler\Message\SecretMessage;
-use danog\MadelineProto\EventHandler\Message\Service\DialogBotAllowed;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
-use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
-use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
-use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogDeleteMessages;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCall;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
-use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
-use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
-use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
-use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
-use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
-use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
-use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
-use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
-use danog\MadelineProto\EventHandler\Message\Service\DialogReadMessages;
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatWallPaper;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
-use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
-use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
-use danog\MadelineProto\EventHandler\Pinned\PinnedChannelMessages;
-use danog\MadelineProto\EventHandler\Pinned\PinnedPrivateMessages;
 use danog\MadelineProto\EventHandler\Privacy;
-use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
-use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
-use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
-use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\Wallpaper;
+use danog\MadelineProto\Loop\Update\FeedLoop;
+use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\InlineQuery;
+use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\User\Username;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Query\ChatGameQuery;
+use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
+use danog\MadelineProto\EventHandler\Query\InlineGameQuery;
+use danog\MadelineProto\EventHandler\Query\InlineButtonQuery;
+use danog\MadelineProto\EventHandler\Channel\UpdateChannel;
+use danog\MadelineProto\EventHandler\Channel\MessageForwards;
+use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
+use danog\MadelineProto\EventHandler\Typing\UserTyping;
 use danog\MadelineProto\EventHandler\Typing\ChatUserTyping;
 use danog\MadelineProto\EventHandler\Typing\SecretUserTyping;
 use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
-use danog\MadelineProto\EventHandler\Typing\UserTyping;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\User\Blocked;
-use danog\MadelineProto\EventHandler\User\BotStopped;
-use danog\MadelineProto\EventHandler\User\Phone;
-use danog\MadelineProto\EventHandler\User\Status;
-use danog\MadelineProto\EventHandler\User\Status\Emoji;
-use danog\MadelineProto\EventHandler\User\Username;
-use danog\MadelineProto\EventHandler\Wallpaper;
-use danog\MadelineProto\Exception;
-use danog\MadelineProto\Lang;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Loop\Update\FeedLoop;
-use danog\MadelineProto\Loop\Update\UpdateLoop;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\PeerNotInDbException;
-use danog\MadelineProto\ResponseException;
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Settings;
-use danog\MadelineProto\TL\TL;
-use danog\MadelineProto\TL\Types\Button;
-use danog\MadelineProto\Tools;
-use danog\MadelineProto\UpdateHandlerType;
-use danog\MadelineProto\VoIP\DiscardReason;
-use danog\MadelineProto\VoIPController;
-use Revolt\EventLoop;
-use Throwable;
-use Webmozart\Assert\Assert;
-use function Amp\delay;
+use danog\MadelineProto\EventHandler\Pinned\PinnedChannelMessages;
+use danog\MadelineProto\EventHandler\Pinned\PinnedPrivateMessages;
+use danog\MadelineProto\EventHandler\Pinned\PinnedGroupMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteChannelMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteScheduledMessages;
+use danog\MadelineProto\EventHandler\ChatInviteRequester\PendingJoinRequests;
+use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
+use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
+use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogWebView;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGameScore;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPhoneCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogBotAllowed;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMemberLeft;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGiftPremium;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogReadMessages;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatTheme;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTitleChanged;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
+use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMembersJoined;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMessagePinned;
+use danog\MadelineProto\EventHandler\Message\Service\DialogPeerRequested;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogDeleteMessages;
+use danog\MadelineProto\EventHandler\Message\Service\DialogHistoryCleared;
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSetChatWallPaper;
+use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGeoProximityReached;
+use danog\MadelineProto\EventHandler\Message\Service\DialogSuggestProfilePhoto;
+use danog\MadelineProto\EventHandler\Message\Service\DialogMemberJoinedByRequest;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCall;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallInvited;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCallScheduled;
 
 /**
  * Manages updates.
@@ -393,6 +395,7 @@ trait UpdateHandler
         try {
             return match ($update['_']) {
                 'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage','updateNewOutgoingEncryptedMessage' => $this->wrapMessage($update['message']),
+                'updatePinnedMessages', 'updatePinnedChannelMessages' => $this->wrapPin($update),
                 'updateBotCallbackQuery' => isset($update['game_short_name'])
                     ? new ChatGameQuery($this, $update)
                     : new ChatButtonQuery($this, $update),
@@ -405,28 +408,26 @@ trait UpdateHandler
                 'updateStory' => $update['story']['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($this, $update)
                     : new Story($this, $update),
-                'updateSentStoryReaction' => new StoryReaction($this, $update),
-                'updateUserStatus' => Status::fromRawStatus($this, $update),
-                'updatePeerBlocked' => new Blocked($this, $update),
-                'updateBotStopped' => new BotStopped($this, $update),
-                'updateUserEmojiStatus' => new Emoji($this, $update),
-                'updateUserName' => new Username($this, $update),
-                'updateUserPhone' => new Phone($this, $update),
-                'updatePrivacy' => new Privacy($this, $update),
-                'updateUserTyping' => new UserTyping($this, $update),
-                'updateChannelUserTyping' => new SupergroupUserTyping($this, $update),
-                'updateChatUserTyping' => new ChatUserTyping($this, $update),
-                'updateChannel' => new NewChannel($this, $update),
-                'updateChannelMessageViews' => new MessageViewsChanged($this, $update),
-                'updateChannelMessageForwards' => new MessageForwards($this, $update),
-                'updateDeleteMessages' => new DeleteMessages($this, $update),
-                'updateDeleteChannelMessages' => new DeleteChannelMessages($this, $update),
+                'updateSentStoryReaction'       => new StoryReaction($this, $update),
+                'updateUserStatus'              => Status::fromRawStatus($this, $update),
+                'updatePeerBlocked'             => new Blocked($this, $update),
+                'updateBotStopped'              => new BotStopped($this, $update),
+                'updateUserEmojiStatus'         => new Emoji($this, $update),
+                'updateUserName'                => new Username($this, $update),
+                'updateUserPhone'               => new Phone($this, $update),
+                'updatePrivacy'                 => new Privacy($this, $update),
+                'updateUserTyping'              => new UserTyping($this, $update),
+                'updateChannelUserTyping'       => new SupergroupUserTyping($this, $update),
+                'updateChatUserTyping'          => new ChatUserTyping($this, $update),
+                'updateChannel'                 => new UpdateChannel($this, $update),
+                'updateChannelMessageViews'     => new MessageViewsChanged($this, $update),
+                'updateChannelMessageForwards'  => new MessageForwards($this, $update),
+                'updateDeleteMessages'          => new DeleteMessages($this, $update),
+                'updateDeleteChannelMessages'   => new DeleteChannelMessages($this, $update),
                 'updateDeleteScheduledMessages' => new DeleteScheduledMessages($this, $update),
-                'updatePendingJoinRequests' => new PendingJoinRequests($this, $update),
-                'updateBotChatInviteRequester' => new BotChatInviteRequest($this, $update),
-                'updatePinnedMessages' => new PinnedPrivateMessages($this, $update),
-                'updatePinnedChannelMessages' => new PinnedChannelMessages($this, $update),
-                'updateBotCommands' => new BotCommands($this, $update),
+                'updatePendingJoinRequests'     => new PendingJoinRequests($this, $update),
+                'updateBotChatInviteRequester'  => new BotChatInviteRequest($this, $update),
+                'updateBotCommands'             => new BotCommands($this, $update),
                 default => null
             };
         } catch (\Throwable $e) {
@@ -435,6 +436,17 @@ trait UpdateHandler
             $this->report("An error occured while wrapping $update: $e");
             return null;
         }
+    }
+
+    public function wrapPin(array $message): ?Pinned
+    {
+        return match ($this->getInfo($message)['type'])
+        {
+            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PinnedPrivateMessages($this, $message),
+            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new PinnedGroupMessages($this, $message),
+            API::PEER_TYPE_CHANNEL => new PinnedChannelMessages($this, $message),
+            default => null,
+        };
     }
 
     /**

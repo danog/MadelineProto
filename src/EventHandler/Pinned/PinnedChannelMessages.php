@@ -18,10 +18,9 @@ namespace danog\MadelineProto\EventHandler\Pinned;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Pinned;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * Represents messages that were pinned/unpinned in a [channel/supergroup](https://core.telegram.org/api/channel).
+ * Represents messages that were pinned/unpinned in a [channel](https://core.telegram.org/api/channel).
  */
 final class PinnedChannelMessages extends Pinned
 {

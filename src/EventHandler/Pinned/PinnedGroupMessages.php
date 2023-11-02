@@ -14,30 +14,19 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler;
+namespace danog\MadelineProto\EventHandler\Pinned;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Pinned;
 
 /**
- * Represents messages s were pinned/unpinned.
+ * Represents messages that were pinned/unpinned in a [chat/supergroup](https://core.telegram.org/api/channel).
  */
-abstract class Pinned extends Update
+final class PinnedGroupMessages extends Pinned
 {
-    /** Whether the messages were pinned or unpinned. */
-    public readonly bool $pinned;
-
-    /** @var list<int> List of identifiers of pinned messages. */
-    public readonly array $ids;
-
-    /** ID of the chat where the messages were pinned. */
-    public readonly int $chatId;
-
     /** @internal */
     public function __construct(MTProto $API, array $rawPinned)
     {
-        parent::__construct($API);
-        $this->pinned = $rawPinned['pinned'];
-        $this->ids = $rawPinned['messages'];
-        $this->chatId = $API->getIdInternal($rawPinned);
+        parent::__construct($API, $rawPinned);
     }
 }
