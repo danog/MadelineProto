@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use danog\MadelineProto\MTProto;
 
 /**
- * Represents messages s were pinned/unpinned.
+ * Indicates that some messages were pinned/unpinned.
  */
 abstract class Pinned extends Update
 {
