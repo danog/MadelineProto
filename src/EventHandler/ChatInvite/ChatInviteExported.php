@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\ChatInvite;
 
 /**
- * Represents exported chat invite.
+ * Represents exported [chat invite](https://core.telegram.org/api/invites#join-requests).
  */
 final class ChatInviteExported extends ChatInvite
 {
