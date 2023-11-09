@@ -102,6 +102,11 @@ abstract class Message extends AbstractMessage
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text */
     public readonly array $entities;
 
+    /**
+     * Group ID for albums.
+     */
+    public readonly int $groupedId;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -118,6 +123,7 @@ abstract class Message extends AbstractMessage
         $this->views = $rawMessage['views'] ?? null;
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
+        $this->groupedId = $rawMessage['grouped_id'] ?? null;
 
         $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->message = $rawMessage['message'];
