@@ -270,6 +270,12 @@ trait UpdateHandler
             'timeout' => $timeout
         ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
 
+        foreach ($this->updates as $key => $value) {
+            if ($offset > $key) {
+                unset($this->updates[$key]);
+            }
+        }
+
         if (!$this->updates) {
             try {
                 $this->update_deferred = new DeferredFuture();
