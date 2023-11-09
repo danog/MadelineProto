@@ -90,14 +90,19 @@ final class MyTelegramOrgWrapper
             $this->jar = new LocalCookieJar();
         }
         $this->datacenter = new DoHWrapper(
-            $this->settings->getConnection(),
-            new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
-                public function __construct(private Logger $logger)
+            new class($this->settings) implements SettingsGetter,
+                LoggerGetter {
+                public function __construct(
+                    private readonly Settings $settings
+                ) {
+                }
+                public function getSettings(): Settings
                 {
+                    return $this->settings;
                 }
                 public function getLogger(): Logger
                 {
-                    return $this->logger;
+                    return $this->getLogger();
                 }
             },
             $this->jar

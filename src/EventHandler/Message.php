@@ -104,7 +104,7 @@ abstract class Message extends AbstractMessage
 
     /**
      * Group ID for albums.
-     * 
+     *
      * All messages associated to the same album will have an identical grouped ID.
      */
     public readonly ?int $groupedId;

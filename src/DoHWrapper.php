@@ -84,7 +84,7 @@ final class DoHWrapper
     public readonly Rfc6455Connector $webSocketConnector;
 
     public function __construct(
-        private MTProto $API,
+        private SettingsGetter&LoggerGetter $API,
         ?CookieJar $jar = null
     ) {
         $configProvider = new class implements DnsConfigLoader {
