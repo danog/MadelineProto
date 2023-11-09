@@ -86,6 +86,8 @@ abstract class InternalDoc
     public $chatlists;
     /** @var \danog\MadelineProto\Namespace\Stories $stories */
     public $stories;
+    /** @var \danog\MadelineProto\Namespace\Premium $premium */
+    public $premium;
 
     /**
      * Export APIFactory instance with the specified namespace.
@@ -131,6 +133,8 @@ abstract class InternalDoc
         $this->chatlists->setWrapper($this->wrapper);
         $this->stories ??= new \danog\MadelineProto\Namespace\AbstractAPI('stories');
         $this->stories->setWrapper($this->wrapper);
+        $this->premium ??= new \danog\MadelineProto\Namespace\AbstractAPI('premium');
+        $this->premium->setWrapper($this->wrapper);
     }
     /**
          * Convert MTProto parameters to bot API parameters.

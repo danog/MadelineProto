@@ -12,7 +12,7 @@ interface Payments
     /**
      * Get a payment form.
      *
-     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
+     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string}|array{_: 'inputInvoicePremiumGiftCode', purpose: array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int}, option: array{_: 'premiumGiftCodeOption', users?: int, months?: int, store_product?: string, store_quantity?: int, currency?: string, amount?: int}} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
      * @param mixed $theme_params Any JSON-encodable data
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
@@ -36,7 +36,7 @@ interface Payments
     /**
      * Submit requested order information for validation.
      *
-     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
+     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string}|array{_: 'inputInvoicePremiumGiftCode', purpose: array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int}, option: array{_: 'premiumGiftCodeOption', users?: int, months?: int, store_product?: string, store_quantity?: int, currency?: string, amount?: int}} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
      * @param array{_: 'paymentRequestedInfo', name?: string, phone?: string, email?: string, shipping_address?: array{_: 'postAddress', street_line1?: string, street_line2?: string, city?: string, state?: string, country_iso2?: string, post_code?: string}} $info Requested order information @see https://docs.madelineproto.xyz/API_docs/types/PaymentRequestedInfo.html
      * @param bool $save Save order information to re-use it for future orders
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -49,7 +49,7 @@ interface Payments
     /**
      * Send compiled payment form.
      *
-     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
+     * @param array{_: 'inputInvoiceMessage', peer?: array|int|string, msg_id?: int}|array{_: 'inputInvoiceSlug', slug?: string}|array{_: 'inputInvoicePremiumGiftCode', purpose: array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int}, option: array{_: 'premiumGiftCodeOption', users?: int, months?: int, store_product?: string, store_quantity?: int, currency?: string, amount?: int}} $invoice Invoice @see https://docs.madelineproto.xyz/API_docs/types/InputInvoice.html
      * @param array{_: 'inputPaymentCredentialsSaved', id?: string, tmp_password?: string}|array{_: 'inputPaymentCredentials', data: mixed, save?: bool}|array{_: 'inputPaymentCredentialsApplePay', payment_data: mixed}|array{_: 'inputPaymentCredentialsGooglePay', payment_token: mixed} $credentials Payment credentials @see https://docs.madelineproto.xyz/API_docs/types/InputPaymentCredentials.html
      * @param int $form_id Form ID
      * @param string $requested_info_id ID of saved and validated [order info](https://docs.madelineproto.xyz/API_docs/constructors/payments.validatedRequestedInfo.html)
@@ -108,7 +108,7 @@ interface Payments
     /**
      * Informs server about a purchase made through the App Store: for official applications only.
      *
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      * @param string $receipt Receipt
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
@@ -121,7 +121,7 @@ interface Payments
      * Informs server about a purchase made through the Play Store: for official applications only.
      *
      * @param mixed $receipt Any JSON-encodable data
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -132,10 +132,64 @@ interface Payments
     /**
      * Checks whether Telegram Premium purchase is possible. Must be called before in-store Premium purchase, official apps only.
      *
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int} $purpose Payment purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
     public function canPurchasePremium(array $purpose, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $boost_peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return list<array{_: 'premiumGiftCodeOption', users: int, months: int, store_product: string, store_quantity: int, currency: string, amount: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/PremiumGiftCodeOption.html
+     */
+    public function getPremiumGiftCodeOptions(array|int|string|null $boost_peer = null, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array|null;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'payments.checkedGiftCode', from_id: array|int|string, via_giveaway: bool, giveaway_msg_id: int, to_id: int, date: int, months: int, used_date: int, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/payments.CheckedGiftCode.html
+     */
+    public function checkGiftCode(string|null $slug = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     */
+    public function applyGiftCode(string|null $slug = '', ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'payments.giveawayInfo', participating: bool, preparing_results: bool, start_date: int, joined_too_early_date: int, admin_disallowed_chat_id: int, disallowed_country: string}|array{_: 'payments.giveawayInfoResults', winner: bool, refunded: bool, start_date: int, gift_code_slug: string, finish_date: int, winners_count: int, activated_count: int} @see https://docs.madelineproto.xyz/API_docs/types/payments.GiveawayInfo.html
+     */
+    public function getGiveawayInfo(array|int|string|null $peer = null, int|null $msg_id = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, until_date?: int, currency?: string, amount?: int} $purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     */
+    public function launchPrepaidGiveaway(array $purpose, array|int|string|null $peer = null, int|null $giveaway_id = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 }

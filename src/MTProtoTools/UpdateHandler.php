@@ -1087,6 +1087,8 @@ trait UpdateHandler
                     $controller->discard();
                     $update['phone_call'] = $controller->public;
                     break;
+                case 'phoneCallEmpty':
+                    return;
             }
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {

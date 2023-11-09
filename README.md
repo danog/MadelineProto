@@ -935,27 +935,35 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmessage-array-message-danog-madelineproto-eventhandler-abstractmessage" name="wrapMessage">Wrap a Message constructor into an abstract Message object: wrapMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmedia-array-media-bool-protected-false-danog-madelineproto-eventhandler-media" name="wrapMedia">Wrap a media constructor into an abstract Media object: wrapMedia</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate-array-update-danog-madelineproto-eventhandler-update" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultBackgroundEmojis.html" name="account.getDefaultBackgroundEmojis">account.getDefaultBackgroundEmojis</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.invalidateSignInCodes.html" name="account.invalidateSignInCodes">account.invalidateSignInCodes</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateColor.html" name="account.updateColor">account.updateColor</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urldecode-string-data-string" name="base64urlDecode">base64URL decode: base64urlDecode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.allowSendMessage.html" name="bots.allowSendMessage">bots.allowSendMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.canSendMessage.html" name="bots.canSendMessage">bots.canSendMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.invokeWebViewCustomMethod.html" name="bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.clickSponsoredMessage.html" name="channels.clickSponsoredMessage">channels.clickSponsoredMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updateColor.html" name="channels.updateColor">channels.updateColor</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.editCloseFriends.html" name="contacts.editCloseFriends">contacts.editCloseFriends</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.setBlocked.html" name="contacts.setBlocked">contacts.setBlocked</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rledecode-string-string-string" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleencode-string-string-string" name="rleEncode">null-byte RLE encode: rleEncode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.applyGiftCode.html" name="payments.applyGiftCode">payments.applyGiftCode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.checkGiftCode.html" name="payments.checkGiftCode">payments.checkGiftCode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getGiveawayInfo.html" name="payments.getGiveawayInfo">payments.getGiveawayInfo</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getPremiumGiftCodeOptions.html" name="payments.getPremiumGiftCodeOptions">payments.getPremiumGiftCodeOptions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.launchPrepaidGiveaway.html" name="payments.launchPrepaidGiveaway">payments.launchPrepaidGiveaway</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.applyBoost.html" name="premium.applyBoost">premium.applyBoost</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getBoostsList.html" name="premium.getBoostsList">premium.getBoostsList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getBoostsStatus.html" name="premium.getBoostsStatus">premium.getBoostsStatus</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getMyBoosts.html" name="premium.getMyBoosts">premium.getMyBoosts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.activateStealthMode.html" name="stories.activateStealthMode">stories.activateStealthMode</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.applyBoost.html" name="stories.applyBoost">stories.applyBoost</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canApplyBoost.html" name="stories.canApplyBoost">stories.canApplyBoost</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canSendStory.html" name="stories.canSendStory">stories.canSendStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.deleteStories.html" name="stories.deleteStories">stories.deleteStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.editStory.html" name="stories.editStory">stories.editStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.exportStoryLink.html" name="stories.exportStoryLink">stories.exportStoryLink</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllReadPeerStories.html" name="stories.getAllReadPeerStories">stories.getAllReadPeerStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getAllStories.html" name="stories.getAllStories">stories.getAllStories</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getBoostersList.html" name="stories.getBoostersList">stories.getBoostersList</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getBoostsStatus.html" name="stories.getBoostsStatus">stories.getBoostsStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getChatsToSend.html" name="stories.getChatsToSend">stories.getChatsToSend</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPeerMaxIDs.html" name="stories.getPeerMaxIDs">stories.getPeerMaxIDs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPeerStories.html" name="stories.getPeerStories">stories.getPeerStories</a>
