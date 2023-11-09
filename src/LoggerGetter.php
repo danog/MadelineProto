@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+/** @internal */
 interface LoggerGetter
 {
     public function getLogger(): Logger;

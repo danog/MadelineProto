@@ -34,6 +34,7 @@
       <code>API</code>
       <code>API</code>
       <code>API</code>
+      <code>API</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/APIWrapper.php">
@@ -221,8 +222,6 @@
       <code>$config</code>
       <code>$config</code>
       <code><![CDATA[$config->withDatabase(null)]]></code>
-      <code><![CDATA[$settings->getIdleTimeout()]]></code>
-      <code><![CDATA[$settings->getMaxConnections()]]></code>
     </ArgumentTypeCoercion>
   </file>
   <file src="src/Db/DriverArray.php">
@@ -823,6 +822,7 @@
       <code><![CDATA[$this->payments ??= new \danog\MadelineProto\Namespace\AbstractAPI('payments')]]></code>
       <code><![CDATA[$this->phone ??= new \danog\MadelineProto\Namespace\AbstractAPI('phone')]]></code>
       <code><![CDATA[$this->photos ??= new \danog\MadelineProto\Namespace\AbstractAPI('photos')]]></code>
+      <code><![CDATA[$this->premium ??= new \danog\MadelineProto\Namespace\AbstractAPI('premium')]]></code>
       <code><![CDATA[$this->stats ??= new \danog\MadelineProto\Namespace\AbstractAPI('stats')]]></code>
       <code><![CDATA[$this->stickers ??= new \danog\MadelineProto\Namespace\AbstractAPI('stickers')]]></code>
       <code><![CDATA[$this->stories ??= new \danog\MadelineProto\Namespace\AbstractAPI('stories')]]></code>
@@ -831,6 +831,7 @@
       <code><![CDATA[$this->users ??= new \danog\MadelineProto\Namespace\AbstractAPI('users')]]></code>
     </PossiblyInvalidPropertyAssignmentValue>
     <PossiblyUndefinedMethod>
+      <code>setWrapper</code>
       <code>setWrapper</code>
       <code>setWrapper</code>
       <code>setWrapper</code>
@@ -1486,7 +1487,6 @@
     </PossiblyInvalidArrayOffset>
     <PossiblyNullArgument>
       <code>$messageMedia</code>
-      <code>$old_dc</code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>decrypt</code>
@@ -1776,18 +1776,6 @@
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MyTelegramOrgWrapper.php">
-    <InvalidArgument>
-      <code><![CDATA[$this->settings->getConnection()]]></code>
-      <code><![CDATA[new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
-                public function __construct(private Logger $logger)
-                {
-                }
-                public function getLogger(): Logger
-                {
-                    return $this->logger;
-                }
-            }]]></code>
-    </InvalidArgument>
     <MissingReturnType>
       <code>completeLogin</code>
       <code>createApp</code>
@@ -1800,21 +1788,6 @@
     <PossiblyUndefinedArrayOffset>
       <code>$value</code>
     </PossiblyUndefinedArrayOffset>
-    <TooManyArguments>
-      <code><![CDATA[new DoHWrapper(
-            $this->settings->getConnection(),
-            new class(new Logger($this->settings->getLogger())) implements LoggerGetter {
-                public function __construct(private Logger $logger)
-                {
-                }
-                public function getLogger(): Logger
-                {
-                    return $this->logger;
-                }
-            },
-            $this->jar
-        )]]></code>
-    </TooManyArguments>
     <UninitializedProperty>
       <code><![CDATA[$this->settings]]></code>
     </UninitializedProperty>
@@ -1826,6 +1799,58 @@
     <PropertyNotSetInConstructor>
       <code>$wrapper</code>
     </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/Ogg.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$this->comments]]></code>
+      <code><![CDATA[$this->vendorString]]></code>
+    </InaccessibleProperty>
+    <PossiblyInvalidArgument>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$size</code>
+    </PossiblyInvalidArgument>
+    <PossiblyInvalidPropertyAssignmentValue>
+      <code><![CDATA[$this->currentDuration += $frameDuration]]></code>
+      <code><![CDATA[$this->currentDuration += $totalDuration]]></code>
+    </PossiblyInvalidPropertyAssignmentValue>
+    <PossiblyNullArgument>
+      <code><![CDATA[($this->stream)($headers['number_page_segments'])]]></code>
+      <code><![CDATA[($this->stream)(23)]]></code>
+    </PossiblyNullArgument>
+    <PossiblyUndefinedVariable>
+      <code>$cancel</code>
+    </PossiblyUndefinedVariable>
+    <PropertyNotSetInConstructor>
+      <code>$comments</code>
+      <code>$streamCount</code>
+      <code>$vendorString</code>
+    </PropertyNotSetInConstructor>
+    <RedundantCondition>
+      <code>$state === self::STATE_READ_COMMENT</code>
+    </RedundantCondition>
+    <ReferenceConstraintViolation>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+      <code>$offset</code>
+    </ReferenceConstraintViolation>
+    <TooFewArguments>
+      <code><![CDATA[($this->stream)($headers['number_page_segments'])]]></code>
+      <code><![CDATA[($this->stream)($sizeAccumulated)]]></code>
+      <code><![CDATA[($this->stream)(23)]]></code>
+      <code><![CDATA[($this->stream)(4)]]></code>
+    </TooFewArguments>
+    <UndefinedClass>
+      <code>?FFI</code>
+      <code>FFI</code>
+      <code>FFI</code>
+      <code>int|CData $err</code>
+    </UndefinedClass>
   </file>
   <file src="src/PTSException.php">
     <MissingParamType>

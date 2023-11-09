@@ -18,7 +18,6 @@
             <file name="src/DocsBuilder.php" />
             <file name="src/DocsBuilder/Methods.php" />
             <file name="src/DocsBuilder/Constructors.php" />
-            <file name="src/Ogg.php" />
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
