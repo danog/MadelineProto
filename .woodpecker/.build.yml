@@ -4,7 +4,8 @@ matrix:
   platform:
     - linux/arm64
 
-platform: ${platform}
+labels:
+  platform: ${platform}
 
 clone:
   git:

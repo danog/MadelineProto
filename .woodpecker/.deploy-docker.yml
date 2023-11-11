@@ -1,4 +1,5 @@
-platform: linux/arm64
+labels:
+  platform: linux/arm64
 
 clone:
   git:
