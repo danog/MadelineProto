@@ -16,9 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\MTProto;
 
 /**
  * Indicates that the view counter of a message in a channel has changed.

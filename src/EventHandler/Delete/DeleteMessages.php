@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Delete;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Delete;
+use danog\MadelineProto\MTProto;
 
 /**
- * Some messages were deleted in a private chat or simple group
+ * Some messages were deleted in a private chat or simple group.
  */
 final class DeleteMessages extends Delete
 {

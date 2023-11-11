@@ -37,6 +37,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Pinned;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;
@@ -2064,6 +2065,13 @@ abstract class InternalDoc
     public function wrapMessage(array $message): ?\danog\MadelineProto\EventHandler\AbstractMessage
     {
         return $this->wrapper->getAPI()->wrapMessage($message);
+    }
+    /**
+     * Wrap a Pin constructor into an abstract Pinned object.
+     */
+    public function wrapPin(array $message): ?\danog\MadelineProto\EventHandler\Pinned
+    {
+        return $this->wrapper->getAPI()->wrapPin($message);
     }
     /**
      * Wrap an Update constructor into an abstract Update object.

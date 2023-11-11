@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Pinned;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Pinned;
+use danog\MadelineProto\MTProto;
 
 /**
- * Some messages were pinned in a private chat
+ * Some messages were pinned in a private chat.
  */
 final class PinnedPrivateMessages extends Pinned
 {

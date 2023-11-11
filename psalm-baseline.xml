@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@75fcfe3540e378856b49cf60c8d9cfb1cdc434f2">
+<files psalm-version="dev-master@b775d297bb90d50424f79968d590aea2e7da20b4">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -209,20 +209,9 @@
     </ImplementedParamTypeMismatch>
   </file>
   <file src="src/Db/Driver/Mysql.php">
-    <ArgumentTypeCoercion>
-      <code>$config</code>
-      <code><![CDATA[$config->withDatabase(null)]]></code>
-    </ArgumentTypeCoercion>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$connection->query("SHOW VARIABLES LIKE 'max_connections'")->fetchRow()['Value']]]></code>
     </PossiblyNullArrayAccess>
-  </file>
-  <file src="src/Db/Driver/Postgres.php">
-    <ArgumentTypeCoercion>
-      <code>$config</code>
-      <code>$config</code>
-      <code><![CDATA[$config->withDatabase(null)]]></code>
-    </ArgumentTypeCoercion>
   </file>
   <file src="src/Db/DriverArray.php">
     <ArgumentTypeCoercion>
@@ -442,6 +431,42 @@
       <code><![CDATA[isset($rawBotApp['document']) ? $API->wrapMedia($rawBotApp['document']) : null]]></code>
       <code><![CDATA[isset($rawBotApp['photo']) ? $API->wrapMedia($rawBotApp['photo']) : null]]></code>
     </PropertyTypeCoercion>
+  </file>
+  <file src="src/EventHandler/BotCommands.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawBotCommands['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+    <PropertyTypeCoercion>
+      <code><![CDATA[array_map(
+            fn (array $command): Command => new Command($command),
+            $rawBotCommands['commands']
+        )]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/EventHandler/Channel/MessageViewsChanged.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawMessageViews)]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/Channel/UpdateChannel.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawUpdateChannel)]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/ChatInviteRequester.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawChatInviteRequester['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/Delete/DeleteChannelMessages.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawDelete)]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/Delete/DeleteScheduledMessages.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawDelete['peer'])]]></code>
+    </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
     <PropertyNotSetInConstructor>
@@ -708,6 +733,11 @@
       <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
+  <file src="src/EventHandler/Pinned.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawPinned)]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
   <file src="src/EventHandler/Privacy.php">
     <PropertyTypeCoercion>
       <code><![CDATA[array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules'])]]></code>
@@ -753,12 +783,17 @@
   </file>
   <file src="src/EventHandler/Story/StoryReaction.php">
     <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$API->getIdInternal($rawStory['peer'])]]></code>
+      <code><![CDATA[$API->getIdInternal($rawStory)]]></code>
+    </PossiblyNullPropertyAssignmentValue>
+  </file>
+  <file src="src/EventHandler/Typing/SupergroupUserTyping.php">
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getIdInternal($rawTyping)]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/User/Blocked.php">
     <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$API->getIdInternal($rawPeerBlocked['peer_id'])]]></code>
+      <code><![CDATA[$API->getIdInternal($rawPeerBlocked)]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/User/Username.php">

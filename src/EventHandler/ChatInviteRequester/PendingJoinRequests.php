@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\ChatInviteRequester;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\ChatInviteRequester;
+use danog\MadelineProto\MTProto;
 
 /**
  * Someone has requested to join a chat or channel.

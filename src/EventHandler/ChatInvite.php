@@ -29,11 +29,10 @@ abstract class ChatInvite implements JsonSerializable
 {
     public static function fromRawChatInvite(array $rawChatInvite): self
     {
-        return match($rawChatInvite['_'])
-        {
+        return match ($rawChatInvite['_']) {
             'chatInviteExported' => new ChatInviteExported($rawChatInvite),
             'chatInvitePublicJoinRequests' => new ChatInvitePublicJoin($rawChatInvite),
-            default => new \AssertionError('Unknown ChatInvite type \'_\':' . $rawChatInvite['_']),
+            default => throw new \AssertionError('Unknown ChatInvite type \'_\':' . $rawChatInvite['_']),
         };
     }
 

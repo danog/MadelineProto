@@ -16,9 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\MTProto;
 
 /**
  * A new channel is available, or info about an existing channel was changed.

@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Delete;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Delete;
+use danog\MadelineProto\MTProto;
 
 /**
  * Some messages in a [supergroup/channel](https://core.telegram.org/api/channel) were deleted.

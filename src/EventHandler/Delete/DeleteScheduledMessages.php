@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Delete;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Delete;
+use danog\MadelineProto\MTProto;
 
 /**
  * Some [scheduled messages](https://core.telegram.org/api/scheduled-messages) were deleted from the schedule queue of a chat.

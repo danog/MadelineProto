@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**

@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\ChatInvite;
 
 /**
- * Represents an exported chat invite
+ * Represents an exported chat invite.
  */
 final class ChatInviteExported extends ChatInvite
 {
@@ -73,5 +73,6 @@ final class ChatInviteExported extends ChatInvite
         $this->limit = $rawChatInvite['usage_limit'] ?? null;
         $this->requested = $rawChatInvite['requested'] ?? null;
         $this->title = $rawChatInvite['title'] ?? null;
+        $this->used = $rawChatInvite['usage'] ?? null;
     }
 }
