@@ -14,27 +14,30 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Typing;
+namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 
 /**
- * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
+ * Indicates that some messages were pinned/unpinned.
  */
-final class SupergroupUserTyping extends Typing
+abstract class Pinned extends Update
 {
-    /** @var int Channel ID. */
+    /** Whether the messages were pinned or unpinned. */
+    public readonly bool $pinned;
+
+    /** @var list<int> List of identifiers of pinned messages. */
+    public readonly array $ids;
+
+    /** ID of the chat where the messages were pinned. */
     public readonly int $chatId;
 
-    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
-    public readonly ?int $topicId;
-
     /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
+    public function __construct(MTProto $API, array $rawPinned)
     {
-        parent::__construct($API, $rawTyping);
-        $this->chatId = $API->getIdInternal($rawTyping);
-        $this->topicId = $rawTyping['top_msg_id'] ?? null;
+        parent::__construct($API);
+        $this->pinned = $rawPinned['pinned'];
+        $this->ids = $rawPinned['messages'];
+        $this->chatId = $API->getIdInternal($rawPinned);
     }
 }

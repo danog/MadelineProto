@@ -36,7 +36,7 @@ final class StoryReaction extends Update
     public function __construct(MTProto $API, array $rawStory)
     {
         parent::__construct($API);
-        $this->senderId = $API->getIdInternal($rawStory['peer']);
+        $this->senderId = $API->getIdInternal($rawStory);
         $this->id = $rawStory['story_id'];
         $this->reaction = $rawStory['reaction']['emoticon'] ?? $rawStory['reaction']['document_id'] ?? null;
     }

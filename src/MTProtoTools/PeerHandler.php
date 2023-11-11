@@ -187,39 +187,31 @@ trait PeerHandler
                 case 'updateDialogPinned':
                 case 'updateDialogUnreadMark':
                 case 'updateNotifySettings':
-                    $id = $id['peer'];
-                    // no break
                 case 'updateDraftMessage':
-                case 'inputDialogPeer':
-                case 'dialogPeer':
-                case 'inputNotifyPeer':
-                case 'notifyPeer':
-                case 'dialog':
-                case 'help.proxyDataPromo':
+                case 'updateReadHistoryInbox':
+                case 'updateReadHistoryOutbox':
                 case 'updateChatDefaultBannedRights':
+                case 'updateDeleteScheduledMessages':
+                case 'updateSentStoryReaction':
+                case 'updateBotCommands':
+                case 'updateBotChatInviteRequester':
+                case 'updatePendingJoinRequests':
+                case 'updateStory':
+                case 'dialog':
+                case 'dialogPeer':
+                case 'notifyPeer':
+                case 'help.proxyDataPromo':
                 case 'folderPeer':
+                case 'inputDialogPeer':
+                case 'inputNotifyPeer':
                 case 'inputFolderPeer':
                     return $this->getIdInternal($id['peer']);
-                case 'inputUserFromMessage':
-                case 'inputPeerUserFromMessage':
-                    return $id['user_id'];
-                case 'inputChannelFromMessage':
-                case 'inputPeerChannelFromMessage':
-                case 'updateChannelParticipant':
-                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
                     return $this->authorization['user']['id'];
                 case 'user':
-                    return $id['id'];
                 case 'userFull':
                     return $id['id'];
-                case 'inputPeerUser':
-                case 'inputUser':
-                case 'peerUser':
-                case 'messageEntityMentionName':
-                case 'messageActionChatDeleteUser':
-                    return $id['user_id'];
                 case 'messageActionChatJoinedByLink':
                     return $id['inviter_id'];
                 case 'chat':
@@ -233,10 +225,7 @@ trait PeerHandler
                 case 'channel':
                 case 'channelFull':
                     return DialogId::fromSupergroupOrChannel($id['id']);
-                case 'inputPeerChannel':
-                case 'inputChannel':
-                case 'peerChannel':
-                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
+                case 'updatePeerBlocked':
                 case 'message':
                 case 'messageService':
                     if (!isset($id['from_id']) // No other option
@@ -248,6 +237,11 @@ trait PeerHandler
                         return $this->getIdInternal($id['peer_id']);
                     }
                     return $this->getIdInternal($id['from_id']);
+                case 'peerChannel':
+                case 'inputChannel':
+                case 'inputPeerChannel':
+                case 'inputChannelFromMessage':
+                case 'inputPeerChannelFromMessage':
                 case 'updateChannelReadMessagesContents':
                 case 'updateChannelAvailableMessages':
                 case 'updateChannel':
@@ -258,6 +252,10 @@ trait PeerHandler
                 case 'updateDeleteChannelMessages':
                 case 'updateChannelPinnedMessage':
                 case 'updateChannelTooLong':
+                case 'updateChannelParticipant':
+                case 'updatePinnedChannelMessages':
+                case 'updateChannelMessageForwards':
+                case 'updateChannelUserTyping':
                     return DialogId::fromSupergroupOrChannel($id['channel_id']);
                 case 'updateChatParticipants':
                     $id = $id['participants'];
@@ -269,6 +267,7 @@ trait PeerHandler
                 case 'updateChatAdmins':
                 case 'updateChatPinnedMessage':
                     return -$id['chat_id'];
+                case 'contact':
                 case 'updateUserTyping':
                 case 'updateUserStatus':
                 case 'updateUserName':
@@ -285,13 +284,18 @@ trait PeerHandler
                 case 'updateBotShippingQuery':
                 case 'updateUserPinnedMessage':
                 case 'updateUser':
-                case 'contact':
+                case 'updateUserEmojiStatus':
+                case 'updateBotStopped':
+                case 'inputUserFromMessage':
+                case 'inputPeerUserFromMessage':
+                case 'inputPeerUser':
+                case 'inputUser':
+                case 'peerUser':
+                case 'messageEntityMentionName':
+                case 'messageActionChatDeleteUser':
                     return $id['user_id'];
                 case 'updatePhoneCall':
                     return $id['phone_call']->getOtherID();
-                case 'updateReadHistoryInbox':
-                case 'updateReadHistoryOutbox':
-                    return $this->getIdInternal($id['peer']);
                 case 'updateNewMessage':
                 case 'updateNewChannelMessage':
                 case 'updateEditMessage':

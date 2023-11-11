@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /**
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,22 +14,17 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Plugin;
+namespace danog\MadelineProto\EventHandler\ChatInvite;
 
-use danog\MadelineProto\EventHandler\Filter\FilterCommand;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\PluginEventHandler;
+use danog\MadelineProto\EventHandler\ChatInvite;
 
 /**
- * Plugin that offers a /restart command to admins that can be used to restart the bot, applying changes.
+ * Used in updates and in the channel log to indicate when a user is requesting to join or has joined a [discussion group](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
  */
-final class RestartPlugin extends PluginEventHandler
+final class ChatInvitePublicJoin extends ChatInvite
 {
-    #[FilterCommand('restart')]
-    public function cmd(Incoming&Message&FromAdmin $_): void
+    /** @internal */
+    public function __construct(array $rawChatInvite)
     {
-        $this->restart();
     }
 }

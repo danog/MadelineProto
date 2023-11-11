@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /**
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -7,28 +8,28 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Plugin;
+namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Filter\FilterCommand;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\PluginEventHandler;
+use danog\MadelineProto\MTProto;
 
 /**
- * Plugin that offers a /restart command to admins that can be used to restart the bot, applying changes.
+ * Indicates that some messages were deleted.
  */
-final class RestartPlugin extends PluginEventHandler
+abstract class Delete extends Update
 {
-    #[FilterCommand('restart')]
-    public function cmd(Incoming&Message&FromAdmin $_): void
+    /** @var list<int> List of identifiers of deleted messages */
+    public readonly array $ids;
+
+    /** @internal */
+    public function __construct(MTProto $API, array $rawDelete)
     {
-        $this->restart();
+        parent::__construct($API);
+        $this->ids = $rawDelete['messages'];
     }
 }

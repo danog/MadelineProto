@@ -14,27 +14,33 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Typing;
+namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
 
 /**
- * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
+ * The [command set](https://core.telegram.org/api/bots/commands) of a certain bot in a certain chat has changed.
  */
-final class SupergroupUserTyping extends Typing
+final class BotCommands extends Update
 {
-    /** @var int Channel ID. */
+    /** ID of the bot that changed its command set. */
+    public readonly int $botId;
+
+    /** The affected chat. */
     public readonly int $chatId;
 
-    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
-    public readonly ?int $topicId;
+    /** @var list<Command> New bot commands. */
+    public readonly array $commands;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
+    public function __construct(MTProto $API, array $rawBotCommands)
     {
-        parent::__construct($API, $rawTyping);
-        $this->chatId = $API->getIdInternal($rawTyping);
-        $this->topicId = $rawTyping['top_msg_id'] ?? null;
+        parent::__construct($API);
+        $this->botId = $rawBotCommands['bot_id'];
+        $this->chatId = $API->getIdInternal($rawBotCommands['peer']);
+        $this->commands = array_map(
+            fn (array $command): Command => new Command($command),
+            $rawBotCommands['commands']
+        );
     }
 }

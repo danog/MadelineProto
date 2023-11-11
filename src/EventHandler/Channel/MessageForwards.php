@@ -14,27 +14,32 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Typing;
+namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
- * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
+ * Indicates that the forward counter of a message in a channel has changed.
  */
-final class SupergroupUserTyping extends Typing
+final class MessageForwards extends Update
 {
-    /** @var int Channel ID. */
+    /** Channel ID */
     public readonly int $chatId;
 
-    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
-    public readonly ?int $topicId;
+    /** ID of the message */
+    public readonly int $id;
+
+    /** New forward counter */
+    public readonly int $forwards;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
+    public function __construct(MTProto $API, array $rawMessageViews)
     {
-        parent::__construct($API, $rawTyping);
-        $this->chatId = $API->getIdInternal($rawTyping);
-        $this->topicId = $rawTyping['top_msg_id'] ?? null;
+        parent::__construct($API);
+        $this->chatId = DialogId::fromSupergroupOrChannel($rawMessageViews['channel_id']);
+        $this->id = $rawMessageViews['id'];
+        $this->forwards = $rawMessageViews['forwards'];
     }
 }

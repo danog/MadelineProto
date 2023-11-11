@@ -14,27 +14,27 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Typing;
+namespace danog\MadelineProto\EventHandler\ChatInviteRequester;
 
-use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\ChatInviteRequester;
 
 /**
- * A user is typing in a [supergroup](https://core.telegram.org/api/channel).
+ * Someone has requested to join a chat or channel.
  */
-final class SupergroupUserTyping extends Typing
+final class PendingJoinRequests extends ChatInviteRequester
 {
-    /** @var int Channel ID. */
-    public readonly int $chatId;
+    /** Number of pending [join requests »](https://core.telegram.org/api/invites#join-requests) for the chat or channel */
+    public readonly int $pending;
 
-    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
-    public readonly ?int $topicId;
+    /** @var list<int> IDs of users that have recently requested to join */
+    public readonly array $recent;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawTyping)
+    public function __construct(MTProto $API, array $rawChatInviteRequester)
     {
-        parent::__construct($API, $rawTyping);
-        $this->chatId = $API->getIdInternal($rawTyping);
-        $this->topicId = $rawTyping['top_msg_id'] ?? null;
+        parent::__construct($API, $rawChatInviteRequester);
+        $this->pending = $rawChatInviteRequester['requests_pending'];
+        $this->recent = $rawChatInviteRequester['recent_requesters'];
     }
 }

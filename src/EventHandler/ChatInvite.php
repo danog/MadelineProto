@@ -14,31 +14,27 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Query;
+namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\CallbackQuery;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\TL\Types\Bytes;
+use danog\MadelineProto\EventHandler\ChatInvite\ChatInviteExported;
+use danog\MadelineProto\EventHandler\ChatInvite\ChatInvitePublicJoin;
+use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
 
-/** Represents a query sent by the user by clicking on a button. */
-abstract class ButtonQuery extends CallbackQuery
+/**
+ * Chat invite link that was used by the user to send the [join request »](https://core.telegram.org/api/invites#join-requests).
+ */
+abstract class ChatInvite implements JsonSerializable
 {
-    /** Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field. */
-    public readonly string $data;
-
-    /**
-     * @readonly
-     * @var list<string> Regex matches, if a filter regex is present.
-     */
-    public ?array $matches = null;
-
-    /** @internal */
-    public function __construct(MTProto $API, array $rawCallback)
+    public static function fromRawChatInvite(array $rawChatInvite): self
     {
-        parent::__construct($API, $rawCallback);
-        $this->data = (string) $rawCallback['data'];
+        return match($rawChatInvite['_'])
+        {
+            'chatInviteExported' => new ChatInviteExported($rawChatInvite),
+            'chatInvitePublicJoinRequests' => new ChatInvitePublicJoin($rawChatInvite),
+            default => new \AssertionError('Unknown ChatInvite type \'_\':' . $rawChatInvite['_']),
+        };
     }
 
     /** @internal */
@@ -49,7 +45,6 @@ abstract class ButtonQuery extends CallbackQuery
         foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
             $res[$prop->getName()] = $prop->getValue($this);
         }
-        $res['data'] = new Bytes($res['data']);
         return $res;
     }
 }

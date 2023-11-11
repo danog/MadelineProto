@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /**
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -13,22 +14,38 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Plugin;
+namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Filter\FilterCommand;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\PluginEventHandler;
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
- * Plugin that offers a /restart command to admins that can be used to restart the bot, applying changes.
+ * Represents a bot command that can be used in a chat.
  */
-final class RestartPlugin extends PluginEventHandler
+final class Command implements JsonSerializable
 {
-    #[FilterCommand('restart')]
-    public function cmd(Incoming&Message&FromAdmin $_): void
+    /** `/command` name. */
+    public readonly string $command;
+
+    /** Description of the command. */
+    public readonly string $description;
+
+    /** @internal */
+    public function __construct(array $rawCommand)
     {
-        $this->restart();
+        $this->command = $rawCommand['command'];
+        $this->description = $rawCommand['description'];
+    }
+
+    /** @internal */
+    public function jsonSerialize(): mixed
+    {
+        $res = ['_' => static::class];
+        $refl = new ReflectionClass($this);
+        foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+            $res[$prop->getName()] = $prop->getValue($this);
+        }
+        return $res;
     }
 }

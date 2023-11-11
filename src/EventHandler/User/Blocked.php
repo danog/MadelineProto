@@ -39,6 +39,6 @@ final class Blocked extends Update
         parent::__construct($API);
         $this->blocked = $rawPeerBlocked['blocked'];
         $this->stories = $rawPeerBlocked['blocked_my_stories_from'];
-        $this->userId = $API->getIdInternal($rawPeerBlocked['peer_id']);
+        $this->userId = $API->getIdInternal($rawPeerBlocked);
     }
 }
