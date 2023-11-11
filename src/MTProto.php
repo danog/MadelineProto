@@ -1156,7 +1156,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if (isset($this->serializeLoop)) {
                 $this->serializeLoop->stop();
             }
-            $this->serializeLoop = new PeriodicLoopInternal($this, [$this, 'serialize'], 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval());
+            $this->serializeLoop = new PeriodicLoopInternal($this, $this->serialize(...), 'serialize', $this->settings->getSerialization()->applyChanges()->getInterval());
             $this->serializeLoop->start();
         }
         if ($recurse && ($this->settings->getAuth()->hasChanged()

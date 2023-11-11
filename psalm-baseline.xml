@@ -228,8 +228,8 @@
       <code>$value</code>
     </MissingClosureParamType>
     <MissingClosureReturnType>
-      <code><![CDATA[fn ($v) => $v]]></code>
-      <code><![CDATA[fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[static fn ($v) => $v]]></code>
+      <code><![CDATA[static fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
     <MissingConstructor>
       <code>$dbSettings</code>
@@ -295,9 +295,9 @@
       <code>$value</code>
     </MissingClosureParamType>
     <MissingClosureReturnType>
-      <code><![CDATA[fn ($v) => igbinary_unserialize(hex2bin($v))]]></code>
-      <code><![CDATA[fn ($v) => unserialize(hex2bin($v))]]></code>
-      <code><![CDATA[fn ($value) => json_decode(hex2bin($value), true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[static fn ($v) => igbinary_unserialize(hex2bin($v))]]></code>
+      <code><![CDATA[static fn ($v) => unserialize(hex2bin($v))]]></code>
+      <code><![CDATA[static fn ($value) => json_decode(hex2bin($value), true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
   </file>
   <file src="src/Db/PostgresArrayBytea.php">
@@ -313,8 +313,8 @@
       <code>$value</code>
     </MissingClosureParamType>
     <MissingClosureReturnType>
-      <code><![CDATA[fn ($v) => $v]]></code>
-      <code><![CDATA[fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
+      <code><![CDATA[static fn ($v) => $v]]></code>
+      <code><![CDATA[static fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR)]]></code>
     </MissingClosureReturnType>
   </file>
   <file src="src/Db/RedisArray.php">
@@ -438,7 +438,7 @@
     </PossiblyNullPropertyAssignmentValue>
     <PropertyTypeCoercion>
       <code><![CDATA[array_map(
-            fn (array $command): Command => new Command($command),
+            static fn (array $command): Command => new Command($command),
             $rawBotCommands['commands']
         )]]></code>
     </PropertyTypeCoercion>
@@ -799,7 +799,7 @@
   <file src="src/EventHandler/User/Username.php">
     <PropertyTypeCoercion>
       <code><![CDATA[array_map(
-            fn (array $username) => new UsernameInfo($username),
+            static fn (array $username) => new UsernameInfo($username),
             $rawUserName['usernames']
         )]]></code>
     </PropertyTypeCoercion>
@@ -1170,11 +1170,6 @@
       <code><![CDATA[$this->connection->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
     </TypeDoesNotContainType>
   </file>
-  <file src="src/Loop/Generic/PeriodicLoopInternal.php">
-    <MissingClosureReturnType>
-      <code><![CDATA[fn () => $callable()]]></code>
-    </MissingClosureReturnType>
-  </file>
   <file src="src/Loop/Secret/SecretFeedLoop.php">
     <TypeDoesNotContainType>
       <code><![CDATA[isset($this->API->logger)]]></code>
@@ -1320,9 +1315,7 @@
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
-                'InputCheckPasswordSRP' => function (string $password): array {
-                    return (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password);
-                },
+                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password),
             ],
         )]]></code>
     </InvalidReturnStatement>
@@ -1425,7 +1418,7 @@
   </file>
   <file src="src/MTProtoSession/CallHandler.php">
     <MissingClosureReturnType>
-      <code><![CDATA[fn (WrappedFuture $f) => $f->await()]]></code>
+      <code><![CDATA[static fn (WrappedFuture $f) => $f->await()]]></code>
     </MissingClosureReturnType>
     <MissingConstructor>
       <code>$abstractionQueueMutex</code>
@@ -1444,9 +1437,6 @@
     </MissingReturnType>
   </file>
   <file src="src/MTProtoSession/ResponseHandler.php">
-    <MissingClosureReturnType>
-      <code><![CDATA[fn () => $e]]></code>
-    </MissingClosureReturnType>
     <PossiblyInvalidArgument>
       <code>$response</code>
       <code>time() + $seconds</code>
@@ -2343,11 +2333,6 @@
       <code>$tdDescriptions</code>
       <code>$typeMismatch</code>
     </PropertyNotSetInConstructor>
-    <RedundantCastGivenDocblockType>
-      <code>(string) $object</code>
-      <code>(string) $object</code>
-      <code>(string) $object</code>
-    </RedundantCastGivenDocblockType>
   </file>
   <file src="src/TL/TLConstructors.php">
     <MissingReturnType>
@@ -2379,7 +2364,7 @@
   </file>
   <file src="src/Tools.php">
     <ArgumentTypeCoercion>
-      <code><![CDATA[fn (ClassLike $c): bool => $c->name !== null]]></code>
+      <code><![CDATA[static fn (ClassLike $c): bool => $c->name !== null]]></code>
     </ArgumentTypeCoercion>
     <MissingClosureParamType>
       <code>$val</code>

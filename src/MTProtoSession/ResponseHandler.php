@@ -200,7 +200,7 @@ trait ResponseHandler
             try {
                 $exception = $this->handleRpcError($request, $response);
             } catch (Throwable $e) {
-                $exception = static fn () => $e;
+                $exception = static fn (): \Throwable => $e;
             }
             if ($exception) {
                 $this->handleReject($request, $exception);
