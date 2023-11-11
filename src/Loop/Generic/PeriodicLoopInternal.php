@@ -45,6 +45,6 @@ final class PeriodicLoopInternal extends PeriodicLoop
     public function __construct(MTProto $API, callable $callable, string $name, ?int $interval)
     {
         $this->init($API);
-        parent::__construct(fn () => $callable(), $name, $interval);
+        parent::__construct(static fn () => $callable(), $name, $interval);
     }
 }

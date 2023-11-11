@@ -63,8 +63,8 @@ class SecretMessage extends AbstractPrivateMessage
                 'peer' => $this->chatId,
                 'message' => [
                     '_' => 'decryptedMessageService',
-                    'action' => ['_' => 'decryptedMessageActionScreenshotMessages', 'random_ids' => [$this->id]]
-                ]
+                    'action' => ['_' => 'decryptedMessageActionScreenshotMessages', 'random_ids' => [$this->id]],
+                ],
             ]
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));

@@ -54,7 +54,7 @@ final class Gif extends AbstractVideo
             'messages.saveGif',
             [
                 'id' => $this->botApiFileId,
-                'unsave' => false
+                'unsave' => false,
             ]
         );
     }
@@ -69,7 +69,7 @@ final class Gif extends AbstractVideo
             'messages.saveGif',
             [
                 'id' => $this->botApiFileId,
-                'unsave' => true
+                'unsave' => true,
             ]
         );
     }

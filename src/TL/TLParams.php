@@ -30,7 +30,7 @@ trait TLParams
         foreach ($this->by_id[$key]['params'] as $kkey => $param) {
             if (preg_match('/([^.]+)\\.(\\d+)\\?(.+)/', $param['type'], $matches)) {
                 $param['flag'] = $matches[1];
-                $param['pow'] = pow(2, (int) $matches[2]);
+                $param['pow'] = 2** (int) $matches[2];
                 $param['type'] = $matches[3];
             }
             if (preg_match('/^(v|V)ector\\<(.*)\\>$/', $param['type'], $matches)) {

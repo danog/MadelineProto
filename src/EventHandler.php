@@ -180,12 +180,12 @@ abstract class EventHandler extends AbstractAPI
                     $methods[$method_name] = [
                         static function (array $update) use ($basic_handler, $closure): void {
                             EventLoop::queue($basic_handler, $update, $closure);
-                        }
+                        },
                     ];
                     continue;
                 }
 
-                array_map(fn (ReflectionAttribute $attribute) => $attribute->newInstance(), $methodRefl->getAttributes());
+                array_map(static fn (ReflectionAttribute $attribute) => $attribute->newInstance(), $methodRefl->getAttributes());
 
                 if ($periodic = $methodRefl->getAttributes(Cron::class)) {
                     if (!$this instanceof SimpleEventHandler) {
@@ -193,9 +193,7 @@ abstract class EventHandler extends AbstractAPI
                     }
                     $periodic = $periodic[0]->newInstance();
                     $this->periodicLoops[$method] = new PeriodicLoop(
-                        static function (PeriodicLoop $loop) use ($closure): bool {
-                            return $closure($loop) ?? false;
-                        },
+                        static fn (PeriodicLoop $loop): bool => $closure($loop) ?? false,
                         $method,
                         $periodic->period
                     );

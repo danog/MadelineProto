@@ -170,7 +170,7 @@ final class Story extends AbstractStory
                 'background' => $background,
                 'clear_draft' => $clearDraft,
                 'no_webpage' => $noWebpage,
-                'update_stickersets_order' => $updateStickersetsOrder
+                'update_stickersets_order' => $updateStickersetsOrder,
             ]
         );
         if (isset($result['_'])) {

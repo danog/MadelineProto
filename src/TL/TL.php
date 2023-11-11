@@ -367,29 +367,29 @@ final class TL implements TLInterface
     public function updateCallbacks(array $callbacks): void
     {
         $this->beforeMethodResponseDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
+            static fn (TLCallback $t) => $t->getMethodBeforeResponseDeserializationCallbacks(),
             $callbacks
         ));
         $this->afterMethodResponseDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
+            static fn (TLCallback $t) => $t->getMethodAfterResponseDeserializationCallbacks(),
             $callbacks
         ));
 
         $this->beforeConstructorSerialization = array_merge(...array_map(
-            fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
+            static fn (TLCallback $t) => $t->getConstructorBeforeSerializationCallbacks(),
             $callbacks
         ));
         $this->beforeConstructorDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
+            static fn (TLCallback $t) => $t->getConstructorBeforeDeserializationCallbacks(),
             $callbacks
         ));
         $this->afterConstructorDeserialization = array_merge_recursive(...array_map(
-            fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
+            static fn (TLCallback $t) => $t->getConstructorAfterDeserializationCallbacks(),
             $callbacks
         ));
 
         $this->typeMismatch = array_merge(...array_map(
-            fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
+            static fn (TLCallback $t) => $t->getTypeMismatchCallbacks(),
             $callbacks
         ));
     }
@@ -451,7 +451,7 @@ final class TL implements TLInterface
                 return Tools::packSignedLong((int) $object);
             case 'int128':
                 if (\strlen($object) !== 16) {
-                    $object = base64_decode($object);
+                    $object = base64_decode($object, true);
                     if (\strlen($object) !== 16) {
                         throw new Exception(Lang::$current_lang['long_not_16']);
                     }
@@ -459,7 +459,7 @@ final class TL implements TLInterface
                 return (string) $object;
             case 'int256':
                 if (\strlen($object) !== 32) {
-                    $object = base64_decode($object);
+                    $object = base64_decode($object, true);
                     if (\strlen($object) !== 32) {
                         throw new Exception(Lang::$current_lang['long_not_32']);
                     }
@@ -467,7 +467,7 @@ final class TL implements TLInterface
                 return (string) $object;
             case 'int512':
                 if (\strlen($object) !== 64) {
-                    $object = base64_decode($object);
+                    $object = base64_decode($object, true);
                     if (\strlen($object) !== 64) {
                         throw new Exception(Lang::$current_lang['long_not_64']);
                     }
@@ -497,7 +497,7 @@ final class TL implements TLInterface
                 return $concat;
             case 'bytes':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
-                    $object = base64_decode($object['bytes']);
+                    $object = base64_decode($object['bytes'], true);
                 }
                 if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;
@@ -520,7 +520,7 @@ final class TL implements TLInterface
                 return $concat;
             case 'waveform':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
-                    $object = base64_decode($object['bytes']);
+                    $object = base64_decode($object['bytes'], true);
                 }
                 if (\is_array($object)) {
                     $object = self::compressWaveform($object);
@@ -742,7 +742,7 @@ final class TL implements TLInterface
                 $value = ['_' => 'dataJSON', 'data' => json_encode($value)];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'], true)) {
-                array_walk($value, function (&$arg): void {
+                array_walk($value, static function (&$arg): void {
                     $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
                 });
             }

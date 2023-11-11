@@ -43,7 +43,7 @@ final class FeedLoop extends Loop
     /**
      * Main loop ID.
      */
-    const GENERIC = 0;
+    public const GENERIC = 0;
     /**
      * Incoming updates array.
      */

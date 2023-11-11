@@ -377,7 +377,7 @@ final class Connection extends SettingsAbstract
         if (!isset($this->proxy[$proxy])) {
             return $this;
         }
-        if (false === $index = array_search($extra, $this->proxy[$proxy])) {
+        if (false === $index = array_search($extra, $this->proxy[$proxy], true)) {
             return $this;
         }
         unset($this->proxy[$proxy][$index]);

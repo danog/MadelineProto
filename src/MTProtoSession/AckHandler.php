@@ -122,7 +122,7 @@ trait AckHandler
                     continue;
                 }
                 if ($message->getSent() + $dropTimeout < time()) {
-                    $this->handleReject($message, fn () => new Exception('Request timeout'));
+                    $this->handleReject($message, static fn () => new Exception('Request timeout'));
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {

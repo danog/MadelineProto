@@ -110,7 +110,7 @@ trait Files
                 '_' => 'messageMediaDocument',
                 'document' => $media,
                 'ttl_seconds' => $media['ttl_seconds'],
-                'secret' => true
+                'secret' => true,
             ];
         }
         if ($media['_'] !== 'messageMediaDocument') {
@@ -234,8 +234,8 @@ trait Files
                 $this->logger->logger('Upload status: '.$percent.'%', Logger::NOTICE);
             };
         } else {
-            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
-                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+            $cb = static function (float $percent, float $speed, float $time) use ($cb): void {
+                EventLoop::queue(static function () use ($percent, $speed, $time, $cb): void {
                     $cb($percent, $speed, $time);
                 });
             };
@@ -272,7 +272,7 @@ trait Files
         $speed = 0;
         $time = 0;
         if ($size) {
-            $cb = function () use ($cb, $part_total_num, &$speed, &$time): void {
+            $cb = static function () use ($cb, $part_total_num, &$speed, &$time): void {
                 static $cur = 0;
                 $cur++;
                 $cb($cur * 100 / $part_total_num, $speed, $time);
@@ -996,7 +996,7 @@ trait Files
         $this->logger->logger('Waiting for lock of file to download...');
         $unlock = Tools::flock("$file.lock", LOCK_EX);
         $this->logger->logger('Got lock of file to download');
-        async($this->downloadToStream(...), $messageMedia, $stream, $cb, $size, -1, $cancellation)->finally(function () use ($stream, $unlock, $file): void {
+        async($this->downloadToStream(...), $messageMedia, $stream, $cb, $size, -1, $cancellation)->finally(static function () use ($stream, $unlock, $file): void {
             $stream->close();
             $unlock();
             try {
@@ -1034,8 +1034,8 @@ trait Files
                 $this->logger->logger('Download status: '.$percent.'%', Logger::NOTICE);
             };
         } else {
-            $cb = function (float $percent, float $speed, float $time) use ($cb): void {
-                EventLoop::queue(function () use ($percent, $speed, $time, $cb): void {
+            $cb = static function (float $percent, float $speed, float $time) use ($cb): void {
+                EventLoop::queue(static function () use ($percent, $speed, $time, $cb): void {
                     $cb($percent, $speed, $time);
                 });
             };

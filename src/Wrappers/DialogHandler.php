@@ -70,7 +70,7 @@ trait DialogHandler
                     [
                         ...$this->botDialogsUpdatesState,
                         'pts_total_limit' => 2147483647,
-                        'floodWaitLimit' => 86400
+                        'floodWaitLimit' => 86400,
                     ],
                 );
                 switch ($result['_']) {

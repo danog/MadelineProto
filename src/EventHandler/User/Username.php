@@ -44,7 +44,7 @@ final class Username extends Update
         $this->firstName = $rawUserName['first_name'];
         $this->lastName = $rawUserName['last_name'];
         $this->usernames = array_map(
-            fn (array $username) => new UsernameInfo($username),
+            static fn (array $username) => new UsernameInfo($username),
             $rawUserName['usernames']
         );
     }

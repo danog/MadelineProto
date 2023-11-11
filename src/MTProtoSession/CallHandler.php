@@ -137,8 +137,8 @@ trait CallHandler
             if (!$postpone) {
                 $this->flush();
             }
-            return new WrappedFuture(async(fn () => array_map(
-                fn (WrappedFuture $f) => $f->await(),
+            return new WrappedFuture(async(static fn () => array_map(
+                static fn (WrappedFuture $f) => $f->await(),
                 await($promises)
             )));
         }

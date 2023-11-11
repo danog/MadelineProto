@@ -85,16 +85,16 @@ final class PeerDatabase implements TLCallback
     protected static array $dbProperties = [
         'db' => [
             'innerMadelineProto' => true,
-            'table' => 'MTProto_chats'
+            'table' => 'MTProto_chats',
         ],
         'fullDb' => [
             'innerMadelineProto' => true,
-            'table' => 'MTProto_full_chats'
+            'table' => 'MTProto_full_chats',
         ],
         'usernames' => [
             'innerMadelineProto' => true,
             'innerMadelineProtoSerializer' => SerializerType::STRING,
-            'table' => 'MTProto_usernames'
+            'table' => 'MTProto_usernames',
         ],
     ];
 

@@ -68,7 +68,7 @@ class EntitiesTest extends MadelineTestCase
 
     private function assertNoRelevantEntities(array $entities): void
     {
-        $entities = array_filter($entities, fn (array $e) => !\in_array(
+        $entities = array_filter($entities, static fn (array $e) => !\in_array(
             $e['type'],
             ['url', 'email', 'phone_number', 'mention', 'bot_command'],
             true
@@ -244,7 +244,7 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'spoiler',
                     ],
                 ],
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> blockquote <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;'
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> blockquote <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
             ],
             [
                 'markdown',
@@ -290,8 +290,8 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 2,
                         'length' => 17,
                         'type' => 'pre',
-                        'language' => 'php'
-                    ]
+                        'language' => 'php',
+                    ],
                 ],
             ],
             [
@@ -305,7 +305,7 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'bold',
                     ],
                 ],
-                '<b>&#039;&quot;</b>'
+                '<b>&#039;&quot;</b>',
             ],
             [
                 'html',
@@ -353,8 +353,8 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 5,
                         'type' => 'pre',
-                        'language' => ''
-                    ]
+                        'language' => '',
+                    ],
                 ],
             ],
             [
@@ -366,7 +366,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
             ],
@@ -379,9 +379,9 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://transfer.sh/(/test/test.PNG,/test/test.MP4).zip'
-                    ]
-                ]
+                        'url' => 'https://transfer.sh/(/test/test.PNG,/test/test.MP4).zip',
+                    ],
+                ],
             ],
             [
                 'markdown',
@@ -392,7 +392,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
             ],
@@ -405,7 +405,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/?v=\\test'
+                        'url' => 'https://google.com/?v=\\test',
                     ],
                 ],
             ],
@@ -418,7 +418,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
             ],
@@ -431,7 +431,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
             ],
@@ -450,7 +450,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
                 '<a href="https://google.com/">link</a> test',
@@ -464,7 +464,7 @@ class EntitiesTest extends MadelineTestCase
                         'offset' => 0,
                         'length' => 4,
                         'type' => 'text_url',
-                        'url' => 'https://google.com/'
+                        'url' => 'https://google.com/',
                     ],
                 ],
                 '<a href="https://google.com/">link</a> ',

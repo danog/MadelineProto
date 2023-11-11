@@ -789,7 +789,7 @@ trait UpdateHandler
                 'clear_draft' => $clearDraft,
                 'no_webpage' => $noWebpage,
                 'update_stickersets_order' => $updateStickersetsOrder,
-                'cancellation' => $cancellation
+                'cancellation' => $cancellation,
             ]
         );
         if (isset($result['_'])) {

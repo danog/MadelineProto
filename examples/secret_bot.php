@@ -46,7 +46,7 @@ class SecretHandler extends SimpleEventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "danogentili"; // Change this
+    public const ADMIN = "danogentili"; // Change this
     /**
      * Get peer(s) where to report errors.
      *

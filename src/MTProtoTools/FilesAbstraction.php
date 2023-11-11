@@ -405,7 +405,7 @@ trait FilesAbstraction
                     '_' => 'inputMediaUploadedPhoto',
                     'spoiler' => $spoiler,
                     'file' => $file,
-                    'ttl_seconds' => $ttl
+                    'ttl_seconds' => $ttl,
                 ],
                 default => [
                     '_' => 'inputMediaUploadedDocument',
@@ -415,7 +415,7 @@ trait FilesAbstraction
                     'file' => $file,
                     'thumb' => $thumb,
                     'mime_type' => $mimeType,
-                    'attributes' => $attributes
+                    'attributes' => $attributes,
                 ]
             };
             if ($reuseId) {

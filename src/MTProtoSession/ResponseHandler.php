@@ -200,7 +200,7 @@ trait ResponseHandler
             try {
                 $exception = $this->handleRpcError($request, $response);
             } catch (Throwable $e) {
-                $exception = fn () => $e;
+                $exception = static fn () => $e;
             }
             if ($exception) {
                 $this->handleReject($request, $exception);
@@ -229,7 +229,7 @@ trait ResponseHandler
                     EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
-            $this->handleReject($request, fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, static fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
             return;
         }
 
@@ -284,7 +284,7 @@ trait ResponseHandler
             $this->shared->getTempAuthKey()->init(true);
         }
         if (\in_array($response['error_message'], ['PERSISTENT_TIMESTAMP_EMPTY', 'PERSISTENT_TIMESTAMP_INVALID'], true)) {
-            return fn () => new PTSException($response['error_message']);
+            return static fn () => new PTSException($response['error_message']);
         }
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
@@ -335,7 +335,7 @@ trait ResponseHandler
                     EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
                     return null;
                 }
-                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 303:
                 $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($this->API->isTestMode()) {
@@ -379,7 +379,7 @@ trait ResponseHandler
                     }
                     return null;
                 }
-                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 401:
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':
@@ -400,7 +400,7 @@ trait ResponseHandler
                             EventLoop::queue(
                                 $this->handleReject(...),
                                 $request,
-                                fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor())
+                                static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor())
                             );
                             return null;
                         }
@@ -427,7 +427,7 @@ trait ResponseHandler
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                 }
-                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -440,15 +440,15 @@ trait ResponseHandler
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
                     $id = EventLoop::delay((float) $seconds, fn () => $this->methodRecall($msgId));
-                    $request->cancellation?->subscribe(fn () => EventLoop::cancel($id));
+                    $request->cancellation?->subscribe(static fn () => EventLoop::cancel($id));
                     return null;
                 }
                 if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
-                    return fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
+                    return static fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
                 }
                 // no break
             default:
-                return fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
         }
     }
 }

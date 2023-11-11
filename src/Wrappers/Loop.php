@@ -125,7 +125,7 @@ trait Loop
     {
         if (!$this->hasEventHandler()) {
             if (Magic::$isIpcWorker) {
-                EventLoop::queue(fn () => throw new SignalException('Restarting IPC daemon!'));
+                EventLoop::queue(static fn () => throw new SignalException('Restarting IPC daemon!'));
             }
             return;
         }

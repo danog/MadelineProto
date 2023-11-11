@@ -40,9 +40,9 @@ use function strlen;
  */
 final class WriteLoop extends Loop
 {
-    const MAX_COUNT = 1020;
+    public const MAX_COUNT = 1020;
     private const MAX_SIZE = 1 << 15;
-    const MAX_IDS = 8192;
+    public const MAX_IDS = 8192;
 
     use Common;
     /**
@@ -226,9 +226,9 @@ final class WriteLoop extends Loop
                                         'lang_code' => $this->API->settings->getAppInfo()->getLangCode(),
                                         'lang_pack' => $this->API->settings->getAppInfo()->getLangPack(),
                                         'proxy' => $this->connection->getInputClientProxy(),
-                                        'query' => $MTmessage['body']
+                                        'query' => $MTmessage['body'],
                                     ]
-                                )
+                                ),
                             ]));
                         } else {
                             $this->API->logger("Skipping $message due to uninited connection in DC $this->datacenter");
@@ -257,7 +257,7 @@ final class WriteLoop extends Loop
                             'invokeAfterMsg',
                             [
                                 'msg_id' => $prevId,
-                                'query' => $MTmessage['body']
+                                'query' => $MTmessage['body'],
                             ]
                         );
                     }

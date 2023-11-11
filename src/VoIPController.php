@@ -60,61 +60,61 @@ final class VoIPController
             "11.0.0"
         ]*/
     ];
-    const NET_TYPE_UNKNOWN = 0;
-    const NET_TYPE_GPRS = 1;
-    const NET_TYPE_EDGE = 2;
-    const NET_TYPE_3G = 3;
-    const NET_TYPE_HSPA = 4;
-    const NET_TYPE_LTE = 5;
-    const NET_TYPE_WIFI = 6;
-    const NET_TYPE_ETHERNET = 7;
-    const NET_TYPE_OTHER_HIGH_SPEED = 8;
-    const NET_TYPE_OTHER_LOW_SPEED = 9;
-    const NET_TYPE_DIALUP = 10;
-    const NET_TYPE_OTHER_MOBILE = 11;
+    public const NET_TYPE_UNKNOWN = 0;
+    public const NET_TYPE_GPRS = 1;
+    public const NET_TYPE_EDGE = 2;
+    public const NET_TYPE_3G = 3;
+    public const NET_TYPE_HSPA = 4;
+    public const NET_TYPE_LTE = 5;
+    public const NET_TYPE_WIFI = 6;
+    public const NET_TYPE_ETHERNET = 7;
+    public const NET_TYPE_OTHER_HIGH_SPEED = 8;
+    public const NET_TYPE_OTHER_LOW_SPEED = 9;
+    public const NET_TYPE_DIALUP = 10;
+    public const NET_TYPE_OTHER_MOBILE = 11;
 
-    const DATA_SAVING_NEVER = 0;
-    const DATA_SAVING_MOBILE = 1;
-    const DATA_SAVING_ALWAYS = 2;
+    public const DATA_SAVING_NEVER = 0;
+    public const DATA_SAVING_MOBILE = 1;
+    public const DATA_SAVING_ALWAYS = 2;
 
-    const PROXY_NONE = 0;
-    const PROXY_SOCKS5 = 1;
+    public const PROXY_NONE = 0;
+    public const PROXY_SOCKS5 = 1;
 
-    const AUDIO_STATE_NONE = -1;
-    const AUDIO_STATE_CREATED = 0;
-    const AUDIO_STATE_CONFIGURED = 1;
-    const AUDIO_STATE_RUNNING = 2;
+    public const AUDIO_STATE_NONE = -1;
+    public const AUDIO_STATE_CREATED = 0;
+    public const AUDIO_STATE_CONFIGURED = 1;
+    public const AUDIO_STATE_RUNNING = 2;
 
-    const PKT_INIT = 1;
-    const PKT_INIT_ACK = 2;
-    const PKT_STREAM_STATE = 3;
-    const PKT_STREAM_DATA = 4;
-    const PKT_UPDATE_STREAMS = 5;
-    const PKT_PING = 6;
-    const PKT_PONG = 7;
-    const PKT_STREAM_DATA_X2 = 8;
-    const PKT_STREAM_DATA_X3 = 9;
-    const PKT_LAN_ENDPOINT = 10;
-    const PKT_NETWORK_CHANGED = 11;
-    const PKT_SWITCH_PREF_RELAY = 12;
-    const PKT_SWITCH_TO_P2P = 13;
-    const PKT_NOP = 14;
+    public const PKT_INIT = 1;
+    public const PKT_INIT_ACK = 2;
+    public const PKT_STREAM_STATE = 3;
+    public const PKT_STREAM_DATA = 4;
+    public const PKT_UPDATE_STREAMS = 5;
+    public const PKT_PING = 6;
+    public const PKT_PONG = 7;
+    public const PKT_STREAM_DATA_X2 = 8;
+    public const PKT_STREAM_DATA_X3 = 9;
+    public const PKT_LAN_ENDPOINT = 10;
+    public const PKT_NETWORK_CHANGED = 11;
+    public const PKT_SWITCH_PREF_RELAY = 12;
+    public const PKT_SWITCH_TO_P2P = 13;
+    public const PKT_NOP = 14;
 
-    const TLID_DECRYPTED_AUDIO_BLOCK = "\xc1\xdb\xf9\x48";
-    const TLID_SIMPLE_AUDIO_BLOCK = "\x0d\x0e\x76\xcc";
+    public const TLID_DECRYPTED_AUDIO_BLOCK = "\xc1\xdb\xf9\x48";
+    public const TLID_SIMPLE_AUDIO_BLOCK = "\x0d\x0e\x76\xcc";
 
-    const TLID_REFLECTOR_SELF_INFO = "\xC7\x72\x15\xc0";
-    const TLID_REFLECTOR_PEER_INFO = "\x1C\x37\xD9\x27";
+    public const TLID_REFLECTOR_SELF_INFO = "\xC7\x72\x15\xc0";
+    public const TLID_REFLECTOR_PEER_INFO = "\x1C\x37\xD9\x27";
 
-    const PROTO_ID = 'GrVP';
+    public const PROTO_ID = 'GrVP';
 
-    const PROTOCOL_VERSION = 9;
-    const MIN_PROTOCOL_VERSION = 9;
+    public const PROTOCOL_VERSION = 9;
+    public const MIN_PROTOCOL_VERSION = 9;
 
-    const STREAM_TYPE_AUDIO = 1;
-    const STREAM_TYPE_VIDEO = 2;
+    public const STREAM_TYPE_AUDIO = 1;
+    public const STREAM_TYPE_VIDEO = 2;
 
-    const CODEC_OPUS = 'SUPO';
+    public const CODEC_OPUS = 'SUPO';
 
     private MessageHandler $messageHandler;
     private VoIPState $voipState = VoIPState::CREATED;
@@ -229,7 +229,7 @@ final class VoIPController
                     'key_fingerprint' => substr(sha1($key, true), -8),
                     'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
                     'g_a' => $this->call['g_a'],
-                    'protocol' => self::CALL_PROTOCOL
+                    'protocol' => self::CALL_PROTOCOL,
                 ]))['phone_call'];
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
@@ -287,10 +287,10 @@ final class VoIPController
                     'peer' => [
                         'id' => $this->call['id'],
                         'access_hash' => $this->call['access_hash'],
-                        '_' => 'inputPhoneCall'
+                        '_' => 'inputPhoneCall',
                     ],
                     'g_b' => $g_b->toBytes(),
-                    'protocol' => self::CALL_PROTOCOL
+                    'protocol' => self::CALL_PROTOCOL,
                 ]);
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'CALL_ALREADY_ACCEPTED') {
@@ -469,7 +469,7 @@ final class VoIPController
                     }
                     $formats[]= [
                         'name' => $name,
-                        'parameters' => $parameters
+                        'parameters' => $parameters,
                     ];
                 }
                 return [
@@ -596,8 +596,8 @@ final class VoIPController
                     'protocol' => self::PROTOCOL_VERSION,
                     'min_protocol' => self::MIN_PROTOCOL_VERSION,
                     'all_streams' => [
-                        ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1]
-                    ]
+                        ['id' => 0, 'type' => self::STREAM_TYPE_AUDIO, 'codec' => self::CODEC_OPUS, 'frame_duration' => 60, 'enabled' => 1],
+                    ],
                 ]));
                 $socket->sendInit();
                 break;
@@ -634,7 +634,7 @@ final class VoIPController
         $this->bestEndpoint->writeReliably([
             '_' => self::PKT_STREAM_STATE,
             'id' => 0,
-            'enabled' => false
+            'enabled' => false,
         ]);
 
         $this->startWriteLoop();
@@ -696,7 +696,7 @@ final class VoIPController
                     if (!$this->bestEndpoint->writeReliably([
                         '_' => self::PKT_STREAM_STATE,
                         'id' => 0,
-                        'enabled' => true
+                        'enabled' => true,
                     ])) {
                         $this->log("Exiting write loop in $this because we could not write stream state!");
                         return;
@@ -709,7 +709,7 @@ final class VoIPController
                     '_' => self::PKT_STREAM_DATA,
                     'stream_id' => 0,
                     'data' => $packet,
-                    'timestamp' => $this->opusTimestamp
+                    'timestamp' => $this->opusTimestamp,
                 ]);
                 $this->opusTimestamp += 60;
             } else {
@@ -718,7 +718,7 @@ final class VoIPController
                     if (!$this->bestEndpoint->writeReliably([
                         '_' => self::PKT_STREAM_STATE,
                         'id' => 0,
-                        'enabled' => false
+                        'enabled' => false,
                     ])) {
                         $this->log("Exiting write loop in $this because we could not write stream state!");
                         return;
@@ -727,7 +727,7 @@ final class VoIPController
                     $delay = 0.2;
                 }
                 $packet = $this->messageHandler->encryptPacket([
-                    '_' => self::PKT_NOP
+                    '_' => self::PKT_NOP,
                 ]);
             }
             //$this->log("Writing {$this->opusTimestamp} in $this!");

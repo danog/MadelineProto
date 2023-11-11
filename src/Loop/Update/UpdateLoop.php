@@ -47,7 +47,7 @@ final class UpdateLoop extends Loop
     /**
      * Main loop ID.
      */
-    const GENERIC = 0;
+    public const GENERIC = 0;
 
     private const DEFAULT_TIMEOUT = 10.0;
 

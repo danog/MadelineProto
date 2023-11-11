@@ -226,7 +226,7 @@ trait Start
                 if ($qr) {
                     $result = [
                         'logged_in' => false,
-                        'svg' => $qr->getQRSvg(400, 2)
+                        'svg' => $qr->getQRSvg(400, 2),
                     ];
                 } else {
                     $result = [

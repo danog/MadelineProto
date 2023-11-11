@@ -167,7 +167,7 @@ trait PeerHandler
      */
     public function getId(mixed $id): int
     {
-        if (\is_integer($id)) {
+        if (\is_int($id)) {
             return $id;
         }
         return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_ID);
@@ -306,7 +306,7 @@ trait PeerHandler
             }
         }
         if (\is_string($id)) {
-            if (strpos($id, '#') !== false) {
+            if (str_contains($id, '#')) {
                 if (preg_match('/^channel#(\\d*)/', $id, $matches)) {
                     return DialogId::fromSupergroupOrChannel((int) $matches[1]);
                 }

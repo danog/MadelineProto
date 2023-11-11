@@ -49,7 +49,7 @@ final class FiltersAnd extends Filter
         }
         $final = array_filter(
             $final,
-            fn (Filter $f): bool => !$f instanceof FilterAllowAll,
+            static fn (Filter $f): bool => !$f instanceof FilterAllowAll,
         );
         $final = array_values($final);
         return match (\count($final)) {

@@ -409,7 +409,7 @@ trait BotAPI
                     'file_id' => (string) $fileId,
                     'file_unique_id' => $fileId->getUniqueBotAPI(),
                     'file_size' => $data['size'],
-                    'mime_type' => 'application/octet-stream'
+                    'mime_type' => 'application/octet-stream',
                 ];
                 return ['encrypted' => $res];
             default:

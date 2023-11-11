@@ -54,19 +54,19 @@ final class Logger
     /**
      * @internal ANSI foreground color escapes
      */
-    const FOREGROUND = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
+    public const FOREGROUND = ['default' => 39, 'black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'light_gray' => 37, 'dark_gray' => 90, 'light_red' => 91, 'light_green' => 92, 'light_yellow' => 93, 'light_blue' => 94, 'light_magenta' => 95, 'light_cyan' => 96, 'white' => 97];
     /**
      * @internal ANSI background color escapes
      */
-    const BACKGROUND = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
+    public const BACKGROUND = ['default' => 49, 'black' => 40, 'red' => 41, 'magenta' => 45, 'yellow' => 43, 'green' => 42, 'blue' => 44, 'cyan' => 46, 'light_gray' => 47, 'dark_gray' => 100, 'light_red' => 101, 'light_green' => 102, 'light_yellow' => 103, 'light_blue' => 104, 'light_magenta' => 105, 'light_cyan' => 106, 'white' => 107];
     /**
      * @internal ANSI modifier escapes
      */
-    const SET = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
+    public const SET = ['bold' => 1, 'dim' => 2, 'underlined' => 3, 'blink' => 4, 'reverse' => 5, 'hidden' => 6];
     /**
      * @internal ANSI reset modifier escapes
      */
-    const RESET = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
+    public const RESET = ['all' => 0, 'bold' => 21, 'dim' => 22, 'underlined' => 24, 'blink' => 25, 'reverse' => 26, 'hidden' => 28];
     /**
      * Logging mode.
      *
@@ -134,104 +134,104 @@ final class Logger
      *
      * @internal
      */
-    const ULTRA_VERBOSE = 5;
+    public const ULTRA_VERBOSE = 5;
     /**
      * Verbose logging.
      *
      * @internal
      */
-    const VERBOSE = 4;
+    public const VERBOSE = 4;
     /**
      * Notice logging.
      *
      * @internal
      */
-    const NOTICE = 3;
+    public const NOTICE = 3;
     /**
      * Warning logging.
      *
      * @internal
      */
-    const WARNING = 2;
+    public const WARNING = 2;
     /**
      * Error logging.
      *
      * @internal
      */
-    const ERROR = 1;
+    public const ERROR = 1;
     /**
      * Log only fatal errors.
      *
      * @internal
      */
-    const FATAL_ERROR = 0;
+    public const FATAL_ERROR = 0;
 
     /**
      * Default logger (syslog).
      *
      * @internal
      */
-    const DEFAULT_LOGGER = 1;
+    public const DEFAULT_LOGGER = 1;
     /**
      * File logger.
      *
      * @internal
      */
-    const FILE_LOGGER = 2;
+    public const FILE_LOGGER = 2;
     /**
      * Echo logger.
      *
      * @internal
      */
-    const ECHO_LOGGER = 3;
+    public const ECHO_LOGGER = 3;
     /**
      * Callable logger.
      *
      * @internal
      */
-    const CALLABLE_LOGGER = 4;
+    public const CALLABLE_LOGGER = 4;
 
     /**
      * Ultra verbose level.
      */
-    const LEVEL_ULTRA_VERBOSE = self::ULTRA_VERBOSE;
+    public const LEVEL_ULTRA_VERBOSE = self::ULTRA_VERBOSE;
     /**
      * Verbose level.
      */
-    const LEVEL_VERBOSE = self::VERBOSE;
+    public const LEVEL_VERBOSE = self::VERBOSE;
     /**
      * Notice level.
      */
-    const LEVEL_NOTICE = self::NOTICE;
+    public const LEVEL_NOTICE = self::NOTICE;
     /**
      * Warning level.
      */
-    const LEVEL_WARNING = self::WARNING;
+    public const LEVEL_WARNING = self::WARNING;
     /**
      * Error level.
      */
-    const LEVEL_ERROR = self::ERROR;
+    public const LEVEL_ERROR = self::ERROR;
     /**
      * Fatal error level.
      */
-    const LEVEL_FATAL = self::FATAL_ERROR;
+    public const LEVEL_FATAL = self::FATAL_ERROR;
 
     /**
      * Default logger (syslog).
      */
-    const LOGGER_DEFAULT = self::DEFAULT_LOGGER;
+    public const LOGGER_DEFAULT = self::DEFAULT_LOGGER;
     /**
      * Echo logger.
      */
-    const LOGGER_ECHO = self::ECHO_LOGGER;
+    public const LOGGER_ECHO = self::ECHO_LOGGER;
     /**
      * File logger.
      */
-    const LOGGER_FILE = self::FILE_LOGGER;
+    public const LOGGER_FILE = self::FILE_LOGGER;
     /**
      * Callable logger.
      */
-    const LOGGER_CALLABLE = self::CALLABLE_LOGGER;
+    public const LOGGER_CALLABLE = self::CALLABLE_LOGGER;
 
     /**
      * Construct global static logger from MadelineProto settings.

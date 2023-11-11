@@ -40,7 +40,7 @@ final class TLMethods
             'type' => $json_dict['type'],
             'params' => $json_dict['params'],
             'flags' => [],
-            'encrypted' => $scheme_type !== 'mtproto'
+            'encrypted' => $scheme_type !== 'mtproto',
         ];
         if (preg_match('/^(v|V)ector\\<(.*)\\>$/', $json_dict['type'], $matches)) {
             $this->by_id[$json_dict['id']]['type'] = $matches[1] === 'v' ? 'vector' : 'Vector t';

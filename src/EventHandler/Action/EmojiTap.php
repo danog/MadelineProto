@@ -45,8 +45,8 @@ final class EmojiTap extends Action
             'emoticon' => $this->emoticon,
             'interaction' => [
                 'v' => 1,
-                'a' => $this->animation
-            ]
+                'a' => $this->animation,
+            ],
         ];
     }
 }

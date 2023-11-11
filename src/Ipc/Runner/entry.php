@@ -59,7 +59,7 @@ use Webmozart\Assert\Assert;
 
     if (\defined('SIGHUP')) {
         try {
-            pcntl_signal(SIGHUP, fn () => null);
+            pcntl_signal(SIGHUP, static fn () => null);
         } catch (\Throwable $e) {
         }
     }

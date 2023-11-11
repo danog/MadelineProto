@@ -44,7 +44,7 @@ final class TLConstructors
             'params' => $json_dict['params'],
             'flags' => [],
             'type' => ($scheme_type === 'mtproto' && $json_dict['type'] === 'Message' ? 'MT' : '').$json_dict['type'],
-            'encrypted' => $scheme_type !== 'mtproto'
+            'encrypted' => $scheme_type !== 'mtproto',
         ];
         if ($scheme_type === 'secret') {
             $this->by_id[$json_dict['id']]['layer'] = $json_dict['layer'];

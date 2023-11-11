@@ -167,7 +167,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.getMessages' : 'messages.getMessages',
             [
                 'channel' => $this->chatId,
-                'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]]
+                'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]],
             ]
         )['messages'];
         /** @psalm-suppress InaccessibleProperty */
@@ -342,7 +342,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 'peer' => $this->senderId,
             ]
         )['stories']['stories'];
-        $result = array_filter($result, fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
+        $result = array_filter($result, static fn (array $t): bool => $t['_'] !== 'storyItemDeleted');
         // Recall it because storyItemSkipped
         // TODO: Do this more efficiently
         $result = $client->methodCallAsyncRead(
@@ -375,7 +375,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             [
                 'peer' => $this->senderId,
                 'top_msg_id' => $this->topicId,
-                'action' => $action
+                'action' => $action,
             ]
         );
     }
@@ -393,7 +393,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,
-                'max_id' => $readAll ? 0 : $this->id
+                'max_id' => $readAll ? 0 : $this->id,
             ]
         );
     }

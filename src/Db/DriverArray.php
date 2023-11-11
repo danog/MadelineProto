@@ -140,14 +140,14 @@ abstract class DriverArray implements DbArray, IteratorAggregate
         $this->serializer = match ($serializer) {
             SerializerType::SERIALIZE => \serialize(...),
             SerializerType::IGBINARY => \igbinary_serialize(...),
-            SerializerType::JSON => fn ($value) => json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
+            SerializerType::JSON => static fn ($value) => json_encode($value, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
             SerializerType::STRING => strval(...),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),
             SerializerType::IGBINARY => \igbinary_unserialize(...),
-            SerializerType::JSON => fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
-            SerializerType::STRING => fn ($v) => $v,
+            SerializerType::JSON => static fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => static fn ($v) => $v,
         };
     }
     private static function migrateDataToDb(self $new, DbType|null $old): void

@@ -30,15 +30,15 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * We have received this message.
      */
-    const STATE_RECEIVED = 4;
+    public const STATE_RECEIVED = 4;
     /**
      * We have acknowledged this message.
      */
-    const STATE_ACKED = 8;
+    public const STATE_ACKED = 8;
     /**
      * We have read the contents of this message.
      */
-    const STATE_READ = 128;
+    public const STATE_READ = 128;
 
     /**
      * Response field map.

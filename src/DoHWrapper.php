@@ -133,7 +133,7 @@ final class DoHWrapper
     {
         $ctxs = [];
         $combos = [
-            [[DefaultStream::class, []], [BufferedRawStream::class, []]]
+            [[DefaultStream::class, []], [BufferedRawStream::class, []]],
         ];
         if ($this->API->getSettings()->getConnection()->getRetry()) {
             $proxyCombos = [];

@@ -61,7 +61,7 @@ if ($loader) {
             'PhabelVendor\\Monolog\\Test\\TestCase',
             'PhabelVendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface',
             'PhabelVendor\\Symfony\\Component\\String\\Slugger\\AsciiSlugger',
-        ])) {
+        ], true)) {
             continue;
         }
         if (str_starts_with($class, 'PhabelVendor\\Symfony\\Component\\Console') || str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || str_ends_with($class, 'Test') || class_exists($class) || interface_exists($class)) {
@@ -296,18 +296,18 @@ function eq(string $file, string $contents, string $type, string $subtype): void
 function sendMedia(API $MadelineProto, array $media, string $message, string $mention, mixed $peer, string $type): void
 {
     $medias = [
-        'base' => $media
+        'base' => $media,
     ];
     if (isset($media['file']) && is_string($media['file'])) {
         $MadelineProto->sendDocument(
             peer: $peer,
             file: new ReadableBuffer(read($media['file'])),
-            callback: fn ($v) => $MadelineProto->logger($v),
+            callback: static fn ($v) => $MadelineProto->logger($v),
             fileName: basename($media['file'])
         );
         $medias['callback'] = array_merge(
             $media,
-            ['file' => new FileCallback($media['file'], fn ($v) => $MadelineProto->logger(...))]
+            ['file' => new FileCallback($media['file'], static fn ($v) => $MadelineProto->logger(...))]
         );
         $medias['stream'] = array_merge(
             $media,
@@ -315,12 +315,12 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
         );
         $medias['callback stream'] = array_merge(
             $media,
-            ['file' => new FileCallback(new ReadableBuffer(read($media['file'])), fn ($v) => $MadelineProto->logger(...))]
+            ['file' => new FileCallback(new ReadableBuffer(read($media['file'])), static fn ($v) => $MadelineProto->logger(...))]
         );
     } elseif (isset($media['url'])) {
         $medias['callback'] = array_merge(
             $media,
-            ['url' => new FileCallback($media['url'], fn ($v) => $MadelineProto->logger(...))]
+            ['url' => new FileCallback($media['url'], static fn ($v) => $MadelineProto->logger(...))]
         );
     }
     foreach ($medias as $subtype => $m) {

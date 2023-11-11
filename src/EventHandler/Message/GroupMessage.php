@@ -165,14 +165,14 @@ final class GroupMessage extends Message
             'send_voices' => false,
             'send_docs' => false,
             'send_plain' => false,
-            'until_date' => $untilDate
+            'until_date' => $untilDate,
         ];
         $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
                 'participant' => $this->senderId,
-                'banned_rights' => $chatBannedRights
+                'banned_rights' => $chatBannedRights,
             ]
         );
     }
@@ -206,14 +206,14 @@ final class GroupMessage extends Message
             'send_voices' => true,
             'send_docs' => true,
             'send_plain' => true,
-            'until_date' => $untilDate
+            'until_date' => $untilDate,
         ];
         $this->getClient()->methodCallAsyncRead(
             'channels.editBanned',
             [
                 'channel' => $this->chatId,
                 'participant' => $this->senderId,
-                'banned_rights' => $chatBannedRights
+                'banned_rights' => $chatBannedRights,
             ]
         );
     }
@@ -237,7 +237,7 @@ final class GroupMessage extends Message
             [
                 'channel' => $this->chatId,
                 'for_everyone' => $forEveryone,
-                'max_id' => $maxId
+                'max_id' => $maxId,
             ]
         );
     }

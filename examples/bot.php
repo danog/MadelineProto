@@ -69,7 +69,7 @@ class MyEventHandler extends SimpleEventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = "@me"; // !!! Change this to your username !!!
+    public const ADMIN = "@me"; // !!! Change this to your username !!!
 
     /**
      * @var array<int, bool>
@@ -112,7 +112,7 @@ class MyEventHandler extends SimpleEventHandler
         return [
             // Offers a /restart command to admins that can be used to restart the bot, applying changes.
             // Make sure to run in a bash while loop when running via CLI to allow self-restarts.
-            RestartPlugin::class
+            RestartPlugin::class,
         ];
     }
 
@@ -185,9 +185,9 @@ class MyEventHandler extends SimpleEventHandler
 
         $stories = $this->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
         // Skip deleted stories
-        $stories = array_filter($stories, fn (array $s): bool => $s['_'] === 'storyItem');
+        $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
         // Sort by date
-        usort($stories, fn ($a, $b) => $a['date'] <=> $b['date']);
+        usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
 
         $result = "Total stories: ".count($stories)."\n\n";
         foreach ($stories as $story) {

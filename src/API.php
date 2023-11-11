@@ -415,7 +415,7 @@ final class API extends AbstractAPI
 
         $prev = EventLoop::getErrorHandler();
         EventLoop::setErrorHandler(
-            $cb = function (Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
+            $cb = static function (Throwable $e) use ($instanceOne, &$errors, &$started, $eventHandler): void {
                 if ($e instanceof UnhandledFutureError) {
                     $e = $e->getPrevious();
                 }
@@ -442,7 +442,7 @@ final class API extends AbstractAPI
             $promises = [];
             foreach ($instances as $k => $instance) {
                 $instance->start();
-                $promises []= async(function () use ($k, $instance, $eventHandler, &$started): void {
+                $promises []= async(static function () use ($k, $instance, $eventHandler, &$started): void {
                     $instance->startAndLoopLogic($eventHandler[$k], $started[$k]);
                 });
             }

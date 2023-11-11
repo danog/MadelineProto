@@ -27,7 +27,7 @@ use danog\MadelineProto\TL\TL;
 // This code was written a few years ago: it is garbage, and has to be rewritten
 final class DocsBuilder
 {
-    const DEFAULT_TEMPLATES = [
+    public const DEFAULT_TEMPLATES = [
         'User' => ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'InputPeer', 'NotifyPeer', 'InputNotifyPeer'],
         'ReplyMarkup' => ['ReplyMarkup'],
         'InputFile' => ['InputFile', 'InputEncryptedFile'],

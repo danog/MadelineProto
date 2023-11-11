@@ -77,7 +77,7 @@ class RPCErrorException extends \Exception
             && !self::isBad($error, $code)
             && !($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
         ) {
-            EventLoop::queue(function () use ($method, $code, $error): void {
+            EventLoop::queue(static function () use ($method, $code, $error): void {
                 try {
                     $res = json_decode(
                         (

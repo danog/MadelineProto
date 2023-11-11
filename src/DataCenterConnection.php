@@ -41,9 +41,9 @@ use function count;
  */
 final class DataCenterConnection implements JsonSerializable
 {
-    const READ_WEIGHT = 1;
-    const READ_WEIGHT_MEDIA = 5;
-    const WRITE_WEIGHT = 10;
+    public const READ_WEIGHT = 1;
+    public const READ_WEIGHT_MEDIA = 5;
+    public const WRITE_WEIGHT = 10;
     /**
      * Promise for connection.
      *
@@ -604,7 +604,7 @@ final class DataCenterConnection implements JsonSerializable
             return $this->connections[0];
         }
         $max = max($this->availableConnections);
-        $key = array_search($max, $this->availableConnections);
+        $key = array_search($max, $this->availableConnections, true);
         // Decrease to implement round robin
         $this->availableConnections[$key]--;
         return $this->connections[$key];

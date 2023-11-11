@@ -73,7 +73,7 @@ $doc = new \danog\MadelineProto\AnnotationsBuilder(
     $docs[0],
     [
         'API' => API::class,
-        'MTProto' => MTProto::class
+        'MTProto' => MTProto::class,
     ],
     'danog\\MadelineProto'
 );
@@ -127,7 +127,7 @@ foreach ($files as $file) {
     if ($base === 'UPDATES_INTERNAL') {
         continue;
     }
-    $key = array_search($base, $order);
+    $key = array_search($base, $order, true);
     if ($key !== false) {
         $orderedfiles[$key] = $file;
     }
@@ -170,7 +170,7 @@ function printTypes(array $types, string $type): string
 
 foreach ($orderedfiles as $key => $filename) {
     $lines = file_get_contents($filename);
-    $lines = preg_replace_callback('/\<\!--\s+cut_here\s+(\S+)\s+-->.*\<\!--\s+cut_here_end\s+\1\s+--\>/sim', function ($matches) {
+    $lines = preg_replace_callback('/\<\!--\s+cut_here\s+(\S+)\s+-->.*\<\!--\s+cut_here_end\s+\1\s+--\>/sim', static function ($matches) {
         [, $match] = $matches;
         if ($match === "concretefilters") {
             $result = ClassFinder::getClassesInNamespace(
@@ -180,7 +180,7 @@ foreach ($orderedfiles as $key => $filename) {
             $result []= ServiceMessage::class;
             $result = array_filter(
                 $result,
-                fn ($class) => is_subclass_of($class, Update::class)
+                static fn ($class) => is_subclass_of($class, Update::class)
             );
             sort($result);
             $data = printTypes($result, $match);
@@ -195,7 +195,7 @@ foreach ($orderedfiles as $key => $filename) {
                 \danog\MadelineProto\EventHandler\Filter::class,
                 ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
             );
-            $result = array_filter($result, fn (string $class) => (new ReflectionClass($class))->getAttributes());
+            $result = array_filter($result, static fn (string $class) => (new ReflectionClass($class))->getAttributes());
             $data = printTypes($result, $match);
         } elseif ($match === "plugins") {
             $result = ClassFinder::getClassesInNamespace(

@@ -84,7 +84,7 @@ abstract class Tools extends AsyncTools
         $f = [];
         for ($x = 0; $x < $fiberCount; $x++) {
             try {
-                $f []= $cur = new Fiber(function (): void {
+                $f []= $cur = new Fiber(static function (): void {
                     Fiber::suspend();
                 });
                 $cur->start();
@@ -338,7 +338,7 @@ abstract class Tools extends AsyncTools
      */
     public static function base64urlDecode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT), true);
     }
     /**
      * Base64URL encode.
@@ -616,7 +616,7 @@ abstract class Tools extends AsyncTools
     {
         if ($stream instanceof LocalFile) {
             $stream = openFile($stream->file, 'r');
-            return fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
+            return static fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
         }
         if ($stream instanceof RemoteUrl) {
             self::$client ??= HttpClientBuilder::buildDefault();
@@ -628,7 +628,7 @@ abstract class Tools extends AsyncTools
             )->getBody();
         }
         $buffer = '';
-        return function (int $len) use (&$buffer, $stream, $cancellation): ?string {
+        return static function (int $len) use (&$buffer, $stream, $cancellation): ?string {
             if ($buffer === null) {
                 return null;
             }
@@ -683,7 +683,7 @@ abstract class Tools extends AsyncTools
     private const NO_YIELD_FUNCTIONS = [
         'onstart',
         'onupdatenewmessage',
-        'onupdatenewchannelmessage'
+        'onupdatenewchannelmessage',
     ];
     /**
      * Perform static analysis on a certain event handler class, to make sure it satisfies some performance requirements.
@@ -712,7 +712,7 @@ abstract class Tools extends AsyncTools
 
         if ($plugin) {
             $class = $finder->findInstanceOf($code, ClassLike::class);
-            $class = array_filter($class, fn (ClassLike $c): bool => $c->name !== null);
+            $class = array_filter($class, static fn (ClassLike $c): bool => $c->name !== null);
             if (\count($class) !== 1 || !$class[0] instanceof Class_) {
                 $issues []= new EventHandlerIssue(
                     message: Lang::$current_lang['plugins_must_have_exactly_one_class'],

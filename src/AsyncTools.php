@@ -48,7 +48,7 @@ abstract class AsyncTools extends StrTools
      */
     public static function rethrow(Throwable $e): void
     {
-        EventLoop::queue(fn () => throw $e);
+        EventLoop::queue(static fn () => throw $e);
     }
     /**
      * Fork a new green thread and execute the passed function in the background.
@@ -133,7 +133,7 @@ abstract class AsyncTools extends StrTools
     {
         $e = new TimeoutException($message);
         $deferred = new DeferredCancellation;
-        EventLoop::delay($timeout, fn () => $deferred->cancel($e));
+        EventLoop::delay($timeout, static fn () => $deferred->cancel($e));
         return $deferred->getCancellation();
     }
 

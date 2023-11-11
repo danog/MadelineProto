@@ -68,7 +68,7 @@ final class WebRunner extends RunnerAbstract
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
             'cwd' => Magic::getcwd(),
-            'MadelineSelfRestart' => 1
+            'MadelineSelfRestart' => 1,
         ];
         if (\function_exists('memprof_enabled') && memprof_enabled()) {
             $params['MEMPROF_PROFILE'] = '1';
@@ -80,7 +80,7 @@ final class WebRunner extends RunnerAbstract
     }
 
     private static ?string $absoluteRootDir = null;
-    final public static function getAbsoluteRootDir(): string
+    public static function getAbsoluteRootDir(): string
     {
         if (self::$absoluteRootDir) {
             return self::$absoluteRootDir;

@@ -322,7 +322,7 @@ final class Blacklist {
             }
             $newParams[$param['name']] = $param;
         }
-        uasort($newParams, fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
+        uasort($newParams, static fn (array $arr1, array $arr2) => isset($arr1['pow']) <=> isset($arr2['pow']));
         return $newParams;
     }
     private function prepareTLParams(array $data): array
@@ -418,14 +418,14 @@ final class Blacklist {
         foreach ($methods as $key => $method) {
             $name = $method->getName();
             if ($name == 'methodCallAsyncRead') {
-                unset($methods[array_search('methodCall', $methods)]);
-            } elseif (strpos($name, '__') === 0) {
+                unset($methods[array_search('methodCall', $methods, true)]);
+            } elseif (str_starts_with($name, '__')) {
                 unset($methods[$key]);
             } elseif (stripos($name, 'async') !== false) {
-                if (strpos($name, '_async') !== false) {
-                    unset($methods[array_search(str_ireplace('_async', '', $name), $methods)]);
+                if (str_contains($name, '_async')) {
+                    unset($methods[array_search(str_ireplace('_async', '', $name), $methods, true)]);
                 } else {
-                    unset($methods[array_search(str_ireplace('async', '', $name), $methods)]);
+                    unset($methods[array_search(str_ireplace('async', '', $name), $methods, true)]);
                 }
             }
         }
@@ -439,21 +439,21 @@ final class Blacklist {
 
         foreach ($methods as $method) {
             $name = $method->getName();
-            if (strpos($method->getDocComment() ?: '', '@internal') !== false) {
+            if (str_contains($method->getDocComment() ?: '', '@internal')) {
                 continue;
             }
             $static = $method->isStatic();
             if (!$static) {
                 $code = file_get_contents($method->getFileName());
                 $code = implode("\n", \array_slice(explode("\n", $code), $method->getStartLine(), $method->getEndLine() - $method->getStartLine()));
-                if (strpos($code, '$this') === false) {
+                if (!str_contains($code, '$this')) {
                     Logger::log("{$name} should be STATIC!", Logger::FATAL_ERROR);
                 }
             }
             if ($name == 'methodCallAsyncRead') {
                 $name = 'methodCall';
             } elseif (stripos($name, 'async') !== false) {
-                if (strpos($name, '_async') !== false) {
+                if (str_contains($name, '_async')) {
                     $name = str_ireplace('_async', '', $name);
                 } else {
                     $name = str_ireplace('async', '', $name);
@@ -629,7 +629,7 @@ final class Blacklist {
         fwrite($handle, "/** @internal An internal interface used to avoid type errors when using simple filters. */\n");
         fwrite($handle, "interface SimpleFilters extends ");
         /** @psalm-suppress UndefinedClass */
-        fwrite($handle, implode(", ", array_map(fn ($s) => "\\$s", ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler\SimpleFilter::class, ClassFinder::RECURSIVE_MODE|ClassFinder::ALLOW_INTERFACES))));
+        fwrite($handle, implode(", ", array_map(static fn ($s) => "\\$s", ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler\SimpleFilter::class, ClassFinder::RECURSIVE_MODE|ClassFinder::ALLOW_INTERFACES))));
         fwrite($handle, "{}\n");
     }
 

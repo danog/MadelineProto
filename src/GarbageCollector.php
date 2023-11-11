@@ -81,7 +81,7 @@ final class GarbageCollector
         $client = HttpClientBuilder::buildDefault();
 
         $id = null;
-        $cb = function () use ($client, &$id): void {
+        $cb = static function () use ($client, &$id): void {
             try {
                 $request = new Request(MADELINE_RELEASE_URL);
                 $latest = $client->request($request);
@@ -91,7 +91,7 @@ final class GarbageCollector
                     $new = Magic::$latest_release;
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
 
-                    $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".rand(0, PHP_INT_MAX)))
+                    $contents = $client->request(new Request("https://phar.madelineproto.xyz/phar.php?v=new".random_int(0, PHP_INT_MAX)))
                         ->getBody()
                         ->buffer();
 

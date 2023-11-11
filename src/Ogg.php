@@ -108,7 +108,7 @@ final class Ogg
         0x89b8fd09,0x8d79e0be,0x803ac667,0x84fbdbd0,
         0x9abc8bd5,0x9e7d9662,0x933eb0bb,0x97ffad0c,
         0xafb010b1,0xab710d06,0xa6322bdf,0xa2f33668,
-        0xbcb4666d,0xb8757bda,0xb5365d03,0xb1f740b4
+        0xbcb4666d,0xb8757bda,0xb5365d03,0xb1f740b4,
     ];
     private const OPUS_SET_APPLICATION_REQUEST = 4000;
     private const OPUS_GET_APPLICATION_REQUEST = 4001;
@@ -185,14 +185,14 @@ final class Ogg
     private const OPUS_FRAMESIZE_120_MS = 5009 /**< Use 120 ms frames */;
 
     private const CAPTURE_PATTERN = "OggS";
-    const CONTINUATION = 1;
-    const BOS = 2;
-    const EOS = 4;
+    public const CONTINUATION = 1;
+    public const BOS = 2;
+    public const EOS = 4;
 
-    const STATE_READ_HEADER = 0;
-    const STATE_READ_COMMENT = 1;
-    const STATE_STREAMING = 3;
-    const STATE_END = 4;
+    public const STATE_READ_HEADER = 0;
+    public const STATE_READ_COMMENT = 1;
+    public const STATE_STREAMING = 3;
+    public const STATE_END = 4;
 
     private int $currentDuration = 0;
     /**
@@ -243,7 +243,7 @@ final class Ogg
         $this->packFormat = implode(
             '/',
             array_map(
-                fn (string $v, string $k): string => $v.$k,
+                static fn (string $v, string $k): string => $v.$k,
                 $pack_format,
                 array_keys($pack_format),
             ),
@@ -608,7 +608,7 @@ final class Ogg
                 }
             }
         }
-        $checkErr = function (int|CData $err) use ($opus): void {
+        $checkErr = static function (int|CData $err) use ($opus): void {
             if ($err instanceof CData) {
                 $err = $err->cdata;
             }
@@ -660,11 +660,11 @@ final class Ogg
             ? openFile($oggOut->file, 'w')
             : $oggOut;
 
-        $writePage = function (int $header_type_flag, int $granule, int $streamId, int &$streamSeqno, string $packet) use ($out): void {
+        $writePage = static function (int $header_type_flag, int $granule, int $streamId, int &$streamSeqno, string $packet) use ($out): void {
             Assert::true(\strlen($packet) < 65025);
             $segments = [
                 ...array_fill(0, (int) (\strlen($packet) / 255), 255),
-                \strlen($packet) % 255
+                \strlen($packet) % 255,
             ];
             $data = 'OggS'.pack(
                 'CCPVVVCC*',
@@ -713,7 +713,7 @@ final class Ogg
         );
 
         $tags = 'OpusTags';
-        $writeTag = function (string $tag) use (&$tags): void {
+        $writeTag = static function (string $tag) use (&$tags): void {
             $tags .= pack('V', \strlen($tag)).$tag;
         };
         $writeTag("MadelineProto ".API::RELEASE.", ".$opus->opus_get_version_string());

@@ -39,7 +39,7 @@ final class BotCommands extends Update
         $this->botId = $rawBotCommands['bot_id'];
         $this->chatId = $API->getIdInternal($rawBotCommands['peer']);
         $this->commands = array_map(
-            fn (array $command): Command => new Command($command),
+            static fn (array $command): Command => new Command($command),
             $rawBotCommands['commands']
         );
     }

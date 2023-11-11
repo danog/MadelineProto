@@ -63,7 +63,7 @@ final class ActionForward implements Action
                             'unpin' => false,
                             'pm_oneside' => false,
                             'floodWaitLimit' => 2*86400,
-                            'cancellation' => $cancellation
+                            'cancellation' => $cancellation,
                         ],
                     );
                 } catch (RPCErrorException) {

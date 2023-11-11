@@ -14,8 +14,8 @@ if (!\defined('MADELINE_ALLOW_COMPOSER') && class_exists(\Composer\Autoload\Clas
 
 class Installer
 {
-    const RELEASE_TEMPLATE = 'https://phar.madelineproto.xyz/release%s?v=new';
-    const PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline%s.phar?v=%s';
+    public const RELEASE_TEMPLATE = 'https://phar.madelineproto.xyz/release%s?v=new';
+    public const PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline%s.phar?v=%s';
 
     /**
      * Phar lock instance.
@@ -100,7 +100,7 @@ class Installer
         }
         foreach ($composer['packages'] as $dep) {
             $name = $dep['name'];
-            if (strpos($name, 'phabel/transpiler') === 0) {
+            if (str_starts_with($name, 'phabel/transpiler')) {
                 $name = explode('/', $name, 3)[2];
             }
             $version = $dep['version_normalized'];
@@ -126,7 +126,7 @@ class Installer
             }
             $postData['downloads'][] = [
                 'name' => $name,
-                'version' => $version
+                'version' => $version,
             ];
         }
 
@@ -144,7 +144,7 @@ class Installer
                         $phpVersion,
                         'streams',
                         getenv('CI') ? '; CI' : ''
-                    )
+                    ),
                 ],
                 'content' => json_encode($postData),
                 'timeout' => 6,
@@ -221,7 +221,7 @@ class Installer
         if (!file_exists($madeline_phar)) {
             for ($x = 0; $x < 10; $x++) {
                 $pharTest = file_get_contents(sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
-                if ($pharTest && strpos($pharTest, $remote_release) !== false) {
+                if ($pharTest && str_contains($pharTest, $remote_release)) {
                     $phar = $pharTest;
                     unset($pharTest);
                     break;

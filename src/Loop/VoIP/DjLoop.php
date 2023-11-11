@@ -90,11 +90,11 @@ final class DjLoop extends VoIPLoop
             'instance' => $this->instance,
             'holdFiles' => array_filter(
                 $this->holdFiles,
-                fn ($v) => !$v instanceof ReadableStream
+                static fn ($v) => !$v instanceof ReadableStream
             ),
             'inputFiles' => array_filter(
                 $this->inputFiles,
-                fn ($v) => !$v instanceof ReadableStream
+                static fn ($v) => !$v instanceof ReadableStream
             ),
             'packetQueuePrimary' => $this->packetQueuePrimary,
             'packetQueueSecondary' => $this->packetQueueSecondary,
@@ -206,7 +206,7 @@ final class DjLoop extends VoIPLoop
             }
             $this->instance->log("Starting conversion fiber...");
             $pipe = new Pipe(4096);
-            EventLoop::queue(function () use ($f, $pipe, $cancellation): void {
+            EventLoop::queue(static function () use ($f, $pipe, $cancellation): void {
                 try {
                     Ogg::convert($f, $pipe->getSink(), $cancellation);
                 } catch (CancelledException) {

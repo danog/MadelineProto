@@ -120,7 +120,7 @@ final class SecretChatController implements Stringable
         $this->inputChat = [
             '_' => 'inputEncryptedChat',
             'chat_id' => $id,
-            'access_hash' => $accessHash
+            'access_hash' => $accessHash,
         ];
         if ($creator) {
             $this->in_seq_no_base = 0;
@@ -695,7 +695,7 @@ final class SecretChatController implements Stringable
             $this->gapQuery = ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => [
                 '_' => 'decryptedMessageActionResend',
                 'start_seq_no' => $C_plus_one * 2 + $this->in_seq_no_base,
-                'end_seq_no' => $this->gapEnd * 2 + $this->in_seq_no_base
+                'end_seq_no' => $this->gapEnd * 2 + $this->in_seq_no_base,
             ]]];
             $this->API->methodCallAsyncRead('messages.sendEncryptedService', $this->gapQuery);
             return;

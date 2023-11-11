@@ -72,16 +72,16 @@ final class PostgresArray extends PostgresArrayBytea
     protected function setSerializer(SerializerType $serializer): void
     {
         $this->serializer = match ($serializer) {
-            SerializerType::SERIALIZE => fn ($v) => bin2hex(serialize($v)),
-            SerializerType::IGBINARY => fn ($v) => bin2hex(igbinary_serialize($v)),
-            SerializerType::JSON => fn ($v) => bin2hex(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
-            SerializerType::STRING => fn ($v) => bin2hex(\strval($v)),
+            SerializerType::SERIALIZE => static fn ($v) => bin2hex(serialize($v)),
+            SerializerType::IGBINARY => static fn ($v) => bin2hex(igbinary_serialize($v)),
+            SerializerType::JSON => static fn ($v) => bin2hex(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
+            SerializerType::STRING => static fn ($v) => bin2hex(\strval($v)),
         };
         $this->deserializer = match ($serializer) {
-            SerializerType::SERIALIZE => fn ($v) => unserialize(hex2bin($v)),
-            SerializerType::IGBINARY => fn ($v) => igbinary_unserialize(hex2bin($v)),
-            SerializerType::JSON => fn ($value) => json_decode(hex2bin($value), true, 256, JSON_THROW_ON_ERROR),
-            SerializerType::STRING => fn ($v) => hex2bin($v),
+            SerializerType::SERIALIZE => static fn ($v) => unserialize(hex2bin($v)),
+            SerializerType::IGBINARY => static fn ($v) => igbinary_unserialize(hex2bin($v)),
+            SerializerType::JSON => static fn ($value) => json_decode(hex2bin($value), true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => static fn ($v) => hex2bin($v),
         };
     }
     /**

@@ -95,8 +95,8 @@ $ignore = [ // Disallow list
     \ArrayIterator::class,
 ];
 
-$filter = function (string $class) use ($ignore): bool {
-    if (in_array($class, $ignore)) {
+$filter = static function (string $class) use ($ignore): bool {
+    if (in_array($class, $ignore, true)) {
         return false;
     }
     if (str_starts_with($class, 'danog\\MadelineProto\\Ipc')

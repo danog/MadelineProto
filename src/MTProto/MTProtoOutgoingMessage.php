@@ -40,19 +40,19 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * The message was created.
      */
-    const STATE_PENDING = 0;
+    public const STATE_PENDING = 0;
     /**
      * The message was sent.
      */
-    const STATE_SENT = 1;
+    public const STATE_SENT = 1;
     /**
      * The message was acked.
      */
-    const STATE_ACKED = 2;
+    public const STATE_ACKED = 2;
     /**
      * We got a reply to the message.
      */
-    const STATE_REPLIED = self::STATE_ACKED | 4;
+    public const STATE_REPLIED = self::STATE_ACKED | 4;
 
     /**
      * State of message.
@@ -127,7 +127,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
-        $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(fn () => throw $e));
+        $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(static fn () => throw $e));
     }
 
     /**

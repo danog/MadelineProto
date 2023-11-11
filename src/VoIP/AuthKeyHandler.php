@@ -82,7 +82,7 @@ trait AuthKeyHandler
             $res = $this->methodCallAsyncRead('phone.requestCall', [
                 'user_id' => $user,
                 'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
-                'protocol' => VoIPController::CALL_PROTOCOL
+                'protocol' => VoIPController::CALL_PROTOCOL,
             ])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
@@ -152,7 +152,7 @@ trait AuthKeyHandler
      */
     public function getAllCalls(): array
     {
-        return array_map(fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+        return array_map(static fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
     }
 
     /**

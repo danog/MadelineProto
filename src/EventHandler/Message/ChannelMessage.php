@@ -110,7 +110,7 @@ final class ChannelMessage extends Message
             [
                 'peer' => $this->chatId,
                 'id' => [$this->id],
-                'increment' => true
+                'increment' => true,
             ]
         );
     }

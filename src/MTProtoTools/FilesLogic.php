@@ -230,7 +230,7 @@ trait FilesLogic
 
         $result = ResponseInfo::parseHeaders(
             $request->getMethod(),
-            array_map(fn (array $headers) => $headers[0], $request->getHeaders()),
+            array_map(static fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
         );
 

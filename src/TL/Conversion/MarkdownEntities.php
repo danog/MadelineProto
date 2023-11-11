@@ -147,7 +147,7 @@ final class MarkdownEntities extends Entities
                             '_' => 'messageEntityPre',
                             'language' => $language,
                             'offset' => $start,
-                            'length' => $pieceLen
+                            'length' => $pieceLen,
                         ];
                     }
 

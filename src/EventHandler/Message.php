@@ -202,7 +202,7 @@ abstract class Message extends AbstractMessage
                 'id' => $this->id,
                 'pm_oneside' => $pmOneside,
                 'silent' => $silent,
-                'unpin' => false
+                'unpin' => false,
             ]
         );
     }
@@ -222,7 +222,7 @@ abstract class Message extends AbstractMessage
                 'id' => $this->id,
                 'pm_oneside' => $pmOneside,
                 'silent' => $silent,
-                'unpin' => true
+                'unpin' => true,
             ]
         );
         return $this->getClient()->wrapUpdate($result);
@@ -252,7 +252,7 @@ abstract class Message extends AbstractMessage
                 'reason' => ['_' => $reason->value],
                 'message' => $message,
                 'id' => [$this->id],
-                'peer' => $this->chatId
+                'peer' => $this->chatId,
             ]
         );
     }
@@ -278,7 +278,7 @@ abstract class Message extends AbstractMessage
                 'last_name' => $lastName,
                 'phone_number' => $phoneNumber,
                 'add_phone_privacy_exception' => $addPhonePrivacyException,
-                'id' => $this->senderId
+                'id' => $this->senderId,
             ]
         );
     }
@@ -291,7 +291,7 @@ abstract class Message extends AbstractMessage
         $this->getClient()->methodCallAsyncRead(
             'contacts.deleteContacts',
             [
-                'id' => [$this->senderId]
+                'id' => [$this->senderId],
             ]
         );
     }
@@ -307,7 +307,7 @@ abstract class Message extends AbstractMessage
             'channels.inviteToChannel',
             [
                 'channel' => $channel,
-                'users' => [$this->senderId]
+                'users' => [$this->senderId],
             ]
         );
     }
@@ -335,7 +335,7 @@ abstract class Message extends AbstractMessage
                     ? [['_' => 'reactionCustomEmoji', 'document_id' => $reaction]]
                     : [['_' => 'reactionEmoji', 'emoticon' => $reaction]],
                 'big' => $big,
-                'add_to_recent' => $addToRecent
+                'add_to_recent' => $addToRecent,
             ]
         );
         $this->reactions[] = $reaction;
@@ -357,7 +357,7 @@ abstract class Message extends AbstractMessage
         }
         unset($this->reactions[$key]);
         $this->reactions = array_values($this->reactions);
-        $r = array_map(fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
+        $r = array_map(static fn (string|int $r): array => \is_int($r) ? ['_' => 'reactionCustomEmoji', 'document_id' => $r] : ['_' => 'reactionEmoji', 'emoticon' => $r], $this->reactions);
         $r[]= ['_' => 'reactionEmpty'];
         $this->getClient()->methodCallAsyncRead(
             'messages.sendReaction',
@@ -387,7 +387,7 @@ abstract class Message extends AbstractMessage
             [
                 'peer' => $this->chatId,
                 'id' => [$this->id],
-                'to_lang' => $toLang
+                'to_lang' => $toLang,
             ]
         );
         return $result['result'][0]['text'];
@@ -419,7 +419,7 @@ abstract class Message extends AbstractMessage
                 'reply_markup' => $replyMarkup,
                 'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
-                'no_webpage' => $noWebpage
+                'no_webpage' => $noWebpage,
             ]
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));

@@ -112,11 +112,11 @@ final class ProcessRunner extends RunnerAbstract
             }
         }
         $envVars = array_merge(
-            array_filter($_SERVER, fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
+            array_filter($_SERVER, static fn ($v, $k): bool => \is_string($v) && !\in_array($k, self::CGI_VARS, true), ARRAY_FILTER_USE_BOTH),
             [
                 'QUERY_STRING' => http_build_query($params),
                 'absoluteRootDir' => $root,
-                'serverName' => $_SERVER['SERVER_NAME'] ?? ''
+                'serverName' => $_SERVER['SERVER_NAME'] ?? '',
             ],
         );
 

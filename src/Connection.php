@@ -304,7 +304,7 @@ final class Connection
                 foreach ($this->new_outgoing as $message_id => $message) {
                     if ($message->unencrypted) {
                         if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                            $message->reply(fn () => new Exception('Restart because we were reconnected'));
+                            $message->reply(static fn () => new Exception('Restart because we were reconnected'));
                         }
                         unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     }
@@ -527,7 +527,7 @@ final class Connection
             $arguments['reply_to'] = [
                 '_' => 'inputReplyToMessage',
                 'reply_to_msg_id' => $arguments['reply_to_msg_id'],
-                'top_msg_id' => $arguments['top_msg_id'] ?? null
+                'top_msg_id' => $arguments['top_msg_id'] ?? null,
             ];
             unset($arguments['reply_to_msg_id'], $arguments['top_msg_id']);
         }

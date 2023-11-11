@@ -125,7 +125,7 @@ abstract class Serialization
             } else {
                 Logger::log('It seems like the session is busy.');
                 Logger::log('Telegram does not support starting multiple instances of the same session, make sure no other instance of the session is running.');
-                $warningId = EventLoop::repeat(5, fn () => Logger::log('Still waiting for exclusive session lock...'));
+                $warningId = EventLoop::repeat(5, static fn () => Logger::log('Still waiting for exclusive session lock...'));
                 EventLoop::unreference($warningId);
             }
         });
@@ -144,7 +144,7 @@ abstract class Serialization
                     $copy->cancel();
                 }
             };
-            EventLoop::queue(function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+            EventLoop::queue(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
                 try {
                     $lightState = $session->getLightState();
                     if (!$lightState->canStartIpc()) {
@@ -181,7 +181,7 @@ abstract class Serialization
                 // Unlock and fork
                 $unlock();
                 $monitor = Server::startMe($session);
-                EventLoop::queue(function () use ($cancelIpc, $monitor): void {
+                EventLoop::queue(static function () use ($cancelIpc, $monitor): void {
                     try {
                         $cancelIpc->complete($monitor->await());
                     } catch (\Throwable $e) {

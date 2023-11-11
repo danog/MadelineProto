@@ -84,7 +84,7 @@ final class Shutdown
     public static function init(): void
     {
         if (!self::$registered) {
-            register_shutdown_function(fn () => self::shutdown());
+            register_shutdown_function(static fn () => self::shutdown());
             self::$registered = true;
         }
     }

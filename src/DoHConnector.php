@@ -91,7 +91,7 @@ final class DoHConnector implements SocketConnector
             } else {
                 $records = $this->dataCenter->DoHClient->resolve($host, $socketContext->getDnsTypeRestriction());
             }
-            usort($records, fn (DnsRecord $a, DnsRecord $b) => $a->getType() - $b->getType());
+            usort($records, static fn (DnsRecord $a, DnsRecord $b) => $a->getType() - $b->getType());
             if ($this->ctx->getIpv6()) {
                 $records = array_reverse($records);
             }
@@ -111,7 +111,7 @@ final class DoHConnector implements SocketConnector
                 $streamContext = stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
                 /** @psalm-suppress NullArgument */
                 if (!($socket = @stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
-                    throw new ConnectException(sprintf('Connection to %s failed: [Error #%d] %s%s', (string) $uri, $errno, $errstr, $failures ? '; previous attempts: '.implode($failures) : ''), $errno);
+                    throw new ConnectException(sprintf('Connection to %s failed: [Error #%d] %s%s', (string) $uri, $errno, $errstr, $failures ? '; previous attempts: '.implode('', $failures) : ''), $errno);
                 }
                 stream_set_blocking($socket, false);
                 $deferred = new DeferredFuture();
@@ -125,7 +125,7 @@ final class DoHConnector implements SocketConnector
                         throw $e;
                     }
 
-                    throw new ConnectException(sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', (string) $uri, $timeout, $failures ? '; previous attempts: '.implode($failures) : ''), 110);
+                    throw new ConnectException(sprintf('Connecting to %s failed: timeout exceeded (%d ms)%s', (string) $uri, $timeout, $failures ? '; previous attempts: '.implode('', $failures) : ''), 110);
                     // See ETIMEDOUT in http://www.virtsync.com/c-error-codes-include-errno
                 } finally {
                     EventLoop::cancel($watcher);
@@ -134,7 +134,7 @@ final class DoHConnector implements SocketConnector
                 // The following hack looks like the only way to detect connection refused errors with PHP's stream sockets.
                 if (stream_socket_get_name($socket, true) === false) {
                     fclose($socket);
-                    throw new ConnectException(sprintf('Connection to %s refused%s', (string) $uri, $failures ? '; previous attempts: '.implode($failures) : ''), 111);
+                    throw new ConnectException(sprintf('Connection to %s refused%s', (string) $uri, $failures ? '; previous attempts: '.implode('', $failures) : ''), 111);
                     // See ECONNREFUSED in http://www.virtsync.com/c-error-codes-include-errno
                 }
             } catch (ConnectException $e) {

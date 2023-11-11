@@ -143,10 +143,10 @@ trait Constructors
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (strpos($type, 'Input') === 0 && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer'], true) && !isset($this->settings['td'])) {
+                if (str_starts_with($type, 'Input')   && \in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'InputPeer'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
-                if (strpos($type, 'Input') === 0 && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'], true) && !isset($this->settings['td'])) {
+                if (str_starts_with($type, 'Input')   && \in_array($ptype, ['InputMedia', 'InputDocument', 'InputPhoto'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'MessageMedia, Message, Update or '.$ptype;
                 }
                 if (\in_array($ptype, ['InputMessage'], true) && !isset($this->settings['td'])) {

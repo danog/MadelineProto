@@ -46,34 +46,34 @@ final class ReferenceDatabase implements TLCallback
         return $this->API->getDbPrefix();
     }
     // Reference from a document
-    const DOCUMENT_LOCATION = 0;
+    public const DOCUMENT_LOCATION = 0;
     // Reference from a photo
-    const PHOTO_LOCATION = 1;
+    public const PHOTO_LOCATION = 1;
     // Reference from a photo location (can only be photo location)
-    const PHOTO_LOCATION_LOCATION = 2;
+    public const PHOTO_LOCATION_LOCATION = 2;
     // Peer + photo ID
-    const USER_PHOTO_ORIGIN = 0;
+    public const USER_PHOTO_ORIGIN = 0;
     // Peer (default photo ID)
-    const PEER_PHOTO_ORIGIN = 1;
+    public const PEER_PHOTO_ORIGIN = 1;
     // set ID
-    const STICKER_SET_ID_ORIGIN = 2;
+    public const STICKER_SET_ID_ORIGIN = 2;
     // Peer + msg ID
-    const MESSAGE_ORIGIN = 3;
-    const SAVED_GIFS_ORIGIN = 4;
-    const STICKER_SET_RECENT_ORIGIN = 5;
-    const STICKER_SET_FAVED_ORIGIN = 6;
+    public const MESSAGE_ORIGIN = 3;
+    public const SAVED_GIFS_ORIGIN = 4;
+    public const STICKER_SET_RECENT_ORIGIN = 5;
+    public const STICKER_SET_FAVED_ORIGIN = 6;
     // emoticon
-    const STICKER_SET_EMOTICON_ORIGIN = 8;
-    const WALLPAPER_ORIGIN = 9;
-    const LOCATION_CONTEXT = [
+    public const STICKER_SET_EMOTICON_ORIGIN = 8;
+    public const WALLPAPER_ORIGIN = 9;
+    public const LOCATION_CONTEXT = [
         //'inputFileLocation'         => self::PHOTO_LOCATION_LOCATION, // DEPRECATED
         'inputDocumentFileLocation' => self::DOCUMENT_LOCATION,
         'inputPhotoFileLocation' => self::PHOTO_LOCATION,
         'inputPhoto' => self::PHOTO_LOCATION,
         'inputDocument' => self::DOCUMENT_LOCATION,
     ];
-    const METHOD_CONTEXT = ['photos.updateProfilePhoto' => self::USER_PHOTO_ORIGIN, 'photos.getUserPhotos' => self::USER_PHOTO_ORIGIN, 'photos.uploadProfilePhoto' => self::USER_PHOTO_ORIGIN, 'messages.getStickers' => self::STICKER_SET_EMOTICON_ORIGIN];
-    const CONSTRUCTOR_CONTEXT = ['message' => self::MESSAGE_ORIGIN, 'messageService' => self::MESSAGE_ORIGIN, 'chatFull' => self::PEER_PHOTO_ORIGIN, 'channelFull' => self::PEER_PHOTO_ORIGIN, 'chat' => self::PEER_PHOTO_ORIGIN, 'channel' => self::PEER_PHOTO_ORIGIN, 'updateUserPhoto' => self::USER_PHOTO_ORIGIN, 'user' => self::USER_PHOTO_ORIGIN, 'userFull' => self::USER_PHOTO_ORIGIN, 'wallPaper' => self::WALLPAPER_ORIGIN, 'messages.savedGifs' => self::SAVED_GIFS_ORIGIN, 'messages.recentStickers' => self::STICKER_SET_RECENT_ORIGIN, 'messages.favedStickers' => self::STICKER_SET_FAVED_ORIGIN, 'messages.stickerSet' => self::STICKER_SET_ID_ORIGIN, 'document' => self::STICKER_SET_ID_ORIGIN];
+    public const METHOD_CONTEXT = ['photos.updateProfilePhoto' => self::USER_PHOTO_ORIGIN, 'photos.getUserPhotos' => self::USER_PHOTO_ORIGIN, 'photos.uploadProfilePhoto' => self::USER_PHOTO_ORIGIN, 'messages.getStickers' => self::STICKER_SET_EMOTICON_ORIGIN];
+    public const CONSTRUCTOR_CONTEXT = ['message' => self::MESSAGE_ORIGIN, 'messageService' => self::MESSAGE_ORIGIN, 'chatFull' => self::PEER_PHOTO_ORIGIN, 'channelFull' => self::PEER_PHOTO_ORIGIN, 'chat' => self::PEER_PHOTO_ORIGIN, 'channel' => self::PEER_PHOTO_ORIGIN, 'updateUserPhoto' => self::USER_PHOTO_ORIGIN, 'user' => self::USER_PHOTO_ORIGIN, 'userFull' => self::USER_PHOTO_ORIGIN, 'wallPaper' => self::WALLPAPER_ORIGIN, 'messages.savedGifs' => self::SAVED_GIFS_ORIGIN, 'messages.recentStickers' => self::STICKER_SET_RECENT_ORIGIN, 'messages.favedStickers' => self::STICKER_SET_FAVED_ORIGIN, 'messages.stickerSet' => self::STICKER_SET_ID_ORIGIN, 'document' => self::STICKER_SET_ID_ORIGIN];
 
     private const V = 1;
     /**
@@ -97,7 +97,7 @@ final class ReferenceDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true]
+        'db' => ['innerMadelineProto' => true],
     ];
 
     private LocalKeyedMutex $flushMutex;
@@ -428,7 +428,7 @@ final class ReferenceDatabase implements TLCallback
         $this->pendingDb[$location] = [
             $reference,
             $originType,
-            $origin
+            $origin,
         ];
 
         if ($this->refresh) {

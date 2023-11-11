@@ -43,7 +43,7 @@ if (file_exists('vendor/autoload.php')) {
  */
 class MyEventHandler extends EventHandler
 {
-    const START = "Send me a file URL and I will download it and send it to you!\n\n".
+    public const START = "Send me a file URL and I will download it and send it to you!\n\n".
                 "Usage: `https://example.com`\n".
                 "Usage: `https://example.com file name.ext`\n\n".
                 "I can also rename Telegram files, just send me any file and I will rename it!\n\n".
@@ -52,7 +52,7 @@ class MyEventHandler extends EventHandler
     /**
      * @var int|string Username or ID of bot admin
      */
-    const ADMIN = 'danogentili'; // Change this
+    public const ADMIN = 'danogentili'; // Change this
 
     /**
      * Get peer(s) where to report errors.
@@ -149,7 +149,7 @@ class MyEventHandler extends EventHandler
 
             $msg->delete();
         } catch (Throwable $e) {
-            if (strpos($e->getMessage(), 'Could not connect to URI') === false && !($e instanceof UriException) && strpos($e->getMessage(), 'URI') === false) {
+            if (!str_contains($e->getMessage(), 'Could not connect to URI')   && !($e instanceof UriException) && !str_contains($e->getMessage(), 'URI')) {
                 $this->report((string) $e);
                 $this->logger((string) $e, Logger::FATAL_ERROR);
             }

@@ -293,7 +293,7 @@ final class DataCenter
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [
                     $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4',
-                    $this->getSettings()->getIpv6() ? 'ipv4' : 'ipv6'
+                    $this->getSettings()->getIpv6() ? 'ipv4' : 'ipv6',
                 ];
                 foreach ($ipv6Combos as $ipv6) {
                     if ($onlyIPv6 !== null && $onlyIPv6 !== $ipv6) {

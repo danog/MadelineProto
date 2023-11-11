@@ -457,7 +457,7 @@ final class Endpoint
             'protocol' => VoIPController::PROTOCOL_VERSION,
             'min_protocol' => VoIPController::MIN_PROTOCOL_VERSION,
             'audio_streams' => [VoIPController::CODEC_OPUS],
-            'video_streams' => []
+            'video_streams' => [],
         ]));
     }
 }

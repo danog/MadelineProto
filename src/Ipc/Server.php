@@ -52,11 +52,11 @@ class Server extends Loop
     /**
      * Server version.
      */
-    const VERSION = 1;
+    public const VERSION = 1;
     /**
      * Shutdown server.
      */
-    const SHUTDOWN = 0;
+    public const SHUTDOWN = 0;
     /**
      * Boolean to shut down worker, if started.
      */
@@ -246,7 +246,7 @@ class Server extends Loop
             $result = new ExitFailure($e);
         } finally {
             if (isset($wrapper)) {
-                EventLoop::queue(function () use ($wrapper): void {
+                EventLoop::queue(static function () use ($wrapper): void {
                     try {
                         $wrapper->disconnect();
                     } catch (Throwable $e) {

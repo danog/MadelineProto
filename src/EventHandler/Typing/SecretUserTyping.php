@@ -33,7 +33,7 @@ final class SecretUserTyping extends Typing
         $this->chatId = $rawMessage['chat_id'];
         parent::__construct($API, [
             'user_id' => $info['user_id'],
-            'action' => $rawMessage['decrypted_message']['action']
+            'action' => $rawMessage['decrypted_message']['action'],
         ]);
     }
 }

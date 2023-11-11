@@ -8,6 +8,12 @@ $config = new class extends Amp\CodeStyle\Config {
             'array_indentation' => true,
             'ternary_to_null_coalescing' => true,
             'assign_null_coalescing_to_coalesce_equal' => true,
+            '@PHP82Migration' => true,
+            '@PHP81Migration' => true,
+            '@PHP80Migration' => true,
+            '@PHP80Migration:risky' => true,
+            'static_lambda' => true,
+            'strict_param' => true,
             "native_function_invocation" => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced'],
         ]);
     }

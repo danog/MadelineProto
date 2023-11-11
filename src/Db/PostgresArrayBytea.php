@@ -90,16 +90,16 @@ class PostgresArrayBytea extends SqlArray
     protected function setSerializer(SerializerType $serializer): void
     {
         $this->serializer = match ($serializer) {
-            SerializerType::SERIALIZE => fn ($v) => new ByteA(serialize($v)),
-            SerializerType::IGBINARY => fn ($v) => new ByteA(igbinary_serialize($v)),
-            SerializerType::JSON => fn ($v) => new ByteA(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
-            SerializerType::STRING => fn ($v) => new ByteA(\strval($v)),
+            SerializerType::SERIALIZE => static fn ($v) => new ByteA(serialize($v)),
+            SerializerType::IGBINARY => static fn ($v) => new ByteA(igbinary_serialize($v)),
+            SerializerType::JSON => static fn ($v) => new ByteA(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
+            SerializerType::STRING => static fn ($v) => new ByteA(\strval($v)),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),
             SerializerType::IGBINARY => \igbinary_unserialize(...),
-            SerializerType::JSON => fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
-            SerializerType::STRING => fn ($v) => $v,
+            SerializerType::JSON => static fn ($value) => json_decode($value, true, 256, JSON_THROW_ON_ERROR),
+            SerializerType::STRING => static fn ($v) => $v,
         };
     }
     /**

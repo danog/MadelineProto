@@ -50,11 +50,11 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
         $this->story = match ($rawMedia['story']['_'] ?? null) {
             'storyItem' => new Story($API, [
                 'peer' => $this->senderId,
-                'story' => $rawMedia['story']
+                'story' => $rawMedia['story'],
             ]),
             'storyItemDeleted' => new StoryDeleted($API, [
                 'peer' => $this->senderId,
-                'story' => $rawMedia['story']
+                'story' => $rawMedia['story'],
             ]),
             'storyItemSkipped' => null, // Will it happen?
             default => null

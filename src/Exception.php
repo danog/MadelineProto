@@ -46,7 +46,7 @@ class Exception extends \Exception
             $this->line = $line;
         }
         parent::__construct($message, $code, $previous);
-        if (strpos($message, 'socket_accept') === false
+        if (!str_contains($message, 'socket_accept')
             && !\in_array(basename($this->file), ['PKCS8.php', 'PSS.php'], true)
         ) {
             Logger::log($message.' in '.basename($this->file).':'.$this->line, Logger::FATAL_ERROR);
@@ -85,13 +85,13 @@ class Exception extends \Exception
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0
             || strpos($errstr, 'headers already sent')
-            || strpos($errstr, 'Creation of dynamic property') !== false
-            || strpos($errstr, 'Legacy nullable type detected') !== false
+            || str_contains($errstr, 'Creation of dynamic property')
+            || str_contains($errstr, 'Legacy nullable type detected')
             || str_contains($errstr, '$tdMethods is deprecated')
             || $errfileReplaced && (
-                strpos($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR) !== false
-                || strpos($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR) !== false
-                || strpos($errfileReplaced, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR) !== false
+                str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR)
+                || str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR)
+                || str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR)
             )
         ) {
             return false;
@@ -105,7 +105,7 @@ class Exception extends \Exception
      */
     public static function exceptionHandler(\Throwable $exception): void
     {
-        $print = function (string $s): void {
+        $print = static function (string $s): void {
             Logger::log($s, Logger::FATAL_ERROR);
             if (headers_sent()) {
                 return;

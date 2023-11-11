@@ -15,7 +15,7 @@ foreach ($classes as $class) {
 }
 $methods = array_unique($methods);
 
-usort($methods, fn ($a, $b) => strlen($b->getName())-strlen($a->getName()));
+usort($methods, static fn ($a, $b) => strlen($b->getName())-strlen($a->getName()));
 
 $find = [];
 $replace = [];
@@ -23,7 +23,7 @@ $findDocs = [];
 $replaceDocs = [];
 foreach ($methods as $methodObj) {
     $method = $methodObj->getName();
-    if (strpos($method, '__') === 0 || $method === 'async') {
+    if (str_starts_with($method, '__')   || $method === 'async') {
         continue;
     }
     $method = Tools::fromCamelCase($method);
@@ -31,7 +31,7 @@ foreach ($methods as $methodObj) {
     $new = Tools::fromSnakeCase($method);
     $new = str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $new);
     $new = preg_replace('/TL$/i', 'TL', $new);
-    if (!in_array($method, ['discardCallAsync', 'acceptCallAsync', 'requestCallAsync'])) {
+    if (!in_array($method, ['discardCallAsync', 'acceptCallAsync', 'requestCallAsync'], true)) {
         $new = preg_replace('/async$/i', '', $new);
     }
 

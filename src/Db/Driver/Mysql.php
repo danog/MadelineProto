@@ -76,7 +76,7 @@ final class Mysql
 
                 self::$connections[$dbKey] = [
                     new MysqlConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout()),
-                    $pdo
+                    $pdo,
                 ];
             }
         } finally {
