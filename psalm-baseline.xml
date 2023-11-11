@@ -1170,6 +1170,11 @@
       <code><![CDATA[$this->connection->isHttp() && empty($this->connection->pendingOutgoing)]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="src/Loop/Generic/PeriodicLoopInternal.php">
+    <MissingClosureReturnType>
+      <code><![CDATA[static fn () => $callable()]]></code>
+    </MissingClosureReturnType>
+  </file>
   <file src="src/Loop/Secret/SecretFeedLoop.php">
     <TypeDoesNotContainType>
       <code><![CDATA[isset($this->API->logger)]]></code>
