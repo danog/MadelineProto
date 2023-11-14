@@ -2,7 +2,7 @@ matrix:
   php:
     - "8.1"
   platform:
-    - linux/arm64
+    - linux/aarch64
 
 labels:
   platform: ${platform}
