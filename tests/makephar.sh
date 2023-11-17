@@ -25,7 +25,7 @@ git config --global user.email "41898282+github-actions[bot]@users.noreply.githu
 git config --global user.name "Github Actions"
 
 if [ "$CI_COMMIT_TAG" == "" ]; then
-    export TAG=7777
+    export CI_COMMIT_TAG=7777
     git tag "$CI_COMMIT_TAG"
     git checkout "$CI_COMMIT_TAG"
 fi
