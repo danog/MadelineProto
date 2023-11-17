@@ -37,7 +37,6 @@ steps:
     environment:
       - PHP_VERSION=${php}
       - PLATFORM=${platform}
-      - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
       - /bin/bash -e tests/makephar.sh

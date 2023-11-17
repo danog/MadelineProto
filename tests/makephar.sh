@@ -10,8 +10,8 @@ mv composer.phar /usr/local/bin/composer
 
 apk add procps git unzip github-cli openssh
 
-echo "$TAG" | grep -q '\.9999' && exit 0 || true
-echo "$TAG" | grep -q '\.9998' && exit 0 || true
+echo "$CI_COMMIT_TAG" | grep -q '\.9999' && exit 0 || true
+echo "$CI_COMMIT_TAG" | grep -q '\.9998' && exit 0 || true
 
 PHP_MAJOR_VERSION=$(php -r 'echo PHP_MAJOR_VERSION;')
 PHP_MINOR_VERSION=$(php -r 'echo PHP_MINOR_VERSION;')
@@ -24,14 +24,14 @@ COMMIT_MESSAGE="$(git log -1 --pretty=%B HEAD)"
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git config --global user.name "Github Actions"
 
-if [ "$TAG" == "" ]; then
+if [ "$CI_COMMIT_TAG" == "" ]; then
     export TAG=7777
-    git tag "$TAG"
-    git checkout "$TAG"
+    git tag "$CI_COMMIT_TAG"
+    git checkout "$CI_COMMIT_TAG"
 fi
 
-if [ "$TAG" != "7777" ]; then
-    grep -q "const RELEASE = '$TAG'" src/API.php || {
+if [ "$CI_COMMIT_TAG" != "7777" ]; then
+    grep -q "const RELEASE = '$CI_COMMIT_TAG'" src/API.php || {
         echo "The RELEASE constant is not up to date!"
         exit 1
     }
@@ -45,7 +45,7 @@ export MTPROTO_SETTINGS='{"logger":{"logger_level":5}}'
 echo "PHP: $php"
 echo "Branch: $BRANCH"
 echo "Commit: $COMMIT"
-echo "Latest tag: $TAG"
+echo "Latest tag: $CI_COMMIT_TAG"
 
 # Clean up
 madelinePath=$PWD
@@ -64,7 +64,7 @@ composer update
 #composer test
 #vendor/bin/phpunit tests/danog/MadelineProto/EntitiesTest.php
 
-COMPOSER_TAG="$TAG"
+COMPOSER_TAG="$CI_COMMIT_TAG"
 
 rm -rf vendor*
 git reset --hard
@@ -199,21 +199,21 @@ input=$PWD
 
 cd "$madelinePath"
 
-if [ "$TAG" == "7777" ]; then exit 0; fi
+if [ "$CI_COMMIT_TAG" == "7777" ]; then exit 0; fi
 
 if [ "$PLATFORM" == "linux/arm64" ]; then :; else exit 0; fi
 
 cp "$input/madeline$php$branch.phar" "madeline81.phar"
 git remote add hub https://github.com/danog/MadelineProto
 
-echo -n "$TAG" > release
+echo -n "$CI_COMMIT_TAG" > release
 cp tools/phar.php madeline.php
 
-gh release upload "$TAG" "madeline81.phar"
-gh release upload "$TAG" "release"
-gh release upload "$TAG" "madeline.php"
+gh release upload "$CI_COMMIT_TAG" "madeline81.phar"
+gh release upload "$CI_COMMIT_TAG" "release"
+gh release upload "$CI_COMMIT_TAG" "madeline.php"
 
-gh release edit --prerelease=false "$TAG"
-gh release edit --latest=true "$TAG"
+gh release edit --prerelease=false "$CI_COMMIT_TAG"
+gh release edit --latest=true "$CI_COMMIT_TAG"
 
 

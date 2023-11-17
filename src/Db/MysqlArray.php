@@ -118,7 +118,7 @@ final class MysqlArray extends SqlArray
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
                 `key` VARCHAR(255) NOT NULL,
-                `value` MEDIUMBLOB NULL,
+                `value` LONGBLOB NULL,
                 `ts` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`key`)
             )
