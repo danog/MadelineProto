@@ -58,7 +58,7 @@ abstract class DatabaseAbstract extends SettingsAbstract
      *
      * @param bool $enableFileReferenceDb Whether to enable the file reference database. If disabled, will break file downloads.
      */
-    public function setEnableFileReferenceDb(bool $enableFileReferenceDb): self
+    public function setEnableFileReferenceDb(bool $enableFileReferenceDb): static
     {
         $this->enableFileReferenceDb = $enableFileReferenceDb;
 
@@ -78,7 +78,7 @@ abstract class DatabaseAbstract extends SettingsAbstract
      *
      * @param bool $enableMinDb Whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
      */
-    public function setEnableMinDb(bool $enableMinDb): self
+    public function setEnableMinDb(bool $enableMinDb): static
     {
         $this->enableMinDb = $enableMinDb;
 
@@ -98,7 +98,7 @@ abstract class DatabaseAbstract extends SettingsAbstract
      *
      * @param bool $enableUsernameDb Whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
      */
-    public function setEnableUsernameDb(bool $enableUsernameDb): self
+    public function setEnableUsernameDb(bool $enableUsernameDb): static
     {
         $this->enableUsernameDb = $enableUsernameDb;
 
@@ -118,7 +118,7 @@ abstract class DatabaseAbstract extends SettingsAbstract
      *
      * @param bool $enableFullPeerDb Whether to enable the full peer info database. If disabled, will break getFullInfo.
      */
-    public function setEnableFullPeerDb(bool $enableFullPeerDb): self
+    public function setEnableFullPeerDb(bool $enableFullPeerDb): static
     {
         $this->enableFullPeerDb = $enableFullPeerDb;
 
@@ -138,7 +138,7 @@ abstract class DatabaseAbstract extends SettingsAbstract
      *
      * @param bool $enablePeerInfoDb Whether to enable the peer info database. If disabled, will break getInfo.
      */
-    public function setEnablePeerInfoDb(bool $enablePeerInfoDb): self
+    public function setEnablePeerInfoDb(bool $enablePeerInfoDb): static
     {
         $this->enablePeerInfoDb = $enablePeerInfoDb;
 

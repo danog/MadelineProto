@@ -55,6 +55,7 @@ use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
@@ -562,9 +563,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /** @internal */
     public function getDbPrefix(): string
     {
-        $prefix = $this->getSelf()['id'] ?? null;
-        if (!$prefix) {
-            $this->tmpDbPrefix ??= 'tmp_'.spl_object_id($this);
+        $prefix = null;
+        if ($this->settings->getDb() instanceof DriverDatabaseAbstract) {
+            $prefix = $this->settings->getDb()->getEphemeralFilesystemPrefix();
+        }
+        $prefix ??= $this->getSelf()['id'] ?? null;
+        if ($prefix === null) {
+            $this->tmpDbPrefix ??= 'tmp_'.hash('sha256', $this->getSessionName());
             $prefix = $this->tmpDbPrefix;
         }
         return (string) $prefix;

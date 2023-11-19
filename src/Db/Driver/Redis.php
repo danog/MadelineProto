@@ -39,7 +39,7 @@ final class Redis
     public static function getConnection(DatabaseRedis $settings): RedisClient
     {
         self::$mutex ??= new LocalKeyedMutex;
-        $dbKey = $settings->getKey();
+        $dbKey = $settings->getDbIdentifier();
         $lock = self::$mutex->acquire($dbKey);
 
         try {

@@ -197,6 +197,7 @@ trait PeerHandler
                 case 'updateBotChatInviteRequester':
                 case 'updatePendingJoinRequests':
                 case 'updateStory':
+                case 'updatePinnedMessages':
                 case 'dialog':
                 case 'dialogPeer':
                 case 'notifyPeer':

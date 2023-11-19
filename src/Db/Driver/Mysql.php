@@ -42,15 +42,30 @@ final class Mysql
     public static function getConnection(DatabaseMysql $settings): array
     {
         self::$mutex ??= new LocalKeyedMutex;
-        $dbKey = $settings->getKey();
+        $dbKey = $settings->getDbIdentifier();
         $lock = self::$mutex->acquire($dbKey);
 
         try {
             if (!isset(self::$connections[$dbKey])) {
-                $config = MysqlConfig::fromString('host='.str_replace('tcp://', '', $settings->getUri()))
-                    ->withUser($settings->getUsername())
-                    ->withPassword($settings->getPassword())
-                    ->withDatabase($settings->getDatabase());
+                $host = str_replace(['tcp://', 'unix://'], '', $settings->getUri());
+                if ($host[0] === '/') {
+                    $port = 0;
+                } else {
+                    $host = explode(':', $host, 2);
+                    if (\count($host) === 2) {
+                        [$host, $port] = $host;
+                    } else {
+                        $host = $host[0];
+                        $port = MysqlConfig::DEFAULT_PORT;
+                    }
+                }
+                $config = new MysqlConfig(
+                    host: $host,
+                    port: (int) $port,
+                    user: $settings->getUsername(),
+                    password: $settings->getPassword(),
+                    database: $settings->getDatabase()
+                );
 
                 self::createDb($config);
 
@@ -62,14 +77,18 @@ final class Mysql
 
                 try {
                     $pdo = new PDO(
-                        "mysql:host={$host};port={$port};charset=UTF8",
+                        $host[0] === '/'
+                            ? "mysql:unix_socket={$host};charset=UTF8"
+                            : "mysql:host={$host};port={$port};charset=UTF8",
                         $settings->getUsername(),
                         $settings->getPassword(),
                     );
-                } catch (PDOException) {
+                } catch (PDOException $e) {
                     $config = $config->withPassword(null);
                     $pdo = new PDO(
-                        "mysql:host={$host};port={$port};charset=UTF8",
+                        $host[0] === '/'
+                            ? "mysql:unix_socket={$host};charset=UTF8"
+                            : "mysql:host={$host};port={$port};charset=UTF8",
                         $settings->getUsername(),
                     );
                 }
@@ -105,7 +124,7 @@ final class Mysql
             }
             $connection->close();
         } catch (Throwable $e) {
-            Logger::log($e->getMessage(), Logger::ERROR);
+            Logger::log("An error occurred while trying to create the database: ".$e->getMessage(), Logger::ERROR);
         }
     }
 }

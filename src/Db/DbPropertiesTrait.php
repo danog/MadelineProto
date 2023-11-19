@@ -54,7 +54,7 @@ trait DbPropertiesTrait
             if ($reset) {
                 unset($this->{$property});
             } else {
-                $table = ($type['global'] ?? false) ? ($API->isTestMode() ? 'test_' : 'prod_') : $prefix.'_';
+                $table = $prefix.'_';
                 $table .= $type['table'] ?? "{$className}_{$property}";
                 $promises[$property] = async(DbPropertiesFactory::get(...), $dbSettings, $table, $type, $this->{$property} ?? null);
             }

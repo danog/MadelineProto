@@ -38,15 +38,30 @@ final class Postgres
     public static function getConnection(DatabasePostgres $settings): PostgresConnectionPool
     {
         self::$mutex ??= new LocalKeyedMutex;
-        $dbKey = $settings->getKey();
+        $dbKey = $settings->getDbIdentifier();
         $lock = self::$mutex->acquire($dbKey);
 
         try {
             if (empty(self::$connections[$dbKey])) {
-                $config = PostgresConfig::fromString('host='.str_replace('tcp://', '', $settings->getUri()))
-                    ->withUser($settings->getUsername())
-                    ->withPassword($settings->getPassword())
-                    ->withDatabase($settings->getDatabase());
+                $host = str_replace(['tcp://', 'unix://'], '', $settings->getUri());
+                if ($host[0] === '/') {
+                    $port = 0;
+                } else {
+                    $host = explode(':', $host, 2);
+                    if (\count($host) === 2) {
+                        [$host, $port] = $host;
+                    } else {
+                        $host = $host[0];
+                        $port = PostgresConfig::DEFAULT_PORT;
+                    }
+                }
+                $config = new PostgresConfig(
+                    host: $host,
+                    port: (int) $port,
+                    user: $settings->getUsername(),
+                    password: $settings->getPassword(),
+                    database: $settings->getDatabase()
+                );
 
                 self::createDb($config);
                 self::$connections[$dbKey] = new PostgresConnectionPool($config, $settings->getMaxConnections(), $settings->getIdleTimeout());

@@ -30,6 +30,7 @@ use AssertionError;
 use danog\MadelineProto\Db\DbPropertiesFactory;
 use danog\MadelineProto\Db\DriverArray;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 use Revolt\EventLoop;
 use Throwable;
@@ -114,8 +115,28 @@ abstract class Serialization
     public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): array
     {
         if (!exists($session->getSessionPath())) {
-            // No session exists yet, lock for when we create it
-            return [null, Tools::flock($session->getLockPath(), LOCK_EX, 1)];
+            if ($settings instanceof Settings) {
+                $dbSettings = $settings->getDb();
+            } else {
+                $dbSettings = $settings;
+            }
+            $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1);
+            $unserialized = null;
+            if ($dbSettings instanceof DriverDatabaseAbstract
+                && $prefix = $dbSettings->getEphemeralFilesystemPrefix()
+            ) {
+                $tableName = "{$prefix}_MTProto_session";
+                $unserialized = DbPropertiesFactory::get(
+                    $dbSettings,
+                    $tableName,
+                    ['enableCache' => false],
+                );
+                $unserialized = $unserialized['data'];
+                if (!$unserialized) {
+                    $unserialized = null;
+                }
+            }
+            return [$unserialized, $unlock];
         }
 
         //Logger::log('Waiting for exclusive session lock...');

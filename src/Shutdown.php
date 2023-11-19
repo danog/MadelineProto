@@ -20,10 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use ReflectionClass;
-use Revolt\EventLoop;
-use Revolt\EventLoop\Internal\AbstractDriver;
-
 use function Amp\ByteStream\getStdin;
 
 /**
@@ -52,17 +48,6 @@ final class Shutdown
      */
     private static function shutdown(): void
     {
-        $obj = EventLoop::getSuspension();
-        $reflection = new ReflectionClass($obj);
-        $reflection->getProperty('pending')->setValue($obj, false);
-        $obj = EventLoop::getDriver();
-        $reflection = new ReflectionClass(AbstractDriver::class);
-        if (!$reflection->getProperty('callbackFiber')->isInitialized($obj)
-            || $reflection->getProperty('callbackFiber')->getValue($obj)->isTerminated()
-        ) {
-            $reflection->getMethod('createCallbackFiber')->invoke($obj);
-        }
-
         foreach (self::$callbacks as $callback) {
             $callback();
         }
