@@ -239,15 +239,18 @@ abstract class Serialization
                 ) {
                     $tableName = "{$prefix}_MTProto_session";
                 } else {
-                    \assert($unserialized !== null);
-                    $tableName = $unserialized->__toString();
+                    $tableName = $unserialized
+                        ? $unserialized->__toString()
+                        : null;
                 }
-                $unserialized = DbPropertiesFactory::get(
-                    $settings,
-                    $tableName,
-                    ['enableCache' => false],
-                    $unserialized,
-                )['data'];
+                if ($tableName !== null) {
+                    $unserialized = DbPropertiesFactory::get(
+                        $settings,
+                        $tableName,
+                        ['enableCache' => false],
+                        $unserialized,
+                    )['data'];
+                }
                 if (!$unserialized && $exists) {
                     throw new Exception('Could not extract session from database!');
                 }

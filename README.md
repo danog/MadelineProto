@@ -69,7 +69,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
 
 ## Documentation
 
-* [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html) - To create the session and set the serialization destination file, do the following:
+* [Creating a client](https://docs.madelineproto.xyz/docs/CREATING_A_CLIENT.html) - This page explains how to create a MadelineProto instance.
 * [Login](https://docs.madelineproto.xyz/docs/LOGIN.html) - There are many ways you can login with MadelineProto.
   * [Getting permission to use the telegram API](https://docs.madelineproto.xyz/docs/LOGIN.html#getting-permission-to-use-the-telegram-api)
   * [Automatic](https://docs.madelineproto.xyz/docs/LOGIN.html#automatic)
