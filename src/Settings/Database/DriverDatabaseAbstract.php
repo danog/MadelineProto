@@ -49,7 +49,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * Note that the session folder must still NEVER be deleted *if* MadelineProto is running,
      * or else the session will be dropped from the database due to AUTH_KEY_DUPLICATED errors.
-     * 
+     *
      * Stopping the container and then deleting the session folder is 100% OK though.
      */
     protected ?string $ephemeralFilesystemPrefix = null;
@@ -64,7 +64,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * Note that the session folder must still NEVER be deleted *if* MadelineProto is running,
      * or else the session will be dropped from the database due to AUTH_KEY_DUPLICATED errors.
-     * 
+     *
      * Stopping the container and then deleting the session folder is 100% OK though.
      */
     public function getEphemeralFilesystemPrefix(): ?string
@@ -82,9 +82,9 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * Note that the session folder must still NEVER be deleted *if* MadelineProto is running,
      * or else the session will be dropped from the database due to AUTH_KEY_DUPLICATED errors.
-     * 
+     *
      * Stopping the container and then deleting the session folder is 100% OK though.
-     * 
+     *
      * @param ?string $ephemeralFilesystemPrefix The database prefix
      */
     public function setEphemeralFilesystemPrefix(?string $ephemeralFilesystemPrefix): static
