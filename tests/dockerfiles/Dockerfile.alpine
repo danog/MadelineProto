@@ -15,7 +15,9 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions pcntl uv-beta ffi pq memprof intl gmp mbstring pdo_mysql xml dom iconv zip opcache igbinary gd && \
     rm /usr/local/bin/install-php-extensions
 
-RUN apk add ffmpeg nghttp2
+RUN apk add --no-cache ffmpeg nghttp2 jemalloc
+
+ENV LD_PRELOAD=libjemalloc.so.2
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
