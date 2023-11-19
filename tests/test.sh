@@ -22,3 +22,5 @@ composer update
 composer build
 
 if [ "$(git diff)" != "" ]; then echo "Please run composer build!"; exit 1; fi
+
+php tests/jit.php
