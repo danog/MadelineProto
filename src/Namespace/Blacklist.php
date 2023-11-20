@@ -9,7 +9,7 @@ final class Blacklist
         'account.getPasswordSettings' => 'You cannot use this method directly; use $MadelineProto->update2fa($params), instead (see https://docs.madelineproto.xyz for more info)',
         'messages.receivedQueue' => 'You cannot use this method directly',
         'messages.getDhConfig' => 'You cannot use this method directly, instead use $MadelineProto->getDhConfig();',
-        'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS and default_temp_auth_key_expires_in settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info',
+        'auth.bindTempAuthKey' => 'You cannot use this method directly, instead modify the PFS settings, see https://docs.madelineproto.xyz/docs/SETTINGS.html for more info',
         'auth.exportAuthorization' => 'You cannot use this method directly, use $MadelineProto->exportAuthorization() instead, see https://docs.madelineproto.xyz/docs/LOGIN.html',
         'auth.importAuthorization' => 'You cannot use this method directly, use $MadelineProto->importAuthorization($authorization) instead, see https://docs.madelineproto.xyz/docs/LOGIN.html',
         'auth.logOut' => 'You cannot use this method directly, use the logout method instead (see https://docs.madelineproto.xyz for more info)',

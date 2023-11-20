@@ -219,6 +219,11 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'underline',
                     ],
                     [
+                        'offset' => 49,
+                        'length' => 10,
+                        'type' => 'block_quote',
+                    ],
+                    [
                         'offset' => 60,
                         'length' => 18,
                         'type' => 'url',
@@ -244,7 +249,7 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'spoiler',
                     ],
                 ],
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> blockquote <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
             ],
             [
                 'markdown',
@@ -346,14 +351,26 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'markdown',
-                "```\n".StrTools::markdownCodeblockEscape('\\ ```').'```',
-                '\\ ```',
+                "```\na_b\n".StrTools::markdownCodeblockEscape('\\ ```').'```',
+                "a_b\n\\ ```",
+                [
+                    [
+                        'offset' => 0,
+                        'length' => 9,
+                        'type' => 'pre',
+                        'language' => '',
+                    ],
+                ],
+            ],
+            [
+                'markdown',
+                '`a_b '.StrTools::markdownCodeEscape('`').'`',
+                'a_b `',
                 [
                     [
                         'offset' => 0,
                         'length' => 5,
-                        'type' => 'pre',
-                        'language' => '',
+                        'type' => 'code',
                     ],
                 ],
             ],

@@ -25,6 +25,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\Code;
 use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
 use danog\MadelineProto\EventHandler\Message\Entities\Email;
+use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\Italic;
 use danog\MadelineProto\EventHandler\Message\Entities\Mention;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
@@ -161,6 +162,7 @@ abstract class StrTools extends Extension
                 $entity instanceof Spoiler => $allowTelegramTags ? '<tg-spoiler>' : '',
                 $entity instanceof CustomEmoji => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity->documentId.'">' : '',
                 $entity instanceof MentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
+                $entity instanceof InputMentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
                 default => '',
             };
             $offset += $length;
@@ -176,6 +178,7 @@ abstract class StrTools extends Extension
                 $entity instanceof Spoiler => $allowTelegramTags ? '</tg-spoiler>' : '',
                 $entity instanceof CustomEmoji => $allowTelegramTags ? "</tg-emoji>" : '',
                 $entity instanceof MentionName => $allowTelegramTags ? '</a>' : '',
+                $entity instanceof InputMentionName => $allowTelegramTags ? '</a>' : '',
                 default => '',
             } . ($insertions[$offset] ?? '');
         }
@@ -273,6 +276,15 @@ abstract class StrTools extends Extension
     public static function markdownCodeblockEscape(string $what): string
     {
         return str_replace('```', '\\```', $what);
+    }
+    /**
+     * Escape string for markdown code section.
+     *
+     * @param string $what String to escape
+     */
+    public static function markdownCodeEscape(string $what): string
+    {
+        return str_replace('`', '\\`', $what);
     }
     /**
      * Escape string for URL.

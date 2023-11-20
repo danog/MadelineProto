@@ -232,6 +232,10 @@ trait BotAPI
                 unset($data['_']);
                 $data['type'] = 'phone_number';
                 return $data;
+            case 'messageEntityBlockquote':
+                unset($data['_']);
+                $data['type'] = 'block_quote';
+                return $data;
             case 'messageEntityMention':
                 unset($data['_']);
                 $data['type'] = 'mention';
