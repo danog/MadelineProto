@@ -569,7 +569,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         $prefix ??= $this->getSelf()['id'] ?? null;
         if ($prefix === null) {
-            $this->tmpDbPrefix ??= 'tmp_'.hash('sha256', $this->getSessionName());
+            $this->tmpDbPrefix ??= 'tmp_'.hash('xxh3', $this->getSessionName());
             $prefix = $this->tmpDbPrefix;
         }
         return (string) $prefix;
