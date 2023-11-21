@@ -81,6 +81,7 @@ use function Amp\async;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
+use function Amp\File\read;
 use function Amp\Future\await;
 
 use function time;
@@ -755,13 +756,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $this->datacenter->getDNSClient();
     }
     /**
-     * Get contents of remote file asynchronously.
+     * Get contents of remote or local file asynchronously.
      *
-     * @param string $url URL
+     * @param string $filename Filename
      */
-    public function fileGetContents(string $url): string
+    public function fileGetContents(string $filename): string
     {
-        return $this->getHTTPClient()->request(new Request($url))->getBody()->buffer();
+        if (filter_var($filename, FILTER_VALIDATE_URL)) {
+            return $this->getHTTPClient()->request(new Request($filename))->getBody()->buffer();
+        }
+        return read($filename);
     }
     /**
      * Get main DC ID.
