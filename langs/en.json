@@ -162,5 +162,8 @@
     "plugin_path_does_not_exist": "Plugin path %s does not exist!",
 
     "windows_warning": "For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it's 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)",
-    "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open and remove open_basedir restrictions or disable webserver path rewrites to fix! If you already did that, make sure the CLI version of PHP is exactly the same as the web version (same version, extensions, et cetera) and check out the MadelineProto.log file for more info about the error that prevented the IPC server from starting."
+    "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open and remove open_basedir restrictions or disable webserver path rewrites to fix! If you already did that, make sure the CLI version of PHP is exactly the same as the web version (same version, extensions, et cetera) and check out the MadelineProto.log file for more info about the error that prevented the IPC server from starting.",
+
+    "translate_madelineproto_web": "MadelineProto can be translated in your language (current translation progress: %d%%), click <a href=\"https://weblate.madelineproto.xyz\" target=\"_blank\">here to contribute with the translation!</a>",
+    "translate_madelineproto_cli": "MadelineProto can be translated in your language (current translation progress: %d%%), go to https://weblate.madelineproto.xyz to contribute with the translation!"
 }

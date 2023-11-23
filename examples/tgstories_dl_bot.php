@@ -122,7 +122,13 @@ final class StoriesEventHandler extends SimpleEventHandler
             return;
         }
 
-        $stories = $this->userInstance->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
+        $stories = $this->userInstance->stories->getPeerStories(peer: $message->commandArgs[0])['stories']['stories'];
+        $last = null;
+        do {
+            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories']['stories'];
+            $last = $res ? end($res)['id'] : null;
+            $stories = array_merge($res, $stories);
+        } while ($last);
         // Skip deleted stories
         $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
         // Skip protected stories
