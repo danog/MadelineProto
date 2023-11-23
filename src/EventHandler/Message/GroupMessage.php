@@ -17,20 +17,14 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
-use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
-use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Participant\Admin;
-use danog\MadelineProto\EventHandler\Participant\Banned;
-use danog\MadelineProto\EventHandler\Participant\Creator;
-use danog\MadelineProto\EventHandler\Participant\Left;
-use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\EventHandler\Topic\IconColor;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
+use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
 
 /**
  * Represents an incoming or outgoing group message.
@@ -54,16 +48,7 @@ final class GroupMessage extends Message
                 'participant' => $member,
             ]
         )['participant'];
-
-        return match ($result['_']) {
-            'channelParticipant' => new Member($result),
-            'channelParticipantLeft' => new Left($client, $result),
-            'channelParticipantSelf' => new MySelf($result),
-            'channelParticipantAdmin' => new Admin($result),
-            'channelParticipantBanned' => new Banned($client, $result),
-            'channelParticipantCreator' => new Creator($result),
-            default => throw new AssertionError("undefined Participant type: {$result['_']}")
-        };
+        return Participant::fromRawParticipant($result);
     }
 
     /**
