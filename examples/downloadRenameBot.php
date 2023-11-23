@@ -17,23 +17,23 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
+use League\Uri\Contracts\UriException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\FileCallback;
-use League\Uri\Contracts\UriException;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\SimpleEventHandler;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\CommandType;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
-use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
+use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FilterNot;
 
 // MadelineProto is already loaded
@@ -129,8 +129,7 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterNot(new FilterCommand('upload', [CommandType::SLASH]))]
     public function cmdNameFile(PrivateMessage&Incoming&IsNotEdited $message)
     {
-        if (isset($this->states[$message->chatId]))
-        {
+        if (isset($this->states[$message->chatId])) {
             $name = $message->message;
             $url  = unserialize($this->states[$message->chatId]);
             unset($this->states[$message->chatId]);
@@ -187,12 +186,11 @@ class MyEventHandler extends SimpleEventHandler
 }
 
 $settings = new Settings;
-$settings->getConnection()
-    ->setMaxMediaSocketCount(1000);
-
+$settings->getConnection()->setMaxMediaSocketCount(1000);
+// In this case we don't need full caching
+$settings->getPeer()->setFullFetch(false)->setCacheAllPeersOnStartup(false);
 // IMPORTANT: for security reasons, upload by URL will still be allowed
 $settings->getFiles()->setAllowAutomaticUpload(true);
-
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
 MyEventHandler::startAndLoop('bot.madeline', $settings);
