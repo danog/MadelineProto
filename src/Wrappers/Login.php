@@ -91,6 +91,7 @@ trait Login
         $this->qrLoginDeferred ??= new DeferredCancellation;
         if (!$this->loginQrCode || $this->loginQrCode->isExpired()) {
             try {
+                $datacenter = $this->datacenter->currentDatacenter;
                 $authorization = $this->methodCallAsyncRead(
                     'auth.exportLoginToken',
                     [
@@ -98,10 +99,28 @@ trait Login
                         'api_hash' => $this->settings->getAppInfo()->getApiHash(),
                     ],
                 );
+                if ($authorization['_'] === 'auth.loginToken') {
+                    return $this->loginQrCode = new LoginQrCode(
+                        $this,
+                        "tg://login?token=".Tools::base64urlEncode((string) $authorization['token']),
+                        $authorization['expires']
+                    );
+                }
+
+                if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
+                    $datacenter = $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id'];
+                    $this->authorized_dc = $datacenter;
+                    $authorization = $this->methodCallAsyncRead(
+                        'auth.importLoginToken',
+                        $authorization,
+                        $datacenter
+                    );
+                }
+                $this->processAuthorization($authorization['authorization']);
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                     $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
+                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter);
                     if (!isset($this->authorization['hint'])) {
                         $this->authorization['hint'] = '';
                     }
@@ -112,22 +131,6 @@ trait Login
                 }
                 throw $e;
             }
-            if ($authorization['_'] === 'auth.loginToken') {
-                return $this->loginQrCode = new LoginQrCode(
-                    $this,
-                    "tg://login?token=".Tools::base64urlEncode((string) $authorization['token']),
-                    $authorization['expires']
-                );
-            }
-
-            if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
-                $authorization = $this->methodCallAsyncRead(
-                    'auth.importLoginToken',
-                    $authorization,
-                    $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id']
-                );
-            }
-            $this->processAuthorization($authorization['authorization']);
             return null;
         }
         return $this->loginQrCode;
@@ -194,7 +197,6 @@ trait Login
                 'lang_code' => $this->settings->getAppInfo()->getLangCode(),
             ],
         );
-        $this->authorized_dc = $this->datacenter->currentDatacenter;
         $this->authorization['phone_number'] = $number;
         //$this->authorization['_'] .= 'MP';
         $this->authorized = \danog\MadelineProto\API::WAITING_CODE;
@@ -328,10 +330,10 @@ trait Login
         }
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         try {
-            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]);
+            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password], $this->authorized_dc);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'PASSWORD_HASH_INVALID') {
-                $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password]);
+                $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password], $this->authorized_dc);
             } else {
                 throw $e;
             }
@@ -343,12 +345,12 @@ trait Login
         if ($this->authorized === \danog\MadelineProto\API::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
-        $this->authorized_dc = $this->datacenter->currentDatacenter;
-        $this->qrLoginDeferred?->cancel();
-        $this->qrLoginDeferred = null;
+        $this->authorized_dc ??= $this->datacenter->currentDatacenter;
         $this->authorization = $authorization;
         $this->authorized = \danog\MadelineProto\API::LOGGED_IN;
-        $this->datacenter->getDataCenterConnection($this->datacenter->currentDatacenter)->authorized(true);
+        $this->datacenter->getDataCenterConnection($this->authorized_dc)->authorized(true);
+        $this->qrLoginDeferred?->cancel();
+        $this->qrLoginDeferred = null;
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
         $this->getPhoneConfig();
         $this->startUpdateSystem();

@@ -228,7 +228,6 @@ abstract class Serialization
         }
         if ($unserialized instanceof DriverArray || !$exists) {
             \assert($unserialized instanceof DriverArray || $unserialized === null);
-            Logger::log('Extracting session from database...');
             if ($settings instanceof Settings) {
                 $settings = $settings->getDb();
             }
@@ -244,6 +243,7 @@ abstract class Serialization
                         : null;
                 }
                 if ($tableName !== null) {
+                    Logger::log('Extracting session from database...');
                     $unserialized = DbPropertiesFactory::get(
                         $settings,
                         $tableName,

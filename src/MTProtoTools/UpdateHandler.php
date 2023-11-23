@@ -1016,6 +1016,7 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateLoginToken') {
             try {
+                $datacenter = $this->datacenter->currentDatacenter;
                 $authorization = $this->methodCallAsyncRead(
                     'auth.exportLoginToken',
                     [
@@ -1024,17 +1025,19 @@ trait UpdateHandler
                     ],
                 );
                 if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
+                    $datacenter = $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id'];
+                    $this->authorized_dc = $datacenter;
                     $authorization = $this->methodCallAsyncRead(
                         'auth.importLoginToken',
                         $authorization,
-                        $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id']
+                        $datacenter
                     );
                 }
                 $this->processAuthorization($authorization['authorization']);
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                     $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
+                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter);
                     if (!isset($this->authorization['hint'])) {
                         $this->authorization['hint'] = '';
                     }

@@ -107,7 +107,7 @@ class PostgresArrayBytea extends SqlArray
      */
     protected function prepareTable(): void
     {
-        Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
+        //Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
 
         $this->db->query("
             CREATE TABLE IF NOT EXISTS \"bytea_{$this->table}\"
