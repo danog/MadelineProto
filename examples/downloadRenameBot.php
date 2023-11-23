@@ -1,5 +1,4 @@
-#!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 /**
  * Example bot.
  *
@@ -18,36 +17,50 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\FileCallback;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\FileCallback;
 use League\Uri\Contracts\UriException;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\SimpleEventHandler;
+use danog\MadelineProto\EventHandler\CommandType;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
+use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
+use danog\MadelineProto\EventHandler\Filter\Combinator\FilterNot;
 
-/*
- * Various ways to load MadelineProto
- */
-if (file_exists('vendor/autoload.php')) {
-    include 'vendor/autoload.php';
+// MadelineProto is already loaded
+if (class_exists(API::class)) {
+    // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader
+} elseif (file_exists('vendor/autoload.php')) {
+    require_once 'vendor/autoload.php';
 } else {
+    // Otherwise download an !!! alpha !!! version of MadelineProto via madeline.php
     if (!file_exists('madeline.php')) {
         copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
     }
-    include 'madeline.php';
+    require_once 'madeline.php';
 }
 
 /**
  * Event handler class.
+ *
+ * All properties returned by __sleep are automatically stored in the database.
  */
-class MyEventHandler extends EventHandler
+class MyEventHandler extends SimpleEventHandler
 {
     public const START = "Send me a file URL and I will download it and send it to you!\n\n".
-                "Usage: `https://example.com`\n".
-                "Usage: `https://example.com file name.ext`\n\n".
+                "Usage: `/upload https://example.com`\n".
+                "Usage: `/upload https://example.com file name.ext`\n\n".
                 "I can also rename Telegram files, just send me any file and I will rename it!\n\n".
-                "Max 1.5GB, parallel upload and download powered by @MadelineProto.";
+                "Max 2.0GB, parallel upload and download powered by @MadelineProto.";
 
     /**
      * @var int|string Username or ID of bot admin
@@ -65,99 +78,107 @@ class MyEventHandler extends EventHandler
     }
 
     /**
-     * Array of media objects.
-     *
-     * @var array
+     * Returns a list of names for properties that will be automatically saved to the session database (MySQL/postgres/redis if configured, the session file otherwise).
      */
-    private $states = [];
-    /**
-     * Handle updates from users.
-     *
-     * @param array $update Update
-     */
-    public function onUpdateNewMessage(array $update)
+    public function __sleep(): array
     {
-        if ($update['message']['out'] ?? false) {
-            return;
-        }
-        if ($update['message']['_'] !== 'message') {
-            return;
-        }
+        return ['states'];
+    }
 
+    /**
+     * Array of media objects.
+     */
+    private array $states = [];
+
+    /**
+     * Start
+     */
+    #[FilterCommand('start', [CommandType::SLASH])]
+    public function cmdStart(PrivateMessage&Incoming&IsNotEdited $message)
+    {
+        $message->reply(self::START, ParseMode::MARKDOWN);
+    }
+
+    /**
+     * Save user file
+     */
+    #[Handler]
+    public function cmdSaveState(PrivateMessage&Incoming&HasMedia&IsNotEdited $message)
+    {
+        $message->reply('Give me a new name for this file: ', ParseMode::MARKDOWN);
+        $this->states[$message->chatId] = serialize($message->media);
+    }
+
+    /**
+     * Upload an url
+     */
+    #[FilterCommand('upload', [CommandType::SLASH])]
+    public function cmdUrl(PrivateMessage&Incoming&IsNotEdited $message)
+    {
+        $url  = $message->commandArgs[0];
+        $name = $message->commandArgs[1] ?? basename($url);
+        if (stripos($url, 'http') !== 0) {
+            $url = "http://$url";
+        }
+        $this->cmdUpload(new RemoteUrl($url), $name, $message);
+    }
+
+    /**
+     * Change file name
+     */
+    #[FilterNot(new FilterCommand('upload', [CommandType::SLASH]))]
+    public function cmdNameFile(PrivateMessage&Incoming&IsNotEdited $message)
+    {
+        if (isset($this->states[$message->chatId]))
+        {
+            $name = $message->message;
+            $url  = unserialize($this->states[$message->chatId]);
+            unset($this->states[$message->chatId]);
+            $this->cmdUpload($url, $name, $message);
+        }
+    }
+
+    private function cmdUpload(Media|RemoteUrl $file, string $name, PrivateMessage $message)
+    {
         try {
-            $peer = $this->getInfo($update);
-            $peerId = $peer['bot_api_id'];
-            $messageId = $update['message']['id'];
-
-            if ($update['message']['message'] === '/start') {
-                return $this->messages->sendMessage(['peer' => $peerId, 'message' => self::START, 'parse_mode' => 'Markdown', 'reply_to_msg_id' => $messageId]);
-            }
-            if (isset($update['message']['media']['_']) && $update['message']['media']['_'] !== 'messageMediaWebPage') {
-                $this->messages->sendMessage(['peer' => $peerId, 'message' => 'Give me a new name for this file: ', 'reply_to_msg_id' => $messageId]);
-                $this->states[$peerId] = $update['message']['media'];
-
-                return;
-            }
-            if (isset($this->states[$peerId])) {
-                $name = $update['message']['message'];
-                $url = $this->states[$peerId];
-                unset($this->states[$peerId]);
-            } else {
-                $url = explode(' ', $update['message']['message'], 2);
-                $name = trim($url[1] ?? basename($update['message']['message']));
-                $url = trim($url[0]);
-                if (!$url) {
-                    return;
-                }
-                if (stripos($url, 'http') !== 0) {
-                    $url = "http://$url";
-                }
-            }
-            $msg = $this->sendMessage(peer: $peerId, message: 'Preparing...', replyToMsgId: $messageId);
-            $id = $msg->id;
-
-            $url = new FileCallback(
-                $url,
-                function ($progress, $speed, $time) use ($peerId, $id): void {
-                    $this->logger("Upload progress: $progress%");
-
+            $sent = $message->reply('Preparing...');
+            $file = new FileCallback(
+                $file,
+                function ($progress, $speed, $time) use ($sent) {
                     static $prev = 0;
                     $now = time();
-                    if ($now - $prev < 10 && $progress < 100) {
+                    if ($now - $prev < 10 && $progress < 100)
                         return;
-                    }
+
                     $prev = $now;
                     try {
-                        $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => "Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time"], ['FloodWaitLimit' => 0]);
-                    } catch (RPCErrorException $e) {
-                    }
+                        $sent->editText("Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time");
+                    } catch (RPCErrorException $e) {}
                 },
             );
             $this->messages->sendMedia(
-                peer: $peerId,
-                reply_to_msg_id: $messageId,
-                media: [
-                    '_' => 'inputMediaUploadedDocument',
-                    'file' => $url,
+                peer           : $message->chatId,
+                reply_to_msg_id: $message->id,
+                media          : [
+                    '_'          => 'inputMediaUploadedDocument',
+                    'file'       => $file,
                     'attributes' => [
                         ['_' => 'documentAttributeFilename', 'file_name' => $name],
                     ],
                 ],
-                message: 'Powered by @MadelineProto!',
-                parse_mode: ParseMode::MARKDOWN,
+                message   : 'Powered by @MadelineProto!'
             );
-
-            $msg->delete();
+            $sent->delete();
         } catch (Throwable $e) {
             if (!str_contains($e->getMessage(), 'Could not connect to URI')   && !($e instanceof UriException) && !str_contains($e->getMessage(), 'URI')) {
                 $this->report((string) $e);
                 $this->logger((string) $e, Logger::FATAL_ERROR);
             }
             if ($e instanceof RPCErrorException && $e->rpc === 'FILE_PARTS_INVALID') {
-                $this->report(json_encode($url));
+                $this->report(json_encode($file));
             }
             try {
-                $this->messages->editMessage(['peer' => $peerId, 'id' => $id, 'message' => 'Error: '.$e->getMessage()]);
+                $sent->editText('Error: ' . $e->getMessage());
             } catch (Throwable $e) {
                 $this->logger((string) $e, Logger::FATAL_ERROR);
             }
@@ -174,4 +195,4 @@ $settings->getFiles()->setAllowAutomaticUpload(true);
 
 // Reduce boilerplate with new wrapper method.
 // Also initializes error reporting, catching and reporting all errors surfacing from the event loop.
-MyEventHandler::startAndLoop(($argv[1] ?? 'bot').'.madeline', $settings);
+MyEventHandler::startAndLoop('bot.madeline', $settings);
