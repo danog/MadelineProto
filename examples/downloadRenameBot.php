@@ -16,7 +16,7 @@
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
-
+use League\Uri\Uri;
 use League\Uri\Contracts\UriException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
@@ -106,7 +106,7 @@ class MyEventHandler extends SimpleEventHandler
     public function cmdSaveState(PrivateMessage&Incoming&HasMedia&IsNotEdited $message)
     {
         $message->reply('Give me a new name for this file: ', ParseMode::MARKDOWN);
-        $this->states[$message->chatId] = serialize($message->media);
+        $this->states[$message->chatId] = $message->media;
     }
 
     /**
@@ -117,10 +117,13 @@ class MyEventHandler extends SimpleEventHandler
     {
         $url  = $message->commandArgs[0];
         $name = $message->commandArgs[1] ?? basename($url);
-        if (stripos($url, 'http') !== 0) {
-            $url = "http://$url";
+        try {
+            $url = Uri::new($message->commandArgs[0]);
+            $url->getScheme() || $url = "http://$url";
+            $this->cmdUpload(new RemoteUrl("$url"), $name, $message);
+        } catch (UriException $e) {
+            $message->reply('Error: ' . $e->getMessage());
         }
-        $this->cmdUpload(new RemoteUrl($url), $name, $message);
     }
 
     /**
@@ -131,7 +134,7 @@ class MyEventHandler extends SimpleEventHandler
     {
         if (isset($this->states[$message->chatId])) {
             $name = $message->message;
-            $url  = unserialize($this->states[$message->chatId]);
+            $url  = $this->states[$message->chatId];
             unset($this->states[$message->chatId]);
             $this->cmdUpload($url, $name, $message);
         }
