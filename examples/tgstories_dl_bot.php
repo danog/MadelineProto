@@ -125,7 +125,7 @@ final class StoriesEventHandler extends SimpleEventHandler
         $stories = $this->userInstance->stories->getPeerStories(peer: $message->commandArgs[0])['stories']['stories'];
         $last = null;
         do {
-            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories']['stories'];
+            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories'];
             $last = $res ? end($res)['id'] : null;
             $stories = array_merge($res, $stories);
         } while ($last);
