@@ -22,7 +22,6 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
-use Revolt\EventLoop;
 use Throwable;
 
 use const PHP_EOL;
@@ -77,24 +76,22 @@ class RPCErrorException extends \Exception
             && !self::isBad($error, $code)
             && !($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
         ) {
-            EventLoop::queue(static function () use ($method, $code, $error): void {
-                try {
-                    $res = json_decode(
-                        (
-                            HttpClientBuilder::buildDefault()
-                            ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
-                        )->getBody()->buffer(),
-                        true,
-                    );
-                    if (isset($res['ok']) && $res['ok'] && isset($res['result']) && \is_string($res['result'])) {
-                        $description = $res['result'];
-                        self::$descriptions[$error] = $description;
-                        self::$errorMethodMap[$code][$method][$error] = $error;
-                    }
-                    self::$fetchedError[$error] = true;
-                } catch (Throwable) {
+            try {
+                $res = json_decode(
+                    (
+                        HttpClientBuilder::buildDefault()
+                        ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
+                    )->getBody()->buffer(),
+                    true,
+                );
+                if (isset($res['ok']) && $res['ok'] && isset($res['result']) && \is_string($res['result'])) {
+                    $description = $res['result'];
+                    self::$descriptions[$error] = $description;
+                    self::$errorMethodMap[$code][$method][$error] = $error;
                 }
-            });
+                self::$fetchedError[$error] = true;
+            } catch (Throwable) {
+            }
         }
         if (!$description) {
             return $error;
