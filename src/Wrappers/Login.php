@@ -91,7 +91,6 @@ trait Login
         $this->qrLoginDeferred ??= new DeferredCancellation;
         if (!$this->loginQrCode || $this->loginQrCode->isExpired()) {
             try {
-                $datacenter = $this->datacenter->currentDatacenter;
                 $authorization = $this->methodCallAsyncRead(
                     'auth.exportLoginToken',
                     [
@@ -99,6 +98,7 @@ trait Login
                         'api_hash' => $this->settings->getAppInfo()->getApiHash(),
                     ],
                 );
+                $datacenter = $this->datacenter->currentDatacenter;
                 if ($authorization['_'] === 'auth.loginToken') {
                     return $this->loginQrCode = new LoginQrCode(
                         $this,
@@ -352,6 +352,7 @@ trait Login
         $this->qrLoginDeferred?->cancel();
         $this->qrLoginDeferred = null;
         $this->logger->logger(Lang::$current_lang['login_ok'], Logger::NOTICE);
+        $this->fullGetSelf();
         $this->getPhoneConfig();
         $this->startUpdateSystem();
         return $authorization;
