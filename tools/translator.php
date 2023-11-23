@@ -27,6 +27,10 @@ namespace danog\MadelineProto;
 /** @internal */
 final class Lang
 {
+    public const PERCENTAGES = %s;
+
+    public static int $currentPercentage = 100;
+
     public static array $lang = %s;
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
@@ -36,10 +40,20 @@ final class Lang
 $base = json_decode(file_get_contents("langs/en.json"), true);
 
 $langs = [];
+$percentages = [];
+
 foreach (glob("langs/*.json") as $lang) {
     $code = basename($lang, '.json');
     $langs[$code] = array_merge($base, json_decode(file_get_contents($lang), true));
     ksort($langs[$code]);
+
+    $translated = $code === 'en' ? count($base) : 0;
+    foreach ($langs[$code] as $key => $value) {
+        if ($base[$key] !== $value) {
+            $translated++;
+        }
+    }
+    $percentages[$code] = (int) (($translated*100)/count($base));
 }
 
-file_put_contents('src/Lang.php', sprintf($template, var_export($langs, true), var_export($langs['en'], true)));
+file_put_contents('src/Lang.php', sprintf($template, var_export($percentages, true), var_export($langs, true), var_export($langs['en'], true)));
