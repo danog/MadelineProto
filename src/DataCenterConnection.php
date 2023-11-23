@@ -256,7 +256,7 @@ final class DataCenterConnection implements JsonSerializable
         $logger = $this->API->logger;
         if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN && !$this->isAuthorized()) {
             foreach ($this->API->datacenter->getDataCenterConnections() as $authorized_dc_id => $authorized_socket) {
-                if ($this->API->authorized_dc !== -1 && $authorized_dc_id !== $this->API->authorized_dc) {
+                if ($this->API->authorized_dc !== null && $authorized_dc_id !== $this->API->authorized_dc) {
                     continue;
                 }
                 if ($authorized_socket->hasTempAuthKey()

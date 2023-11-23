@@ -196,9 +196,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public int $authorized = API::NOT_LOGGED_IN;
     /**
      * Main authorized DC ID.
-     *
      */
-    public int $authorized_dc = -1;
+    public ?int $authorized_dc = null;
     /**
      * RSA keys.
      *
@@ -1818,7 +1817,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
-                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password),
+                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password),
             ],
         );
     }

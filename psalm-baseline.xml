@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@b775d297bb90d50424f79968d590aea2e7da20b4">
+<files psalm-version="dev-master@baa6d5dd7801e24d99d2f57995b58b79e8ad304a">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -1320,7 +1320,7 @@
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
-                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [])))->getCheckPassword($password),
+                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password),
             ],
         )]]></code>
     </InvalidReturnStatement>
@@ -1346,6 +1346,9 @@
       <code><![CDATA[$this->getSelf()['bot']]]></code>
       <code><![CDATA[$this->getSelf()['premium']]]></code>
     </PossiblyInvalidArrayAccess>
+    <PossiblyNullArgument>
+      <code><![CDATA[$this->authorized_dc]]></code>
+    </PossiblyNullArgument>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->authorization['hint']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
@@ -1516,6 +1519,7 @@
       <code><![CDATA[$this->write[$offset]]]></code>
     </PossiblyInvalidArrayOffset>
     <PossiblyNullArgument>
+      <code>$datacenter</code>
       <code>$messageMedia</code>
     </PossiblyNullArgument>
     <PossiblyNullReference>
@@ -1558,6 +1562,9 @@
     <RedundantCondition>
       <code><![CDATA[$fingerprint !== $messageMedia['key_fingerprint']]]></code>
     </RedundantCondition>
+    <ReferenceConstraintViolation>
+      <code>$datacenter</code>
+    </ReferenceConstraintViolation>
     <TooManyArguments>
       <code>$cb(100, $speed, $time)</code>
     </TooManyArguments>
@@ -1793,6 +1800,7 @@
       <code><![CDATA[$updates['out']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedVariable>
+      <code>$datacenter</code>
       <code>$first</code>
     </PossiblyUndefinedVariable>
     <RedundantCondition>
@@ -1940,9 +1948,6 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/Serialization.php">
-    <LessSpecificReturnStatement>
-      <code>[$unserialized, $unlock]</code>
-    </LessSpecificReturnStatement>
     <NullableReturnStatement>
       <code>$ipcSocket</code>
       <code>$ipcSocket</code>
@@ -2542,6 +2547,9 @@
       <code><![CDATA[$this->authorization['phone_number']]]></code>
       <code><![CDATA[$this->authorization['phone_number']]]></code>
     </PossiblyNullArrayAccess>
+    <PossiblyUndefinedVariable>
+      <code>$datacenter</code>
+    </PossiblyUndefinedVariable>
     <RedundantConditionGivenDocblockType>
       <code>\is_array($auth_key)</code>
     </RedundantConditionGivenDocblockType>

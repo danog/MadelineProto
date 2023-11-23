@@ -383,6 +383,9 @@ final class Magic
             $deferred->complete();
         } else {
             self::$suspendPeriodicLogging = new DeferredFuture;
+            $f = new DeferredFuture;
+            $f->complete();
+            $f->getFuture()->await();
         }
     }
 
