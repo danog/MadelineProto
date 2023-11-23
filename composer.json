@@ -112,8 +112,6 @@
             "@docs-fix",
             "@cs-fix"
         ],
-        "test-php7": "tests/test-conversion.sh 70",
-        "test-php56": "tests/test-conversion.sh 5",
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v",
         "psalm": "psalm --no-cache --threads=10",
         "docs": "php tools/build_docs.php",
