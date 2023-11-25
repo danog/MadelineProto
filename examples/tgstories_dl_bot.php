@@ -137,7 +137,7 @@ final class StoriesEventHandler extends SimpleEventHandler
         usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
 
         $message = $message->reply("Total stories: ".count($stories));
-        foreach (array_chunk($stories, 50) as $sub) {
+        foreach (array_chunk($stories, 10) as $sub) {
             $result = '';
             foreach ($sub as $story) {
                 $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
