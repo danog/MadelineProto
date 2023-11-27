@@ -117,7 +117,7 @@
     "long_not_64": "Given value is not 64 bytes long",
     "array_invalid": "You didn't provide a valid array",
     "predicate_not_set": "Predicate (value under _) was not set!",
-    "update_madelineproto": "You're running an old version of MadelineProto, an update is required!",
+    "update_madelineproto": "You're running an old version of MadelineProto, an update is required: currently running %s, but the latest version with multiple bugfixes and new features is %s!",
     "type_extract_error": "Could not extract type \"%s\", you should update MadelineProto!",
     "method_not_found": "Could not find method: ",
     "params_missing": "Missing required parameter",
