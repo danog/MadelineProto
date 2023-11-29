@@ -963,6 +963,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
                 Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()];
                 Lang::$currentPercentage = Lang::PERCENTAGES[$this->settings->getAppInfo()->getLangCode()];
+            } else {
+                Lang::$currentPercentage = 0;
             }
             // Reset MTProto session (not related to user session)
             $this->resetMTProtoSession();

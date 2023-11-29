@@ -84,8 +84,6 @@ final class AppInfo extends SettingsAbstract
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language
-        Lang::$current_lang =& Lang::$lang[$this->langCode];
-        Lang::$currentPercentage = Lang::PERCENTAGES[$this->langCode];
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $this->setLangCode(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
         } elseif (isset($_SERVER['LANG'])) {
@@ -105,6 +103,8 @@ final class AppInfo extends SettingsAbstract
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];
             Lang::$currentPercentage = Lang::PERCENTAGES[$this->langCode];
+        } else {
+            Lang::$currentPercentage = 0;
         }
     }
 
@@ -239,6 +239,8 @@ final class AppInfo extends SettingsAbstract
         if (isset(Lang::$lang[$this->langCode])) {
             Lang::$current_lang =& Lang::$lang[$this->langCode];
             Lang::$currentPercentage = Lang::PERCENTAGES[$this->langCode];
+        } else {
+            Lang::$currentPercentage = 0;
         }
 
         return $this;
