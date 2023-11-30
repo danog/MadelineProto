@@ -5,7 +5,7 @@ set -ex
 export COMPOSER_PROCESS_TIMEOUT=100000
 
 (
-    flock -x -w 100000 200 || exit 1
+    flock -x 200 || exit 1
 
     touch /tmp/ci_status
     if [ "$(cat /tmp/ci_status)" != "done" ]; then
