@@ -48,7 +48,7 @@ steps:
       - apk add bash
       - tests/test.sh phpunit-light
 
-  docs:
+  cs:
     group: test
     image: danog/madelineproto:next
     when:
@@ -58,7 +58,7 @@ steps:
         - push
     commands:
       - apk add bash
-      - tests/test.sh docs
+      - tests/test.sh cs
   
   psalm:
     group: test
@@ -71,18 +71,6 @@ steps:
     commands:
       - apk add bash
       - tests/test.sh psalm
-  
-  cs:
-    group: test
-    image: danog/madelineproto:next
-    when:
-      event:
-        - pull_request
-        - tag
-        - push
-    commands:
-      - apk add bash
-      - tests/test.sh cs
   
   handshake:
     group: test

@@ -9,7 +9,7 @@ touch /tmp/ci_status
 exec 4</tmp/ci_status
 flock 4
 
-[ "$(cat /tmp/ci_status)" != "done" ]; then
+if [ "$(cat /tmp/ci_status)" != "done" ]; then
     apk add procps git unzip github-cli openssh
 
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -26,7 +26,9 @@ fi
 
 exec 4<&-
 
-if [ "$1" == "docs" ]; then
+if [ "$1" == "cs" ]; then
+    composer psalm
+
     rmdir docs
     curl -L https://github.com/danog/MadelineProtoDocs/archive/refs/heads/master.tar.gz | tar -xz
     mv MadelineProtoDocs-master/ docs
@@ -39,20 +41,6 @@ if [ "$1" == "docs" ]; then
     composer cs-fix
 
     if [ "$(git diff)" != "" ]; then echo "Please run composer build!"; exit 1; fi
-
-    exit 0
-fi
-
-if [ "$1" == "psalm" ]; then
-    composer psalm
-
-    exit 0
-fi
-
-if [ "$1" == "cs" ]; then
-    composer cs-fix
-
-    if [ "$(git diff)" != "" ]; then echo "Please run composer cs-fix!"; exit 1; fi
 
     exit 0
 fi
