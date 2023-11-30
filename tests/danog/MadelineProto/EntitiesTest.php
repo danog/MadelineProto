@@ -62,6 +62,7 @@ class EntitiesTest extends MadelineTestCase
             $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
             $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, rtrim($result['text']));
+            $result['entities'][0]['language'] = ''; // Telegram now has automatic language detection
             $this->assertEquals([['offset' => 0, 'length' => StrTools::mbStrlen($html), 'language' => '', 'type' => 'pre']], $result['entities']);
         }
     }
@@ -142,11 +143,11 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                'test<b>test </b>test',
-                'testtest test',
+                'è»test<b>test </b>test',
+                'è»testtest test',
                 [
                     [
-                        'offset' => 4,
+                        'offset' => 6,
                         'length' => 4,
                         'type' => 'bold',
                     ],
