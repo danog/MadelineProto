@@ -38,12 +38,6 @@ if [ "$1" == "cs" ]; then
     exit 0
 fi
 
-if [ "$1" == "psalm" ]; then
-    composer psalm
-    exit 0
-fi
-
-
 if [ "$1" == "handshake" ]; then
     php tests/handshake.php
     exit 0

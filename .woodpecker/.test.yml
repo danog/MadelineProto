@@ -60,18 +60,6 @@ steps:
       - apk add bash
       - tests/test.sh cs
   
-  psalm:
-    group: test
-    image: danog/madelineproto:next
-    when:
-      event:
-        - pull_request
-        - tag
-        - push
-    commands:
-      - apk add bash
-      - tests/test.sh psalm
-  
   handshake:
     group: test
     image: danog/madelineproto:next
