@@ -47,7 +47,7 @@ if [ "$1" == "cs" ]; then
 fi
 
 if [ "$1" == "handshake" ]; then
-    composer test
+    php tests/handshake.php
     exit 0
 fi
 
