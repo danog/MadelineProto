@@ -112,7 +112,8 @@
             "@docs",
             "@docs-fix",
             "@cs-fix",
-            "@psalm"
+            "@psalm",
+            "@test-light"
         ],
         "test": [
             "@paratest"
