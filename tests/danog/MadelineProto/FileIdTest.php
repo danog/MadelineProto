@@ -164,7 +164,7 @@ class FileIdTest extends MadelineTestCase
 
                 unlink(basename($url));
             } else {
-                $botResult = json_decode(file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true);
+                $botResult = json_decode(file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true, flags: JSON_THROW_ON_ERROR);
             }
             $botResult = $botResult['result'][$type];
             if ($type !== 'photo') {

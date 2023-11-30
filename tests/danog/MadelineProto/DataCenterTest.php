@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\PHPUnit\AsyncTestCase;
 use Amp\Process\Process;
 use Amp\Socket\InternetAddress;
 use danog\MadelineProto\API;
@@ -34,7 +35,7 @@ use function Amp\delay;
 \define('MADELINEPROTO_TEST', 'pony');
 
 /** @internal */
-final class DataCenterTest extends TestCase
+final class DataCenterTest extends AsyncTestCase
 {
     private static API $main;
     private static API $test;

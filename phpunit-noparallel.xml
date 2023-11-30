@@ -17,8 +17,7 @@
   </coverage>
   <testsuites>
     <testsuite name="Main">
-      <directory>tests</directory>
-      <exclude>tests/danog/MadelineProto/DataCenterTest.php</exclude>
+      <file>tests/danog/MadelineProto/DataCenterTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>
