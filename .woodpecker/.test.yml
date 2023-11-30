@@ -34,27 +34,64 @@ steps:
       - API_HASH
       - BOT_TOKEN
       - DEST
-    environment:
-      - PHP_VERSION=${php}
-      - PLATFORM=${platform}
-      - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - tests/test.sh
-      - php tests/handshake.php
-      - composer test
+      - tests/test.sh phpunit
+    
   test_pr:
     group: test
     image: danog/madelineproto:next
     when:
       event:
         - pull_request
-    environment:
-      - PHP_VERSION=${php}
-      - PLATFORM=${platform}
-      - TAG=${CI_COMMIT_TAG}
     commands:
       - apk add bash
-      - tests/test.sh
-      - php tests/handshake.php
-      - composer test-light
+      - tests/test.sh phpunit-light
+
+  docs:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh docs
+  
+  psalm:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh psalm
+  
+  cs:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh cs
+  
+  handshake:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh handshake

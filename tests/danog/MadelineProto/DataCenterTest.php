@@ -108,8 +108,6 @@ final class DataCenterTest extends AsyncTestCase
         $API->updateSettings($settings);
 
         $this->assertIsArray($API->help->getConfig());
-
-        delay(1.0);
     }
 
     private static function provideProxies(bool $enable = true): iterable
