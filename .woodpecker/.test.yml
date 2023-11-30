@@ -36,7 +36,7 @@ steps:
       - DEST
     commands:
       - apk add bash
-      - tests/test.sh phpunit
+      - tests/test.sh phpunit-light
     
   test_pr:
     group: test
