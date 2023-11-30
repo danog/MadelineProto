@@ -465,7 +465,7 @@ abstract class Message extends AbstractMessage
     public function getHTML(bool $allowTelegramTags = false): string
     {
         if (!$this->entities) {
-            return htmlentities($this->message);
+            return StrTools::htmlEscape($this->message);
         }
         if ($allowTelegramTags) {
             return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);

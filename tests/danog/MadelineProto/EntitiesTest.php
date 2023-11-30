@@ -46,7 +46,7 @@ class EntitiesTest extends MadelineTestCase
                     true
                 ),
             );
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: htmlentities($html), parse_mode: $mode);
+            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: StrTools::htmlEscape($html), parse_mode: $mode);
             $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
             $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, $result['text']);
@@ -310,7 +310,7 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'bold',
                     ],
                 ],
-                '<b>&#039;&quot;</b>',
+                '<b>&apos;&quot;</b>',
             ],
             [
                 'html',
