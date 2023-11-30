@@ -18,7 +18,6 @@
   <testsuites>
     <testsuite name="Main">
       <directory>tests</directory>
-      <exclude>tests/danog/MadelineProto/DataCenterTest.php</exclude>
     </testsuite>
   </testsuites>
 </phpunit>
