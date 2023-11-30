@@ -196,11 +196,11 @@ class FileIdTest extends MadelineTestCase
     public function provideUrls(): array
     {
         $res = [
-            'sticker' => 'https://github.com/danog/MadelineProto/blob/master/tests/lel.webp?raw=true',
-            'photo' => 'https://github.com/danog/MadelineProto/blob/master/tests/faust.jpg',
-            'audio' => 'https://github.com/danog/MadelineProto/blob/master/tests/mosconi.mp3?raw=true',
-            'video' => 'https://github.com/danog/MadelineProto/blob/master/tests/swing.mp4?raw=true',
-            'animation' => 'https://github.com/danog/MadelineProto/blob/master/tests/pony.mp4?raw=true',
+            'sticker' => 'https://github.com/danog/MadelineProto/raw/v8/tests/lel.webp?raw=true',
+            'photo' => 'https://github.com/danog/MadelineProto/raw/v8/tests/faust.jpg',
+            'audio' => 'https://github.com/danog/MadelineProto/raw/v8/tests/mosconi.mp3?raw=true',
+            'video' => 'https://github.com/danog/MadelineProto/raw/v8/tests/swing.mp4?raw=true',
+            'animation' => 'https://github.com/danog/MadelineProto/raw/v8/tests/pony.mp4?raw=true',
             'document' => 'https://github.com/danog/danog.github.io/raw/master/lol/index_htm_files/0.gif',
             'voice' => 'https://daniil.it/audio_2020-02-01_18-09-08.ogg',
         ];

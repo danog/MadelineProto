@@ -57,3 +57,4 @@ steps:
       - apk add bash
       - tests/test.sh
       - php tests/handshake.php
+      - composer test-light

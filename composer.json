@@ -115,15 +115,19 @@
             "@psalm"
         ],
         "test": [
-            "paratest",
-            "phpunit"
+            "@paratest",
+            "@phpunit"
+        ],
+        "test-light": [
+            "@paratest-light"
         ],
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v",
         "psalm": "psalm --no-cache --threads=10",
         "docs": "php tools/build_docs.php",
         "docs-fix": "tools/fix_docs.sh",
-        "phpunit": "@php -dzend.assertions=1 ./vendor/bin/phpunit --coverage-text -c phpunit-noparallel.xml",
-        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest --coverage-text",
+        "phpunit": "@php -dzend.assertions=1 ./vendor/bin/phpunit -c phpunit-noparallel.xml",
+        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest",
+        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -c phpunit-light.xml",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],
         "post-update-cmd": ["@composer bin all update --ansi"]
