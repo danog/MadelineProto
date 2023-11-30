@@ -435,6 +435,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleBotInAttachMenu.html" name="messages.toggleBotInAttachMenu">Enable or disable web bot attachment menu »: messages.toggleBotInAttachMenu</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleSignatures.html" name="channels.toggleSignatures">Enable/disable message signatures in channels: channels.toggleSignatures</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.toggleTopPeers.html" name="contacts.toggleTopPeers">Enable/disable top peers: contacts.toggleTopPeers</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#htmlescape-string-what-string" name="htmlEscape">Escape string for MadelineProto's HTML entity converter: htmlEscape</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdownurlescape-string-what-string" name="markdownUrlEscape">Escape string for URL: markdownUrlEscape</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdowncodeescape-string-what-string" name="markdownCodeEscape">Escape string for markdown code section: markdownCodeEscape</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#markdowncodeblockescape-string-what-string" name="markdownCodeblockEscape">Escape string for markdown codeblock: markdownCodeblockEscape</a>

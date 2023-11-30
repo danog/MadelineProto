@@ -23,10 +23,6 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use Generator;
-use LeProxy\LeProxy\LeProxyServer;
-use PHPUnit\Framework\TestCase;
-use React\EventLoop\Loop;
-use React\Socket\ServerInterface;
 use Throwable;
 
 use function Amp\ByteStream\splitLines;

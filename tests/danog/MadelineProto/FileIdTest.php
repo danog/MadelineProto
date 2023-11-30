@@ -104,7 +104,7 @@ class FileIdTest extends MadelineTestCase
 
             [$type, $fileIdStr, $uniqueFileIdStr] = $fullInfo;
         } else {
-            $this->assertArrayHasKey($type, $res);
+            $this->assertArrayHasKey($type, $res, json_encode($res));
             $res = $res[$type];
         }
 
