@@ -20,8 +20,6 @@ php tests/jit.php
 php tests/lock_setup.php
 
 if [ "$1" == "cs" ]; then
-    composer psalm
-
     rmdir docs
     curl -L https://github.com/danog/MadelineProtoDocs/archive/refs/heads/master.tar.gz | tar -xz
     mv MadelineProtoDocs-master/ docs
@@ -40,6 +38,11 @@ fi
 
 if [ "$1" == "handshake" ]; then
     php tests/handshake.php
+    exit 0
+fi
+
+if [ "$1" == "psalm" ]; then
+    composer psalm
     exit 0
 fi
 

@@ -37,7 +37,7 @@ steps:
       - apk add bash
       - tests/test.sh phpunit
     
-  test_pr:
+  test_light:
     group: test
     image: danog/madelineproto:next
     when:
@@ -48,7 +48,7 @@ steps:
       - apk add bash
       - tests/test.sh phpunit-light
 
-  cs:
+  psalm:
     group: test
     image: danog/madelineproto:next
     when:
@@ -58,7 +58,7 @@ steps:
         - push
     commands:
       - apk add bash
-      - tests/test.sh cs
+      - tests/test.sh psalm
   
   handshake:
     group: test
@@ -71,3 +71,6 @@ steps:
     commands:
       - apk add bash
       - tests/test.sh handshake
+
+depends_on:
+  - build-docker

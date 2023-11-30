@@ -89,7 +89,6 @@ class EntitiesTest extends TestCase
             $resultMTProto = self::sendMessage(message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
             $result = self::MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, rtrim($result['text']));
-            $result['entities'][0]['language'] = ''; // Telegram now has automatic language detection
             $this->assertEquals([['offset' => 0, 'length' => StrTools::mbStrlen($html), 'language' => '', 'type' => 'pre']], $result['entities']);
         }
     }
