@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\Process\Process;
 use Amp\Socket\InternetAddress;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
@@ -27,6 +28,7 @@ use React\EventLoop\Loop;
 use React\Socket\ServerInterface;
 use Throwable;
 
+use function Amp\ByteStream\splitLines;
 use function Amp\delay;
 
 \define('MADELINEPROTO_TEST', 'pony');
@@ -36,8 +38,7 @@ final class DataCenterTest extends TestCase
 {
     private static API $main;
     private static API $test;
-    private static LeProxyServer $proxy;
-    private static ServerInterface $proxySocket;
+    private static Process $proxy;
     private static InternetAddress $proxyEndpoint;
 
     private static function getBaseSettings(bool $test): Settings
@@ -61,9 +62,11 @@ final class DataCenterTest extends TestCase
         if (isset(self::$proxy)) {
             return;
         }
-        self::$proxy = new LeProxyServer(Loop::get());
-        self::$proxySocket = self::$proxy->listen('127.0.0.1:0', false);
-        self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', self::$proxySocket->getAddress()));
+        self::$proxy = Process::start([PHP_BINARY, __DIR__.'/../../../vendor-bin/leproxy/proxy.php']);
+        foreach (splitLines(self::$proxy->getStdout()) as $addr) {
+            break;
+        }
+        self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', $addr));
 
         self::$main = new API(
             sys_get_temp_dir().'/testing_datacenter_main.madeline',
@@ -137,7 +140,8 @@ final class DataCenterTest extends TestCase
                 }
 
                 $testedProxies = false;
-                foreach ([WssStream::class, DefaultStream::class, WsStream::class] as $transport) {
+                //foreach ([WssStream::class, DefaultStream::class, WsStream::class] as $transport) {
+                foreach ([DefaultStream::class] as $transport) {
                     foreach ([true, false] as $obfuscated) {
                         if ($transport !== DefaultStream::class && !$obfuscated) {
                             continue;

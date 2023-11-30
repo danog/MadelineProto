@@ -110,7 +110,8 @@
         "build": [
             "@docs",
             "@docs-fix",
-            "@cs-fix"
+            "@cs-fix",
+            "@psalm"
         ],
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v",
         "psalm": "psalm --no-cache --threads=10",
