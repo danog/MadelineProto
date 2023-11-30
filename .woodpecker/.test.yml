@@ -71,6 +71,3 @@ steps:
     commands:
       - apk add bash
       - tests/test.sh handshake
-
-depends_on:
-  - build-docker
