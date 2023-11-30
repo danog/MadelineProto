@@ -4,25 +4,7 @@ set -ex
 
 export COMPOSER_PROCESS_TIMEOUT=100000
 
-(
-    flock -x 200 || exit 1
-
-    touch /tmp/ci_status
-    if [ "$(cat /tmp/ci_status)" != "done" ]; then
-        apk add procps git unzip github-cli openssh
-
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php
-        php -r "unlink('composer-setup.php');"
-        mv composer.phar /usr/local/bin/composer
-
-        php tests/jit.php
-
-        composer update
-
-        echo done > /tmp/ci_status
-    fi
-) 200>/var/lock/woodpecker.lock
+php tests/lock_setup.php
 
 if [ "$1" == "cs" ]; then
     composer psalm
