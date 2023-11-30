@@ -22,7 +22,7 @@ class FileIdTest extends MadelineTestCase
      */
     public static function stripFileReference(string $fileId): string
     {
-        return (string) FileId::fromBotAPI($fileId)->setFileReference('');
+        return (string) FileId::fromBotAPI($fileId)->setFileReference('')->setVersion(0);
     }
     /**
      * Strip access hash (and possibly ID) from file ID.
@@ -87,14 +87,10 @@ class FileIdTest extends MadelineTestCase
             $this->expectExceptionMessage("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
         }
         $res = self::$MadelineProto->messages->sendMedia(
-            [
-                'peer' => getenv('DEST'),
-                'media' => $fileIdStr,
-            ],
-            [
-                'botAPI' => true,
-            ],
+            peer: getenv('DEST'),
+            media: $fileIdStr,
         );
+        $res = self::$MadelineProto->MTProtoToBotAPI($res);
         if ($type === 'thumbnail') {
             $this->assertArrayHasKey($fullInfo[0], $res);
             $res = $res[$fullInfo[0]];

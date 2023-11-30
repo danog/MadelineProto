@@ -66,7 +66,7 @@ final class DataCenterTest extends AsyncTestCase
         self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', $addr));
 
         self::$main = new API(
-            sys_get_temp_dir().'/testing_datacenter_main.madeline',
+            sys_get_temp_dir(). '/'.random_int(0, PHP_INT_MAX).'_'.getmypid().'testing_datacenter_main.madeline',
             self::getBaseSettings(false)
         );
         /*self::$test = new API(

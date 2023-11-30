@@ -115,8 +115,7 @@
             "@psalm"
         ],
         "test": [
-            "@paratest",
-            "@phpunit"
+            "@paratest"
         ],
         "test-light": [
             "@paratest-light"
@@ -125,9 +124,8 @@
         "psalm": "psalm --no-cache --threads=10",
         "docs": "php tools/build_docs.php",
         "docs-fix": "tools/fix_docs.sh",
-        "phpunit": "@php -dzend.assertions=1 ./vendor/bin/phpunit -c phpunit-noparallel.xml",
-        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -f",
-        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -f -c phpunit-light.xml",
+        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -fv",
+        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -fvc phpunit-light.xml",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],
         "post-update-cmd": ["@composer bin all update --ansi"]
