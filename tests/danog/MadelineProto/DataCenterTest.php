@@ -26,7 +26,6 @@ use Generator;
 use Throwable;
 
 use function Amp\ByteStream\splitLines;
-use function Amp\delay;
 
 \define('MADELINEPROTO_TEST', 'pony');
 

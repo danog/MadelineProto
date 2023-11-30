@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 $lock = fopen('woodpecker.lock', 'c+');
 flock($lock, LOCK_EX);
