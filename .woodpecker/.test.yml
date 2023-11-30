@@ -28,7 +28,6 @@ steps:
     when:
       event:
         - tag
-        - push
     secrets:
       - API_ID
       - API_HASH
@@ -36,7 +35,7 @@ steps:
       - DEST
     commands:
       - apk add bash
-      - tests/test.sh phpunit-light
+      - tests/test.sh phpunit
     
   test_pr:
     group: test
@@ -44,6 +43,7 @@ steps:
     when:
       event:
         - pull_request
+        - push
     commands:
       - apk add bash
       - tests/test.sh phpunit-light
