@@ -4,6 +4,19 @@ set -ex
 
 export COMPOSER_PROCESS_TIMEOUT=100000
 
+apk add procps git unzip github-cli openssh
+
+cd /tmp
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
+
+cd $OLDPWD
+
+php tests/jit.php
+
 php tests/lock_setup.php
 
 if [ "$1" == "cs" ]; then
@@ -24,6 +37,12 @@ if [ "$1" == "cs" ]; then
 
     exit 0
 fi
+
+if [ "$1" == "psalm" ]; then
+    composer psalm
+    exit 0
+fi
+
 
 if [ "$1" == "handshake" ]; then
     php tests/handshake.php
