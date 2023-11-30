@@ -1,6 +1,6 @@
 <?php
 
-$lock = fopen('/tmp/woodpecker.lock', 'c+');
+$lock = fopen('woodpecker.lock', 'c+');
 flock($lock, LOCK_EX);
 
 if (fread($lock, 1) !== "1") {
