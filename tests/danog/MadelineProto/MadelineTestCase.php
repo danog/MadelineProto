@@ -7,6 +7,7 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
 /** @internal */
@@ -32,7 +33,9 @@ abstract class MadelineTestCase extends TestCase
             'testing.madeline',
             $settings
         );
+        $unlock = Tools::flock('/tmp/login.flock', LOCK_EX);
         self::$MadelineProto->botLogin(getenv('BOT_TOKEN'));
+        $unlock();
     }
 
     /**

@@ -959,8 +959,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->settings->getConnection()->init();
             // Setup language
             Lang::$current_lang =& Lang::$lang['en'];
+            Lang::$currentPercentage = 100;
             if (Lang::$lang[$this->settings->getAppInfo()->getLangCode()] ?? false) {
                 Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()];
+                Lang::$currentPercentage = Lang::PERCENTAGES[$this->settings->getAppInfo()->getLangCode()];
+            } else {
+                Lang::$currentPercentage = 0;
             }
             // Reset MTProto session (not related to user session)
             $this->resetMTProtoSession();
@@ -1521,7 +1525,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         Magic::start(light: false);
         $warning = '';
         if (API::RELEASE !== Magic::$latest_release) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(Lang::$current_lang['update_madelineproto']).'</h2>';
+            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(
+                Lang::$current_lang['update_madelineproto'],
+                API::RELEASE,
+                Magic::$latest_release ?? 'error',
+            )).'</h2>';
         }
         if (!Magic::$hasOpenssl) {
             $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
@@ -1531,6 +1539,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         if (!\extension_loaded('uv')) {
             $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
+        }
+        if (Lang::$currentPercentage !== 100) {
+            $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
         }
         return $warning;
     }

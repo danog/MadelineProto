@@ -340,11 +340,16 @@ final class Logger
 
         if (!self::$printed) {
             self::$printed = true;
-            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['magenta']]);
             $this->logger('MadelineProto '.\danog\MadelineProto\API::RELEASE);
             $this->logger('Copyright (C) 2016-'.date('Y').' Daniil Gentili');
             $this->logger('Licensed under AGPLv3');
             $this->logger('https://github.com/danog/MadelineProto');
+
+            $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
+            if (Lang::$currentPercentage !== 100) {
+                $this->logger(sprintf(Lang::$current_lang['translate_madelineproto_cli'], Lang::$currentPercentage));
+            }
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
     }

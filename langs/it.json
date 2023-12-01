@@ -134,7 +134,7 @@
     "do_not_use_deprecated_function": "la funzione %s è deprecata, per favore usa %s",
     "recommend_not_use_filesystem_function": "l'uso della funzione %s non è racommandato, perché l'accesso al filesystem durante la gestione degli update rallenterà il bot, si prega di leggere https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions per una lista di modi alternativi per memorizzare informazioni in modi che non rallenteranno il tuo bot!",
     "do_not_use_blocking_class": "per motivi di performance, gli event handler non possono usare la classe bloccante non-asincrona %s, per favore usa %s",
-    "must_have_declare_types": "per motivi di performance, la prima riga del file contenente l'event handler deve essere uguale a declare(strict_types=1);",
+    "must_have_declare_types": "per motivi di performance, la prima riga del file contenente l'event handler deve essere uguale a \"declare(strict_types=1);\"",
     "do_not_delete_MadelineProto.log": "il file MadelineProto.log non deve essere mai eliminato, per favore imposta una dimensione massima nelle impostazioni invece di eliminarlo!",
     "do_not_use_non_root_require_in_event_handler": "per motivi di performance, non è possibile usare require o include dentro l'event handler, è possibile includere file solo all'esterno della classe.",
     "static_analysis_minor": "È stato riscontrato un problema minore durante l'analisi statica di %s: %s",
@@ -152,5 +152,10 @@
     "waveform_value": "Un singolo valore di una forma d'onda deve essere compreso tra 0 e 31!",
     "could_not_convert_object": "Non è stato possibile convertire l'oggetto di tipo %s",
     "dl.php_check_logs_make_sure_session_running": "Sia l'event handler associato al bot che il server IPC della sessione sono offline, controllare i log e assicurarsi che almeno uno dei due sia online!",
-    "update_madelineproto": "Stai usando una vecchia versione di MadelineProto, è necessario un aggiornamento!"
+    "update_madelineproto": "Stai usando una vecchia versione di MadelineProto, è necessario un aggiornamento: la versione che stai usando adesso è %s, ma l'ultima versione con tutti gli ultimi bugfix e tante nuove funzionalità è %s!",
+    "do_not_use_yield": "MadelineProto 8 non richede e non supporta l'uso della parola chiave yield in funzioni asincrono, è necessario rimuovere tutte gli yield usati in precedenza per chiamate a funzioni asincrone",
+    "translate_madelineproto_web": "MadelineProto pu&ograve; essere tradotto nella tua lingua (stato attuale della traduzione: %d%%), cliccate  <a href=\"https://weblate.madelineproto.xyz\" target=\"_blank\">qui per contribuire alla traduzione!</a>",
+    "translate_madelineproto_cli": "MadelineProto può essere tradotto nella tua lingua (stato attuale della traduzione: %d%%), vai su https://weblate.madelineproto.xyz per contribuire alla traduzione!",
+    "windows_warning": "Per utenti Windows: per favore passate a Linux se questo passaggio fallisce. Per continuare ad usare Windows, potrebbe essere necessario modificare le impostazioni del firewall per permettere a tutti i processi PHP di creare socket (100% è più facile passare a Linux, su Linux MadelineProto funziona direttamente senza alcuna modifica richiesta)",
+    "could_not_connect_to_MadelineProto": "Non è stato possibile collegarsi a MadelineProto, per favore abilitare la funzione proc_open e rimuovere ogni limitazione open_basedir o disabilitare le rewrite lato server per fixare! Se l'avete già fatto, assicuratevi che la versione PHP CLI è la stessa versione di PHP web (apache/php-fpm) (stessa versione, estensioni, eccetera) e controllate il file MadelineProto.log per più informazioni sull'errore che ha impedito l'avvio del server IPC."
 }

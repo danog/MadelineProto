@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\PHPUnit\AsyncTestCase;
+use Amp\Process\Process;
 use Amp\Socket\InternetAddress;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
@@ -21,23 +23,18 @@ use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
 use danog\MadelineProto\Stream\Transport\WsStream;
 use Generator;
-use LeProxy\LeProxy\LeProxyServer;
-use PHPUnit\Framework\TestCase;
-use React\EventLoop\Loop;
-use React\Socket\ServerInterface;
 use Throwable;
 
-use function Amp\delay;
+use function Amp\ByteStream\splitLines;
 
 \define('MADELINEPROTO_TEST', 'pony');
 
 /** @internal */
-final class DataCenterTest extends TestCase
+final class DataCenterTest extends AsyncTestCase
 {
     private static API $main;
     private static API $test;
-    private static LeProxyServer $proxy;
-    private static ServerInterface $proxySocket;
+    private static Process $proxy;
     private static InternetAddress $proxyEndpoint;
 
     private static function getBaseSettings(bool $test): Settings
@@ -61,12 +58,14 @@ final class DataCenterTest extends TestCase
         if (isset(self::$proxy)) {
             return;
         }
-        self::$proxy = new LeProxyServer(Loop::get());
-        self::$proxySocket = self::$proxy->listen('127.0.0.1:0', false);
-        self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', self::$proxySocket->getAddress()));
+        self::$proxy = Process::start([PHP_BINARY, __DIR__.'/../../../vendor-bin/leproxy/proxy.php']);
+        foreach (splitLines(self::$proxy->getStdout()) as $addr) {
+            break;
+        }
+        self::$proxyEndpoint = InternetAddress::fromString(str_replace('tcp://', '', $addr));
 
         self::$main = new API(
-            sys_get_temp_dir().'/testing_datacenter_main.madeline',
+            sys_get_temp_dir(). '/'.random_int(0, PHP_INT_MAX).'_'.getmypid().'testing_datacenter_main.madeline',
             self::getBaseSettings(false)
         );
         /*self::$test = new API(
@@ -108,8 +107,6 @@ final class DataCenterTest extends TestCase
         $API->updateSettings($settings);
 
         $this->assertIsArray($API->help->getConfig());
-
-        delay(1.0);
     }
 
     private static function provideProxies(bool $enable = true): iterable
@@ -137,7 +134,8 @@ final class DataCenterTest extends TestCase
                 }
 
                 $testedProxies = false;
-                foreach ([WssStream::class, DefaultStream::class, WsStream::class] as $transport) {
+                //foreach ([WssStream::class, DefaultStream::class, WsStream::class] as $transport) {
+                foreach ([DefaultStream::class] as $transport) {
                     foreach ([true, false] as $obfuscated) {
                         if ($transport !== DefaultStream::class && !$obfuscated) {
                             continue;

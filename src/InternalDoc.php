@@ -1180,6 +1180,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->hasSecretChat($chat);
     }
     /**
+     * Escape string for MadelineProto's HTML entity converter.
+     *
+     * @param string $what String to escape
+     */
+    public static function htmlEscape(string $what): string
+    {
+        return \danog\MadelineProto\StrTools::htmlEscape($what);
+    }
+    /**
      * Manually convert HTML to a message and a set of entities.
      *
      * NOTE: You don't have to use this method to send HTML messages.

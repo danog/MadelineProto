@@ -1018,7 +1018,6 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateLoginToken') {
             try {
-                $datacenter = $this->datacenter->currentDatacenter;
                 $authorization = $this->methodCallAsyncRead(
                     'auth.exportLoginToken',
                     [
@@ -1026,6 +1025,7 @@ trait UpdateHandler
                         'api_hash' => $this->settings->getAppInfo()->getApiHash(),
                     ],
                 );
+                $datacenter = $this->datacenter->currentDatacenter;
                 if ($authorization['_'] === 'auth.loginTokenMigrateTo') {
                     $datacenter = $this->isTestMode() ? 10_000 + $authorization['dc_id'] : $authorization['dc_id'];
                     $this->authorized_dc = $datacenter;

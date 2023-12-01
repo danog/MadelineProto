@@ -149,15 +149,19 @@ final class MarkdownEntities extends Entities
                         $pieceLen--;
                     }
                     if ($pieceLen > 0) {
-                        $entities []= [
+                        $tmp = [
                             '_' => match ($token) {
                                 '```' => 'messageEntityPre',
                                 '`' => 'messageEntityCode',
                             },
-                            'language' => $language,
                             'offset' => $start,
                             'length' => $pieceLen,
                         ];
+                        if ($language !== null) {
+                            $tmp['language'] = $language;
+                        }
+                        $entities []= $tmp;
+                        unset($tmp);
                     }
 
                     $offset = $posClose+\strlen($token);

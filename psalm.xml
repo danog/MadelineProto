@@ -18,6 +18,8 @@
             <file name="src/DocsBuilder.php" />
             <file name="src/DocsBuilder/Methods.php" />
             <file name="src/DocsBuilder/Constructors.php" />
+            <!-- FFI psalm bug -->
+            <file name="src/Ogg.php" />
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>

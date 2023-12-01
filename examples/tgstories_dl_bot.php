@@ -122,7 +122,13 @@ final class StoriesEventHandler extends SimpleEventHandler
             return;
         }
 
-        $stories = $this->userInstance->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
+        $stories = $this->userInstance->stories->getPeerStories(peer: $message->commandArgs[0])['stories']['stories'];
+        $last = null;
+        do {
+            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories'];
+            $last = $res ? end($res)['id'] : null;
+            $stories = array_merge($res, $stories);
+        } while ($last);
         // Skip deleted stories
         $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
         // Skip protected stories
@@ -130,16 +136,18 @@ final class StoriesEventHandler extends SimpleEventHandler
         // Sort by date
         usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
 
-        $result = "Total stories: ".count($stories)."\n\n";
-        foreach ($stories as $story) {
-            $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
-            if (isset($story['caption'])) {
-                $cur .= ', "'.self::markdownEscape($story['caption']).'"';
+        $message = $message->reply("Total stories: ".count($stories));
+        foreach (array_chunk($stories, 10) as $sub) {
+            $result = '';
+            foreach ($sub as $story) {
+                $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
+                if (isset($story['caption'])) {
+                    $cur .= ', "'.self::markdownEscape($story['caption']).'"';
+                }
+                $result .= "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
             }
-            $result .= "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
+            $message = $message->reply($result, parseMode: ParseMode::MARKDOWN);
         }
-
-        $message->reply($result, parseMode: ParseMode::MARKDOWN);
     }
 }
 

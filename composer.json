@@ -71,7 +71,8 @@
         "symfony/yaml": "^6.0",
         "amphp/http-server": "^3",
         "revolt/event-loop-adapter-react": "^1",
-        "dg/bypass-finals": "dev-master"
+        "dg/bypass-finals": "dev-master",
+        "brianium/paratest": "^6.11"
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
@@ -110,13 +111,22 @@
         "build": [
             "@docs",
             "@docs-fix",
-            "@cs-fix"
+            "@cs-fix",
+            "@psalm",
+            "@test-light"
+        ],
+        "test": [
+            "@paratest"
+        ],
+        "test-light": [
+            "@paratest-light"
         ],
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v",
         "psalm": "psalm --no-cache --threads=10",
         "docs": "php tools/build_docs.php",
         "docs-fix": "tools/fix_docs.sh",
-        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text",
+        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -fv",
+        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -fvc phpunit-light.xml",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],
         "post-update-cmd": ["@composer bin all update --ansi"]

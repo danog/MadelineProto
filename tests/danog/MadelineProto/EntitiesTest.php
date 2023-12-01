@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Conversion\DOMEntities;
+use danog\MadelineProto\TL\Conversion\MarkdownEntities;
 use danog\MadelineProto\Tools;
+use PHPUnit\Framework\TestCase;
 
 /** @internal */
-class EntitiesTest extends MadelineTestCase
+class EntitiesTest extends TestCase
 {
     public function testMb(): void
     {
@@ -27,40 +31,63 @@ class EntitiesTest extends MadelineTestCase
         $this->assertEquals(['a👍', 'a👍'], StrTools::mbStrSplit('a👍a👍', 3));
         $this->assertEquals(['🇺🇦', '🇺🇦'], StrTools::mbStrSplit('🇺🇦🇺🇦', 4));
     }
+    private static function sendMessage(string $message, string $parse_mode): DOMEntities|MarkdownEntities
+    {
+        return match ($parse_mode) {
+            'html' => (new DOMEntities($message)),
+            'markdown' => (new MarkdownEntities($message)),
+        };
+    }
+    private static function MTProtoToBotAPI(DOMEntities|MarkdownEntities $entities): array
+    {
+        $result = ['text' => $entities->message];
+        $entities = $entities->entities;
+        foreach ($entities as &$entity) {
+            switch ($entity['_']) {
+                case 'messageEntityMentionName':
+                case 'inputMessageEntityMentionName':
+                    unset($entity['_']);
+                    $entity['type'] = 'text_mention';
+                    $entity['user'] = $entity['user_id'];
+                    unset($entity['user_id']);
+                    break;
+                default:
+                    $entity = MTProto::MTProtoEntityToBotAPI($entity);
+            }
+        }
+        $result['entities'] = $entities;
+        return $result;
+    }
     /**
      * @dataProvider provideEntities
      */
     public function testEntities(string $mode, string $html, string $bare, array $entities, ?string $htmlReverse = null): void
     {
-        $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: $html, parse_mode: $mode);
-        $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
-        $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+        $resultMTProto = self::sendMessage(message: $html, parse_mode: $mode);
+        $result = self::MTProtoToBotAPI($resultMTProto);
         $this->assertEquals($bare, $result['text']);
         $this->assertEquals($entities, $result['entities']);
         if (strtolower($mode) === 'html') {
             $this->assertEquals(
                 str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
                 StrTools::entitiesToHtml(
-                    $resultMTProto['message'],
-                    $resultMTProto['entities'],
+                    $resultMTProto->message,
+                    $resultMTProto->entities,
                     true
                 ),
             );
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: htmlentities($html), parse_mode: $mode);
-            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
-            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $resultMTProto = self::sendMessage(message: StrTools::htmlEscape($html), parse_mode: $mode);
+            $result = self::MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, $result['text']);
             $this->assertNoRelevantEntities($result['entities']);
         } else {
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: Tools::markdownEscape($html), parse_mode: $mode);
-            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
-            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $resultMTProto = self::sendMessage(message: Tools::markdownEscape($html), parse_mode: $mode);
+            $result = self::MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, $result['text']);
             $this->assertNoRelevantEntities($result['entities']);
 
-            $resultMTProto = self::$MadelineProto->messages->sendMessage(peer: getenv('DEST'), message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
-            $resultMTProto = self::$MadelineProto->extractMessage($resultMTProto);
-            $result = self::$MadelineProto->MTProtoToBotAPI($resultMTProto);
+            $resultMTProto = self::sendMessage(message: "```\n".Tools::markdownCodeblockEscape($html)."\n```", parse_mode: $mode);
+            $result = self::MTProtoToBotAPI($resultMTProto);
             $this->assertEquals($html, rtrim($result['text']));
             $this->assertEquals([['offset' => 0, 'length' => StrTools::mbStrlen($html), 'language' => '', 'type' => 'pre']], $result['entities']);
         }
@@ -78,7 +105,6 @@ class EntitiesTest extends MadelineTestCase
     public function provideEntities(): array
     {
         $this->setUpBeforeClass();
-        $mention = self::$MadelineProto->getPwrChat(getenv('TEST_USERNAME'), false);
         return [
             [
                 'html',
@@ -142,11 +168,11 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                'test<b>test </b>test',
-                'testtest test',
+                'è»test<b>test </b>test',
+                'è»testtest test',
                 [
                     [
-                        'offset' => 4,
+                        'offset' => 6,
                         'length' => 4,
                         'type' => 'bold',
                     ],
@@ -178,7 +204,7 @@ class EntitiesTest extends MadelineTestCase
             ],
             [
                 'html',
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
                 "test\ntest test test test strikethrough underline blockquote https://google.com daniil@daniil.it +39398172758722 @daniilgentili spoiler <b>not_bold</b>",
                 [
                     [
@@ -224,32 +250,12 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'block_quote',
                     ],
                     [
-                        'offset' => 60,
-                        'length' => 18,
-                        'type' => 'url',
-                    ],
-                    [
-                        'offset' => 79,
-                        'length' => 16,
-                        'type' => 'email',
-                    ],
-                    [
-                        'offset' => 96,
-                        'length' => 15,
-                        'type' => 'phone_number',
-                    ],
-                    [
-                        'offset' => 112,
-                        'length' => 14,
-                        'type' => 'mention',
-                    ],
-                    [
                         'offset' => 127,
                         'length' => 7,
                         'type' => 'spoiler',
                     ],
                 ],
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> <a href="https://google.com">https://google.com</a> <a href="mailto:daniil@daniil.it">daniil@daniil.it</a> <a href="phone:+39398172758722">+39398172758722</a> <a href="https://t.me/daniilgentili">@daniilgentili</a> <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
             ],
             [
                 'markdown',
@@ -257,14 +263,14 @@ class EntitiesTest extends MadelineTestCase
                 'test bold bold and italic bold',
                 [
                     [
-                        'offset' => 5,
-                        'length' => 25,
-                        'type' => 'bold',
-                    ],
-                    [
                         'offset' => 10,
                         'length' => 15,
                         'type' => 'italic',
+                    ],
+                    [
+                        'offset' => 5,
+                        'length' => 25,
+                        'type' => 'bold',
                     ],
                 ],
             ],
@@ -310,24 +316,24 @@ class EntitiesTest extends MadelineTestCase
                         'type' => 'bold',
                     ],
                 ],
-                '<b>&#039;&quot;</b>',
+                '<b>&apos;&quot;</b>',
             ],
             [
                 'html',
-                '<a href="mention:'.getenv('TEST_USERNAME').'">mention1</a> <a href="tg://user?id='.getenv('TEST_USERNAME').'">mention2</a>',
+                '<a href="mention:101374607">mention1</a> <a href="tg://user?id=101374607">mention2</a>',
                 'mention1 mention2',
                 [
                     [
                         'offset' => 0,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention,
+                        'user' => 101374607,
                     ],
                     [
                         'offset' => 9,
                         'length' => 8,
                         'type' => 'text_mention',
-                        'user' => $mention,
+                        'user' => 101374607,
                     ],
                 ],
             ],

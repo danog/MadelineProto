@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@baa6d5dd7801e24d99d2f57995b58b79e8ad304a">
+<files psalm-version="dev-master@efdf425983038f7ef6194df43f3dc18cde13d770">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -1067,6 +1067,7 @@
       <code><![CDATA[$this->colors]]></code>
       <code><![CDATA[$this->colors]]></code>
       <code><![CDATA[$this->colors]]></code>
+      <code><![CDATA[$this->colors]]></code>
     </UninitializedProperty>
   </file>
   <file src="src/Loop/Connection/CheckLoop.php">
@@ -1838,58 +1839,6 @@
       <code>$wrapper</code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="src/Ogg.php">
-    <InaccessibleProperty>
-      <code><![CDATA[$this->comments]]></code>
-      <code><![CDATA[$this->vendorString]]></code>
-    </InaccessibleProperty>
-    <PossiblyInvalidArgument>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$size</code>
-    </PossiblyInvalidArgument>
-    <PossiblyInvalidPropertyAssignmentValue>
-      <code><![CDATA[$this->currentDuration += $frameDuration]]></code>
-      <code><![CDATA[$this->currentDuration += $totalDuration]]></code>
-    </PossiblyInvalidPropertyAssignmentValue>
-    <PossiblyNullArgument>
-      <code><![CDATA[($this->stream)($headers['number_page_segments'])]]></code>
-      <code><![CDATA[($this->stream)(23)]]></code>
-    </PossiblyNullArgument>
-    <PossiblyUndefinedVariable>
-      <code>$cancel</code>
-    </PossiblyUndefinedVariable>
-    <PropertyNotSetInConstructor>
-      <code>$comments</code>
-      <code>$streamCount</code>
-      <code>$vendorString</code>
-    </PropertyNotSetInConstructor>
-    <RedundantCondition>
-      <code>$state === self::STATE_READ_COMMENT</code>
-    </RedundantCondition>
-    <ReferenceConstraintViolation>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-    </ReferenceConstraintViolation>
-    <TooFewArguments>
-      <code><![CDATA[($this->stream)($headers['number_page_segments'])]]></code>
-      <code><![CDATA[($this->stream)($sizeAccumulated)]]></code>
-      <code><![CDATA[($this->stream)(23)]]></code>
-      <code><![CDATA[($this->stream)(4)]]></code>
-    </TooFewArguments>
-    <UndefinedClass>
-      <code>?FFI</code>
-      <code>FFI</code>
-      <code>FFI</code>
-      <code>int|CData $err</code>
-    </UndefinedClass>
-  </file>
   <file src="src/PTSException.php">
     <MissingParamType>
       <code>$file</code>
@@ -2374,6 +2323,7 @@
   </file>
   <file src="src/Tools.php">
     <ArgumentTypeCoercion>
+      <code><![CDATA[static fn (ClassLike $c): bool => $c->name !== null]]></code>
       <code><![CDATA[static fn (ClassLike $c): bool => $c->name !== null]]></code>
     </ArgumentTypeCoercion>
     <MissingClosureParamType>

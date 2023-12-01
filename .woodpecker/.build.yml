@@ -64,3 +64,4 @@ services:
 depends_on:
   - build-docker
   - test
+  - cs

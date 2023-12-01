@@ -78,7 +78,9 @@ final class DOMEntities extends Entities
             'i', 'em' => ['_' => 'messageEntityItalic'],
             'code' => ['_' => 'messageEntityCode'],
             'spoiler', 'tg-spoiler' => ['_' => 'messageEntitySpoiler'],
-            'pre' => ['_' => 'messageEntityPre', 'language' => $node->getAttribute('language')],
+            'pre' => $node->hasAttribute('language')
+                ? ['_' => 'messageEntityPre', 'language' => $node->getAttribute('language')]
+                : ['_' => 'messageEntityPre'],
             'tg-emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('emoji-id')],
             'emoji' => ['_' => 'messageEntityCustomEmoji', 'document_id' => (int) $node->getAttribute('id')],
             'a' => self::handleLink($node->getAttribute('href')),

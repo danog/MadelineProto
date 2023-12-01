@@ -28,13 +28,46 @@ steps:
     when:
       event:
         - tag
-        - push
-        - pull_request
-    environment:
-      - PHP_VERSION=${php}
-      - PLATFORM=${platform}
-      - TAG=${CI_COMMIT_TAG}
+    secrets:
+      - API_ID
+      - API_HASH
+      - BOT_TOKEN
+      - DEST
     commands:
       - apk add bash
-      - tests/test.sh
-      - php tests/handshake.php
+      - tests/test.sh phpunit
+    
+  test_light:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh phpunit-light
+
+  psalm:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh psalm
+  
+  handshake:
+    group: test
+    image: danog/madelineproto:next
+    when:
+      event:
+        - pull_request
+        - tag
+        - push
+    commands:
+      - apk add bash
+      - tests/test.sh handshake
