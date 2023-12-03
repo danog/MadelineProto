@@ -984,7 +984,7 @@ interface Account
      * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function updateColor(int|null $color = 0, int|null $background_emoji_id = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
+    public function updateColor(bool|null $for_profile = false, int|null $color = 0, int|null $background_emoji_id = 0, ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      *
