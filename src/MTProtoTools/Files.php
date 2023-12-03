@@ -609,6 +609,10 @@ trait Files
                 $res['InputMedia'] = ['_' => 'inputMediaPhoto', 'id' => $res['InputPhoto']];
                 $res['MessageMedia'] = ['_' => 'messageMediaPhoto', 'photo' => $media];
                 break;
+            case 'messageMediaStory':
+                $media['_'] = 'inputMediaStory';
+                $res['InputMedia'] = $media;
+                break;
             default:
                 throw new Exception("Could not convert media object of type {$media['_']}");
         }
