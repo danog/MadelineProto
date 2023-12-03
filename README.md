@@ -243,7 +243,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * [Multiple async](https://docs.madelineproto.xyz/docs/ASYNC.html#multiple-async)
     * [Ignored async](https://docs.madelineproto.xyz/docs/ASYNC.html#ignored-async)
     * [Combining async operations](https://docs.madelineproto.xyz/docs/ASYNC.html#combining-async-operations)
-    * [Blocking async](https://docs.madelineproto.xyz/docs/ASYNC.html#blocking-async)
     * [MadelineProto and AMPHP async APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#madelineproto-and-amphp-async-apis)
       * [Helper methods](https://docs.madelineproto.xyz/docs/ASYNC.html#helper-methods)
         * [Async sleep](https://docs.madelineproto.xyz/docs/ASYNC.html#async-sleep-does-not-block-the-main-thread)
