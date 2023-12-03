@@ -36,7 +36,7 @@ if (file_exists('vendor/autoload.php')) {
 /**
  * Event handler class.
  */
-class MyEventHandler extends EventHandler
+class CombinedEventHandler extends EventHandler
 {
     /**
      * @var int|string Username or ID of bot admin
@@ -75,8 +75,8 @@ class MyEventHandler extends EventHandler
 }
 
 $MadelineProtos = [];
-foreach (['session1.madeline', 'session2.madeline', 'session3.madeline'] as $session => $message) {
+foreach (['session1.madeline', 'session2.madeline', 'session3.madeline'] as $session) {
     $MadelineProtos []= new API($session);
 }
 
-API::startAndLoopMulti($MadelineProtos, MyEventHandler::class);
+API::startAndLoopMulti($MadelineProtos, CombinedEventHandler::class);

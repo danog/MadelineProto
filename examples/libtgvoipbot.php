@@ -24,7 +24,7 @@ if (class_exists(API::class)) {
     require_once 'madeline.php';
 }
 
-class MyEventHandler extends SimpleEventHandler
+class LibtgvoipEventHandler extends SimpleEventHandler
 {
     // !!! Change this to your username! !!!
     private const ADMIN = 'danogentili';
@@ -70,4 +70,4 @@ if (!getenv('TOKEN')) {
     throw new AssertionError("You must define a TOKEN environment variable with the token of the bot!");
 }
 
-MyEventHandler::startAndLoopBot($argv[1] ?? 'libtgvoipbot.madeline', getenv('TOKEN'));
+LibtgvoipEventHandler::startAndLoopBot($argv[1] ?? 'libtgvoipbot.madeline', getenv('TOKEN'));
