@@ -67,7 +67,7 @@ class SecretHandler extends SimpleEventHandler
             $this->requestSecretChat($update);
         }
         if (($update['message']['message'] ?? '') === 'ping') {
-            $this->messages->sendMessage(['message' => 'pong', 'peer' => $update]);
+            $this->messages->sendMessage(message: 'pong', peer: $update);
         }
     }
     /**
