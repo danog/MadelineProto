@@ -27,6 +27,47 @@ use Revolt\EventLoop;
 abstract class AbstractAPI extends InternalDoc
 {
     /**
+     * Initialize account takeout session.
+     *
+     * @param bool $contacts Whether to export contacts
+     * @param bool $message_users Whether to export messages in private chats
+     * @param bool $message_chats Whether to export messages in [basic groups](https://core.telegram.org/api/channel#basic-groups)
+     * @param bool $message_megagroups Whether to export messages in [supergroups](https://core.telegram.org/api/channel#supergroups)
+     * @param bool $message_channels Whether to export messages in [channels](https://core.telegram.org/api/channel#channels)
+     * @param bool $files Whether to export files
+     * @param int $file_max_size Maximum size of files to export
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function initTakeoutSession(
+        bool|null $contacts = false,
+        bool|null $message_users = false,
+        bool|null $message_chats = false,
+        bool|null $message_megagroups = false,
+        bool|null $message_channels = false,
+        bool|null $files = false,
+        int|null $file_max_size = 0,
+        ?int $floodWaitLimit = null,
+        ?\Amp\Cancellation $cancellation = null
+    ): API {
+        $API = new API($this->wrapper->getSession()->getSessionPath());
+        $API->takeoutSessionId = $this->wrapper->getAPI()->methodCallAsyncRead(
+            'account.initTakeoutSession',
+            [
+                'contacts' => $contacts,
+                'message_users' => $message_users,
+                'message_chats' => $message_chats,
+                'message_megagroups' => $message_megagroups,
+                'files' => $files,
+                'file_max_size' => $file_max_size,
+                'floodWaitLimit' => $floodWaitLimit,
+                'cancellation' => $cancellation
+            ]
+        )['id'];
+        return $API;
+    }
+    /**
      * Start MadelineProto and the event handler (enables async).
      *
      * Also initializes error reporting, catching and reporting all errors surfacing from the event loop.

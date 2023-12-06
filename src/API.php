@@ -158,6 +158,8 @@ final class API extends AbstractAPI
      */
     private $unlock = null;
 
+    protected ?int $takeoutSessionId = null;
+
     /**
      * Obtain the API ID UI template.
      */
@@ -351,7 +353,7 @@ final class API extends AbstractAPI
     }
     public function __sleep(): array
     {
-        return ['session'];
+        return ['session', 'takeoutSessionId'];
     }
     /**
      * @var array<Future<null>>
