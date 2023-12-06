@@ -28,6 +28,7 @@ use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
 use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
@@ -37,6 +38,34 @@ use Webmozart\Assert\InvalidArgumentException;
  */
 final class GroupMessage extends Message
 {
+    /**
+     * If this message is part of a [message thread](https://core.telegram.org/api/threads) or [comment section](https://core.telegram.org/api/discuss),
+     * contains the total number of replies in the thread.
+     */
+    public readonly ?int $replies;
+    /**
+     * If this message is part of a [message thread](https://core.telegram.org/api/threads) or [comment section](https://core.telegram.org/api/discuss),
+     * contains the ID of the latest message in this thread.
+     */
+    public readonly ?int $latestMessageInThread;
+    /**
+     * If this message is part of a [message thread](https://core.telegram.org/api/threads) or [comment section](https://core.telegram.org/api/discuss),
+     * contains the ID of the latest read message in this thread.
+     */
+    public readonly ?int $latestReadMessageInThread;
+
+    /** @internal */
+    public function __construct(
+        MTProto $API,
+        array $rawMessage,
+        array $info,
+    ) {
+        parent::__construct($API, $rawMessage, $info);
+        $this->replies = $rawMessage['replies']['replies'] ?? null;
+        $this->latestMessageInThread = $rawMessage['replies']['max_id'] ?? null;
+        $this->latestReadMessageInThread = $rawMessage['replies']['read_max_id'] ?? null;
+        // TODO pts
+    }
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
      *
