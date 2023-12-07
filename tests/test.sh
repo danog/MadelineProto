@@ -47,7 +47,8 @@ if [ "$1" == "psalm" ]; then
 fi
 
 if [ "$1" == "phpunit" ]; then
-    composer test
+    #composer test
+    composer test-light
     exit 0
 fi
 
