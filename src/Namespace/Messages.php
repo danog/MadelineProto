@@ -10,6 +10,17 @@ namespace danog\MadelineProto\Namespace;
 interface Messages
 {
     /**
+     * Returns the list of messages by their IDs.
+     *
+     * @param list<int|array>|array<never, never> $id Array of Message ID list @see https://docs.madelineproto.xyz/API_docs/types/InputMessage.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     */
+    public function getMessages(array $id = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
      * Returns the current user dialog list.
      *
      * @param bool $exclude_pinned Exclude pinned dialogs
@@ -25,6 +36,24 @@ interface Messages
      * @return array{_: 'messages.dialogs', dialogs: list<array>, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.dialogsSlice', count: array, dialogs: list<array>, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.dialogsNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Dialogs.html
      */
     public function getDialogs(bool|null $exclude_pinned = false, int|null $folder_id = 0, int|null $offset_date = 0, int|null $offset_id = 0, array|int|string|null $offset_peer = null, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * Returns the conversation history with one interlocutor / within a chat.
+     *
+     * @param array|int|string $peer Target peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $offset_id Only return messages starting from the specified message ID
+     * @param int $offset_date Only return messages sent before the specified date
+     * @param int $add_offset Number of list elements to be skipped, negative values are also accepted.
+     * @param int $limit Number of results to return
+     * @param int $max_id If a positive value was transferred, the method will return only messages with IDs less than **max\_id**
+     * @param int $min_id If a positive value was transferred, the method will return only messages with IDs more than **min\_id**
+     * @param list<int>|array<never, never> $hash [Result hash](https://core.telegram.org/api/offsets)
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     */
+    public function getHistory(array|int|string|null $peer = null, int|null $offset_id = 0, int|null $offset_date = 0, int|null $add_offset = 0, int|null $limit = 0, int|null $max_id = 0, int|null $min_id = 0, array $hash = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Returns found messages.

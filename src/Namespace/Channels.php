@@ -45,6 +45,18 @@ interface Channels
     public function reportSpam(array|int|string|null $channel = null, array|int|string|null $participant = null, array $id = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Get [channel/supergroup](https://core.telegram.org/api/channel) messages.
+     *
+     * @param array|int|string $channel Channel/supergroup @see https://docs.madelineproto.xyz/API_docs/types/InputChannel.html
+     * @param list<int|array>|array<never, never> $id Array of IDs of messages to get @see https://docs.madelineproto.xyz/API_docs/types/InputMessage.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param bool $postpone If true, will postpone execution of this method until the first method call with $postpone = false to the same DC or a call to flush() is made, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \Amp\async.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate: array, offset_id_offset: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     */
+    public function getMessages(array|int|string|null $channel = null, array $id = [], ?int $floodWaitLimit = null, bool $postpone = false, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
      * Get the participants of a [supergroup/channel](https://core.telegram.org/api/channel).
      *
      * @param array{_: 'channelParticipantsRecent'}|array{_: 'channelParticipantsAdmins'}|array{_: 'channelParticipantsKicked', q?: string}|array{_: 'channelParticipantsBots'}|array{_: 'channelParticipantsBanned', q?: string}|array{_: 'channelParticipantsSearch', q?: string}|array{_: 'channelParticipantsContacts', q?: string}|array{_: 'channelParticipantsMentions', q?: string, top_msg_id?: int} $filter Which participant types to fetch @see https://docs.madelineproto.xyz/API_docs/types/ChannelParticipantsFilter.html
