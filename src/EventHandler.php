@@ -26,6 +26,7 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use Closure;
 use danog\Loop\PeriodicLoop;
+use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
@@ -160,7 +161,7 @@ abstract class EventHandler extends AbstractAPI
             $methods = [];
             $handlers = [];
             $has_any = false;
-            $basic_handler = static function (array $update, Closure $closure): void {
+            $basic_handler = static function (array|Progress $update, Closure $closure): void {
                 $closure($update);
             };
             foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
@@ -178,7 +179,7 @@ abstract class EventHandler extends AbstractAPI
                     || $method_name === 'updateNewOutgoingEncryptedMessage'
                 ) {
                     $methods[$method_name] = [
-                        static function (array $update) use ($basic_handler, $closure): void {
+                        static function (array|Progress $update) use ($basic_handler, $closure): void {
                             EventLoop::queue($basic_handler, $update, $closure);
                         },
                     ];
