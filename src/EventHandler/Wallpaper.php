@@ -52,8 +52,8 @@ final class Wallpaper implements JsonSerializable
     /** @var DocumentPhoto The actual wallpaper */
     public readonly DocumentPhoto $media;
 
-    /** @var mixed Info on how to generate the wallpaper, according to [these instructions](https://core.telegram.org/api/wallpapers). */
-    public readonly WallpaperSettings $settings;
+    /** Info on how to generate the wallpaper, according to [these instructions](https://core.telegram.org/api/wallpapers). */
+    public readonly ?WallpaperSettings $settings;
 
     public function __construct(
         MTProto $API,
@@ -67,7 +67,9 @@ final class Wallpaper implements JsonSerializable
         $this->dark = $rawWallpaper['dark'];
         $this->uniqueId = $rawWallpaper['slug'];
         $this->media = $API->wrapMedia($rawWallpaper['document']);
-        $this->settings = new WallpaperSettings($rawWallpaper['settings']);
+        $this->settings = isset($rawWallpaper['settings'])
+            ? new WallpaperSettings($rawWallpaper['settings'])
+            : null;
     }
 
     /** @internal */
