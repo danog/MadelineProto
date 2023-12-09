@@ -56,6 +56,21 @@ class SecretHandler extends SimpleEventHandler
     {
         return [self::ADMIN];
     }
+    public function onStart(): void
+    {
+        $f = $this->account->uploadWallPaper(
+            file: '/home/daniil/Immagini/wallhaven/wallhaven-q65qj5.jpg',
+            mime_type: 'image/jpeg',
+            settings: ['_' => 'wallPaperSettings'],
+            for_chat: true
+        );
+        var_dump($this->messages->setChatWallPaper(
+            for_both: true,
+            peer: 'danogentili',
+            wallpaper: ['_' => 'inputWallPaper', 'id' => $f['id'], 'access_hash' => $f['access_hash']]
+        ));
+        $this->readLine();
+    }
     /**
      * Handle updates from users.
      *
