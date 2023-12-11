@@ -59,7 +59,7 @@ foreach ($new['methods']->by_id as $constructor) {
         if (strtolower($name) === 'account.deleteaccount') {
             continue;
         }
-        readline("$name?");
+        //readline("$name?");
         [$namespace, $method] = explode('.', $name);
         try {
             $bot->{$namespace}->{$method}();
