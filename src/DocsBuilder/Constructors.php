@@ -69,6 +69,9 @@ trait Constructors
                 if (\in_array($param['name'], ['flags', 'flags2', 'random_id', 'random_bytes'], true)) {
                     continue;
                 }
+                if ($param['name'] === 'peer' && $param['type'] === 'Peer') {
+                    $param['type'] = 'long';
+                }
                 if ($type === 'EncryptedMessage' && $param['name'] === 'bytes' && !isset($this->settings['td'])) {
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
