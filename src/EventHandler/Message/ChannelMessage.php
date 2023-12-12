@@ -42,6 +42,27 @@ final class ChannelMessage extends Message
     }
 
     /**
+     * Obtains the copy of the current message, that was sent to the linked group.
+     *
+     * Can be used to reply in the comment section, for example:
+     *
+     * ```php
+     * $update->getDiscussion()->reply("Comment");
+     * ```
+     *
+     */
+    public function getDiscussion(): GroupMessage
+    {
+        $r = $this->getClient()->methodCallAsyncRead(
+            'messages.getDiscussionMessage',
+            ['peer' => $this->chatId, 'msg_id' => $this->id]
+        )['messages'];
+        $r = end($r);
+
+        return $this->getClient()->wrapMessage($r);
+    }
+
+    /**
      * Disable message signatures in channels.
      *
      */

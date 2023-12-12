@@ -1193,17 +1193,23 @@ trait UpdateHandler
         if (isset($update['message']['_']) && $update['message']['_'] === 'messageEmpty') {
             return;
         }
-        if ($update['message']['from_id'] > 0) {
+        if (isset($update['message']['from_id'])
+            && $update['message']['from_id'] > 0
+        ) {
             if ($update['message']['from_id'] === $this->authorization['user']['id']) {
                 $update['message']['out'] = true;
             }
         } elseif (!isset($update['message']['from_id'])
+            && isset($update['message']['peer_id'])
             && $update['message']['peer_id'] > 0
             && $update['message']['peer_id'] === $this->authorization['user']['id']) {
             $update['message']['out'] = true;
         }
 
-        if (!isset($update['message']['from_id']) && $update['message']['peer_id'] > 0) {
+        if (!isset($update['message']['from_id'])
+            && isset($update['message']['peer_id'])
+            && $update['message']['peer_id'] > 0
+        ) {
             $update['message']['from_id'] = $update['message']['peer_id'];
         }
 

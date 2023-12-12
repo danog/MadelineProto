@@ -18,9 +18,11 @@
  */
 
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\SimpleEventHandler;
 

@@ -162,6 +162,7 @@ final class FeedLoop extends Loop
                 if (!DialogId::isSupergroupOrChannel($channelId)) {
                     return false;
                 }
+                $channelId = DialogId::toSupergroupOrChannel($channelId);
                 break;
             case 'updateChannelWebPage':
             case 'updateDeleteChannelMessages':

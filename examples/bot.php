@@ -29,6 +29,7 @@ use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Filter\FilterTextCaseInsensitive;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Plugin\RestartPlugin;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
@@ -169,36 +170,18 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     /**
-     * Downloads all telegram stories of a user (including protected ones).
-     *
-     * The bot must be started via web for this command to work.
-     *
-     * You can also start it via CLI but you'll have to specify a download script URL in the settings: https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link-cli-bots.
+     * Automatically sends a comment to all new incoming channel posts.
      */
-    #[FilterCommand('dlStories')]
-    public function dlStoriesCommand(Message $message): void
+    #[Handler]
+    public function makeComment(Incoming&ChannelMessage $message): void
     {
-        if (!$message->commandArgs) {
-            $message->reply("You must specify the @username or the Telegram ID of a user to download their stories!");
+        if ($this->isSelfBot()) {
             return;
         }
-
-        $stories = $this->stories->getUserStories(user_id: $message->commandArgs[0])['stories']['stories'];
-        // Skip deleted stories
-        $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
-        // Sort by date
-        usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
-
-        $result = "Total stories: ".count($stories)."\n\n";
-        foreach ($stories as $story) {
-            $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
-            if (isset($story['caption'])) {
-                $cur .= ', "'.self::markdownEscape($story['caption']).'"';
-            }
-            $result .= "$cur; [click here to download »]({$this->getDownloadLink($story)})\n";
-        }
-
-        $message->reply($result, parseMode: ParseMode::MARKDOWN);
+        $message->getDiscussion()->reply(
+            message: "This comment is powered by [MadelineProto](https://t.me/MadelineProto)!",
+            parseMode: ParseMode::MARKDOWN
+        );
     }
 
     #[FilterCommand('broadcast')]

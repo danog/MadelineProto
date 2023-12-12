@@ -1062,7 +1062,7 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'peerChat') {
             $x = -$x['chat_id'];
         } elseif ($x['_'] === 'peerChannel') {
-            $x = DialogId::toSupergroupOrChannel($x['channel_id']);
+            $x = DialogId::fromSupergroupOrChannel($x['channel_id']);
         } else {
             unset($x['flags'], $x['flags2']);
         }

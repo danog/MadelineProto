@@ -45,7 +45,7 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\Ipc\Server;
 
-/** @psalm-suppress PossiblyNullReference */
+/** @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor */
 abstract class InternalDoc
 {
     protected APIWrapper $wrapper;
