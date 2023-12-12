@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * @internal
@@ -132,8 +133,8 @@ trait TD
                     case 'choose_forward_info':
                         if (isset($params['fwd_from'])) {
                             $newparams[$td] = ['_' => 'messageForwardedFromUser'];
-                            if (isset($params['fwd_from']['channel_id'])) {
-                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => '-100'.$params['fwd_from']['channel_id']];
+                            if (DialogId::isSupergroupOrChannel($params['fwd_from']['channel_id'])) {
+                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => $params['fwd_from']['channel_id']];
                             }
                             $newparams[$td]['date'] = $params['fwd_from']['date'];
                             if (isset($params['fwd_from']['channel_post'])) {

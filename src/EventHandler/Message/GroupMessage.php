@@ -264,7 +264,7 @@ final class GroupMessage extends Message
     /**
      * Turn a [basic group into a supergroup](https://core.telegram.org/api/channel#migration).
      *
-     * @return integer                  the channel id that migrate to
+     * @return integer                  the channel id we migrated to
      * @throws InvalidArgumentException
      */
     public function toSuperGroup(): int
@@ -277,7 +277,9 @@ final class GroupMessage extends Message
                 'chat_id' => $this->chatId,
             ]
         );
-        return DialogId::fromSupergroupOrChannel($result['updates'][0]['channel_id']);
+        $v = $client->getIdInternal($result['updates'][0]);
+        \assert($v !== null);
+        return $v;
     }
 
     /**

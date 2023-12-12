@@ -24,7 +24,6 @@ use danog\Decoder\FileId;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 use Throwable;
@@ -207,9 +206,9 @@ trait BotAPI
                 if (isset($data['fwd_from']['from_id'])) {
                     $newd['forward_from'] = ($this->getPwrChat($data['fwd_from']['from_id'], false));
                 }
-                if (isset($data['fwd_from']['channel_id'])) {
+                if ($data['fwd_from'] < 0) {
                     try {
-                        $newd['forward_from_chat'] = $this->getPwrChat(DialogId::fromSupergroupOrChannel($data['fwd_from']['channel_id']), false);
+                        $newd['forward_from_chat'] = $this->getPwrChat($data['fwd_from'], false);
                     } catch (Throwable $e) {
                     }
                 }
