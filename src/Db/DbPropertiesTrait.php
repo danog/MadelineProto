@@ -27,7 +27,7 @@ use function Amp\Future\await;
  *
  * You will have to define a `$dbProperties` static array property, with a list of properties you want to store to a database.
  *
- * @psalm-type TOrmConfig=array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int}
+ * @psalm-import-type TOrmConfig from DbArray
  * @property array<string, TOrmConfig> $dbProperties
  */
 trait DbPropertiesTrait

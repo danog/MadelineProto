@@ -231,9 +231,9 @@ trait PeerHandler
                 case 'messageService':
                     if (!isset($id['from_id']) // No other option
                         // It's a channel/chat, 100% what we need
-                        || $id['peer_id']['_'] !== 'peerUser'
+                        || $id['peer_id'] < 0
                         // It is a user, and it's not ourselves
-                        || $id['peer_id']['user_id'] !== $this->authorization['user']['id']
+                        || $id['peer_id'] !== $this->authorization['user']['id']
                     ) {
                         return $this->getIdInternal($id['peer_id']);
                     }

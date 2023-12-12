@@ -23,6 +23,8 @@ use Traversable;
 /**
  * DB array interface.
  *
+ * @psalm-type TOrmConfig=array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, table?: string}
+ * 
  * @template TKey as array-key
  * @template TValue
  *

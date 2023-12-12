@@ -24,6 +24,7 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
@@ -1056,6 +1057,12 @@ final class TL implements TLInterface
                     $x['reply_markup']['rows'][$key]['buttons'][$bkey] = new Types\Button($this->API, $x, $button);
                 }
             }
+        } elseif ($x['_'] === 'peerUser') {
+            $x = $x['user_id'];
+        } elseif ($x['_'] === 'peerChat') {
+            $x = -$x['chat_id'];
+        } elseif ($x['_'] === 'peerChannel') {
+            $x = DialogId::toSupergroupOrChannel($x['channel_id']);
         }
         unset($x['flags'], $x['flags2']);
         return $x;

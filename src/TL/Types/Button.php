@@ -63,9 +63,9 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
         parent::__construct($API);
         if (!isset($message['from_id']) // No other option
             // It's a channel/chat, 100% what we need
-            || $message['peer_id']['_'] !== 'peerUser'
+            || $message['peer_id'] < 0
             // It is a user, and it's not ourselves
-            || $message['peer_id']['user_id'] !== $API->authorization['user']['id']
+            || $message['peer_id'] !== $API->authorization['user']['id']
         ) {
             $this->peer = $message['peer_id'];
         } else {

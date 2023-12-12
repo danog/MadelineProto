@@ -101,6 +101,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * [Plugins](https://docs.madelineproto.xyz/docs/PLUGINS.html)
     * [Cron](https://docs.madelineproto.xyz/docs/UPDATES.html#cron)
     * [Persisting data and IPC](https://docs.madelineproto.xyz/docs/UPDATES.html#persisting-data-and-ipc)
+    * [Built-in ORM](https://docs.madelineproto.xyz/docs/UPDATES.html#built-in-orm)
+    * [IPC](https://docs.madelineproto.xyz/docs/UPDATES.html#ipc)
     * [Restarting](https://docs.madelineproto.xyz/docs/UPDATES.html#restarting)
     * [Self-restart on webhosts](https://docs.madelineproto.xyz/docs/UPDATES.html#self-restart-on-webhosts)
     * [Multi-account](https://docs.madelineproto.xyz/docs/UPDATES.html#multiaccount)
