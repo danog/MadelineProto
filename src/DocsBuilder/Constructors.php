@@ -128,6 +128,9 @@ trait Constructors
                     $param['name'] = 'decrypted_message';
                     $param['type'] = 'DecryptedMessage';
                 }
+                if ($param['name'] === 'peer' && $param['type'] === 'Peer') {
+                    $param['type'] = 'long';
+                }
                 if ($type === 'DecryptedMessageMedia' && \in_array($param['name'], ['key', 'iv'], true)) {
                     unset(Lang::$lang['en']['object_'.$constructor.'_param_'.$param['name'].'_type_'.$param['type']]);
                     continue;

@@ -1207,9 +1207,6 @@ trait UpdateHandler
             $update['message']['from_id'] = $update['message']['peer_id'];
         }
 
-        if (isset($update['message']['peer_id'])) {
-            $update['message']['to_id'] = $update['message']['peer_id'];
-        }
         $this->handleUpdate($update);
     }
     private function handleUpdate(array $update): void
