@@ -94,11 +94,8 @@ final class SeqLoop extends Loop
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
-                delay(1);
-                if (!$this->incomingUpdates) {
-                    $this->API->updaters[UpdateLoop::GENERIC]->resume();
-                }
-                $this->incomingUpdates = array_merge($this->incomingUpdates, [$update], $updates);
+                $this->API->updaters[UpdateLoop::GENERIC]->resume();
+                // Drop current update, it will be recovered anyway while filling the gap
                 continue;
             }
             if ($result < 0) {

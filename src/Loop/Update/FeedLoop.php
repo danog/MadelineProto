@@ -112,7 +112,7 @@ final class FeedLoop extends Loop
                 continue;
             }
             if (isset($update['pts'], $update['pts_count'])) {
-                $logger = function ($msg) use ($update): void {
+                $logger = function (string $msg) use ($update): void {
                     $pts_count = $update['pts_count'];
                     $mid = $update['message']['id'] ?? '-';
                     $mypts = $this->state->pts();
@@ -128,8 +128,7 @@ final class FeedLoop extends Loop
                     $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
                     $this->updater->resume();
-                    $updates = array_merge($this->incomingUpdates, $updates);
-                    $this->incomingUpdates = [];
+                    // Drop current update, it will be recovered anyway while filling the gap
                     continue;
                 }
                 if (isset($update['message']['id'], $update['message']['peer_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'], true)) {
