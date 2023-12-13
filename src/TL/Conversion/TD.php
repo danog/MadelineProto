@@ -133,8 +133,8 @@ trait TD
                     case 'choose_forward_info':
                         if (isset($params['fwd_from'])) {
                             $newparams[$td] = ['_' => 'messageForwardedFromUser'];
-                            if (DialogId::isSupergroupOrChannel($params['fwd_from']['channel_id'])) {
-                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => $params['fwd_from']['channel_id']];
+                            if (DialogId::isSupergroupOrChannel($params['fwd_from'])) {
+                                $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => $params['fwd_from']];
                             }
                             $newparams[$td]['date'] = $params['fwd_from']['date'];
                             if (isset($params['fwd_from']['channel_post'])) {
