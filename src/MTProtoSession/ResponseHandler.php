@@ -212,12 +212,12 @@ trait ResponseHandler
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                    $this->methodRecall(message_id: $requestId, postpone: true);
+                    $this->methodRecall(message_id: $requestId);
                     return;
                 case 20:
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $this->methodRecall(message_id: $requestId, postpone: true);
+                    $this->methodRecall(message_id: $requestId);
                     return;
                 case 16:
                 case 17:
@@ -296,7 +296,7 @@ trait ResponseHandler
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
-            $this->methodRecall(message_id: $msgId, postpone: true);
+            $this->methodRecall(message_id: $msgId);
             return null;
         }
 
