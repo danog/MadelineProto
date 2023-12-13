@@ -99,6 +99,9 @@ final class FeedLoop extends Loop
         }
         return self::PAUSE;
     }
+    /**
+     * @param array<int, array> $updates
+     */
     public function parse(array $updates): void
     {
         reset($updates);
@@ -127,9 +130,12 @@ final class FeedLoop extends Loop
                 if ($result > 0) {
                     $logger('PTS hole');
                     $this->updater->setLimit($this->state->pts() + $result);
-                    $this->updater->resume();
-                    // Drop current update, it will be recovered anyway while filling the gap
-                    continue;
+                    $this->updater->resumeAndWait();
+                    $this->incomingUpdates []= $update;
+                    foreach ($updates as $update) {
+                        $this->incomingUpdates []= $update;
+                    }
+                    return;
                 }
                 if (isset($update['message']['id'], $update['message']['peer_id']) && !\in_array($update['_'], ['updateEditMessage', 'updateEditChannelMessage', 'updateMessageID'], true)) {
                     if (!$this->API->checkMsgId($update['message'])) {

@@ -25,8 +25,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 
-use function Amp\delay;
-
 /**
  * update feed loop.
  *
@@ -80,6 +78,9 @@ final class SeqLoop extends Loop
         }
         return self::PAUSE;
     }
+    /**
+     * @param array<int, array> $updates
+     */
     public function parse(array $updates): void
     {
         reset($updates);
@@ -94,9 +95,12 @@ final class SeqLoop extends Loop
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
-                $this->API->updaters[UpdateLoop::GENERIC]->resume();
-                // Drop current update, it will be recovered anyway while filling the gap
-                continue;
+                $this->API->updaters[UpdateLoop::GENERIC]->resumeAndWait();
+                $this->incomingUpdates []= $update;
+                foreach ($updates as $update) {
+                    $this->incomingUpdates []= $update;
+                }
+                return;
             }
             if ($result < 0) {
                 $this->API->logger('Seq too old. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);

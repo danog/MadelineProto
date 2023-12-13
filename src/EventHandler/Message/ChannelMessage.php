@@ -59,7 +59,9 @@ final class ChannelMessage extends Message
         )['messages'];
         $r = end($r);
 
-        return $this->getClient()->wrapMessage($r);
+        $v = $this->getClient()->wrapMessage($r);
+        \assert($v instanceof GroupMessage);
+        return $v;
     }
 
     /**

@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
+use Amp\DeferredFuture;
+use AssertionError;
 use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -29,6 +31,7 @@ use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
+use Revolt\EventLoop;
 
 use function Amp\delay;
 
@@ -68,10 +71,41 @@ final class UpdateLoop extends Loop
         $this->init($API);
         $this->channelId = $channelId;
     }
+    private ?DeferredFuture $done = null;
+    public function resumeAndWait(): void
+    {
+        $i = 0;
+        do {
+            ++$i;
+            $this->API->logger("Queued resume of $this (try $i) to recover gap...", Logger::NOTICE);
+            if ($this->done !== null) {
+                throw new AssertionError("Already waiting in $this!");
+            }
+            if ($this->isRunning()) {
+                throw new AssertionError("$this is not running!");
+            }
+            $this->done = new DeferredFuture;
+            // Can be false if we're currently running, so wait for it to finish and re-queue.
+            $resumed = $this->resume();
+            $this->done->getFuture()->await();
+        } while (!$resumed);
+        $this->API->logger("Resumed and re-paused $this (try $i) to recover gap!", Logger::NOTICE);
+    }
     /**
      * Main loop.
      */
     public function loop(): ?float
+    {
+        try {
+            return $this->loopInner();
+        } finally {
+            if ($this->done !== null) {
+                EventLoop::queue($this->done->complete(...));
+                $this->done = null;
+            }
+        }
+    }
+    private function loopInner(): ?float
     {
         if (!$this->isLoggedIn()) {
             return self::PAUSE;
