@@ -81,7 +81,7 @@ final class UpdateLoop extends Loop
             if ($this->done !== null) {
                 throw new AssertionError("Already waiting in $this!");
             }
-            if ($this->isRunning()) {
+            if (!$this->isRunning()) {
                 throw new AssertionError("$this is not running!");
             }
             $this->done = new DeferredFuture;
