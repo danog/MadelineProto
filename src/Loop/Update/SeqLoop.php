@@ -89,9 +89,9 @@ final class SeqLoop extends Loop
 
         return self::PAUSE;
     }
-    public function parse(SplQueue $updates): void
+    public function parse(SplQueue $queue): void
     {
-        foreach ($updates as ['updates' => $updates, 'options' => $options]) {
+        foreach ($queue as ['updates' => $updates, 'options' => $options]) {
             ['seq_start' => $seq_start, 'seq_end' => $seq_end] = $options;
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
@@ -99,8 +99,8 @@ final class SeqLoop extends Loop
                 $this->incomingUpdates = new SplQueue;
                 $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
                 $this->API->updaters[UpdateLoop::GENERIC]->resumeAndWait();
-                foreach ($updates as $update) {
-                    $this->incomingUpdates->enqueue($update);
+                foreach ($queue as $data) {
+                    $this->incomingUpdates->enqueue($data);
                 }
                 return;
             }

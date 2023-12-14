@@ -158,6 +158,12 @@ trait Session
         if ($count+$total) {
             $this->API->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
+
+        $new_outgoing = [];
+        foreach ($this->new_outgoing as $key => $message) {
+            $new_outgoing[$key] = $message;
+        }
+        $this->new_outgoing = $new_outgoing;
     }
     /**
      * Create MTProto session if needed.

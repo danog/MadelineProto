@@ -86,10 +86,6 @@ trait Reliable
         foreach ($content['msg_ids'] as $key => $msg_id) {
             $info = \ord($content['info'][$key]);
             $status = 'Status for message id '.$msg_id.': ';
-            /*if ($info & 4) {
-             *$this->gotResponseForOutgoingMessageId($msg_id);
-             *}
-             */
             foreach (MTProto::MSGS_INFO_FLAGS as $flag => $description) {
                 if (($info & $flag) !== 0) {
                     $status .= $description;
