@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="dev-master@a75d26a3d425d183da8bef37cfc14976c8d817d6">
-  <file src="examples/bot.php">
-    <LessSpecificImplementedReturnType>
-      <code>int|string|array</code>
-    </LessSpecificImplementedReturnType>
-    <MissingFile>
-      <code><![CDATA[require_once 'madeline.php']]></code>
-    </MissingFile>
-    <PossiblyNullArrayAccess>
-      <code><![CDATA[$message->matches[1]]]></code>
-    </PossiblyNullArrayAccess>
-    <PossiblyNullPropertyFetch>
-      <code><![CDATA[$reply->media]]></code>
-    </PossiblyNullPropertyFetch>
-    <PossiblyNullReference>
-      <code>addReaction</code>
-      <code>delReaction</code>
-      <code>getDownloadLink</code>
-      <code>reply</code>
-    </PossiblyNullReference>
-  </file>
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -1320,16 +1300,6 @@
             ),
             array_fill_keys(
                 [
-                    'User',
-                    'Chat',
-                    'Peer',
-                    'InputDialogPeer',
-                    'InputNotifyPeer',
-                ],
-                $this->getInfo(...),
-            ),
-            array_fill_keys(
-                [
                     'InputMedia',
                     'InputDocument',
                     'InputPhoto',
@@ -1692,7 +1662,6 @@
       <code>$filter</code>
       <code>$filter</code>
       <code>$filter</code>
-      <code>$folder_id</code>
       <code>$gres</code>
       <code>$limit</code>
       <code>$limit</code>
@@ -1808,9 +1777,6 @@
       <code><![CDATA[$this->authorization['user']['id']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
     </PossiblyNullArrayAccess>
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->msg_ids]]></code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullReference>
       <code>addPendingWakeups</code>
       <code>waitForInternalStart</code>
@@ -2471,8 +2437,6 @@
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
       <code><![CDATA[$this->authorization['user']]]></code>
-      <code><![CDATA[$this->authorization['user']]]></code>
-      <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['bot']]]></code>

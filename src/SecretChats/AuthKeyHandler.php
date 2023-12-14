@@ -27,7 +27,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
@@ -64,11 +63,10 @@ trait AuthKeyHandler
      */
     public function requestSecretChat(mixed $user): int
     {
-        $user = ($this->getInfo($user));
-        if (!isset($user['InputUser'])) {
-            throw new PeerNotInDbException();
+        $user = $this->getInfo($user);
+        if ($user['type'] !== 'user') {
+            throw new AssertionError("Can only create a secret chat with a user!");
         }
-        $user = $user['InputUser'];
         $this->logger->logger('Creating secret chat with '.$user['user_id'].'...', Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating a...', Logger::VERBOSE);

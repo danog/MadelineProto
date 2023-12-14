@@ -1827,16 +1827,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             ),
             array_fill_keys(
                 [
-                    'User',
-                    'Chat',
-                    'Peer',
-                    'InputDialogPeer',
-                    'InputNotifyPeer',
-                ],
-                $this->getInfo(...),
-            ),
-            array_fill_keys(
-                [
                     'InputMedia',
                     'InputDocument',
                     'InputPhoto',

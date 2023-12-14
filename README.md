@@ -225,7 +225,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Just the chat ID (extremely fast)](https://docs.madelineproto.xyz/docs/CHAT_INFO.html#getId)
 * [Getting all chats (dialogs)](https://docs.madelineproto.xyz/docs/DIALOGS.html) - There are two ways to get a list of all chats, depending if you logged in as a user, or as a bot.
   * [Dialog ID list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogIds)
-  * [Dialog list](https://docs.madelineproto.xyz/docs/DIALOGS.html#getDialogs)
   * [Full dialog info](https://docs.madelineproto.xyz/docs/DIALOGS.html#getFullDialogs)
 * [Inline buttons](https://docs.madelineproto.xyz/docs/INLINE_BUTTONS.html) - You can easily click inline buttons using MadelineProto, just access the correct button:
 * [Secret chats](https://docs.madelineproto.xyz/docs/SECRET_CHATS.html) - MadelineProto provides wrappers to work with secret chats.

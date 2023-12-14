@@ -820,15 +820,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getFileInfo($constructor);
     }
     /**
-     * Get folder ID from object.
-     *
-     * @param mixed $id Object
-     */
-    public static function getFolderId(mixed $id): ?int
-    {
-        return \danog\MadelineProto\MTProto::getFolderId($id);
-    }
-    /**
      * Get full info of all dialogs.
      *
      * Bots should use getDialogs or getDialogIds, instead.
@@ -882,18 +873,12 @@ abstract class InternalDoc
      * @param \danog\MadelineProto\API::INFO_TYPE_* $type Whether to generate an Input*, an InputPeer or the full set of constructors
      * @see https://docs.madelineproto.xyz/Info.html
      * @return ($type is \danog\MadelineProto\API::INFO_TYPE_ALL ? array{
-     *      InputPeer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int},
-     *      Peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int},
-     *      DialogPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
-     *      NotifyPeer: array{_: string, peer: array{_: string, user_id?: int, chat_id?: int, channel_id?: int}},
-     *      InputDialogPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
-     *      InputNotifyPeer: array{_: string, peer: array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}},
+     *      User?: array,
+     *      Chat?: array,
      *      bot_api_id: int,
      *      user_id?: int,
      *      chat_id?: int,
      *      channel_id?: int,
-     *      InputUser?: array{_: string, user_id?: int, access_hash?: int, min?: bool},
-     *      InputChannel?: array{_: string, channel_id: int, access_hash: int, min: bool},
      *      type: string
      * } : ($type is API::INFO_TYPE_TYPE ? string : ($type is \danog\MadelineProto\API::INFO_TYPE_ID ? int : array{_: string, user_id?: int, access_hash?: int, min?: bool, chat_id?: int, channel_id?: int}|array{_: string, user_id?: int, access_hash?: int, min?: bool}|array{_: string, channel_id: int, access_hash: int, min: bool})))
      */

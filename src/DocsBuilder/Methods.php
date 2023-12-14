@@ -169,7 +169,7 @@ trait Methods
                         $ptype = 'Bool';
                 }
                 $human_ptype = $ptype;
-                if (\in_array($ptype, ['InputDialogPeer', 'DialogPeer', 'NotifyPeer', 'InputNotifyPeer', 'User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'], true) && !isset($this->settings['td'])) {
+                if (\in_array($ptype, ['User', 'InputUser', 'Chat', 'InputChannel', 'Peer', 'InputPeer'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'Username, chat ID, Update, Message or '.$ptype;
                 }
                 if (\in_array($ptype, ['InputMedia', 'InputPhoto', 'InputDocument'], true) && !isset($this->settings['td'])) {

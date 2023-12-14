@@ -764,7 +764,7 @@ interface Messages
     /**
      * Get dialog info of specified peers.
      *
-     * @param list<array|int|string>|array<never, never> $peers Array of Peers @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
+     * @param list<array{_: 'inputDialogPeer', peer?: array|int|string}|array{_: 'inputDialogPeerFolder', folder_id?: int}>|array<never, never> $peers Array of Peers @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -974,20 +974,20 @@ interface Messages
     /**
      * Pin/unpin a dialog.
      *
-     * @param array|int|string $peer The dialog to pin @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
+     * @param array{_: 'inputDialogPeer', peer?: array|int|string}|array{_: 'inputDialogPeerFolder', folder_id?: int} $peer The dialog to pin @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
      * @param bool $pinned Whether to pin or unpin the dialog
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function toggleDialogPin(array|int|string $peer, bool|null $pinned = false, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function toggleDialogPin(array $peer, bool|null $pinned = false, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Reorder pinned dialogs.
      *
      * @param bool $force If set, dialogs pinned server-side but not present in the `order` field will be unpinned.
      * @param int $folder_id [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
-     * @param list<array|int|string>|array<never, never> $order Array of New dialog order @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
+     * @param list<array{_: 'inputDialogPeer', peer?: array|int|string}|array{_: 'inputDialogPeerFolder', folder_id?: int}>|array<never, never> $order Array of New dialog order @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -1181,13 +1181,13 @@ interface Messages
     /**
      * Manually mark dialog as unread.
      *
-     * @param array|int|string $peer Dialog @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
+     * @param array{_: 'inputDialogPeer', peer?: array|int|string}|array{_: 'inputDialogPeerFolder', folder_id?: int} $peer Dialog @see https://docs.madelineproto.xyz/API_docs/types/InputDialogPeer.html
      * @param bool $unread Mark as unread/read
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function markDialogUnread(array|int|string $peer, bool|null $unread = false, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function markDialogUnread(array $peer, bool|null $unread = false, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Get dialogs manually marked as unread.
@@ -1195,7 +1195,7 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return list<array|int|string> Array of  @see https://docs.madelineproto.xyz/API_docs/types/DialogPeer.html
+     * @return list<array{_: 'dialogPeer', peer: array|int|string}|array{_: 'dialogPeerFolder', folder_id: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/DialogPeer.html
      */
     public function getDialogUnreadMarks(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
 
