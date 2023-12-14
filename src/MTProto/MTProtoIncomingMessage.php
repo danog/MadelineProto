@@ -82,6 +82,16 @@ final class MTProtoIncomingMessage extends MTProtoMessage
             $this->state |= 16; // message not requiring acknowledgment
         }
     }
+
+    /**
+     * Get my message ID.
+     */
+    public function getMsgId(): int
+    {
+        \assert($this->msgId !== null);
+        return $this->msgId;
+    }
+
     /**
      * Get deserialized response content.
      */

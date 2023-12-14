@@ -605,13 +605,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\AsyncTools::flock($file, $operation, $polling, $token, $failureCb);
     }
     /**
-     * Flush all postponed messages.
-     */
-    public function flush(): void
-    {
-        $this->wrapper->getAPI()->flush();
-    }
-    /**
      * When was full info for this chat last cached.
      *
      * @param mixed $id Chat ID

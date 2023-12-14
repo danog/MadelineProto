@@ -27,6 +27,7 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use SplQueue;
 
 /**
  * Update feed loop.
@@ -46,12 +47,16 @@ final class FeedLoop extends Loop
     public const GENERIC = 0;
     /**
      * Incoming updates array.
+     *
+     * @var SplQueue<array>
      */
-    private array $incomingUpdates = [];
+    private SplQueue $incomingUpdates;
     /**
      * Parsed updates array.
+     *
+     * @var SplQueue<array>
      */
-    private array $parsedUpdates = [];
+    private SplQueue $parsedUpdates;
     /**
      * Update loop.
      */
@@ -65,6 +70,10 @@ final class FeedLoop extends Loop
      */
     public function __construct(MTProto $API, private int $channelId = 0)
     {
+        $this->incomingUpdates = new SplQueue;
+        $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
+        $this->parsedUpdates = new SplQueue;
+        $this->parsedUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
         $this->init($API);
     }
     /**
@@ -79,36 +88,24 @@ final class FeedLoop extends Loop
         $this->state = $this->channelId === self::GENERIC ? $this->API->loadUpdateState() : $this->API->loadChannelState($this->channelId);
 
         $this->API->logger("Resumed {$this}");
-        while ($this->incomingUpdates) {
-            $updates = $this->incomingUpdates;
-            $this->incomingUpdates = [];
-            $this->parse($updates);
-            $updates = null;
+
+        while (!$this->incomingUpdates->isEmpty()) {
+            $this->parse($this->incomingUpdates);
         }
-        while ($this->parsedUpdates) {
-            $parsedUpdates = $this->parsedUpdates;
-            $this->parsedUpdates = [];
-            foreach ($parsedUpdates as $update) {
-                try {
-                    $this->API->saveUpdate($update);
-                } catch (\Throwable $e) {
-                    AsyncTools::rethrow($e);
-                }
+
+        foreach ($this->parsedUpdates as $update) {
+            try {
+                $this->API->saveUpdate($update);
+            } catch (\Throwable $e) {
+                AsyncTools::rethrow($e);
             }
-            $parsedUpdates = null;
         }
+
         return self::PAUSE;
     }
-    /**
-     * @param array<int, array> $updates
-     */
-    public function parse(array $updates): void
+    public function parse(SplQueue $updates): void
     {
-        reset($updates);
-        while ($updates) {
-            $key = key($updates);
-            $update = $updates[$key];
-            unset($updates[$key]);
+        foreach ($updates as $update) {
             if ($update['_'] === 'updateChannelTooLong') {
                 $this->API->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
                 $this->updater->resume();
@@ -129,11 +126,12 @@ final class FeedLoop extends Loop
                 }
                 if ($result > 0) {
                     $logger('PTS hole');
+                    $this->incomingUpdates = new SplQueue;
+                    $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
                     $this->updater->setLimit($this->state->pts() + $result);
                     $this->updater->resumeAndWait();
-                    $this->incomingUpdates []= $update;
                     foreach ($updates as $update) {
-                        $this->incomingUpdates []= $update;
+                        $this->incomingUpdates->enqueue($update);
                     }
                     return;
                 }
@@ -146,7 +144,7 @@ final class FeedLoop extends Loop
                 $logger('PTS OK');
                 $this->state->pts($update['pts']);
             }
-            $this->save($update);
+            $this->parsedUpdates->enqueue($update);
         }
     }
     public function feed(array $updates)
@@ -257,12 +255,8 @@ final class FeedLoop extends Loop
             $this->API->saveUpdate($update);
             return $this->channelId;
         }
-        $this->incomingUpdates[] = $update;
+        $this->incomingUpdates->enqueue($update);
         return $this->channelId;
-    }
-    public function save($update): void
-    {
-        $this->parsedUpdates[] = $update;
     }
     public function saveMessages($messages): void
     {
@@ -274,7 +268,7 @@ final class FeedLoop extends Loop
             if ($message['_'] !== 'messageEmpty') {
                 $this->API->logger('Getdiff fed me message of type '.$message['_']." in {$this}...", Logger::VERBOSE);
             }
-            $this->parsedUpdates[] = ['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
+            $this->parsedUpdates->enqueue(['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1]);
         }
     }
     public function __toString(): string

@@ -44,7 +44,10 @@ final class HttpWaitLoop extends Loop
             return self::PAUSE;
         }
         $this->API->logger("DC {$this->datacenter}: request {$this->connection->countHttpSent()}, response {$this->connection->countHttpReceived()}");
-        if ($this->connection->countHttpSent() === $this->connection->countHttpReceived() && (!empty($this->connection->pendingOutgoing) || !empty($this->connection->new_outgoing) && !$this->connection->hasPendingCalls())) {
+        if ($this->connection->countHttpSent() === $this->connection->countHttpReceived()
+            && ($this->connection->pendingOutgoing || $this->connection->new_outgoing)
+            && !$this->connection->hasPendingCalls()
+        ) {
             $this->connection->objectCall(
                 'http_wait',
                 ['max_wait' => 30000, 'wait_after' => 0, 'max_delay' => 0],

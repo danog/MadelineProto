@@ -32,7 +32,7 @@ final class BotChatInviteRequest extends ChatInviteRequester
     public readonly int $userId;
 
     /** Bio of the user */
-    public readonly int $about;
+    public readonly string $about;
 
     /** Chat invite link that was used by the user to send the [join request »](https://core.telegram.org/api/invites#join-requests) */
     public readonly ChatInvite $invite;

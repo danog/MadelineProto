@@ -123,7 +123,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @internal
      * @var int
      */
-    public const V = 178;
+    public const V = 179;
     /**
      * Bad message error codes.
      *
@@ -1588,16 +1588,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         $this->reportDest = $this->sanitizeReportPeers($userOrId);
         $this->admins = array_values(array_filter($this->reportDest, static fn (int $v) => $v > 0));
-    }
-    /**
-     * Flush all postponed messages.
-     */
-    public function flush(): void
-    {
-        $this->waitForInit();
-        foreach ($this->datacenter->getDataCenterConnections() as $conn) {
-            $conn->flush();
-        }
     }
     private ?LocalMutex $reportMutex = null;
     /**

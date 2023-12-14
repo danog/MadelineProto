@@ -61,7 +61,7 @@ final class MsgIdHandler
     /**
      * Check validity of given message ID.
      */
-    public function checkMessageId(int $newMessageId, bool $outgoing, bool $container = false): void
+    public function checkOutgoingMessageId(int $newMessageId): void
     {
         $minMessageId = (time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
@@ -71,30 +71,41 @@ final class MsgIdHandler
         if ($newMessageId > $maxMessageId) {
             throw new Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
         }
-        if ($outgoing) {
-            if ($newMessageId % 4) {
-                throw new Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
-            }
-            if ($newMessageId <= $this->maxOutgoingId) {
-                throw new Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Please sync your date using NTP.');
-            }
-            $this->maxOutgoingId = $newMessageId;
-        } else {
-            if (!($newMessageId % 2)) {
-                throw new Exception('message id mod 4 != 1 or 3');
-            }
-            $key = $this->maxIncomingId;
-            if ($container) {
-                if ($newMessageId >= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
-                }
-            } else {
-                if ($newMessageId <= $key) {
-                    $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
-                }
-            }
-            $this->maxIncomingId = $newMessageId;
+        if ($newMessageId % 4) {
+            throw new Exception('Given message id ('.$newMessageId.') is not divisible by 4. Please sync your date using NTP.');
         }
+        if ($newMessageId <= $this->maxOutgoingId) {
+            throw new Exception('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$this->maxOutgoingId.'). Please sync your date using NTP.');
+        }
+        $this->maxOutgoingId = $newMessageId;
+    }
+    /**
+     * Check validity of given message ID.
+     */
+    public function checkIncomingMessageId(int $newMessageId, bool $container): void
+    {
+        $minMessageId = (time() + $this->session->time_delta - 300) << 32;
+        if ($newMessageId < $minMessageId) {
+            $this->session->API->logger->logger('Given message id ('.$newMessageId.') is too old compared to the min value ('.$minMessageId.').', Logger::WARNING);
+        }
+        $maxMessageId = (time() + $this->session->time_delta + 30) << 32;
+        if ($newMessageId > $maxMessageId) {
+            throw new Exception('Given message id ('.$newMessageId.') is too new compared to the max value ('.$maxMessageId.'). Please sync your date using NTP.');
+        }
+        if (!($newMessageId % 2)) {
+            throw new Exception('message id mod 4 != 1 or 3');
+        }
+        $key = $this->maxIncomingId;
+        if ($container) {
+            if ($newMessageId >= $key) {
+                $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
+            }
+        } else {
+            if ($newMessageId <= $key) {
+                $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
+            }
+        }
+        $this->maxIncomingId = $newMessageId;
     }
     /**
      * Generate message ID.
@@ -107,7 +118,7 @@ final class MsgIdHandler
         if ($messageId <= $this->maxOutgoingId) {
             $messageId = $this->maxOutgoingId + 4;
         }
-        $this->checkMessageId($messageId, outgoing: true, container: false);
+        $this->checkOutgoingMessageId($messageId);
         return $messageId;
     }
     /**

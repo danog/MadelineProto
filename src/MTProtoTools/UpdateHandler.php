@@ -334,13 +334,8 @@ trait UpdateHandler
         if (!isset($message['peer_id'])) {
             return true;
         }
-        try {
-            $peer_id = $this->getIdInternal($message['peer_id']);
-        } catch (Exception $e) {
-            return true;
-        } catch (RPCErrorException $e) {
-            return true;
-        }
+        // TODO: remove this once migration of the cache is done
+        $peer_id = $this->getIdInternal($message['peer_id']);
         $message_id = $message['id'];
         if (!isset($this->msg_ids[$peer_id]) || $message_id > $this->msg_ids[$peer_id]) {
             $this->msg_ids[$peer_id] = $message_id;

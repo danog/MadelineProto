@@ -193,7 +193,9 @@ final class DataCenterConnection implements JsonSerializable
                         $this->setTempAuthKey($connection->createAuthKey(true));
                     }
                 }
-                $this->flush();
+                foreach ($this->connections as $socket) {
+                    $socket->flush();
+                }
             } elseif (!$cdn) {
                 $this->syncAuthorization();
             }
@@ -408,19 +410,6 @@ final class DataCenterConnection implements JsonSerializable
         }
     }
     /**
-     * Flush all pending packets.
-     */
-    public function flush(): void
-    {
-        if (!isset($this->datacenter)) {
-            return;
-        }
-        $this->API->logger("Flushing pending messages, DC {$this->datacenter}", Logger::NOTICE);
-        foreach ($this->connections as $socket) {
-            $socket->flush();
-        }
-    }
-    /**
      * Has connection context?
      */
     public function hasCtx(): bool
@@ -493,13 +482,13 @@ final class DataCenterConnection implements JsonSerializable
         $backup = $this->connections[$id]->backupSession();
         $list = '';
         foreach ($backup as $k => $message) {
-            if ($message->getConstructor() === 'msgs_state_req'
-                || $message->getConstructor() === 'ping_delay_disconnect'
+            if ($message->constructor === 'msgs_state_req'
+                || $message->constructor === 'ping_delay_disconnect'
                 || $message->unencrypted) {
                 unset($backup[$k]);
                 continue;
             }
-            $list .= $message->getConstructor();
+            $list .= $message->constructor;
             $list .= ', ';
         }
         $this->API->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
@@ -558,7 +547,7 @@ final class DataCenterConnection implements JsonSerializable
             }
             if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
                 $this->API->logger("Resending $message to DC {$this->datacenter}");
-                EventLoop::queue($this->getConnection()->sendMessage(...), $message);
+                EventLoop::queue($this->getConnection()->sendMessage(...), $message, true);
             } else {
                 $this->API->logger("Dropping $message to DC {$this->datacenter}");
             }

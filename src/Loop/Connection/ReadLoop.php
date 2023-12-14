@@ -119,7 +119,7 @@ final class ReadLoop extends Loop
         if ($this->connection->isHttp()) {
             EventLoop::queue($this->connection->pingHttpWaiter(...));
         }
-        EventLoop::queue($this->connection->handleMessages(...));
+        $this->connection->wakeupHandler();
         return self::CONTINUE;
     }
     public function readMessage(): ?int
@@ -153,7 +153,7 @@ final class ReadLoop extends Loop
                     throw new SecurityException("Got unencrypted message from encrypted socket!");
                 }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
-                $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
+                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
                 $message_length = unpack('V', $buffer->bufferRead(4))[1];
                 $message_data = $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
@@ -190,7 +190,7 @@ final class ReadLoop extends Loop
                     throw new NothingInTheSocketException();
                 }
                 $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
-                $this->connection->msgIdHandler->checkMessageId($message_id, outgoing: false, container: false);
+                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
                 $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
                 $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {
@@ -226,7 +226,9 @@ final class ReadLoop extends Loop
             if (isset($seq_no)) {
                 $message->setSeqNo($seq_no);
             }
-            $this->connection->new_incoming[$message_id] = $this->connection->incoming_messages[$message_id] = $message;
+
+            $this->connection->new_incoming->enqueue($message);
+            $this->connection->incoming_messages[$message_id] = $message;
         } finally {
             $this->connection->reading(false);
         }

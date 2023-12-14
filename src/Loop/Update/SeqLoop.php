@@ -23,7 +23,9 @@ namespace danog\MadelineProto\Loop\Update;
 use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use SplQueue;
 
 /**
  * update feed loop.
@@ -34,11 +36,13 @@ use danog\MadelineProto\MTProtoTools\UpdatesState;
  */
 final class SeqLoop extends Loop
 {
-    use InternalLoop;
+    use InternalLoop {
+        __construct as private init;
+    }
     /**
      * Incoming updates.
      */
-    private array $incomingUpdates = [];
+    private SplQueue $incomingUpdates;
     /**
      * Update feeder.
      */
@@ -52,6 +56,15 @@ final class SeqLoop extends Loop
      */
     private ?UpdatesState $state = null;
     /**
+     * Constructor.
+     */
+    public function __construct(MTProto $API)
+    {
+        $this->incomingUpdates = new SplQueue;
+        $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
+        $this->init($API);
+    }
+    /**
      * Main loop.
      */
     public function loop(): ?float
@@ -62,43 +75,32 @@ final class SeqLoop extends Loop
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
         $this->state = $this->API->loadUpdateState();
         $this->API->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
-        while ($this->incomingUpdates) {
-            $updates = $this->incomingUpdates;
-            $this->incomingUpdates = [];
-            $this->parse($updates);
-            $updates = null;
+
+        while (!$this->incomingUpdates->isEmpty()) {
+            $this->parse($this->incomingUpdates);
         }
-        while ($this->pendingWakeups) {
-            reset($this->pendingWakeups);
-            $channelId = key($this->pendingWakeups);
-            unset($this->pendingWakeups[$channelId]);
+
+        foreach ($this->pendingWakeups as $channelId => $_) {
             if (isset($this->API->feeders[$channelId])) {
                 $this->API->feeders[$channelId]->resume();
             }
         }
+        $this->pendingWakeups = [];
+
         return self::PAUSE;
     }
-    /**
-     * @param array<int, array> $updates
-     */
-    public function parse(array $updates): void
+    public function parse(SplQueue $updates): void
     {
-        reset($updates);
-        while ($updates) {
-            $options = [];
-            $key = key($updates);
-            $update = $updates[$key];
-            unset($updates[$key]);
-            $options = $update['options'];
-            $seq_start = $options['seq_start'];
-            $seq_end = $options['seq_end'];
+        foreach ($updates as ['updates' => $updates, 'options' => $options]) {
+            ['seq_start' => $seq_start, 'seq_end' => $seq_end] = $options;
             $result = $this->state->checkSeq($seq_start);
             if ($result > 0) {
                 $this->API->logger('Seq hole. seq_start: '.$seq_start.' != cur seq: '.($this->state->seq() + 1), Logger::ERROR);
+                $this->incomingUpdates = new SplQueue;
+                $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
                 $this->API->updaters[UpdateLoop::GENERIC]->resumeAndWait();
-                $this->incomingUpdates []= $update;
                 foreach ($updates as $update) {
-                    $this->incomingUpdates []= $update;
+                    $this->incomingUpdates->enqueue($update);
                 }
                 return;
             }
@@ -110,7 +112,8 @@ final class SeqLoop extends Loop
             if (isset($options['date'])) {
                 $this->state->date($options['date']);
             }
-            $this->save($update);
+
+            $this->pendingWakeups += $this->feeder->feed($updates);
         }
     }
     /**
@@ -119,14 +122,7 @@ final class SeqLoop extends Loop
     public function feed(array $updates): void
     {
         $this->API->logger('Was fed updates of type '.$updates['_'].'...', Logger::VERBOSE);
-        $this->incomingUpdates[] = $updates;
-    }
-    /**
-     * @param array{updates: array} $updates
-     */
-    public function save(array $updates): void
-    {
-        $this->pendingWakeups += ($this->feeder->feed($updates['updates']));
+        $this->incomingUpdates->enqueue($updates);
     }
     /**
      * @param array<true> $wakeups

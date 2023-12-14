@@ -255,14 +255,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Get constructor name.
-     */
-    public function getConstructor(): string
-    {
-        return $this->constructor;
-    }
-
-    /**
      * Get whether we should refresh references upon serialization of this message.
      */
     public function shouldRefreshReferences(): bool

@@ -39,7 +39,7 @@ trait Reliable
         if (isset($this->incoming_messages[$content['answer_msg_id']])) {
             $this->ackIncomingMessage($this->incoming_messages[$content['answer_msg_id']]);
         } else {
-            EventLoop::queue($this->objectCall(...), 'msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]], false);
+            EventLoop::queue($this->objectCall(...), 'msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]]);
         }
     }
     /**
@@ -64,7 +64,7 @@ trait Reliable
         }
         if ($ok) {
             foreach ($content['msg_ids'] as $msg_id) {
-                $this->methodRecall(message_id: $msg_id, postpone: true);
+                $this->methodRecall($msg_id);
             }
         } else {
             $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);
@@ -128,6 +128,6 @@ trait Reliable
             }
             $info .= \chr($cur_info);
         }
-        EventLoop::queue($this->objectCall(...), 'msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info], false);
+        EventLoop::queue($this->objectCall(...), 'msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info]);
     }
 }

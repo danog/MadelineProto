@@ -1003,8 +1003,8 @@ final class TL implements TLInterface
             if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
                 /** @var MTProtoOutgoingMessage */
                 $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
-                foreach ($this->beforeMethodResponseDeserialization[$message->getConstructor()] ?? [] as $callback) {
-                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor());
+                foreach ($this->beforeMethodResponseDeserialization[$message->constructor] ?? [] as $callback) {
+                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->constructor);
                 }
                 if ($message->subtype) {
                     $arg['subtype'] = $message->subtype;
@@ -1045,8 +1045,8 @@ final class TL implements TLInterface
             }
         } elseif ($x['_'] === 'rpc_result'
             && isset($type['connection']->outgoing_messages[$x['req_msg_id']])
-            && isset($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()])) {
-            foreach ($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->getConstructor()] as $callback) {
+            && isset($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->constructor])) {
+            foreach ($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->constructor] as $callback) {
                 $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
             }
         }

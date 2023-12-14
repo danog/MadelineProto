@@ -82,8 +82,8 @@ trait AckHandler
             if ($message->wasSent()
                 && $message->getSent() + $timeout < time()
                 && $message->unencrypted === $unencrypted
-                && $message->getConstructor() !== 'msgs_state_req') {
-                if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
+                && $message->constructor !== 'msgs_state_req') {
+                if (!$unencrypted && $pfsNotBound && $message->constructor !== 'auth.bindTempAuthKey') {
                     continue;
                 }
                 return true;
@@ -114,10 +114,10 @@ trait AckHandler
                 && $message->getSent() + $timeout < time()
                 && $message->unencrypted === $unencrypted
             ) {
-                if (!$unencrypted && $pfsNotBound && $message->getConstructor() !== 'auth.bindTempAuthKey') {
+                if (!$unencrypted && $pfsNotBound && $message->constructor !== 'auth.bindTempAuthKey') {
                     continue;
                 }
-                if ($message->getConstructor() === 'msgs_state_req' || $message->getConstructor() === 'ping_delay_disconnect') {
+                if ($message->constructor === 'msgs_state_req' || $message->constructor === 'ping_delay_disconnect') {
                     unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     continue;
                 }

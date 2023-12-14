@@ -355,7 +355,7 @@ final class ReferenceDatabase implements TLCallback
     public function addOriginMethod(MTProtoOutgoingMessage $data, array $res): void
     {
         $key = \count($this->cacheContexts) - 1;
-        $constructor = $data->getConstructor();
+        $constructor = $data->constructor;
         if ($key === -1) {
             throw new Exception("Trying to add origin to method $constructor with no origin context set");
         }
@@ -367,7 +367,7 @@ final class ReferenceDatabase implements TLCallback
         $cache = $this->cache[$key];
         unset($this->cache[$key]);
         $origin = [];
-        switch ($data->getConstructor()) {
+        switch ($data->constructor) {
             case 'photos.updateProfilePhoto':
                 $origin['max_id'] = $res['photo_id'] ?? 0;
                 $origin['offset'] = -1;

@@ -25,6 +25,7 @@ use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Sync\LocalMutex;
 use AssertionError;
+use danog\Loop\GenericLoop;
 use danog\MadelineProto\Loop\Connection\CheckLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
 use danog\MadelineProto\Loop\Connection\HttpWaitLoop;
@@ -61,6 +62,11 @@ final class Connection
      *
      */
     protected ?WriteLoop $writer = null;
+    /**
+     * Handler loop.
+     *
+     */
+    protected ?GenericLoop $handler = null;
     /**
      * Reader loop.
      *
@@ -298,6 +304,7 @@ final class Connection
                 $this->checker ??= new CheckLoop($this);
                 $this->cleanup ??= new CleanupLoop($this);
                 $this->waiter ??= new HttpWaitLoop($this);
+                $this->handler ??= new GenericLoop(fn () => $this->handleMessages($this->new_incoming), "Handler loop");
                 if (!isset($this->pinger) && !$ctx->isMedia() && !$ctx->isCDN() && !$this->isHttp()) {
                     $this->pinger = new PingLoop($this);
                 }
@@ -317,6 +324,7 @@ final class Connection
                 if ($this->pinger) {
                     Assert::true($this->pinger->start(), "Could not start pinger stream");
                 }
+                $this->handler->start();
 
                 EventLoop::queue($this->shared->initAuthorization(...));
                 return $this;
@@ -325,6 +333,11 @@ final class Connection
         } finally {
             EventLoop::queue($lock->release(...));
         }
+    }
+    public function wakeupHandler(): void
+    {
+        \assert($this->handler !== null);
+        $this->handler->resume();
     }
     /**
      * Apply method abstractions.
@@ -535,9 +548,8 @@ final class Connection
     /**
      * Send an MTProto message.
      *
-     * @param boolean $flush Whether to flush the message right away
      */
-    public function sendMessage(MTProtoOutgoingMessage $message, bool $flush = true): void
+    public function sendMessage(MTProtoOutgoingMessage $message, bool $postpone = false): void
     {
         $message->trySend();
         $promise = $message->getSendPromise();
@@ -547,10 +559,10 @@ final class Connection
                 $this->API->referenceDatabase->refreshNext(true);
             }
             if ($message->isMethod) {
-                $body = $this->API->getTL()->serializeMethod($message->getConstructor(), $body);
+                $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
             } else {
-                $body['_'] = $message->getConstructor();
-                $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->getConstructor());
+                $body['_'] = $message->constructor;
+                $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->constructor);
             }
             if ($message->shouldRefreshReferences()) {
                 $this->API->referenceDatabase->refreshNext(false);
@@ -559,8 +571,8 @@ final class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
-        if ($flush) {
-            $this->flush();
+        if (isset($this->writer)) {
+            $this->writer->resume($postpone);
         }
         $this->connect();
         $promise->await();

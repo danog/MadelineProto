@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\SignalException;
+use danog\Loop\Loop;
 use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
@@ -33,6 +34,7 @@ use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use Revolt\EventLoop;
+use SplQueue;
 use Throwable;
 
 use const PHP_EOL;
@@ -44,126 +46,114 @@ use const PHP_EOL;
  */
 trait ResponseHandler
 {
-    public function handleMessages(): void
+    /**
+     * @param iterable<array-key, MTProtoIncomingMessage> $messages
+     */
+    private function handleMessages(iterable $messages): ?float
     {
-        while ($this->new_incoming) {
-            reset($this->new_incoming);
-            $current_msg_id = key($this->new_incoming);
-
-            /** @var MTProtoIncomingMessage */
-            $message = $this->new_incoming[$current_msg_id];
-            unset($this->new_incoming[$current_msg_id]);
-
+        foreach ($messages as $message) {
             $this->API->logger($message->log($this->datacenter), Logger::ULTRA_VERBOSE);
 
             $type = $message->getPredicate();
             if ($type !== 'msg_container') {
                 $this->checkInSeqNo($message);
             }
-            switch ($type) {
-                case 'msgs_ack':
-                    foreach ($message->read()['msg_ids'] as $msg_id) {
-                        // Acknowledge that the server received my message
-                        $this->ackOutgoingMessageId($msg_id);
-                    }
-                    break;
-                case 'rpc_result':
-                    $this->ackIncomingMessage($message);
-                    // no break
-                case 'future_salts':
-                case 'msgs_state_info':
-                case 'bad_server_salt':
-                case 'bad_msg_notification':
-                case 'pong':
-                    $this->handleResponse($message);
-                    break;
-                case 'new_session_created':
-                    $this->ackIncomingMessage($message);
-                    $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
-                    if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
-                        && isset($this->API->updaters[UpdateLoop::GENERIC])
-                    ) {
-                        $this->API->updaters[UpdateLoop::GENERIC]->resume();
-                    }
-                    break;
-                case 'msg_container':
-                    foreach ($message->read()['messages'] as $msg) {
-                        $this->msgIdHandler->checkMessageId($msg['msg_id'], outgoing: false, container: true);
-                        $newMessage = new MTProtoIncomingMessage($msg['body'], $msg['msg_id'], $message->unencrypted, true);
-                        $newMessage->setSeqNo($msg['seqno']);
-                        $this->checkInSeqNo($newMessage);
-                        $newMessage->setSeqNo(null);
-                        $this->new_incoming[$msg['msg_id']] = $this->incoming_messages[$msg['msg_id']] = $newMessage;
-                    }
-                    $this->checkInSeqNo($message);
-                    unset($newMessage, $message, $msg);
-                    ksort($this->new_incoming);
-                    break;
-                case 'msg_copy':
-                    $this->ackIncomingMessage($message);
-                    $content = $message->read();
-                    $referencedMsgId = $content['msg_id'];
-                    if (isset($this->incoming_messages[$referencedMsgId])) {
-                        $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
-                    } else {
-                        $this->msgIdHandler->checkMessageId($referencedMsgId, outgoing: false, container: true);
-                        $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId, $message->unencrypted);
-                        $this->new_incoming[$referencedMsgId] = $this->incoming_messages[$referencedMsgId] = $message;
-                        unset($message);
-                    }
-                    unset($content, $referencedMsgId);
-                    break;
-                case 'http_wait':
-                    $this->API->logger($message->read(), Logger::NOTICE);
-                    break;
-                case 'msgs_state_req':
-                    $this->sendMsgsStateInfo($message->read()['msg_ids'], $current_msg_id);
-                    break;
-                case 'msgs_all_info':
-                    $this->onMsgsAllInfo($message->read());
-                    break;
-                case 'msg_detailed_info':
-                    $this->onMsgDetailedInfo($message->read());
-                    break;
-                case 'msg_new_detailed_info':
-                    $this->onNewMsgDetailedInfo($message->read());
-                    break;
-                case 'msg_resend_req':
-                    $this->onMsgResendReq($message->read(), $current_msg_id);
-                    break;
-                case 'msg_resend_ans_req':
-                    $this->onMsgResendAnsReq($message->read(), $current_msg_id);
-                    break;
-                default:
-                    $this->ackIncomingMessage($message);
-                    $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
-                    if ($response_type == 'Updates') {
-                        if (!$this->isCdn()) {
-                            EventLoop::queue($this->API->handleUpdates(...), $message->read());
-                        }
-                        break;
-                    }
+            match ($type) {
+                'msgs_ack' => $this->handleAck($message),
 
-                    $this->API->logger('Trying to assign a response of type ' . $response_type . ' to its request...', Logger::VERBOSE);
-                    foreach ($this->new_outgoing as $expecting_msg_id => $expecting) {
-                        if (!$expecting->type) {
-                            continue;
-                        }
-                        $this->API->logger("Does the request of return type {$expecting->type} match?", Logger::VERBOSE);
-                        if ($response_type === $expecting->type) {
-                            $this->API->logger('Yes', Logger::VERBOSE);
-                            $this->handleResponse($message, $expecting_msg_id);
-                            break 2;
-                        }
-                        $this->API->logger('No', Logger::VERBOSE);
-                    }
-                    $this->API->logger('Dunno how to handle ' . PHP_EOL . var_export($message->read(), true), Logger::FATAL_ERROR);
-                    break;
-            }
+                'rpc_result',
+                'future_salts',
+                'msgs_state_info',
+                'bad_server_salt',
+                'bad_msg_notification',
+                'pong' => $this->handleResponse($message),
+
+                'new_session_created' => $this->handleNewSession($message),
+                'msg_container' => $this->handleContainer($message),
+                'msg_copy' => $this->handleMsgCopy($message),
+                'http_wait' => $this->API->logger($message->read(), Logger::NOTICE),
+                'msgs_state_req' => $this->sendMsgsStateInfo($message->read()['msg_ids'], $message->getMsgId()),
+                'msgs_all_info' => $this->onMsgsAllInfo($message->read()),
+                'msg_detailed_info' => $this->onMsgDetailedInfo($message->read()),
+                'msg_new_detailed_info' => $this->onNewMsgDetailedInfo($message->read()),
+                'msg_resend_req' => $this->onMsgResendReq($message->read(), $message->getMsgId()),
+                'msg_resend_ans_req' => $this->onMsgResendAnsReq($message->read(), $message->getMsgId()),
+                default => $this->handleFallback($message)
+            };
         }
-        $this->new_incoming = [];
-        if ($this->pendingOutgoing) {
-            $this->flush();
+        return Loop::PAUSE;
+    }
+    private function handleAck(MTProtoIncomingMessage $message): void
+    {
+        foreach ($message->read()['msg_ids'] as $msg_id) {
+            // Acknowledge that the server received my message
+            $this->ackOutgoingMessageId($msg_id);
+        }
+    }
+    private function handleFallback(MTProtoIncomingMessage $message): void
+    {
+        $this->ackIncomingMessage($message);
+        $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
+        if ($response_type == 'Updates') {
+            if (!$this->isCdn()) {
+                EventLoop::queue($this->API->handleUpdates(...), $message->read());
+            }
+            return;
+        }
+
+        $this->API->logger('Trying to assign a response of type ' . $response_type . ' to its request...', Logger::VERBOSE);
+        foreach ($this->new_outgoing as $expecting_msg_id => $expecting) {
+            if (!$expecting->type) {
+                continue;
+            }
+            $this->API->logger("Does the request of return type {$expecting->type} match?", Logger::VERBOSE);
+            if ($response_type === $expecting->type) {
+                $this->API->logger('Yes', Logger::VERBOSE);
+                $this->handleResponse($message, $expecting_msg_id);
+                return;
+            }
+            $this->API->logger('No', Logger::VERBOSE);
+        }
+        $this->API->logger('Dunno how to handle ' . PHP_EOL . var_export($message->read(), true), Logger::FATAL_ERROR);
+    }
+    private function handleNewSession(MTProtoIncomingMessage $message): void
+    {
+        $this->ackIncomingMessage($message);
+        $this->shared->getTempAuthKey()->setServerSalt($message->read()['server_salt']);
+        if ($this->API->authorized === \danog\MadelineProto\API::LOGGED_IN
+            && isset($this->API->updaters[UpdateLoop::GENERIC])
+        ) {
+            $this->API->updaters[UpdateLoop::GENERIC]->resume();
+        }
+    }
+    private function handleContainer(MTProtoIncomingMessage $message): void
+    {
+        $tmp = new SplQueue;
+        $tmp->setIteratorMode(SplQueue::IT_MODE_DELETE);
+        foreach ($message->read()['messages'] as $msg) {
+            $this->msgIdHandler->checkIncomingMessageId($msg['msg_id'], true);
+            $newMessage = new MTProtoIncomingMessage($msg['body'], $msg['msg_id'], $message->unencrypted, true);
+            $newMessage->setSeqNo($msg['seqno']);
+            $this->checkInSeqNo($newMessage);
+            $newMessage->setSeqNo(null);
+            $tmp->enqueue($newMessage);
+            $this->incoming_messages[$msg['msg_id']] = $newMessage;
+        }
+        $this->checkInSeqNo($message);
+        $this->handleMessages($tmp);
+    }
+    private function handleMsgCopy(MTProtoIncomingMessage $message): void
+    {
+        $this->ackIncomingMessage($message);
+        $content = $message->read();
+        $referencedMsgId = $content['msg_id'];
+        if (isset($this->incoming_messages[$referencedMsgId])) {
+            $this->ackIncomingMessage($this->incoming_messages[$referencedMsgId]);
+        } else {
+            $this->msgIdHandler->checkIncomingMessageId($referencedMsgId, true);
+            $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId, $message->unencrypted);
+            $this->incoming_messages[$referencedMsgId] = $message;
+            $this->handleMessages([$message]);
         }
     }
     /**
@@ -182,6 +172,10 @@ trait ResponseHandler
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();
+        if ($response['_'] === 'rpc_result') {
+            $this->ackIncomingMessage($message);
+            $response = $response['result'];
+        }
         if (!isset($this->outgoing_messages[$requestId])) {
             $this->API->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
             return;
@@ -191,9 +185,6 @@ trait ResponseHandler
         if ($request->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
             $this->API->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
-        }
-        if ($response['_'] === 'rpc_result') {
-            $response = $response['result'];
         }
         $constructor = $response['_'] ?? '';
         if ($constructor === 'rpc_error') {
@@ -212,12 +203,12 @@ trait ResponseHandler
             switch ($response['error_code']) {
                 case 48:
                     $this->shared->getTempAuthKey()->setServerSalt($response['new_server_salt']);
-                    $this->methodRecall(message_id: $requestId);
+                    $this->methodRecall($requestId);
                     return;
                 case 20:
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
-                    $this->methodRecall(message_id: $requestId);
+                    $this->methodRecall($requestId);
                     return;
                 case 16:
                 case 17:
@@ -229,11 +220,11 @@ trait ResponseHandler
                     EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
-            $this->handleReject($request, static fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->getConstructor()));
+            $this->handleReject($request, static fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
             return;
         }
 
-        if ($request->isMethod && $request->getConstructor() !== 'auth.bindTempAuthKey'
+        if ($request->isMethod && $request->constructor !== 'auth.bindTempAuthKey'
             && $this->shared->hasTempAuthKey()
             && !$this->shared->getTempAuthKey()->isInited()
         ) {
@@ -256,7 +247,7 @@ trait ResponseHandler
                 if (isset($trimmed['message'])) {
                     $trimmed['message'] = (string) $body['message'];
                 }
-                $response['request'] = ['_' => $request->getConstructor(), 'body' => $trimmed];
+                $response['request'] = ['_' => $request->constructor, 'body' => $trimmed];
                 unset($body);
                 EventLoop::queue($this->API->handleUpdates(...), $response);
             } elseif ($responseType === 'messages.SentEncryptedMessage') {
@@ -277,7 +268,7 @@ trait ResponseHandler
     private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
         if ($request->isMethod
-            && $request->getConstructor() !== 'auth.bindTempAuthKey'
+            && $request->constructor !== 'auth.bindTempAuthKey'
             && $this->shared->hasTempAuthKey()
             && !$this->shared->getTempAuthKey()->isInited()
         ) {
@@ -296,7 +287,7 @@ trait ResponseHandler
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
-            $this->methodRecall(message_id: $msgId);
+            $this->methodRecall($msgId);
             return null;
         }
 
@@ -326,7 +317,7 @@ trait ResponseHandler
                     }
                     return null;
                 }
-                if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->getConstructor(), ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
+                if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->constructor, ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
                     || (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'], true))) {
                     $this->API->logger("Resending $request in 1 second due to {$response['error_message']}");
                     $msgId = $request->getMsgId();
@@ -335,7 +326,7 @@ trait ResponseHandler
                     EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
             case 303:
                 $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($this->API->isTestMode()) {
@@ -353,7 +344,7 @@ trait ResponseHandler
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
                 $this->API->logger("Resending $request to new DC $datacenter...");
-                EventLoop::queue(closure: $this->methodRecall(...), message_id: $request->getMsgId(), datacenter: $datacenter);
+                EventLoop::queue($this->methodRecall(...), $request->getMsgId(), $datacenter);
                 return null;
             case 400:
                 if ($request->previousQueuedMessage &&
@@ -379,7 +370,7 @@ trait ResponseHandler
                     }
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
             case 401:
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':
@@ -400,7 +391,7 @@ trait ResponseHandler
                             EventLoop::queue(
                                 $this->handleReject(...),
                                 $request,
-                                static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor())
+                                static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor)
                             );
                             return null;
                         }
@@ -427,7 +418,7 @@ trait ResponseHandler
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -444,11 +435,11 @@ trait ResponseHandler
                     return null;
                 }
                 if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
-                    return static fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->getConstructor());
+                    return static fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->constructor);
                 }
                 // no break
             default:
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->getConstructor());
+                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
         }
     }
 }
