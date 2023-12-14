@@ -344,7 +344,7 @@ trait ResponseHandler
                     $this->API->authorized_dc = $this->API->datacenter->currentDatacenter;
                 }
                 $this->API->logger("Resending $request to new DC $datacenter...");
-                EventLoop::queue($this->methodRecall(...), $request->getMsgId(), $datacenter);
+                $this->methodRecall($request->getMsgId(), $datacenter);
                 return null;
             case 400:
                 if ($request->previousQueuedMessage &&

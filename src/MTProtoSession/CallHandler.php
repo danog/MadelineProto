@@ -64,8 +64,9 @@ trait CallHandler
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
                     EventLoop::queue(function () use ($datacenter, $message): void {
+                        // Do not postpone, hot path due to DC migration API errors
                         $this->API->datacenter->waitGetConnection($datacenter)
-                            ->sendMessage($message, true);
+                            ->sendMessage($message, false);
                     });
                 } else {
                     /** @var MTProtoOutgoingMessage */
@@ -73,6 +74,7 @@ trait CallHandler
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
+                    // Postpone, cold path due to rare MTProto errors
                     EventLoop::queue($this->sendMessage(...), $message, true);
                 }
             } else {

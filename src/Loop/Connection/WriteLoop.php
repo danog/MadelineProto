@@ -62,7 +62,7 @@ final class WriteLoop extends Loop
             }
             if ($please_wait) {
                 $this->API->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
-                return self::PAUSE;
+                return 1.0;
             }
             $this->connection->writing(true);
             try {
