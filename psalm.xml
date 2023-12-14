@@ -13,7 +13,6 @@
 >
     <projectFiles>
         <directory name="src" />
-        <file name="examples/bot.php" />
         <ignoreFiles>
             <directory name="vendor" />
             <file name="src/DocsBuilder.php" />
