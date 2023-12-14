@@ -174,7 +174,7 @@ trait Files
             return new Gif($this, $media, $has_video, $protected);
         }
         if ($has_video) {
-            return $has_video['round_message']
+            return ($has_video['round_message'] ?? false)
                 ? new RoundVideo($this, $media, $has_video, $protected)
                 : new Video($this, $media, $has_video, $protected);
         }

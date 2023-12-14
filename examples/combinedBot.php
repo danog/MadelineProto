@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 /**
  * Example combined event handler bot.
  *
@@ -19,7 +19,10 @@
  */
 
 use danog\MadelineProto\API;
-use danog\MadelineProto\EventHandler;
+use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
+use danog\MadelineProto\SimpleEventHandler;
 
 /*
  * Various ways to load MadelineProto
@@ -33,10 +36,13 @@ if (file_exists('vendor/autoload.php')) {
     include 'madeline.php';
 }
 
+class SecretHandler extends SimpleEventHandler
+{
+}
 /**
- * Event handler class.
+ * Combined multiaccount event handler class.
  */
-class CombinedEventHandler extends EventHandler
+class CombinedEventHandler extends SimpleEventHandler
 {
     /**
      * @var int|string Username or ID of bot admin
@@ -44,33 +50,29 @@ class CombinedEventHandler extends EventHandler
     public const ADMIN = "danogentili"; // Change this
     /**
      * Get peer(s) where to report errors.
-     *
-     * @return int|string|array
      */
     public function getReportPeers()
     {
+        // Can also return a different report peer depending on the ID returned by $this->getSelf()...
         return [self::ADMIN];
     }
-    /**
-     * Handle updates from supergroups and channels.
-     *
-     * @param array $update Update
-     */
-    public function onUpdateNewChannelMessage(array $update)
+
+    public function onStart(): void
     {
-        return $this->onUpdateNewMessage($update);
     }
+
     /**
-     * Handle updates from users.
-     *
-     * @param array $update Update
+     * Handle incoming updates from users, chats and channels.
      */
-    public function onUpdateNewMessage(array $update): void
+    #[Handler]
+    public function handleMessage(Incoming&Message $message): void
     {
-        if ($update['message']['_'] === 'messageEmpty' || $update['message']['out'] ?? false) {
-            return;
-        }
-        $this->logger($update);
+        // Code that uses $message...
+        // See the following pages for more examples and documentation:
+        // - https://github.com/danog/MadelineProto/blob/v8/examples/bot.php
+        // - https://docs.madelineproto.xyz/docs/UPDATES.html
+        // - https://docs.madelineproto.xyz/docs/FILTERS.html
+        // - https://docs.madelineproto.xyz/
     }
 }
 

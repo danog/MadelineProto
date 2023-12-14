@@ -27,8 +27,10 @@ use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
+use Amp\Future\UnhandledFutureError;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
+use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
@@ -1544,6 +1546,32 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
         }
         return $warning;
+    }
+
+    /** @internal */
+    public function rethrowInner(\Throwable $e, bool $now = false): void
+    {
+        if ($e instanceof UnhandledFutureError) {
+            $e = $e->getPrevious();
+            \assert($e !== null);
+        }
+        if ($e instanceof SecurityException || $e instanceof SignalException) {
+            if ($now) {
+                throw $e;
+            }
+            AsyncTools::rethrow($e);
+            return;
+        }
+        if (str_starts_with($e->getMessage(), 'Could not connect to DC ')) {
+            if ($now) {
+                throw $e;
+            }
+            AsyncTools::rethrow($e);
+            return;
+        }
+        echo $e;
+        $this->wrapper->logger((string) $e, Logger::FATAL_ERROR);
+        $this->report("Surfaced: $e");
     }
 
     /**

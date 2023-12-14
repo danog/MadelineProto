@@ -114,7 +114,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
         $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
         if ($this->encrypted = isset($rawMedia['iv'])) {
-            $this->thumb = $rawMedia['thumb'] ?? null;
+            $thumb = $rawMedia['thumb'] ?? null;
+            $this->thumb = \is_string($thumb) ? new Bytes($thumb) : $thumb;
             $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
             $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
         } else {

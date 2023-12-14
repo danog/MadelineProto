@@ -24,9 +24,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use AssertionError;
-use Closure;
 use danog\Loop\PeriodicLoop;
-use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
@@ -142,12 +140,13 @@ abstract class EventHandler extends AbstractAPI
                 $this->setReportPeers($this->getReportPeers());
             }
             if (method_exists($this, 'onStart')) {
-                $r = $this->onStart();
-                if ($r instanceof Generator) {
-                    throw new AssertionError("Yield cannot be used in onStart!");
-                }
-                if ($r instanceof Future) {
-                    $r = $r->await();
+                try {
+                    $r = $this->onStart();
+                    if ($r instanceof Generator) {
+                        throw new AssertionError("Yield cannot be used in onStart!");
+                    }
+                } catch (\Throwable $e) {
+                    $this->wrapper->getAPI()->rethrowInner($e, true);
                 }
             }
             if ($main) {
@@ -161,9 +160,6 @@ abstract class EventHandler extends AbstractAPI
             $methods = [];
             $handlers = [];
             $has_any = false;
-            $basic_handler = static function (array|Progress $update, Closure $closure): void {
-                $closure($update);
-            };
             foreach ((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC) as $methodRefl) {
                 $method = $methodRefl->getName();
                 if ($method === 'onAny') {
@@ -179,9 +175,7 @@ abstract class EventHandler extends AbstractAPI
                     || $method_name === 'updateNewOutgoingEncryptedMessage'
                 ) {
                     $methods[$method_name] = [
-                        static function (array|Progress $update) use ($basic_handler, $closure): void {
-                            EventLoop::queue($basic_handler, $update, $closure);
-                        },
+                        $closure,
                     ];
                     continue;
                 }
@@ -222,11 +216,9 @@ abstract class EventHandler extends AbstractAPI
                     throw new AssertionError("Please extend SimpleEventHandler to use filters!");
                 }
                 $handlers []= static function (Update $update) use ($closure, $filter): void {
-                    EventLoop::queue(static function () use ($closure, $filter, $update): void {
-                        if ($filter->apply($update)) {
-                            $closure($update);
-                        }
-                    });
+                    if ($filter->apply($update)) {
+                        $closure($update);
+                    }
                 };
             }
             if ($this instanceof SimpleEventHandler) {
@@ -243,9 +235,7 @@ abstract class EventHandler extends AbstractAPI
             }
             if ($has_any) {
                 /** @psalm-suppress UndefinedMethod */
-                $onAny = function (array $update): void {
-                    EventLoop::queue($this->onAny(...), $update);
-                };
+                $onAny = $this->onAny(...);
                 foreach ($constructors->by_id as $constructor) {
                     if ($constructor['type'] === 'Update' && !isset($methods[$constructor['predicate']])) {
                         $methods[$constructor['predicate']] = [$onAny];
@@ -483,7 +473,11 @@ abstract class EventHandler extends AbstractAPI
     public function __destruct()
     {
         if (method_exists($this, 'onStop')) {
-            $this->onStop();
+            try {
+                $this->onStop();
+            } catch (\Throwable $e) {
+                $this->wrapper->getAPI()->rethrowInner($e);
+            }
         }
     }
 }

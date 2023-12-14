@@ -199,7 +199,7 @@ trait UpdateHandler
             $obj = $this->wrapUpdate($update);
             if ($obj !== null) {
                 foreach ($this->eventHandlerHandlers as $closure) {
-                    $closure($obj);
+                    EventLoop::queue($this->rethrowHandler, $closure, $obj);
                 }
             }
         }
@@ -208,8 +208,17 @@ trait UpdateHandler
         }
         if (isset($this->eventHandlerMethods[$updateType])) {
             foreach ($this->eventHandlerMethods[$updateType] as $closure) {
-                $closure($update);
+                EventLoop::queue($this->rethrowHandler, $closure, $update);
             }
+        }
+    }
+
+    private function rethrowUpdateHandler(\Closure $closure, mixed $update): void
+    {
+        try {
+            $closure($update);
+        } catch (\Throwable $e) {
+            $this->rethrowInner($e);
         }
     }
 

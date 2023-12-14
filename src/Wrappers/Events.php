@@ -57,6 +57,7 @@ trait Events
      * @var array<string, callable>
      */
     private array $eventHandlerMethods = [];
+    private \Closure $rethrowHandler;
     /**
      * Event handler handler list.
      *
@@ -94,6 +95,7 @@ trait Events
             // Already started event handler
             return;
         }
+        $this->rethrowHandler = $this->rethrowUpdateHandler(...);
         [$this->eventHandlerMethods, $this->eventHandlerHandlers] = $methods;
         $this->pluginInstances = $pluginsNew;
 

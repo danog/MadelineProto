@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\Loop;
-use danog\MadelineProto\AsyncTools;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
@@ -97,7 +96,7 @@ final class FeedLoop extends Loop
             try {
                 $this->API->saveUpdate($update);
             } catch (\Throwable $e) {
-                AsyncTools::rethrow($e);
+                $this->API->rethrowInner($e);
             }
         }
 
