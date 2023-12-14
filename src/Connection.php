@@ -547,9 +547,8 @@ final class Connection
     }
     /**
      * Send an MTProto message.
-     *
      */
-    public function sendMessage(MTProtoOutgoingMessage $message, bool $postpone = false): void
+    public function sendMessage(MTProtoOutgoingMessage $message): void
     {
         $message->trySend();
         $promise = $message->getSendPromise();
@@ -572,7 +571,7 @@ final class Connection
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
         if (isset($this->writer)) {
-            $this->writer->resume($postpone);
+            $this->writer->resume();
         }
         $this->connect();
         $promise->await();

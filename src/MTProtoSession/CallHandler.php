@@ -64,9 +64,8 @@ trait CallHandler
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
                     EventLoop::queue(function () use ($datacenter, $message): void {
-                        // Do not postpone, hot path due to DC migration API errors
                         $this->API->datacenter->waitGetConnection($datacenter)
-                            ->sendMessage($message, false);
+                            ->sendMessage($message);
                     });
                 } else {
                     /** @var MTProtoOutgoingMessage */
@@ -74,8 +73,7 @@ trait CallHandler
                     if (!$message->hasSeqNo()) {
                         $this->gotResponseForOutgoingMessage($message);
                     }
-                    // Postpone, cold path due to rare MTProto errors
-                    EventLoop::queue($this->sendMessage(...), $message, true);
+                    EventLoop::queue($this->sendMessage(...), $message);
                 }
             } else {
                 $this->API->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
@@ -122,7 +120,6 @@ trait CallHandler
             $promises = [];
             foreach ($args as $sub) {
                 $sub['queueId'] = $queueId;
-                $sub['postpone'] = true;
                 $sub = $this->API->botAPIToMTProto($sub);
                 $this->methodAbstractions($method, $sub);
                 $promises[] = async($this->methodCallAsyncWrite(...), $method, $sub);
@@ -186,7 +183,7 @@ trait CallHandler
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);
         }
-        $this->sendMessage($message, (bool) ($args['postpone'] ?? false));
+        $this->sendMessage($message);
         $this->checker->resume();
         return new WrappedFuture($response->getFuture());
     }
@@ -207,7 +204,6 @@ trait CallHandler
                 unencrypted: false,
                 resultDeferred: $promise
             ),
-            true
         );
     }
 }

@@ -547,7 +547,7 @@ final class DataCenterConnection implements JsonSerializable
             }
             if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
                 $this->API->logger("Resending $message to DC {$this->datacenter}");
-                EventLoop::queue($this->getConnection()->sendMessage(...), $message, true);
+                EventLoop::queue($this->getConnection()->sendMessage(...), $message);
             } else {
                 $this->API->logger("Dropping $message to DC {$this->datacenter}");
             }

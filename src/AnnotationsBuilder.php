@@ -365,9 +365,7 @@ final class Blacklist {
         }
         $contents .= "     * @param ?int \$floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self\n";
         $signature []= "?int \$floodWaitLimit = null";
-        $contents .= "     * @param bool \$postpone If true, will postpone execution of this method, bundling all queued in a single container for higher efficiency. Will not return until the method is queued and a response is received, so this should be used in combination with \\Amp\\async.\n";
-        $signature []= "bool \$postpone = false";
-        $contents .= "     * @param ?string \$queueId If specified, ensures strict execution order of postponed calls with the same queue ID.\n";
+        $contents .= "     * @param ?string \$queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.\n";
         $signature []= "?string \$queueId = null";
         $contents .= "     * @param ?\\Amp\\Cancellation \$cancellation Cancellation\n";
         $signature []= "?\\Amp\\Cancellation \$cancellation = null";

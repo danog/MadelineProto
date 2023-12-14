@@ -723,16 +723,6 @@
       <code>SecretMessage</code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="src/EventHandler/Participant/Banned.php">
-    <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
-    </PossiblyNullPropertyAssignmentValue>
-  </file>
-  <file src="src/EventHandler/Participant/Left.php">
-    <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$API->getIdInternal($rawParticipant['peer'])]]></code>
-    </PossiblyNullPropertyAssignmentValue>
-  </file>
   <file src="src/EventHandler/Pinned.php">
     <PossiblyNullPropertyAssignmentValue>
       <code><![CDATA[$API->getIdInternal($rawPinned)]]></code>
@@ -1460,6 +1450,7 @@
       <code>$msgId</code>
       <code>$msgId</code>
       <code>$msgId</code>
+      <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
