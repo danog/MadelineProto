@@ -822,7 +822,7 @@ abstract class InternalDoc
     /**
      * Get full info of all dialogs.
      *
-     * Bots should use getDialogs or getDialogIds, instead.
+     * Bots should use getDialogIds, instead.
      *
      * @return array<int, array>
      */
