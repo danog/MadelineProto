@@ -8,33 +8,32 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2023 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Participant;
+namespace danog\MadelineProto\EventHandler\Filter;
 
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\EventHandler\Participant;
+use Attribute;
+use Webmozart\Assert\Assert;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
- * A participant that left the channel/supergroup.
+ * Allow only messages with a specific topic id (Supergroups only).
  */
-final class Left extends Participant
+#[Attribute(Attribute::TARGET_METHOD)]
+final class FilterTopicId extends Filter
 {
-    /** The peer that left */
-    public readonly int $peer;
-
-    /** @internal */
-    public function __construct(array $rawParticipant)
+    public function __construct(
+        private readonly int $topicId
+    ) {
+        Assert::greaterThan($topicId, 0);
+    }
+    public function apply(Update $update): bool
     {
-        $rawParticipant = $rawParticipant['peer'];
-        $this->peer = match ($rawParticipant['_']) {
-            'peerUser' => $rawParticipant['user_id'],
-            'peerChat' => -$rawParticipant['chat_id'],
-            'peerChannel' => DialogId::fromSupergroupOrChannel($rawParticipant['channel_id']),
-        };
+        return ($update instanceof Message && $update->topicId === $this->topicId);
     }
 }

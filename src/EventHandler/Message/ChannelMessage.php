@@ -17,15 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Participant\Admin;
-use danog\MadelineProto\EventHandler\Participant\Banned;
-use danog\MadelineProto\EventHandler\Participant\Creator;
-use danog\MadelineProto\EventHandler\Participant\Left;
-use danog\MadelineProto\EventHandler\Participant\Member;
-use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\MTProto;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -110,16 +104,7 @@ final class ChannelMessage extends Message
                 'participant' => $member,
             ]
         )['participant'];
-
-        return match ($result['_']) {
-            'channelParticipant' => new Member($result),
-            'channelParticipantLeft' => new Left($client, $result),
-            'channelParticipantSelf' => new MySelf($result),
-            'channelParticipantAdmin' => new Admin($result),
-            'channelParticipantBanned' => new Banned($client, $result),
-            'channelParticipantCreator' => new Creator($result),
-            default => throw new AssertionError("undefined Participant type: {$result['_']}")
-        };
+        return Participant::fromRawParticipant($result);
     }
 
     /**

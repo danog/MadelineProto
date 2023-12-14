@@ -29,6 +29,7 @@ use Amp\TimeoutException;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
 use danog\MadelineProto\EventHandler\Channel\MessageForwards;
 use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
 use danog\MadelineProto\EventHandler\Channel\UpdateChannel;
@@ -423,6 +424,7 @@ trait UpdateHandler
                 'updateChannel'                 => new UpdateChannel($this, $update),
                 'updateChannelMessageViews'     => new MessageViewsChanged($this, $update),
                 'updateChannelMessageForwards'  => new MessageForwards($this, $update),
+                'updateChannelParticipant'      => new ChannelParticipant($this, $update),
                 'updateDeleteMessages'          => new DeleteMessages($this, $update),
                 'updateDeleteChannelMessages'   => new DeleteChannelMessages($this, $update),
                 'updateDeleteScheduledMessages' => new DeleteScheduledMessages($this, $update),
