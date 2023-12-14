@@ -523,7 +523,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFavedStickers.html" name="messages.getFavedStickers">Get faved stickers: messages.getFavedStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFeaturedStickers.html" name="messages.getFeaturedStickers">Get featured stickers: messages.getFeaturedStickers</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#end-t-what-t" name="end">Get final element of array: end</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getfolderid-mixed-id-int" name="getFolderId">Get folder ID from object: getFolderId</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDialogFilters.html" name="messages.getDialogFilters">Get folders: messages.getDialogFilters</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopicsByID.html" name="channels.getForumTopicsByID">Get forum topics by their ID: channels.getForumTopicsByID</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getallmethods-array" name="getAllMethods">Get full list of MTProto and API methods: getAllMethods</a>
