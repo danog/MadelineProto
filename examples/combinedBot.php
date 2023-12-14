@@ -36,9 +36,6 @@ if (file_exists('vendor/autoload.php')) {
     include 'madeline.php';
 }
 
-class SecretHandler extends SimpleEventHandler
-{
-}
 /**
  * Combined multiaccount event handler class.
  */

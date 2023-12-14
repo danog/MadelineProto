@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="dev-master@a75d26a3d425d183da8bef37cfc14976c8d817d6">
+  <file src="examples/bot.php">
+    <LessSpecificImplementedReturnType>
+      <code>int|string|array</code>
+    </LessSpecificImplementedReturnType>
+    <MissingFile>
+      <code><![CDATA[require_once 'madeline.php']]></code>
+    </MissingFile>
+    <PossiblyNullArrayAccess>
+      <code><![CDATA[$message->matches[1]]]></code>
+    </PossiblyNullArrayAccess>
+    <PossiblyNullPropertyFetch>
+      <code><![CDATA[$reply->media]]></code>
+    </PossiblyNullPropertyFetch>
+    <PossiblyNullReference>
+      <code>addReaction</code>
+      <code>delReaction</code>
+      <code>getDownloadLink</code>
+      <code>reply</code>
+    </PossiblyNullReference>
+  </file>
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -371,6 +391,8 @@
     </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>getDbPrefix</code>
+      <code>rethrowInner</code>
+      <code>rethrowInner</code>
     </PossiblyNullReference>
     <PropertyTypeCoercion>
       <code>self::$pluginCache</code>
