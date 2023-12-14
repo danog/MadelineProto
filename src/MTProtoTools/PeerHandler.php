@@ -578,9 +578,6 @@ trait PeerHandler
                     $this->cacheFullDialogs();
                     throw new PeerNotInDbException();
                 }
-                $res['Peer'] = ['_' => 'peerUser', 'user_id' => $constructor['id']];
-                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
-                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['user_id'] = $constructor['id'];
@@ -590,9 +587,6 @@ trait PeerHandler
             case 'chat':
             case 'chatForbidden':
                 $res['InputPeer'] = ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
-                $res['Peer'] = ['_' => 'peerChat', 'chat_id' => $constructor['id']];
-                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
-                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['chat_id'] = $constructor['id'];
@@ -605,9 +599,6 @@ trait PeerHandler
                     throw new PeerNotInDbException();
                 }
                 $res['InputPeer'] = ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
-                $res['Peer'] = ['_' => 'peerChannel', 'channel_id' => $constructor['id']];
-                $res['DialogPeer'] = ['_' => 'dialogPeer', 'peer' => $res['Peer']];
-                $res['NotifyPeer'] = ['_' => 'notifyPeer', 'peer' => $res['Peer']];
                 $res['InputDialogPeer'] = ['_' => 'inputDialogPeer', 'peer' => $res['InputPeer']];
                 $res['InputNotifyPeer'] = ['_' => 'inputNotifyPeer', 'peer' => $res['InputPeer']];
                 $res['InputChannel'] = ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
@@ -621,7 +612,6 @@ trait PeerHandler
                 throw new Exception('Invalid constructor given '.$constructor['_']);
         }
         if ($folder_id) {
-            $res['FolderPeer'] = ['_' => 'folderPeer', 'peer' => $res['Peer'], 'folder_id' => $folder_id];
             $res['InputFolderPeer'] = ['_' => 'inputFolderPeer', 'peer' => $res['InputPeer'], 'folder_id' => $folder_id];
         }
         return $res;

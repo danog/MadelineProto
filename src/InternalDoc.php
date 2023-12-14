@@ -745,15 +745,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getDialogIds();
     }
     /**
-     * Get dialog peers.
-     *
-     * @return list<array>
-     */
-    public function getDialogs(): array
-    {
-        return $this->wrapper->getAPI()->getDialogs();
-    }
-    /**
      * Get download info of file
      * Returns an array with the following structure:.
      *

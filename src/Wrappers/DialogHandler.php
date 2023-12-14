@@ -143,31 +143,6 @@ trait DialogHandler
         return array_keys($this->getFullDialogs());
     }
     /**
-     * Get dialog peers.
-     *
-     * @return list<array>
-     */
-    public function getDialogs(): array
-    {
-        if ($this->authorization['user']['bot']) {
-            $this->cacheAllBotUsers();
-            $res = [];
-            foreach ($this->peerDatabase->getDialogs() as $chat) {
-                try {
-                    $res[] = $this->genAll($chat, null, \danog\MadelineProto\API::INFO_TYPE_ALL)['Peer'];
-                } catch (Throwable $e) {
-                    continue;
-                }
-            }
-            return $res;
-        }
-        $res = [];
-        foreach ($this->getFullDialogs() as $dialog) {
-            $res[] = $dialog['peer'];
-        }
-        return $res;
-    }
-    /**
      * Get full info of all dialogs.
      *
      * Bots should use getDialogs or getDialogIds, instead.

@@ -344,8 +344,7 @@ trait UpdateHandler
         if (!isset($message['peer_id'])) {
             return true;
         }
-        // TODO: remove this once migration of the cache is done
-        $peer_id = $this->getIdInternal($message['peer_id']);
+        $peer_id = $message['peer_id'];
         $message_id = $message['id'];
         if (!isset($this->msg_ids[$peer_id]) || $message_id > $this->msg_ids[$peer_id]) {
             $this->msg_ids[$peer_id] = $message_id;
@@ -955,16 +954,8 @@ trait UpdateHandler
                 }
                 $message = $updates;
                 $message['_'] = 'message';
-                try {
-                    $message['from_id'] = ($this->getInfo($from_id))['Peer'];
-                    $message['peer_id'] = ($this->getInfo($to_id))['Peer'];
-                } catch (Exception $e) {
-                    $this->logger->logger('Still did not get user in database, postponing update', Logger::ERROR);
-                    break;
-                } catch (RPCErrorException $e) {
-                    $this->logger->logger('Still did not get user in database, postponing update', Logger::ERROR);
-                    break;
-                }
+                $message['from_id'] = $from_id;
+                $message['peer_id'] = $to_id;
                 $this->populateMessageFlags($message);
                 $update = ['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']];
                 $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)]->resume();
