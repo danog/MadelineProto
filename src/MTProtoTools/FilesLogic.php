@@ -59,6 +59,7 @@ use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
+use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\File\exists;
 
 use function Amp\File\getSize;
@@ -130,7 +131,7 @@ trait FilesLogic
                 ob_implicit_flush();
             }
             [$start, $end] = $result->getServeRange();
-            $this->downloadToStream($messageMedia, fopen('php://output', 'w'), $cb, $start, $end, $cancellation);
+            $this->downloadToStream($messageMedia, getOutputBufferStream(), $cb, $start, $end, $cancellation);
         }
     }
     /**
