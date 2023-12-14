@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * A participant has left, joined, was banned or admined in a [channel or supergroup](https://core.telegram.org/api/channel).
@@ -38,7 +38,7 @@ final class ChannelParticipant extends Update
 
     /** User that triggered the change (inviter, admin that kicked the user, or the even the userId itself) */
     public readonly int $actorId;
-    
+
     /** User that was affected by the change */
     public readonly int $userId;
 

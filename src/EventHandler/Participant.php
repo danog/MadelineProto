@@ -17,15 +17,15 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
-use ReflectionClass;
-use ReflectionProperty;
-use JsonSerializable;
-use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Banned;
+use danog\MadelineProto\EventHandler\Participant\Creator;
+use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\EventHandler\Participant\Creator;
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Info about a channel participant.
@@ -34,8 +34,7 @@ abstract class Participant implements JsonSerializable
 {
     public static function fromRawParticipant(array $rawParticipant): self
     {
-        return match ($rawParticipant['_'])
-        {
+        return match ($rawParticipant['_']) {
             'channelParticipant'        => new Member($rawParticipant),
             'channelParticipantLeft'    => new Left($rawParticipant),
             'channelParticipantSelf'    => new MySelf($rawParticipant),

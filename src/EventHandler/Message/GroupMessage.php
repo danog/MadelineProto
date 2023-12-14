@@ -17,14 +17,14 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
-use Webmozart\Assert\Assert;
-use Webmozart\Assert\InvalidArgumentException;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Topic\IconColor;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
+use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Topic\IconColor;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Represents an incoming or outgoing group message.

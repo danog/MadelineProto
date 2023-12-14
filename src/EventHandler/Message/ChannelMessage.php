@@ -17,9 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use AssertionError;
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\MTProto;
 
 /**
  * Represents an incoming or outgoing channel message.

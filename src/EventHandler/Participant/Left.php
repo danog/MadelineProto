@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler\Participant;
 
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * A participant that left the channel/supergroup.

@@ -16,9 +16,9 @@
 
 namespace danog\MadelineProto\EventHandler\Participant;
 
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Rights\Banned as BannedRights;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * Banned/kicked user.

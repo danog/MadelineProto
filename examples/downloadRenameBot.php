@@ -16,25 +16,25 @@
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
-use League\Uri\Uri;
-use League\Uri\Contracts\UriException;
 use danog\MadelineProto\API;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Settings;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\FileCallback;
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\SimpleEventHandler;
-use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\EventHandler\CommandType;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\CommandType;
+use danog\MadelineProto\EventHandler\Filter\Combinator\FilterNot;
+use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
-use danog\MadelineProto\EventHandler\Filter\FilterCommand;
-use danog\MadelineProto\EventHandler\Filter\Combinator\FilterNot;
+use danog\MadelineProto\FileCallback;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Settings;
+use danog\MadelineProto\SimpleEventHandler;
+use League\Uri\Contracts\UriException;
+use League\Uri\Uri;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -91,29 +91,29 @@ class MyEventHandler extends SimpleEventHandler
     private array $states = [];
 
     /**
-     * Start
+     * Start.
      */
     #[FilterCommand('start', [CommandType::SLASH])]
-    public function cmdStart(PrivateMessage&Incoming&IsNotEdited $message)
+    public function cmdStart(PrivateMessage&Incoming&IsNotEdited $message): void
     {
         $message->reply(self::START, ParseMode::MARKDOWN);
     }
 
     /**
-     * Save user file
+     * Save user file.
      */
     #[Handler]
-    public function cmdSaveState(PrivateMessage&Incoming&HasMedia&IsNotEdited $message)
+    public function cmdSaveState(PrivateMessage&Incoming&HasMedia&IsNotEdited $message): void
     {
         $message->reply('Give me a new name for this file: ', ParseMode::MARKDOWN);
         $this->states[$message->chatId] = $message->media;
     }
 
     /**
-     * Upload an url
+     * Upload an url.
      */
     #[FilterCommand('upload', [CommandType::SLASH])]
-    public function cmdUrl(PrivateMessage&Incoming&IsNotEdited $message)
+    public function cmdUrl(PrivateMessage&Incoming&IsNotEdited $message): void
     {
         $url  = $message->commandArgs[0];
         $name = $message->commandArgs[1] ?? basename($url);
@@ -127,10 +127,10 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     /**
-     * Change file name
+     * Change file name.
      */
     #[FilterNot(new FilterCommand('upload', [CommandType::SLASH]))]
-    public function cmdNameFile(PrivateMessage&Incoming&IsNotEdited $message)
+    public function cmdNameFile(PrivateMessage&Incoming&IsNotEdited $message): void
     {
         if (isset($this->states[$message->chatId])) {
             $name = $message->message;
@@ -140,22 +140,24 @@ class MyEventHandler extends SimpleEventHandler
         }
     }
 
-    private function cmdUpload(Media|RemoteUrl $file, string $name, PrivateMessage $message)
+    private function cmdUpload(Media|RemoteUrl $file, string $name, PrivateMessage $message): void
     {
         try {
             $sent = $message->reply('Preparing...');
             $file = new FileCallback(
                 $file,
-                function ($progress, $speed, $time) use ($sent) {
+                static function ($progress, $speed, $time) use ($sent): void {
                     static $prev = 0;
                     $now = time();
-                    if ($now - $prev < 10 && $progress < 100)
+                    if ($now - $prev < 10 && $progress < 100) {
                         return;
+                    }
 
                     $prev = $now;
                     try {
                         $sent->editText("Upload progress: $progress%\nSpeed: $speed mbps\nTime elapsed since start: $time");
-                    } catch (RPCErrorException $e) {}
+                    } catch (RPCErrorException $e) {
+                    }
                 },
             );
             $this->messages->sendMedia(
