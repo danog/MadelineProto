@@ -47,6 +47,7 @@ class Exception extends \Exception
         }
         parent::__construct($message, $code, $previous);
         if (!str_contains($message, 'socket_accept')
+            && $message !== 'Client backtrace'
             && !\in_array(basename($this->file), ['PKCS8.php', 'PSS.php'], true)
         ) {
             Logger::log($message.' in '.basename($this->file).':'.$this->line, Logger::FATAL_ERROR);

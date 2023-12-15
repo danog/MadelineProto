@@ -16,10 +16,8 @@
 
 namespace danog\MadelineProto\Ipc;
 
-use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\TL\Exception;
-use ReflectionObject;
-use RuntimeException;
+use danog\MadelineProto\Exception as MadelineProtoException;
+use ReflectionClass;
 use Throwable;
 
 use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThrowableBacktrace;
@@ -29,75 +27,66 @@ use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThr
  */
 final class ExitFailure
 {
+    /** @var class-string<\Throwable> */
     private string $type;
 
-    private string $message;
-
-    private string $file;
-
-    private int $line;
-
-    private int|string $code;
-
-    /** @var list<array<non-empty-string, list<scalar>|scalar>> */
-    private array $trace;
-
-    private ?string $tlTrace = null;
+    private array $props;
 
     private ?self $previous = null;
-
-    private ?string $localized = null;
 
     public function __construct(Throwable $exception)
     {
         $this->type = $exception::class;
-        $this->message = $exception->getMessage();
-        $this->code = $exception->getCode();
-        $this->file = $exception->getFile();
-        $this->line = $exception->getLine();
-        $this->trace = ContextFlattenThrowableBacktrace($exception);
-        if (method_exists($exception, 'getTLTrace')) {
-            $this->tlTrace = $exception->getTLTrace();
-        }
+        $props = [];
+        $f = new ReflectionClass($exception);
+        do {
+            foreach ($f->getProperties() as $prop) {
+                if ($prop->isStatic()) {
+                    continue;
+                }
+                $value = $prop->getValue($exception);
+                if ($prop->getName() === 'trace' && \is_array($value)) {
+                    $value = ContextFlattenThrowableBacktrace($exception);
+                } elseif ($prop->getName() === 'previous' && $value instanceof \Throwable) {
+                    $value = new self($value);
+                }
+                $props[$f->getName()][$prop->getName()] = $value;
+            }
+        } while ($f = $f->getParentClass());
 
-        if ($exception instanceof RPCErrorException) {
-            $this->localized = $exception->getLocalization();
-        }
-
-        if ($previous = $exception->getPrevious()) {
-            $this->previous = new self($previous);
-        }
+        $this->props = $props;
     }
 
     public function getException(): object
     {
-        $previous = $this->previous ? $this->previous->getException() : null;
+        $prev = new MadelineProtoException("Client backtrace");
 
-        try {
-            if ($this->type === Exception::class) {
-                $exception = new $this->type($this->message);
-            } else {
-                $exception = new $this->type($this->message, $this->code, $previous);
+        $refl = new \ReflectionClass($this->type);
+        $exception = $refl->newInstanceWithoutConstructor();
+
+        $props = $this->props;
+        $props[\Exception::class]['previous'] = $this->previous?->getException();
+
+        foreach ($props as $class => $subprops) {
+            $class = new ReflectionClass($class);
+            foreach ($subprops as $key => $value) {
+                if ($key === 'previous') {
+                    if ($value instanceof self) {
+                        $value = $value->getException();
+                    } elseif ($value === null) {
+                        $value = $prev;
+                    }
+                } elseif ($key === 'tlTrace') {
+                    $value = "$value\n\nClient TL trace:".$prev->getTLTrace();
+                }
+                try {
+                    $key = $refl->getProperty($key);
+                    $key->setValue($exception, $value);
+                } catch (\Throwable) {
+                }
             }
-        } catch (Throwable $e) {
-            $exception = new RuntimeException($this->message, $this->code, $previous);
         }
 
-        $refl = new ReflectionObject($exception);
-        foreach (['trace', 'line', 'file'] as $prop) {
-            try {
-                $trace = $refl->getProperty($prop);
-                $trace->setValue($exception, $this->{$prop});
-            } catch (Throwable) {
-            }
-        }
-
-        if ($this->tlTrace && method_exists($exception, 'setTLTrace')) {
-            $exception->setTLTrace($this->tlTrace);
-        }
-        if ($this->localized && method_exists($exception, 'setLocalization')) {
-            $exception->setLocalization($this->localized);
-        }
         return $exception;
     }
 }
