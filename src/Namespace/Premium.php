@@ -12,13 +12,14 @@ interface Premium
     /**
      *
      *
+     * @param bool $gifts
      * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id: int, giveaway_msg_id: int, date: int, expires: int, used_gift_slug: string, multiplier: int}>, next_offset: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
+     * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id?: int, giveaway_msg_id?: int, date: int, expires: int, used_gift_slug?: string, multiplier?: int}>, next_offset?: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
      */
-    public function getBoostsList(bool|null $gifts = false, array|int|string|null $peer = null, string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getBoostsList(bool|null $gifts = null, array|int|string|null $peer = null, string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      *
@@ -26,21 +27,21 @@ interface Premium
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
+     * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date?: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
      */
     public function getMyBoosts(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      *
      *
-     * @param list<int>|array<never, never> $slots
+     * @param list<int> $slots
      * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
+     * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date?: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
      */
-    public function applyBoost(array $slots = [], array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function applyBoost(array|null $slots = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      *
@@ -49,7 +50,7 @@ interface Premium
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'premium.boostsStatus', my_boost: bool, level: int, current_level_boosts: int, boosts: int, gift_boosts: int, next_level_boosts: int, premium_audience?: array{_: 'statsPercentValue', part: float, total: float}, boost_url: string, prepaid_giveaways: list<array{_: 'prepaidGiveaway', id: int, months: int, quantity: int, date: int}>, my_boost_slots: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsStatus.html
+     * @return array{_: 'premium.boostsStatus', my_boost: bool, level: int, current_level_boosts: int, boosts: int, gift_boosts?: int, next_level_boosts?: int, premium_audience?: array{_: 'statsPercentValue', part: float, total: float}, boost_url: string, prepaid_giveaways?: list<array{_: 'prepaidGiveaway', id: int, months: int, quantity: int, date: int}>, my_boost_slots?: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsStatus.html
      */
     public function getBoostsStatus(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -61,7 +62,7 @@ interface Premium
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id: int, giveaway_msg_id: int, date: int, expires: int, used_gift_slug: string, multiplier: int}>, next_offset: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
+     * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id?: int, giveaway_msg_id?: int, date: int, expires: int, used_gift_slug?: string, multiplier?: int}>, next_offset?: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
      */
     public function getUserBoosts(array|int|string|null $peer = null, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

@@ -18,7 +18,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<int>
      */
-    public function getContactIDs(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function getContactIDs(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Returns the list of contact statuses.
@@ -28,7 +28,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'contactStatus', user_id: int, status: array{_: 'userStatusEmpty'}|array{_: 'userStatusOnline', expires: int}|array{_: 'userStatusOffline', was_online: int}|array{_: 'userStatusRecently'}|array{_: 'userStatusLastWeek'}|array{_: 'userStatusLastMonth'}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/ContactStatus.html
      */
-    public function getStatuses(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function getStatuses(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Returns the current user's contact list.
@@ -78,26 +78,29 @@ interface Contacts
     /**
      * Adds the user to the blacklist.
      *
+     * @param bool $my_stories_from
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function block(bool|null $my_stories_from = false, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function block(bool|null $my_stories_from = null, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Deletes the user from the blacklist.
      *
+     * @param bool $my_stories_from
      * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function unblock(bool|null $my_stories_from = false, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function unblock(bool|null $my_stories_from = null, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Returns the list of blocked users.
      *
+     * @param bool $my_stories_from
      * @param int $offset The number of list elements to be skipped
      * @param int $limit The number of list elements to be returned
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -105,7 +108,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'contacts.blocked', blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.blockedSlice', count: int, blocked: list<array{_: 'peerBlocked', peer_id: array|int|string, date: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.Blocked.html
      */
-    public function getBlocked(bool|null $my_stories_from = false, int|null $offset = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getBlocked(bool|null $my_stories_from = null, int|null $offset = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Returns users found by username substring.
@@ -138,7 +141,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'contacts.topPeersNotModified'}|array{_: 'contacts.topPeers', categories: list<array{_: 'topPeerCategoryPeers', category: array{_: 'topPeerCategoryBotsPM'}|array{_: 'topPeerCategoryBotsInline'}|array{_: 'topPeerCategoryCorrespondents'}|array{_: 'topPeerCategoryGroups'}|array{_: 'topPeerCategoryChannels'}|array{_: 'topPeerCategoryPhoneCalls'}|array{_: 'topPeerCategoryForwardUsers'}|array{_: 'topPeerCategoryForwardChats'}, count: int, peers: list<array{_: 'topPeer', peer: array|int|string, rating: float}>}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'contacts.topPeersDisabled'} @see https://docs.madelineproto.xyz/API_docs/types/contacts.TopPeers.html
      */
-    public function getTopPeers(bool|null $correspondents = false, bool|null $bots_pm = false, bool|null $bots_inline = false, bool|null $phone_calls = false, bool|null $forward_users = false, bool|null $forward_chats = false, bool|null $groups = false, bool|null $channels = false, int|null $offset = 0, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getTopPeers(bool|null $correspondents = null, bool|null $bots_pm = null, bool|null $bots_inline = null, bool|null $phone_calls = null, bool|null $forward_users = null, bool|null $forward_chats = null, bool|null $groups = null, bool|null $channels = null, int|null $offset = 0, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Reset [rating](https://core.telegram.org/api/top-rating) of top peer.
@@ -168,7 +171,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'savedPhoneContact', phone: string, first_name: string, last_name: string, date: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SavedContact.html
      */
-    public function getSaved(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function getSaved(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Enable/disable [top peers](https://core.telegram.org/api/top-rating).
@@ -195,7 +198,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function addContact(bool|null $add_phone_privacy_exception = false, array|int|string|null $id = null, string|null $first_name = '', string|null $last_name = '', string|null $phone = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function addContact(bool|null $add_phone_privacy_exception = null, array|int|string|null $id = null, string|null $first_name = '', string|null $last_name = '', string|null $phone = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * If the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of a new user allow us to add them as contact, add that user as contact.
@@ -219,7 +222,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function getLocated(bool|null $background = false, array|null $geo_point = null, int|null $self_expires = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getLocated(bool|null $background = null, array|null $geo_point = null, int|null $self_expires = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Stop getting notifications about [thread replies](https://core.telegram.org/api/threads) of a certain user in `@replies`.
@@ -233,7 +236,7 @@ interface Contacts
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function blockFromReplies(bool|null $delete_message = false, bool|null $delete_history = false, bool|null $report_spam = false, int|null $msg_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function blockFromReplies(bool|null $delete_message = null, bool|null $delete_history = null, bool|null $report_spam = null, int|null $msg_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Resolve a phone number to get user info, if their privacy settings allow it.
@@ -280,10 +283,11 @@ interface Contacts
     /**
      *
      *
+     * @param bool $my_stories_from
      * @param list<array|int|string>|array<never, never> $id Array of  @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function setBlocked(bool|null $my_stories_from = false, array $id = [], int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function setBlocked(bool|null $my_stories_from = null, array $id = [], int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

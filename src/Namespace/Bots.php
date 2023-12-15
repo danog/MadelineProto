@@ -65,7 +65,7 @@ interface Bots
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'botCommand', command: string, description: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
      */
-    public function getBotCommands(array $scope, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function getBotCommands(array $scope, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Sets the [menu button action »](https://core.telegram.org/api/bots/menu) for a given user or for all users.
@@ -121,7 +121,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
-    public function setBotInfo(array|int|string|null $bot = null, string|null $lang_code = '', string|null $name = '', string|null $about = '', string|null $description = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function setBotInfo(array|int|string|null $bot = null, string|null $lang_code = '', string|null $name = null, string|null $about = null, string|null $description = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * Get localized name, about text and description of a bot (or of the current account, if called by a bot).

@@ -96,11 +96,11 @@ final class Blacklist {
         }
         return [false, $type];
     }
-    private function prepareTLType(string $type, bool $optional): string
+    private function prepareTLType(string $type, string|int|null $pow): string
     {
         [$isVector, $type] = self::isVector($type);
         if ($isVector) {
-            return $optional ? 'array' : 'array|null';
+            return \is_int($pow) ? 'array|null' : 'array';
         }
         $type = match ($type) {
             'string' => 'string',
@@ -120,7 +120,7 @@ final class Blacklist {
             'JSONValue' => 'mixed',
             default => $this->special[$type] ?? 'array'
         };
-        if ($type === 'mixed' || !$optional) {
+        if ($type === 'mixed' || !$pow) {
             return $type;
         }
         return $type.'|null';
@@ -304,21 +304,21 @@ final class Blacklist {
                 $param['type'] = 'InputPeer';
             }
             if ($param['name'] === 'hash' && $param['type'] === 'long') {
-                $param['pow'] = 'optional';
+                $param['pow'] ??= 'optional';
                 $param['type'] = 'Vector t';
                 $param['subtype'] = 'int';
             }
             if (\in_array($param['type'], ['int', 'long', 'strlong', 'string', 'bytes'], true)) {
-                $param['pow'] = 'optional';
+                $param['pow'] ??= 'optional';
             }
             $param['array'] = isset($param['subtype']);
             if ($param['array']) {
                 $param['subtype'] = ltrim($param['subtype'], '%');
                 $param['type'] = 'Vector<'.$param['subtype'].'>';
-                $param['pow'] = 'optional';
+                $param['pow'] ??= 'optional';
             }
             if ($this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty')) {
-                $param['pow'] = 'optional';
+                $param['pow'] ??= 'optional';
             }
             $newParams[$param['name']] = $param;
         }
@@ -337,7 +337,7 @@ final class Blacklist {
         $signature = [];
         foreach ($params as $name => $param) {
             if ($name === 'reply_to') {
-                $param['pow'] = true;
+                $param['pow'] ??= 'yes';
                 $contents .= "     * @param int \$reply_to_msg_id ID Of message to reply to\n";
                 $signature []= "int \$reply_to_msg_id = 0";
                 $contents .= "     * @param int \$top_msg_id This field must contain the topic ID only when replying to messages in forum topics different from the \"General\" topic (i.e. reply_to_msg_id is set and reply_to_msg_id != topicID and topicID != 1). \n";
@@ -346,13 +346,18 @@ final class Blacklist {
 
             $description = $this->prepareTLTypeDescription($param['type'], $param['description']);
             $psalmType = $this->prepareTLPsalmType($param['type'], true);
-            $type = $this->prepareTLType($param['type'], isset($param['pow']));
+            $type = $this->prepareTLType($param['type'], $param['pow'] ?? null);
             $param_var = $type.' $'.$name;
             if (isset($param['pow'])) {
-                $param_var .= ' = '.$this->prepareTLDefault($param['type']);
-                $psalmDef = $this->preparePsalmDefault($param['type']);
-                if ($psalmDef === 'array<never, never>') {
-                    $psalmType .= '|'.$psalmDef;
+                if (\is_int($param['pow'])) {
+                    $param_var .= ' = null';
+                    $psalmDef = '|null';
+                } else {
+                    $param_var .= ' = '.$this->prepareTLDefault($param['type']);
+                    $psalmDef = $this->preparePsalmDefault($param['type']);
+                    if ($psalmDef === 'array<never, never>') {
+                        $psalmType .= '|'.$psalmDef;
+                    }
                 }
             }
             $signature []= $param_var;
@@ -400,7 +405,7 @@ final class Blacklist {
             $contents .= "     *\n";
             [$params, $signature] = $this->prepareTLParams($data);
             $contents .= $params;
-            $returnType = $this->prepareTLType($data['type'], isset($data['pow']));
+            $returnType = $this->prepareTLType($data['type'], $data['pow'] ?? null);
             $psalmType = $this->prepareTLPsalmType($data['type'], false);
             $description = $this->prepareTLTypeDescription($data['type'], '');
             $contents .= "     * @return {$psalmType} {$description}\n";

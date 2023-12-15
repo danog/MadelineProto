@@ -18,7 +18,7 @@ interface Chatlists
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'chatlists.exportedChatlistInvite', filter: array{_: 'dialogFilter', contacts: bool, non_contacts: bool, groups: bool, broadcasts: bool, bots: bool, exclude_muted: bool, exclude_read: bool, exclude_archived: bool, id: int, title: string, emoticon: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>, exclude_peers: list<array|int|string>}|array{_: 'dialogFilterDefault'}|array{_: 'dialogFilterChatlist', has_my_invites: bool, id: int, title: string, emoticon: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>}, invite: array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>}} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ExportedChatlistInvite.html
+     * @return array{_: 'chatlists.exportedChatlistInvite', filter: array{_: 'dialogFilter', contacts: bool, non_contacts: bool, groups: bool, broadcasts: bool, bots: bool, exclude_muted: bool, exclude_read: bool, exclude_archived: bool, id: int, title: string, emoticon?: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>, exclude_peers: list<array|int|string>}|array{_: 'dialogFilterDefault'}|array{_: 'dialogFilterChatlist', has_my_invites: bool, id: int, title: string, emoticon?: string, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>}, invite: array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>}} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ExportedChatlistInvite.html
      */
     public function exportChatlistInvite(array $chatlist, string|null $title = '', array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -39,13 +39,13 @@ interface Chatlists
      * @param array{_: 'inputChatlistDialogFilter', filter_id?: int} $chatlist Folder ID @see https://docs.madelineproto.xyz/API_docs/types/InputChatlist.html
      * @param string $slug `slug` obtained from the [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).
      * @param string $title If set, sets a new name for the link
-     * @param list<array|int|string>|array<never, never> $peers Array of If set, changes the list of peers shared with the link @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param list<array|int|string> $peers Array of If set, changes the list of peers shared with the link @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/ExportedChatlistInvite.html
      */
-    public function editExportedInvite(array $chatlist, string|null $slug = '', string|null $title = '', array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function editExportedInvite(array $chatlist, string|null $slug = '', string|null $title = null, array|null $peers = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * List all [chat folder deep links »](https://core.telegram.org/api/links#chat-folder-links) associated to a folder.
@@ -65,7 +65,7 @@ interface Chatlists
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'chatlists.chatlistInviteAlready', filter_id: int, missing_peers: list<array|int|string>, already_peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'chatlists.chatlistInvite', title: string, emoticon: string, peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ChatlistInvite.html
+     * @return array{_: 'chatlists.chatlistInviteAlready', filter_id: int, missing_peers: list<array|int|string>, already_peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'chatlists.chatlistInvite', title: string, emoticon?: string, peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ChatlistInvite.html
      */
     public function checkChatlistInvite(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -123,7 +123,7 @@ interface Chatlists
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array|int|string> Array of  @see https://docs.madelineproto.xyz/API_docs/types/Peer.html
      */
-    public function getLeaveChatlistSuggestions(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function getLeaveChatlistSuggestions(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Delete a folder imported using a [chat folder deep link »](https://core.telegram.org/api/links#chat-folder-links).

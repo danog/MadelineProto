@@ -18,9 +18,9 @@ interface Photos
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function updateProfilePhoto(bool|null $fallback = false, array|int|string|null $bot = null, array|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function updateProfilePhoto(bool|null $fallback = null, array|int|string|null $bot = null, array|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Updates current user profile photo.
@@ -36,9 +36,9 @@ interface Photos
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function uploadProfilePhoto(bool|null $fallback = false, array|int|string|null $bot = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = 0.0, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function uploadProfilePhoto(bool|null $fallback = null, array|int|string|null $bot = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = null, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Deletes profile photos. The method returns a list of successfully deleted photo IDs.
@@ -49,7 +49,7 @@ interface Photos
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<int>
      */
-    public function deletePhotos(array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|null;
+    public function deletePhotos(array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Returns the list of user photos.
@@ -61,7 +61,7 @@ interface Photos
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'photos.photos', photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}>, users: list<array|int|string>}|array{_: 'photos.photosSlice', count: int, photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photos.html
+     * @return array{_: 'photos.photos', photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>}|array{_: 'photos.photosSlice', count: int, photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photos.html
      */
     public function getUserPhotos(array|int|string|null $user_id = null, int|null $offset = 0, int|null $max_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -80,7 +80,7 @@ interface Photos
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
      */
-    public function uploadContactProfilePhoto(bool|null $suggest = false, bool|null $save = false, array|int|string|null $user_id = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = 0.0, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function uploadContactProfilePhoto(bool|null $suggest = null, bool|null $save = null, array|int|string|null $user_id = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = null, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }
