@@ -1110,7 +1110,7 @@ trait Files
             $origCb(100, 0, 0);
             return;
         }
-        $parallel_chunks = $seekable ? $parallel_chunks : 1;
+        $parallel_chunks = $seekable ? $parallel_chunks : 2;
         if ($params) {
             $previous_promise = true;
             $promises = [];

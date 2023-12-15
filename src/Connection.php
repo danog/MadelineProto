@@ -555,16 +555,19 @@ final class Connection
         if (!$message->hasSerializedBody() || $message->shouldRefreshReferences()) {
             $body = $message->getBody();
             if ($message->shouldRefreshReferences()) {
-                $this->API->referenceDatabase->refreshNext(true);
+                $this->API->referenceDatabase->refreshNextEnable();
             }
-            if ($message->isMethod) {
-                $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
-            } else {
-                $body['_'] = $message->constructor;
-                $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->constructor);
-            }
-            if ($message->shouldRefreshReferences()) {
-                $this->API->referenceDatabase->refreshNext(false);
+            try {
+                if ($message->isMethod) {
+                    $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
+                } else {
+                    $body['_'] = $message->constructor;
+                    $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->constructor);
+                }
+            } finally {
+                if ($message->shouldRefreshReferences()) {
+                    $this->API->referenceDatabase->refreshNextDisable();
+                }
             }
             $message->setSerializedBody($body);
             unset($body);

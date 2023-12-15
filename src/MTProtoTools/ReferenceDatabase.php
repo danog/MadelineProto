@@ -441,19 +441,23 @@ final class ReferenceDatabase implements TLCallback
 
         EventLoop::queue($this->flush(...), $location);
     }
-    public function refreshNext(bool $refresh = false): void
+    public function refreshNextEnable(): void
     {
-        if ($this->refreshCount === 1 && !$refresh) {
-            $this->refreshed = [];
-            $this->refreshCount--;
-            $this->refresh = false;
-        } elseif ($this->refreshCount === 0 && $refresh) {
+        if ($this->refreshCount === 0) {
             $this->refreshed = [];
             $this->refreshCount++;
             $this->refresh = true;
-        } elseif ($this->refreshCount === 0 && !$refresh) {
-        } elseif ($refresh) {
+        } else {
             $this->refreshCount++;
+        }
+    }
+    public function refreshNextDisable(): void
+    {
+        if ($this->refreshCount === 1) {
+            $this->refreshed = [];
+            $this->refreshCount--;
+            $this->refresh = false;
+        } elseif ($this->refreshCount === 0) {
         } else {
             $this->refreshCount--;
         }

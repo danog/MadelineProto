@@ -100,8 +100,8 @@
     <PossiblyNullReference>
       <code>getInputClientProxy</code>
       <code>isHttp</code>
-      <code>refreshNext</code>
-      <code>refreshNext</code>
+      <code>refreshNextDisable</code>
+      <code>refreshNextEnable</code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$res['chat_id']]]></code>
@@ -1713,10 +1713,6 @@
     <PossiblyNullArrayOffset>
       <code><![CDATA[$res['participants']]]></code>
     </PossiblyNullArrayOffset>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$partial['InputChannel']]]></code>
-      <code><![CDATA[$partial['InputUser']]]></code>
-    </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/MTProtoTools/ReferenceDatabase.php">
     <PossiblyNullArrayAccess>
@@ -1751,9 +1747,6 @@
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
     </InaccessibleProperty>
-    <InvalidArrayOffset>
-      <code><![CDATA[$info['User']]]></code>
-    </InvalidArrayOffset>
     <MissingReturnType>
       <code>getUpdatesState</code>
       <code>loadUpdateState</code>

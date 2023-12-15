@@ -21,6 +21,8 @@ It can login with a phone number (MTProto API), or with a bot token (MTProto API
 ```php
 <?php
 
+// PHP 8.2+ is required.
+
 if (!file_exists('madeline.php')) {
     copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 }
