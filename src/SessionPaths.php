@@ -45,6 +45,13 @@ use function Amp\File\write;
 final class SessionPaths
 {
     /**
+     * Header for session files.
+     */
+    private const PHP_HEADER = '<?php __HALT_COMPILER();';
+    private const VERSION_OLD = 2;
+    private const VERSION_SERIALIZATION_AWARE = 3;
+
+    /**
      * Session directory path.
      */
     private string $sessionDirectoryPath;
@@ -135,8 +142,8 @@ final class SessionPaths
         try {
             Logger::log("Got exclusive lock of $path.lock...");
 
-            $object = Serialization::PHP_HEADER
-                .\chr(Serialization::VERSION_SERIALIZATION_AWARE)
+            $object = self::PHP_HEADER
+                .\chr(self::VERSION_SERIALIZATION_AWARE)
                 .\chr(PHP_MAJOR_VERSION)
                 .\chr(PHP_MINOR_VERSION)
                 .\chr(Magic::$can_use_igbinary ? 1 : 0)
@@ -165,7 +172,7 @@ final class SessionPaths
         if (!exists($path)) {
             return null;
         }
-        $headerLen = \strlen(Serialization::PHP_HEADER);
+        $headerLen = \strlen(self::PHP_HEADER);
 
         Logger::log("Waiting for shared lock of $path.lock...", Logger::ULTRA_VERBOSE);
         $unlock = Tools::flock("$path.lock", LOCK_SH, 0.1);
@@ -180,7 +187,7 @@ final class SessionPaths
 
             $file->seek($headerLen++);
             $v = \ord($file->read(null, 1));
-            if ($v >= Serialization::VERSION_OLD) {
+            if ($v >= self::VERSION_OLD) {
                 $php = $file->read(null, 2);
                 $major = \ord($php[0]);
                 $minor = \ord($php[1]);
@@ -190,7 +197,7 @@ final class SessionPaths
                 $headerLen += 2;
             }
             $igbinary = false;
-            if ($v >= Serialization::VERSION_SERIALIZATION_AWARE) {
+            if ($v >= self::VERSION_SERIALIZATION_AWARE) {
                 $igbinary = (bool) \ord($file->read(null, 1));
                 if ($igbinary && !Magic::$can_use_igbinary) {
                     throw Exception::extension('igbinary');

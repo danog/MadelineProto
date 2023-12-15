@@ -40,8 +40,13 @@ final class ActionSend implements Action
                     return;
                 }
                 $id = $this->API->extractMessageId($this->API->methodCallAsyncRead(
-                    \is_string($message['media']) || (isset($message['media']['_']) &&
-                        $message['media']['_'] !== 'messageMediaWebPage')
+                    isset($message['media']) && (
+                        \is_string($message['media'])
+                        || (
+                            isset($message['media']['_']) &&
+                            $message['media']['_'] !== 'messageMediaWebPage'
+                        )
+                    )
                         ? 'messages.sendMedia'
                         : 'messages.sendMessage',
                     array_merge($message, ['peer' => $peer, 'floodWaitLimit' => 2*86400, 'cancellation' => $cancellation]),

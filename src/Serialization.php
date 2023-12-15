@@ -48,13 +48,6 @@ use function Amp\Ipc\connect;
 abstract class Serialization
 {
     /**
-     * Header for session files.
-     */
-    public const PHP_HEADER = '<?php __HALT_COMPILER();';
-    public const VERSION_OLD = 2;
-    public const VERSION_SERIALIZATION_AWARE = 3;
-
-    /**
      * Unserialize session.
      *
      * Logic for deserialization is as follows.
