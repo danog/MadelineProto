@@ -17,7 +17,10 @@
 namespace danog\MadelineProto\EventHandler\Query;
 
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\ParseMode;
 
 /** @internal */
@@ -64,5 +67,82 @@ trait ChatTrait
             ],
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    }
+
+    /**
+     * Delete the message.
+     *
+     * @param boolean $revoke Whether to delete the message for all participants of the chat.
+     */
+    public function delete(bool $revoke = true): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            [
+                'channel' => $this->chatId,
+                'id' => [$this->messageId],
+                'revoke' => $revoke,
+            ]
+        );
+    }
+
+    /**
+     * Pin a message.
+     *
+     * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
+     * @param bool $silent    Pin the message silently, without triggering a notification
+     */
+    public function pin(bool $pmOneside = false, bool $silent = false): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.updatePinnedMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->messageId,
+                'pm_oneside' => $pmOneside,
+                'silent' => $silent,
+                'unpin' => false,
+            ]
+        );
+    }
+
+    /**
+     * Unpin a message.
+     *
+     * @param bool $pmOneside Whether the message should only be pinned on the local side of a one-to-one chat
+     * @param bool $silent    Pin the message silently, without triggering a notification
+     */
+    public function unpin(bool $pmOneside = false, bool $silent = false): ?Update
+    {
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.updatePinnedMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->messageId,
+                'pm_oneside' => $pmOneside,
+                'silent' => $silent,
+                'unpin' => true,
+            ]
+        );
+        return $this->getClient()->wrapUpdate($result);
+    }
+
+    /**
+     * Report a message in a chat for violation of telegram’s Terms of Service.
+     *
+     * @param ReportReason $reason  Why are these messages being reported
+     * @param string       $message Comment for report moderation
+     */
+    public function report(ReportReason $reason, string $message): bool
+    {
+        return $this->getClient()->methodCallAsyncRead(
+            'messages.report',
+            [
+                'reason' => ['_' => $reason->value],
+                'message' => $message,
+                'id' => [$this->messageId],
+                'peer' => $this->chatId,
+            ]
+        );
     }
 }
