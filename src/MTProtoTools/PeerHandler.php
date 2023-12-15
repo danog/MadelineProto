@@ -855,7 +855,7 @@ trait PeerHandler
         }
         return $res;
     }
-    private function recurseAlphabetSearchParticipants($channel, $filter, $q, $total_count, &$res, int $depth)
+    private function recurseAlphabetSearchParticipants(int $channel, string $filter, string $q, int $total_count, array &$res, int $depth): array
     {
         if (!($this->fetchParticipants($channel, $filter, $q, $total_count, $res))) {
             return [];
@@ -885,7 +885,7 @@ trait PeerHandler
 
         return [];
     }
-    private function fetchParticipants($channel, $filter, $q, $total_count, &$res)
+    private function fetchParticipants(int $channel, string $filter, string $q, int $total_count, array &$res): bool
     {
         $offset = 0;
         $limit = 200;
@@ -907,6 +907,7 @@ trait PeerHandler
             } else {
                 $this->storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit);
             }
+            \assert($gres !== null);
             if ($last_count !== -1 && $last_count !== $gres['count']) {
                 $has_more = true;
             } else {
@@ -959,7 +960,7 @@ trait PeerHandler
                 });
             }
             await($promises);
-            $h = $hash ? 'present' : 'absent';
+            $h = $hash !== null ? 'present' : 'absent';
             $this->logger->logger('Fetched '.\count($gres['participants'])." channel participants with filter {$filter}, query {$q}, offset {$offset}, limit {$limit}, hash {$h}: ".($cached ? 'cached' : 'not cached').', '.($offset + \count($gres['participants'])).' participants out of '.$gres['count'].', in total fetched '.\count($res['participants']).' out of '.$total_count);
             $offset += \count($gres['participants']);
         } while (\count($gres['participants']));
@@ -975,11 +976,11 @@ trait PeerHandler
     {
         return "$channelId'$filter'$q'$offset'$limit";
     }
-    private function fetchParticipantsCache($channel, $filter, $q, $offset, $limit)
+    private function fetchParticipantsCache(int $channel, string $filter, string $q, int $offset, int $limit): ?array
     {
-        return $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)];
+        return $this->channelParticipants[$this->participantsKey($channel, $filter, $q, $offset, $limit)];
     }
-    private function storeParticipantsCache($gres, $channel, $filter, $q, $offset, $limit): void
+    private function storeParticipantsCache(array $gres, int $channel, string $filter, string $q, int $offset, int $limit): void
     {
         unset($gres['users']);
         $ids = [];
@@ -990,10 +991,10 @@ trait PeerHandler
         }
         sort($ids, SORT_NUMERIC);
         $gres['hash'] = Tools::genVectorHash($ids);
-        $this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)] = $gres;
+        $this->channelParticipants[$this->participantsKey($channel, $filter, $q, $offset, $limit)] = $gres;
     }
-    private function getParticipantsHash($channel, $filter, $q, $offset, $limit)
+    private function getParticipantsHash(int $channel, string $filter, string $q, int $offset, int $limit): ?string
     {
-        return ($this->channelParticipants[$this->participantsKey($channel['channel_id'], $filter, $q, $offset, $limit)])['hash'] ?? 0;
+        return $this->fetchParticipantsCache($channel, $filter, $q, $offset, $limit)['hash'] ?? null;
     }
 }

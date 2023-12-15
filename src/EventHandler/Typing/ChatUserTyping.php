@@ -31,6 +31,6 @@ final class ChatUserTyping extends Typing
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);
-        $this->chatId = $rawTyping['chat_id'];
+        $this->chatId = -$rawTyping['chat_id'];
     }
 }

@@ -555,14 +555,14 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    $message['action']['channel_id'],
+                    DialogId::fromSupergroupOrChannel($message['action']['channel_id']),
                 ),
                 'messageActionChannelMigrateFrom' => new DialogChannelMigrateFrom(
                     $this,
                     $message,
                     $info,
                     $message['action']['title'],
-                    $message['action']['chat_id'],
+                    -$message['action']['chat_id'],
                 ),
                 'messageActionGameScore' => new DialogGameScore(
                     $this,

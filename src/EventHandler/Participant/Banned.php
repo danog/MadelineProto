@@ -18,7 +18,6 @@ namespace danog\MadelineProto\EventHandler\Participant;
 
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Rights\Banned as BannedRights;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * Banned/kicked user.
@@ -48,10 +47,6 @@ final class Banned extends Participant
         $this->kickedBy = $rawParticipant['kicked_by'];
         $this->date = $rawParticipant['date'];
         $this->bannedRights = new BannedRights($rawParticipant['banned_rights']);
-        $this->peer = match ($peer['_']) {
-            'peerUser' => $peer['user_id'],
-            'peerChat' => -$peer['chat_id'],
-            'peerChannel' => DialogId::fromSupergroupOrChannel($peer['channel_id']),
-        };
+        $this->peer = $peer;
     }
 }
