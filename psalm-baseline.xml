@@ -1181,7 +1181,7 @@
       <code>checkPts</code>
       <code>pts</code>
       <code>resume</code>
-      <code>setLimit</code>
+      <code>resume</code>
     </PossiblyNullReference>
   </file>
   <file src="src/Loop/Update/SeqLoop.php">
