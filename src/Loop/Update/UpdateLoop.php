@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
-use Amp\DeferredFuture;
-use AssertionError;
 use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -31,7 +29,6 @@ use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
-use Revolt\EventLoop;
 
 use function Amp\delay;
 
@@ -56,60 +53,24 @@ final class UpdateLoop extends Loop
 
     private ?int $toPts = null;
     /**
-     * Loop name.
-     */
-    private int $channelId;
-    /**
      * Feed loop.
      */
-    private FeedLoop $feeder;
+    private ?FeedLoop $feeder = null;
     /**
      * Constructor.
      */
-    public function __construct(MTProto $API, int $channelId)
+    public function __construct(MTProto $API, private int $channelId)
     {
         $this->init($API);
-        $this->channelId = $channelId;
     }
     public function __sleep(): array
     {
-        return ['channelId', 'feeder', 'API'];
-    }
-    private ?DeferredFuture $done = null;
-    public function resumeAndWait(): void
-    {
-        $i = 0;
-        do {
-            ++$i;
-            $this->API->logger("Queued resume of $this (try $i) to recover gap...", Logger::NOTICE);
-            if ($this->done !== null) {
-                throw new AssertionError("Already waiting in $this!");
-            }
-            if (!$this->isRunning()) {
-                throw new AssertionError("$this is not running!");
-            }
-            $this->done = new DeferredFuture;
-            // Can be false if we're currently running, so wait for it to finish and re-queue.
-            $resumed = $this->resume();
-            $this->done->getFuture()->await();
-        } while (!$resumed);
-        $this->API->logger("Resumed and re-paused $this (try $i) to recover gap!", Logger::NOTICE);
+        return ['channelId', 'API', 'feeder'];
     }
     /**
      * Main loop.
      */
     public function loop(): ?float
-    {
-        try {
-            return $this->loopInner();
-        } finally {
-            if ($this->done !== null) {
-                EventLoop::queue($this->done->complete(...));
-                $this->done = null;
-            }
-        }
-    }
-    private function loopInner(): ?float
     {
         if (!$this->isLoggedIn()) {
             return self::PAUSE;
@@ -122,7 +83,7 @@ final class UpdateLoop extends Loop
         $this->toPts = null;
         while (true) {
             if ($this->channelId) {
-                $this->API->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::VERBOSE);
+                $this->API->logger('Resumed and fetching '.$this->channelId.' difference...', Logger::ULTRA_VERBOSE);
                 if ($state->pts() <= 1) {
                     $limit = 10;
                 } elseif ($this->API->authorization['user']['bot']) {
@@ -160,7 +121,7 @@ final class UpdateLoop extends Loop
                     return self::STOP;
                 }
                 $timeout = min(self::DEFAULT_TIMEOUT, $difference['timeout'] ?? self::DEFAULT_TIMEOUT);
-                $this->API->logger('Got '.$difference['_'], Logger::VERBOSE);
+                $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                 switch ($difference['_']) {
                     case 'updates.channelDifferenceEmpty':
                         $state->update($difference);
@@ -196,7 +157,7 @@ final class UpdateLoop extends Loop
                         throw new Exception('Unrecognized update difference received: '.var_export($difference, true));
                 }
             } else {
-                $this->API->logger('Resumed and fetching normal difference...', Logger::VERBOSE);
+                $this->API->logger('Resumed and fetching normal difference...', Logger::ULTRA_VERBOSE);
                 do {
                     try {
                         $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $this->API->authorized_dc);
@@ -207,7 +168,7 @@ final class UpdateLoop extends Loop
                         }
                     }
                 } while (true);
-                $this->API->logger('Got '.$difference['_'], Logger::VERBOSE);
+                $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
                 $timeout = self::DEFAULT_TIMEOUT;
                 switch ($difference['_']) {
                     case 'updates.differenceEmpty':
@@ -249,11 +210,11 @@ final class UpdateLoop extends Loop
                 }
             }
         }
-        $this->API->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::VERBOSE);
+        $this->API->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
         foreach ($result as $channelId => $_) {
             $this->API->feeders[$channelId]?->resume();
         }
-        $this->API->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::VERBOSE);
+        $this->API->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
 
         return $timeout;
     }

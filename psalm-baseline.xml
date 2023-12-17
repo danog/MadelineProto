@@ -912,17 +912,6 @@
       <code>$server</code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="src/Ipc/ExitFailure.php">
-    <ArgumentTypeCoercion>
-      <code>$previous</code>
-    </ArgumentTypeCoercion>
-    <InvalidStringClass>
-      <code><![CDATA[new $this->type($this->message, $this->code, $previous)]]></code>
-    </InvalidStringClass>
-    <PossiblyInvalidArgument>
-      <code><![CDATA[$this->code]]></code>
-    </PossiblyInvalidArgument>
-  </file>
   <file src="src/Ipc/IpcState.php">
     <LessSpecificReturnStatement>
       <code><![CDATA[$this->exception ? $this->exception->getException() : null]]></code>
@@ -1174,37 +1163,32 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/Loop/Update/FeedLoop.php">
+    <MissingClosureParamType>
+      <code>$msg</code>
+    </MissingClosureParamType>
     <MissingParamType>
       <code>$messages</code>
+      <code>$update</code>
     </MissingParamType>
     <MissingReturnType>
       <code>feed</code>
       <code>feedSingle</code>
     </MissingReturnType>
     <PossiblyInvalidArgument>
-      <code>$update</code>
+      <code><![CDATA[$update['message']]]></code>
     </PossiblyInvalidArgument>
-    <PropertyNotSetInConstructor>
-      <code>$state</code>
-      <code>$updater</code>
-      <code>FeedLoop</code>
-    </PropertyNotSetInConstructor>
+    <PossiblyNullReference>
+      <code>checkPts</code>
+      <code>pts</code>
+      <code>resume</code>
+      <code>setLimit</code>
+    </PossiblyNullReference>
   </file>
   <file src="src/Loop/Update/SeqLoop.php">
-    <InvalidArrayAccess>
-      <code>$options</code>
-      <code>$updates</code>
-    </InvalidArrayAccess>
-    <InvalidArrayOffset>
-      <code><![CDATA[['updates' => $updates, 'options' => $options]]]></code>
-    </InvalidArrayOffset>
     <PossiblyNullReference>
       <code>checkSeq</code>
       <code>feed</code>
     </PossiblyNullReference>
-    <PropertyNotSetInConstructor>
-      <code>SeqLoop</code>
-    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Loop/Update/UpdateLoop.php">
     <DocblockTypeContradiction>
@@ -1268,10 +1252,6 @@
       <code>$difference</code>
       <code>$difference</code>
     </PossiblyUndefinedVariable>
-    <PropertyNotSetInConstructor>
-      <code>$feeder</code>
-      <code>UpdateLoop</code>
-    </PropertyNotSetInConstructor>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->feeders[$channelId]?->resume()]]></code>
     </RedundantConditionGivenDocblockType>
@@ -1309,6 +1289,7 @@
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
+                'InputDialogPeer' => fn (mixed $id): array => ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)],
                 'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password),
             ],
         )]]></code>
@@ -1648,45 +1629,10 @@
     <InvalidArrayOffset>
       <code><![CDATA[$this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum']]]></code>
     </InvalidArrayOffset>
-    <MissingClosureReturnType>
-      <code><![CDATA[function () use ($channel, $filter, $q, $x, $total_count, &$res, $depth) {]]></code>
-    </MissingClosureReturnType>
-    <MissingParamType>
-      <code>$channel</code>
-      <code>$channel</code>
-      <code>$channel</code>
-      <code>$channel</code>
-      <code>$channel</code>
-      <code>$filter</code>
-      <code>$filter</code>
-      <code>$filter</code>
-      <code>$filter</code>
-      <code>$filter</code>
-      <code>$gres</code>
-      <code>$limit</code>
-      <code>$limit</code>
-      <code>$limit</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$offset</code>
-      <code>$q</code>
-      <code>$q</code>
-      <code>$q</code>
-      <code>$q</code>
-      <code>$q</code>
-      <code>$res</code>
-      <code>$res</code>
-      <code>$total_count</code>
-      <code>$total_count</code>
-    </MissingParamType>
     <MissingReturnType>
-      <code>fetchParticipants</code>
-      <code>fetchParticipantsCache</code>
       <code>fwdPeerIsset</code>
       <code>getInputConstructor</code>
       <code>getInputPeer</code>
-      <code>getParticipantsHash</code>
-      <code>recurseAlphabetSearchParticipants</code>
     </MissingReturnType>
     <MoreSpecificReturnType>
       <code>\danog\MadelineProto\API::PEER_TYPE_*</code>
