@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
+use Amp\TimeoutException;
 use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -29,6 +30,7 @@ use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCErrorException;
+use Revolt\EventLoop;
 
 use function Amp\delay;
 
@@ -119,6 +121,9 @@ final class UpdateLoop extends Loop
                     unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
                     $this->API->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
                     return self::STOP;
+                } catch (TimeoutException) {
+                    EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
+                    continue;
                 }
                 $timeout = min(self::DEFAULT_TIMEOUT, $difference['timeout'] ?? self::DEFAULT_TIMEOUT);
                 $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
@@ -166,6 +171,9 @@ final class UpdateLoop extends Loop
                         if ($e->rpc !== '-503') {
                             throw $e;
                         }
+                    } catch (TimeoutException) {
+                        EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
+                        continue;
                     }
                 } while (true);
                 $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);

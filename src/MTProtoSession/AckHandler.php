@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\TimeoutException;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -122,7 +123,7 @@ trait AckHandler
                     continue;
                 }
                 if ($message->getSent() + $dropTimeout < time()) {
-                    $this->handleReject($message, static fn () => new Exception('Request timeout'));
+                    $this->handleReject($message, static fn () => new TimeoutException('Request timeout'));
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
