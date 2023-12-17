@@ -64,6 +64,10 @@ final class SeqLoop extends Loop
         $this->incomingUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
         $this->init($API);
     }
+    public function __sleep()
+    {
+        return ['incomingUpdates', 'feeder', 'pendingWakeups', 'state', 'API'];
+    }
     /**
      * Main loop.
      */

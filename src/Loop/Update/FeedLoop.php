@@ -75,6 +75,10 @@ final class FeedLoop extends Loop
         $this->parsedUpdates->setIteratorMode(SplQueue::IT_MODE_DELETE);
         $this->init($API);
     }
+    public function __sleep()
+    {
+        return ['channelId', 'incomingUpdates', 'parsedUpdates', 'updater', 'state', 'API'];
+    }
     /**
      * Main loop.
      */

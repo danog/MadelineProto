@@ -71,6 +71,10 @@ final class UpdateLoop extends Loop
         $this->init($API);
         $this->channelId = $channelId;
     }
+    public function __sleep(): array
+    {
+        return ['channelId', 'feeder', 'API'];
+    }
     private ?DeferredFuture $done = null;
     public function resumeAndWait(): void
     {
