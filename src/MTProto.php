@@ -1674,6 +1674,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function report(string $message, string $parseMode = ''): void
     {
+        $this->logger->logger("Reporting: $message", Logger::FATAL_ERROR);
         if (!$this->reportDest) {
             return;
         }
