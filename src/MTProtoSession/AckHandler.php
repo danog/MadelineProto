@@ -22,7 +22,6 @@ namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\TimeoutException;
 use danog\MadelineProto\DataCenterConnection;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
