@@ -1836,6 +1836,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
+                'InputDialogPeer' => fn (mixed $id) => ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)],
                 'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password),
             ],
         );

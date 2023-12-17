@@ -74,7 +74,7 @@ final class SeqLoop extends Loop
         }
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
         $this->state = $this->API->loadUpdateState();
-        $this->API->logger("Resumed $this!", Logger::LEVEL_ULTRA_VERBOSE);
+        $this->API->logger("Resumed $this!", Logger::LEVEL_VERBOSE);
 
         while (!$this->incomingUpdates->isEmpty()) {
             $this->parse($this->incomingUpdates);

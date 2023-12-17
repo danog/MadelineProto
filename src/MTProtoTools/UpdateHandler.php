@@ -1056,20 +1056,22 @@ trait UpdateHandler
                 && \in_array($update['message']['action']['_'], ['messageActionChatEditTitle', 'messageActionChatEditPhoto', 'messageActionChatDeletePhoto', 'messageActionChatMigrateTo', 'messageActionChannelMigrateFrom', 'messageActionGroupCall'], true)
             )
         ) {
-            try {
-                $id = $this->getIdInternal($update);
-                \assert($id !== null);
-                $this->refreshPeerCache($id);
-                if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
-                    $this->peerDatabase->expireFull($id);
+            $id = $this->getIdInternal($update);
+            \assert($id !== null);
+            EventLoop::queue(function () use ($id): void {
+                try {
+                    $this->refreshPeerCache($id);
+                    if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
+                        $this->peerDatabase->expireFull($id);
+                    }
+                } catch (PeerNotInDbException) {
+                } catch (FloodWaitError) {
+                } catch (RPCErrorException $e) {
+                    if ($e->rpc !== 'CHANNEL_PRIVATE' && $e->rpc !== 'MSG_ID_INVALID') {
+                        throw $e;
+                    }
                 }
-            } catch (PeerNotInDbException) {
-            } catch (FloodWaitError) {
-            } catch (RPCErrorException $e) {
-                if ($e->rpc !== 'CHANNEL_PRIVATE' && $e->rpc !== 'MSG_ID_INVALID') {
-                    throw $e;
-                }
-            }
+            });
         }
         if ($update['_'] === 'updateDcOptions') {
             $this->logger->logger('Got new dc options', Logger::VERBOSE);

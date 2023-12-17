@@ -106,7 +106,7 @@ final class FeedLoop extends Loop
     {
         foreach ($updates as $update) {
             if ($update['_'] === 'updateChannelTooLong') {
-                $this->API->logger('Got channel too long update, getting difference...', Logger::VERBOSE);
+                $this->API->logger("Got channel too long update in $this, getting difference...", Logger::VERBOSE);
                 $this->updater->resume();
                 continue;
             }
@@ -116,7 +116,7 @@ final class FeedLoop extends Loop
                     $mid = $update['message']['id'] ?? '-';
                     $mypts = $this->state->pts();
                     $computed = $mypts + $pts_count;
-                    $this->API->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("{$msg}. My pts: {$mypts}, remote pts: {$update['pts']}, computed pts: {$computed}, msg id: {$mid}, channel id: {$this->channelId}", Logger::VERBOSE);
                 };
                 $result = $this->state->checkPts($update);
                 if ($result < 0) {
@@ -249,7 +249,7 @@ final class FeedLoop extends Loop
                 return $this->API->feeders[self::GENERIC]->feedSingle($update);
             }
         }
-        $this->API->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::ULTRA_VERBOSE);
+        $this->API->logger('Was fed an update of type '.$update['_']." in {$this}...", Logger::VERBOSE);
         if ($update['_'] === 'updateLoginToken') {
             $this->API->saveUpdate($update);
             return $this->channelId;
