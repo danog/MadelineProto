@@ -44,7 +44,7 @@ final class EventHandlerIssue
 
     public function log(): void
     {
-        Logger::log((string) $this, Logger::FATAL_ERROR);
+        Logger::log((string) $this, $this->severe ? Logger::FATAL_ERROR : Logger::ERROR);
     }
 
     public function getHTML(): string

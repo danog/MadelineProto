@@ -100,9 +100,11 @@ trait Events
         $this->pluginInstances = $pluginsNew;
 
         $this->updateHandlerType = UpdateHandlerType::EVENT_HANDLER;
-        array_map($this->handleUpdate(...), $this->updates);
-        $this->updates = [];
-        $this->updates_key = 0;
+        foreach ($this->getUpdatesQueue as $update) {
+            $this->handleUpdate($update);
+        }
+        $this->getUpdatesQueue->clear();
+        $this->getUpdatesQueueKey = 0;
         $this->startUpdateSystem();
     }
     /**

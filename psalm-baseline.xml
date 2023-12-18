@@ -1168,7 +1168,6 @@
     </MissingClosureParamType>
     <MissingParamType>
       <code>$messages</code>
-      <code>$update</code>
     </MissingParamType>
     <MissingReturnType>
       <code>feed</code>
@@ -1217,6 +1216,8 @@
       <code><![CDATA[$this->API->authorization['user']['bot']]]></code>
     </PossiblyNullArrayAccess>
     <PossiblyUndefinedVariable>
+      <code>$difference</code>
+      <code>$difference</code>
       <code>$difference</code>
       <code>$difference</code>
       <code>$difference</code>
@@ -1693,6 +1694,9 @@
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
     </InaccessibleProperty>
+    <MissingParamType>
+      <code>$update</code>
+    </MissingParamType>
     <MissingReturnType>
       <code>getUpdatesState</code>
       <code>loadUpdateState</code>

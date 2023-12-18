@@ -145,7 +145,8 @@ final class FeedLoop extends Loop
                 $logger('PTS OK');
                 $this->state->pts($update['pts']);
             }
-            $this->save($update);
+
+            $this->parsedUpdates[] = $update;
         }
     }
     public function feed(array $updates)
@@ -257,10 +258,6 @@ final class FeedLoop extends Loop
         }
         $this->incomingUpdates[] = $update;
         return $this->channelId;
-    }
-    public function save($update): void
-    {
-        $this->parsedUpdates[] = $update;
     }
     public function saveMessages($messages): void
     {

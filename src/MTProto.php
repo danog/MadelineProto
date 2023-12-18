@@ -76,6 +76,7 @@ use danog\MadelineProto\Wrappers\Loop;
 use danog\MadelineProto\Wrappers\Start;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
+use SplQueue;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -125,7 +126,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @internal
      * @var int
      */
-    public const V = 179;
+    public const V = 180;
     /**
      * Bad message error codes.
      *
@@ -397,6 +398,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     protected static array $dbProperties = [
         'sponsoredMessages' => ['innerMadelineProto' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
+        'getUpdatesQueue' => ['innerMadelineProto' => true],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false],
     ];
 
@@ -479,6 +481,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->wrapper = $wrapper;
             self::$references[$this->getSessionName()] = $this;
         }
+        $q = new SplQueue;
+        $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
+        $this->updateQueue ??= $q;
 
         $initDeferred = new DeferredFuture;
         $this->initPromise = $initDeferred->getFuture();
@@ -612,8 +617,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'event_handler',
             'event_handler_instance',
             'pluginInstances',
-            'updates',
-            'updates_key',
+            'updateQueue',
+            'getUpdatesQueue',
+            'getUpdatesQueueKey',
             'webhookUrl',
 
             'updateHandlerType',
@@ -838,6 +844,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        if (!isset($this->updateQueue)) {
+            $q = new SplQueue;
+            $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
+            $this->updateQueue = $q;
+        }
+
         $this->acceptChatMutex ??= new LocalKeyedMutex;
         $this->confirmChatMutex ??= new LocalKeyedMutex;
         $this->channels_state ??= new CombinedUpdatesState;
@@ -914,6 +926,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $chat->notifyLayer();
             } catch (RPCErrorException $e) {
             }
+        }
+
+        if (isset($this->updates) && \is_array($this->updates)) {
+            foreach ($this->updates as $update) {
+                $this->updateQueue->enqueue($update);
+            }
+            unset($this->updates);
         }
     }
     /**
@@ -1293,6 +1312,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->seqUpdater->resume();
         foreach ($this->secretChats as $chat) {
             $chat->startFeedLoop();
+        }
+
+        foreach ($this->updateQueue as $update) {
+            $this->handleUpdate($update);
         }
     }
     /**

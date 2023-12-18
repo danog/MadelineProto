@@ -26,7 +26,9 @@ use Amp\DeferredFuture;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutException;
+use AssertionError;
 use danog\MadelineProto\API;
+use danog\MadelineProto\Db\DbArray;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
 use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
@@ -118,6 +120,7 @@ use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
+use SplQueue;
 use Throwable;
 use Webmozart\Assert\Assert;
 use function Amp\delay;
@@ -136,8 +139,9 @@ trait UpdateHandler
 
     private bool $got_state = false;
     private CombinedUpdatesState $channels_state;
-    private array $updates = [];
-    private int $updates_key = 0;
+    private DbArray $getUpdatesQueue;
+    private int $getUpdatesQueueKey = 0;
+    private SplQueue $updateQueue;
 
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -145,8 +149,11 @@ trait UpdateHandler
     public function setNoop(): void
     {
         $this->updateHandlerType = UpdateHandlerType::NOOP;
-        $this->updates = [];
-        $this->updates_key = 0;
+        $this->getUpdatesQueue->clear();
+        $this->getUpdatesQueueKey = 0;
+        $q = new SplQueue;
+        $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
+        $this->updateQueue = $q;
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
@@ -167,9 +174,14 @@ trait UpdateHandler
     {
         $this->webhookUrl = $webhookUrl;
         $this->updateHandlerType = UpdateHandlerType::WEBHOOK;
-        array_map($this->handleUpdate(...), $this->updates);
-        $this->updates = [];
-        $this->updates_key = 0;
+        foreach ($this->getUpdatesQueue as $update) {
+            $this->handleUpdate($update);
+        }
+        $this->getUpdatesQueue->clear();
+        $this->getUpdatesQueueKey = 0;
+        foreach ($this->updateQueue as $update) {
+            $this->handleUpdate($update);
+        }
         $this->event_handler = null;
         $this->event_handler_instance = null;
         $this->eventHandlerMethods = [];
@@ -188,11 +200,11 @@ trait UpdateHandler
         $updateType = $update['_'];
         if ($f = $this->event_handler_instance->waitForInternalStart()) {
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
-            $this->updates[$this->updates_key++] = $update;
+            $this->updateQueue->enqueue($update);
             $f->map(function (): void {
-                array_map($this->handleUpdate(...), $this->updates);
-                $this->updates = [];
-                $this->updates_key = 0;
+                foreach ($this->updateQueue as $update) {
+                    $this->handleUpdate($update);
+                }
             });
             return;
         }
@@ -245,11 +257,11 @@ trait UpdateHandler
             }
         } catch (Throwable $e) {
             $this->logger->logger("Got {$e->getMessage()} while sending webhook", Logger::FATAL_ERROR);
-            $this->updates[$this->updates_key++] = $update;
+            $this->updateQueue->enqueue($update);
             delay(1.0);
-            array_map($this->handleUpdate(...), $this->updates);
-            $this->updates = [];
-            $this->updates_key = 0;
+            foreach ($this->updateQueue as $update) {
+                $this->handleUpdate($update);
+            }
         }
     }
 
@@ -259,9 +271,9 @@ trait UpdateHandler
      *
      * @internal
      */
-    private function signalUpdate(array $update): void
+    private function addGetUpdatesUpdate($update): void
     {
-        $this->updates[$this->updates_key++] = $update;
+        $this->getUpdatesQueue[$this->getUpdatesQueueKey++] = $update;
         if ($this->update_deferred) {
             $deferred = $this->update_deferred;
             $this->update_deferred = null;
@@ -269,6 +281,7 @@ trait UpdateHandler
         }
     }
 
+    private bool $usingGetUpdates = false;
     /**
      * Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**.
      *
@@ -281,58 +294,67 @@ trait UpdateHandler
      */
     public function getUpdates(array $params = []): array
     {
-        $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
-        $this->event_handler = null;
-        $this->event_handler_instance = null;
-        $this->eventHandlerMethods = [];
-        $this->eventHandlerHandlers = [];
-        $this->pluginInstances = [];
-
-        [
-            'offset' => $offset,
-            'limit' => $limit,
-            'timeout' => $timeout
-        ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
-
-        foreach ($this->updates as $key => $value) {
-            if ($offset > $key) {
-                unset($this->updates[$key]);
-            }
+        if ($this->usingGetUpdates) {
+            throw new AssertionError("Concurrent getUpdates detected, aborting!");
         }
+        try {
+            $this->usingGetUpdates = true;
+            $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
+            $this->event_handler = null;
+            $this->event_handler_instance = null;
+            $this->eventHandlerMethods = [];
+            $this->eventHandlerHandlers = [];
+            $this->pluginInstances = [];
+            foreach ($this->updateQueue as $update) {
+                $this->addGetUpdatesUpdate($update);
+            }
 
-        if (!$this->updates) {
-            try {
-                $this->update_deferred = new DeferredFuture();
-                $this->update_deferred->getFuture()->await(
-                    $timeout === INF ? null : Tools::getTimeoutCancellation($timeout)
-                );
-            } catch (CancelledException $e) {
-                if (!$e->getPrevious() instanceof TimeoutException) {
-                    throw $e;
+            [
+                'offset' => $offset,
+                'limit' => $limit,
+                'timeout' => $timeout
+            ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
+
+            if ($offset > 0) {
+                foreach ($this->getUpdatesQueue as $key => $value) {
+                    if ($offset > $key) {
+                        unset($this->getUpdatesQueue[$key]);
+                    }
                 }
             }
-        }
-        if (!$this->updates) {
-            return [];
-        }
-        if ($offset < 0) {
-            $offset = $this->updates_key+$offset;
-        }
-        $updates = [];
-        foreach ($this->updates as $key => $value) {
-            if ($offset > $key) {
-                unset($this->updates[$key]);
-                continue;
-            }
 
-            $updates[] = ['update_id' => $key, 'update' => $value];
-
-            if ($limit !== null && \count($updates) === $limit) {
-                break;
+            if (!$this->getUpdatesQueue->count()) {
+                try {
+                    $this->update_deferred = new DeferredFuture();
+                    $this->update_deferred->getFuture()->await(
+                        $timeout === INF ? null : Tools::getTimeoutCancellation($timeout)
+                    );
+                } catch (CancelledException $e) {
+                    if (!$e->getPrevious() instanceof TimeoutException) {
+                        throw $e;
+                    }
+                }
             }
+            if ($offset < 0) {
+                $offset = $this->getUpdatesQueueKey+$offset;
+            }
+            $updates = [];
+            foreach ($this->getUpdatesQueue as $key => $value) {
+                if ($offset > $key) {
+                    unset($this->getUpdatesQueue[$key]);
+                    continue;
+                }
+
+                $updates[] = ['update_id' => $key, 'update' => $value];
+
+                if ($limit !== null && \count($updates) === $limit) {
+                    break;
+                }
+            }
+            return $updates;
+        } finally {
+            $this->usingGetUpdates = false;
         }
-        $this->updates = \array_slice($this->updates, 0, \count($this->updates), true);
-        return $updates;
     }
     /**
      * Check message ID.
@@ -1223,7 +1245,7 @@ trait UpdateHandler
         match ($this->updateHandlerType) {
             UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler($update),
             UpdateHandlerType::WEBHOOK => EventLoop::queue($this->pwrWebhook(...), $update),
-            UpdateHandlerType::GET_UPDATES => EventLoop::queue($this->signalUpdate(...), $update),
+            UpdateHandlerType::GET_UPDATES => EventLoop::queue($this->addGetUpdatesUpdate(...), $update),
         };
     }
     /**

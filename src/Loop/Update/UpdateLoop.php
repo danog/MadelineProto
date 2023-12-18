@@ -139,6 +139,9 @@ final class UpdateLoop extends Loop
                         }
                         $result += ($this->feeder->feed($difference['other_updates']));
                         $state->update($difference);
+                        if ($difference['new_messages']) {
+                            $result[$this->channelId] = true;
+                        }
                         $this->feeder->saveMessages($difference['new_messages']);
                         if (!$difference['final']) {
                             if ($difference['pts'] >= $toPts) {
@@ -155,6 +158,9 @@ final class UpdateLoop extends Loop
                             $difference['pts'] = $difference['dialog']['pts'];
                         }
                         $state->update($difference);
+                        if ($difference['messages']) {
+                            $result[$this->channelId] = true;
+                        }
                         $this->feeder->saveMessages($difference['messages']);
                         unset($difference);
                         break;
@@ -191,6 +197,9 @@ final class UpdateLoop extends Loop
                         $result += ($this->feeder->feed($difference['other_updates']));
                         $result += ($this->feeder->feed($difference['new_encrypted_messages']));
                         $state->update($difference['state']);
+                        if ($difference['new_messages']) {
+                            $result[$this->channelId] = true;
+                        }
                         $this->feeder->saveMessages($difference['new_messages']);
                         unset($difference);
                         break 2;
@@ -202,6 +211,9 @@ final class UpdateLoop extends Loop
                         $result += ($this->feeder->feed($difference['other_updates']));
                         $result += ($this->feeder->feed($difference['new_encrypted_messages']));
                         $state->update($difference['intermediate_state']);
+                        if ($difference['new_messages']) {
+                            $result[$this->channelId] = true;
+                        }
                         $this->feeder->saveMessages($difference['new_messages']);
                         if ($difference['intermediate_state']['pts'] >= $toPts) {
                             unset($difference);
