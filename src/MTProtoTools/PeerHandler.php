@@ -698,7 +698,7 @@ trait PeerHandler
         switch ($full['type']) {
             case 'user':
             case 'bot':
-                foreach (['first_name', 'last_name', 'username', 'usernames', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'access_hash', 'phone', 'lang_code', 'bot_nochats'] as $key) {
+                foreach (['first_name', 'last_name', 'username', 'usernames', 'verified', 'restricted', 'restriction_reason', 'status', 'bot_inline_placeholder', 'phone', 'lang_code', 'bot_nochats'] as $key) {
                     if (isset($full['User'][$key])) {
                         $res[$key] = $full['User'][$key];
                     }
@@ -738,7 +738,7 @@ trait PeerHandler
                 break;
             case 'channel':
             case 'supergroup':
-                foreach (['title', 'democracy', 'restricted', 'restriction_reason', 'access_hash', 'username', 'usernames', 'signatures'] as $key) {
+                foreach (['title', 'democracy', 'restricted', 'restriction_reason', 'username', 'usernames', 'signatures'] as $key) {
                     if (isset($full['Chat'][$key])) {
                         $res[$key] = $full['Chat'][$key];
                     }
