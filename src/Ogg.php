@@ -617,7 +617,7 @@ final class Ogg
                 throw new AssertionError("opus returned: ".$opus->opus_strerror($err));
             }
         };
-        $err = FFI::new('int');
+        $err = $opus->new('int');
 
         $read = Tools::openBuffered($wavIn, $cancellation);
 
@@ -731,7 +731,7 @@ final class Ogg
         );
 
         $granule = 0;
-        $buf = FFI::cast(FFI::type('char*'), FFI::addr($opus->new('char[1024]')));
+        $buf = $opus->cast($opus->type('char*'), FFI::addr($opus->new('char[1024]')));
         do {
             $chunkOrig = $read($chunkSize) ?? '';
             $chunk = str_pad($chunkOrig, $chunkSize, "\0");
