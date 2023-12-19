@@ -107,8 +107,9 @@ trait Session
         $this->session_out_seq_no = 0;
         $this->msgIdHandler ??= new MsgIdHandler($this);
         if (!isset($this->new_incoming)) {
-            $this->new_incoming = new SplQueue;
-            $this->new_incoming->setIteratorMode(SplQueue::IT_MODE_DELETE);
+            $q = new SplQueue;
+            $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
+            $this->new_incoming = $q;
         }
         foreach ($this->outgoing_messages as &$msg) {
             if ($msg->hasMsgId()) {

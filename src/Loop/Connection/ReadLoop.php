@@ -117,7 +117,7 @@ final class ReadLoop extends Loop
         }
         $this->connection->httpReceived();
         if ($this->connection->isHttp()) {
-            EventLoop::queue($this->connection->pingHttpWaiter(...));
+            $this->connection->pingHttpWaiter();
         }
         $this->connection->wakeupHandler();
         return self::CONTINUE;

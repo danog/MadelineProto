@@ -337,7 +337,7 @@ final class Connection
     public function wakeupHandler(): void
     {
         \assert($this->handler !== null);
-        $this->handler->resume();
+        Assert::true($this->handler->resume() || $this->handler->isRunning(), "Could not resume handler!");
     }
     /**
      * Apply method abstractions.

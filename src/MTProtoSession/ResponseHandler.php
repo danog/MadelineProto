@@ -58,28 +58,32 @@ trait ResponseHandler
             if ($type !== 'msg_container') {
                 $this->checkInSeqNo($message);
             }
-            match ($type) {
-                'msgs_ack' => $this->handleAck($message),
+            try {
+                match ($type) {
+                    'msgs_ack' => $this->handleAck($message),
 
-                'rpc_result',
-                'future_salts',
-                'msgs_state_info',
-                'bad_server_salt',
-                'bad_msg_notification',
-                'pong' => $this->handleResponse($message),
+                    'rpc_result',
+                    'future_salts',
+                    'msgs_state_info',
+                    'bad_server_salt',
+                    'bad_msg_notification',
+                    'pong' => $this->handleResponse($message),
 
-                'new_session_created' => $this->handleNewSession($message),
-                'msg_container' => $this->handleContainer($message),
-                'msg_copy' => $this->handleMsgCopy($message),
-                'http_wait' => $this->API->logger($message->read(), Logger::NOTICE),
-                'msgs_state_req' => $this->sendMsgsStateInfo($message->read()['msg_ids'], $message->getMsgId()),
-                'msgs_all_info' => $this->onMsgsAllInfo($message->read()),
-                'msg_detailed_info' => $this->onMsgDetailedInfo($message->read()),
-                'msg_new_detailed_info' => $this->onNewMsgDetailedInfo($message->read()),
-                'msg_resend_req' => $this->onMsgResendReq($message->read(), $message->getMsgId()),
-                'msg_resend_ans_req' => $this->onMsgResendAnsReq($message->read(), $message->getMsgId()),
-                default => $this->handleFallback($message)
-            };
+                    'new_session_created' => $this->handleNewSession($message),
+                    'msg_container' => $this->handleContainer($message),
+                    'msg_copy' => $this->handleMsgCopy($message),
+                    'http_wait' => $this->API->logger($message->read(), Logger::NOTICE),
+                    'msgs_state_req' => $this->sendMsgsStateInfo($message->read()['msg_ids'], $message->getMsgId()),
+                    'msgs_all_info' => $this->onMsgsAllInfo($message->read()),
+                    'msg_detailed_info' => $this->onMsgDetailedInfo($message->read()),
+                    'msg_new_detailed_info' => $this->onNewMsgDetailedInfo($message->read()),
+                    'msg_resend_req' => $this->onMsgResendReq($message->read(), $message->getMsgId()),
+                    'msg_resend_ans_req' => $this->onMsgResendAnsReq($message->read(), $message->getMsgId()),
+                    default => $this->handleFallback($message)
+                };
+            } catch (\Throwable $e) {
+                $this->API->logger("An error occurred while handling $message: $e", Logger::FATAL_ERROR);
+            }
         }
         return Loop::PAUSE;
     }
@@ -378,12 +382,13 @@ trait ResponseHandler
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
                         $this->API->logger($response['error_message'], Logger::FATAL_ERROR);
+                        $phone = null;
                         if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
                             $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         $this->API->logout();
-                        throw new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
+                        return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
@@ -406,7 +411,7 @@ trait ResponseHandler
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
                             $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                             $this->API->logout();
-                            throw new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
+                            return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
                         EventLoop::queue($this->shared->initAuthorization(...));
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
