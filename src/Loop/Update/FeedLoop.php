@@ -163,10 +163,7 @@ final class FeedLoop extends Loop
         switch ($update['_']) {
             case 'updateNewChannelMessage':
             case 'updateEditChannelMessage':
-                $channelId = $update['message']['peer_id']['channel_id'] ?? self::GENERIC;
-                if (!$channelId) {
-                    return false;
-                }
+                $channelId = DialogId::toSupergroupOrChannel($update['message']['peer_id']);
                 break;
             case 'updateChannelWebPage':
             case 'updateDeleteChannelMessages':
