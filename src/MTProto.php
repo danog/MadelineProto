@@ -1313,10 +1313,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         foreach ($this->secretChats as $chat) {
             $chat->startFeedLoop();
         }
-
-        foreach ($this->updateQueue as $update) {
-            $this->handleUpdate($update);
-        }
     }
     /**
      * Store shared phone config.
