@@ -22,6 +22,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Database\Mysql as DatabaseMysql;
 use PDO;
+use Webmozart\Assert\Assert;
 
 /**
  * MySQL database backend.
@@ -132,7 +133,9 @@ final class MysqlArray extends SqlArray
                 $database = $this->dbSettings->getDatabase();
                 $result = $this->db->prepare("SELECT data_free FROM information_schema.tables WHERE table_schema=? AND table_name=?")
                     ->execute([$database, $this->table])
-                    ->fetchRow()['data_free'];
+                    ->fetchRow();
+                Assert::notNull($result);
+                $result = $result['data_free'];
                 if (($result >> 20) > $this->dbSettings->getOptimizeIfWastedGtMb()) {
                     $this->db->query("OPTIMIZE TABLE `{$this->table}`");
                 }
