@@ -85,12 +85,16 @@ final class Mysql
                     );
                 } catch (PDOException $e) {
                     $config = $config->withPassword(null);
-                    $pdo = new PDO(
-                        $host[0] === '/'
-                            ? "mysql:unix_socket={$host};charset=UTF8"
-                            : "mysql:host={$host};port={$port};charset=UTF8",
-                        $settings->getUsername(),
-                    );
+                    try {
+                        $pdo = new PDO(
+                            $host[0] === '/'
+                                ? "mysql:unix_socket={$host};charset=UTF8"
+                                : "mysql:host={$host};port={$port};charset=UTF8",
+                            $settings->getUsername(),
+                        );
+                    } catch (\Throwable) {
+                        throw $e;
+                    }
                 }
 
                 self::$connections[$dbKey] = [

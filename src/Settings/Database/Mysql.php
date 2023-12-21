@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use AssertionError;
 use danog\MadelineProto\Db\MysqlArray;
 
 /**
@@ -25,6 +26,42 @@ use danog\MadelineProto\Db\MysqlArray;
  */
 final class Mysql extends SqlAbstract
 {
+    /**
+     * @var int<1, max>|null $optimizeIfWastedGtMb
+     */
+    private ?int $optimizeIfWastedGtMb = null;
+    /**
+     * Whether to optimize MySQL tables automatically if more than the specified amount of megabytes is wasted by the MySQL engine.
+     *
+     * Be careful when tweaking this setting as it may lead to slowdowns on startup.
+     *
+     * A good setting is 10mb.
+     *
+     * @param int<1, max>|null $optimizeIfWastedGtMb
+     */
+    public function setOptimizeIfWastedGtMb(?int $optimizeIfWastedGtMb): self
+    {
+        /** @psalm-suppress DocblockTypeContradiction */
+        if ($optimizeIfWastedGtMb !== null && $optimizeIfWastedGtMb <= 0) {
+            /** @var int $optimizeIfWastedGtMb */
+            throw new AssertionError("An invalid value was specified: $optimizeIfWastedGtMb");
+        }
+        $this->optimizeIfWastedGtMb = $optimizeIfWastedGtMb;
+        return $this;
+    }
+    /**
+     * Whether to optimize MySQL tables automatically if more than the specified amount of bytes is wasted by the MySQL engine.
+     *
+     * Be careful when tweaking this setting as it may lead to slowdowns on startup.
+     *
+     * A good setting is 10mb.
+     *
+     * @return int<1, max>|null
+     */
+    public function getOptimizeIfWastedGtMb(): ?int
+    {
+        return $this->optimizeIfWastedGtMb;
+    }
     public function getDriverClass(): string
     {
         return MysqlArray::class;

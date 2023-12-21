@@ -399,7 +399,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         'sponsoredMessages' => ['innerMadelineProto' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
         'getUpdatesQueue' => ['innerMadelineProto' => true],
-        'session' => ['innerMadelineProto' => true, 'enableCache' => false],
+        'session' => ['innerMadelineProto' => true, 'enableCache' => false, 'optimizeIfWastedGtMb' => 1],
     ];
 
     /**

@@ -282,6 +282,13 @@
     <MissingConstructor>
       <code>$pdo</code>
     </MissingConstructor>
+    <PossiblyNullArrayAccess>
+      <code><![CDATA[$this->db->query("SELECT data_free FROM information_schema.tables WHERE table_schema=`{$database}` AND table_name=`{$this->table}`")->fetchRow()['data_free']]]></code>
+    </PossiblyNullArrayAccess>
+    <UndefinedMethod>
+      <code>getOptimizeIfWastedGtMb</code>
+      <code>getOptimizeIfWastedGtMb</code>
+    </UndefinedMethod>
   </file>
   <file src="src/Db/PostgresArray.php">
     <MissingClosureParamType>

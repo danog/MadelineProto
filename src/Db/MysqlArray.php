@@ -126,6 +126,20 @@ final class MysqlArray extends SqlArray
             CHARACTER SET 'utf8mb4' 
             COLLATE 'utf8mb4_general_ci'
         ");
+        \assert($this->dbSettings instanceof DatabaseMysql);
+        if ($this->dbSettings->getOptimizeIfWastedGtMb() !== null) {
+            try {
+                $database = $this->dbSettings->getDatabase();
+                $result = $this->db->prepare("SELECT data_free FROM information_schema.tables WHERE table_schema=? AND table_name=?")
+                    ->execute([$database, $this->table])
+                    ->fetchRow()['data_free'];
+                if (($result >> 20) > $this->dbSettings->getOptimizeIfWastedGtMb()) {
+                    $this->db->query("OPTIMIZE TABLE `{$this->table}`");
+                }
+            } catch (\Throwable $e) {
+                Logger::log("An error occurred while optimizing the table: $e", Logger::ERROR);
+            }
+        }
     }
 
     protected function moveDataFromTableToTable(string $from, string $to): void

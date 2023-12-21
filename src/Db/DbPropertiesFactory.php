@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Db;
 
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
+use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
@@ -29,7 +30,7 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 final class DbPropertiesFactory
 {
     /**
-     * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool, innerMadelineProtoSerializer?: SerializerType}|'array' $config
+     * @param array{serializer?: SerializerType, enableCache?: bool, cacheTtl?: int, innerMadelineProto?: bool, innerMadelineProtoSerializer?: SerializerType, optimizeIfWastedGtMb?: int<1, max>}|'array' $config
      */
     public static function get(DatabaseAbstract $dbSettings, string $table, string|array $config, ?DbArray $value = null): DbArray
     {
@@ -62,6 +63,16 @@ final class DbPropertiesFactory
 
             $dbSettings->setSerializer($config['serializer']);
             $dbSettings->setCacheTtl($config['cacheTtl']);
+
+            if (isset($config['optimizeIfWastedGtMb'])
+                && $dbSettings instanceof Mysql
+                && (
+                    $dbSettings->getOptimizeIfWastedGtMb() === null
+                    || $config['optimizeIfWastedGtMb'] < $dbSettings->getOptimizeIfWastedGtMb()
+                )
+            ) {
+                $dbSettings->setOptimizeIfWastedGtMb($config['optimizeIfWastedGtMb']);
+            }
         }
 
         if (!($config['enableCache'] ?? true)) {
