@@ -31,6 +31,8 @@ final class Mysql extends SqlAbstract
      */
     private ?int $optimizeIfWastedGtMb = null;
     /**
+     * @internal Not entirely sure whether this should be exposed.
+     *
      * Whether to optimize MySQL tables automatically if more than the specified amount of megabytes is wasted by the MySQL engine.
      *
      * Be careful when tweaking this setting as it may lead to slowdowns on startup.
@@ -50,6 +52,8 @@ final class Mysql extends SqlAbstract
         return $this;
     }
     /**
+     * @internal Not entirely sure whether this should be exposed.
+     *
      * Whether to optimize MySQL tables automatically if more than the specified amount of bytes is wasted by the MySQL engine.
      *
      * Be careful when tweaking this setting as it may lead to slowdowns on startup.
