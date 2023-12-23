@@ -35,8 +35,8 @@ abstract class AbstractSticker extends Media
         MTProto $API,
         array $rawMedia,
         array $stickerAttribute,
-        public readonly int $width,
-        public readonly int $height,
+        public readonly ?int $width,
+        public readonly ?int $height,
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $protected);

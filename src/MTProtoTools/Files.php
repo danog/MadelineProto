@@ -138,7 +138,10 @@ trait Files
                 }
 
                 if ($has_document_photo === null) {
-                    throw new AssertionError("has_document_photo === null: ".json_encode($media['document']));
+                    $has_document_photo = [
+                        'w' => null,
+                        'h' => null,
+                    ];
                 }
 
                 if ($attr['mask'] ?? false) {
