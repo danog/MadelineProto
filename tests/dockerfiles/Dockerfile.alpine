@@ -159,6 +159,12 @@ RUN set -eux; \
 		--disable-cgi \
 		\
 		--enable-fpm \
+        --with-ffi \
+        --enable-pcntl \
+        --enable-intl \
+        --with-pdo-mysql \
+        --with-gmp \
+        --with-zip \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
 	; \
@@ -260,7 +266,7 @@ RUN apk add --no-cache make g++ && \
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-    install-php-extensions pcntl uv-beta ffi pq memprof intl gmp mbstring pdo_mysql xml dom iconv zip opcache igbinary gd && \
+    install-php-extensions uv-beta pq memprof igbinary gd && \
     rm /usr/local/bin/install-php-extensions
 
 RUN apk add --no-cache ffmpeg nghttp2 jemalloc
@@ -268,6 +274,10 @@ RUN apk add --no-cache ffmpeg nghttp2 jemalloc
 ENV LD_PRELOAD=libjemalloc.so.2
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
+
+ADD ./tests/jit.php /jit.php
+
+RUN php /jit.php && rm /jit.php
 
 WORKDIR /app
 

@@ -499,7 +499,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcachedconfig-array" name="getCachedConfig">Get cached server-side config: getCachedConfig</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getcallstate-int-id-danog-madelineproto-voip-callstate" name="getCallState">Get call state: getCallState</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiKeywordsDifference.html" name="messages.getEmojiKeywordsDifference">Get changed emoji keywords »: messages.getEmojiKeywordsDifference</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getAppChangelog.html" name="help.getAppChangelog">Get changelog of current app.  : help.getAppChangelog</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastStats.html" name="stats.getBroadcastStats">Get channel statistics: stats.getBroadcastStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getMessages.html" name="channels.getMessages">Get channel/supergroup messages: channels.getMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getAdminedPublicChannels.html" name="channels.getAdminedPublicChannels">Get channels/supergroups/geogroups we're admin in. Usually called when the user exceeds the limit for owned public channels/supergroups/geogroups, and the user is given the choice to remove one of his channels/supergroups/geogroups: channels.getAdminedPublicChannels</a>
@@ -944,6 +943,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrappin-array-message-danog-madelineproto-eventhandler-pinned" name="wrapPin">Wrap a Pin constructor into an abstract Pinned object: wrapPin</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmedia-array-media-bool-protected-false-danog-madelineproto-eventhandler-media" name="wrapMedia">Wrap a media constructor into an abstract Media object: wrapMedia</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate-array-update-danog-madelineproto-eventhandler-update" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getChannelDefaultEmojiStatuses.html" name="account.getChannelDefaultEmojiStatuses">account.getChannelDefaultEmojiStatuses</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getChannelRestrictedStatusEmojis.html" name="account.getChannelRestrictedStatusEmojis">account.getChannelRestrictedStatusEmojis</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getDefaultBackgroundEmojis.html" name="account.getDefaultBackgroundEmojis">account.getDefaultBackgroundEmojis</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.invalidateSignInCodes.html" name="account.invalidateSignInCodes">account.invalidateSignInCodes</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateColor.html" name="account.updateColor">account.updateColor</a>
@@ -955,6 +956,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getChannelRecommendations.html" name="channels.getChannelRecommendations">channels.getChannelRecommendations</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleViewForumAsMessages.html" name="channels.toggleViewForumAsMessages">channels.toggleViewForumAsMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updateColor.html" name="channels.updateColor">channels.updateColor</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updateEmojiStatus.html" name="channels.updateEmojiStatus">channels.updateEmojiStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.editCloseFriends.html" name="contacts.editCloseFriends">contacts.editCloseFriends</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.setBlocked.html" name="contacts.setBlocked">contacts.setBlocked</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerColors.html" name="help.getPeerColors">help.getPeerColors</a>
@@ -988,6 +990,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesArchive.html" name="stories.getStoriesArchive">stories.getStoriesArchive</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesByID.html" name="stories.getStoriesByID">stories.getStoriesByID</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesViews.html" name="stories.getStoriesViews">stories.getStoriesViews</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryReactionsList.html" name="stories.getStoryReactionsList">stories.getStoryReactionsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryViewsList.html" name="stories.getStoryViewsList">stories.getStoryViewsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.incrementStoryViews.html" name="stories.incrementStoryViews">stories.incrementStoryViews</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.readStories.html" name="stories.readStories">stories.readStories</a>

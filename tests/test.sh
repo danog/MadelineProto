@@ -15,7 +15,7 @@ mv composer.phar /usr/local/bin/composer
 
 cd $OLDPWD
 
-#php tests/jit.php
+php tests/jit.php
 
 php tests/lock_setup.php
 
