@@ -33,9 +33,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'messages.dialogs', dialogs: list<array>, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.dialogsSlice', count: array, dialogs: list<array>, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.dialogsNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Dialogs.html
      */
-    public function getDialogs(bool|null $exclude_pinned = null, int|null $folder_id = null, int|null $offset_date = 0, int|null $offset_id = 0, array|int|string|null $offset_peer = null, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getDialogs(bool|null $exclude_pinned = null, int|null $folder_id = null, int|null $offset_date = 0, int|null $offset_id = 0, array|int|string|null $offset_peer = null, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
     /**
      * Returns the conversation history with one interlocutor / within a chat.
@@ -51,9 +52,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate?: array, offset_id_offset?: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
      */
-    public function getHistory(array|int|string|null $peer = null, int|null $offset_id = 0, int|null $offset_date = 0, int|null $add_offset = 0, int|null $limit = 0, int|null $max_id = 0, int|null $min_id = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getHistory(array|int|string|null $peer = null, int|null $offset_id = 0, int|null $offset_date = 0, int|null $add_offset = 0, int|null $limit = 0, int|null $max_id = 0, int|null $min_id = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
     /**
      * Returns found messages.
@@ -74,9 +76,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate?: array, offset_id_offset?: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
      */
-    public function search(array $filter, array|int|string|null $peer = null, string|null $q = '', array|int|string|null $from_id = null, int|null $top_msg_id = null, int|null $min_date = 0, int|null $max_date = 0, int|null $offset_id = 0, int|null $add_offset = 0, int|null $limit = 0, int|null $max_id = 0, int|null $min_id = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function search(array $filter, array|int|string|null $peer = null, string|null $q = '', array|int|string|null $from_id = null, int|null $top_msg_id = null, int|null $min_date = 0, int|null $max_date = 0, int|null $offset_id = 0, int|null $add_offset = 0, int|null $limit = 0, int|null $max_id = 0, int|null $min_id = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
     /**
      * Marks message history as read.
@@ -1177,12 +1180,13 @@ interface Messages
     /**
      * Get message ranges for saving the user's chat history.
      *
+     * @param int $takeoutId Takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'messageRange', min_id: int, max_id: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/MessageRange.html
      */
-    public function getSplitRanges(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getSplitRanges(int $takeoutId, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Manually mark dialog as unread.

@@ -335,6 +335,12 @@ final class Blacklist {
         $params = $this->filterParams($params, $type, $method);
         $contents = '';
         $signature = [];
+
+        if (\in_array($method, ['messages.getSplitRanges', 'contacts.getSaved', 'channels.getLeftChannels'], true)) {
+            $contents .= "     * @param int \$takeoutId Takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.\n";
+            $signature []= "int \$takeoutId";
+        }
+
         foreach ($params as $name => $param) {
             if ($name === 'reply_to') {
                 $param['pow'] ??= 'yes';
@@ -374,6 +380,13 @@ final class Blacklist {
         $signature []= "?string \$queueId = null";
         $contents .= "     * @param ?\\Amp\\Cancellation \$cancellation Cancellation\n";
         $signature []= "?\\Amp\\Cancellation \$cancellation = null";
+
+        // TODO users.getUsers
+        if (\in_array($method, ['messages.getDialogs', 'messages.getHistory', 'messages.search', 'stories.getStoriesArchive', 'photos.getUserPhotos', 'account.getAuthorizations', 'account.getWebAuthorizations'], true)) {
+            $contents .= "     * @param ?int \$takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.\n";
+            $signature []= "?int \$takeoutId = null";
+        }
+
         return [$contents, $signature];
     }
     /**

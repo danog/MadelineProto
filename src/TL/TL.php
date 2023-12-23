@@ -602,7 +602,7 @@ final class TL implements TLInterface
         $predicate = $object['_'];
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
-            $this->API->logger($object, Logger::FATAL_ERROR);
+            //$this->API->logger($object, Logger::FATAL_ERROR);
             throw new Exception(sprintf(Lang::$current_lang['type_extract_error'], $predicate));
         }
         if ($bare = $type['type'] != '' && $type['type'][0] === '%') {

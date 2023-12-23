@@ -61,9 +61,10 @@ interface Photos
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'photos.photos', photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>}|array{_: 'photos.photosSlice', count: int, photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photos.html
      */
-    public function getUserPhotos(array|int|string|null $user_id = null, int|null $offset = 0, int|null $max_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getUserPhotos(array|int|string|null $user_id = null, int|null $offset = 0, int|null $max_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
     /**
      * Upload a custom profile picture for a contact, or suggest a new profile picture to a contact.

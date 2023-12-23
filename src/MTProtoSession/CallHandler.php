@@ -175,6 +175,7 @@ trait CallHandler
             floodWaitLimit: $args['floodWaitLimit'] ?? null,
             resultDeferred: $response,
             cancellation: $cancellation,
+            takeoutId: $args['takeoutId'] ?? null
         );
         if ($queueId !== null) {
             $this->callQueue[$queueId] = $message;

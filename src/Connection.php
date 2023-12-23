@@ -560,6 +560,12 @@ final class Connection
             try {
                 if ($message->isMethod) {
                     $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
+                    if ($message->takeoutId !== null) {
+                        $body = $this->API->getTL()->serializeMethod(
+                            'invokeWithTakeout',
+                            ['takeout_id' => $message->takeoutId, 'query' => $body],
+                        );
+                    }
                 } else {
                     $body['_'] = $message->constructor;
                     $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->constructor);

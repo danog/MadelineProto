@@ -327,13 +327,14 @@ interface Channels
     /**
      * Get a list of [channels/supergroups](https://core.telegram.org/api/channel) we left.
      *
+     * @param int $takeoutId Takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @param int $offset Offset for [pagination](https://core.telegram.org/api/offsets)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
      */
-    public function getLeftChannels(int|null $offset = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getLeftChannels(int $takeoutId, int|null $offset = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Get all groups that can be used as [discussion groups](https://core.telegram.org/api/discussion).
