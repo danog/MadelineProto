@@ -96,6 +96,10 @@ RUN set -eux; \
 		openssl-dev \
 		readline-dev \
 		sqlite-dev \
+        libffi-dev \
+        gmp-dev \
+        icu-dev \
+        libzip-dev \
 	; \
 	\
 # make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
