@@ -1,4 +1,5 @@
 tests/ export-ignore
+tools/ export-ignore
 extracted.json export-ignore
 README.md export-ignore
 CHANGELOG.md export-ignore
