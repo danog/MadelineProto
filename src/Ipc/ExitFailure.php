@@ -69,7 +69,12 @@ final class ExitFailure
 
         foreach ($props as $class => $subprops) {
             $class = new ReflectionClass($class);
-            foreach ($subprops as $key => $value) {
+            foreach ($class->getProperties() as $prop) {
+                $key = $prop->getName();
+                if (!\array_key_exists($key, $subprops)) {
+                    continue;
+                }
+                $value = $subprops[$key];
                 if ($key === 'previous') {
                     if ($value instanceof self) {
                         $value = $value->getException();
@@ -80,8 +85,7 @@ final class ExitFailure
                     $value = "$value\n\nClient TL trace:".$prev->getTLTrace();
                 }
                 try {
-                    $key = $refl->getProperty($key);
-                    $key->setValue($exception, $value);
+                    $prop->setValue($exception, $value);
                 } catch (\Throwable) {
                 }
             }
