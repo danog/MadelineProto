@@ -28,7 +28,7 @@ use Webmozart\Assert\Assert;
  * Allow only messages or button queries matching the specified regex.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterRegex extends Filter
+final class FilterRegexAll extends Filter
 {
     /** @param non-empty-string $regex */
     public function __construct(
@@ -37,31 +37,31 @@ final class FilterRegex extends Filter
         private readonly int $offset = 0
     )
     {
-        preg_match($regex, '', flags: $flags, offset: $offset);
+        preg_match_all($regex, '', flags: $flags, offset: $offset);
         Assert::eq(preg_last_error_msg(), 'No error');
     }
 
     public function apply(Update $update): bool
     {
-        if ($update instanceof Message && preg_match($this->regex, $update->message, $matches, $this->flags, $this->offset)) {
+        if ($update instanceof Message && preg_match_all($this->regex, $update->message, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
 
-        if ($update instanceof ButtonQuery && preg_match($this->regex, $update->data, $matches, $this->flags, $this->offset)) {
+        if ($update instanceof ButtonQuery && preg_match_all($this->regex, $update->data, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
 
-        if ($update instanceof InlineQuery && preg_match($this->regex, $update->query, $matches, $this->flags, $this->offset)) {
+        if ($update instanceof InlineQuery && preg_match_all($this->regex, $update->query, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
 
-        if ($update instanceof Story && preg_match($this->regex, $update->caption, $matches, $this->flags, $this->offset)) {
+        if ($update instanceof Story && preg_match_all($this->regex, $update->caption, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
