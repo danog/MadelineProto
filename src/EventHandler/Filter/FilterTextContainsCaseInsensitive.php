@@ -23,10 +23,10 @@ use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
 
 /**
- * Allow only messages that end with a specific content.
+ * Allow only messages that contain a specific case-insensitive content.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterTextEnd extends Filter
+final class FilterTextContainsCaseInsensitive extends Filter
 {
     public function __construct(
         private readonly string $content
@@ -35,7 +35,7 @@ final class FilterTextEnd extends Filter
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof Message && str_ends_with($update->message, $this->content)) ||
-            ($update instanceof Story && str_ends_with($update->caption, $this->content));
+        return ($update instanceof Message && str_contains(strtolower($update->message), $this->content)) ||
+            ($update instanceof Story && str_contains(strtolower($update->caption), $this->content));
     }
 }

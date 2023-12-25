@@ -26,7 +26,7 @@ use Webmozart\Assert\Assert;
  * Allow only messages that contain a specific content.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterTextContain extends Filter
+final class FilterTextContains extends Filter
 {
     public function __construct(
         private readonly string $content

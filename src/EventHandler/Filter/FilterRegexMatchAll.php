@@ -28,7 +28,7 @@ use Webmozart\Assert\Assert;
  * Allow only messages or button queries matching the specified regex.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterRegexAll extends Filter
+final class FilterRegexMatchAll extends Filter
 {
     /** @param non-empty-string $regex */
     public function __construct(
