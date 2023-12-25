@@ -18,18 +18,27 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\AbstractStory;
-use danog\MadelineProto\EventHandler\InlineQuery;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Query\ButtonQuery;
-use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Pinned;
 use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\User\Blocked;
-use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\User\Username;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\Query\ButtonQuery;
+use danog\MadelineProto\EventHandler\ChatInviteRequester;
+use danog\MadelineProto\EventHandler\Story\StoryReaction;
+use danog\MadelineProto\EventHandler\Channel\UpdateChannel;
+use danog\MadelineProto\EventHandler\Channel\MessageForwards;
+use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
+use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
+use danog\MadelineProto\EventHandler\Delete\DeleteChannelMessages;
+use danog\MadelineProto\EventHandler\Delete\DeleteScheduledMessages;
 
 /**
  * Allow messages coming from or sent to a certain peer.
@@ -59,6 +68,16 @@ final class FilterPeer extends Filter
             ($update instanceof BotStopped && $update->userId === $this->peerResolved) ||
             ($update instanceof Phone && $update->userId === $this->peerResolved) ||
             ($update instanceof Status && $update->userId === $this->peerResolved) ||
-            ($update instanceof Username && $update->userId === $this->peerResolved);
+            ($update instanceof Username && $update->userId === $this->peerResolved) ||
+            ($update instanceof BotCommands && $update->chatId === $this->peerResolved) ||
+            ($update instanceof ChatInviteRequester && $update->chatId === $this->peerResolved) ||
+            ($update instanceof MessageForwards && $update->chatId === $this->peerResolved) ||
+            ($update instanceof MessageViewsChanged && $update->chatId === $this->peerResolved) ||
+            ($update instanceof MessageViewsChanged && $update->chatId === $this->peerResolved) ||
+            ($update instanceof UpdateChannel && $update->chatId === $this->peerResolved) ||
+            ($update instanceof DeleteChannelMessages && $update->chatId === $this->peerResolved) ||
+            ($update instanceof DeleteScheduledMessages && $update->chatId === $this->peerResolved) ||
+            ($update instanceof Pinned && $update->chatId === $this->peerResolved) ||
+            ($update instanceof ChannelParticipant && $update->chatId === $this->peerResolved);
     }
 }
