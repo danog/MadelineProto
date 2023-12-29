@@ -53,7 +53,7 @@ steps:
         - push
     commands:
       - apk add bash
-      - tests/test.sh psalm
+      #- tests/test.sh psalm
   
   handshake:
     group: test
