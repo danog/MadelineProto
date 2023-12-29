@@ -1,6 +1,3 @@
-labels:
-  platform: linux/aarch64
-
 clone:
   git:
     when:

@@ -44,9 +44,9 @@ RUN set -eux; \
 # Enable linker optimization (this sorts the hash buckets to improve cache locality, and is non-default)
 # https://github.com/docker-library/php/issues/272
 # -D_LARGEFILE_SOURCE and -D_FILE_OFFSET_BITS=64 (https://www.php.net/manual/en/intro.filesystem.php)
-ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g"
+ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O0 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
-ENV PHP_LDFLAGS="-Wl,-O1 -pie"
+ENV PHP_LDFLAGS="-Wl,-O0 -pie"
 
 ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
@@ -162,6 +162,7 @@ RUN set -eux; \
 		\
 		--disable-cgi \
 		\
+		--enable-debug \
 		--enable-fpm \
         --with-ffi \
         --enable-pcntl \
