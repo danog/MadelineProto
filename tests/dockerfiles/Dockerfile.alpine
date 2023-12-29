@@ -81,6 +81,7 @@ RUN set -eux; \
 	apk del --no-network .fetch-deps
 
 COPY tests/dockerfiles/docker-php-source /usr/local/bin/
+COPY tests/dockerfiles/a.patch /a.patch
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -99,7 +100,7 @@ RUN set -eux; \
         libffi-dev \
         gmp-dev \
         icu-dev \
-        libzip-dev \
+        libzip-dev patch compiler-rt \
 	; \
 	\
 # make sure musl's iconv doesn't get used (https://www.php.net/manual/en/intro.iconv.php)
@@ -112,6 +113,7 @@ RUN set -eux; \
 	; \
 	docker-php-source extract; \
 	cd /usr/src/php; \
+	patch -p1 < /a.patch; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./configure \
 		--build="$gnuArch" \
