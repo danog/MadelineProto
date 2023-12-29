@@ -259,14 +259,8 @@ STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
 
-RUN apk add --no-cache make g++ && \
-    curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
-    cd PrimeModule-ext-2.0 && \
-    make -j$(nproc) && \
-    make install && \
-    cd .. && \
-    rm -r PrimeModule-ext-2.0 && \
-    apk del make g++
+ENV CFLAGS="-g -O0"
+ENV CXXFLAGS="-g -O0"
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -276,6 +270,18 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 
 RUN apk add --no-cache ffmpeg nghttp2 jemalloc
 
+ENV CFLAGS="-g -O0 -fsanitize=address"
+ENV CXXFLAGS="-g -O0 -fsanitize=address"
+
+RUN apk add --no-cache make g++ && \
+    curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
+    cd PrimeModule-ext-2.0 && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && \
+    rm -r PrimeModule-ext-2.0 && \
+    apk del make g++
+
 ENV LD_PRELOAD=libjemalloc.so.2
 
 ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
@@ -283,6 +289,8 @@ ADD ./tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 ADD ./tests/jit.php /jit.php
 
 RUN php /jit.php && rm /jit.php
+
+RUN apk add llvm
 
 WORKDIR /app
 
