@@ -7,7 +7,7 @@ ENV PHPIZE_DEPS \
 		dpkg-dev dpkg \
 		file \
 		g++ \
-		gcc \
+		clang \
 		libc-dev \
 		make \
 		pkgconf \
@@ -47,6 +47,9 @@ RUN set -eux; \
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O0 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O0 -pie"
+
+ENV CC=clang
+ENV CXX=clang++
 
 ENV GPG_KEYS 1198C0117593497A5EC5C199286AF1F9897469DC C28D937575603EB4ABB725861C0779DC5C0A9DE4 AFD8691FDAEDF03BDF6E460563F15A9B715376CA
 
@@ -163,6 +166,7 @@ RUN set -eux; \
 		--disable-cgi \
 		\
 		--enable-debug \
+		--enable-address-sanitizer \
 		--enable-fpm \
         --with-ffi \
         --enable-pcntl \
