@@ -8,13 +8,13 @@ foreach (['pcntl', 'uv', 'ffi', 'pq', 'memprof', 'intl', 'gmp', 'mbstring', 'pdo
     }
 }
 
-/*$status = opcache_get_status();
+$status = opcache_get_status();
 var_dump($status);
 
 if (!$status["jit"]["on"]) {
     echo "JIT is not enabled!".PHP_EOL;
     die(1);
-}*/
+}
 
 if (!$ok) {
     die(1);

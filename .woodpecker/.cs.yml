@@ -27,4 +27,4 @@ steps:
         - push
     commands:
       - apk add bash
-      #- tests/test.sh cs
+      - tests/test.sh cs
