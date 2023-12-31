@@ -16,18 +16,19 @@
 
 namespace danog\MadelineProto\EventHandler\Query;
 
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\ParseMode;
 
 /** @internal */
 trait ChatTrait
 {
     /** @var int Chat where the inline keyboard was sent */
     public readonly int $chatId;
+
     /** @var int Message ID */
     public readonly int $messageId;
 
@@ -38,6 +39,7 @@ trait ChatTrait
         $this->chatId = $API->getIdInternal($rawCallback['peer']);
         $this->messageId = $rawCallback['msg_id'];
     }
+
     /**
      * Edit message text.
      *
@@ -64,6 +66,24 @@ trait ChatTrait
                 'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
                 'no_webpage' => $noWebpage,
+            ],
+        );
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    }
+
+    /**
+     * Edit message keyboard.
+     *
+     * @param array $replyMarkup Reply markup for inline keyboards
+     */
+    public function editReplyMarkup(array $replyMarkup): Message
+    {
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->messageId,
+                'reply_markup' => $replyMarkup,
             ],
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
