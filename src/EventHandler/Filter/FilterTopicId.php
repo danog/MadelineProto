@@ -17,9 +17,10 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Update;
 use Webmozart\Assert\Assert;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
 
 /**
  * Allow only messages with a specific topic id (Supergroups only).
@@ -34,6 +35,7 @@ final class FilterTopicId extends Filter
     }
     public function apply(Update $update): bool
     {
-        return ($update instanceof Message && $update->topicId === $this->topicId);
+        return ($update instanceof Message && $update->topicId === $this->topicId) ||
+        ($update instanceof SupergroupUserTyping && $update->topicId === $this->topicId);
     }
 }

@@ -61,6 +61,7 @@ final class ChannelMessage extends Message
         } catch (RPCErrorException $e) {
             if ($e->rpc == 'MSG_ID_INVALID')
                 return null;
+            throw $e;
         }
     }
 
