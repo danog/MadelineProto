@@ -33,6 +33,7 @@ final class FilterText extends Filter
     ) {
         Assert::notEmpty($content);
     }
+
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->message === $this->content) ||

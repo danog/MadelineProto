@@ -29,13 +29,15 @@ use Webmozart\Assert\Assert;
 final class FilterTextEndsCaseInsensitive extends Filter
 {
     public function __construct(
-        private readonly string $content
+        private readonly string $content,
+        private readonly ?string $encoding = null,
     ) {
         Assert::notEmpty($content);
     }
+
     public function apply(Update $update): bool
     {
-        return ($update instanceof Message && str_ends_with(strtolower($update->message), $this->content)) ||
-            ($update instanceof Story && str_ends_with(strtolower($update->caption), $this->content));
+        return ($update instanceof Message && str_ends_with(mb_strtolower($update->message, $this->encoding), $this->content)) ||
+            ($update instanceof Story && str_ends_with(mb_strtolower($update->caption, $this->encoding), $this->content));
     }
 }

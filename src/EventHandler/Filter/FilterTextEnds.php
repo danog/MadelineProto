@@ -33,6 +33,7 @@ final class FilterTextEnds extends Filter
     ) {
         Assert::notEmpty($content);
     }
+
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_ends_with($update->message, $this->content)) ||

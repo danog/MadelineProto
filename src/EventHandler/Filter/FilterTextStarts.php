@@ -33,6 +33,7 @@ final class FilterTextStart extends Filter
     ) {
         Assert::notEmpty($content);
     }
+
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_starts_with($update->message, $this->content)) ||

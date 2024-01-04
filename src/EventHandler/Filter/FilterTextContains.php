@@ -33,6 +33,7 @@ final class FilterTextContains extends Filter
     ) {
         Assert::notEmpty($content);
     }
+
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_contains($update->message, $this->content)) ||
