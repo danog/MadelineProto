@@ -49,6 +49,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\HasRoundVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVoice;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasTopic;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
@@ -114,6 +115,7 @@ abstract class Filter
                 HasSticker::class => new FilterSticker,
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
+                HasTopic::class => new FilterTopic,
                 Ended::class => new FilterEnded,
                 Running::class => new FilterRunning,
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
