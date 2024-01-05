@@ -22,22 +22,22 @@ use ReflectionProperty;
 use danog\MadelineProto\TL\Types\Bytes;
 
 /** Represents a possible answer of a poll */
-final readonly class PollAnswer implements JsonSerializable
+final class PollAnswer implements JsonSerializable
 {
     /** Textual representation of the answer */
-    public string $text;
+    public readonly string $text;
 
     /** The param that has to be passed to [messages.sendVote](https://docs.madelineproto.xyz/API_docs/methods/messages.sendVote.html) */
-    public string $option;
+    public readonly string $option;
     
     /** Whether we have chosen this answer */
-    public ?bool $chosen;
+    public readonly ?bool $chosen;
 
     /** For quizzes, whether the option we have chosen is correct */
-    public ?bool $correct;
+    public readonly ?bool $correct;
 
     /** How many users voted for this option */
-    public ?int $voters;
+    public readonly ?int $voters;
 
     /** @internal */
     public function __construct(array $rawAnswer)
