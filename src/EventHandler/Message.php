@@ -21,9 +21,10 @@ use danog\MadelineProto\StrTools;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Audio;
-use danog\MadelineProto\EventHandler\Media\Voice;
-use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\Voice;
+use danog\MadelineProto\EventHandler\AbstractPoll;
 use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
@@ -113,6 +114,9 @@ abstract class Message extends AbstractMessage
      */
     public readonly ?int $groupedId;
 
+    /** The poll */
+    public readonly ?AbstractPoll $poll;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -138,10 +142,6 @@ abstract class Message extends AbstractMessage
         $this->viaBotId = $rawMessage['via_bot_id'] ??
             (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
 
-        $this->keyboard = isset($rawMessage['reply_markup'])
-            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
-            : null;
-
         if (isset($rawMessage['fwd_from']))
         {
             $fwdFrom = $rawMessage['fwd_from'];
@@ -165,9 +165,17 @@ abstract class Message extends AbstractMessage
             $this->psaType = null;
             $this->imported = false;
         }
-
+        
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'], $this->protected)
+            : null;
+        
+        $this->keyboard = isset($rawMessage['reply_markup'])
+            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
+            : null;
+
+        $this->poll = ($rawMessage['media']['_'] ?? '') === 'messageMediaPoll'
+            ? AbstractPoll::fromRawPoll($rawMessage['media'])
             : null;
 
         if ($this->commandType = CommandType::tryFrom($this->message[0] ?? '')) {
