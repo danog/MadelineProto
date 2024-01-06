@@ -577,13 +577,17 @@ abstract class Tools extends AsyncTools
      */
     public static function parseLink(string $link): array|null
     {
-        if (preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
+        if (\preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
             if ($matches[1] !== 'www') {
                 return [false, $matches[1]];
             }
         }
-        if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
+        if (\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
             return [!!$matches[1], $matches[2]];
+        }
+        if (\preg_match('@tg://resolve\?domain=([a-z0-9_-]+)@i', $link, $matches))
+        {
+            return [false, $matches[1]];
         }
         return null;
     }
