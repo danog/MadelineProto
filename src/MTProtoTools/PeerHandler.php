@@ -155,15 +155,6 @@ trait PeerHandler
         if (\is_int($id)) {
             return $id;
         }
-        if (\is_string($id))
-        {
-            if (\preg_match('@(?:https?://)?t\.me/c/(\d+)@', $id, $matches)) {
-                $id = DialogId::fromSupergroupOrChannel((int) $matches[1]);
-            }
-            elseif (\preg_match('@tg://(?:openmessage|user)\?(?:userid|id)=(\d+)@i', $id, $matches)) {
-                $id = $matches[1];
-            }
-        }
         return $this->getInfo($id, \danog\MadelineProto\API::INFO_TYPE_ID);
     }
 
