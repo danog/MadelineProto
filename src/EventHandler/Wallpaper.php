@@ -16,49 +16,48 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
-use danog\MadelineProto\EventHandler\Wallpaper\WallpaperSettings;
-use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Wallpaper\WallpaperSettings;
 
 /**
  * Represents a [wallpaper](https://core.telegram.org/api/wallpapers).
  */
 final class Wallpaper implements JsonSerializable
 {
-    /** @var int Identifier */
+    /** Identifier */
     public readonly int $id;
 
-    /** @var int Access hash */
+    /** Access hash */
     public readonly int $accessHash;
 
-    /** @var bool Whether we created this wallpaper */
+    /** Whether we created this wallpaper */
     public readonly bool $creator;
 
-    /** @var bool Whether this is the default wallpaper */
+    /**  Whether this is the default wallpaper */
     public readonly bool $default;
 
-    /** @var bool Whether this is a [pattern wallpaper](https://core.telegram.org/api/wallpapers#pattern-wallpapers) */
+    /** Whether this is a [pattern wallpaper](https://core.telegram.org/api/wallpapers#pattern-wallpapers) */
     public readonly bool $pattern;
 
-    /** @var bool Whether this wallpaper should be used in dark mode. */
+    /** Whether this wallpaper should be used in dark mode. */
     public readonly bool $dark;
 
-    /** @var string Unique wallpaper ID, used when generating [wallpaper links](https://core.telegram.org/api/links#wallpaper-links) or [importing wallpaper links](https://core.telegram.org/api/wallpapers). */
+    /** Unique wallpaper ID, used when generating [wallpaper links](https://core.telegram.org/api/links#wallpaper-links) or [importing wallpaper links](https://core.telegram.org/api/wallpapers). */
     public readonly string $uniqueId;
 
-    /** @var DocumentPhoto The actual wallpaper */
+    /** The actual wallpaper */
     public readonly DocumentPhoto $media;
 
     /** Info on how to generate the wallpaper, according to [these instructions](https://core.telegram.org/api/wallpapers). */
     public readonly ?WallpaperSettings $settings;
-
-    public function __construct(
-        MTProto $API,
-        array $rawWallpaper,
-    ) {
+    
+    /** @internal */
+    public function __construct(MTProto $API, array $rawWallpaper)
+    {
         $this->id = $rawWallpaper['id'];
         $this->accessHash = $rawWallpaper['access_hash'];
         $this->creator = $rawWallpaper['creator'];

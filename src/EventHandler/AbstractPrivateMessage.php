@@ -16,10 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 
-/** Represents a private or secret chat message. */
+/** 
+ * Represents a private or secret chat message.
+ */
 abstract class AbstractPrivateMessage extends Message
 {
     /** @internal */
@@ -27,6 +29,7 @@ abstract class AbstractPrivateMessage extends Message
     {
         parent::__construct($API, $rawMessage, $info);
     }
+
     /**
      * Notify the other user in a private chat that a screenshot of the chat was taken.
      *

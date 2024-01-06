@@ -26,10 +26,10 @@ use danog\MadelineProto\EventHandler\Message\ReportReason;
 /** @internal */
 trait ChatTrait
 {
-    /** @var int Chat where the inline keyboard was sent */
+    /** Chat where the inline keyboard was sent */
     public readonly int $chatId;
 
-    /** @var int Message ID */
+    /** Message ID */
     public readonly int $messageId;
 
     /** @internal */

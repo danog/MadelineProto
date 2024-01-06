@@ -24,13 +24,13 @@ use danog\MadelineProto\MTProto;
  */
 final class Blocked extends Update
 {
-    /** @var bool Whether blocked or unblocked. */
+    /** Whether blocked or unblocked. */
     public readonly bool $blocked;
 
-    /** @var bool Whether we hid or unhid stories of this user */
+    /** Whether we hid or unhid stories of this user */
     public readonly bool $stories;
 
-    /** @var int The user ID */
+    /** The user ID */
     public readonly int $userId;
 
     /** @internal */

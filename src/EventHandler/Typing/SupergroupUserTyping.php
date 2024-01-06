@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 final class SupergroupUserTyping extends Typing
 {
-    /** @var int Channel ID. */
+    /** Channel ID. */
     public readonly int $chatId;
 
-    /** @var int [Topic](https://core.telegram.org/api/threads) ID. */
+    /** [Topic](https://core.telegram.org/api/threads) ID. */
     public readonly ?int $topicId;
 
     /** @internal */

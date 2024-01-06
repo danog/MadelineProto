@@ -25,6 +25,7 @@ use danog\MadelineProto\MTProto;
  */
 final class DialogMessagePinned extends ServiceMessage
 {
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage,

@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class GroupCall extends DialogGroupCall
 {
-    /** @var bool Whether that group call ended or not. */
+    /** Whether that group call ended or not. */
     public readonly bool $ended;
 
     public function __construct(
@@ -32,7 +32,7 @@ final class GroupCall extends DialogGroupCall
         array $rawMessage,
         array $info,
 
-        /** Group call duration */
+        /** @var ?int Group call duration */
         public readonly ?int $duration
     ) {
         parent::__construct($API, $rawMessage, $info);
