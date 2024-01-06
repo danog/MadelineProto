@@ -28,11 +28,14 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterTextContainsCaseInsensitive extends Filter
 {
+    private readonly string $content;
+
     public function __construct(
-        private readonly string $content,
+        string $content,
         private readonly ?string $encoding = null,
     ) {
         Assert::notEmpty($content);
+        $this->content = mb_strtolower($content, $encoding);
     }
     public function apply(Update $update): bool
     {

@@ -17,10 +17,11 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Story\Story;
-use danog\MadelineProto\EventHandler\Update;
+use AssertionError;
 use Webmozart\Assert\Assert;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\CommandType;
 
 /**
  * Allow only messages containing the specified case-insensitive command.
@@ -29,15 +30,23 @@ use Webmozart\Assert\Assert;
 final class FilterCommandCaseInsensetive extends Filter
 {
     /**
-     * @var array<CommandType>
+     * @var list<CommandType>
      */
     public readonly array $commandTypes;
+
+    /** Command */
+    private readonly string $command;
+
     /**
      * @param string            $command Command
      * @param list<CommandType> $types   Command types, if empty all command types are allowed.
      */
-    public function __construct(private readonly string $command, array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH])
-    {
+    public function __construct(
+        string $command,
+        array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH],
+        private readonly ?string $encoding = null,
+    ) {
+        $this->command = mb_strtolower($command, $encoding);
         Assert::true(preg_match("/^\w+$/", $command) === 1, "An invalid command was specified!");
         Assert::notEmpty($types, 'No command types were specified!');
         $c = [];
