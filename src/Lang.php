@@ -29,7 +29,7 @@ final class Lang
         'ckb' => 74,
         'fa' => 100,
         'ru' => 53,
-        'uz' => 74,
+        'uz' => 75,
     ];
 
     public static int $currentPercentage = 100;
@@ -1411,7 +1411,7 @@ If you intentionally deleted this account, ignore this message.',
             'api_not_set' => 'Siz api kaliti va api ID taqdim etishingiz kerak, o\'zingiz @ my.telegram.org manzilidan oling',
             'array_invalid' => 'Siz toʻgʻri massiv taqdim qilmadingiz',
             'bool_error' => 'Mantiqiy natija chiqarib bo\'lmadi',
-            'botAlreadyRunning' => 'The bot is already running!',
+            'botAlreadyRunning' => 'Bot allaqachon ishlayapti!',
             'botapi_conversion_error' => '%s bot API obyektiga aylantirib bo‘lmadi',
             'call_already_accepted' => '%s chaqiruvi allaqachon qabul qilingan',
             'call_already_declined' => '%s qo‘ng‘iroqlari allaqachon rad etilgan',

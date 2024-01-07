@@ -37,7 +37,6 @@ use danog\MadelineProto\SecurityException;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
-use Webmozart\Assert\Assert;
 
 use const PHP_EOL;
 

@@ -117,5 +117,6 @@
     "botapi_conversion_error": "%s bot API obyektiga aylantirib bo‘lmadi",
     "non_text_conversion": "Matnli boʻlmagan xabarlarni oʻzgartirib boʻlmaydi!",
     "file_type_invalid": "Yaroqsiz fayl turi aniqlandi (%s)",
-    "secret_chat_skipping": "Menda %s maxfiy chati maʼlumotlar bazasida yoʻq, xabar oʻtkazib yuborilmoqda..."
+    "secret_chat_skipping": "Menda %s maxfiy chati maʼlumotlar bazasida yoʻq, xabar oʻtkazib yuborilmoqda...",
+    "botAlreadyRunning": "Bot allaqachon ishlayapti!"
 }
