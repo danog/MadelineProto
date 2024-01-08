@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 // Simple example bot.
-// PHP 8.1.15+ or 8.2.4+ is required.
+// PHP 8.2.4+ is required.
 
 // Run via CLI (recommended: `screen php bot.php`) or via web.
 

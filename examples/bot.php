@@ -2,7 +2,7 @@
 /**
  * Example bot.
  *
- * PHP 8.1.15+ or 8.2.4+ is required.
+ * PHP 8.2.4+ is required.
  *
  * Copyright 2016-2020 Daniil Gentili
  * (https://daniil.it)

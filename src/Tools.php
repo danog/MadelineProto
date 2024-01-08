@@ -709,7 +709,7 @@ abstract class Tools extends AsyncTools
         $plugin = is_subclass_of($class, PluginEventHandler::class);
         $file = (new ReflectionClass($class))->getFileName();
         $code = read($file);
-        $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
+        $code = (new ParserFactory)->createForNewestSupportedVersion()->parse($code);
         Assert::notNull($code);
         $traverser = new NodeTraverser;
         $traverser->addVisitor(new NameResolver());
