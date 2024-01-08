@@ -40,11 +40,11 @@ class Installer
      */
     public function __construct()
     {
-        if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
-            die('MadelineProto requires at least PHP 8.1.'.PHP_EOL);
+        if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 2) || PHP_MAJOR_VERSION <= 7) {
+            die('MadelineProto requires at least PHP 8.2.'.PHP_EOL);
         }
         if (PHP_INT_SIZE < 8) {
-            die('A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.'.PHP_EOL);
+            die('A 64-bit build of PHP is required to run MadelineProto, PHP 8.2+ is required.'.PHP_EOL);
         }
         $backtrace = debug_backtrace(0);
         if (\count($backtrace) === 1) {
@@ -159,8 +159,8 @@ class Installer
     private static function load(?string $release): mixed
     {
         if ($release === null) {
-            if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
-                throw new \Exception('MadelineProto requires at least PHP 8.1.');
+            if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 2) || PHP_MAJOR_VERSION <= 7) {
+                throw new \Exception('MadelineProto requires at least PHP 8.2.');
             }
             throw new \Exception('Could not download MadelineProto, please check your internet connection and PHP configuration!');
         }
