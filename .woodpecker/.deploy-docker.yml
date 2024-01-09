@@ -3,7 +3,6 @@ clone:
     when:
       event:
         - tag
-        - push
     image: woodpeckerci/plugin-git
     settings:
       depth: 1
@@ -23,7 +22,6 @@ steps:
     when:
       event:
         - tag
-        - push
 
 depends_on:
   - build
