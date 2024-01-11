@@ -325,6 +325,15 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
     }
     /**
+     * Set output file or stream for incoming OPUS audio packets in a call.
+     *
+     * Will write an OGG OPUS stream to the specified file or stream.
+     */
+    public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
+    {
+        $this->wrapper->getAPI()->callSetOutput($id, $file);
+    }
+    /**
      * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
      */
     public static function canConvertOgg(): bool
