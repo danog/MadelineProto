@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\VoIP;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
 use AssertionError;
 use danog\MadelineProto\LocalFile;
@@ -175,6 +176,16 @@ trait AuthKeyHandler
             }
         }
         ($this->calls[$id] ?? null)?->play($file);
+    }
+
+    /**
+     * Set output file or stream for incoming OPUS audio packets in a call.
+     *
+     * Will write an OGG OPUS stream to the specified file or stream.
+     */
+    public function callSetOutput(int $id, LocalFile|WritableStream $file): void
+    {
+        ($this->calls[$id] ?? null)?->setOutput($file);
     }
 
     /**
