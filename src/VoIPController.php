@@ -642,6 +642,7 @@ final class VoIPController
                 break;
         }
         if ($this->outputStream !== null && $cnt) {
+            unset($packet['_'], $packet['extra']);
             foreach ($packet as ['data' => $data]) {
                 $this->outputStream->writeChunk($data, 2880, false);
             }
