@@ -77,8 +77,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
     ) {
         parent::__construct($API);
         if (isset($rawMessage['decrypted_message'])) {
-            $rawMessage = $rawMessage['decrypted_message'];
             $secretChat = $this->getClient()->getSecretChat($rawMessage['chat_id']);
+            $rawMessage = $rawMessage['decrypted_message'];
         } else {
             $secretChat = null;
         }
