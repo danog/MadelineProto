@@ -420,21 +420,27 @@ final class SecretChatController implements Stringable
             EventLoop::queue($lock->release(...));
         }
     }
+    private static function transformDecryptedUpdate(array &$update): void
+    {
+        $decryptedMessage = &$update['message']['decrypted_message'];
+
+        $decryptedMessage['out'] = false;
+        $decryptedMessage['date'] = $update['message']['date'];
+        $decryptedMessage['chat_id'] = $update['message']['chat_id'];
+
+        if ($decryptedMessage['_'] === 'decryptedMessage'
+            && isset($decryptedMessage['media'])
+            && $decryptedMessage['media']['_'] !== 'decryptedMessageMediaEmpty'
+        ) {
+            $decryptedMessage['media']['file'] = $update['message']['file'];
+            $decryptedMessage['media']['date'] = $update['message']['date'];
+            $decryptedMessage['media']['ttl_seconds'] = $decryptedMessage['ttl'];
+        }
+    }
     private function handleDecryptedUpdate(array $update): void
     {
-        $update['message']['decrypted_message']['out'] = false;
-        $update['message']['decrypted_message']['date'] = $update['message']['date'];
-        $update['message']['decrypted_message']['chat_id'] = $update['message']['chat_id'];
-
         $decryptedMessage = $update['message']['decrypted_message'];
         if ($decryptedMessage['_'] === 'decryptedMessage') {
-            if (isset($update['message']['decrypted_message']['media'])
-                && $update['message']['decrypted_message']['media']['_'] !== 'decryptedMessageMediaEmpty'
-            ) {
-                $update['message']['decrypted_message']['media']['file'] = $update['message']['file'];
-                $update['message']['decrypted_message']['media']['date'] = $update['message']['date'];
-                $update['message']['decrypted_message']['media']['ttl_seconds'] = $update['message']['decrypted_message']['ttl'];
-            }
             $this->API->saveUpdate($update);
             return;
         }
@@ -569,11 +575,13 @@ final class SecretChatController implements Stringable
                     }
                 }
                 $message['message']['decrypted_message'] = $message['message']['decrypted_message']['message'];
+                self::transformDecryptedUpdate($message);
                 $this->incoming[$seq = $this->in_seq_no++] = $message;
                 $this->randomIdMap[$message['message']['decrypted_message']['random_id']] = [$seq, false];
                 $this->handleDecryptedUpdate($message);
             }
         } else {
+            self::transformDecryptedUpdate($message);
             $this->handleDecryptedUpdate($message);
         }
         return true;
