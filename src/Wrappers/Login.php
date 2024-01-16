@@ -120,7 +120,7 @@ trait Login
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
                     $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter);
+                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
                     if (!isset($this->authorization['hint'])) {
                         $this->authorization['hint'] = '';
                     }
