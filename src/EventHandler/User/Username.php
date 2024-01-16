@@ -24,13 +24,13 @@ use danog\MadelineProto\MTProto;
  */
 final class Username extends Update
 {
-    /** @var int User identifier */
+    /** User identifier */
     public readonly int $userId;
 
-    /** @var string New first name. Corresponds to the new value of `real_first_name` field of the [userFull](https://docs.madelineproto.xyz/API_docs/constructors/userFull.html) constructor. */
+    /** New first name. Corresponds to the new value of `real_first_name` field of the [userFull](https://docs.madelineproto.xyz/API_docs/constructors/userFull.html) constructor. */
     public readonly string $firstName;
 
-    /** @var string New last name. Corresponds to the new value of `real_last_name` field of the [userFull](https://docs.madelineproto.xyz/API_docs/constructors/userFull.html) constructor. */
+    /** New last name. Corresponds to the new value of `real_last_name` field of the [userFull](https://docs.madelineproto.xyz/API_docs/constructors/userFull.html) constructor. */
     public readonly string $lastName;
 
     /** @var list<UsernameInfo> */

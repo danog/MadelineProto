@@ -31,6 +31,7 @@ final class DialogChannelMigrateFrom extends ServiceMessage
 
         /** @var string The old chat title */
         public readonly string $oldTitle,
+
         /** @var int The old chat title */
         public readonly int $oldChatId,
     ) {

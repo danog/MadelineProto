@@ -16,6 +16,9 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 use danog\MadelineProto\EventHandler\Action\Cancel;
 use danog\MadelineProto\EventHandler\Action\ChooseContact;
 use danog\MadelineProto\EventHandler\Action\ChooseSticker;
@@ -34,9 +37,6 @@ use danog\MadelineProto\EventHandler\Action\UploadDocument;
 use danog\MadelineProto\EventHandler\Action\UploadPhoto;
 use danog\MadelineProto\EventHandler\Action\UploadRound;
 use danog\MadelineProto\EventHandler\Action\UploadVideo;
-use JsonSerializable;
-use ReflectionClass;
-use ReflectionProperty;
 
 /**
  * In-progress actions.

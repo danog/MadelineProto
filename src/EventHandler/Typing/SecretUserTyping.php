@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class SecretUserTyping extends Typing
 {
-    /** @var int Secret chat ID. */
+    /** Secret chat ID. */
     public readonly int $chatId;
 
     /** @internal */

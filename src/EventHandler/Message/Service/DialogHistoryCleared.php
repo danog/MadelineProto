@@ -24,11 +24,9 @@ use danog\MadelineProto\MTProto;
  */
 final class DialogHistoryCleared extends ServiceMessage
 {
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
-    ) {
+    /** @internal */
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
         parent::__construct($API, $rawMessage, $info);
     }
 }

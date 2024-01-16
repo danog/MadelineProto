@@ -17,51 +17,60 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use AssertionError;
+use ReflectionType;
+use ReflectionNamedType;
+use ReflectionUnionType;
+use ReflectionIntersectionType;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
-use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
-use danog\MadelineProto\EventHandler\Filter\Media\FilterAudio;
-use danog\MadelineProto\EventHandler\Filter\Media\FilterDocument;
-use danog\MadelineProto\EventHandler\Filter\Media\FilterDocumentPhoto;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\GroupMessage;
+use danog\MadelineProto\EventHandler\Message\SecretMessage;
+use danog\MadelineProto\EventHandler\Message\ChannelMessage;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Filter\FilterPoll;
+use danog\MadelineProto\EventHandler\Filter\Poll\FilterQuizPoll;
+use danog\MadelineProto\EventHandler\Filter\Poll\FilterSinglePoll;
+use danog\MadelineProto\EventHandler\Filter\Poll\FilterMultiplePoll;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterGif;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterAudio;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterPhoto;
-use danog\MadelineProto\EventHandler\Filter\Media\FilterRoundVideo;
-use danog\MadelineProto\EventHandler\Filter\Media\FilterSticker;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterVideo;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterVoice;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Message\ChannelMessage;
-use danog\MadelineProto\EventHandler\Message\GroupMessage;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
-use danog\MadelineProto\EventHandler\Message\SecretMessage;
-use danog\MadelineProto\EventHandler\Message\ServiceMessage;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterSticker;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterDocument;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterRoundVideo;
+use danog\MadelineProto\EventHandler\Filter\Media\FilterDocumentPhoto;
 use danog\MadelineProto\EventHandler\SimpleFilter\Ended;
-use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\FromAdminOrOutgoing;
-use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
-use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
-use danog\MadelineProto\EventHandler\SimpleFilter\HasDocumentPhoto;
+use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
+use danog\MadelineProto\EventHandler\SimpleFilter\Running;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasGif;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasPhoto;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasNoMedia;
-use danog\MadelineProto\EventHandler\SimpleFilter\HasPhoto;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasRoundVideo;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasDocumentPhoto;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasPoll;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasQuizPoll;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasSinglePoll;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasMultiplePoll;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVoice;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasTopic;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsEdited;
-use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReplyToSelf;
-use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
-use danog\MadelineProto\EventHandler\SimpleFilter\Running;
-use danog\MadelineProto\EventHandler\Update;
-use ReflectionIntersectionType;
-use ReflectionNamedType;
-use ReflectionType;
-use ReflectionUnionType;
+use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
+use danog\MadelineProto\EventHandler\SimpleFilter\FromAdminOrOutgoing;
+use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
+use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
 
 abstract class Filter
 {
@@ -114,6 +123,11 @@ abstract class Filter
                 HasSticker::class => new FilterSticker,
                 HasVideo::class => new FilterVideo,
                 HasVoice::class => new FilterVoice,
+                HasTopic::class => new FilterTopic,
+                HasPoll::class => new FilterPoll,
+                HasQuizPoll::class => new FilterQuizPoll,
+                HasSinglePoll::class => new FilterSinglePoll,
+                HasMultiplePoll::class => new FilterMultiplePoll,
                 Ended::class => new FilterEnded,
                 Running::class => new FilterRunning,
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),

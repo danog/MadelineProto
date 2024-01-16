@@ -29,7 +29,7 @@ final class DialogScreenshotTaken extends ServiceMessage
         array $rawMessage,
         array $info,
 
-        /** $ids list<int> List of affected message ids that appeared on the screenshot, only for secret chats. */
+        /** @var list<int> List of affected message ids that appeared on the screenshot, only for secret chats. */
         public readonly array $ids = [],
     ) {
         parent::__construct($API, $rawMessage, $info);

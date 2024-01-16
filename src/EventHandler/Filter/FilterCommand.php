@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use AssertionError;
 use Attribute;
-use danog\MadelineProto\EventHandler\CommandType;
+use AssertionError;
+use Webmozart\Assert\Assert;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
-use Webmozart\Assert\Assert;
+use danog\MadelineProto\EventHandler\CommandType;
 
 /**
  * Allow only messages containing the specified command.

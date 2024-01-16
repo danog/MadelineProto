@@ -16,11 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\EventHandler\ChatInvite;
-use danog\MadelineProto\EventHandler\Participant;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\ChatInvite;
+use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\Participant\Left;
+use danog\MadelineProto\EventHandler\Participant\Member;
 
 /**
  * A participant has left, joined, was banned or admined in a [channel or supergroup](https://core.telegram.org/api/channel).
@@ -65,10 +67,10 @@ final class ChannelParticipant extends Update
         // If null, user lefted channel
         $this->prevParticipant = isset($rawChannelParticipant['prev_participant'])
             ? Participant::fromRawParticipant($rawChannelParticipant['prev_participant'])
-            : null;
+            : new Left(['peer' => $this->userId]);
         // if null, user joind
         $this->newParticipant = isset($rawChannelParticipant['new_participant'])
             ? Participant::fromRawParticipant($rawChannelParticipant['new_participant'])
-            : null;
+            : new Member(['user_id' => $this->userId, 'date' => $this->date]);
     }
 }

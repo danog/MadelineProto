@@ -16,10 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\Ipc\IpcCapable;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
+use danog\MadelineProto\Ipc\IpcCapable;
 
 /**
  * Represents a generic update.

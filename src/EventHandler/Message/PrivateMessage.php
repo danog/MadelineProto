@@ -24,6 +24,9 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
  */
 final class PrivateMessage extends AbstractPrivateMessage
 {
+    /**
+     * @inheritDoc
+     */
     public function screenShot(): DialogScreenshotTaken
     {
         $result = $this->getClient()->methodCallAsyncRead(

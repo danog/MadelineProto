@@ -26,21 +26,18 @@ use danog\MadelineProto\MTProto;
  */
 final class DialogBotAllowed extends ServiceMessage
 {
-    /** @var bool We have authorized the bot to send us messages by installing the bot’s [attachment menu](https://core.telegram.org/api/bots/attach). */
+    /** We have authorized the bot to send us messages by installing the bot’s [attachment menu](https://core.telegram.org/api/bots/attach). */
     public readonly bool $attachMenu;
 
-    /** @var string We have authorized the bot to send us messages by logging into a website via [Telegram Login »](https://core.telegram.org/widgets/login); this field contains the domain name of the website on which the user has logged in. */
+    /** We have authorized the bot to send us messages by logging into a website via [Telegram Login »](https://core.telegram.org/widgets/login); this field contains the domain name of the website on which the user has logged in. */
     public readonly ?string $domain;
 
-    /** @var ?BotApp We have authorized the bot to send us messages by opening the specified [bot web app](https://core.telegram.org/api/bots/webapps). */
+    /** We have authorized the bot to send us messages by opening the specified [bot web app](https://core.telegram.org/api/bots/webapps). */
     public readonly ?BotApp $app;
 
     /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info,
-    ) {
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
         parent::__construct($API, $rawMessage, $info);
         $this->attachMenu = $rawMessage['action']['attach_menu'];
         $this->domain = $rawMessage['action']['domain'] ?? null;

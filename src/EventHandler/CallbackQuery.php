@@ -21,13 +21,13 @@ use danog\MadelineProto\MTProto;
 /** Represents a query sent by the user by clicking on a button. */
 abstract class CallbackQuery extends Update
 {
-    /** @var int Query ID */
+    /** Query ID */
     public readonly int $queryId;
-    /** @var int ID of the user that pressed the button */
+
+    /** ID of the user that pressed the button */
     public readonly int $userId;
-    /**
-     * @var int Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games.
-     */
+
+    /** Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games. */
     public readonly int $chatInstance;
 
     /** @internal */

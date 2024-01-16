@@ -16,23 +16,24 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
-use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
-use danog\MadelineProto\EventHandler\Media\Audio;
-use danog\MadelineProto\EventHandler\Media\Document;
-use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\StrTools;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\EventHandler\AbstractPoll;
 use danog\MadelineProto\EventHandler\Media\Gif;
-use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\EventHandler\Media\RoundVideo;
-use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
-use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
+use danog\MadelineProto\EventHandler\Media\MaskSticker;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\StrTools;
+use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
+use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 
 /**
  * Represents an incoming or outgoing message.
@@ -50,8 +51,10 @@ abstract class Message extends AbstractMessage
 
     /** Bot command (if present) */
     public readonly ?string $command;
+
     /** Bot command type (if present) */
     public readonly ?CommandType $commandType;
+
     /** @var list<string> Bot command arguments (if present) */
     public readonly ?array $commandArgs;
 
@@ -94,8 +97,10 @@ abstract class Message extends AbstractMessage
 
     /** View counter for messages from channels or forwarded from channels */
     public readonly ?int $views;
+
     /** Forward counter for messages from channels or forwarded from channels */
     public readonly ?int $forwards;
+
     /** Author of the post, if signatures are enabled for messages from channels or forwarded from channels */
     public readonly ?string $signature;
 
@@ -108,6 +113,9 @@ abstract class Message extends AbstractMessage
      * All messages associated to the same album will have an identical grouped ID.
      */
     public readonly ?int $groupedId;
+
+    /** The poll */
+    public readonly ?AbstractPoll $poll;
 
     /** @internal */
     public function __construct(
@@ -126,18 +134,16 @@ abstract class Message extends AbstractMessage
         $this->forwards = $rawMessage['forwards'] ?? null;
         $this->signature = $rawMessage['post_author'] ?? null;
         $this->groupedId = $rawMessage['grouped_id'] ?? null;
-
-        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
+        $this->editDate = $rawMessage['edit_date'] ?? null;
         $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
+
+        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->viaBotId = $rawMessage['via_bot_id'] ??
             (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
-        $this->editDate = $rawMessage['edit_date'] ?? null;
 
-        $this->keyboard = isset($rawMessage['reply_markup'])
-            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
-            : null;
-        if (isset($rawMessage['fwd_from'])) {
+        if (isset($rawMessage['fwd_from']))
+        {
             $fwdFrom = $rawMessage['fwd_from'];
             $this->fwdInfo = new ForwardedInfo(
                 $fwdFrom['date'],
@@ -159,24 +165,27 @@ abstract class Message extends AbstractMessage
             $this->psaType = null;
             $this->imported = false;
         }
-
+        
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'], $this->protected)
             : null;
+        
+        $this->keyboard = isset($rawMessage['reply_markup'])
+            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
+            : null;
 
-        if (\in_array($this->message[0] ?? '', ['/', '.', '!'], true)) {
-            $space = strpos($this->message, ' ', 1) ?: \strlen($this->message);
-            $this->command = substr($this->message, 1, $space-1);
-            $args = explode(
-                ' ',
-                substr($this->message, $space+1)
-            );
+        $this->poll = ($rawMessage['media']['_'] ?? '') === 'messageMediaPoll'
+            ? AbstractPoll::fromRawPoll($rawMessage['media'])
+            : null;
+
+        if ($this->commandType = CommandType::tryFrom($this->message[0] ?? '')) {
+            $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
+            $args = \explode(' ', \substr($this->message, $space+1));
+            $this->command = \substr($this->message, 1, $space-1);
             $this->commandArgs = $args === [''] ? [] : $args;
-            $this->commandType = CommandType::from($this->message[0]);
         } else {
             $this->command = null;
             $this->commandArgs = null;
-            $this->commandType = null;
         }
 
         foreach ($rawMessage['reactions']['results'] ?? [] as $r) {
@@ -421,6 +430,24 @@ abstract class Message extends AbstractMessage
                 'schedule_date' => $scheduleDate,
                 'no_webpage' => $noWebpage,
             ]
+        );
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    }
+
+    /**
+     * Edit message keyboard.
+     *
+     * @param array $replyMarkup Reply markup for inline keyboards
+     */
+    public function editReplyMarkup(array $replyMarkup): Message
+    {
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->id,
+                'reply_markup' => $replyMarkup,
+            ],
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }

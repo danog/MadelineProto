@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 final class StoryReaction extends Update
 {
-    /** @var int ID of the sender of the story */
+    /** ID of the sender of the story */
     public readonly int $senderId;
 
-    /** @var int Story ID */
+    /** Story ID */
     public readonly int $id;
 
     public readonly int|string|null $reaction;

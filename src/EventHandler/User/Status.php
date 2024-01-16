@@ -30,9 +30,10 @@ use danog\MadelineProto\MTProto;
  */
 abstract class Status extends Update
 {
-    /** @var int User identifier */
+    /** User identifier */
     public readonly int $userId;
 
+    /** @internal */
     public function __construct(MTProto $API, array $rowUserStatus)
     {
         parent::__construct($API);

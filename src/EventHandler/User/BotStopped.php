@@ -24,13 +24,13 @@ use danog\MadelineProto\MTProto;
  */
 final class BotStopped extends Update
 {
-    /** @var int When did this action occur */
+    /** When did this action occur */
     public readonly int $date;
 
-    /** @var bool Whether the bot was stopped or started. */
+    /** Whether the bot was stopped or started. */
     public readonly bool $stopped;
 
-    /** @var int The user ID */
+    /** The user ID */
     public readonly int $userId;
 
     /** @internal */

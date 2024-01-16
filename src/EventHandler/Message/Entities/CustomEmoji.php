@@ -7,10 +7,10 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class CustomEmoji extends MessageEntity
 {
-    /**  @var int Document ID of the [custom emoji](https://core.telegram.org/api/custom-emoji). */
+    /** Document ID of the [custom emoji](https://core.telegram.org/api/custom-emoji). */
     public readonly int $documentId;
 
-    /** @internal  */
+    /** @internal */
     protected function __construct(array $rawEntities)
     {
         parent::__construct($rawEntities);

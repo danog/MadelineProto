@@ -31,7 +31,7 @@ final class DialogGameScore extends ServiceMessage
 
         /** @var int Game ID */
         public readonly int $gameId,
-
+    
         /** @var int Score */
         public readonly int $score
     ) {

@@ -24,6 +24,7 @@ use danog\MadelineProto\MTProto;
  */
 final class DialogPeerRequested extends ServiceMessage
 {
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawMessage,
@@ -32,8 +33,8 @@ final class DialogPeerRequested extends ServiceMessage
         /** @var int buttonId contained in the [keyboardButtonRequestPeer](https://docs.madelineproto.xyz/API_docs/constructors/keyboardButtonRequestPeer.html) */
         public readonly int $buttonId,
 
-        /** @var int The shared peer */
-        public readonly int $peer
+        /** @var list<int> The shared peers */
+        public readonly int $peers
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

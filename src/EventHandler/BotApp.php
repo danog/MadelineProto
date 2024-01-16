@@ -16,41 +16,43 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\Media\Document;
-use danog\MadelineProto\EventHandler\Media\Photo;
-use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\Photo;
 
 /**
  * Represents information about a [named bot web app](https://core.telegram.org/api/bots/webapps#named-bot-web-apps).
  */
 final class BotApp implements JsonSerializable
 {
-    /** @var int app ID */
+    /** App ID */
     public readonly int $id;
 
-    /** @var int access hash*/
+    /** Access hash*/
     public readonly int $accessHash;
 
-    /** @var string Bot web app short name, used to generate [named bot web app deep links](https://core.telegram.org/api/links#named-bot-web-app-links). */
+    /** Bot web app short name, used to generate [named bot web app deep links](https://core.telegram.org/api/links#named-bot-web-app-links). */
     public readonly string $name;
 
-    /** @var string Bot web app title. */
+    /** Bot web app title. */
     public readonly string $title;
 
-    /** @var string Bot web app description. */
+    /** Bot web app description. */
     public readonly string $description;
 
-    /** @var Photo Bot web app photo. */
+    /** Bot web app photo. */
     public readonly ?Photo $photo;
 
-    /** @var Document Bot web app animation. */
+    /** Bot web app animation. */
     public readonly ?Document $document;
 
-    /** @var int Hash to pass to [messages.getBotApp](https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html), to avoid refetching bot app info if it hasn’t changed. */
+    /** Hash to pass to [messages.getBotApp](https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html), to avoid refetching bot app info if it hasn’t changed. */
     public readonly int $hash;
+
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawBotApp,
@@ -60,6 +62,7 @@ final class BotApp implements JsonSerializable
 
         /** The bot is asking permission to send messages to the user: if the user agrees, set the write_allowed flag when invoking [messages.requestAppWebView](https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html). */
         public readonly ?bool $requestWriteAccess = null,
+
         public readonly ?bool $hasSettings = null,
     ) {
         $this->id = $rawBotApp['id'];

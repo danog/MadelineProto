@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 final class Emoji extends Status
 {
-    /** @var ?int [Custom emoji document ID](https://core.telegram.org/api/custom-emoji) */
+    /** [Custom emoji document ID](https://core.telegram.org/api/custom-emoji) */
     public readonly ?int $emojiId;
 
-    /** @var ?int This status is valid until this date */
+    /** This status is valid until this date */
     public readonly ?int $until;
 
     public function __construct(MTProto $API, array $rawEmojiStatus)

@@ -20,6 +20,7 @@ use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCErrorException;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -27,11 +28,8 @@ use danog\MadelineProto\MTProto;
 final class ChannelMessage extends Message
 {
     /** @internal */
-    public function __construct(
-        MTProto $API,
-        array $rawMessage,
-        array $info
-    ) {
+    public function __construct(MTProto $API, array $rawMessage, array $info)
+    {
         parent::__construct($API, $rawMessage, $info);
     }
 
@@ -45,17 +43,23 @@ final class ChannelMessage extends Message
      * ```
      *
      */
-    public function getDiscussion(): GroupMessage
+    public function getDiscussion(): ?GroupMessage
     {
-        $r = $this->getClient()->methodCallAsyncRead(
-            'messages.getDiscussionMessage',
-            ['peer' => $this->chatId, 'msg_id' => $this->id]
-        )['messages'];
-        $r = end($r);
-
-        $v = $this->getClient()->wrapMessage($r);
-        \assert($v instanceof GroupMessage);
-        return $v;
+        try
+        {
+            $r = $this->getClient()->methodCallAsyncRead(
+                'messages.getDiscussionMessage',
+                ['peer' => $this->chatId, 'msg_id' => $this->id]
+            )['messages'];
+            $r = end($r);
+            $v = $this->getClient()->wrapMessage($r);
+            \assert($v instanceof GroupMessage);
+            return $v;
+        } catch (RPCErrorException $e) {
+            if ($e->rpc == 'MSG_ID_INVALID')
+                return null;
+            throw $e;
+        }
     }
 
     /**

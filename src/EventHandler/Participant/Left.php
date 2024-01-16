@@ -29,7 +29,6 @@ final class Left extends Participant
     /** @internal */
     public function __construct(array $rawParticipant)
     {
-        $rawParticipant = $rawParticipant['peer'];
         $this->peer = $rawParticipant['peer'];
     }
 }

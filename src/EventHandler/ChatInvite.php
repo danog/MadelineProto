@@ -16,11 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\EventHandler\ChatInvite\ChatInviteExported;
-use danog\MadelineProto\EventHandler\ChatInvite\ChatInvitePublicJoin;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
+use danog\MadelineProto\EventHandler\ChatInvite\ChatInviteExported;
+use danog\MadelineProto\EventHandler\ChatInvite\ChatInvitePublicJoin;
 
 /**
  * Chat invite link that was used by the user to send the [join request »](https://core.telegram.org/api/invites#join-requests).

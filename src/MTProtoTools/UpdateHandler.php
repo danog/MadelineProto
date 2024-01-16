@@ -694,7 +694,7 @@ trait UpdateHandler
                     $message,
                     $info,
                     $message['action']['button_id'],
-                    $this->getIdInternal($message['action']['peer']),
+                    $message['action']['peers'],
                 ),
                 'messageActionSetChatWallPaper' => new DialogSetChatWallPaper(
                     $this,
