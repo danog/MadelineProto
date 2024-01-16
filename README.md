@@ -852,6 +852,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.setGlobalPrivacySettings.html" name="account.setGlobalPrivacySettings">Set global privacy settings: account.setGlobalPrivacySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.setBotInfo.html" name="bots.setBotInfo">Set localized name, about text and description of a bot (or of the current account, if called by a bot): bots.setBotInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setHistoryTTL.html" name="messages.setHistoryTTL">Set maximum Time-To-Live of all messages in the specified chat: messages.setHistoryTTL</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callsetoutput-int-id-danog-madelineproto-localfile-amp-bytestream-writablestream-file-void" name="callSetOutput">Set output file or stream for incoming OPUS audio packets in a call: callSetOutput</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#setreportpeers-int-string-int-string-userorid-void" name="setReportPeers">Set peer(s) where to send errors occurred in the event loop: setReportPeers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.setContentSettings.html" name="account.setContentSettings">Set sensitive content settings (for viewing or hiding NSFW content): account.setContentSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.setStickerSetThumb.html" name="stickers.setStickerSetThumb">Set stickerset thumbnail: stickers.setStickerSetThumb</a>
@@ -961,7 +962,16 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.setBlocked.html" name="contacts.setBlocked">contacts.setBlocked</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerColors.html" name="help.getPeerColors">help.getPeerColors</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerProfileColors.html" name="help.getPeerProfileColors">help.getPeerProfileColors</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteSavedHistory.html" name="messages.deleteSavedHistory">messages.deleteSavedHistory</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultTagReactions.html" name="messages.getDefaultTagReactions">messages.getDefaultTagReactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getPinnedSavedDialogs.html" name="messages.getPinnedSavedDialogs">messages.getPinnedSavedDialogs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSavedDialogs.html" name="messages.getSavedDialogs">messages.getSavedDialogs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSavedHistory.html" name="messages.getSavedHistory">messages.getSavedHistory</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSavedReactionTags.html" name="messages.getSavedReactionTags">messages.getSavedReactionTags</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reorderPinnedSavedDialogs.html" name="messages.reorderPinnedSavedDialogs">messages.reorderPinnedSavedDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.searchEmojiStickerSets.html" name="messages.searchEmojiStickerSets">messages.searchEmojiStickerSets</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.toggleSavedDialogPin.html" name="messages.toggleSavedDialogPin">messages.toggleSavedDialogPin</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateSavedReactionTag.html" name="messages.updateSavedReactionTag">messages.updateSavedReactionTag</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rledecode-string-string-string" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleencode-string-string-string" name="rleEncode">null-byte RLE encode: rleEncode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.applyGiftCode.html" name="payments.applyGiftCode">payments.applyGiftCode</a>

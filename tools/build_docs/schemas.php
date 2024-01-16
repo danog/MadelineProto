@@ -6,6 +6,10 @@
  */
 function loadSchemas(): array
 {
+    $last = file_get_contents("https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/Telegram/SourceFiles/mtproto/scheme/api.tl");
+    preg_match("|// Layer (\d+)|i", $last, $matches);
+    file_put_contents(getcwd()."/schemas/TL_telegram_v{$matches[1]}.tl", $last);
+
     $res = [];
     foreach (glob(getcwd().'/schemas/TL_telegram_*') as $file) {
         preg_match("/telegram_v(\d+)/", $file, $matches);
