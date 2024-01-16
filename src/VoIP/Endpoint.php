@@ -311,8 +311,8 @@ final class Endpoint
                     $length = \ord(stream_get_contents($message, 1));
                     for ($x = 0; $x < $length; $x++) {
                         $result['all_streams'][$x]['id'] = \ord(stream_get_contents($message, 1));
-                        $result['all_streams'][$x]['type'] = stream_get_contents($message, 4);
-                        $result['all_streams'][$x]['codec'] = \ord(stream_get_contents($message, 1));
+                        $result['all_streams'][$x]['type'] = \ord(stream_get_contents($message, 1));
+                        $result['all_streams'][$x]['codec'] = stream_get_contents($message, 4);
                         $result['all_streams'][$x]['frame_duration'] = unpack('v', stream_get_contents($message, 2))[1];
                         $result['all_streams'][$x]['enabled'] = \ord(stream_get_contents($message, 1));
                     }
