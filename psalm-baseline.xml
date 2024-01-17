@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@a75d26a3d425d183da8bef37cfc14976c8d817d6">
+<files psalm-version="dev-master@64868c5c9ff3f025f7e9d2412f5b3b719269361c">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code>$settings</code>
@@ -36,6 +36,10 @@
       <code>API</code>
       <code>API</code>
     </PropertyNotSetInConstructor>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$errors[$t] > 10]]></code>
+      <code><![CDATA[$errors[$t] > 10]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/APIWrapper.php">
     <PossiblyNullReference>
@@ -51,6 +55,14 @@
       <code>isInited</code>
       <code>setEventHandler</code>
     </PossiblyNullReference>
+    <RedundantCondition>
+      <code>!$started</code>
+      <code>!$started</code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$errors[$t] > 10]]></code>
+      <code><![CDATA[$errors[$t] > 10]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/ApiWrappers/Start.php">
     <MissingReturnType>
@@ -834,11 +846,18 @@
     </MissingReturnType>
   </file>
   <file src="src/GarbageCollector.php">
+    <NoValue>
+      <code>$id</code>
+    </NoValue>
     <PropertyTypeCoercion>
       <code>self::$map</code>
       <code>self::$map ??= new WeakMap</code>
       <code>self::$map ??= new WeakMap</code>
     </PropertyTypeCoercion>
+    <TypeDoesNotContainType>
+      <code>$id</code>
+      <code>$id</code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/InternalDoc.php">
     <InvalidReturnStatement>
@@ -1054,6 +1073,9 @@
       <code>$stdout</code>
       <code>$stdoutUnbuffered</code>
     </PropertyNotSetInConstructor>
+    <UndefinedVariable>
+      <code>$promise</code>
+    </UndefinedVariable>
     <UninitializedProperty>
       <code><![CDATA[$this->colors]]></code>
       <code><![CDATA[$this->colors]]></code>
@@ -1675,8 +1697,17 @@
     <PossiblyNullArrayOffset>
       <code><![CDATA[$res['participants']]]></code>
     </PossiblyNullArrayOffset>
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$res['id']]]></code>
+    </PossiblyUndefinedArrayOffset>
+    <RedundantFunctionCall>
+      <code>array_values</code>
+    </RedundantFunctionCall>
   </file>
   <file src="src/MTProtoTools/ReferenceDatabase.php">
+    <ParadoxicalCondition>
+      <code><![CDATA[$frame['args'][1]['type'] === $previous]]></code>
+    </ParadoxicalCondition>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$this->API->authorization['user']]]></code>
       <code><![CDATA[$this->API->authorization['user']]]></code>
@@ -1838,10 +1869,16 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/Serialization.php">
+    <InvalidNullableReturnType>
+      <code>array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}</code>
+    </InvalidNullableReturnType>
     <NullableReturnStatement>
       <code>$ipcSocket</code>
       <code>$ipcSocket</code>
     </NullableReturnStatement>
+    <UndefinedVariable>
+      <code>$warningId</code>
+    </UndefinedVariable>
   </file>
   <file src="src/SessionPaths.php">
     <LessSpecificReturnStatement>
@@ -1876,6 +1913,10 @@
     <InvalidArgument>
       <code>$entities</code>
     </InvalidArgument>
+    <PossiblyInvalidPropertyFetch>
+      <code><![CDATA[$entity->length]]></code>
+      <code><![CDATA[$entity->offset]]></code>
+    </PossiblyInvalidPropertyFetch>
   </file>
   <file src="src/Stream/ADNLTransport/ADNLStream.php">
     <MissingPropertyType>
@@ -2135,6 +2176,8 @@
     </PossiblyInvalidIterator>
     <PossiblyUndefinedArrayOffset>
       <code>$arguments[$key]</code>
+      <code>$arguments[$key]</code>
+      <code>$arguments[$key]</code>
       <code><![CDATA[$data['document']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
@@ -2293,6 +2336,9 @@
       <code>__invoke</code>
       <code>__invoke</code>
     </PossiblyNullReference>
+    <TypeDoesNotContainNull>
+      <code>$buffer === null</code>
+    </TypeDoesNotContainNull>
     <UnsupportedReferenceUsage>
       <code><![CDATA[$this->{$var} =& $val]]></code>
     </UnsupportedReferenceUsage>
