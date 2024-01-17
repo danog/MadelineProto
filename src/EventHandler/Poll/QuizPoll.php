@@ -16,16 +16,16 @@
 
 namespace danog\MadelineProto\EventHandler\Poll;
 
-use danog\MadelineProto\StrTools;
 use danog\MadelineProto\EventHandler\AbstractPoll;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\StrTools;
 
 /** Represents a quiz (with wrong and correct answers, results shown in the return type) poll */
 final class QuizPoll extends AbstractPoll
 {
     /** Explanation of quiz solution */
     public readonly ?string $solution;
-    
+
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text in quiz solution */
     public readonly array $entities;
 

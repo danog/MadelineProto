@@ -34,7 +34,7 @@ final class DialogPeerRequested extends ServiceMessage
         public readonly int $buttonId,
 
         /** @var list<int> The shared peers */
-        public readonly int $peers
+        public readonly array $peers
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

@@ -16,9 +16,9 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Privacy\Rule;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
+use danog\MadelineProto\MTProto;
 
 /**
  * Indicates some privacy rules for a user or set of users.

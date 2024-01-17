@@ -17,21 +17,20 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Typing;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\InlineQuery;
-use danog\MadelineProto\EventHandler\BotCommands;
-use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\AbstractMessage;
-use danog\MadelineProto\EventHandler\User\Phone;
-use danog\MadelineProto\EventHandler\User\Status;
-use danog\MadelineProto\EventHandler\User\Blocked;
-use danog\MadelineProto\EventHandler\User\Username;
-use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
+use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
 use danog\MadelineProto\EventHandler\Story\StoryReaction;
-use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
-use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
+use danog\MadelineProto\EventHandler\Typing;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\EventHandler\User\Blocked;
+use danog\MadelineProto\EventHandler\User\BotStopped;
+use danog\MadelineProto\EventHandler\User\Phone;
+use danog\MadelineProto\EventHandler\User\Status;
+use danog\MadelineProto\EventHandler\User\Username;
 
 /**
  * Allow incoming or outgoing group messages made by a certain list of senders.
@@ -75,8 +74,6 @@ abstract class AbstractFilterFromSenders extends Filter
             ($update instanceof Status && \in_array($update->userId, $this->peersResolved, true)) ||
             ($update instanceof Username && \in_array($update->userId, $this->peersResolved, true)) ||
             ($update instanceof BotCommands && \in_array($update->botId, $this->peersResolved, true)) ||
-            ($update instanceof BotChatInviteRequest && \in_array($update->userId, $this->peersResolved, true)) ||
-            ($update instanceof ChannelParticipant && \in_array($update->userId, $this->peersResolved, true)) ||
-            ($update instanceof ChannelParticipant && \in_array($update->actorId, $this->peersResolved, true));
+            ($update instanceof BotChatInviteRequest && \in_array($update->userId, $this->peersResolved, true));
     }
 }

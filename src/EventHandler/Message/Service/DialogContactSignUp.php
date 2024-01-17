@@ -25,7 +25,7 @@ use danog\MadelineProto\MTProto;
 final class DialogContactSignUp extends ServiceMessage
 {
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessage,array $info)
+    public function __construct(MTProto $API, array $rawMessage, array $info)
     {
         parent::__construct($API, $rawMessage, $info);
     }

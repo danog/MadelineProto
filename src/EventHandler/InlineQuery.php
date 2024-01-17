@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\Media\GeoPoint;
+use danog\MadelineProto\MTProto;
 
 /**
  * An incoming inline query.
@@ -48,6 +48,12 @@ final class InlineQuery extends Update
      * @var list<string> Regex matches, if a filter regex is present
      */
     public ?array $matches = null;
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawInlineQuery)

@@ -191,8 +191,6 @@ trait PeerHandler
                 case 'inputDialogPeer':
                 case 'inputNotifyPeer':
                 case 'inputFolderPeer':
-                case 'channelParticipantBanned':
-                case 'channelParticipantLeft':
                     return $this->getIdInternal($id['peer']);
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
@@ -281,10 +279,6 @@ trait PeerHandler
                 case 'peerUser':
                 case 'messageEntityMentionName':
                 case 'messageActionChatDeleteUser':
-                case 'channelParticipant':
-                case 'channelParticipantSelf':
-                case 'channelParticipantAdmin':
-                case 'channelParticipantCreator':
                     return $id['user_id'];
                 case 'updatePhoneCall':
                     return $id['phone_call']->getOtherID();

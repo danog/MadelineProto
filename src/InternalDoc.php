@@ -344,6 +344,7 @@ abstract class InternalDoc
      * Cancel a running broadcast.
      *
      * @param integer $id Broadcast ID
+     *
      */
     public function cancelBroadcast(int $id): void
     {

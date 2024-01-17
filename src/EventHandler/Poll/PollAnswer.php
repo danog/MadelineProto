@@ -16,10 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler\Poll;
 
+use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use danog\MadelineProto\TL\Types\Bytes;
 
 /** Represents a possible answer of a poll */
 final class PollAnswer implements JsonSerializable
@@ -29,7 +29,7 @@ final class PollAnswer implements JsonSerializable
 
     /** The param that has to be passed to [messages.sendVote](https://docs.madelineproto.xyz/API_docs/methods/messages.sendVote.html) */
     public readonly string $option;
-    
+
     /** Whether we have chosen this answer */
     public readonly ?bool $chosen;
 

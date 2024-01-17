@@ -17,14 +17,14 @@
 namespace danog\MadelineProto\EventHandler;
 
 use Amp\Cancellation;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\EventHandler\Story\Story;
-use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use AssertionError;
 use danog\MadelineProto\EventHandler\Action\Typing;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
-use AssertionError;
+use danog\MadelineProto\EventHandler\Story\Story;
+use danog\MadelineProto\EventHandler\Story\StoryDeleted;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\ParseMode;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 

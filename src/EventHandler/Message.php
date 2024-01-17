@@ -16,24 +16,23 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\StrTools;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\EventHandler\AbstractPoll;
-use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
+use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
+use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\MaskSticker;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
+use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
-use danog\MadelineProto\EventHandler\Media\Sticker;
-use danog\MadelineProto\EventHandler\Media\Document;
-use danog\MadelineProto\EventHandler\Media\RoundVideo;
-use danog\MadelineProto\EventHandler\Media\MaskSticker;
-use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
-use danog\MadelineProto\EventHandler\Message\ReportReason;
-use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
-use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\StrTools;
 
 /**
  * Represents an incoming or outgoing message.
@@ -67,6 +66,12 @@ abstract class Message extends AbstractMessage
      * @var list<string> Regex matches, if a filter regex is present
      */
     public ?array $matches = null;
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
 
     /**
      * Attached media.
@@ -142,8 +147,7 @@ abstract class Message extends AbstractMessage
         $this->viaBotId = $rawMessage['via_bot_id'] ??
             (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
 
-        if (isset($rawMessage['fwd_from']))
-        {
+        if (isset($rawMessage['fwd_from'])) {
             $fwdFrom = $rawMessage['fwd_from'];
             $this->fwdInfo = new ForwardedInfo(
                 $fwdFrom['date'],
@@ -165,11 +169,11 @@ abstract class Message extends AbstractMessage
             $this->psaType = null;
             $this->imported = false;
         }
-        
+
         $this->media = isset($rawMessage['media'])
             ? $API->wrapMedia($rawMessage['media'], $this->protected)
             : null;
-        
+
         $this->keyboard = isset($rawMessage['reply_markup'])
             ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
             : null;
@@ -179,9 +183,9 @@ abstract class Message extends AbstractMessage
             : null;
 
         if ($this->commandType = CommandType::tryFrom($this->message[0] ?? '')) {
-            $space = \strpos($this->message, ' ', 1) ?: \strlen($this->message);
-            $args = \explode(' ', \substr($this->message, $space+1));
-            $this->command = \substr($this->message, 1, $space-1);
+            $space = strpos($this->message, ' ', 1) ?: \strlen($this->message);
+            $args = explode(' ', substr($this->message, $space+1));
+            $this->command = substr($this->message, 1, $space-1);
             $this->commandArgs = $args === [''] ? [] : $args;
         } else {
             $this->command = null;

@@ -17,15 +17,15 @@
 namespace danog\MadelineProto\EventHandler;
 
 use AssertionError;
-use ReflectionClass;
-use ReflectionProperty;
-use JsonSerializable;
-use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Admin;
-use danog\MadelineProto\EventHandler\Participant\MySelf;
-use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Participant\Banned;
 use danog\MadelineProto\EventHandler\Participant\Creator;
+use danog\MadelineProto\EventHandler\Participant\Left;
+use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\MySelf;
+use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Info about a channel participant.

@@ -20,53 +20,53 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Fiber;
-use Closure;
-use Countable;
-use ArrayAccess;
-use Traversable;
-use Amp\File\File;
-use const PHP_SAPI;
-use function unpack;
-use ReflectionClass;
-use Amp\Cancellation;
-use const PHP_INT_MAX;
-use PhpParser\Node\Arg;
 use Amp\ByteStream\Pipe;
-use const STR_PAD_RIGHT;
-use PhpParser\Node\Name;
-use PhpParser\NodeFinder;
-use function Amp\File\read;
-use Amp\Http\Client\Request;
-use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
-use phpseclib3\Crypt\Random;
-use Webmozart\Assert\Assert;
-use PhpParser\Node\Expr\New_;
-use const DIRECTORY_SEPARATOR;
-use Amp\Http\Client\HttpClient;
-use function Amp\File\openFile;
-use PhpParser\Node\Expr\Yield_;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\FunctionLike;
-use PhpParser\Node\Expr\FuncCall;
-use PhpParser\Node\Expr\Include_;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableBuffer;
+use Amp\Cancellation;
+use Amp\File\File;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
+use ArrayAccess;
+use Closure;
+use Countable;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use Fiber;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\Include_;
+use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\Yield_;
 use PhpParser\Node\Expr\YieldFrom;
+use PhpParser\Node\FunctionLike;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\LNumber;
-
 use PhpParser\Node\Scalar\String_;
-
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
-use Amp\Http\Client\HttpClientBuilder;
-
 use PhpParser\Node\Stmt\DeclareDeclare;
+use PhpParser\NodeFinder;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use PhpParser\ParserFactory;
+use phpseclib3\Crypt\Random;
+use ReflectionClass;
+use Traversable;
+
+use Webmozart\Assert\Assert;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_INT_MAX;
+use const PHP_SAPI;
+
+use const STR_PAD_RIGHT;
+use function Amp\File\openFile;
+use function Amp\File\read;
+use function unpack;
 
 /**
  * Some tools.
@@ -574,24 +574,24 @@ abstract class Tools extends AsyncTools
      * Parse t.me link.
      *
      * @internal
-     * @return array{0: bool, 1: string}|null
+     * @return array{0: bool, 1: string|int}|null
      */
     public static function parseLink(string $link): array|null
     {
-        if (\preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
+        if (preg_match('@([a-z0-9_-]*)\\.(?:t|telegram)\.(?:me|dog)@', $link, $matches)) {
             if ($matches[1] !== 'www') {
                 return [false, $matches[1]];
             }
         }
-        if (\preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
+        if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
             return [!!$matches[1], $matches[2]];
         }
         // Deep Link
-        if (\preg_match('@tg://(resolve|openmessage|user)\?(domain|userid|id)=([a-z0-9_-]+)@i', $link, $matches)) {
+        if (preg_match('@tg://(resolve|openmessage|user)\?(domain|userid|id)=([a-z0-9_-]+)@i', $link, $matches)) {
             return [false, $matches[1]];
         }
         // t.me/c/<channelId>
-        if (\preg_match('@(?:https?://)?t\.me/c/(\d+)@', $link, $matches)) {
+        if (preg_match('@(?:https?://)?t\.me/c/(\d+)@', $link, $matches)) {
             return [false, DialogId::fromSupergroupOrChannel((int) $matches[1])];
         }
         return null;

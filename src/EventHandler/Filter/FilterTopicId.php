@@ -17,10 +17,10 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use Webmozart\Assert\Assert;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
+use danog\MadelineProto\EventHandler\Update;
+use Webmozart\Assert\Assert;
 
 /**
  * Allow only messages with a specific topic id (Supergroups only).

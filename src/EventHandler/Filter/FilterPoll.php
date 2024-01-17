@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow only messages that contain a poll.

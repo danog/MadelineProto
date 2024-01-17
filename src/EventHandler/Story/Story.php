@@ -96,6 +96,13 @@ final class Story extends AbstractStory
      */
     public ?array $matches = null;
 
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
+
     /** @internal */
     public function __construct(MTProto|Client $API, array $rawStory)
     {

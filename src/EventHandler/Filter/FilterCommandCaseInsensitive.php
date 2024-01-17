@@ -16,18 +16,18 @@
 
 namespace danog\MadelineProto\EventHandler\Filter;
 
-use Attribute;
 use AssertionError;
-use Webmozart\Assert\Assert;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\Message;
+use Attribute;
 use danog\MadelineProto\EventHandler\CommandType;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
+use Webmozart\Assert\Assert;
 
 /**
  * Allow only messages containing the specified case-insensitive command.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterCommandCaseInsensetive extends Filter
+final class FilterCommandCaseInsensitive extends Filter
 {
     /**
      * @var list<CommandType>
@@ -44,9 +44,8 @@ final class FilterCommandCaseInsensetive extends Filter
     public function __construct(
         string $command,
         array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH],
-        private readonly ?string $encoding = null,
     ) {
-        $this->command = mb_strtolower($command, $encoding);
+        $this->command = mb_strtolower($command);
         Assert::true(preg_match("/^\w+$/", $command) === 1, "An invalid command was specified!");
         Assert::notEmpty($types, 'No command types were specified!');
         $c = [];
@@ -60,6 +59,6 @@ final class FilterCommandCaseInsensetive extends Filter
     }
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && strtolower($update->command) === $this->command && \in_array($update->commandType, $this->commandTypes, true);
+        return $update instanceof Message && $update->command !== null && mb_strtolower($update->command) === $this->command && \in_array($update->commandType, $this->commandTypes, true);
     }
 }

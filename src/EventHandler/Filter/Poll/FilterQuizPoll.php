@@ -17,10 +17,10 @@
 namespace danog\MadelineProto\EventHandler\Filter\Poll;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Filter\Filter;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Poll\QuizPoll;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow only messages that contain a quiz poll.

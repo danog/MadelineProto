@@ -18,8 +18,8 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow only forwarded messages from a certain sender.
@@ -42,6 +42,6 @@ final class FilterForwardedFrom extends Filter
 
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && ($update?->fwdInfo?->fromId === $this->peerResolved || $update?->fwdInfo?->forwardedChannelMsgId === $this->peerResolved);
+        return $update instanceof Message && ($update->fwdInfo?->fromId === $this->peerResolved);
     }
 }

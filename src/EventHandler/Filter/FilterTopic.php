@@ -17,9 +17,9 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Typing\SupergroupUserTyping;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
  * Allow only messages coming from groups that has topics (Supergroups only).

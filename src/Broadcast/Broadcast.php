@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Broadcast;
 
 use danog\MadelineProto\Broadcast\Action\ActionForward;
 use danog\MadelineProto\Broadcast\Action\ActionSend;
-use OutOfBoundsException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -114,7 +113,7 @@ trait Broadcast
      */
     public function getBroadcastProgress(int $id): ?Progress
     {
-        return $this->broadcasts[$id]?->getProgress() ?? null;
+        return $this->broadcasts[$id]?->getProgress();
     }
     /**
      * Cancel a running broadcast.
@@ -124,7 +123,7 @@ trait Broadcast
      */
     public function cancelBroadcast(int $id): void
     {
-        $this->broadcasts[$id]?->cancel() ?? null;
+        $this->broadcasts[$id]?->cancel();
     }
 
     /** @internal */

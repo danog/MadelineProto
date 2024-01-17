@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Poll\MultiplePoll;
+use danog\MadelineProto\EventHandler\Poll\PollAnswer;
+use danog\MadelineProto\EventHandler\Poll\QuizPoll;
+use danog\MadelineProto\EventHandler\Poll\SinglePoll;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use danog\MadelineProto\EventHandler\Poll\QuizPoll;
-use danog\MadelineProto\EventHandler\Poll\SinglePoll;
-use danog\MadelineProto\EventHandler\Poll\PollAnswer;
-use danog\MadelineProto\EventHandler\Poll\MultiplePoll;
 
 /** Poll */
 abstract class AbstractPoll implements JsonSerializable
@@ -48,7 +48,7 @@ abstract class AbstractPoll implements JsonSerializable
     /** @var list<int> IDs of the last users that recently voted in the poll */
     public readonly array $recentVoters;
 
-    /** Total number of people that voted in the poll */	
+    /** Total number of people that voted in the poll */
     public readonly int $totalVoters;
 
     /** @internal */
@@ -59,27 +59,32 @@ abstract class AbstractPoll implements JsonSerializable
         $this->question     = $rawPoll['poll']['question'];
         $this->closeDate    = $rawPoll['poll']['close_date'] ?? null;
         $this->closePeriod  = $rawPoll['poll']['close_period'] ?? null;
-        $this->recentVoters = $rawPoll['poll']['public_voters'] ? $rawPoll['results']['recent_voters'] : [];
+        $this->recentVoters = $rawPoll['poll']['public_voters'] ?: [];
         $this->totalVoters  = $rawPoll['results']['total_voters'];
-        $this->answers = $this->getPollAnswers($rawPoll['poll']['answers'], $rawPoll['results']['results'] ?? []);
+        $this->answers = self::getPollAnswers($rawPoll['poll']['answers'], $rawPoll['results']['results'] ?? []);
     }
 
-    public static function fromRawPoll(array $rawPoll)
+    public static function fromRawPoll(array $rawPoll): AbstractPoll
     {
-        if ($rawPoll['poll']['quiz'])
+        if ($rawPoll['poll']['quiz']) {
             return new QuizPoll($rawPoll);
+        }
 
-        if ($rawPoll['poll']['multiple_choice'])
+        if ($rawPoll['poll']['multiple_choice']) {
             return new MultiplePoll($rawPoll);
-        
+        }
+
         return new SinglePoll($rawPoll);
     }
 
-    private function getPollAnswers(array $answers, array $result): array
+    /**
+     * @return list<PollAnswer>
+     */
+    private static function getPollAnswers(array $answers, array $result): array
     {
         $out = [];
         foreach ($answers as $key => $value) {
-            $merge = array_merge($value, $result[$key] ?? []); 
+            $merge = array_merge($value, $result[$key] ?? []);
             $out[] = new PollAnswer($merge);
         }
         return $out;

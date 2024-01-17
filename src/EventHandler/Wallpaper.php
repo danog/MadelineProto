@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
+use danog\MadelineProto\EventHandler\Wallpaper\WallpaperSettings;
+use danog\MadelineProto\MTProto;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
-use danog\MadelineProto\EventHandler\Wallpaper\WallpaperSettings;
 
 /**
  * Represents a [wallpaper](https://core.telegram.org/api/wallpapers).
@@ -54,7 +54,7 @@ final class Wallpaper implements JsonSerializable
 
     /** Info on how to generate the wallpaper, according to [these instructions](https://core.telegram.org/api/wallpapers). */
     public readonly ?WallpaperSettings $settings;
-    
+
     /** @internal */
     public function __construct(MTProto $API, array $rawWallpaper)
     {

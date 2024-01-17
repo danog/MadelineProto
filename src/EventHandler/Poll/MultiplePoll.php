@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler\Poll;
 
-use danog\MadelineProto\MTProto;
 use danog\MadelineProto\EventHandler\AbstractPoll;
 
 /** Represents a poll with multiple options can be chosen as answer */

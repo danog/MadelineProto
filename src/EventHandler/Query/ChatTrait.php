@@ -16,12 +16,12 @@
 
 namespace danog\MadelineProto\EventHandler\Query;
 
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\MadelineProto\ParseMode;
 
 /** @internal */
 trait ChatTrait

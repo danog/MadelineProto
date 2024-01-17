@@ -78,7 +78,7 @@ trait InlineTrait
      *
      * @param array $replyMarkup Reply markup for inline keyboards
      */
-    public function editReplyMarkup(array $replyMarkup)
+    public function editReplyMarkup(array $replyMarkup): void
     {
         $this->getClient()->methodCallAsyncRead(
             'messages.editInlineBotMessage',

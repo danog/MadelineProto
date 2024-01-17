@@ -33,6 +33,12 @@ abstract class ButtonQuery extends CallbackQuery
      * @var list<string> Regex matches, if a filter regex is present.
      */
     public ?array $matches = null;
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawCallback)

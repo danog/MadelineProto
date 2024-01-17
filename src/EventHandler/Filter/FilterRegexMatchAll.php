@@ -35,9 +35,8 @@ final class FilterRegexMatchAll extends Filter
         private readonly string $regex,
         private readonly int $flags = 0,
         private readonly int $offset = 0
-    )
-    {
-        preg_match_all($regex, '', flags: $flags, offset: $offset);
+    ) {
+        preg_match_all($regex, '', $m, $flags, $offset);
         Assert::eq(preg_last_error_msg(), 'No error');
     }
 
@@ -45,25 +44,25 @@ final class FilterRegexMatchAll extends Filter
     {
         if ($update instanceof Message && preg_match_all($this->regex, $update->message, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
-            $update->matches = $matches;
+            $update->matchesAll = $matches;
             return true;
         }
 
         if ($update instanceof ButtonQuery && preg_match_all($this->regex, $update->data, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
-            $update->matches = $matches;
+            $update->matchesAll = $matches;
             return true;
         }
 
         if ($update instanceof InlineQuery && preg_match_all($this->regex, $update->query, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
-            $update->matches = $matches;
+            $update->matchesAll = $matches;
             return true;
         }
 
         if ($update instanceof Story && preg_match_all($this->regex, $update->caption, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
-            $update->matches = $matches;
+            $update->matchesAll = $matches;
             return true;
         }
         return false;

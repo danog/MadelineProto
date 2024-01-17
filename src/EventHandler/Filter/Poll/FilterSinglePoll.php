@@ -17,19 +17,19 @@
 namespace danog\MadelineProto\EventHandler\Filter\Poll;
 
 use Attribute;
-use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Filter\Filter;
-use danog\MadelineProto\EventHandler\Poll\MultiplePoll;
+use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Poll\SinglePoll;
+use danog\MadelineProto\EventHandler\Update;
 
 /**
- * Allow only messages that contain a multiple poll.
+ * Allow only messages that contain a single poll.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-final class FilterMultiplePoll extends Filter
+final class FilterSinglePoll extends Filter
 {
     public function apply(Update $update): bool
     {
-        return ($update instanceof Message && $update->poll instanceof MultiplePoll);
+        return ($update instanceof Message && $update->poll instanceof SinglePoll);
     }
 }

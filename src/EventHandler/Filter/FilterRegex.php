@@ -30,14 +30,16 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRegex extends Filter
 {
-    /** @param non-empty-string $regex */
+    /**
+     * @param non-empty-string $regex
+     * @param int-mask<0, 256, 512> $flags
+     */
     public function __construct(
         private readonly string $regex,
         private readonly int $flags = 0,
         private readonly int $offset = 0
-    )
-    {
-        preg_match($regex, '', flags: $flags, offset: $offset);
+    ) {
+        preg_match($regex, '', $m, $flags, $offset);
         Assert::eq(preg_last_error_msg(), 'No error');
     }
 

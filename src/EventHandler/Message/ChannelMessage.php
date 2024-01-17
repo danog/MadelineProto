@@ -45,8 +45,7 @@ final class ChannelMessage extends Message
      */
     public function getDiscussion(): ?GroupMessage
     {
-        try
-        {
+        try {
             $r = $this->getClient()->methodCallAsyncRead(
                 'messages.getDiscussionMessage',
                 ['peer' => $this->chatId, 'msg_id' => $this->id]
@@ -56,8 +55,9 @@ final class ChannelMessage extends Message
             \assert($v instanceof GroupMessage);
             return $v;
         } catch (RPCErrorException $e) {
-            if ($e->rpc == 'MSG_ID_INVALID')
+            if ($e->rpc == 'MSG_ID_INVALID') {
                 return null;
+            }
             throw $e;
         }
     }

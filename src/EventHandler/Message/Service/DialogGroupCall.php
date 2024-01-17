@@ -31,7 +31,7 @@ abstract class DialogGroupCall extends ServiceMessage
     public readonly int $accessHash;
 
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessage,array $info)
+    public function __construct(MTProto $API, array $rawMessage, array $info)
     {
         parent::__construct($API, $rawMessage, $info);
         $this->callId = $rawMessage['action']['call']['id'];

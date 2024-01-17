@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\EventHandler\Channel;
 
-use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
-use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\ChatInvite;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Left;
 use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * A participant has left, joined, was banned or admined in a [channel or supergroup](https://core.telegram.org/api/channel).
