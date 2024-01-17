@@ -282,13 +282,6 @@
     <MissingConstructor>
       <code>$pdo</code>
     </MissingConstructor>
-    <PossiblyNullArrayAccess>
-      <code><![CDATA[$this->db->query("SELECT data_free FROM information_schema.tables WHERE table_schema=`{$database}` AND table_name=`{$this->table}`")->fetchRow()['data_free']]]></code>
-    </PossiblyNullArrayAccess>
-    <UndefinedMethod>
-      <code>getOptimizeIfWastedGtMb</code>
-      <code>getOptimizeIfWastedGtMb</code>
-    </UndefinedMethod>
   </file>
   <file src="src/Db/PostgresArray.php">
     <MissingClosureParamType>
@@ -487,6 +480,11 @@
       <code>$peersResolved</code>
     </PropertyNotSetInConstructor>
   </file>
+  <file src="src/EventHandler/Filter/FilterForwardedFrom.php">
+    <PropertyNotSetInConstructor>
+      <code>$peerResolved</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="src/EventHandler/Filter/FilterFromAdmin.php">
     <MissingConstructor>
       <code>$adminIds</code>
@@ -648,11 +646,14 @@
   <file src="src/EventHandler/Message.php">
     <LessSpecificReturnStatement>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
       <code>Message</code>
+      <code>Message</code>
     </MoreSpecificReturnType>
     <NullableReturnStatement>
+      <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
     </NullableReturnStatement>
     <PropertyNotSetInConstructor>
@@ -737,6 +738,12 @@
       <code><![CDATA[$API->getIdInternal($rawPinned)]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
+  <file src="src/EventHandler/Poll/QuizPoll.php">
+    <PropertyNotSetInConstructor>
+      <code>$html</code>
+      <code>$htmlTelegram</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="src/EventHandler/Privacy.php">
     <PropertyTypeCoercion>
       <code><![CDATA[array_map(RuleDestination::fromRawRule(...), $rawPrivacy['rules'])]]></code>
@@ -744,6 +751,7 @@
   </file>
   <file src="src/EventHandler/Query/ChatTrait.php">
     <MoreSpecificReturnType>
+      <code>Message</code>
       <code>Message</code>
     </MoreSpecificReturnType>
     <PossiblyNullPropertyAssignmentValue>
@@ -1710,7 +1718,6 @@
     </MissingReturnType>
     <PossiblyNullArgument>
       <code><![CDATA[$this->getIdInternal($message['action']['from_id'])]]></code>
-      <code><![CDATA[$this->getIdInternal($message['action']['peer'])]]></code>
       <code><![CDATA[$this->getIdInternal($message['action']['to_id'])]]></code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess>
@@ -2207,7 +2214,6 @@
     </PossiblyNullArgument>
     <PossiblyNullReference>
       <code>botAPIToMTProto</code>
-      <code>logger</code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
       <code>$elem[1]</code>
@@ -2256,10 +2262,6 @@
     </PossiblyNullArrayAccess>
   </file>
   <file src="src/Tools.php">
-    <ArgumentTypeCoercion>
-      <code><![CDATA[static fn (ClassLike $c): bool => $c->name !== null]]></code>
-      <code><![CDATA[static fn (ClassLike $c): bool => $c->name !== null]]></code>
-    </ArgumentTypeCoercion>
     <MissingClosureParamType>
       <code>$val</code>
     </MissingClosureParamType>
@@ -2429,9 +2431,6 @@
       <code><![CDATA[$this->authorization['phone_number']]]></code>
       <code><![CDATA[$this->authorization['phone_number']]]></code>
     </PossiblyNullArrayAccess>
-    <PossiblyUndefinedVariable>
-      <code>$datacenter</code>
-    </PossiblyUndefinedVariable>
     <RedundantConditionGivenDocblockType>
       <code>\is_array($auth_key)</code>
     </RedundantConditionGivenDocblockType>

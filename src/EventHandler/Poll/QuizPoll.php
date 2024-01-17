@@ -47,8 +47,11 @@ final class QuizPoll extends AbstractPoll
      *
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
-    public function getHTML(bool $allowTelegramTags = false): string
+    public function getHTML(bool $allowTelegramTags = false): ?string
     {
+        if ($this->solution === null) {
+            return null;
+        }
         if (!$this->entities) {
             return StrTools::htmlEscape($this->solution);
         }
