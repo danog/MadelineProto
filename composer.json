@@ -24,7 +24,7 @@
     },
     "minimum-stability": "beta",
     "require": {
-        "php-64bit": ">=8.2.4",
+        "php-64bit": ">=8.1",
         "danog/primemodule": "^1",
         "symfony/polyfill-mbstring": "*",
         "ext-mbstring": "*",

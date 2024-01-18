@@ -964,6 +964,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerProfileColors.html" name="help.getPeerProfileColors">help.getPeerProfileColors</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteSavedHistory.html" name="messages.deleteSavedHistory">messages.deleteSavedHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultTagReactions.html" name="messages.getDefaultTagReactions">messages.getDefaultTagReactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getOutboxReadDate.html" name="messages.getOutboxReadDate">messages.getOutboxReadDate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getPinnedSavedDialogs.html" name="messages.getPinnedSavedDialogs">messages.getPinnedSavedDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSavedDialogs.html" name="messages.getSavedDialogs">messages.getSavedDialogs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSavedHistory.html" name="messages.getSavedHistory">messages.getSavedHistory</a>
@@ -1010,6 +1011,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.toggleAllStoriesHidden.html" name="stories.toggleAllStoriesHidden">stories.toggleAllStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePeerStoriesHidden.html" name="stories.togglePeerStoriesHidden">stories.togglePeerStoriesHidden</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePinned.html" name="stories.togglePinned">stories.togglePinned</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getIsPremiumRequiredToContact.html" name="users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.  
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
