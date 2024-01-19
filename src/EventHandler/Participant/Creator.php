@@ -38,7 +38,7 @@ final class Creator extends Participant
         array $rawParticipant
     ) {
         $this->userId = $rawParticipant['user_id'];
-        $this->adminRights = new AdminRights($rawParticipant['adminRights']);
+        $this->adminRights = new AdminRights($rawParticipant['admin_rights']);
         $this->rank = $rawParticipant['rank'] ?? 'Owner';
     }
 }
