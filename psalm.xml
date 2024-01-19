@@ -10,15 +10,13 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor-bin/check/vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
-    autoloader="vendor/autoload.php"
+    autoloader="vendor-bin/check/vendor/autoload.php"
 >
+    <enableExtensions>
+        <extension name="ffi"/>
+    </enableExtensions>
     <projectFiles>
         <directory name="src" />
-        <ignoreFiles>
-            <directory name="vendor" />
-            <!-- FFI psalm bug -->
-            <file name="src/Ogg.php" />
-        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
         <!-- Should totally go in level 1... -->
