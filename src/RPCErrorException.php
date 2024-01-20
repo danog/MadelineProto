@@ -148,6 +148,7 @@ class RPCErrorException extends \Exception
                 || str_starts_with($error, 'No workers running')
                 || str_starts_with($error, 'All workers are busy. Active_queries ')
                 || preg_match('/FILE_PART_\d*_MISSING/', $error)
+                || !preg_match('/^[a-zA-Z0-9\.]+$/', $method)
                 || ($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
                 || ($error === 'BOT_MISSING' && \in_array($method, ['stickers.changeStickerPosition', 'stickers.createStickerSet', 'messages.uploadMedia'], true));
     }
