@@ -733,8 +733,11 @@ final class TL implements TLInterface
                         $value = null;
                         break;
                     default:
-                        $value = ['_' => $this->constructors->findByType($type)['predicate']];
-                        throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
+                        if ($this->API->getSettings()->getSchema()->getFuzzMode()) {
+                            $value = ['_' => $this->constructors->findByType($type)['predicate']];
+                        } else {
+                            throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
+                        }
                 }
             } else {
                 $value = $arguments[$name];
