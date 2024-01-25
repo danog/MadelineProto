@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\StrTools;
+use Webmozart\Assert\Assert;
 
 /**
  * Represents an incoming or outgoing message.
@@ -450,6 +451,56 @@ abstract class Message extends AbstractMessage
             scheduleDate: $scheduleDate,
             noWebpage: $noWebpage,
         );
+    }
+
+    /**
+     * Forwards messages by their IDs.
+     * 
+     * @param integer|string $toPeer Destination peer
+     * @param list<int> $id IDs of messages
+     * @param bool $dropAuthor Whether to forward messages without quoting the original author
+     * @param bool $dropCaption Whether to strip captions from media
+     * @param int $topicId Destination [forum topic](https://core.telegram.org/api/forum#forum-topics)
+     * @param boolean $silent Whether to send the message silently, without triggering notifications.
+     * @param boolean $noForwards Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean $background Send this message as background message
+     * @param boolean $score When forwarding games, whether to include your score in the game	
+     * @param integer|null $scheduleDate Schedule date.
+     * @param integer|string|null $sendAs Peer to send the message as.
+     */
+    public function forward(
+        int|string $toPeer,
+        array $id = [],
+        bool $dropAuthor = false,
+        bool $dropCaption = false,
+        int $topicId = 1,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $score = false,
+        ?int $scheduleDate = null,
+        int|string|null $sendAs = null,
+    ): array {
+        Assert::false($this->forwards);
+        $result = $this->getClient()->methodCallAsyncRead(
+            'messages.forwardMessages',
+            [
+                'from_peer' => $this->chatId,
+                'to_peer' => $toPeer,
+                'id' => $id = empty($id) ? [$this->id] : $id,
+                'silent' => $silent,
+                'send_as' => $sendAs,
+                'top_msg_id' => $topicId,
+                'background' => $background,
+                'noforwards' => $noForwards,
+                'with_my_score' => $score,
+                'schedule_date' => $scheduleDate,
+                'drop_author' => $dropAuthor,
+                'drop_media_captions' => $dropCaption,
+            ]
+        );
+        $result = array_slice($this->getClient()->extractUpdates($result), count($id));
+        return array_map($this->getClient()->wrapMessage(...), $result);
     }
 
     protected readonly string $html;
