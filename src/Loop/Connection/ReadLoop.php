@@ -139,10 +139,25 @@ final class ReadLoop extends Loop
             }
             throw $e;
         }
-        if ($payload_length === 4) {
-            $payload = Tools::unpackSignedInt($buffer->bufferRead(4));
-            $this->API->logger("Received {$payload} from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
-            return $payload;
+        if ($payload_length & (1 << 31)) {
+            $this->API->logger("Received quick ACK $payload_length from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
+            return null;
+        }
+        if ($payload_length <= 16) {
+            $code = Tools::unpackSignedInt($buffer->bufferRead(4));
+            if ($code === -1 && $payload_length >= 8) {
+                $ack = unpack('V', $buffer->bufferRead(4))[1];
+                $this->API->logger("Received quick ACK $ack (padded) from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
+                if ($payload_length > 8) {
+                    $buffer->bufferRead($payload_length-8);
+                }
+                return null;
+            }
+            if ($payload_length > 4) {
+                $buffer->bufferRead($payload_length-4);
+            }
+            $this->API->logger("Received {$code} from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
+            return $code;
         }
         $this->connection->reading(true);
         try {

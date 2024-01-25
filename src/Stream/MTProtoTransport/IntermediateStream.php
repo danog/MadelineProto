@@ -60,6 +60,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $buffer = $this->stream->getWriteBuffer($length + 4, $append);
+        //$buffer->bufferWrite(pack('V', ($length) | (1 << 31)));
         $buffer->bufferWrite(pack('V', $length));
         return $buffer;
     }

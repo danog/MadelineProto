@@ -59,8 +59,10 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
     {
         $length >>= 2;
         if ($length < 127) {
+            // $message = \chr($length | (1 << 7));
             $message = \chr($length);
         } else {
+            // $message = \chr(255).substr(pack('V', $length), 0, 3);
             $message = \chr(127).substr(pack('V', $length), 0, 3);
         }
         $buffer = $this->stream->getWriteBuffer(\strlen($message) + $length, $append);
@@ -75,7 +77,12 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
-        $length = \ord($buffer->bufferRead(1));
+        $c = $buffer->bufferRead(1);
+        $length = \ord($c);
+        /*if (($length & (1 << 7)) !== 0) {
+            $length = unpack('V', strrev($c.$buffer->bufferRead(3)))[1];
+            return $buffer;
+        }*/
         if ($length >= 127) {
             $length = unpack('V', ($buffer->bufferRead(3))."\0")[1];
         }

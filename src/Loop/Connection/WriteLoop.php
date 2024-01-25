@@ -342,7 +342,9 @@ final class WriteLoop extends Loop
                 $padding += 16;
             }
             $padding = Tools::random($padding);
-            $message_key = substr(hash('sha256', substr($this->shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true), 8, 16);
+            $message_key_large = hash('sha256', substr($this->shared->getTempAuthKey()->getAuthKey(), 88, 32).$plaintext.$padding, true);
+            $message_key = substr($message_key_large, 8, 16);
+            //$ack = unpack('V', substr($message_key_large, 0, 4))[1] | (1 << 31);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey());
             $message = $this->shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
             $buffer = $this->connection->stream->getWriteBuffer(\strlen($message));
