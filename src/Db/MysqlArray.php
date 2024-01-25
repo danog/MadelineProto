@@ -135,7 +135,7 @@ final class MysqlArray extends SqlArray
                     ->execute([$database, $this->table])
                     ->fetchRow();
                 Assert::notNull($result);
-                $result = $result['data_free'];
+                $result = $result['data_free'] ?? $result['DATA_FREE'];
                 if (($result >> 20) > $this->dbSettings->getOptimizeIfWastedGtMb()) {
                     $this->db->query("OPTIMIZE TABLE `{$this->table}`");
                 }
