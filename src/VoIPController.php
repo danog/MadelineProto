@@ -21,6 +21,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\BufferedReader;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 use Amp\Sync\LocalMutex;
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -37,6 +38,7 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\delay;
+use function Amp\File\openFile;
 use function Amp\Future\await;
 
 /** @internal */
@@ -144,6 +146,10 @@ final class VoIPController
 
     private LocalMutex $authMutex;
 
+    private ?LocalFile $outputFile = null;
+    private ?OggWriter $outputStream = null;
+    private ?int $outputStreamId = null;
+
     /**
      * Constructor.
      *
@@ -169,7 +175,8 @@ final class VoIPController
     public function __serialize(): array
     {
         $result = get_object_vars($this);
-        unset($result['authMutex']);
+        unset($result['authMutex'], $result['outputStream']);
+
         return $result;
     }
     /**
@@ -187,6 +194,11 @@ final class VoIPController
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
         EventLoop::queue(function (): void {
+            if (isset($this->outputFile)) {
+                \assert($this->outputStreamId !== null);
+                $out = openFile($this->outputFile->file, 'a');
+                $this->outputStream = new OggWriter($out, $this->outputStreamId);
+            }
             if ($this->callState === CallState::RUNNING) {
                 if ($this->voipState === VoIPState::CREATED) {
                     // No endpoints yet
@@ -588,6 +600,7 @@ final class VoIPController
      */
     private function handlePacket(Endpoint $socket, array $packet): void
     {
+        $cnt = 0;
         switch ($packet['_']) {
             case self::PKT_INIT:
                 $this->setVoipState(VoIPState::WAIT_INIT_ACK);
@@ -627,6 +640,12 @@ final class VoIPController
                     $this->initStream();
                 }
                 break;
+        }
+        if ($this->outputStream !== null && $cnt) {
+            unset($packet['_'], $packet['extra']);
+            foreach ($packet as ['data' => $data]) {
+                $this->outputStream->writeChunk($data, 2880, false);
+            }
         }
     }
     private function initStream(): void
@@ -750,6 +769,24 @@ final class VoIPController
             $t += $delay;
         }
     }
+    /**
+     * Set output file or stream for incoming OPUS audio packets.
+     *
+     * Will write an OGG OPUS stream to the specified file or stream.
+     */
+    public function setOutput(LocalFile|WritableStream $file): void
+    {
+        if ($file instanceof LocalFile) {
+            $this->outputFile = $file;
+            $file = openFile($file->file, 'w');
+        } else {
+            $this->outputFile = null;
+        }
+        $this->outputStreamId = random_int(-(2**31), (2**31)-1);
+        $this->outputStream = new OggWriter($file, $this->outputStreamId);
+        $this->outputStream->writeHeader(1, 48000, "incoming audio stream");
+    }
+
     /**
      * Play file.
      */

@@ -48,7 +48,7 @@ class SecretMessage extends AbstractPrivateMessage
         }
         $message = $this->getClient()->getSecretMessage(
             chatId: $this->chatId,
-            randomId: $this->id
+            randomId: $this->replyToMsgId
         );
         $this->replyCache = $message;
         $this->replyCached = true;

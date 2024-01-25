@@ -457,21 +457,25 @@ trait PeerHandler
                 $id = $content;
             }
         }
-        $id = strtolower(str_replace('@', '', $id));
-        if ($id === 'me') {
-            return $this->getInfo($this->authorization['user']['id'], $type);
-        }
-        if ($id === 'support') {
-            if (!$this->supportUser) {
-                $this->methodCallAsyncRead('help.getSupport', []);
+        if (\is_string($id)) {
+            $id = strtolower(str_replace('@', '', $id));
+            if ($id === 'me') {
+                return $this->getInfo($this->authorization['user']['id'], $type);
             }
-            return $this->getInfo($this->supportUser, $type);
-        }
-        if ($bot_api_id = $this->peerDatabase->getIdFromUsername($id)) {
-            return $this->getInfo($bot_api_id, $type);
-        }
-        if ($bot_api_id = $this->peerDatabase->resolveUsername($id)) {
-            return $this->getInfo($bot_api_id, $type);
+            if ($id === 'support') {
+                if (!$this->supportUser) {
+                    $this->methodCallAsyncRead('help.getSupport', []);
+                }
+                return $this->getInfo($this->supportUser, $type);
+            }
+            if ($bot_api_id = $this->peerDatabase->getIdFromUsername($id)) {
+                return $this->getInfo($bot_api_id, $type);
+            }
+            if ($bot_api_id = $this->peerDatabase->resolveUsername($id)) {
+                return $this->getInfo($bot_api_id, $type);
+            }
+        } else {
+            return $this->getInfo($id, $type);
         }
         if ($this->cacheFullDialogs()) {
             return $this->getInfo($id, $type);
@@ -602,16 +606,18 @@ trait PeerHandler
                         $id = $content;
                     }
                 }
-                $id = strtolower(str_replace('@', '', $id));
-                if ($id === 'me') {
-                    $id = $this->authorization['user']['id'];
-                } elseif ($id === 'support') {
-                    $this->methodCallAsyncRead('help.getSupport', []);
-                    continue;
-                } else {
-                    $id = $this->peerDatabase->resolveUsername($id);
-                    if ($id === null) {
-                        throw new PeerNotInDbException;
+                if (\is_string($id)) {
+                    $id = strtolower(str_replace('@', '', $id));
+                    if ($id === 'me') {
+                        $id = $this->authorization['user']['id'];
+                    } elseif ($id === 'support') {
+                        $this->methodCallAsyncRead('help.getSupport', []);
+                        continue;
+                    } else {
+                        $id = $this->peerDatabase->resolveUsername($id);
+                        if ($id === null) {
+                            throw new PeerNotInDbException;
+                        }
                     }
                 }
             }

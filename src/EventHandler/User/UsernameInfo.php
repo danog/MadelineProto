@@ -25,13 +25,13 @@ use ReflectionProperty;
  */
 final class UsernameInfo implements JsonSerializable
 {
-    /** @var bool Whether the username is bought, meaning it was bought on [fragment](https://fragment.com). */
+    /** Whether the username is bought, meaning it was bought on [fragment](https://fragment.com). */
     public readonly bool $bought;
 
-    /** @var bool Whether the username is active. */
+    /** Whether the username is active. */
     public readonly bool $active;
 
-    /** @var string The username. */
+    /** The username. */
     public readonly string $username;
 
     /** @internal */

@@ -28,29 +28,31 @@ use ReflectionProperty;
  */
 final class BotApp implements JsonSerializable
 {
-    /** @var int app ID */
+    /** App ID */
     public readonly int $id;
 
-    /** @var int access hash*/
+    /** Access hash*/
     public readonly int $accessHash;
 
-    /** @var string Bot web app short name, used to generate [named bot web app deep links](https://core.telegram.org/api/links#named-bot-web-app-links). */
+    /** Bot web app short name, used to generate [named bot web app deep links](https://core.telegram.org/api/links#named-bot-web-app-links). */
     public readonly string $name;
 
-    /** @var string Bot web app title. */
+    /** Bot web app title. */
     public readonly string $title;
 
-    /** @var string Bot web app description. */
+    /** Bot web app description. */
     public readonly string $description;
 
-    /** @var Photo Bot web app photo. */
+    /** Bot web app photo. */
     public readonly ?Photo $photo;
 
-    /** @var Document Bot web app animation. */
+    /** Bot web app animation. */
     public readonly ?Document $document;
 
-    /** @var int Hash to pass to [messages.getBotApp](https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html), to avoid refetching bot app info if it hasn’t changed. */
+    /** Hash to pass to [messages.getBotApp](https://docs.madelineproto.xyz/API_docs/methods/messages.getBotApp.html), to avoid refetching bot app info if it hasn’t changed. */
     public readonly int $hash;
+
+    /** @internal */
     public function __construct(
         MTProto $API,
         array $rawBotApp,

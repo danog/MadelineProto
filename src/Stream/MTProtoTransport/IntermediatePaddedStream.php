@@ -62,6 +62,7 @@ final class IntermediatePaddedStream implements BufferedStreamInterface, MTProto
     {
         $padding_length = Tools::randomInt(modulus: 16);
         $buffer = $this->stream->getWriteBuffer(4 + $length + $padding_length, $append.Tools::random($padding_length));
+        //$buffer->bufferWrite(pack('V', ($padding_length + $length) | (1 << 31)));
         $buffer->bufferWrite(pack('V', $padding_length + $length));
         return $buffer;
     }

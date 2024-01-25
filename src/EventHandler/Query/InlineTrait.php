@@ -46,6 +46,7 @@ trait InlineTrait
             ),
         });
     }
+
     /**
      * Edit message text.
      *
@@ -68,6 +69,22 @@ trait InlineTrait
                 'reply_markup' => $replyMarkup,
                 'parse_mode' => $parseMode,
                 'no_webpage' => $noWebpage,
+            ],
+        );
+    }
+
+    /**
+     * Edit message keyboard.
+     *
+     * @param array $replyMarkup Reply markup for inline keyboards
+     */
+    public function editReplyMarkup(array $replyMarkup): void
+    {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.editInlineBotMessage',
+            [
+                'id' => $this->rawId,
+                'reply_markup' => $replyMarkup,
             ],
         );
     }

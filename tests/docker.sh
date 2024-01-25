@@ -19,6 +19,7 @@ for f in 192.168.1.30 192.168.69.236 192.168.69.233 192.168.69.207 192.168.69.13
 	fi
 done
 
+arches=""
 arches="arm64"
 if [ $has_x86 -eq 1 ]; then
 	arches="$arches amd64"

@@ -320,7 +320,7 @@ final class Connection
                 Assert::true($this->reader->start(), "Could not start reader stream");
                 Assert::true($this->checker->start(), "Could not start checker stream");
                 Assert::true($this->cleanup->start(), "Could not start cleanup stream");
-                Assert::true($this->waiter->start(), "Could not start waiter stream");
+                $this->waiter->start();
                 if ($this->pinger) {
                     Assert::true($this->pinger->start(), "Could not start pinger stream");
                 }

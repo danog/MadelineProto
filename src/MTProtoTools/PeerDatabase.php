@@ -242,15 +242,17 @@ final class PeerDatabase implements TLCallback
                     $id = $content;
                 }
             }
-            $id = strtolower(str_replace('@', '', $id));
-            if ($id === 'me') {
-                $id = $this->API->authorization['user']['id'];
-            } elseif ($id === 'support') {
-                $id = $this->API->methodCallAsyncRead('help.getSupport', [])['user'];
-            } else {
-                $id = $this->resolveUsername($id);
-                if ($id === null) {
-                    throw new PeerNotInDbException;
+            if (\is_string($id)) {
+                $id = strtolower(str_replace('@', '', $id));
+                if ($id === 'me') {
+                    $id = $this->API->authorization['user']['id'];
+                } elseif ($id === 'support') {
+                    $id = $this->API->methodCallAsyncRead('help.getSupport', [])['user'];
+                } else {
+                    $id = $this->resolveUsername($id);
+                    if ($id === null) {
+                        throw new PeerNotInDbException;
+                    }
                 }
             }
         }

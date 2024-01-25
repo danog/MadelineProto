@@ -33,6 +33,7 @@ use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
+use danog\MadelineProto\SecurityException;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
@@ -99,6 +100,9 @@ trait ResponseHandler
         $this->ackIncomingMessage($message);
         $response_type = $this->API->getTL()->getConstructors()->findByPredicate($message->getContent()['_'])['type'];
         if ($response_type == 'Updates') {
+            if ($message->unencrypted) {
+                throw new SecurityException("Can't accept unencrypted update!");
+            }
             if (!$this->isCdn()) {
                 EventLoop::queue($this->API->handleUpdates(...), $message->read());
             }
@@ -177,6 +181,9 @@ trait ResponseHandler
         $requestId ??= $message->getRequestId();
         $response = $message->read();
         if ($response['_'] === 'rpc_result') {
+            if ($message->unencrypted) {
+                throw new SecurityException("Can't accept unencrypted result!");
+            }
             $this->ackIncomingMessage($message);
             $response = $response['result'];
         }

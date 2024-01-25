@@ -17,6 +17,7 @@
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\VoIP\CallState;
@@ -94,6 +95,18 @@ final class VoIP extends Update implements SimpleFilters
     public function play(LocalFile|RemoteUrl|ReadableStream $file): self
     {
         $this->getClient()->callPlay($this->callID, $file);
+
+        return $this;
+    }
+
+    /**
+     * Set output file or stream for incoming OPUS audio packets.
+     *
+     * Will write an OGG OPUS stream to the specified file or stream.
+     */
+    public function setOutput(LocalFile|WritableStream $file): self
+    {
+        $this->getClient()->callSetOutput($this->callID, $file);
 
         return $this;
     }

@@ -57,7 +57,7 @@
         "psr/log": "^3",
         "webmozart/assert": "^1.11",
         "bacon/bacon-qr-code": "^2.0",
-        "nikic/php-parser": "^4.16",
+        "nikic/php-parser": "^5",
         "revolt/event-loop": "^1.0.5"
     },
     "require-dev": {

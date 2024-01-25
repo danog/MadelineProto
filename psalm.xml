@@ -8,18 +8,19 @@
     ignoreInternalFunctionNullReturn="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor-bin/check/vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
+    autoloader="vendor-bin/check/vendor/autoload.php"
 >
+    <enableExtensions>
+        <extension name="ffi"/>
+    </enableExtensions>
     <projectFiles>
         <directory name="src" />
-        <ignoreFiles>
-            <directory name="vendor" />
-            <!-- FFI psalm bug -->
-            <file name="src/Ogg.php" />
-        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <!-- Should totally go in level 1... -->
+        <RiskyTruthyFalsyComparison errorLevel="suppress" />
         <ParamNameMismatch errorLevel="suppress" />
         <StringIncrement errorLevel="suppress" />
         <InvalidTraversableImplementation errorLevel="suppress" />

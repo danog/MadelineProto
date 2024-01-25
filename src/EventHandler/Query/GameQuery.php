@@ -23,7 +23,7 @@ use danog\MadelineProto\MTProto;
 /** Represents a query sent by the user by clicking on a "Play game" button. */
 abstract class GameQuery extends CallbackQuery
 {
-    /** @var string Short name of a Game to be returned, serves as the unique identifier for the game */
+    /** Short name of a Game to be returned, serves as the unique identifier for the game */
     public readonly string $gameShortName;
 
     /** @internal */

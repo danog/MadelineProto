@@ -24,22 +24,22 @@ use danog\MadelineProto\MTProto;
  */
 final class InlineQuery extends Update
 {
-    /** @var int Query ID */
+    /** Query ID */
     public readonly int $queryId;
 
-    /** @var string Text of query */
+    /** Text of query */
     public readonly string $query;
 
-    /** @var int User that sent the query */
+    /** User that sent the query */
     public readonly int $userId;
 
-    /** @var string Offset to navigate through results */
+    /** Offset to navigate through results */
     public readonly string $offset;
 
-    /** @var GeoPoint Attached geolocation */
+    /** Attached geolocation */
     public readonly ?GeoPoint $geo;
 
-    /** @var InlineQueryPeerType Type of the chat from which the inline query was sent. */
+    /** Type of the chat from which the inline query was sent. */
     public readonly InlineQueryPeerType $peerType;
 
     /**
@@ -48,6 +48,12 @@ final class InlineQuery extends Update
      * @var list<string> Regex matches, if a filter regex is present
      */
     public ?array $matches = null;
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
 
     /** @internal */
     public function __construct(MTProto $API, array $rawInlineQuery)
@@ -57,7 +63,9 @@ final class InlineQuery extends Update
         $this->query = $rawInlineQuery['query'];
         $this->userId = $rawInlineQuery['user_id'];
         $this->offset = $rawInlineQuery['offset'];
-        $this->geo = isset($rawInlineQuery['geo']) ? new GeoPoint($rawInlineQuery['geo']) : null;
         $this->peerType = InlineQueryPeerType::from($rawInlineQuery['peer_type']['_']);
+        $this->geo = isset($rawInlineQuery['geo'])
+            ? new GeoPoint($rawInlineQuery['geo'])
+            : null;
     }
 }

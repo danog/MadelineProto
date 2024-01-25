@@ -27,11 +27,11 @@ final class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 169;
+    protected int $layer = 172;
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__ . '/../TL_telegram_v169.tl';
+    protected string $APISchema = __DIR__ . '/../TL_telegram_v172.tl';
     /**
      * MTProto schema path.
      */
@@ -48,6 +48,10 @@ final class TLSchema extends SettingsAbstract
      * Whether the scheme was upgraded.
      */
     private bool $wasUpgraded = true;
+    /**
+     * Whether to enable fuzzing mode (all parameters will be populated with default values).
+     */
+    protected bool $fuzz = false;
     public function __sleep()
     {
         return array_merge(['wasUpgraded'], parent::__sleep());
@@ -181,6 +185,24 @@ final class TLSchema extends SettingsAbstract
     public function setOther(array $other): self
     {
         $this->other = $other;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of the fuzz mode.
+     */
+    public function getFuzzMode(): bool
+    {
+        return $this->fuzz;
+    }
+
+    /**
+     * Set the value of the fuzz mode.
+     */
+    public function setFuzzMode(bool $fuzz): self
+    {
+        $this->fuzz = $fuzz;
 
         return $this;
     }

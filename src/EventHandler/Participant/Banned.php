@@ -42,11 +42,10 @@ final class Banned extends Participant
     /** @internal */
     public function __construct(array $rawParticipant)
     {
-        $peer = $rawParticipant['peer'];
         $this->left = $rawParticipant['left'];
         $this->kickedBy = $rawParticipant['kicked_by'];
         $this->date = $rawParticipant['date'];
         $this->bannedRights = new BannedRights($rawParticipant['banned_rights']);
-        $this->peer = $peer;
+        $this->peer = $rawParticipant['peer'];
     }
 }

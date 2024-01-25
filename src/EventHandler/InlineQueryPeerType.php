@@ -23,14 +23,19 @@ enum InlineQueryPeerType: string implements JsonSerializable
 {
     /** private chat */
     case PM = 'inlineQueryPeerTypePM';
+
     /** [chat](https://core.telegram.org/api/channel) */
     case Chat = 'inlineQueryPeerTypeChat';
+
     /** private chat with a bot. */
     case BotPM = 'inlineQueryPeerTypeBotPM';
+
     /** [channel](https://core.telegram.org/api/channel) */
     case Broadcast = 'inlineQueryPeerTypeBroadcast';
+
     /** [supergroup](https://core.telegram.org/api/channel) */
     case Megagroup = 'inlineQueryPeerTypeMegagroup';
+
     /** private chat with the bot itself */
     case SameBotPM = 'inlineQueryPeerTypeSameBotPM';
 

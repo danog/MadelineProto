@@ -32,6 +32,7 @@ use Amp\Http\Client\Request;
 use ArrayAccess;
 use Closure;
 use Countable;
+use danog\MadelineProto\MTProtoTools\DialogId;
 use Fiber;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
@@ -55,14 +56,14 @@ use PhpParser\ParserFactory;
 use phpseclib3\Crypt\Random;
 use ReflectionClass;
 use Traversable;
+
 use Webmozart\Assert\Assert;
 
 use const DIRECTORY_SEPARATOR;
-
 use const PHP_INT_MAX;
 use const PHP_SAPI;
-use const STR_PAD_RIGHT;
 
+use const STR_PAD_RIGHT;
 use function Amp\File\openFile;
 use function Amp\File\read;
 use function unpack;
@@ -573,7 +574,7 @@ abstract class Tools extends AsyncTools
      * Parse t.me link.
      *
      * @internal
-     * @return array{0: bool, 1: string}|null
+     * @return array{0: bool, 1: string|int}|null
      */
     public static function parseLink(string $link): array|null
     {
@@ -584,6 +585,14 @@ abstract class Tools extends AsyncTools
         }
         if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
             return [!!$matches[1], $matches[2]];
+        }
+        // Deep Link
+        if (preg_match('@tg://(resolve|openmessage|user)\?(domain|userid|id)=([a-z0-9_-]+)@i', $link, $matches)) {
+            return [false, $matches[1]];
+        }
+        // t.me/c/<channelId>
+        if (preg_match('@(?:https?://)?t\.me/c/(\d+)@', $link, $matches)) {
+            return [false, DialogId::fromSupergroupOrChannel((int) $matches[1])];
         }
         return null;
     }
@@ -700,7 +709,7 @@ abstract class Tools extends AsyncTools
         $plugin = is_subclass_of($class, PluginEventHandler::class);
         $file = (new ReflectionClass($class))->getFileName();
         $code = read($file);
-        $code = (new ParserFactory)->create(ParserFactory::ONLY_PHP7)->parse($code);
+        $code = (new ParserFactory)->createForNewestSupportedVersion()->parse($code);
         Assert::notNull($code);
         $traverser = new NodeTraverser;
         $traverser->addVisitor(new NameResolver());

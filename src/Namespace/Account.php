@@ -734,18 +734,18 @@ interface Account
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool, hide_read_marks: bool, new_noncontact_peers_require_premium: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
     public function getGlobalPrivacySettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Set global privacy settings.
      *
-     * @param array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool, keep_archived_unmuted?: bool, keep_archived_folders?: bool} $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @param array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers?: bool, keep_archived_unmuted?: bool, keep_archived_folders?: bool, hide_read_marks?: bool, new_noncontact_peers_require_premium?: bool} $settings Global privacy settings @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool, hide_read_marks: bool, new_noncontact_peers_require_premium: bool} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
      */
     public function setGlobalPrivacySettings(array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 

@@ -30,30 +30,40 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRegex extends Filter
 {
-    /** @param non-empty-string $regex */
-    public function __construct(private readonly string $regex)
-    {
-        preg_match($regex, '');
+    /**
+     * @param non-empty-string $regex
+     * @param int-mask<0, 256, 512> $flags
+     */
+    public function __construct(
+        private readonly string $regex,
+        private readonly int $flags = 0,
+        private readonly int $offset = 0
+    ) {
+        preg_match($regex, '', $m, $flags, $offset);
         Assert::eq(preg_last_error_msg(), 'No error');
     }
+
     public function apply(Update $update): bool
     {
-        if ($update instanceof Message && preg_match($this->regex, $update->message, $matches)) {
+        if ($update instanceof Message && preg_match($this->regex, $update->message, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof ButtonQuery && preg_match($this->regex, $update->data, $matches)) {
+
+        if ($update instanceof ButtonQuery && preg_match($this->regex, $update->data, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof InlineQuery && preg_match($this->regex, $update->query, $matches)) {
+
+        if ($update instanceof InlineQuery && preg_match($this->regex, $update->query, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;
         }
-        if ($update instanceof Story && preg_match($this->regex, $update->caption, $matches)) {
+
+        if ($update instanceof Story && preg_match($this->regex, $update->caption, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;

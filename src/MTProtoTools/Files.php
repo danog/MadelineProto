@@ -97,7 +97,7 @@ trait Files
             return new Video($this, $media, $media, $protected);
         }
         if ($media['_'] === 'messageMediaPhoto') {
-            if (!isset($media['photo'])) {
+            if (!isset($media['photo']) || $media['photo']['_'] === 'photoEmpty') {
                 return null;
             }
             return new Photo($this, $media, $protected);

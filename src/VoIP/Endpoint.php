@@ -311,8 +311,8 @@ final class Endpoint
                     $length = \ord(stream_get_contents($message, 1));
                     for ($x = 0; $x < $length; $x++) {
                         $result['all_streams'][$x]['id'] = \ord(stream_get_contents($message, 1));
-                        $result['all_streams'][$x]['type'] = stream_get_contents($message, 4);
-                        $result['all_streams'][$x]['codec'] = \ord(stream_get_contents($message, 1));
+                        $result['all_streams'][$x]['type'] = \ord(stream_get_contents($message, 1));
+                        $result['all_streams'][$x]['codec'] = stream_get_contents($message, 4);
                         $result['all_streams'][$x]['frame_duration'] = unpack('v', stream_get_contents($message, 2))[1];
                         $result['all_streams'][$x]['enabled'] = \ord(stream_get_contents($message, 1));
                     }
@@ -324,17 +324,6 @@ final class Endpoint
                     $result['id'] = \ord(stream_get_contents($message, 1));
                     $result['enabled'] = \ord(stream_get_contents($message, 1));
                     break;
-                    // streamData flags:int2 stream_id:int6 has_more_flags:flags.1?true length:(flags.0?int16:int8) timestamp:int data:byteArray = StreamData;
-                    // packetStreamData#4 stream_data:streamData = Packet;
-                case VoIPController::PKT_STREAM_DATA:
-                    $flags = \ord(stream_get_contents($message, 1));
-                    $result['stream_id'] = $flags & 0x3F;
-                    $flags = ($flags & 0xC0) >> 6;
-                    $result['has_more_flags'] = (bool) ($flags & 2);
-                    $length = $flags & 1 ? unpack('v', stream_get_contents($message, 2))[1] : \ord(stream_get_contents($message, 1));
-                    $result['timestamp'] = unpack('V', stream_get_contents($message, 4))[1];
-                    $result['data'] = stream_get_contents($message, $length);
-                    break;
                 case \danog\MadelineProto\VoIPController::PKT_UPDATE_STREAMS:
                     continue 2;
                 case \danog\MadelineProto\VoIPController::PKT_PING:
@@ -344,6 +333,17 @@ final class Endpoint
                     if (fstat($payload)['size'] - ftell($payload)) {
                         $result['out_seq_no'] = unpack('V', stream_get_contents($payload, 4))[1];
                     }
+                    break;
+                    // streamData flags:int2 stream_id:int6 has_more_flags:flags.1?true length:(flags.0?int16:int8) timestamp:int data:byteArray = StreamData;
+                    // packetStreamData#4 stream_data:streamData = Packet;
+                case VoIPController::PKT_STREAM_DATA:
+                    $flags = \ord(stream_get_contents($message, 1));
+                    $result[0]['stream_id'] = $flags & 0x3F;
+                    $flags = ($flags & 0xC0) >> 6;
+                    $result[0]['has_more_flags'] = (bool) ($flags & 2);
+                    $length = $flags & 1 ? unpack('v', stream_get_contents($message, 2))[1] : \ord(stream_get_contents($message, 1));
+                    $result[0]['timestamp'] = unpack('V', stream_get_contents($message, 4))[1];
+                    $result[0]['data'] = stream_get_contents($message, $length);
                     break;
                 case VoIPController::PKT_STREAM_DATA_X2:
                     for ($x = 0; $x < 2; $x++) {

@@ -23,11 +23,11 @@ $p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.t
 
 $p->setStub('<?php
 
-if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 1) || PHP_MAJOR_VERSION <= 7) {
-    die("MadelineProto requires at least PHP 8.1.".PHP_EOL);
+if ((PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION < 2) || PHP_MAJOR_VERSION <= 7) {
+    die("MadelineProto requires at least PHP 8.2.".PHP_EOL);
 }
 if (PHP_INT_SIZE < 8) {
-    die("A 64-bit build of PHP is required to run MadelineProto, PHP 8.1 is required.".PHP_EOL);
+    die("A 64-bit build of PHP is required to run MadelineProto, PHP 8.2 is required.".PHP_EOL);
 }
 
 if (\defined("MADELINE_PHAR")) {

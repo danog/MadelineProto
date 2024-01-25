@@ -24,10 +24,10 @@ use danog\MadelineProto\MTProto;
  */
 final class Phone extends Update
 {
-    /** @var int User ID */
+    /** User ID */
     public readonly int $userId;
 
-    /** @var string New phone number. */
+    /** New phone number. */
     public readonly string $number;
 
     /** @internal */
