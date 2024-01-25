@@ -456,7 +456,7 @@ abstract class Message extends AbstractMessage
     /**
      * Forwards messages by their IDs.
      * 
-     * @param integer|string $toPeer Destination peer
+     * @param integer|string $peer Destination peer
      * @param list<int> $id IDs of messages
      * @param bool $dropAuthor Whether to forward messages without quoting the original author
      * @param bool $dropCaption Whether to strip captions from media
@@ -469,7 +469,7 @@ abstract class Message extends AbstractMessage
      * @param integer|string|null $sendAs Peer to send the message as.
      */
     public function forward(
-        int|string $toPeer,
+        int|string $peer,
         array $id = [],
         bool $dropAuthor = false,
         bool $dropCaption = false,
@@ -486,7 +486,7 @@ abstract class Message extends AbstractMessage
             'messages.forwardMessages',
             [
                 'from_peer' => $this->chatId,
-                'to_peer' => $toPeer,
+                'to_peer' => $peer,
                 'id' => $id = empty($id) ? [$this->id] : $id,
                 'silent' => $silent,
                 'send_as' => $sendAs,
