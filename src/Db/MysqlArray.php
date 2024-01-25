@@ -131,11 +131,11 @@ final class MysqlArray extends SqlArray
         if ($this->dbSettings->getOptimizeIfWastedGtMb() !== null) {
             try {
                 $database = $this->dbSettings->getDatabase();
-                $result = $this->db->prepare("SELECT data_free FROM information_schema.tables WHERE table_schema=? AND table_name=?")
+                $result = $this->db->prepare("SELECT data_free data_free FROM information_schema.tables WHERE table_schema=? AND table_name=?")
                     ->execute([$database, $this->table])
                     ->fetchRow();
                 Assert::notNull($result);
-                $result = $result['data_free'];
+                $result = $result['data_free'] ?? 0;
                 if (($result >> 20) > $this->dbSettings->getOptimizeIfWastedGtMb()) {
                     $this->db->query("OPTIMIZE TABLE `{$this->table}`");
                 }
