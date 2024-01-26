@@ -339,6 +339,7 @@ abstract class EventHandler extends AbstractAPI
         if (isset(self::$pluginCache[$class])) {
             return;
         }
+        Magic::start(light: false);
         $plugins = $class::getPlugins();
         $plugins = array_values(array_unique($plugins, SORT_REGULAR));
         $plugins = array_merge($plugins, self::internalGetDirectoryPlugins($class));
