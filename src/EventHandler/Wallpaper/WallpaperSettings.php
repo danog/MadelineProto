@@ -54,12 +54,12 @@ final class WallpaperSettings implements JsonSerializable
     {
         $this->blur = $rawWallpaperSetting['blur'];
         $this->motion = $rawWallpaperSetting['motion'];
+        $this->intensity = $rawWallpaperSetting['intensity'];
+        $this->rotation = $rawWallpaperSetting['rotation'] ?? 0;
         $this->backgroundColor = $rawWallpaperSetting['background_color'] ?? null;
         $this->secondBackgroundColor = $rawWallpaperSetting['second_background_color'] ?? null;
         $this->thirdBackgroundColor = $rawWallpaperSetting['third_background_color'] ?? null;
         $this->fourthBackgroundColor = $rawWallpaperSetting['fourth_background_color'] ?? null;
-        $this->intensity = $rawWallpaperSetting['intensity'];
-        $this->rotation = $rawWallpaperSetting['rotation'];
     }
 
     /** @internal */
