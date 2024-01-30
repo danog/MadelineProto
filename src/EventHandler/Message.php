@@ -512,7 +512,7 @@ abstract class Message extends AbstractMessage
         ?int $scheduleDate = null,
         int|string|null $sendAs = null,
     ): array {
-        Assert::false($this->forwards);
+        Assert::false($this->protected);
         $result = $this->getClient()->methodCallAsyncRead(
             'messages.forwardMessages',
             [
