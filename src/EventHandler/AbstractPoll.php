@@ -59,7 +59,7 @@ abstract class AbstractPoll implements JsonSerializable
         $this->question     = $rawPoll['poll']['question'];
         $this->closeDate    = $rawPoll['poll']['close_date'] ?? null;
         $this->closePeriod  = $rawPoll['poll']['close_period'] ?? null;
-        $this->recentVoters = $rawPoll['poll']['public_voters'] ?: [];
+        $this->recentVoters = $rawPoll['results']['recent_voters'] ?? [];
         $this->totalVoters  = $rawPoll['results']['total_voters'];
         $this->answers = self::getPollAnswers($rawPoll['poll']['answers'], $rawPoll['results']['results'] ?? []);
     }
