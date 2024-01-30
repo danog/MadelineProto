@@ -583,16 +583,17 @@ abstract class Tools extends AsyncTools
                 return [false, $matches[1]];
             }
         }
+        // t.me/c/<channelId>
+        if (preg_match('@t\.me/c/(\d+)@', $link, $matches)) {
+            return [false, DialogId::fromSupergroupOrChannel((int) $matches[1])];
+        }
+        // Invite links
         if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {
             return [!!$matches[1], $matches[2]];
         }
         // Deep Link
-        if (preg_match('@tg://(resolve|openmessage|user)\?(domain|userid|id)=([a-z0-9_-]+)@i', $link, $matches)) {
-            return [false, $matches[1]];
-        }
-        // t.me/c/<channelId>
-        if (preg_match('@(?:https?://)?t\.me/c/(\d+)@', $link, $matches)) {
-            return [false, DialogId::fromSupergroupOrChannel((int) $matches[1])];
+        if (preg_match('@tg://(?:resolve|openmessage|user)\?(?:domain|userid|id)=([a-z0-9_-]+)@i', $link, $matches)) {
+            return [false, (int) $matches[1]];
         }
         return null;
     }
