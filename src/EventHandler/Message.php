@@ -486,7 +486,7 @@ abstract class Message extends AbstractMessage
 
     /**
      * Forwards messages by their IDs.
-     * 
+     *
      * @param integer|string $peer Destination peer
      * @param list<int> $id IDs of messages
      * @param bool $dropAuthor Whether to forward messages without quoting the original author
@@ -495,7 +495,7 @@ abstract class Message extends AbstractMessage
      * @param boolean $silent Whether to send the message silently, without triggering notifications.
      * @param boolean $noForwards Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean $background Send this message as background message
-     * @param boolean $score When forwarding games, whether to include your score in the game	
+     * @param boolean $score When forwarding games, whether to include your score in the game
      * @param integer|null $scheduleDate Schedule date.
      * @param integer|string|null $sendAs Peer to send the message as.
      */
@@ -530,7 +530,7 @@ abstract class Message extends AbstractMessage
                 'drop_media_captions' => $dropCaption,
             ]
         );
-        $result = array_slice($this->getClient()->extractUpdates($result), count($id));
+        $result = \array_slice($this->getClient()->extractUpdates($result), \count($id));
         return array_map($this->getClient()->wrapMessage(...), $result);
     }
 
