@@ -1,5 +1,14 @@
-
 <?php declare(strict_types=1);
+
+if (file_exists('vendor/autoload.php')) {
+    require_once 'vendor/autoload.php';
+} else {
+    // Otherwise download an !!! alpha !!! version of MadelineProto via madeline.php
+    if (!file_exists('madeline.php')) {
+        copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
+    }
+    require_once 'madeline.php';
+}
 
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
