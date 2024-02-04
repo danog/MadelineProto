@@ -29,6 +29,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
+use function Amp\delay;
 use function Amp\Future\await;
 
 /**
@@ -44,14 +45,17 @@ final class InternalState
     private StatusInternal $status = StatusInternal::IDLING_BEFORE_GATHERING_PEERS;
     private DeferredCancellation $cancellation;
     private bool $cancelled = false;
+
     public function __construct(
         private int $broadcastId,
         private MTProto $API,
         private Action $action,
         private Filter $filter,
+        private readonly ?float $delay = null,
     ) {
+        if ($this->delay !== null)
+            Assert::greaterThanEq($this->delay, 0, 'Delay must be greater than or equal to zero');
         $this->cancellation = new DeferredCancellation;
-
         $this->resume();
     }
     public function __serialize(): array
@@ -181,6 +185,8 @@ final class InternalState
 
                 $e = null;
                 try {
+                    if ($this->delay !== null)
+                        delay($this->delay);
                     $this->action->act($this->broadcastId, $peer, $cancellation);
                     $this->successCount++;
                 } catch (Throwable $e) {
