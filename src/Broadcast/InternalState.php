@@ -53,7 +53,8 @@ final class InternalState
         private Filter $filter,
         private readonly ?float $delay = null,
     ) {
-        Assert::greaterThanEq($this->delay, 0, 'Delay must be greater than or equal to zero');
+        if ($this->delay !== null)
+            Assert::greaterThanEq($this->delay, 0, 'Delay must be greater than or equal to zero');
         $this->cancellation = new DeferredCancellation;
         $this->resume();
     }
