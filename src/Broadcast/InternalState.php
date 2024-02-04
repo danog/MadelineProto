@@ -45,18 +45,16 @@ final class InternalState
     private StatusInternal $status = StatusInternal::IDLING_BEFORE_GATHERING_PEERS;
     private DeferredCancellation $cancellation;
     private bool $cancelled = false;
-    /** Number of seconds to wait between each peer. */
-    private int $delay = 0;
+
     public function __construct(
         private int $broadcastId,
         private MTProto $API,
         private Action $action,
         private Filter $filter,
-        float $delay = 0,
+        private readonly ?float $delay = null,
     ) {
-        Assert::greaterThanEq($delay, 0, 'Delay must be greater than or equal to zero');
+        Assert::greaterThanEq($this->delay, 0, 'Delay must be greater than or equal to zero');
         $this->cancellation = new DeferredCancellation;
-        $this->delay = $delay;
         $this->resume();
     }
     public function __serialize(): array
@@ -186,7 +184,8 @@ final class InternalState
 
                 $e = null;
                 try {
-                    !$this->delay ?: delay($this->delay);
+                    if ($this->delay !== null)
+                        delay($this->delay);
                     $this->action->act($this->broadcastId, $peer, $cancellation);
                     $this->successCount++;
                 } catch (Throwable $e) {
