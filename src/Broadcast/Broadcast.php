@@ -52,10 +52,11 @@ trait Broadcast
      *
      * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
      * @param bool  $pin      Whether to also pin the last sent message.
+     * @param float $delay    Number of seconds to wait between each peer.
      */
-    public function broadcastMessages(array $messages, ?Filter $filter = null, bool $pin = false): int
+    public function broadcastMessages(array $messages, ?Filter $filter = null, bool $pin = false, float $delay = 0): int
     {
-        return $this->broadcastCustom(new ActionSend($this, $messages, $pin), $filter);
+        return $this->broadcastCustom(new ActionSend($this, $messages, $pin), $filter, $delay);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -73,10 +74,11 @@ trait Broadcast
      * @param list<int> $message_ids IDs of the messages to forward.
      * @param bool      $drop_author If true, will forward messages without quoting the original author.
      * @param bool      $pin         Whether to also pin the last sent message.
+     * @param float     $delay       Number of seconds to wait between each peer.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?Filter $filter = null, bool $pin = false): int
+    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?Filter $filter = null, bool $pin = false, float $delay = 0): int
     {
-        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $message_ids, $drop_author, $pin), $filter);
+        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $message_ids, $drop_author, $pin), $filter, $delay);
     }
 
     /**
@@ -92,14 +94,15 @@ trait Broadcast
      * containing a Progress object for all broadcasts currently in-progress.
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
+     * @param float  $delay  Number of seconds to wait between each peer.
      */
-    public function broadcastCustom(Action $action, ?Filter $filter = null): int
+    public function broadcastCustom(Action $action, ?Filter $filter = null, float $delay = 0): int
     {
         // Ensure it can be serialized
         Assert::eq(unserialize(serialize($action))::class, $action::class);
 
         $id = $this->broadcastId--;
-        $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default());
+        $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default(), $delay);
         return $id;
     }
     /**
