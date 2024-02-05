@@ -238,10 +238,11 @@ abstract class InternalDoc
      * containing a Progress object for all broadcasts currently in-progress.
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
+     * @param float|null $delay Number of seconds to wait between each peer.
      */
-    public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action, ?\danog\MadelineProto\Broadcast\Filter $filter = null): int
+    public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action, ?\danog\MadelineProto\Broadcast\Filter $filter = null, ?float $delay = null): int
     {
-        return $this->wrapper->getAPI()->broadcastCustom($action, $filter);
+        return $this->wrapper->getAPI()->broadcastCustom($action, $filter, $delay);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -255,14 +256,15 @@ abstract class InternalDoc
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param mixed     $from_peer   Bot API ID or Update, from where to forward the messages.
-     * @param list<int> $message_ids IDs of the messages to forward.
-     * @param bool      $drop_author If true, will forward messages without quoting the original author.
-     * @param bool      $pin         Whether to also pin the last sent message.
+     * @param mixed      $from_peer   Bot API ID or Update, from where to forward the messages.
+     * @param list<int>  $message_ids IDs of the messages to forward.
+     * @param bool       $drop_author If true, will forward messages without quoting the original author.
+     * @param bool       $pin         Whether to also pin the last sent message.
+     * @param float|null $delay       Number of seconds to wait between each peer.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false): int
+    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
     {
-        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $message_ids, $drop_author, $filter, $pin);
+        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $message_ids, $drop_author, $filter, $pin, $delay);
     }
     /**
      * Sends a list of messages to all peers (users, chats, channels) of the bot.
@@ -278,12 +280,13 @@ abstract class InternalDoc
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param array $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool  $pin      Whether to also pin the last sent message.
+     * @param array      $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
+     * @param bool       $pin      Whether to also pin the last sent message.
+     * @param float|null $delay    Number of seconds to wait between each peer.
      */
-    public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false): int
+    public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
     {
-        return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin);
+        return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin, $delay);
     }
     /**
      * Fork a new green thread and execute the passed function in the background.
