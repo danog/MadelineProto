@@ -131,6 +131,7 @@ class RPCErrorException extends \Exception
         'UPLOAD_NO_VOLUME' => true,
         'USER_NOT_AVAILABLE' => true,
         'VOLUME_LOC_NOT_FOUND' => true,
+        'FILE_WRITE_EMPTY' => true,
     ];
 
     /** @internal */
