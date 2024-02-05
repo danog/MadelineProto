@@ -921,13 +921,15 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void
     {
-        echo "Account ".$this->authorization['user']['id']." connecting by default first to DC ".$this->datacenter->currentDatacenter."\n";
-        foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
-            try {
-                echo "DC $id temp key: ".bin2hex($dc->getTempAuthKey()->getID())."\n";
-                echo "DC $id perm key: ".bin2hex($dc->getPermAuthKey()->getID())."\n";
-                echo "DC $id salt: ".Tools::unpackSignedLong($dc->getPermAuthKey()->getServerSalt())."\n";
-            } catch (NothingInTheSocketException) {}
+        if (isset($this->authorization['user']['id'])) {
+            echo "Account ".$this->authorization['user']['id']." connecting by default first to DC ".$this->datacenter->currentDatacenter."\n";
+            foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
+                try {
+                    echo "DC $id temp key: ".bin2hex($dc->getTempAuthKey()->getID())."\n";
+                    echo "DC $id perm key: ".bin2hex($dc->getPermAuthKey()->getID())."\n";
+                    echo "DC $id salt: ".Tools::unpackSignedLong($dc->getPermAuthKey()->getServerSalt())."\n";
+                } catch (NothingInTheSocketException) {}
+            }
         }
         // Setup one-time stuffs
         Magic::start(light: false);
@@ -1149,7 +1151,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function updateSettingsInternal(SettingsAbstract $settings, bool $recurse = true): void
     {
-        return;
         if ($settings instanceof SettingsEmpty) {
             if (!isset($this->settings)) {
                 $this->settings = new Settings;
