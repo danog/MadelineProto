@@ -59,7 +59,6 @@ use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
-use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
 use danog\MadelineProto\TL\Conversion\TD;
@@ -908,7 +907,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Upgrade MadelineProto instance.
      */
-    private function upgradeMadelineProto(): void {
+    private function upgradeMadelineProto(): void
+    {
     }
     /**
      * Post-deserialization initialization function.
@@ -929,7 +929,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                     echo "DC $id temp key: ".bin2hex($dc->getTempAuthKey()->getID())."\n";
                     echo "DC $id perm key: ".bin2hex($dc->getPermAuthKey()->getID())."\n";
                     echo "DC $id salt: ".Tools::unpackSignedLong($dc->getPermAuthKey()->getServerSalt())."\n";
-                } catch (NothingInTheSocketException) {}
+                } catch (NothingInTheSocketException) {
+                }
             }
         }
         // Setup one-time stuffs
@@ -1030,30 +1031,34 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $deferred->complete();
         }
 
-        EventLoop::queue(function () {
-            delay(3);
-            $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
-            while (1) {
-                $this->logger->res = '';
-                $conn->reconnect();
-                $this->startUpdateSystem();
+        if (isset($this->authorization['user']['id'])) {
+            EventLoop::queue(function (): void {
+                delay(3);
+                $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
+                while (1) {
+                    $this->logger->res = '';
+                    $conn->reconnect();
+                    $this->startUpdateSystem();
 
-                $t = microtime(true);
-                $conn->methodCallAsyncRead('help.getConfig', []);
-                $t = microtime(true)-$t;
+                    $t = microtime(true);
+                    $conn->methodCallAsyncRead('help.getConfig', []);
+                    $t = microtime(true)-$t;
 
-                $this->logger->logger("======== took $t ========", Logger::FATAL_ERROR);
-                if ($t >= 15) {
-                    $this->logger->logger("=============== GOT SOMETHING! ===============", Logger::FATAL_ERROR);
+                    $this->logger->logger("======== took $t ========", Logger::FATAL_ERROR);
+                    if ($t >= 15) {
+                        $this->logger->logger("=============== GOT SOMETHING! ===============", Logger::FATAL_ERROR);
 
-                    file_put_contents(
-                        __DIR__.'/../log_'.microtime(true).'.log',
-                        $this->logger->res
-                    );
-                    while (1) readline("");
+                        file_put_contents(
+                            __DIR__.'/../log_'.microtime(true).'.log',
+                            $this->logger->res
+                        );
+                        while (1) {
+                            readline("");
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     /**
      * Unreference instance, allowing destruction.
@@ -1472,7 +1477,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         if ($t >= 10) {
             var_dump("=============== GOT SOMETHING! ===============");
-            while (1) readline("");
+            while (1) {
+                readline("");
+            }
         }
         return $this->getSelf();
     }
