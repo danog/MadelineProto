@@ -64,7 +64,7 @@ final class Auth extends SettingsAbstract
      */
     public function getPfs(): bool
     {
-        return $this->pfs;
+        return false; //$this->pfs;
     }
 
     /**

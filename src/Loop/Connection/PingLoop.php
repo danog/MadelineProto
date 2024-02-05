@@ -59,9 +59,9 @@ final class PingLoop extends Loop
         }
 
         EventLoop::queue(function (): void {
-            $this->API->logger("Ping DC {$this->datacenter}");
+            //$this->API->logger("Ping DC {$this->datacenter}");
             try {
-                $this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => random_bytes(8), 'disconnect_delay' => $this->timeoutDisconnect]);
+                //$this->connection->methodCallAsyncRead('ping_delay_disconnect', ['ping_id' => random_bytes(8), 'disconnect_delay' => $this->timeoutDisconnect]);
             } catch (Throwable $e) {
                 $this->API->logger("Error while pinging DC {$this->datacenter}");
                 $this->API->logger((string) $e);

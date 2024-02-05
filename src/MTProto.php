@@ -81,6 +81,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
+use function Amp\delay;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -906,34 +907,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Upgrade MadelineProto instance.
      */
-    private function upgradeMadelineProto(): void
-    {
-        $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
-        foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-            if ($this->authorized === API::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
-                $socket->bind();
-                $socket->authorized(true);
-            }
-        }
-        $this->settings->setSchema(new TLSchema);
-
-        $this->resetMTProtoSession(true, true);
-        $this->config = ['expires' => -1];
-        $this->dh_config = ['version' => 0];
-        $this->initialize($this->settings);
-        foreach ($this->secretChats as $chat) {
-            try {
-                $chat->notifyLayer();
-            } catch (RPCErrorException $e) {
-            }
-        }
-
-        if (isset($this->updates) && \is_array($this->updates)) {
-            foreach ($this->updates as $update) {
-                $this->updateQueue->enqueue($update);
-            }
-            unset($this->updates);
-        }
+    private function upgradeMadelineProto(): void {
     }
     /**
      * Post-deserialization initialization function.
@@ -947,6 +921,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function wakeup(SettingsAbstract $settings, APIWrapper $wrapper): void
     {
+        echo "Account ".$this->authorization['user']['id']." connecting by default first to DC ".$this->datacenter->currentDatacenter."\n";
+        foreach ($this->datacenter->getDataCenterConnections() as $id => $dc) {
+            try {
+                echo "DC $id temp key: ".bin2hex($dc->getTempAuthKey()->getID())."\n";
+                echo "DC $id perm key: ".bin2hex($dc->getPermAuthKey()->getID())."\n";
+                echo "DC $id salt: ".Tools::unpackSignedLong($dc->getPermAuthKey()->getServerSalt())."\n";
+            } catch (NothingInTheSocketException) {}
+        }
         // Setup one-time stuffs
         Magic::start(light: false);
 
@@ -1044,6 +1026,25 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         } finally {
             $deferred->complete();
         }
+
+        EventLoop::queue(function () {
+            delay(3);
+            $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
+            while (1) {
+                $conn->reconnect();
+                $this->startUpdateSystem();
+
+                $t = microtime(true);
+                $conn->methodCallAsyncRead('help.getConfig', []);
+                $t = microtime(true)-$t;
+
+                var_dump("======== took $t ========");
+                if ($t >= 30) {
+                    var_dump("=============== GOT SOMETHING! ===============");
+                    while (1) readline("");
+                }
+            }
+        });
     }
     /**
      * Unreference instance, allowing destruction.
@@ -1148,6 +1149,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function updateSettingsInternal(SettingsAbstract $settings, bool $recurse = true): void
     {
+        return;
         if ($settings instanceof SettingsEmpty) {
             if (!isset($this->settings)) {
                 $this->settings = new Settings;
@@ -1459,10 +1461,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function fullGetSelf(): array|false
     {
         try {
+            $t = time();
             $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
+            $t = time()-$t;
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;
+        }
+        if ($t >= 10) {
+            var_dump("=============== GOT SOMETHING! ===============");
+            while (1) readline("");
         }
         return $this->getSelf();
     }
@@ -1703,6 +1711,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function report(string $message, string $parseMode = ''): void
     {
+        return;
         $this->logger->logger("Reporting: $message", Logger::FATAL_ERROR);
         if (!$this->reportDest) {
             return;

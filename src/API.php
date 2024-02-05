@@ -297,7 +297,7 @@ final class API extends AbstractAPI
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
-
+        $forceFull = true;
         try {
             [$unserialized, $this->unlock] = async(
                 Serialization::unserialize(...),

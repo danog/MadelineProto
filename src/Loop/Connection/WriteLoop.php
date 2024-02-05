@@ -201,7 +201,7 @@ final class WriteLoop extends Loop
                 }
 
                 $message_id = $message->getMsgId() ?? $this->connection->msgIdHandler->generateMessageId();
-                $this->API->logger("Sending $message as encrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
+                $this->API->logger("Sending $message ($message_id) as encrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
                 $MTmessage = [
                     '_' => 'MTmessage',
                     'msg_id' => $message_id,

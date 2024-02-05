@@ -426,6 +426,7 @@ final class Logger
         if (empty($file)) {
             $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
+        $param .= " ".microtime(true);
         $param = str_pad($file.$prefix.': ', 16 + \strlen($prefix))."\t".$param;
         if ($this->mode === self::DEFAULT_LOGGER) {
             try {
@@ -435,7 +436,8 @@ final class Logger
             }
             return;
         }
-        $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
+        $param = true ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
+echo $param;return;
         try {
             $this->stdout->write($param);
         } catch (\Throwable) {

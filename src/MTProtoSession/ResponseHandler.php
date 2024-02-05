@@ -178,6 +178,8 @@ trait ResponseHandler
      */
     private function handleResponse(MTProtoIncomingMessage $message, ?int $requestId = null): void
     {
+        $this->API->logger("Got $message for request $requestId");
+
         $requestId ??= $message->getRequestId();
         $response = $message->read();
         if ($response['_'] === 'rpc_result') {

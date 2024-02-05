@@ -108,9 +108,9 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     public function log(int $dc): string
     {
         if ($this->fromContainer) {
-            return "Inside of container, received {$this->content['_']} from DC $dc";
+            return "Inside of container, received $this from DC $dc";
         }
-        return "Received {$this->content['_']} from DC $dc";
+        return "Received $this from DC $dc";
     }
 
     /**
@@ -126,7 +126,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      */
     public function __toString(): string
     {
-        return "incoming message {$this->content['_']}";
+        return "incoming message {$this->content['_']} with message ID {$this->msgId}";
     }
 
     /**
