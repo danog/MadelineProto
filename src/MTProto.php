@@ -1162,10 +1162,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if (!isset($this->settings)) {
                 $this->settings = new Settings;
             } else {
-                if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
-                    $this->logger->logger("Generic settings have changed!", Logger::WARNING);
-                    $this->upgradeMadelineProto();
-                }
                 return;
             }
         } else {
@@ -1204,11 +1200,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         if ($recurse && ($this->settings->getAuth()->hasChanged()
             || $this->settings->getConnection()->hasChanged()
-            || $this->settings->getSchema()->hasChanged()
-            || $this->settings->getSchema()->needsUpgrade()
             || $this->v !== self::V)) {
             $this->logger->logger("Generic settings have changed!", Logger::WARNING);
-            if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+            if ($this->v !== self::V) {
                 $this->upgradeMadelineProto();
             }
             $this->initialize($this->settings);
