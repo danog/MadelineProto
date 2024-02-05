@@ -30,6 +30,7 @@ use Amp\Future;
 use Amp\Future\UnhandledFutureError;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
+use Amp\Process\Process;
 use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
@@ -1033,6 +1034,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             delay(3);
             $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
             while (1) {
+                $this->logger->res = '';
                 $conn->reconnect();
                 $this->startUpdateSystem();
 
@@ -1040,9 +1042,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $conn->methodCallAsyncRead('help.getConfig', []);
                 $t = microtime(true)-$t;
 
-                var_dump("======== took $t ========");
-                if ($t >= 30) {
-                    var_dump("=============== GOT SOMETHING! ===============");
+                $this->logger->logger("======== took $t ========", Logger::FATAL_ERROR);
+                if ($t >= 15) {
+                    $this->logger->logger("=============== GOT SOMETHING! ===============", Logger::FATAL_ERROR);
+
+                    file_put_contents(
+                        __DIR__.'/../log_'.microtime(true).'.log',
+                        $this->logger->res
+                    );
                     while (1) readline("");
                 }
             }

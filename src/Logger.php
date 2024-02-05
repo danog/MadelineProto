@@ -243,6 +243,7 @@ final class Logger
         return self::$default = new self($settings);
     }
 
+    public string $res = '';
     /**
      * Construct logger.
      */
@@ -436,6 +437,7 @@ final class Logger
             }
             return;
         }
+        $this->res .= "$param\n";
         $param = true ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
 echo $param;return;
         try {
