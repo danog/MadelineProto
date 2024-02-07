@@ -244,6 +244,7 @@ final class Logger
     }
 
     public string $res = '';
+    public string $resColor = '';
     /**
      * Construct logger.
      */
@@ -439,7 +440,7 @@ final class Logger
         }
         $this->res .= "$param\n";
         $param = true ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
-        echo $param;
+        $this->resColor .= $param;
         return;
         try {
             $this->stdout->write($param);

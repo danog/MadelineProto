@@ -1037,6 +1037,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
                 while (1) {
                     $this->logger->res = '';
+                    $this->logger->resColor = '';
                     $conn->reconnect();
                     $this->startUpdateSystem();
 
@@ -1045,9 +1046,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                     $t = microtime(true)-$t;
 
                     $this->logger->logger("======== took $t ========", Logger::FATAL_ERROR);
-                    if ($t >= 15) {
+                    if ($t >= 10) {
                         $this->logger->logger("=============== GOT SOMETHING! ===============", Logger::FATAL_ERROR);
 
+                        echo $this->logger->resColor;
                         file_put_contents(
                             __DIR__.'/../log_'.microtime(true).'.log',
                             $this->logger->res
@@ -1055,6 +1057,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                         while (1) {
                             readline("");
                         }
+                    } else {
+                        echo $this->logger->resColor;
                     }
                 }
             });

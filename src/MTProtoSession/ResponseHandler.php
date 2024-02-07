@@ -178,8 +178,6 @@ trait ResponseHandler
      */
     private function handleResponse(MTProtoIncomingMessage $message, ?int $requestId = null): void
     {
-        $this->API->logger("Got $message for request $requestId");
-
         $requestId ??= $message->getRequestId();
         $response = $message->read();
         if ($response['_'] === 'rpc_result') {
@@ -195,6 +193,7 @@ trait ResponseHandler
         }
         /** @var MTProtoOutgoingMessage */
         $request = $this->outgoing_messages[$requestId];
+        $this->API->logger("Got $message for request $request");
         if ($request->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
             $this->API->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
