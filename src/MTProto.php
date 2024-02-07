@@ -1046,7 +1046,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                     $t = microtime(true)-$t;
 
                     $this->logger->logger("======== took $t ========", Logger::FATAL_ERROR);
-                    if ($t >= 10) {
+                    if ($t >= 3) {
                         $this->logger->logger("=============== GOT SOMETHING! ===============", Logger::FATAL_ERROR);
 
                         echo $this->logger->resColor;
