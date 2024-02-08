@@ -110,7 +110,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
                 $this->threadId = $replyTo['reply_to_top_id'] ?? null;
             } else {
                 $this->topicId = null;
-                $this->replyToMsgId = $replyTo['reply_to_msg_id'];
+                $this->replyToMsgId = $replyTo['reply_to_msg_id'] ?? null;
                 $this->threadId = $replyTo['reply_to_top_id'] ?? null;
             }
         } elseif ($info['Chat']['forum'] ?? false) {
