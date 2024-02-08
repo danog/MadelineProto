@@ -1034,6 +1034,25 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (isset($this->authorization['user']['id'])) {
             EventLoop::queue(function (): void {
                 delay(3);
+
+                $id = Tools::random(8);
+                $f1 = async($this->methodCallAsyncWrite(...),
+                    'upload.saveBigFilePart',
+                    ['file_id' => $id, 'file_part' => 0, 'file_total_parts' => -1, 'bytes' => str_repeat('a', 524288)]
+                );
+                $f2 = $this->methodCallAsyncWrite(
+                    'upload.saveBigFilePart',
+                    ['file_id' => $id, 'file_part' => 1, 'file_total_parts' => -1, 'bytes' => 'a']
+                );
+                try {
+                    var_dump($f2->await());
+                } catch (RPCErrorException $e) {
+                    if ($e->rpc === 'memory limit exit') {
+                        $this->logger->logger("$e", Logger::FATAL_ERROR);
+                        readline();
+                    }
+                }
+
                 $conn = $this->datacenter->getDataCenterConnection(4)->getConnection();
                 while (1) {
                     $this->logger->res = '';
