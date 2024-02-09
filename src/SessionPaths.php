@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use AssertionError;
 use danog\MadelineProto\Ipc\IpcState;
 
 use const LOCK_EX;
@@ -101,8 +102,15 @@ final class SessionPaths
         $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
         if (!exists($session)) {
             createDirectory($session);
-            return;
         }
+
+        $session = realpath($session);
+        if (str_starts_with($session, '/storage/emulated/')
+            || str_starts_with($session, '/sdcard/')
+        ) {
+            throw new AssertionError("The MadelineProto session folder cannot be stored in /sdcard, please move the session folder to the termux \$HOME folder, see here for more info: https://wiki.termux.com/wiki/Internal_and_external_storage");
+        }
+
         if (!isDirectory($session) && isFile("$session.safe.php")) {
             deleteFile($session);
             createDirectory($session);

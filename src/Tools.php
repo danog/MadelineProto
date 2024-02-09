@@ -898,7 +898,7 @@ abstract class Tools extends AsyncTools
             return self::$canConvert;
         }
         try {
-            Ogg::convert(new LocalFile(__DIR__.'/empty.wav'), new WritableBuffer);
+            Ogg::convert(new ReadableBuffer(file_get_contents(__DIR__.'/empty.wav')), new WritableBuffer);
             self::$canConvert = true;
         } catch (\Throwable $e) {
             Logger::log("An error occurred while attempting conversion: $e");
