@@ -129,18 +129,14 @@ trait FileServer
             }
 
             $messageMedia = $this->getDownloadInfo($media);
-            $messageMedia['size'] ??= $size;
-            $messageMedia['mime'] ??= $mime;
-            $messageMedia['name'] ??= $name;
-
-            $f = \is_string($media) ? $media : ($this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id']);
-            [
-                'name' => $name,
-                'ext' => $ext,
-                'mime' => $mime,
-                'size' => $size,
-            ] = $messageMedia;
-            $name = $name.$ext;
+            $size ??= $messageMedia['size'];
+            $mime ??= $messageMedia['mime'];
+            if (\is_string($media)) {
+                $f = $media;
+            } else {
+                $f = $this->extractBotAPIFile($this->MTProtoToBotAPI($media))['file_id'];
+                $name ??= $messageMedia['name'].$messageMedia['ext'];
+            }
         }
 
         return $scriptUrl."?".http_build_query([
