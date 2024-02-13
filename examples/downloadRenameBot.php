@@ -138,15 +138,16 @@ class MyEventHandler extends SimpleEventHandler
         $process->join();
         if (isset($info['title'])) {
             $name ??= $info['title'].".mp4";
-            $url = Process::start([
-                'yt-dlp',
-                $url,
-                '-o',
-                '-',
+            $url = escapeshellarg($url);
+            $process = Process::start([
+                'bash',
+                '-c',
+                "yt-dlp $url -f bestvideo*+bestaudio/best -o - | ffmpeg -i - -f mp4 -acodec copy -vcodec copy -movflags isml+frag_keyframe pipe:1",
             ]);
-            async(pipe(...), $url->getStderr(), getStderr())->ignore();
-            $finally = $url->join(...);
-            $url = $url->getStdout();
+            async(pipe(...), $process->getStderr(), getStderr())->ignore();
+
+            $finally = $process->join(...);
+            $url = $process->getStdout();
         } else {
             $name ??= $url;
             if (Uri::new($url)->getScheme() === null) {
