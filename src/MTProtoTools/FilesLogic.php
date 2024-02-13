@@ -316,6 +316,7 @@ trait FilesLogic
         }
         if ($file instanceof RemoteUrl) {
             $file = $file->url;
+            return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof BotApiFileId) {
             $info = $this->getDownloadInfo($file->fileId);

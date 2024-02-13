@@ -16,6 +16,9 @@
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
+
+use Amp\ByteStream\ReadableStream;
+use Amp\Process\Process;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\CommandType;
@@ -35,6 +38,11 @@ use danog\MadelineProto\Settings;
 use danog\MadelineProto\SimpleEventHandler;
 use League\Uri\Contracts\UriException;
 use League\Uri\Uri;
+
+use function Amp\async;
+use function Amp\ByteStream\buffer;
+use function Amp\ByteStream\getStderr;
+use function Amp\ByteStream\pipe;
 
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
@@ -110,20 +118,50 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     /**
-     * Upload an url.
+     * Upload a url or a youtube video.
      */
     #[FilterCommand('upload', [CommandType::SLASH])]
-    public function cmdUrl(PrivateMessage&Incoming&IsNotEdited $message): void
+    public function cmdYt(PrivateMessage&Incoming&IsNotEdited $message): void
     {
         $url  = $message->commandArgs[0];
-        $name = $message->commandArgs[1] ?? basename($url);
-        try {
-            $url = Uri::new($message->commandArgs[0]);
-            $url->getScheme() || $url = "http://$url";
-            $this->cmdUpload(new RemoteUrl("$url"), $name, $message);
-        } catch (UriException $e) {
-            $message->reply('Error: ' . $e->getMessage());
+        $name = $message->commandArgs[1] ?? null;
+
+        $process = Process::start([
+            'yt-dlp',
+            $url,
+            '-J',
+        ]);
+        $info = json_decode(
+            buffer($process->getStdout()),
+            true,
+        );
+        $process->join();
+        if (isset($info['title'])) {
+            $name ??= $info['title'].".mp4";
+            $url = Process::start([
+                'yt-dlp',
+                $url,
+                '-o',
+                '-',
+            ]);
+            async(pipe(...), $url->getStderr(), getStderr())->ignore();
+            $finally = $url->join(...);
+            $url = $url->getStdout();
+        } else {
+            $name ??= $url;
+            if (Uri::new($url)->getScheme() === null) {
+                $url = "http://$url";
+            }
+            $url = new RemoteUrl($url);
+            $finally = static fn () => null;
         }
+
+        async(
+            $this->cmdUpload(...),
+            $url,
+            $name,
+            $message
+        )->finally($finally);
     }
 
     /**
@@ -140,7 +178,7 @@ class MyEventHandler extends SimpleEventHandler
         }
     }
 
-    private function cmdUpload(Media|RemoteUrl $file, string $name, PrivateMessage $message): void
+    private function cmdUpload(Media|RemoteUrl|ReadableStream $file, string $name, PrivateMessage $message): void
     {
         try {
             $sent = $message->reply('Preparing...');

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Builder;

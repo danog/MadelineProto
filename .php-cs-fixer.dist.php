@@ -23,7 +23,8 @@ $config->getFinder()
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests')
     ->in(__DIR__ . '/examples')
-    ->in(__DIR__ . '/tools');
+    ->in(__DIR__ . '/tools')
+    ->exclude('TLParser.php');
 
 $cacheDir = getenv('TRAVIS') ? getenv('HOME') . '/.php-cs-fixer' : __DIR__;
 
