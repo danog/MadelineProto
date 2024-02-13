@@ -10,3 +10,6 @@
 [submodule "docs"]
 	path = docs
 	url = https://github.com/danog/MadelineProtoDocs.git
+[submodule "examples/downloadRenameBot"]
+	path = examples/downloadRenameBot
+	url = https://github.com/danog/downloadRenameBot
