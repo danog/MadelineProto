@@ -118,6 +118,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
+    /** @internal */
+    public const PFS_DURATION = 1*24*60*60;
     /**
      * Internal version of MadelineProto.
      *

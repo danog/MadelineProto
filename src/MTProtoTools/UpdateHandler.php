@@ -313,7 +313,7 @@ trait UpdateHandler
                 'offset' => $offset,
                 'limit' => $limit,
                 'timeout' => $timeout
-            ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => INF], $params);
+            ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => 10.0], $params);
 
             if ($offset > 0) {
                 foreach ($this->getUpdatesQueue as $key => $value) {

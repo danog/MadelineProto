@@ -62,7 +62,7 @@ trait AuthKeyHandler
      */
     public function createAuthKey(bool $temp): PermAuthKey|TempAuthKey|null
     {
-        $expires_in = $temp ? $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn() : -1;
+        $expires_in = $temp ? MTProto::PFS_DURATION : -1;
         $cdn = $this->isCDN();
         $test = $this->API->settings->getConnection()->getTestMode();
 

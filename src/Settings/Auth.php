@@ -24,12 +24,6 @@ use danog\MadelineProto\SettingsAbstract;
 final class Auth extends SettingsAbstract
 {
     /**
-     * Validity period of temporary keys.
-     * Validity period of the binding of temporary and permanent keys.
-     */
-    protected int $defaultTempAuthKeyExpiresIn = 1 * 24 * 60 * 60;
-
-    /**
      * Whether to use PFS.
      */
     protected bool $pfs = true;
@@ -38,26 +32,6 @@ final class Auth extends SettingsAbstract
      * Max tries for generating auth key.
      */
     protected int $maxAuthTries = 5;
-
-    /**
-     * Get validity period of the binding of temporary and permanent keys.
-     */
-    public function getDefaultTempAuthKeyExpiresIn(): int
-    {
-        return $this->defaultTempAuthKeyExpiresIn;
-    }
-
-    /**
-     * Set validity period of the binding of temporary and permanent keys.
-     *
-     * @param int $defaultTempAuthKeyExpiresIn Validity period of the binding of temporary and permanent keys.
-     */
-    public function setDefaultTempAuthKeyExpiresIn(int $defaultTempAuthKeyExpiresIn): self
-    {
-        $this->defaultTempAuthKeyExpiresIn = $defaultTempAuthKeyExpiresIn;
-
-        return $this;
-    }
 
     /**
      * Get whether to use PFS.

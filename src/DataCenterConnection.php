@@ -216,7 +216,7 @@ final class DataCenterConnection implements JsonSerializable
     {
         $connection = $this->getAuthConnection();
         $logger = $this->API->logger;
-        $expires_in = $this->API->settings->getAuth()->getDefaultTempAuthKeyExpiresIn();
+        $expires_in = MTProto::PFS_DURATION;
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
             try {
                 $logger->logger('Binding authorization keys...', Logger::VERBOSE);
