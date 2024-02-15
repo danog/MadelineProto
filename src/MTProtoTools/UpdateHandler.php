@@ -22,6 +22,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
@@ -115,7 +116,6 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\Types\Button;
-use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIPController;
@@ -282,6 +282,7 @@ trait UpdateHandler
     }
 
     private bool $usingGetUpdates = false;
+    private static ?TimeoutException $getUpdatesTimeout = null;
     /**
      * Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**.
      *
@@ -297,14 +298,17 @@ trait UpdateHandler
         if ($this->usingGetUpdates) {
             throw new AssertionError("Concurrent getUpdates detected, aborting!");
         }
+        $id = null;
         try {
             $this->usingGetUpdates = true;
-            $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
-            $this->event_handler = null;
-            $this->event_handler_instance = null;
-            $this->eventHandlerMethods = [];
-            $this->eventHandlerHandlers = [];
-            $this->pluginInstances = [];
+            if ($this->updateHandlerType !== UpdateHandlerType::GET_UPDATES) {
+                $this->updateHandlerType = UpdateHandlerType::GET_UPDATES;
+                $this->event_handler = null;
+                $this->event_handler_instance = null;
+                $this->eventHandlerMethods = [];
+                $this->eventHandlerHandlers = [];
+                $this->pluginInstances = [];
+            }
             foreach ($this->updateQueue as $update) {
                 $this->addGetUpdatesUpdate($update);
             }
@@ -315,45 +319,56 @@ trait UpdateHandler
                 'timeout' => $timeout
             ] = array_merge(['offset' => 0, 'limit' => null, 'timeout' => 10.0], $params);
 
-            if ($offset > 0) {
-                foreach ($this->getUpdatesQueue as $key => $value) {
-                    if ($offset > $key) {
-                        unset($this->getUpdatesQueue[$key]);
-                    }
-                }
-            }
-
-            if (!$this->getUpdatesQueue->count()) {
-                try {
-                    $this->update_deferred = new DeferredFuture();
-                    $this->update_deferred->getFuture()->await(
-                        $timeout === INF ? null : Tools::getTimeoutCancellation($timeout)
-                    );
-                } catch (CancelledException $e) {
-                    if (!$e->getPrevious() instanceof TimeoutException) {
-                        throw $e;
-                    }
-                }
-            }
             if ($offset < 0) {
                 $offset = $this->getUpdatesQueueKey+$offset;
             }
-            $updates = [];
-            foreach ($this->getUpdatesQueue as $key => $value) {
-                if ($offset > $key) {
-                    unset($this->getUpdatesQueue[$key]);
-                    continue;
-                }
 
-                $updates[] = ['update_id' => $key, 'update' => $value];
+            Assert::nullOrPositiveInteger($limit);
 
-                if ($limit !== null && \count($updates) === $limit) {
-                    break;
-                }
+            if ($timeout === INF) {
+                $timeout = null;
+            } elseif ($timeout !== null) {
+                self::$getUpdatesTimeout ??= new TimeoutException("Operation timed out");
+                $deferred = new DeferredCancellation;
+                $id = EventLoop::delay($timeout, static fn () => $deferred->cancel(self::$getUpdatesTimeout));
+                $timeout = $deferred->getCancellation();
             }
-            return $updates;
+
+            do {
+                if (!$this->getUpdatesQueue->count()) {
+                    try {
+                        $this->update_deferred = new DeferredFuture();
+                        $this->update_deferred->getFuture()->await($timeout);
+                    } catch (CancelledException $e) {
+                        if (!$e->getPrevious() instanceof TimeoutException) {
+                            throw $e;
+                        }
+                    }
+                }
+                $updates = [];
+                foreach ($this->getUpdatesQueue as $key => $value) {
+                    if ($offset > $key) {
+                        unset($this->getUpdatesQueue[$key]);
+                        continue;
+                    }
+
+                    $updates[$key] = ['update_id' => $key, 'update' => $value];
+
+                    if ($limit !== null && \count($updates) === $limit) {
+                        break;
+                    }
+                }
+                if ($updates) {
+                    ksort($updates);
+                    return array_values($updates);
+                }
+            } while (!$timeout?->isRequested());
+            return [];
         } finally {
             $this->usingGetUpdates = false;
+            if ($id !== null) {
+                EventLoop::cancel($id);
+            }
         }
     }
     /**
