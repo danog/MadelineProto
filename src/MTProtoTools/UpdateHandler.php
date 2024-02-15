@@ -366,7 +366,7 @@ trait UpdateHandler
             return [];
         } finally {
             $this->usingGetUpdates = false;
-            if ($id !== null) {
+            if ($id !== null && !$timeout->isRequested()) {
                 EventLoop::cancel($id);
             }
         }
