@@ -184,6 +184,17 @@ final class ReferenceDatabase implements TLCallback
         return [];
     }
 
+    public function reset(): void
+    {
+        if ($this->cache) {
+            $this->API->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
+            $this->cache = [];
+        }
+        if ($this->cacheContexts) {
+            $this->API->logger('Found '.\count($this->cacheContexts).' pending contexts', Logger::ERROR);
+            $this->cacheContexts = [];
+        }
+    }
     public function addReference(array $location): bool
     {
         if (!$this->cacheContexts) {

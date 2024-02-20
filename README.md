@@ -955,6 +955,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.invokeWebViewCustomMethod.html" name="bots.invokeWebViewCustomMethod">bots.invokeWebViewCustomMethod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.clickSponsoredMessage.html" name="channels.clickSponsoredMessage">channels.clickSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getChannelRecommendations.html" name="channels.getChannelRecommendations">channels.getChannelRecommendations</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setBoostsToUnblockRestrictions.html" name="channels.setBoostsToUnblockRestrictions">channels.setBoostsToUnblockRestrictions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setEmojiStickers.html" name="channels.setEmojiStickers">channels.setEmojiStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.toggleViewForumAsMessages.html" name="channels.toggleViewForumAsMessages">channels.toggleViewForumAsMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updateColor.html" name="channels.updateColor">channels.updateColor</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.updateEmojiStatus.html" name="channels.updateEmojiStatus">channels.updateEmojiStatus</a>

@@ -235,6 +235,9 @@ final class ReadLoop extends Loop
             } catch (\Throwable $e) {
                 Logger::log('Error during deserializing message (base64): ' .  base64_encode($message_data), Logger::ERROR);
                 throw $e;
+            } finally {
+                $this->API->minDatabase->reset();
+                $this->API->referenceDatabase->reset();
             }
 
             $message = new MTProtoIncomingMessage($deserialized, $message_id, $unencrypted);
