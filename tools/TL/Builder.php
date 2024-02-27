@@ -107,7 +107,8 @@ final class Builder
         if ($predicate === 'jsonNull') {
             return 'null';
         }
-        $superBare = $this->typeByPredicate[$predicate] === 'JSONValue';
+        $superBare = $this->typeByPredicate[$predicate] === 'JSONValue'
+            || $this->typeByPredicate[$predicate] === 'Peer';
             
         $result = '';
         if (!$superBare) {
@@ -135,6 +136,11 @@ final class Builder
         }
         if (!$superBare) {
             $result .= ']';
+        }
+        if ($predicate === 'peerChat') {
+            $result = "-$result";
+        } elseif ($predicate === 'peerChannel') {
+            $result = "-1000000000000 - $result";
         }
         return $result;
     }
