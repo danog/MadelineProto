@@ -76,6 +76,9 @@ final class Builder
             $this->needVector[$param['subtype']] = true;
             $type = "array_of_{$param['subtype']}";
         }
+        if (($param['name'] ?? null) === 'random_bytes') {
+            $type = $param['name'];
+        }
         return match ($type) {
             '#' => "unpack('V', stream_get_contents(\$stream, 4))[1]",
             'int' => "unpack('l', stream_get_contents(\$stream, 4))[1]",
@@ -95,11 +98,24 @@ final class Builder
     }
     private function buildConstructorShort(string $predicate, array $params = []): string
     {
+        if ($predicate === 'dataJSON') {
+            return 'json_decode('.$this->buildParam(['type' => 'string']).', true, 512, \\JSON_THROW_ON_ERROR)';
+        }
         $result = "[\n";
         $result .= "'_' => '$predicate',\n";
         foreach ($params as $param) {
             $name = $param['name'];
-            $code = $this->buildParam($param);
+
+            if ($predicate === 'photoStrippedSize'
+                && $name === 'bytes'
+            ) {
+                $code = $this->buildParam(['type' => 'string']);
+                $code = "new Types\\Bytes(Tools::inflateStripped($code))";
+                $name = 'inflated';
+            } else {
+                $code = $this->buildParam($param);
+            }
+
             $result .= var_export($name, true)." => $code,\n";
         }
         $result .= ']';
@@ -212,9 +228,9 @@ final class Builder
                 throw new Exception(Lang::$current_lang["length_too_big"]);
             }
             if ($l === 254) {
-                $long_len = unpack("V", stream_get_contents($stream, 3).\chr(0))[1];
-                $x = stream_get_contents($stream, $long_len);
-                $resto = (-$long_len) % 4;
+                $l = unpack("V", stream_get_contents($stream, 3).\chr(0))[1];
+                $x = stream_get_contents($stream, $l);
+                $resto = (-$l) % 4;
                 $resto = $resto < 0 ? $resto + 4 : $resto;
                 if ($resto > 0) {
                     stream_get_contents($stream, $resto);
@@ -239,6 +255,29 @@ final class Builder
             $block_str
             return TL::extractWaveform(\$x);
         }\n");
+        fwrite($f, 'private static function deserialize_type_random_bytes(mixed $stream): void {
+            $l = \ord(stream_get_contents($stream, 1));
+            if ($l > 254) {
+                throw new Exception(Lang::$current_lang["length_too_big"]);
+            }
+            if ($l === 254) {
+                $l = unpack("V", stream_get_contents($stream, 3).\chr(0))[1];
+                if ($l < 15) {
+                    throw new SecurityException("Random_bytes is too small!");
+                }
+            } else {
+                if ($l < 15) {
+                    throw new SecurityException("Random_bytes is too small!");
+                }
+                $l += 1;
+            }
+            $resto = (-$l) % 4;
+            $resto = $resto < 0 ? $resto + 4 : $resto;
+            if ($resto > 0) {
+                $l += $resto;
+            }
+            stream_get_contents($stream, $l);
+        }');
 
         fwrite($f, "final public function deserialize(mixed \$stream): mixed {\n");
         fwrite($f, "return {$this->buildTypes($this->TL->getConstructors()->by_id)};");
