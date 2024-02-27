@@ -214,13 +214,15 @@ final class Builder
             if ($l === 254) {
                 $long_len = unpack("V", stream_get_contents($stream, 3).\chr(0))[1];
                 $x = stream_get_contents($stream, $long_len);
-                $resto = Tools::posmod(-$long_len, 4);
+                $resto = (-$long_len) % 4;
+                $resto = $resto < 0 ? $resto + 4 : $resto;
                 if ($resto > 0) {
                     stream_get_contents($stream, $resto);
                 }
             } else {
                 $x = $l ? stream_get_contents($stream, $l) : "";
-                $resto = Tools::posmod(-($l + 1), 4);
+                $resto = (-$l+1) % 4;
+                $resto = $resto < 0 ? $resto + 4 : $resto;
                 if ($resto > 0) {
                     stream_get_contents($stream, $resto);
                 }
