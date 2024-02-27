@@ -94,9 +94,11 @@ final class Builder
             'int128' => 'stream_get_contents($stream, 16)',
             'int256' => 'stream_get_contents($stream, 32)',
             'int512' => 'stream_get_contents($stream, 64)',
-            default => isset($this->byType[$type]) && !\in_array($type, self::RECURSIVE_TYPES, true)
-                ? $this->buildTypes($this->byType[$type], $type)
-                : "self::deserialize_type_{$this->escapeTypeName($type)}(\$stream)"
+            'string', 'bytes', 'waveform', 'random_bytes' => 
+                "self::deserialize_type_$type(\$stream)",
+            default => \in_array($type, self::RECURSIVE_TYPES, true) || isset($param['subtype'])
+                ? "self::deserialize_type_{$this->escapeTypeName($type)}(\$stream)"
+                : $this->buildTypes($this->byType[$type], $type)
         };
     }
     private function buildConstructorShort(string $predicate, array $params = []): string
@@ -214,7 +216,7 @@ final class Builder
         $result .= $this->idByPredicate['gzip_packed']." => self::gzdecode_vector(\$stream)\n";
         $result .= "};\n";
         $result .= "\$result = [];\n";
-        $result .= "for (\$x = unpack('V', stream_get_contents(\$stream, 4))[1]; \$x > 0; \$x--) {\n";
+        $result .= "for (\$x = unpack('V', stream_get_contents(\$stream, 4))[1]; \$x > 0; --\$x) {\n";
         $result .= "\$result []= {$body};";
         $result .= "}\n";
         $result .= "return \$result;\n";
@@ -311,15 +313,22 @@ final class Builder
                 '.$this->idByPredicate["gzip_packed"].' => self::gzdecode_vector($stream)
             };
             $result = [];
-            for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; $x--) {
+            for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {
                 $result['.$this->buildParam(['type' => 'string']).'] = '.$this->buildParam(['type' => 'JSONValue']).';
             }
             return $result;
         }
         ');
 
+        $initial_constructors = array_filter(
+            $this->TL->getConstructors()->by_id,
+            fn (array $arr) => $arr['type'] === 'Update'
+                || $arr['predicate'] === 'rpc_result'
+                || !$arr['encrypted']
+        );
+
         fwrite($f, "final public function deserialize(mixed \$stream): mixed {\n");
-        fwrite($f, "return {$this->buildTypes($this->TL->getConstructors()->by_id)};");
+        fwrite($f, "return {$this->buildTypes($initial_constructors)};");
         fwrite($f, "}\n");
 
         foreach ($this->TL->getConstructors()->by_id as $id => $constructor) {
