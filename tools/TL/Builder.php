@@ -297,7 +297,20 @@ final class Builder
                 $l += $resto;
             }
             stream_get_contents($stream, $l);
-        }');
+        }
+        ');
+        fwrite($f, 'private static function deserialize_type_array_of_JSONObjectValue(mixed $stream): array {
+            $stream = match(stream_get_contents($stream, 4)) {
+                '.$this->idByPredicate["vector"].' => $stream,
+                '.$this->idByPredicate["gzip_packed"].' => self::gzdecode_vector($stream)
+            };
+            $result = [];
+            for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; $x--) {
+                $result['.$this->buildParam(['type' => 'string']).'] = '.$this->buildParam(['type' => 'JSONValue']).';
+            }
+            return $result;
+        }
+        ');
 
         fwrite($f, "final public function deserialize(mixed \$stream): mixed {\n");
         fwrite($f, "return {$this->buildTypes($this->TL->getConstructors()->by_id)};");
