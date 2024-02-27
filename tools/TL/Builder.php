@@ -31,6 +31,7 @@ final class Builder
     private TL $TL;
     private readonly array $byType;
     private readonly array $idByPredicate;
+    private readonly array $typeByPredicate;
     private array $needConstructors = [];
     private array $needVector = [];
     private const RECURSIVE_TYPES = [
@@ -57,9 +58,11 @@ final class Builder
         foreach ($this->TL->getConstructors()->by_id as $id => $constructor) {
             $byType[$constructor['type']][$id]= $constructor;
             $idByPredicate[$constructor['predicate']] = var_export($id, true);
+            $typeByPredicate[$constructor['predicate']] = $constructor['type'];
         }
         $this->byType = $byType;
         $this->idByPredicate = $idByPredicate;
+        $this->typeByPredicate = $typeByPredicate;
     }
     private static function escapeConstructorName(array $constructor): string
     {
@@ -101,8 +104,16 @@ final class Builder
         if ($predicate === 'dataJSON') {
             return 'json_decode('.$this->buildParam(['type' => 'string']).', true, 512, \\JSON_THROW_ON_ERROR)';
         }
-        $result = "[\n";
-        $result .= "'_' => '$predicate',\n";
+        if ($predicate === 'jsonNull') {
+            return 'null';
+        }
+        $superBare = $this->typeByPredicate[$predicate] === 'JSONValue';
+            
+        $result = '';
+        if (!$superBare) {
+            $result .= "[\n";
+            $result .= "'_' => '$predicate',\n";
+        }
         foreach ($params as $param) {
             $name = $param['name'];
 
@@ -116,9 +127,15 @@ final class Builder
                 $code = $this->buildParam($param);
             }
 
-            $result .= var_export($name, true)." => $code,\n";
+            if ($superBare) {
+                $result .= $code;
+            } else {
+                $result .= var_export($name, true)." => $code,\n";
+            }
         }
-        $result .= ']';
+        if (!$superBare) {
+            $result .= ']';
+        }
         return $result;
     }
     private function buildConstructor(string $predicate, array $params, array $flags): string
@@ -164,6 +181,9 @@ final class Builder
                 'params' => $params
             ] = $constructor;
             if ($name === 'gzip_packed') {
+                continue;
+            }
+            if ($name === 'jsonObjectValue') {
                 continue;
             }
             $nameEscaped = self::escapeConstructorName($constructor);
@@ -285,13 +305,28 @@ final class Builder
 
         foreach ($this->TL->getConstructors()->by_id as $id => $constructor) {
             ['predicate' => $name, 'flags' => $flags, 'params' => $params, 'type' => $type] = $constructor;
+            if ($name === 'jsonObjectValue') {
+                continue;
+            }
+            if ($name === 'dataJSON') {
+                continue;
+            }
+            if ($type === 'JSONValue') {
+                continue;
+            }
+            if ($name === 'gzip_packed') {
+                continue;
+            }
             $nameEscaped = self::escapeConstructorName($constructor);
-            fwrite($f, "private static function deserialize_$nameEscaped(mixed \$stream): array {\n");
+            fwrite($f, "private static function deserialize_$nameEscaped(mixed \$stream): mixed {\n");
             fwrite($f, "{$this->buildConstructor($name, $params, $flags)}\n");
             fwrite($f, "}\n");
         }
 
         foreach ($this->byType as $type => $constructors) {
+            if ($type === 'JSONObjectValue') {
+                continue;
+            }
             fwrite($f, "private static function deserialize_type_{$this->escapeTypeName($type)}(mixed \$stream): mixed {\n");
             fwrite($f, "return {$this->buildTypes($constructors, $type)};");
             fwrite($f, "}\n");
