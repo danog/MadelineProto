@@ -5,5 +5,7 @@ use danog\MadelineProto\TL\Builder;
 
 require __DIR__.'/../vendor/autoload.php';
 
+\danog\MadelineProto\Magic::start(true);
+
 $builder = new Builder(new TLSchema, __DIR__.'/../src/TL/TLParser.php', 'danog\\MadelineProto\\TL');
 $builder->build();

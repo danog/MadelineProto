@@ -39,17 +39,19 @@ final class Builder
         'RichText',
         'PageBlock',
     ];
+    private $output;
     public function __construct(
         TLSchema $settings,
         /**
          * Output file.
          */
-        private string $output,
+        string $output,
         /**
          * Output namespace.
          */
         private string $namespace,
     ) {
+        $this->output = fopen($output, 'w');
         $this->TL = new TL();
         $this->TL->init($settings);
 
@@ -72,6 +74,14 @@ final class Builder
     {
         return str_replace(['.', ' '], '___', $name);
     }
+    private array $methodsCalled = [];
+    private array $methodsCreated = [];
+    private function methodCall(string $method): string {
+        $this->methodsCalled[$method] = true;
+        return $this->methodsCreated[$method]
+            ? "\$this->$method(\$stream)"
+            : "self::$method(\$stream)";
+    }
     private function buildParam(array $param): string
     {
         ['type' => $type] = $param;
@@ -89,15 +99,15 @@ final class Builder
             'double' => "unpack('d', stream_get_contents(\$stream, 8))[1]",
             'Bool' => 'match (stream_get_contents($stream, 4)) {'.
                 $this->idByPredicate['boolTrue'].' => true,'.
-                $this->idByPredicate['boolFalse'].' => false, default => self::err($stream) }',
+                $this->idByPredicate['boolFalse'].' => false, default => '.$this->methodCall('err').' }',
             'strlong' => 'stream_get_contents($stream, 8)',
             'int128' => 'stream_get_contents($stream, 16)',
             'int256' => 'stream_get_contents($stream, 32)',
             'int512' => 'stream_get_contents($stream, 64)',
             'string', 'bytes', 'waveform', 'random_bytes' => 
-                "self::deserialize_type_$type(\$stream)",
+                $this->methodCall("deserialize_$type"),
             default => \in_array($type, self::RECURSIVE_TYPES, true) || isset($param['subtype'])
-                ? "self::deserialize_type_{$this->escapeTypeName($type)}(\$stream)"
+                ? $this->methodCall("deserialize_type_{$this->escapeTypeName($type)}")
                 : $this->buildTypes($this->byType[$type], $type)
         };
     }
@@ -180,7 +190,7 @@ final class Builder
     }
     private function buildTypes(array $constructors, ?string $type = null): string
     {
-        $typeMethod = $type ? "deserialize_type_".self::escapeTypeName($type) : 'deserialize';
+        $typeMethod = $type ? "_type_".self::escapeTypeName($type) : '';
         $result = "match (stream_get_contents(\$stream, 4)) {\n";
         foreach ($constructors as $id => $constructor) {
             [
@@ -200,55 +210,61 @@ final class Builder
                 $result .= var_export($id, true)." => $params,\n";
             } else {
                 $this->needConstructors[$name] = true;
-                $result .= var_export($id, true)." => self::deserialize_$nameEscaped(\$stream),\n";
+                $result .= var_export($id, true)." => ".$this->methodCall("deserialize_$nameEscaped").",\n";
             }
         }
-        $result .= $this->idByPredicate['gzip_packed']." => self::$typeMethod(self::gzdecode(\$stream)),\n";
+        $result .= $this->idByPredicate['gzip_packed']." => ".$this->methodCall("deserialize$typeMethod", 'self::gzdecode($stream)').",\n";
         $result .= "default => self::err(\$stream)\n";
         return $result."}\n";
     }
-    private function buildVector(string $type, string $body): string
+    private function buildVector(string $type, string $body): void
     {
-        $result = '';
-        $result .= "private static function deserialize_type_array_of_{$this->escapeTypeName($type)}(mixed \$stream): mixed {\n";
-        $result .= "\$stream = match(stream_get_contents(\$stream, 4)) {\n";
-        $result .= $this->idByPredicate['vector']." => \$stream,\n";
-        $result .= $this->idByPredicate['gzip_packed']." => self::gzdecode_vector(\$stream)\n";
-        $result .= "};\n";
-        $result .= "\$result = [];\n";
-        $result .= "for (\$x = unpack('V', stream_get_contents(\$stream, 4))[1]; \$x > 0; --\$x) {\n";
-        $result .= "\$result []= {$body};";
-        $result .= "}\n";
-        $result .= "return \$result;\n";
-        $result .= "}\n";
-        return $result;
+        $this->m("deserialize_type_array_of_{$this->escapeTypeName($type)}", '
+            $stream = match(stream_get_contents(\$stream, 4)) {    
+                '.$this->idByPredicate['vector'].' => $stream,    
+                '.$this->idByPredicate['gzip_packed'].' => self::gzdecode_vector($stream)
+            };
+            $result = [];
+            for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
+                $result []= '.$body.'
+            }
+            return $result;    
+        ', 'array', static: $type === 'JSONValue');
+    }
+    private function w(string $data): void {
+        fwrite($this->output, $data);
+    }
+    public function m(string $methodName, string $body, string $returnType = 'mixed', bool $public = false, bool $static = true): void {
+        $this->methodsCreated[$methodName] = $static;
+        $public = $public ? 'public' : 'private';
+        $static = $static ? 'static' : '';
+        $this->w("    $public $static function $methodName(mixed \$stream): $returnType {\n{$body}\n    }\n");
     }
     public function build(): void
     {
-        $f = fopen($this->output, 'w');
-        fwrite($f, "<?php namespace {$this->namespace};\n/** @internal Autogenerated using tools/TL/Builder.php */\nfinal class TLParser {\n");
+        $this->w("<?php namespace {$this->namespace};\n/** @internal Autogenerated using tools/TL/Builder.php */\nfinal class TLParser {\n");
 
-        fwrite($f, 'private static function err(mixed $stream): never {
+        $this->m('err', '
             fseek($stream, -4, SEEK_CUR);
             throw new AssertionError("Unexpected ID ".bin2hex(fread($stream, 4)));
-        }'."\n");
+        ', 'never');
 
-        fwrite($f, "private static function gzdecode(mixed \$stream): mixed {
+        $this->m("gzdecode", "
             \$res = fopen('php://memory', 'rw+b');
-            fwrite(\$res, gzdecode(self::deserialize_type_bytes(\$stream)));
+            fwrite(\$res, gzdecode(self::deserialize_string(\$stream)));
             rewind(\$res);
             return \$res;
-        }\n");
+        ");
 
-        fwrite($f, "private static function gzdecode_vector(mixed \$stream): mixed {
+        $this->m('gzdecode_vector', "
             \$res = fopen('php://memory', 'rw+b');
-            fwrite(\$res, gzdecode(self::deserialize_type_bytes(\$stream)));
+            fwrite(\$res, gzdecode(self::deserialize_string(\$stream)));
             rewind(\$res);
             return match (stream_get_contents(\$stream, 4)) {
                 {$this->idByPredicate['vector']} => \$stream,
                 default => self::err(\$stream)
             };
-        }\n");
+        ");
 
         $block_str = '
             $l = \ord(stream_get_contents($stream, 1));
@@ -271,19 +287,21 @@ final class Builder
                     stream_get_contents($stream, $resto);
                 }
             }'."\n";
-        fwrite($f, "private static function deserialize_type_bytes(mixed \$stream): mixed {
+
+        $this->m("deserialize_bytes", "
             $block_str
             return new Types\Bytes(\$x);
-        }\n");
-        fwrite($f, "private static function deserialize_type_string(mixed \$stream): mixed {
+        ");
+        $this->m("deserialize_string", "
             $block_str
             return \$x;
-        }\n");
-        fwrite($f, "private static function deserialize_type_waveform(mixed \$stream): mixed {
+        ");
+        $this->m("deserialize_waveform", "
             $block_str
             return TL::extractWaveform(\$x);
-        }\n");
-        fwrite($f, 'private static function deserialize_type_random_bytes(mixed $stream): void {
+        ");
+
+        $this->m('deserialize_random_bytes', '
             $l = \ord(stream_get_contents($stream, 1));
             if ($l > 254) {
                 throw new Exception(Lang::$current_lang["length_too_big"]);
@@ -305,9 +323,9 @@ final class Builder
                 $l += $resto;
             }
             stream_get_contents($stream, $l);
-        }
-        ');
-        fwrite($f, 'private static function deserialize_type_array_of_JSONObjectValue(mixed $stream): array {
+        ', 'void');
+
+        $this->m('deserialize_type_array_of_JSONObjectValue', '
             $stream = match(stream_get_contents($stream, 4)) {
                 '.$this->idByPredicate["vector"].' => $stream,
                 '.$this->idByPredicate["gzip_packed"].' => self::gzdecode_vector($stream)
@@ -317,8 +335,7 @@ final class Builder
                 $result['.$this->buildParam(['type' => 'string']).'] = '.$this->buildParam(['type' => 'JSONValue']).';
             }
             return $result;
-        }
-        ');
+        ', 'array');
 
         $initial_constructors = array_filter(
             $this->TL->getConstructors()->by_id,
@@ -327,9 +344,7 @@ final class Builder
                 || !$arr['encrypted']
         );
 
-        fwrite($f, "final public function deserialize(mixed \$stream): mixed {\n");
-        fwrite($f, "return {$this->buildTypes($initial_constructors)};");
-        fwrite($f, "}\n");
+        $this->m("deserialize", "return {$this->buildTypes($initial_constructors)};", 'mixed', true, static: false);
 
         foreach ($this->TL->getConstructors()->by_id as $id => $constructor) {
             ['predicate' => $name, 'flags' => $flags, 'params' => $params, 'type' => $type] = $constructor;
@@ -346,26 +361,26 @@ final class Builder
                 continue;
             }
             $nameEscaped = self::escapeConstructorName($constructor);
-            fwrite($f, "private static function deserialize_$nameEscaped(mixed \$stream): mixed {\n");
-            fwrite($f, "{$this->buildConstructor($name, $params, $flags)}\n");
-            fwrite($f, "}\n");
+            $this->m("deserialize_$nameEscaped", $this->buildConstructor($name, $params, $flags));
         }
 
         foreach ($this->byType as $type => $constructors) {
             if ($type === 'JSONObjectValue') {
                 continue;
             }
-            fwrite($f, "private static function deserialize_type_{$this->escapeTypeName($type)}(mixed \$stream): mixed {\n");
-            fwrite($f, "return {$this->buildTypes($constructors, $type)};");
-            fwrite($f, "}\n");
+            $this->m(
+                "deserialize_type_{$this->escapeTypeName($type)}", 
+                "return {$this->buildTypes($constructors, $type)};",
+                static: $type === 'JSONValue'
+            );
 
             if (isset($this->needVector[$type])) {
-                fwrite($f, $this->buildVector($type, $this->buildTypes($constructors, "array_of_$type")));
+                $this->buildVector($type, $this->buildTypes($constructors, "array_of_$type"));
             }
         }
         foreach (['int', 'long', 'double', 'strlong'] as $type) {
-            fwrite($f, $this->buildVector($type, $this->buildParam(['type' => $type])));
+            $this->buildVector($type, $this->buildParam(['type' => $type]));
         }
-        fwrite($f, "}\n");
+        $this->w("}\n");
     }
 }

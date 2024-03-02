@@ -67,11 +67,11 @@ final class GarbageCollector
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 gc_collect_cycles();
-                self::$memoryConsumption = self::getMemoryConsumption();
+                /*self::$memoryConsumption = self::getMemoryConsumption();
                 $cleanedMemory = $currentMemory - self::$memoryConsumption;
                 if (!Magic::$suspendPeriodicLogging) {
-                    Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
-                }
+                    //Logger::log("gc_collect_cycles done. Cleaned memory: $cleanedMemory Mb", Logger::VERBOSE);
+                }*/
             }
         }));
 
@@ -87,6 +87,8 @@ final class GarbageCollector
                 $latest = $client->request($request);
                 Magic::$latest_release = trim($latest->getBody()->buffer());
                 if (API::RELEASE !== Magic::$latest_release) {
+                    Magic::$revision .= ' (AN UPDATE IS REQUIRED)';
+
                     $old = API::RELEASE;
                     $new = Magic::$latest_release;
                     Logger::log("!!!!!!!!!!!!! An update of MadelineProto is required (old=$old, new=$new)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
@@ -155,7 +157,7 @@ final class GarbageCollector
     }
     private static function getMemoryConsumption(): int
     {
-        self::$map ??= new WeakMap;
+        //self::$map ??= new WeakMap;
         $memory = round(memory_get_usage()/1024/1024, 1);
         /*if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
