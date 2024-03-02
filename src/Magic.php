@@ -31,8 +31,6 @@ use const DIRECTORY_SEPARATOR;
 use const E_ALL;
 use const MADELINE_WORKER_TYPE;
 use const PHP_INT_SIZE;
-use const PHP_MAJOR_VERSION;
-use const PHP_MINOR_VERSION;
 
 use const PHP_SAPI;
 use const SIG_DFL;

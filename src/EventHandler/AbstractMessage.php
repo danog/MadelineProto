@@ -389,14 +389,25 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function read(bool $readAll = false): bool
     {
-        return $this->getClient()->methodCallAsyncRead(
-            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.readHistory':'messages.readHistory',
+        if (DialogId::isSupergroupOrChannel($this->chatId)) {
+            return $this->getClient()->methodCallAsyncRead(
+                'channels.readHistory',
+                [
+                    'peer' => $this->chatId,
+                    'channel' => $this->chatId,
+                    'max_id' => $readAll ? 0 : $this->id,
+                ]
+            );
+        }
+        $this->getClient()->methodCallAsyncRead(
+            'messages.readHistory',
             [
                 'peer' => $this->chatId,
                 'channel' => $this->chatId,
                 'max_id' => $readAll ? 0 : $this->id,
             ]
         );
+        return true;
     }
 
     /**

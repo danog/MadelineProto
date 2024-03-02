@@ -76,7 +76,8 @@ final class Builder
     }
     private array $methodsCalled = [];
     private array $methodsCreated = [];
-    private function methodCall(string $method): string {
+    private function methodCall(string $method): string
+    {
         $this->methodsCalled[$method] = true;
         return $this->methodsCreated[$method]
             ? "\$this->$method(\$stream)"
@@ -104,7 +105,7 @@ final class Builder
             'int128' => 'stream_get_contents($stream, 16)',
             'int256' => 'stream_get_contents($stream, 32)',
             'int512' => 'stream_get_contents($stream, 64)',
-            'string', 'bytes', 'waveform', 'random_bytes' => 
+            'string', 'bytes', 'waveform', 'random_bytes' =>
                 $this->methodCall("deserialize_$type"),
             default => \in_array($type, self::RECURSIVE_TYPES, true) || isset($param['subtype'])
                 ? $this->methodCall("deserialize_type_{$this->escapeTypeName($type)}")
@@ -121,7 +122,7 @@ final class Builder
         }
         $superBare = $this->typeByPredicate[$predicate] === 'JSONValue'
             || $this->typeByPredicate[$predicate] === 'Peer';
-            
+
         $result = '';
         if (!$superBare) {
             $result .= "[\n";
@@ -231,10 +232,12 @@ final class Builder
             return $result;    
         ', 'array', static: $type === 'JSONValue');
     }
-    private function w(string $data): void {
+    private function w(string $data): void
+    {
         fwrite($this->output, $data);
     }
-    public function m(string $methodName, string $body, string $returnType = 'mixed', bool $public = false, bool $static = true): void {
+    public function m(string $methodName, string $body, string $returnType = 'mixed', bool $public = false, bool $static = true): void
+    {
         $this->methodsCreated[$methodName] = $static;
         $public = $public ? 'public' : 'private';
         $static = $static ? 'static' : '';
@@ -339,7 +342,7 @@ final class Builder
 
         $initial_constructors = array_filter(
             $this->TL->getConstructors()->by_id,
-            fn (array $arr) => $arr['type'] === 'Update'
+            static fn (array $arr) => $arr['type'] === 'Update'
                 || $arr['predicate'] === 'rpc_result'
                 || !$arr['encrypted']
         );
@@ -369,7 +372,7 @@ final class Builder
                 continue;
             }
             $this->m(
-                "deserialize_type_{$this->escapeTypeName($type)}", 
+                "deserialize_type_{$this->escapeTypeName($type)}",
                 "return {$this->buildTypes($constructors, $type)};",
                 static: $type === 'JSONValue'
             );
