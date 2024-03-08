@@ -1239,6 +1239,26 @@ default => self::err($stream)
 
 return $tmp;
     }
+    private  function deserialize_type_FileLocation(mixed $stream): mixed {
+return match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => $this->deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+    }
     private  function deserialize_type_array_of_PhotoSize(mixed $stream): array {
 
                 $stream = match(stream_get_contents($stream, 4)) {    
@@ -1284,15 +1304,51 @@ return $tmp;
 'bytes' => self::deserialize_bytes($stream),
 ],
 '¶¿w' => [
-'_' => 'photoSize',
+'_' => 'photoSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'size' => unpack('l', stream_get_contents($stream, 4))[1],
 ],
 'ú4§é' => [
-'_' => 'photoCachedSize',
+'_' => 'photoCachedSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'bytes' => self::deserialize_bytes($stream),
@@ -1581,6 +1637,16 @@ default => self::err($stream)
 
 return $tmp;
     }
+    private  function deserialize_documentAttributeVideo_66_66(mixed $stream): mixed {
+$tmp = ['_' => 'documentAttributeVideo_66'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['round_message'] = ($flags & 1) !== 0;
+$tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['w'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['h'] = unpack('l', stream_get_contents($stream, 4))[1];
+
+return $tmp;
+    }
     private  function deserialize_type_array_of_DocumentAttribute(mixed $stream): array {
 
                 $stream = match(stream_get_contents($stream, 4)) {    
@@ -1610,12 +1676,72 @@ return $tmp;
 ],
 '™˜ý' => self::deserialize_documentAttributeCustomEmoji($stream),
 '\'W
-û' => self::deserialize_documentAttributeSticker($stream),
-'ËÌY' => self::deserialize_documentAttributeVideo($stream),
-'åH' => self::deserialize_documentAttributeAudio($stream),
-'cU:' => self::deserialize_documentAttributeSticker($stream),
-'àÒÞ' => self::deserialize_documentAttributeAudio($stream),
-'æ,ð' => self::deserialize_documentAttributeVideo($stream),
+û' => [
+'_' => 'documentAttributeSticker_23',
+],
+'ËÌY' => [
+'_' => 'documentAttributeVideo_23',
+'duration' => unpack('l', stream_get_contents($stream, 4))[1],
+'w' => unpack('l', stream_get_contents($stream, 4))[1],
+'h' => unpack('l', stream_get_contents($stream, 4))[1],
+],
+'åH' => [
+'_' => 'documentAttributeAudio_23',
+'duration' => unpack('l', stream_get_contents($stream, 4))[1],
+],
+'cU:' => [
+'_' => 'documentAttributeSticker_45',
+'alt' => self::deserialize_string($stream),
+'stickerset' => match (stream_get_contents($stream, 4)) {
+'•+¶ÿ' => [
+'_' => 'inputStickerSetEmpty',
+],
+'i¢ç' => [
+'_' => 'inputStickerSetID',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+' È†' => [
+'_' => 'inputStickerSetShortName',
+'short_name' => self::deserialize_string($stream),
+],
+'È‡' => [
+'_' => 'inputStickerSetAnimatedEmoji',
+],
+'Ræ' => [
+'_' => 'inputStickerSetDice',
+'emoticon' => self::deserialize_string($stream),
+],
+'97Þ' => [
+'_' => 'inputStickerSetAnimatedEmojiAnimations',
+],
+';‹È' => [
+'_' => 'inputStickerSetPremiumGifts',
+],
+'ÎÔÄ' => [
+'_' => 'inputStickerSetEmojiGenericAnimations',
+],
+'îõÐ)' => [
+'_' => 'inputStickerSetEmojiDefaultStatuses',
+],
+'éøÁD' => [
+'_' => 'inputStickerSetEmojiDefaultTopicIcons',
+],
+'S…tI' => [
+'_' => 'inputStickerSetEmojiChannelDefaultStatuses',
+],
+'¡Ïr0' => self::deserialize_type_InputStickerSet(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
+],
+'àÒÞ' => [
+'_' => 'documentAttributeAudio_45',
+'duration' => unpack('l', stream_get_contents($stream, 4))[1],
+'title' => self::deserialize_string($stream),
+'performer' => self::deserialize_string($stream),
+],
+'æ,ð' => self::deserialize_documentAttributeVideo_66_66($stream),
 '¡Ïr0' => $this->deserialize_type_DocumentAttribute(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13732,6 +13858,80 @@ default => self::err($stream)
 }
 ;
     }
+    private  function deserialize_webPage(mixed $stream): mixed {
+$tmp = ['_' => 'webPage'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['has_large_media'] = ($flags & 8192) !== 0;
+$tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
+$tmp['url'] = self::deserialize_string($stream);
+$tmp['display_url'] = self::deserialize_string($stream);
+$tmp['hash'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 1) !== 0) $tmp['type'] = self::deserialize_string($stream);
+if (($flags & 2) !== 0) $tmp['site_name'] = self::deserialize_string($stream);
+if (($flags & 4) !== 0) $tmp['title'] = self::deserialize_string($stream);
+if (($flags & 8) !== 0) $tmp['description'] = self::deserialize_string($stream);
+if (($flags & 16) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) {
+'-²1#' => [
+'_' => 'photoEmpty',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'ezû' => self::deserialize_photo($stream),
+'¡Ïr0' => self::deserialize_type_Photo(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+if (($flags & 32) !== 0) $tmp['embed_url'] = self::deserialize_string($stream);
+if (($flags & 32) !== 0) $tmp['embed_type'] = self::deserialize_string($stream);
+if (($flags & 64) !== 0) $tmp['embed_width'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 64) !== 0) $tmp['embed_height'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 128) !== 0) $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 256) !== 0) $tmp['author'] = self::deserialize_string($stream);
+if (($flags & 512) !== 0) $tmp['document'] = match (stream_get_contents($stream, 4)) {
+'qÈø6' => [
+'_' => 'documentEmpty',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'ØÄÔ' => self::deserialize_document($stream),
+'¡Ïr0' => self::deserialize_type_Document(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+if (($flags & 1024) !== 0) $tmp['cached_page'] = match (stream_get_contents($stream, 4)) {
+'e˜' => self::deserialize_page($stream),
+'¡Ïr0' => self::deserialize_type_Page(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+if (($flags & 4096) !== 0) $tmp['attributes'] = $this->deserialize_type_array_of_WebPageAttribute($stream);
+
+return $tmp;
+    }
+    private  function deserialize_webPageNotModified(mixed $stream): mixed {
+$tmp = ['_' => 'webPageNotModified'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+if (($flags & 1) !== 0) $tmp['cached_page_views'] = unpack('l', stream_get_contents($stream, 4))[1];
+
+return $tmp;
+    }
+    private  function deserialize_messageMediaWebPage(mixed $stream): mixed {
+$tmp = ['_' => 'messageMediaWebPage'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['force_large_media'] = ($flags & 1) !== 0;
+$tmp['force_small_media'] = ($flags & 2) !== 0;
+$tmp['manual'] = ($flags & 8) !== 0;
+$tmp['safe'] = ($flags & 16) !== 0;
+$tmp['webpage'] = match (stream_get_contents($stream, 4)) {
+'ˆ!' => self::deserialize_webPageEmpty($stream),
+'G>Ñ°' => self::deserialize_webPagePending($stream),
+'²Eœè' => self::deserialize_webPage($stream),
+'Ês' => self::deserialize_webPageNotModified($stream),
+'¡Ïr0' => $this->deserialize_type_WebPage(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+
+return $tmp;
+    }
     private  function deserialize_game(mixed $stream): mixed {
 $tmp = ['_' => 'game'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
@@ -13831,15 +14031,51 @@ return match (stream_get_contents($stream, 4)) {
 'bytes' => self::deserialize_bytes($stream),
 ],
 '¶¿w' => [
-'_' => 'photoSize',
+'_' => 'photoSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'size' => unpack('l', stream_get_contents($stream, 4))[1],
 ],
 'ú4§é' => [
-'_' => 'photoCachedSize',
+'_' => 'photoCachedSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'bytes' => self::deserialize_bytes($stream),
@@ -13891,15 +14127,51 @@ if (($flags & 2) !== 0) $tmp['thumb'] = match (stream_get_contents($stream, 4)) 
 'bytes' => self::deserialize_bytes($stream),
 ],
 '¶¿w' => [
-'_' => 'photoSize',
+'_' => 'photoSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'size' => unpack('l', stream_get_contents($stream, 4))[1],
 ],
 'ú4§é' => [
-'_' => 'photoCachedSize',
+'_' => 'photoCachedSize_23',
 'type' => self::deserialize_string($stream),
+'location' => match (stream_get_contents($stream, 4)) {
+'FkY|' => [
+'_' => 'fileLocationUnavailable_23',
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'vÖS' => [
+'_' => 'fileLocation_23',
+'dc_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'volume_id' => unpack('q', stream_get_contents($stream, 8))[1],
+'local_id' => unpack('l', stream_get_contents($stream, 4))[1],
+'secret' => unpack('q', stream_get_contents($stream, 8))[1],
+],
+'¡Ïr0' => self::deserialize_type_FileLocation(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
 'w' => unpack('l', stream_get_contents($stream, 4))[1],
 'h' => unpack('l', stream_get_contents($stream, 4))[1],
 'bytes' => self::deserialize_bytes($stream),
@@ -14098,64 +14370,6 @@ return match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-    }
-    private  function deserialize_messageMediaStory(mixed $stream): mixed {
-$tmp = ['_' => 'messageMediaStory'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['via_mention'] = ($flags & 2) !== 0;
-$tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
-'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
-'¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-$tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 1) !== 0) $tmp['story'] = match (stream_get_contents($stream, 4)) {
-'OîæQ' => [
-'_' => 'storyItemDeleted',
-'id' => unpack('l', stream_get_contents($stream, 4))[1],
-],
-'É­ÿ' => self::deserialize_storyItemSkipped($stream),
-'$j²y' => $this->deserialize_storyItem($stream),
-'¡Ïr0' => $this->deserialize_type_StoryItem(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-
-return $tmp;
-    }
-    private  function deserialize_messageMediaGiveaway(mixed $stream): mixed {
-$tmp = ['_' => 'messageMediaGiveaway'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['only_new_subscribers'] = ($flags & 1) !== 0;
-$tmp['winners_are_visible'] = ($flags & 4) !== 0;
-$tmp['channels'] = self::deserialize_type_array_of_long($stream);
-if (($flags & 2) !== 0) $tmp['countries_iso2'] = self::deserialize_type_array_of_string($stream);
-if (($flags & 8) !== 0) $tmp['prize_description'] = self::deserialize_string($stream);
-$tmp['quantity'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
-return $tmp;
-    }
-    private  function deserialize_messageMediaGiveawayResults(mixed $stream): mixed {
-$tmp = ['_' => 'messageMediaGiveawayResults'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['only_new_subscribers'] = ($flags & 1) !== 0;
-$tmp['refunded'] = ($flags & 4) !== 0;
-$tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
-if (($flags & 8) !== 0) $tmp['additional_peers_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['launch_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['winners_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['unclaimed_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-$tmp['winners'] = self::deserialize_type_array_of_long($stream);
-$tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 2) !== 0) $tmp['prize_description'] = self::deserialize_string($stream);
-$tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
-return $tmp;
     }
     private  function deserialize_type_MediaAreaCoordinates(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14502,91 +14716,7 @@ default => self::err($stream)
 $tmp['expire_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['caption'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['entities'] = self::deserialize_type_array_of_MessageEntity($stream);
-$tmp['media'] = match (stream_get_contents($stream, 4)) {
-' cí=' => [
-'_' => 'messageMediaEmpty',
-],
-'×PQi' => self::deserialize_messageMediaPhoto($stream),
-'tÔàV' => [
-'_' => 'messageMediaGeo',
-'geo' => match (stream_get_contents($stream, 4)) {
-'_Ý' => [
-'_' => 'geoPointEmpty',
-],
-'cö¢²' => self::deserialize_geoPoint($stream),
-'¡Ïr0' => self::deserialize_type_GeoPoint(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
-'I)2p' => [
-'_' => 'messageMediaContact',
-'phone_number' => self::deserialize_string($stream),
-'first_name' => self::deserialize_string($stream),
-'last_name' => self::deserialize_string($stream),
-'vcard' => self::deserialize_string($stream),
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'žô„Ÿ' => [
-'_' => 'messageMediaUnsupported',
-],
-'-×ôL' => self::deserialize_messageMediaDocument($stream),
-';ñÝ' => $this->deserialize_messageMediaWebPage($stream),
-'?SÀ.' => [
-'_' => 'messageMediaVenue',
-'geo' => match (stream_get_contents($stream, 4)) {
-'_Ý' => [
-'_' => 'geoPointEmpty',
-],
-'cö¢²' => self::deserialize_geoPoint($stream),
-'¡Ïr0' => self::deserialize_type_GeoPoint(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'title' => self::deserialize_string($stream),
-'address' => self::deserialize_string($stream),
-'provider' => self::deserialize_string($stream),
-'venue_id' => self::deserialize_string($stream),
-'venue_type' => self::deserialize_string($stream),
-],
-'±ý' => [
-'_' => 'messageMediaGame',
-'game' => match (stream_get_contents($stream, 4)) {
-';eù½' => self::deserialize_game($stream),
-'¡Ïr0' => self::deserialize_type_Game(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
-'ÓH¥ö' => self::deserialize_messageMediaInvoice($stream),
-'fÆ@¹' => self::deserialize_messageMediaGeoLive($stream),
-'˜çÖK' => [
-'_' => 'messageMediaPoll',
-'poll' => match (stream_get_contents($stream, 4)) {
-'aá†' => self::deserialize_poll($stream),
-'¡Ïr0' => self::deserialize_type_Poll(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'results' => match (stream_get_contents($stream, 4)) {
-' $ßz' => self::deserialize_pollResults($stream),
-'¡Ïr0' => self::deserialize_type_PollResults(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
-'‹å~?' => [
-'_' => 'messageMediaDice',
-'value' => unpack('l', stream_get_contents($stream, 4))[1],
-'emoticon' => self::deserialize_string($stream),
-],
-'ƒbËh' => self::deserialize_messageMediaStory($stream),
-'°…­Ú' => self::deserialize_messageMediaGiveaway($stream),
-'h™Æ' => self::deserialize_messageMediaGiveawayResults($stream),
-'¡Ïr0' => $this->deserialize_type_MessageMedia(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
+$tmp['media'] = $this->deserialize_type_MessageMedia($stream);
 if (($flags & 16384) !== 0) $tmp['media_areas'] = self::deserialize_type_array_of_MediaArea($stream);
 if (($flags & 4) !== 0) $tmp['privacy'] = self::deserialize_type_array_of_PrivacyRule($stream);
 if (($flags & 8) !== 0) $tmp['views'] = match (stream_get_contents($stream, 4)) {
@@ -14611,6 +14741,64 @@ if (($flags & 32768) !== 0) $tmp['sent_reaction'] = match (stream_get_contents($
 default => self::err($stream)
 }
 ;
+
+return $tmp;
+    }
+    private  function deserialize_messageMediaStory(mixed $stream): mixed {
+$tmp = ['_' => 'messageMediaStory'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['via_mention'] = ($flags & 2) !== 0;
+$tmp['peer'] = match (stream_get_contents($stream, 4)) {
+'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+$tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 1) !== 0) $tmp['story'] = match (stream_get_contents($stream, 4)) {
+'OîæQ' => [
+'_' => 'storyItemDeleted',
+'id' => unpack('l', stream_get_contents($stream, 4))[1],
+],
+'É­ÿ' => self::deserialize_storyItemSkipped($stream),
+'$j²y' => self::deserialize_storyItem($stream),
+'¡Ïr0' => $this->deserialize_type_StoryItem(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+
+return $tmp;
+    }
+    private  function deserialize_messageMediaGiveaway(mixed $stream): mixed {
+$tmp = ['_' => 'messageMediaGiveaway'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['only_new_subscribers'] = ($flags & 1) !== 0;
+$tmp['winners_are_visible'] = ($flags & 4) !== 0;
+$tmp['channels'] = self::deserialize_type_array_of_long($stream);
+if (($flags & 2) !== 0) $tmp['countries_iso2'] = self::deserialize_type_array_of_string($stream);
+if (($flags & 8) !== 0) $tmp['prize_description'] = self::deserialize_string($stream);
+$tmp['quantity'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
+
+return $tmp;
+    }
+    private  function deserialize_messageMediaGiveawayResults(mixed $stream): mixed {
+$tmp = ['_' => 'messageMediaGiveawayResults'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['only_new_subscribers'] = ($flags & 1) !== 0;
+$tmp['refunded'] = ($flags & 4) !== 0;
+$tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
+if (($flags & 8) !== 0) $tmp['additional_peers_count'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['launch_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['winners_count'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['unclaimed_count'] = unpack('l', stream_get_contents($stream, 4))[1];
+$tmp['winners'] = self::deserialize_type_array_of_long($stream);
+$tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
+if (($flags & 2) !== 0) $tmp['prize_description'] = self::deserialize_string($stream);
+$tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 
 return $tmp;
     }
@@ -14672,61 +14860,6 @@ default => self::err($stream)
                 return $result;    
             
     }
-    private  function deserialize_webPage(mixed $stream): mixed {
-$tmp = ['_' => 'webPage'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['has_large_media'] = ($flags & 8192) !== 0;
-$tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
-$tmp['url'] = self::deserialize_string($stream);
-$tmp['display_url'] = self::deserialize_string($stream);
-$tmp['hash'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 1) !== 0) $tmp['type'] = self::deserialize_string($stream);
-if (($flags & 2) !== 0) $tmp['site_name'] = self::deserialize_string($stream);
-if (($flags & 4) !== 0) $tmp['title'] = self::deserialize_string($stream);
-if (($flags & 8) !== 0) $tmp['description'] = self::deserialize_string($stream);
-if (($flags & 16) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) {
-'-²1#' => [
-'_' => 'photoEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'ezû' => self::deserialize_photo($stream),
-'¡Ïr0' => self::deserialize_type_Photo(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-if (($flags & 32) !== 0) $tmp['embed_url'] = self::deserialize_string($stream);
-if (($flags & 32) !== 0) $tmp['embed_type'] = self::deserialize_string($stream);
-if (($flags & 64) !== 0) $tmp['embed_width'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 64) !== 0) $tmp['embed_height'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 128) !== 0) $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
-if (($flags & 256) !== 0) $tmp['author'] = self::deserialize_string($stream);
-if (($flags & 512) !== 0) $tmp['document'] = match (stream_get_contents($stream, 4)) {
-'qÈø6' => [
-'_' => 'documentEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'ØÄÔ' => self::deserialize_document($stream),
-'¡Ïr0' => self::deserialize_type_Document(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-if (($flags & 1024) !== 0) $tmp['cached_page'] = match (stream_get_contents($stream, 4)) {
-'e˜' => self::deserialize_page($stream),
-'¡Ïr0' => self::deserialize_type_Page(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-if (($flags & 4096) !== 0) $tmp['attributes'] = self::deserialize_type_array_of_WebPageAttribute($stream);
-
-return $tmp;
-    }
-    private  function deserialize_webPageNotModified(mixed $stream): mixed {
-$tmp = ['_' => 'webPageNotModified'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-if (($flags & 1) !== 0) $tmp['cached_page_views'] = unpack('l', stream_get_contents($stream, 4))[1];
-
-return $tmp;
-    }
     private  function deserialize_type_WebPage(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
 'ˆ!' => self::deserialize_webPageEmpty($stream),
@@ -14737,25 +14870,6 @@ return match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-    }
-    private  function deserialize_messageMediaWebPage(mixed $stream): mixed {
-$tmp = ['_' => 'messageMediaWebPage'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['force_large_media'] = ($flags & 1) !== 0;
-$tmp['force_small_media'] = ($flags & 2) !== 0;
-$tmp['manual'] = ($flags & 8) !== 0;
-$tmp['safe'] = ($flags & 16) !== 0;
-$tmp['webpage'] = match (stream_get_contents($stream, 4)) {
-'ˆ!' => self::deserialize_webPageEmpty($stream),
-'G>Ñ°' => self::deserialize_webPagePending($stream),
-'²Eœè' => self::deserialize_webPage($stream),
-'Ês' => self::deserialize_webPageNotModified($stream),
-'¡Ïr0' => self::deserialize_type_WebPage(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-
-return $tmp;
     }
     private  function deserialize_type_MessageMedia(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16679,25 +16793,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => $this->deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -17956,6 +18065,42 @@ default => self::err($stream)
 }
 ;
     }
+    private  function deserialize_inputMediaInvoice(mixed $stream): mixed {
+$tmp = ['_' => 'inputMediaInvoice'];
+$flags = unpack('V', stream_get_contents($stream, 4))[1];
+$tmp['title'] = self::deserialize_string($stream);
+$tmp['description'] = self::deserialize_string($stream);
+if (($flags & 1) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) {
+'MCí›' => [
+'_' => 'inputWebDocument',
+'url' => self::deserialize_string($stream),
+'size' => unpack('l', stream_get_contents($stream, 4))[1],
+'mime_type' => self::deserialize_string($stream),
+'attributes' => self::deserialize_type_array_of_DocumentAttribute($stream),
+],
+'¡Ïr0' => self::deserialize_type_InputWebDocument(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+$tmp['invoice'] = match (stream_get_contents($stream, 4)) {
+'Z¹]' => self::deserialize_invoice($stream),
+'¡Ïr0' => self::deserialize_type_Invoice(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+$tmp['payload'] = self::deserialize_bytes($stream);
+$tmp['provider'] = self::deserialize_string($stream);
+$tmp['provider_data'] = match (stream_get_contents($stream, 4)) {
+'t}' => json_decode(self::deserialize_string($stream), true, 512, \JSON_THROW_ON_ERROR),
+'¡Ïr0' => self::deserialize_type_DataJSON(self::gzdecode($stream)),
+default => self::err($stream)
+}
+;
+if (($flags & 2) !== 0) $tmp['start_param'] = self::deserialize_string($stream);
+if (($flags & 4) !== 0) $tmp['extended_media'] = $this->deserialize_type_InputMedia($stream);
+
+return $tmp;
+    }
     private  function deserialize_inputMediaGeoLive(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaGeoLive'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
@@ -17997,218 +18142,6 @@ $tmp['force_large_media'] = ($flags & 1) !== 0;
 $tmp['force_small_media'] = ($flags & 2) !== 0;
 $tmp['optional'] = ($flags & 4) !== 0;
 $tmp['url'] = self::deserialize_string($stream);
-
-return $tmp;
-    }
-    private  function deserialize_inputMediaInvoice(mixed $stream): mixed {
-$tmp = ['_' => 'inputMediaInvoice'];
-$flags = unpack('V', stream_get_contents($stream, 4))[1];
-$tmp['title'] = self::deserialize_string($stream);
-$tmp['description'] = self::deserialize_string($stream);
-if (($flags & 1) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) {
-'MCí›' => [
-'_' => 'inputWebDocument',
-'url' => self::deserialize_string($stream),
-'size' => unpack('l', stream_get_contents($stream, 4))[1],
-'mime_type' => self::deserialize_string($stream),
-'attributes' => self::deserialize_type_array_of_DocumentAttribute($stream),
-],
-'¡Ïr0' => self::deserialize_type_InputWebDocument(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-$tmp['invoice'] = match (stream_get_contents($stream, 4)) {
-'Z¹]' => self::deserialize_invoice($stream),
-'¡Ïr0' => self::deserialize_type_Invoice(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-$tmp['payload'] = self::deserialize_bytes($stream);
-$tmp['provider'] = self::deserialize_string($stream);
-$tmp['provider_data'] = match (stream_get_contents($stream, 4)) {
-'t}' => json_decode(self::deserialize_string($stream), true, 512, \JSON_THROW_ON_ERROR),
-'¡Ïr0' => self::deserialize_type_DataJSON(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
-if (($flags & 2) !== 0) $tmp['start_param'] = self::deserialize_string($stream);
-if (($flags & 4) !== 0) $tmp['extended_media'] = match (stream_get_contents($stream, 4)) {
-'õd–' => [
-'_' => 'inputMediaEmpty',
-],
-'}(' => self::deserialize_inputMediaUploadedPhoto($stream),
-'5º³' => self::deserialize_inputMediaPhoto($stream),
-'DAÄù' => [
-'_' => 'inputMediaGeoPoint',
-'geo_point' => match (stream_get_contents($stream, 4)) {
-'Ö#Áä' => [
-'_' => 'inputGeoPointEmpty',
-],
-'¯/"H' => self::deserialize_inputGeoPoint($stream),
-'¡Ïr0' => self::deserialize_type_InputGeoPoint(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
-'û}«ø' => [
-'_' => 'inputMediaContact',
-'phone_number' => self::deserialize_string($stream),
-'first_name' => self::deserialize_string($stream),
-'last_name' => self::deserialize_string($stream),
-'vcard' => self::deserialize_string($stream),
-],
-'ÁÆ8[' => self::deserialize_inputMediaUploadedDocument($stream),
-'X0G3' => self::deserialize_inputMediaDocument($stream),
-'=Á' => [
-'_' => 'inputMediaVenue',
-'geo_point' => match (stream_get_contents($stream, 4)) {
-'Ö#Áä' => [
-'_' => 'inputGeoPointEmpty',
-],
-'¯/"H' => self::deserialize_inputGeoPoint($stream),
-'¡Ïr0' => self::deserialize_type_InputGeoPoint(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'title' => self::deserialize_string($stream),
-'address' => self::deserialize_string($stream),
-'provider' => self::deserialize_string($stream),
-'venue_id' => self::deserialize_string($stream),
-'venue_type' => self::deserialize_string($stream),
-],
-'þ»å' => self::deserialize_inputMediaPhotoExternal($stream),
-'™ÜRû' => self::deserialize_inputMediaDocumentExternal($stream),
-'óC?Ó' => [
-'_' => 'inputMediaGame',
-'id' => match (stream_get_contents($stream, 4)) {
-'w>,' => [
-'_' => 'inputGameID',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'
-è1Ã' => [
-'_' => 'inputGameShortName',
-'bot_id' => match (stream_get_contents($stream, 4)) {
-'Ï†ˆ¹' => [
-'_' => 'inputUserEmpty',
-],
-'?±Á÷' => [
-'_' => 'inputUserSelf',
-],
-'ÆXò' => [
-'_' => 'inputUser',
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'âH¤' => [
-'_' => 'inputUserFromMessage',
-'peer' => match (stream_get_contents($stream, 4)) {
-'ê;' => [
-'_' => 'inputPeerEmpty',
-],
-'É~ }' => [
-'_' => 'inputPeerSelf',
-],
-'¹\\©5' => [
-'_' => 'inputPeerChat',
-'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'L¥èÝ' => [
-'_' => 'inputPeerUser',
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'ü»¼\'' => [
-'_' => 'inputPeerChannel',
-'channel_id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'
-{¨' => [
-'_' => 'inputPeerUserFromMessage',
-'peer' => self::deserialize_type_InputPeer($stream),
-'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'@*½' => [
-'_' => 'inputPeerChannelFromMessage',
-'peer' => self::deserialize_type_InputPeer($stream),
-'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
-'channel_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'¡Ïr0' => self::deserialize_type_InputPeer(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'¡Ïr0' => self::deserialize_type_InputUser(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'short_name' => self::deserialize_string($stream),
-],
-'¡Ïr0' => self::deserialize_type_InputGame(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
-'Õ¦µŽ' => $this->deserialize_inputMediaInvoice($stream),
-'C¨—' => self::deserialize_inputMediaGeoLive($stream),
-'ñå”' => self::deserialize_inputMediaPoll($stream),
-'{¿oæ' => [
-'_' => 'inputMediaDice',
-'emoticon' => self::deserialize_string($stream),
-],
-'x×ý‰' => [
-'_' => 'inputMediaStory',
-'peer' => match (stream_get_contents($stream, 4)) {
-'ê;' => [
-'_' => 'inputPeerEmpty',
-],
-'É~ }' => [
-'_' => 'inputPeerSelf',
-],
-'¹\\©5' => [
-'_' => 'inputPeerChat',
-'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'L¥èÝ' => [
-'_' => 'inputPeerUser',
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'ü»¼\'' => [
-'_' => 'inputPeerChannel',
-'channel_id' => unpack('q', stream_get_contents($stream, 8))[1],
-'access_hash' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'
-{¨' => [
-'_' => 'inputPeerUserFromMessage',
-'peer' => self::deserialize_type_InputPeer($stream),
-'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'@*½' => [
-'_' => 'inputPeerChannelFromMessage',
-'peer' => self::deserialize_type_InputPeer($stream),
-'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
-'channel_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'¡Ïr0' => self::deserialize_type_InputPeer(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'id' => unpack('l', stream_get_contents($stream, 4))[1],
-],
-'IˆÂ' => self::deserialize_inputMediaWebPage($stream),
-'¡Ïr0' => $this->deserialize_type_InputMedia(self::gzdecode($stream)),
-default => self::err($stream)
-}
-;
 
 return $tmp;
     }
@@ -19502,25 +19435,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -20351,25 +20279,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -20458,25 +20381,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -21690,25 +21608,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -21797,25 +21710,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -28746,25 +28654,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -28853,25 +28756,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -31027,25 +30925,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -31134,25 +31027,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -33620,25 +33508,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -33727,25 +33610,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -35801,25 +35679,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
@@ -35908,25 +35781,20 @@ default => self::err($stream)
 'emoticon' => self::deserialize_string($stream),
 ],
 '÷/’' => [
-'_' => 'sendMessageUploadVideoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadVideoAction_17',
 ],
 'oŠ¬æ' => [
-'_' => 'sendMessageUploadAudioAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadAudioAction_17',
 ],
 '<
 ™' => [
-'_' => 'sendMessageUploadPhotoAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadPhotoAction_17',
 ],
 'Žé®' => [
-'_' => 'sendMessageUploadDocumentAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadDocumentAction_17',
 ],
 '$†q»' => [
-'_' => 'sendMessageUploadRoundAction',
-'progress' => unpack('l', stream_get_contents($stream, 4))[1],
+'_' => 'sendMessageUploadRoundAction_66',
 ],
 '¡Ïr0' => self::deserialize_type_SendMessageAction(self::gzdecode($stream)),
 default => self::err($stream)
