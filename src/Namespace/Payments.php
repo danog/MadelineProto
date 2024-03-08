@@ -140,9 +140,9 @@ interface Payments
     public function canPurchasePremium(array $purpose, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Obtain a list of Telegram Premium [giveaway/gift code »](https://core.telegram.org/api/giveaways) options.
      *
-     *
-     * @param array|int|string $boost_peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $boost_peer The channel that will start the giveaway @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -151,8 +151,9 @@ interface Payments
     public function getPremiumGiftCodeOptions(array|int|string|null $boost_peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Obtain information about a [Telegram Premium giftcode »](https://core.telegram.org/api/giveaways).
      *
-     *
+     * @param string $slug The giftcode to check
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -161,8 +162,9 @@ interface Payments
     public function checkGiftCode(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Apply a [Telegram Premium giftcode »](https://core.telegram.org/api/giveaways).
      *
-     *
+     * @param string $slug The code to apply
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -171,9 +173,10 @@ interface Payments
     public function applyGiftCode(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Obtain information about a [Telegram Premium giveaway »](https://core.telegram.org/api/giveaways).
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $peer The peer where the giveaway was posted. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $msg_id Message ID of the [messageActionGiveawayLaunch](https://docs.madelineproto.xyz/API_docs/constructors/messageActionGiveawayLaunch.html) service message
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -182,10 +185,11 @@ interface Payments
     public function getGiveawayInfo(array|int|string|null $peer = null, int|null $msg_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Launch a [prepaid giveaway »](https://core.telegram.org/api/giveaways).
      *
-     *
-     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, winners_are_visible?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, prize_description?: string, until_date?: int, currency?: string, amount?: int} $purpose @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array{_: 'inputStorePaymentPremiumSubscription', restore?: bool, upgrade?: bool}|array{_: 'inputStorePaymentGiftPremium', user_id?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiftCode', users?: list<array|int|string>, boost_peer?: array|int|string, currency?: string, amount?: int}|array{_: 'inputStorePaymentPremiumGiveaway', only_new_subscribers?: bool, winners_are_visible?: bool, boost_peer?: array|int|string, additional_peers?: list<array|int|string>, countries_iso2?: list<string>, prize_description?: string, until_date?: int, currency?: string, amount?: int} $purpose Giveway parameters @see https://docs.madelineproto.xyz/API_docs/types/InputStorePaymentPurpose.html
+     * @param array|int|string $peer The peer where to launch the giveaway. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $giveaway_id The prepaid giveaway ID.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

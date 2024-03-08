@@ -10,10 +10,12 @@ namespace danog\MadelineProto\Namespace;
 interface Premium
 {
     /**
+     * Obtains info about the boosts that were applied to a certain channel (admins only).
      *
-     *
-     * @param bool $gifts
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param bool $gifts Whether to return only info about boosts received from [gift codes and giveaways created by the channel »](https://core.telegram.org/api/giveaways)
+     * @param array|int|string $peer The channel @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param string $offset Offset for pagination, obtained from [premium.boostsList](https://docs.madelineproto.xyz/API_docs/constructors/premium.boostsList.html).`next_offset`
+     * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -22,7 +24,7 @@ interface Premium
     public function getBoostsList(bool|null $gifts = null, array|int|string|null $peer = null, string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     *
+     * Obtain which peers are we currently [boosting](https://core.telegram.org/api/boost), and how many [boost slots](https://core.telegram.org/api/boost) we have left.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -32,10 +34,10 @@ interface Premium
     public function getMyBoosts(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Apply one or more [boosts »](https://core.telegram.org/api/boost) to a peer.
      *
-     *
-     * @param list<int> $slots
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param list<int> $slots Which [boost slots](https://core.telegram.org/api/boost) to assign to this peer.
+     * @param array|int|string $peer The peer to boost. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -44,9 +46,9 @@ interface Premium
     public function applyBoost(array|null $slots = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Gets the current [number of boosts](https://core.telegram.org/api/boost) of a channel.
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $peer The peer. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -55,10 +57,10 @@ interface Premium
     public function getBoostsStatus(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Returns the lists of boost that were applied to a channel by a specific user (admins only).
      *
-     *
-     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array|int|string $user_id @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param array|int|string $peer The channel @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array|int|string $user_id The user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

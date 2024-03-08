@@ -244,7 +244,7 @@ interface Help
     public function getPremiumPromo(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     *
+     * Get the set of [accent color palettes »](https://core.telegram.org/api/colors) that can be used for message accents.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -254,7 +254,7 @@ interface Help
     public function getPeerColors(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     *
+     * Get the set of [accent color palettes »](https://core.telegram.org/api/colors) that can be used in profile page backgrounds.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -262,4 +262,14 @@ interface Help
      * @return array{_: 'help.peerColorsNotModified'}|array{_: 'help.peerColors', hash: int, colors: list<array{_: 'help.peerColorOption', hidden: bool, color_id: int, colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, dark_colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, channel_min_level?: int, group_min_level?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/help.PeerColors.html
      */
     public function getPeerProfileColors(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'help.timezonesListNotModified'}|array{_: 'help.timezonesList', timezones: list<array{_: 'timezone', id: string, name: string, utc_offset: int}>, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.TimezonesList.html
+     */
+    public function getTimezonesList(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

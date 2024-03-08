@@ -440,7 +440,7 @@ interface Account
     public function verifyEmail(array $purpose, array $verification, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Initialize account takeout session.
+     * Initialize a [takeout session, see here » for more info](https://core.telegram.org/api/takeout).
      *
      * @param bool $contacts Whether to export contacts
      * @param bool $message_users Whether to export messages in private chats
@@ -457,7 +457,7 @@ interface Account
     public function initTakeoutSession(bool|null $contacts = null, bool|null $message_users = null, bool|null $message_chats = null, bool|null $message_megagroups = null, bool|null $message_channels = null, bool|null $files = null, int|null $file_max_size = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Finish account takeout session.
+     * Terminate a [takeout session, see here » for more info](https://core.telegram.org/api/takeout).
      *
      * @param bool $success Data exported successfully
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -516,8 +516,8 @@ interface Account
     /**
      * Returns list of chats with non-default notification settings.
      *
-     * @param bool $compare_sound If true, chats with non-default sound will also be returned
-     * @param bool $compare_stories
+     * @param bool $compare_sound If set, chats with non-default sound will be returned
+     * @param bool $compare_stories If set, chats with non-default notification settings for stories will be returned
      * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int} $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -782,7 +782,7 @@ interface Account
     public function declinePasswordReset(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Get all available chat themes.
+     * Get all available chat [themes »](https://core.telegram.org/api/themes).
      *
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -803,9 +803,9 @@ interface Account
     public function setAuthorizationTTL(int|null $authorization_ttl_days = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Change authorization settings.
+     * Change settings related to a session.
      *
-     * @param bool $confirmed
+     * @param bool $confirmed If set, [confirms a newly logged in session »](https://core.telegram.org/api/auth#confirming-login).
      * @param list<int>|array<never, never> $hash Session ID from the [authorization](https://docs.madelineproto.xyz/API_docs/constructors/authorization.html) constructor, fetchable using [account.getAuthorizations](https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizations.html)
      * @param bool $encrypted_requests_disabled Whether to enable or disable receiving encrypted chats: if the flag is not set, the previous setting is not changed
      * @param bool $call_requests_disabled Whether to enable or disable receiving calls: if the flag is not set, the previous setting is not changed
@@ -972,9 +972,9 @@ interface Account
     public function deleteAutoSaveExceptions(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Invalidate the specified login codes, see [here »](https://core.telegram.org/api/auth#invalidating-login-codes) for more info.
      *
-     *
-     * @param list<string>|array<never, never> $codes
+     * @param list<string>|array<never, never> $codes The login codes to invalidate.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -982,11 +982,11 @@ interface Account
     public function invalidateSignInCodes(array $codes = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Update the [accent color and background custom emoji »](https://core.telegram.org/api/colors) of the current account.
      *
-     *
-     * @param bool $for_profile
-     * @param int $color
-     * @param int $background_emoji_id
+     * @param bool $for_profile Whether to change the accent color emoji pattern of the profile page; otherwise, the accent color and emoji pattern of messages will be changed.
+     * @param int $color [ID of the accent color palette »](https://core.telegram.org/api/colors) to use (not RGB24, see [here »](https://core.telegram.org/api/colors) for more info).
+     * @param int $background_emoji_id Custom emoji ID used in the accent color pattern.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -994,9 +994,9 @@ interface Account
     public function updateColor(bool|null $for_profile = null, int|null $color = null, int|null $background_emoji_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Get a set of suggested [custom emoji stickers](https://core.telegram.org/api/custom-emoji) that can be used in an [accent color pattern](https://core.telegram.org/api/colors).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -1005,9 +1005,9 @@ interface Account
     public function getDefaultBackgroundEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Get a list of default suggested [channel emoji statuses](https://core.telegram.org/api/emoji-status).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -1016,13 +1016,78 @@ interface Account
     public function getChannelDefaultEmojiStatuses(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
+     * Returns fetch the full list of [custom emoji IDs »](https://core.telegram.org/api/custom-emoji) that cannot be used in [channel emoji statuses »](https://core.telegram.org/api/emoji-status).
      *
-     *
-     * @param list<int>|array<never, never> $hash
+     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
      */
     public function getChannelRestrictedStatusEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array{_: 'businessWorkHours', open_now?: bool, timezone_id?: string, weekly_open?: list<array{_: 'businessWeeklyOpen', start_minute?: int, end_minute?: int}>} $business_work_hours @see https://docs.madelineproto.xyz/API_docs/types/BusinessWorkHours.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBusinessWorkHours(array|null $business_work_hours = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputGeoPointEmpty'}|array{_: 'inputGeoPoint', lat: float, long: float, accuracy_radius?: int} $geo_point @see https://docs.madelineproto.xyz/API_docs/types/InputGeoPoint.html
+     * @param string $address
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBusinessLocation(array|null $geo_point = null, string|null $address = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessGreetingMessage', recipients: array{_: 'inputBusinessRecipients', existing_chats?: bool, new_chats?: bool, contacts?: bool, non_contacts?: bool, exclude_selected?: bool, users?: list<array|int|string>}, shortcut_id?: int, no_activity_days?: int} $message @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessGreetingMessage.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBusinessGreetingMessage(array|null $message = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessAwayMessage', schedule: array{_: 'businessAwayMessageScheduleAlways'}|array{_: 'businessAwayMessageScheduleOutsideWorkHours'}|array{_: 'businessAwayMessageScheduleCustom', start_date?: int, end_date?: int}, recipients: array{_: 'inputBusinessRecipients', existing_chats?: bool, new_chats?: bool, contacts?: bool, non_contacts?: bool, exclude_selected?: bool, users?: list<array|int|string>}, offline_only?: bool, shortcut_id?: int} $message @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessAwayMessage.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBusinessAwayMessage(array|null $message = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessRecipients', existing_chats?: bool, new_chats?: bool, contacts?: bool, non_contacts?: bool, exclude_selected?: bool, users?: list<array|int|string>} $recipients @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessRecipients.html
+     * @param bool $can_reply
+     * @param bool $deleted
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     */
+    public function updateConnectedBot(array $recipients, bool|null $can_reply = null, bool|null $deleted = null, array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'account.connectedBots', connected_bots: list<array{_: 'connectedBot', recipients: array{_: 'businessRecipients', existing_chats: bool, new_chats: bool, contacts: bool, non_contacts: bool, exclude_selected: bool, users?: list<int>}, can_reply: bool, bot_id: int}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ConnectedBots.html
+     */
+    public function getConnectedBots(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

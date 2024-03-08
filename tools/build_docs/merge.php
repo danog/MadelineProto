@@ -12,6 +12,7 @@ function mergeExtracted(): void
         return;
     }
     foreach (json_decode(file_get_contents('extracted.json'), true) as $key => $value) {
+        $key = html_entity_decode($key);
         if ($key === 'method_messages.sendMultiMedia_param_multi_media_type_Vector<InputSingleMedia>') {
             $value = 'The medias to send';
         }

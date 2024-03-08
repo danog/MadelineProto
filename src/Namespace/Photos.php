@@ -56,7 +56,7 @@ interface Photos
      *
      * @param array|int|string $user_id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param int $offset Number of list elements to be skipped
-     * @param int $max_id If a positive value was transferred, the method will return only photos with IDs less than the set one
+     * @param int $max_id If a positive value was transferred, the method will return only photos with IDs less than the set one. This parameter is often useful when [refetching file references »](https://core.telegram.org/api/file_reference), as in conjuction with `limit=1` and `offset=-1` the [photo](https://docs.madelineproto.xyz/API_docs/constructors/photo.html) object with the `id` specified in `max_id` can be fetched.
      * @param int $limit Number of list elements to be returned
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.

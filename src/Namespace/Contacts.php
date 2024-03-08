@@ -10,7 +10,8 @@ namespace danog\MadelineProto\Namespace;
 interface Contacts
 {
     /**
-     * Get contact by telegram IDs.
+     * Get the telegram IDs of all contacts.
+     * Returns an array of Telegram user IDs for all contacts (0 if a contact does not have an associated Telegram account or have hidden their account using privacy settings).
      *
      * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -21,7 +22,7 @@ interface Contacts
     public function getContactIDs(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Returns the list of contact statuses.
+     * Use this method to obtain the online statuses of all contacts with an accessible Telegram account.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -76,10 +77,10 @@ interface Contacts
     public function deleteByPhones(array $phones = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Adds the user to the blacklist.
+     * Adds a peer to a blocklist, see [here »](https://core.telegram.org/api/block) for more info.
      *
-     * @param bool $my_stories_from
-     * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param bool $my_stories_from Whether the peer should be added to the story blocklist; if not set, the peer will be added to the main blocklist, see [here »](https://core.telegram.org/api/block) for more info.
+     * @param array|int|string $id Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -87,10 +88,10 @@ interface Contacts
     public function block(bool|null $my_stories_from = null, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Deletes the user from the blacklist.
+     * Deletes a peer from a blocklist, see [here »](https://core.telegram.org/api/block) for more info.
      *
-     * @param bool $my_stories_from
-     * @param array|int|string $id User ID @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param bool $my_stories_from Whether the peer should be removed from the story blocklist; if not set, the peer will be removed from the main blocklist, see [here »](https://core.telegram.org/api/block) for more info.
+     * @param array|int|string $id Peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -100,7 +101,7 @@ interface Contacts
     /**
      * Returns the list of blocked users.
      *
-     * @param bool $my_stories_from
+     * @param bool $my_stories_from Whether to fetch the story blocklist; if not set, will fetch the main blocklist. See [here »](https://core.telegram.org/api/block) for differences between the two.
      * @param int $offset The number of list elements to be skipped
      * @param int $limit The number of list elements to be returned
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -155,7 +156,7 @@ interface Contacts
     public function resetTopPeerRating(array $category, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Delete saved contacts.
+     * Removes all contacts without an associated Telegram account.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -164,7 +165,7 @@ interface Contacts
     public function resetSaved(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
-     * Get all contacts.
+     * Get all contacts, requires a [takeout session, see here » for more info](https://core.telegram.org/api/takeout).
      *
      * @param int $takeoutId Takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -193,7 +194,7 @@ interface Contacts
      * @param array|int|string $id Telegram ID of the other user @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param string $first_name First name
      * @param string $last_name Last name
-     * @param string $phone User's phone number
+     * @param string $phone User's phone number, may be omitted to simply add the user to the contact list, without a phone number.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -202,7 +203,7 @@ interface Contacts
     public function addContact(bool|null $add_phone_privacy_exception = null, array|int|string|null $id = null, string|null $first_name = '', string|null $last_name = '', string|null $phone = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * If the [peer settings](https://docs.madelineproto.xyz/API_docs/constructors/peerSettings.html) of a new user allow us to add them as contact, add that user as contact.
+     * If the [add contact action bar is active](https://core.telegram.org/api/action-bar#add-contact), add that user as contact.
      *
      * @param array|int|string $id The user to add as contact @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -213,7 +214,7 @@ interface Contacts
     public function acceptContact(array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Get contacts near you.
+     * Get users and geochats near you, see [here »](https://core.telegram.org/api/nearby) for more info.
      *
      * @param bool $background While the geolocation of the current user is public, clients should update it in the background every half-an-hour or so, while setting this flag. <br>Do this only if the new location is more than 1 KM away from the previous one, or if the previous location is unknown.
      * @param array{_: 'inputGeoPointEmpty'}|array{_: 'inputGeoPoint', lat: float, long: float, accuracy_radius?: int} $geo_point Geolocation @see https://docs.madelineproto.xyz/API_docs/types/InputGeoPoint.html
@@ -226,12 +227,12 @@ interface Contacts
     public function getLocated(bool|null $background = null, array|null $geo_point = null, int|null $self_expires = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Stop getting notifications about [thread replies](https://core.telegram.org/api/threads) of a certain user in `@replies`.
+     * Stop getting notifications about [discussion replies](https://core.telegram.org/api/discussion) of a certain user in `@replies`.
      *
      * @param bool $delete_message Whether to delete the specified message as well
      * @param bool $delete_history Whether to delete all `@replies` messages from this user as well
      * @param bool $report_spam Whether to also report this user for spam
-     * @param int $msg_id ID of the message in the [@replies](https://core.telegram.org/api/threads#replies) chat
+     * @param int $msg_id ID of the message in the [@replies](https://core.telegram.org/api/discussion#replies) chat
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -272,9 +273,9 @@ interface Contacts
     public function importContactToken(string|null $token = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|int|string;
 
     /**
+     * Edit the [close friends list, see here »](https://core.telegram.org/api/privacy) for more info.
      *
-     *
-     * @param list<int>|array<never, never> $id
+     * @param list<int>|array<never, never> $id Full list of user IDs of close friends, see [here](https://core.telegram.org/api/privacy) for more info.
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -282,10 +283,11 @@ interface Contacts
     public function editCloseFriends(array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Replace the contents of an entire [blocklist, see here for more info »](https://core.telegram.org/api/block).
      *
-     *
-     * @param bool $my_stories_from
-     * @param list<array|int|string>|array<never, never> $id Array of  @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param bool $my_stories_from Whether to edit the story blocklist; if not set, will edit the main blocklist. See [here »](https://core.telegram.org/api/block) for differences between the two.
+     * @param list<array|int|string>|array<never, never> $id Array of Full content of the blocklist. @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

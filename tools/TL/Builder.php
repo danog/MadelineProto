@@ -19,7 +19,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL;
 
 use AssertionError;
-use Closure;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PeerDatabase;
@@ -76,15 +75,16 @@ final class Builder
     {
         return str_replace(['.', ' '], '___', $name);
     }
-    private function needFullConstructor(string $predicate): bool {
+    private function needFullConstructor(string $predicate): bool
+    {
         if (isset($this->TL->beforeConstructorDeserialization[$predicate])
-            || isset($this->TL->afterConstructorDeserialization[$predicate]))
-        {
+            || isset($this->TL->afterConstructorDeserialization[$predicate])) {
             return true;
         }
         return $predicate === 'rpc_result';
     }
-    private static function methodFromClosure(ReflectionFunction $closure): string {
+    private static function methodFromClosure(ReflectionFunction $closure): string
+    {
         $refl = new ReflectionFunction($closure);
         return match ($refl->getClosureThis()::class) {
             PeerDatabase::class => '$this->peerDatabase',
@@ -114,7 +114,8 @@ final class Builder
         return $result."}\n";
     }
     private array $createdConstructors = [];
-    public function buildConstructor(string $predicate): string {
+    public function buildConstructor(string $predicate): string
+    {
         $constructor = $this->TL->getConstructors()->findByPredicate($predicate);
         Assert::notFalse($constructor, "Missing constructor $predicate");
         [
@@ -123,14 +124,14 @@ final class Builder
         ] = $constructor;
         if (!$flags && !$this->needFullConstructor($predicate)) {
             return $this->buildConstructorShort($predicate, $params);
-        } 
+        }
 
         $nameEscaped = self::escapeConstructorName($constructor);
         if (!isset($this->createdConstructors[$predicate])) {
             $this->createdConstructors[$predicate] = true;
             $this->m("deserialize_$nameEscaped", $this->buildConstructorFull($predicate, $params, $flags));
         }
-            
+
         return $this->methodCall("deserialize_$nameEscaped");
     }
     private function buildConstructorFull(string $predicate, array $params, array $flags): string
@@ -274,9 +275,10 @@ final class Builder
         }
         return $this->methodCall("deserialize_type_array_of_{$this->escapeTypeName($type)}");
     }
-    
+
     private array $createdTypes = ['Object' => true, 'MethodResponse'];
-    private function buildType(string $type): string {
+    private function buildType(string $type): string
+    {
         if (!isset($this->createdTypes[$type])) {
             $this->createdTypes[$type] = true;
             $this->m(
@@ -403,7 +405,8 @@ final class Builder
 
         $initial_constructors = array_filter(
             $this->TL->getConstructors()->by_id,
-            static fn (array $arr) => ($arr['type'] === 'Update'
+            static fn (array $arr) => (
+                $arr['type'] === 'Update'
                 || $arr['predicate'] === 'rpc_result'
                 || !$arr['encrypted']
             ) && (
