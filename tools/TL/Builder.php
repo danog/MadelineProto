@@ -410,9 +410,11 @@ final class Builder
                 || $arr['predicate'] === 'rpc_result'
                 || !$arr['encrypted']
             ) && (
-                $arr['predicate'] === 'rpc_error'
+                $arr['predicate'] !== 'rpc_error'
             )
         );
+
+        $this->m("deserialize", "return {$this->buildTypes($initial_constructors)};", 'mixed', true, static: false);
 
         $this->m("deserialize_type_Object", "return {$this->buildTypes($initial_constructors)};", 'mixed', true, static: false);
 

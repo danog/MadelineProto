@@ -1568,9 +1568,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!\extension_loaded('uv')) {
             $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
         }
-        if (Magic::$hasBasedirLimitation) {
-            $warning .= "<p>".htmlentities(Lang::$current_lang['extensionRecommended'])."</p>";
-        }
+        /*if (Magic::$hasBasedirLimitation) {
+            $warning .= "<p>".htmlentities(Lang::$current_lang['baseDirLimitation'])."</p>";
+        }*/
         if (Lang::$currentPercentage !== 100) {
             $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
         }
