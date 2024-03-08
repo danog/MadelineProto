@@ -121,15 +121,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /** @internal */
     public const PFS_DURATION = 1*24*60*60;
     /**
-     * Internal version of MadelineProto.
-     *
-     * Increased every time the default settings array or something big changes
-     *
-     * @internal
-     * @var int
-     */
-    public const V = 184;
-    /**
      * Bad message error codes.
      *
      * @internal
@@ -251,10 +242,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private array $msg_ids = [];
     /**
-     * Version integer for upgrades.
+     * Version value for upgrades.
      *
      */
-    private int $v = 0;
+    private string|int $v = 0;
     /**
      * Cached getdialogs params.
      *
@@ -545,7 +536,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->datacenter->currentDatacenter = $this->settings->getConnection()->getTestMode() ? 10002 : 2;
         $this->getConfig();
         $this->startUpdateSystem(true);
-        $this->v = self::V;
+        $this->v = API::RELEASE;
 
         $this->settings->applyChanges();
     }
@@ -1154,7 +1145,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if (!isset($this->settings)) {
                 $this->settings = new Settings;
             } else {
-                if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+                if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
                     $this->logger->logger("Generic settings have changed!", Logger::WARNING);
                     $this->upgradeMadelineProto();
                 }
@@ -1198,9 +1189,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             || $this->settings->getConnection()->hasChanged()
             || $this->settings->getSchema()->hasChanged()
             || $this->settings->getSchema()->needsUpgrade()
-            || $this->v !== self::V)) {
+            || $this->v !== API::RELEASE)) {
             $this->logger->logger("Generic settings have changed!", Logger::WARNING);
-            if ($this->v !== self::V || $this->settings->getSchema()->needsUpgrade()) {
+            if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
                 $this->upgradeMadelineProto();
             }
             $this->initialize($this->settings);
@@ -1576,6 +1567,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         if (!\extension_loaded('uv')) {
             $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
+        }
+        if (Magic::$hasBasedirLimitation) {
+            $warning .= "<p>".htmlentities(Lang::$current_lang['extensionRecommended'])."</p>";
         }
         if (Lang::$currentPercentage !== 100) {
             $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";

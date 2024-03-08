@@ -201,6 +201,10 @@ final class Magic
      */
     public static bool $hasOpenssl = false;
     /**
+     * Whether there's a basedir limitation.
+     */
+    public static bool $hasBasedirLimitation = false;
+    /**
      * Encoded emojis.
      *
      * @var string
@@ -311,6 +315,9 @@ final class Magic
         }
         self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
         self::$hasOpenssl = \extension_loaded('openssl');
+        try {
+            self::$hasBasedirLimitation = (bool)@ini_get('open_basedir');
+        } catch (\Throwable) {}
         self::$emojis = json_decode(self::JSON_EMOJIS);
         self::$zero = new BigInteger(0);
         self::$one = new BigInteger(1);

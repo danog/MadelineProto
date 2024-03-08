@@ -70,20 +70,20 @@ final class TL implements TLInterface
     private array $tdDescriptions;
 
     /** @var array<string, list<TBeforeMethodResponseDeserialization>> */
-    private array $beforeMethodResponseDeserialization;
+    public array $beforeMethodResponseDeserialization;
 
     /** @var array<string, list<TAfterMethodResponseDeserialization>> */
-    private array $afterMethodResponseDeserialization;
+    public array $afterMethodResponseDeserialization;
 
     /** @var array<string, TBeforeConstructorSerialization> */
-    private array $beforeConstructorSerialization;
+    public array $beforeConstructorSerialization;
     /** @var array<string, list<TBeforeConstructorDeserialization>> */
-    private array $beforeConstructorDeserialization;
+    public array $beforeConstructorDeserialization;
     /** @var array<string, list<TAfterConstructorDeserialization>> */
-    private array $afterConstructorDeserialization;
+    public array $afterConstructorDeserialization;
 
     /** @var array<string, TTypeMismatch> */
-    private array $typeMismatch;
+    public array $typeMismatch;
 
     /**
      * API instance.

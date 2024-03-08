@@ -371,6 +371,7 @@ If you intentionally deleted this account, ignore this message.',
         ],
         'en' =>
         [
+            'baseDirLimitation' => 'A basedir limitation is configured: this can impact performance and cause some issues, please disable it if possible!',
             '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
             'accepting_call' => 'Accepting call from %s...',
             'account_banned' => '!!!!!!! WARNING !!!!!!!
