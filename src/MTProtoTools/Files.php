@@ -578,6 +578,9 @@ trait Files
                 if (isset($media['ttl_seconds'])) {
                     $res['InputMedia']['ttl_seconds'] = $media['ttl_seconds'];
                 }
+                if (isset($media['spoiler'])) {
+                    $res['InputMedia']['spoiler'] = $media['spoiler'];
+                }
                 break;
             case 'messageMediaDocument':
                 if (!isset($media['document']['access_hash'])) {
