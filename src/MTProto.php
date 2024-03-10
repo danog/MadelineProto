@@ -675,7 +675,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (empty($file)) {
             $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }
-        ($this->logger ?? Logger::$default)->logger($param, $level, $file);
+        ($this->logger ?? Logger::$default)?->logger($param, $level, $file);
     }
     /**
      * Get TL namespaces.
@@ -1817,15 +1817,25 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * @internal
      */
+    public function populateSupportUser(array $support): void
+    {
+        $this->supportUser = $support['user']['id'];
+    }
+    /**
+     * @internal
+     */
+    public function populateConfig(array $config): void
+    {
+        $this->config = $config;
+    }
+    /**
+     * @internal
+     */
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return [
-            'help.support' => [function (array $support): void {
-                $this->supportUser = $support['user']['id'];
-            }],
-            'config' => [function (array $config): void {
-                $this->config = $config;
-            }],
+            'help.support' => [$this->populateSupportUser(...)],
+            'config' => [$this->populateConfig(...)],
         ];
     }
     /**
@@ -1866,10 +1876,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             [
                 'InputFileLocation' => $this->getDownloadInfo(...),
                 'InputPeer' => $this->getInputPeer(...),
-                'InputDialogPeer' => fn (mixed $id): array => ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)],
-                'InputCheckPasswordSRP' => fn (string $password): array => (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password),
+                'InputDialogPeer' => $this->getInputDialogPeer(...),
+                'InputCheckPasswordSRP' => $this->getPasswordSRP(...),
             ],
         );
+    }
+    public function getInputDialogPeer(mixed $id): array
+    {
+        return ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)];
+    }
+    /** @internal */
+    public function getPasswordSRP(string $password): array
+    {
+        return (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password);
     }
     /**
      * Get debug information for var_dump.

@@ -145,7 +145,7 @@ final class MinDatabase implements TLCallback
             $this->cache = [];
         }
     }
-    public function addPeer(array $location): bool
+    public function addPeer(array|int $location): bool
     {
         $peers = [];
         switch ($location['_']) {

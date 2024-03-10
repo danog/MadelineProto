@@ -903,6 +903,11 @@ abstract class InternalDoc
     {
         return $this->wrapper->getAPI()->getInfo($id, $type);
     }
+
+    public function getInputDialogPeer(mixed $id): array
+    {
+        return $this->wrapper->getAPI()->getInputDialogPeer($id);
+    }
     /**
      * Get logger.
      */

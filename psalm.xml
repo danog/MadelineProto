@@ -17,6 +17,10 @@
     </enableExtensions>
     <projectFiles>
         <directory name="src" />
+        <ignoreFiles>
+            <file name="src/TL/TLParser.php" />
+            <file name="src/TL/SecretTLParser.php" />
+        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
         <!-- Should totally go in level 1... -->

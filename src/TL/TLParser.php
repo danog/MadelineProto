@@ -186,11 +186,23 @@ final class TLParser {
                 return $result;    
             
     }
+    private  function deserialize_peerUser(mixed $stream): mixed {
+$tmp = unpack('q', stream_get_contents($stream, 8))[1];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
+    }
+    private  function deserialize_peerChannel(mixed $stream): mixed {
+$tmp = -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
+    }
     private  function deserialize_type_Peer(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => $this->deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -201,15 +213,15 @@ $tmp = ['_' => 'messageEmpty'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageFwdHeader(mixed $stream): mixed {
 $tmp = ['_' => 'messageFwdHeader'];
@@ -217,9 +229,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['imported'] = ($flags & 128) !== 0;
 $tmp['saved_out'] = ($flags & 2048) !== 0;
 if (($flags & 1) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -229,18 +241,18 @@ $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['channel_post'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 8) !== 0) $tmp['post_author'] = self::deserialize_string($stream);
 if (($flags & 16) !== 0) $tmp['saved_from_peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 if (($flags & 16) !== 0) $tmp['saved_from_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 256) !== 0) $tmp['saved_from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -248,8 +260,9 @@ default => self::err($stream)
 if (($flags & 512) !== 0) $tmp['saved_from_name'] = self::deserialize_string($stream);
 if (($flags & 1024) !== 0) $tmp['saved_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 64) !== 0) $tmp['psa_type'] = self::deserialize_string($stream);
-
+$this->minDatabase?->addPeer($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_MessageFwdHeader(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -318,8 +331,8 @@ $tmp['w'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['h'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['size'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['video_start_ts'] = unpack('d', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputStickerSet(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -454,8 +467,9 @@ if (($flags & 2) !== 0) $tmp['video_sizes'] = self::deserialize_type_array_of_Vi
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 $tmp['dc_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
+$this->referenceDatabase?->addReference($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_Photo(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -484,8 +498,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 4) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_geoPoint(mixed $stream): mixed {
 $tmp = ['_' => 'geoPoint'];
@@ -494,8 +508,8 @@ $tmp['long'] = unpack('d', stream_get_contents($stream, 8))[1];
 $tmp['lat'] = unpack('d', stream_get_contents($stream, 8))[1];
 $tmp['access_hash'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['accuracy_radius'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_GeoPoint(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -581,8 +595,8 @@ if (($flags & 1) !== 0) $tmp['mask_coords'] = match (stream_get_contents($stream
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_documentAttributeVideo(mixed $stream): mixed {
 $tmp = ['_' => 'documentAttributeVideo'];
@@ -594,8 +608,8 @@ $tmp['duration'] = unpack('d', stream_get_contents($stream, 8))[1];
 $tmp['w'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['h'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['preload_prefix_size'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_documentAttributeAudio(mixed $stream): mixed {
 $tmp = ['_' => 'documentAttributeAudio'];
@@ -605,8 +619,8 @@ $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['title'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['performer'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['waveform'] = self::deserialize_waveform($stream);
-
 return $tmp;
+
     }
     private  function deserialize_documentAttributeCustomEmoji(mixed $stream): mixed {
 $tmp = ['_' => 'documentAttributeCustomEmoji'];
@@ -656,8 +670,8 @@ $tmp['stickerset'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_DocumentAttribute(mixed $stream): array {
 
@@ -692,6 +706,7 @@ default => self::err($stream)
             
     }
     private  function deserialize_document(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('document');
 $tmp = ['_' => 'document'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
@@ -713,8 +728,10 @@ $tmp['attributes'] = self::deserialize_type_array_of_DocumentAttribute(match(str
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
+$this->referenceDatabase?->addReference($tmp);
+$this->referenceDatabase?->addOrigin($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_Document(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -757,16 +774,16 @@ default => self::err($stream)
 }
 ;
 if (($flags & 4) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_webPageEmpty(mixed $stream): mixed {
 $tmp = ['_' => 'webPageEmpty'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_webPagePending(mixed $stream): mixed {
 $tmp = ['_' => 'webPagePending'];
@@ -774,8 +791,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['url'] = self::deserialize_string($stream);
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_RichText(mixed $stream): array {
 
@@ -2304,8 +2321,8 @@ default => self::err($stream)
 ;
 if (($flags & 1) !== 0) $tmp['url'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['webpage_id'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_pageBlockVideo(mixed $stream): mixed {
 $tmp = ['_' => 'pageBlockVideo'];
@@ -2477,8 +2494,8 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_pageBlockEmbed(mixed $stream): mixed {
 $tmp = ['_' => 'pageBlockEmbed'];
@@ -2654,8 +2671,17 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
+    }
+    private  function deserialize_chatEmpty(mixed $stream): mixed {
+$tmp = [
+'_' => 'chatEmpty',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+];
+$this->peerDatabase->addChat($tmp);
+return $tmp;
+
     }
     private  function deserialize_chatPhoto(mixed $stream): mixed {
 $tmp = ['_' => 'chatPhoto'];
@@ -2664,8 +2690,8 @@ $tmp['has_video'] = ($flags & 1) !== 0;
 $tmp['photo_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 2) !== 0) $tmp['stripped_thumb'] = self::deserialize_bytes($stream);
 $tmp['dc_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_ChatPhoto(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -2868,8 +2894,8 @@ $tmp['manage_topics'] = ($flags & 8192) !== 0;
 $tmp['post_stories'] = ($flags & 16384) !== 0;
 $tmp['edit_stories'] = ($flags & 32768) !== 0;
 $tmp['delete_stories'] = ($flags & 65536) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_ChatAdminRights(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -2903,8 +2929,8 @@ $tmp['send_voices'] = ($flags & 8388608) !== 0;
 $tmp['send_docs'] = ($flags & 16777216) !== 0;
 $tmp['send_plain'] = ($flags & 33554432) !== 0;
 $tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_ChatBannedRights(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -2915,6 +2941,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_chat(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('chat');
 $tmp = ['_' => 'chat'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['creator'] = ($flags & 1) !== 0;
@@ -3005,8 +3032,20 @@ if (($flags & 262144) !== 0) $tmp['default_banned_rights'] = match (stream_get_c
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addChat($tmp);
 return $tmp;
+
+    }
+    private  function deserialize_chatForbidden(mixed $stream): mixed {
+$tmp = [
+'_' => 'chatForbidden',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+'title' => self::deserialize_string($stream),
+];
+$this->peerDatabase->addChat($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_array_of_RestrictionReason(mixed $stream): array {
 
@@ -3033,8 +3072,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['editable'] = ($flags & 1) !== 0;
 $tmp['active'] = ($flags & 2) !== 0;
 $tmp['username'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_Username(mixed $stream): array {
 
@@ -3055,8 +3094,8 @@ $tmp = ['_' => 'peerColor'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['color'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['background_emoji_id'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_PeerColor(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -3086,6 +3125,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_channel(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('channel');
 $tmp = ['_' => 'channel'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['creator'] = ($flags & 1) !== 0;
@@ -3184,8 +3224,10 @@ default => self::err($stream)
 }
 ;
 if (($flags2 & 1024) !== 0) $tmp['level'] = unpack('l', stream_get_contents($stream, 4))[1];
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addChat($tmp);
 return $tmp;
+
     }
     private  function deserialize_channelForbidden(mixed $stream): mixed {
 $tmp = ['_' => 'channelForbidden'];
@@ -3196,21 +3238,15 @@ $tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['access_hash'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['title'] = self::deserialize_string($stream);
 if (($flags & 65536) !== 0) $tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
+$this->peerDatabase->addChat($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_Chat(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -3307,8 +3343,8 @@ default => self::err($stream)
 ;
 if (($flags & 2) !== 0) $tmp['colspan'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['rowspan'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PageTableCell(mixed $stream): array {
 
@@ -3431,8 +3467,8 @@ $tmp['rows'] = self::deserialize_type_array_of_PageTableRow(match(stream_get_con
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PageListOrderedItem(mixed $stream): array {
 
@@ -3623,8 +3659,8 @@ $tmp['title'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_pageRelatedArticle(mixed $stream): mixed {
 $tmp = ['_' => 'pageRelatedArticle'];
@@ -3636,8 +3672,8 @@ if (($flags & 2) !== 0) $tmp['description'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['photo_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 8) !== 0) $tmp['author'] = self::deserialize_string($stream);
 if (($flags & 16) !== 0) $tmp['published_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PageRelatedArticle(mixed $stream): array {
 
@@ -6158,16 +6194,9 @@ default => self::err($stream)
 'µQï' => [
 '_' => 'pageBlockChannel',
 'channel' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -7225,16 +7254,9 @@ default => self::err($stream)
 'µQï' => [
 '_' => 'pageBlockChannel',
 'channel' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -10278,16 +10300,9 @@ default => self::err($stream)
 'µQï' => [
 '_' => 'pageBlockChannel',
 'channel' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -11345,16 +11360,9 @@ default => self::err($stream)
 'µQï' => [
 '_' => 'pageBlockChannel',
 'channel' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -11949,8 +11957,8 @@ $tmp['documents'] = self::deserialize_type_array_of_Document(match(stream_get_co
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 8) !== 0) $tmp['views'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Page(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -11994,8 +12002,8 @@ if (($flags & 64) !== 0) $tmp['fourth_background_color'] = unpack('l', stream_ge
 if (($flags & 8) !== 0) $tmp['intensity'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 16) !== 0) $tmp['rotation'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 128) !== 0) $tmp['emoticon'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_WallPaperSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12006,6 +12014,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_wallPaper(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('wallPaper');
 $tmp = ['_' => 'wallPaper'];
 $tmp['id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
@@ -12031,8 +12040,9 @@ if (($flags & 4) !== 0) $tmp['settings'] = match (stream_get_contents($stream, 4
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
 return $tmp;
+
     }
     private  function deserialize_wallPaperNoFile(mixed $stream): mixed {
 $tmp = ['_' => 'wallPaperNoFile'];
@@ -12046,8 +12056,8 @@ if (($flags & 4) !== 0) $tmp['settings'] = match (stream_get_contents($stream, 4
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_WallPaper(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12095,8 +12105,8 @@ if (($flags & 2) !== 0) $tmp['wallpaper'] = match (stream_get_contents($stream, 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_ThemeSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12119,8 +12129,8 @@ if (($flags & 2) !== 0) $tmp['settings'] = match (stream_get_contents($stream, 4
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_storyItemSkipped(mixed $stream): mixed {
 $tmp = ['_' => 'storyItemSkipped'];
@@ -12129,25 +12139,25 @@ $tmp['close_friends'] = ($flags & 256) !== 0;
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['expire_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_storyFwdHeader(mixed $stream): mixed {
 $tmp = ['_' => 'storyFwdHeader'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['modified'] = ($flags & 8) !== 0;
 if (($flags & 1) !== 0) $tmp['from'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 if (($flags & 2) !== 0) $tmp['from_name'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['story_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_StoryFwdHeader(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12156,6 +12166,17 @@ return match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
+    }
+    private  function deserialize_messageEntityMentionName(mixed $stream): mixed {
+$tmp = [
+'_' => 'messageEntityMentionName',
+'offset' => unpack('l', stream_get_contents($stream, 4))[1],
+'length' => unpack('l', stream_get_contents($stream, 4))[1],
+'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
+];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_InputUser(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12280,12 +12301,7 @@ default => self::err($stream)
 'length' => unpack('l', stream_get_contents($stream, 4))[1],
 'url' => self::deserialize_string($stream),
 ],
-'@{Ü' => [
-'_' => 'messageEntityMentionName',
-'offset' => unpack('l', stream_get_contents($stream, 4))[1],
-'length' => unpack('l', stream_get_contents($stream, 4))[1],
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'@{Ü' => self::deserialize_messageEntityMentionName($stream),
 'ÉhŽ ' => [
 '_' => 'inputMessageEntityMentionName',
 'offset' => unpack('l', stream_get_contents($stream, 4))[1],
@@ -12447,15 +12463,15 @@ if (($flags & 4096) !== 0) $tmp['attributes'] = $this->deserialize_type_array_of
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_webPageNotModified(mixed $stream): mixed {
 $tmp = ['_' => 'webPageNotModified'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['cached_page_views'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageMediaWebPage(mixed $stream): mixed {
 $tmp = ['_' => 'messageMediaWebPage'];
@@ -12473,8 +12489,8 @@ $tmp['webpage'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_game(mixed $stream): mixed {
 $tmp = ['_' => 'game'];
@@ -12504,8 +12520,8 @@ if (($flags & 1) !== 0) $tmp['document'] = match (stream_get_contents($stream, 4
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_Game(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12637,8 +12653,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 4) !== 0) $tmp['video_duration'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_MessageExtendedMedia(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12699,8 +12715,8 @@ if (($flags & 16) !== 0) $tmp['extended_media'] = match (stream_get_contents($st
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageMediaGeoLive(mixed $stream): mixed {
 $tmp = ['_' => 'messageMediaGeoLive'];
@@ -12717,8 +12733,8 @@ default => self::err($stream)
 if (($flags & 1) !== 0) $tmp['heading'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['proximity_notification_radius'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PollAnswer(mixed $stream): array {
 
@@ -12753,8 +12769,8 @@ $tmp['answers'] = self::deserialize_type_array_of_PollAnswer(match(stream_get_co
             });
 if (($flags & 16) !== 0) $tmp['close_period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 32) !== 0) $tmp['close_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Poll(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12771,8 +12787,8 @@ $tmp['chosen'] = ($flags & 1) !== 0;
 $tmp['correct'] = ($flags & 2) !== 0;
 $tmp['option'] = self::deserialize_bytes($stream);
 $tmp['voters'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PollAnswerVoters(mixed $stream): array {
 
@@ -12793,9 +12809,9 @@ default => self::err($stream)
                 $result = [];
                 for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
                     $result []= match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -12822,8 +12838,8 @@ if (($flags & 16) !== 0) $tmp['solution_entities'] = self::deserialize_type_arra
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_PollResults(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -12900,8 +12916,8 @@ $tmp['reaction'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_MediaArea(mixed $stream): array {
 
@@ -13158,8 +13174,8 @@ default => self::err($stream)
 }
 ;
 $tmp['count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ReactionCount(mixed $stream): array {
 
@@ -13190,8 +13206,8 @@ if (($flags & 1) !== 0) $tmp['recent_viewers'] = self::deserialize_type_array_of
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_StoryViews(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -13216,9 +13232,9 @@ $tmp['out'] = ($flags & 65536) !== 0;
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 262144) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13266,17 +13282,17 @@ if (($flags & 32768) !== 0) $tmp['sent_reaction'] = match (stream_get_contents($
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageMediaStory(mixed $stream): mixed {
 $tmp = ['_' => 'messageMediaStory'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['via_mention'] = ($flags & 2) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13293,8 +13309,8 @@ if (($flags & 1) !== 0) $tmp['story'] = match (stream_get_contents($stream, 4)) 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageMediaGiveaway(mixed $stream): mixed {
 $tmp = ['_' => 'messageMediaGiveaway'];
@@ -13313,8 +13329,8 @@ if (($flags & 8) !== 0) $tmp['prize_description'] = self::deserialize_string($st
 $tmp['quantity'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageMediaGiveawayResults(mixed $stream): mixed {
 $tmp = ['_' => 'messageMediaGiveawayResults'];
@@ -13333,8 +13349,8 @@ $tmp['winners'] = self::deserialize_type_array_of_long(match(stream_get_contents
 $tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['prize_description'] = self::deserialize_string($stream);
 $tmp['until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_StoryItem(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -13353,9 +13369,9 @@ default => self::err($stream)
 $tmp = ['_' => 'webPageAttributeStory'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13372,8 +13388,8 @@ if (($flags & 1) !== 0) $tmp['story'] = match (stream_get_contents($stream, 4)) 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_WebPageAttribute(mixed $stream): array {
 
@@ -13496,9 +13512,9 @@ $tmp['forum_topic'] = ($flags & 8) !== 0;
 $tmp['quote'] = ($flags & 512) !== 0;
 if (($flags & 16) !== 0) $tmp['reply_to_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['reply_to_peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13601,8 +13617,8 @@ if (($flags & 128) !== 0) $tmp['quote_entities'] = self::deserialize_type_array_
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1024) !== 0) $tmp['quote_offset'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_MessageReplyHeader(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -13610,9 +13626,9 @@ return match (stream_get_contents($stream, 4)) {
 '9ùZ' => [
 '_' => 'messageReplyStoryHeader',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -13628,8 +13644,8 @@ default => self::err($stream)
 $tmp = ['_' => 'replyKeyboardHide'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['selective'] = ($flags & 4) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_replyKeyboardForceReply(mixed $stream): mixed {
 $tmp = ['_' => 'replyKeyboardForceReply'];
@@ -13637,8 +13653,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['single_use'] = ($flags & 2) !== 0;
 $tmp['selective'] = ($flags & 4) !== 0;
 if (($flags & 8) !== 0) $tmp['placeholder'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_keyboardButtonCallback(mixed $stream): mixed {
 $tmp = ['_' => 'keyboardButtonCallback'];
@@ -13646,8 +13662,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['requires_password'] = ($flags & 1) !== 0;
 $tmp['text'] = self::deserialize_string($stream);
 $tmp['data'] = self::deserialize_bytes($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_InlineQueryPeerType(mixed $stream): array {
 
@@ -13691,8 +13707,8 @@ if (($flags & 2) !== 0) $tmp['peer_types'] = self::deserialize_type_array_of_Inl
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_keyboardButtonUrlAuth(mixed $stream): mixed {
 $tmp = ['_' => 'keyboardButtonUrlAuth'];
@@ -13701,8 +13717,8 @@ $tmp['text'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['fwd_text'] = self::deserialize_string($stream);
 $tmp['url'] = self::deserialize_string($stream);
 $tmp['button_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_inputKeyboardButtonUrlAuth(mixed $stream): mixed {
 $tmp = ['_' => 'inputKeyboardButtonUrlAuth'];
@@ -13770,24 +13786,24 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_keyboardButtonRequestPoll(mixed $stream): mixed {
 $tmp = ['_' => 'keyboardButtonRequestPoll'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['quiz'] = match (stream_get_contents($stream, 4)) {'µur™' => true,'7—y¼' => false, default => self::err($stream) };
 $tmp['text'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_requestPeerTypeUser(mixed $stream): mixed {
 $tmp = ['_' => 'requestPeerTypeUser'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['bot'] = match (stream_get_contents($stream, 4)) {'µur™' => true,'7—y¼' => false, default => self::err($stream) };
 if (($flags & 2) !== 0) $tmp['premium'] = match (stream_get_contents($stream, 4)) {'µur™' => true,'7—y¼' => false, default => self::err($stream) };
-
 return $tmp;
+
     }
     private  function deserialize_requestPeerTypeChat(mixed $stream): mixed {
 $tmp = ['_' => 'requestPeerTypeChat'];
@@ -13808,8 +13824,8 @@ if (($flags & 4) !== 0) $tmp['bot_admin_rights'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_requestPeerTypeBroadcast(mixed $stream): mixed {
 $tmp = ['_' => 'requestPeerTypeBroadcast'];
@@ -13828,8 +13844,8 @@ if (($flags & 4) !== 0) $tmp['bot_admin_rights'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_RequestPeerType(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14008,8 +14024,8 @@ $tmp['rows'] = self::deserialize_type_array_of_KeyboardButtonRow(match(stream_ge
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 8) !== 0) $tmp['placeholder'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_ReplyMarkup(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14041,8 +14057,8 @@ if (($flags & 2) !== 0) $tmp['recent_repliers'] = self::deserialize_type_array_o
 if (($flags & 1) !== 0) $tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 4) !== 0) $tmp['max_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 8) !== 0) $tmp['read_max_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_MessageReplies(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14059,9 +14075,9 @@ $tmp['big'] = ($flags & 1) !== 0;
 $tmp['unread'] = ($flags & 2) !== 0;
 $tmp['my'] = ($flags & 4) !== 0;
 $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -14083,8 +14099,8 @@ $tmp['reaction'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_MessagePeerReaction(mixed $stream): array {
 
@@ -14114,8 +14130,8 @@ if (($flags & 2) !== 0) $tmp['recent_reactions'] = self::deserialize_type_array_
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_MessageReactions(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14126,6 +14142,8 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_message(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('message');
+$this->minDatabase?->addOriginContext('message');
 $tmp = ['_' => 'message'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['out'] = ($flags & 2) !== 0;
@@ -14141,26 +14159,26 @@ $tmp['noforwards'] = ($flags & 67108864) !== 0;
 $tmp['invert_media'] = ($flags & 134217728) !== 0;
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 256) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 if (($flags & 536870912) !== 0) $tmp['from_boosts_applied'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 if (($flags & 268435456) !== 0) $tmp['saved_peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -14177,9 +14195,9 @@ if (($flags & 8) !== 0) $tmp['reply_to'] = match (stream_get_contents($stream, 4
 '9ùZ' => [
 '_' => 'messageReplyStoryHeader',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -14319,8 +14337,53 @@ if (($flags & 4194304) !== 0) $tmp['restriction_reason'] = self::deserialize_typ
             });
 if (($flags & 33554432) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1073741824) !== 0) $tmp['quick_reply_shortcut_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->minDatabase?->addOrigin($tmp);
 return $tmp;
+
+    }
+    private  function deserialize_messageActionChatCreate(mixed $stream): mixed {
+$tmp = [
+'_' => 'messageActionChatCreate',
+'title' => self::deserialize_string($stream),
+'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
+    }
+    private  function deserialize_messageActionChatAddUser(mixed $stream): mixed {
+$tmp = [
+'_' => 'messageActionChatAddUser',
+'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
+    }
+    private  function deserialize_messageActionChatDeleteUser(mixed $stream): mixed {
+$tmp = [
+'_' => 'messageActionChatDeleteUser',
+'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
+];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
+    }
+    private  function deserialize_messageActionChatJoinedByLink(mixed $stream): mixed {
+$tmp = [
+'_' => 'messageActionChatJoinedByLink',
+'inviter_id' => unpack('q', stream_get_contents($stream, 8))[1],
+];
+$this->minDatabase?->addPeer($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_PostAddress(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14358,8 +14421,8 @@ if (($flags & 8) !== 0) $tmp['shipping_address'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_PaymentRequestedInfo(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14406,8 +14469,8 @@ $tmp['charge'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageActionPaymentSent(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionPaymentSent'];
@@ -14417,8 +14480,8 @@ $tmp['recurring_used'] = ($flags & 8) !== 0;
 $tmp['currency'] = self::deserialize_string($stream);
 $tmp['total_amount'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['invoice_slug'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_PhoneCallDiscardReason(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14462,8 +14525,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 2) !== 0) $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_botApp(mixed $stream): mixed {
 $tmp = ['_' => 'botApp'];
@@ -14494,8 +14557,8 @@ default => self::err($stream)
 }
 ;
 $tmp['hash'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_BotApp(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14523,8 +14586,8 @@ if (($flags & 4) !== 0) $tmp['app'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_SecureValueType(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -14780,8 +14843,8 @@ default => self::err($stream)
 }
 ;
 $tmp['hash'] = self::deserialize_bytes($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SecureValue(mixed $stream): array {
 
@@ -14888,16 +14951,16 @@ default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageActionSetMessagesTTL(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionSetMessagesTTL'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['auto_setting_from'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageActionGiftPremium(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionGiftPremium'];
@@ -14907,8 +14970,8 @@ $tmp['amount'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['months'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['crypto_currency'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['crypto_amount'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageActionTopicCreate(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionTopicCreate'];
@@ -14916,8 +14979,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['title'] = self::deserialize_string($stream);
 $tmp['icon_color'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['icon_emoji_id'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_messageActionTopicEdit(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionTopicEdit'];
@@ -14926,8 +14989,8 @@ if (($flags & 1) !== 0) $tmp['title'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['icon_emoji_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 4) !== 0) $tmp['closed'] = match (stream_get_contents($stream, 4)) {'µur™' => true,'7—y¼' => false, default => self::err($stream) };
 if (($flags & 8) !== 0) $tmp['hidden'] = match (stream_get_contents($stream, 4)) {'µur™' => true,'7—y¼' => false, default => self::err($stream) };
-
 return $tmp;
+
     }
     private  function deserialize_messageActionSetChatWallPaper(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionSetChatWallPaper'];
@@ -14941,8 +15004,8 @@ $tmp['wallpaper'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messageActionGiftCode(mixed $stream): mixed {
 $tmp = ['_' => 'messageActionGiftCode'];
@@ -14950,9 +15013,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['via_giveaway'] = ($flags & 1) !== 0;
 $tmp['unclaimed'] = ($flags & 4) !== 0;
 if (($flags & 2) !== 0) $tmp['boost_peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -14963,22 +15026,15 @@ if (($flags & 4) !== 0) $tmp['currency'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['amount'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 8) !== 0) $tmp['crypto_currency'] = self::deserialize_string($stream);
 if (($flags & 8) !== 0) $tmp['crypto_amount'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_MessageAction(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
 '°÷®¶' => [
 '_' => 'messageActionEmpty',
 ],
-'­ËG½' => [
-'_' => 'messageActionChatCreate',
-'title' => self::deserialize_string($stream),
-'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'­ËG½' => self::deserialize_messageActionChatCreate($stream),
 'ZÎ¡µ' => [
 '_' => 'messageActionChatEditTitle',
 'title' => self::deserialize_string($stream),
@@ -14999,21 +15055,9 @@ default => self::err($stream)
 'ïûã•' => [
 '_' => 'messageActionChatDeletePhoto',
 ],
-'' . "\0" . 'ýÎ' => [
-'_' => 'messageActionChatAddUser',
-'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
-'Ì0?¤' => [
-'_' => 'messageActionChatDeleteUser',
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'Ã$' => [
-'_' => 'messageActionChatJoinedByLink',
-'inviter_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'' . "\0" . 'ýÎ' => self::deserialize_messageActionChatAddUser($stream),
+'Ì0?¤' => self::deserialize_messageActionChatDeleteUser($stream),
+'Ã$' => self::deserialize_messageActionChatJoinedByLink($stream),
 '’¬Ò•' => [
 '_' => 'messageActionChannelCreate',
 'title' => self::deserialize_string($stream),
@@ -15080,17 +15124,17 @@ default => self::err($stream)
 '—Öà˜' => [
 '_' => 'messageActionGeoProximityReached',
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ,
 'to_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -15190,6 +15234,8 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_messageService(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('messageService');
+$this->minDatabase?->addOriginContext('messageService');
 $tmp = ['_' => 'messageService'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['out'] = ($flags & 2) !== 0;
@@ -15200,17 +15246,17 @@ $tmp['post'] = ($flags & 16384) !== 0;
 $tmp['legacy'] = ($flags & 524288) !== 0;
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 256) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -15220,9 +15266,9 @@ if (($flags & 8) !== 0) $tmp['reply_to'] = match (stream_get_contents($stream, 4
 '9ùZ' => [
 '_' => 'messageReplyStoryHeader',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -15238,14 +15284,7 @@ $tmp['action'] = match (stream_get_contents($stream, 4)) {
 '°÷®¶' => [
 '_' => 'messageActionEmpty',
 ],
-'­ËG½' => [
-'_' => 'messageActionChatCreate',
-'title' => self::deserialize_string($stream),
-'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'­ËG½' => self::deserialize_messageActionChatCreate($stream),
 'ZÎ¡µ' => [
 '_' => 'messageActionChatEditTitle',
 'title' => self::deserialize_string($stream),
@@ -15266,21 +15305,9 @@ default => self::err($stream)
 'ïûã•' => [
 '_' => 'messageActionChatDeletePhoto',
 ],
-'' . "\0" . 'ýÎ' => [
-'_' => 'messageActionChatAddUser',
-'users' => self::deserialize_type_array_of_long(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
-'Ì0?¤' => [
-'_' => 'messageActionChatDeleteUser',
-'user_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'Ã$' => [
-'_' => 'messageActionChatJoinedByLink',
-'inviter_id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'' . "\0" . 'ýÎ' => self::deserialize_messageActionChatAddUser($stream),
+'Ì0?¤' => self::deserialize_messageActionChatDeleteUser($stream),
+'Ã$' => self::deserialize_messageActionChatJoinedByLink($stream),
 '’¬Ò•' => [
 '_' => 'messageActionChannelCreate',
 'title' => self::deserialize_string($stream),
@@ -15347,17 +15374,17 @@ default => self::err($stream)
 '—Öà˜' => [
 '_' => 'messageActionGeoProximityReached',
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ,
 'to_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -15456,8 +15483,10 @@ default => self::err($stream)
 }
 ;
 if (($flags & 33554432) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->minDatabase?->addOrigin($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_Message(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -15601,8 +15630,8 @@ if (($flags & 1) !== 0) $tmp['self_participant'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ChatParticipant(mixed $stream): array {
 
@@ -15654,22 +15683,22 @@ default => self::err($stream)
 $tmp = ['_' => 'userStatusRecently'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['by_me'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_userStatusLastWeek(mixed $stream): mixed {
 $tmp = ['_' => 'userStatusLastWeek'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['by_me'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_userStatusLastMonth(mixed $stream): mixed {
 $tmp = ['_' => 'userStatusLastMonth'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['by_me'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_UserStatus(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -15700,8 +15729,8 @@ $tmp['hash'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['device'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['location'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_EncryptedFile(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -15768,16 +15797,16 @@ $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['admin_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['participant_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['g_a'] = self::deserialize_bytes($stream);
-
 return $tmp;
+
     }
     private  function deserialize_encryptedChatDiscarded(mixed $stream): mixed {
 $tmp = ['_' => 'encryptedChatDiscarded'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['history_deleted'] = ($flags & 1) !== 0;
 $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_EncryptedChat(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -15823,8 +15852,8 @@ $tmp['id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['ip_address'] = self::deserialize_string($stream);
 $tmp['port'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1024) !== 0) $tmp['secret'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_DcOption(mixed $stream): array {
 
@@ -15845,9 +15874,9 @@ return match (stream_get_contents($stream, 4)) {
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -15865,9 +15894,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -16029,8 +16058,8 @@ if (($flags & 1024) !== 0) $tmp['stories_other_sound'] = match (stream_get_conte
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_PeerNotifySettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16137,8 +16166,8 @@ $tmp['entities'] = self::deserialize_type_array_of_MessageEntity(match(stream_ge
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_PrivacyKey(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16182,9 +16211,9 @@ $tmp = ['_' => 'updateReadHistoryInbox'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['folder_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -16193,8 +16222,8 @@ $tmp['max_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['still_unread_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateReadMessagesContents(mixed $stream): mixed {
 $tmp = ['_' => 'updateReadMessagesContents'];
@@ -16206,16 +16235,16 @@ $tmp['messages'] = self::deserialize_type_array_of_int(match(stream_get_contents
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateChannelTooLong(mixed $stream): mixed {
 $tmp = ['_' => 'updateChannelTooLong'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateReadChannelInbox(mixed $stream): mixed {
 $tmp = ['_' => 'updateReadChannelInbox'];
@@ -16225,8 +16254,8 @@ $tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['max_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['still_unread_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_stickerSet(mixed $stream): mixed {
 $tmp = ['_' => 'stickerSet'];
@@ -16253,8 +16282,8 @@ if (($flags & 16) !== 0) $tmp['thumb_version'] = unpack('l', stream_get_contents
 if (($flags & 256) !== 0) $tmp['thumb_document_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['hash'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_StickerSet(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16306,9 +16335,9 @@ default => self::err($stream)
                 return $result;    
             
     }
-    private  function deserialize_type_messages___StickerSet(mixed $stream): mixed {
-return match (stream_get_contents($stream, 4)) {
-'?n' => [
+    private  function deserialize_messages___stickerSet(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('messages.stickerSet');
+$tmp = [
 '_' => 'messages.stickerSet',
 'set' => match (stream_get_contents($stream, 4)) {
 'ÜNÑ-' => self::deserialize_stickerSet($stream),
@@ -16328,7 +16357,14 @@ default => self::err($stream)
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             }),
-],
+];
+$this->referenceDatabase?->addOrigin($tmp);
+return $tmp;
+
+    }
+    private  function deserialize_type_messages___StickerSet(mixed $stream): mixed {
+return match (stream_get_contents($stream, 4)) {
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -16346,16 +16382,16 @@ $tmp['order'] = self::deserialize_type_array_of_long(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_updateStickerSets(mixed $stream): mixed {
 $tmp = ['_' => 'updateStickerSets'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['masks'] = ($flags & 1) !== 0;
 $tmp['emojis'] = ($flags & 2) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_InlineQueryPeerType(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16423,8 +16459,8 @@ default => self::err($stream)
 }
 ;
 $tmp['offset'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_InputBotInlineMessageID(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16479,8 +16515,8 @@ if (($flags & 2) !== 0) $tmp['msg_id'] = match (stream_get_contents($stream, 4))
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updateBotCallbackQuery(mixed $stream): mixed {
 $tmp = ['_' => 'updateBotCallbackQuery'];
@@ -16488,9 +16524,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['query_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['user_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -16499,8 +16535,8 @@ $tmp['msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['chat_instance'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['data'] = self::deserialize_bytes($stream);
 if (($flags & 2) !== 0) $tmp['game_short_name'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_updateInlineBotCallbackQuery(mixed $stream): mixed {
 $tmp = ['_' => 'updateInlineBotCallbackQuery'];
@@ -16528,15 +16564,15 @@ default => self::err($stream)
 $tmp['chat_instance'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['data'] = self::deserialize_bytes($stream);
 if (($flags & 2) !== 0) $tmp['game_short_name'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_draftMessageEmpty(mixed $stream): mixed {
 $tmp = ['_' => 'draftMessageEmpty'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_inputReplyToMessage(mixed $stream): mixed {
 $tmp = ['_' => 'inputReplyToMessage'];
@@ -16587,8 +16623,8 @@ if (($flags & 8) !== 0) $tmp['quote_entities'] = self::deserialize_type_array_of
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 16) !== 0) $tmp['quote_offset'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputReplyTo(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16709,8 +16745,8 @@ if (($flags & 1) !== 0) $tmp['stickers'] = self::deserialize_type_array_of_Input
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 2) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputPhoto(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16747,8 +16783,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_inputGeoPoint(mixed $stream): mixed {
 $tmp = ['_' => 'inputGeoPoint'];
@@ -16756,8 +16792,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['lat'] = unpack('d', stream_get_contents($stream, 8))[1];
 $tmp['long'] = unpack('d', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['accuracy_radius'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputGeoPoint(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16822,8 +16858,8 @@ if (($flags & 1) !== 0) $tmp['stickers'] = self::deserialize_type_array_of_Input
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 2) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputDocument(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -16861,8 +16897,8 @@ default => self::err($stream)
 ;
 if (($flags & 1) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['query'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_inputMediaPhotoExternal(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaPhotoExternal'];
@@ -16870,8 +16906,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['spoiler'] = ($flags & 2) !== 0;
 $tmp['url'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_inputMediaDocumentExternal(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaDocumentExternal'];
@@ -16879,8 +16915,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['spoiler'] = ($flags & 2) !== 0;
 $tmp['url'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['ttl_seconds'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_InputGame(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17016,8 +17052,8 @@ if (($flags & 256) !== 0) $tmp['suggested_tip_amounts'] = self::deserialize_type
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1024) !== 0) $tmp['terms_url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_Invoice(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17063,8 +17099,8 @@ default => self::err($stream)
 ;
 if (($flags & 2) !== 0) $tmp['start_param'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['extended_media'] = $this->deserialize_type_InputMedia($stream);
-
 return $tmp;
+
     }
     private  function deserialize_inputMediaGeoLive(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaGeoLive'];
@@ -17082,8 +17118,8 @@ default => self::err($stream)
 if (($flags & 4) !== 0) $tmp['heading'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 8) !== 0) $tmp['proximity_notification_radius'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_inputMediaPoll(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaPoll'];
@@ -17103,8 +17139,8 @@ if (($flags & 2) !== 0) $tmp['solution_entities'] = self::deserialize_type_array
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_inputMediaWebPage(mixed $stream): mixed {
 $tmp = ['_' => 'inputMediaWebPage'];
@@ -17113,8 +17149,8 @@ $tmp['force_large_media'] = ($flags & 1) !== 0;
 $tmp['force_small_media'] = ($flags & 2) !== 0;
 $tmp['optional'] = ($flags & 4) !== 0;
 $tmp['url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_InputMedia(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17531,8 +17567,8 @@ default => self::err($stream)
 }
 ;
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_DraftMessage(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17547,9 +17583,9 @@ default => self::err($stream)
 $tmp = ['_' => 'updateDraftMessage'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -17562,17 +17598,17 @@ $tmp['draft'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_DialogPeer(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
 '¿må' => [
 '_' => 'dialogPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -17596,9 +17632,9 @@ $tmp['peer'] = match (stream_get_contents($stream, 4)) {
 '¿må' => [
 '_' => 'dialogPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -17612,8 +17648,8 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_DialogPeer(mixed $stream): array {
 
@@ -17623,9 +17659,9 @@ return $tmp;
 '¿må' => [
 '_' => 'dialogPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -17651,8 +17687,8 @@ if (($flags & 1) !== 0) $tmp['order'] = self::deserialize_type_array_of_DialogPe
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_updateBotPrecheckoutQuery(mixed $stream): mixed {
 $tmp = ['_' => 'updateBotPrecheckoutQuery'];
@@ -17669,8 +17705,8 @@ default => self::err($stream)
 if (($flags & 2) !== 0) $tmp['shipping_option_id'] = self::deserialize_string($stream);
 $tmp['currency'] = self::deserialize_string($stream);
 $tmp['total_amount'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_phoneCallProtocol(mixed $stream): mixed {
 $tmp = ['_' => 'phoneCallProtocol'];
@@ -17683,8 +17719,8 @@ $tmp['library_versions'] = self::deserialize_type_array_of_string(match(stream_g
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_PhoneCallProtocol(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17710,8 +17746,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['receive_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_phoneCallRequested(mixed $stream): mixed {
 $tmp = ['_' => 'phoneCallRequested'];
@@ -17729,8 +17765,8 @@ $tmp['protocol'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_phoneCallAccepted(mixed $stream): mixed {
 $tmp = ['_' => 'phoneCallAccepted'];
@@ -17748,8 +17784,8 @@ $tmp['protocol'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_phoneConnection(mixed $stream): mixed {
 $tmp = ['_' => 'phoneConnection'];
@@ -17760,8 +17796,8 @@ $tmp['ip'] = self::deserialize_string($stream);
 $tmp['ipv6'] = self::deserialize_string($stream);
 $tmp['port'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['peer_tag'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_phoneConnectionWebrtc(mixed $stream): mixed {
 $tmp = ['_' => 'phoneConnectionWebrtc'];
@@ -17774,8 +17810,8 @@ $tmp['ipv6'] = self::deserialize_string($stream);
 $tmp['port'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['username'] = self::deserialize_string($stream);
 $tmp['password'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PhoneConnection(mixed $stream): array {
 
@@ -17815,8 +17851,8 @@ $tmp['connections'] = self::deserialize_type_array_of_PhoneConnection(match(stre
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 $tmp['start_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_phoneCallDiscarded(mixed $stream): mixed {
 $tmp = ['_' => 'phoneCallDiscarded'];
@@ -17843,8 +17879,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 2) !== 0) $tmp['duration'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_PhoneCall(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -17872,8 +17908,8 @@ if (($flags & 4) !== 0) $tmp['two_value'] = self::deserialize_string($stream);
 if (($flags & 8) !== 0) $tmp['few_value'] = self::deserialize_string($stream);
 if (($flags & 16) !== 0) $tmp['many_value'] = self::deserialize_string($stream);
 $tmp['other_value'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_LangPackString(mixed $stream): array {
 
@@ -17924,8 +17960,8 @@ $tmp['messages'] = self::deserialize_type_array_of_int(match(stream_get_contents
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_updateDialogUnreadMark(mixed $stream): mixed {
 $tmp = ['_' => 'updateDialogUnreadMark'];
@@ -17935,9 +17971,9 @@ $tmp['peer'] = match (stream_get_contents($stream, 4)) {
 '¿må' => [
 '_' => 'dialogPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -17951,8 +17987,8 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updateMessagePoll(mixed $stream): mixed {
 $tmp = ['_' => 'updateMessagePoll'];
@@ -17970,8 +18006,8 @@ $tmp['results'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_FolderPeer(mixed $stream): array {
 
@@ -17981,9 +18017,9 @@ return $tmp;
 'h¦ºé' => [
 '_' => 'folderPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18013,8 +18049,8 @@ $tmp['request_chat_broadcast'] = ($flags & 1024) !== 0;
 if (($flags & 64) !== 0) $tmp['geo_distance'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 512) !== 0) $tmp['request_chat_title'] = self::deserialize_string($stream);
 if (($flags & 512) !== 0) $tmp['request_chat_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_PeerSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18032,9 +18068,9 @@ default => self::err($stream)
 ']FÊ' => [
 '_' => 'peerLocated',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18094,8 +18130,8 @@ if (($flags & 8) !== 0) $tmp['settings'] = self::deserialize_type_array_of_Theme
             });
 if (($flags & 64) !== 0) $tmp['emoticon'] = self::deserialize_string($stream);
 if (($flags & 16) !== 0) $tmp['installs_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Theme(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18252,8 +18288,8 @@ $tmp['exclude_peers'] = self::deserialize_type_array_of_InputPeer(match(stream_g
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_dialogFilterChatlist(mixed $stream): mixed {
 $tmp = ['_' => 'dialogFilterChatlist'];
@@ -18271,8 +18307,8 @@ $tmp['include_peers'] = self::deserialize_type_array_of_InputPeer(match(stream_g
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_DialogFilter(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18300,8 +18336,8 @@ if (($flags & 1) !== 0) $tmp['filter'] = match (stream_get_contents($stream, 4))
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updateReadChannelDiscussionInbox(mixed $stream): mixed {
 $tmp = ['_' => 'updateReadChannelDiscussionInbox'];
@@ -18311,8 +18347,8 @@ $tmp['top_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['read_max_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['broadcast_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['broadcast_post'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updatePeerBlocked(mixed $stream): mixed {
 $tmp = ['_' => 'updatePeerBlocked'];
@@ -18320,15 +18356,15 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['blocked'] = ($flags & 1) !== 0;
 $tmp['blocked_my_stories_from'] = ($flags & 2) !== 0;
 $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updateChannelUserTyping(mixed $stream): mixed {
 $tmp = ['_' => 'updateChannelUserTyping'];
@@ -18336,9 +18372,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 1) !== 0) $tmp['top_msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18417,17 +18453,17 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updatePinnedMessages(mixed $stream): mixed {
 $tmp = ['_' => 'updatePinnedMessages'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['pinned'] = ($flags & 1) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18438,8 +18474,8 @@ $tmp['messages'] = self::deserialize_type_array_of_int(match(stream_get_contents
             });
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updatePinnedChannelMessages(mixed $stream): mixed {
 $tmp = ['_' => 'updatePinnedChannelMessages'];
@@ -18452,8 +18488,8 @@ $tmp['messages'] = self::deserialize_type_array_of_int(match(stream_get_contents
             });
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['pts_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_GroupCallParticipantVideoSourceGroup(mixed $stream): array {
 
@@ -18486,8 +18522,8 @@ $tmp['source_groups'] = self::deserialize_type_array_of_GroupCallParticipantVide
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 2) !== 0) $tmp['audio_source'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_GroupCallParticipantVideo(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18511,9 +18547,9 @@ $tmp['volume_by_admin'] = ($flags & 1024) !== 0;
 $tmp['self'] = ($flags & 4096) !== 0;
 $tmp['video_joined'] = ($flags & 32768) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18536,8 +18572,8 @@ if (($flags & 16384) !== 0) $tmp['presentation'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_GroupCallParticipant(mixed $stream): array {
 
@@ -18574,8 +18610,8 @@ if (($flags & 128) !== 0) $tmp['schedule_date'] = unpack('l', stream_get_content
 if (($flags & 1024) !== 0) $tmp['unmuted_video_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['unmuted_video_limit'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['version'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_GroupCall(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18595,16 +18631,16 @@ default => self::err($stream)
 $tmp = ['_' => 'updatePeerHistoryTTL'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_chatInviteExported(mixed $stream): mixed {
 $tmp = ['_' => 'chatInviteExported'];
@@ -18621,8 +18657,8 @@ if (($flags & 4) !== 0) $tmp['usage_limit'] = unpack('l', stream_get_contents($s
 if (($flags & 8) !== 0) $tmp['usage'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 128) !== 0) $tmp['requested'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 256) !== 0) $tmp['title'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_ExportedChatInvite(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18696,8 +18732,8 @@ default => self::err($stream)
 }
 ;
 $tmp['qts'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_channelParticipantSelf(mixed $stream): mixed {
 $tmp = ['_' => 'channelParticipantSelf'];
@@ -18706,8 +18742,8 @@ $tmp['via_request'] = ($flags & 1) !== 0;
 $tmp['user_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['inviter_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_channelParticipantCreator(mixed $stream): mixed {
 $tmp = ['_' => 'channelParticipantCreator'];
@@ -18720,8 +18756,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['rank'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_channelParticipantAdmin(mixed $stream): mixed {
 $tmp = ['_' => 'channelParticipantAdmin'];
@@ -18739,17 +18775,17 @@ default => self::err($stream)
 }
 ;
 if (($flags & 4) !== 0) $tmp['rank'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_channelParticipantBanned(mixed $stream): mixed {
 $tmp = ['_' => 'channelParticipantBanned'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['left'] = ($flags & 1) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18762,8 +18798,8 @@ $tmp['banned_rights'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_ChannelParticipant(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18779,9 +18815,9 @@ return match (stream_get_contents($stream, 4)) {
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18813,9 +18849,9 @@ if (($flags & 1) !== 0) $tmp['prev_participant'] = match (stream_get_contents($s
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18838,9 +18874,9 @@ if (($flags & 2) !== 0) $tmp['new_participant'] = match (stream_get_contents($st
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18861,8 +18897,8 @@ default => self::err($stream)
 }
 ;
 $tmp['qts'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateGroupCallConnection(mixed $stream): mixed {
 $tmp = ['_' => 'updateGroupCallConnection'];
@@ -18874,8 +18910,8 @@ $tmp['params'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_BotCommand(mixed $stream): array {
 
@@ -18899,9 +18935,9 @@ default => self::err($stream)
 $tmp = ['_' => 'updateMessageReactions'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18914,8 +18950,8 @@ $tmp['reactions'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_BotMenuButton(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -18940,9 +18976,9 @@ $tmp = ['_' => 'updateTranscribedAudio'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['pending'] = ($flags & 1) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -18950,8 +18986,8 @@ default => self::err($stream)
 $tmp['msg_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['transcription_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['text'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_updateMoveStickerSetToTop(mixed $stream): mixed {
 $tmp = ['_' => 'updateMoveStickerSetToTop'];
@@ -18959,8 +18995,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['masks'] = ($flags & 1) !== 0;
 $tmp['emojis'] = ($flags & 2) !== 0;
 $tmp['stickerset'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateChannelPinnedTopic(mixed $stream): mixed {
 $tmp = ['_' => 'updateChannelPinnedTopic'];
@@ -18968,8 +19004,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['pinned'] = ($flags & 1) !== 0;
 $tmp['channel_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['topic_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateChannelPinnedTopics(mixed $stream): mixed {
 $tmp = ['_' => 'updateChannelPinnedTopics'];
@@ -18979,16 +19015,16 @@ if (($flags & 1) !== 0) $tmp['order'] = self::deserialize_type_array_of_int(matc
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_storiesStealthMode(mixed $stream): mixed {
 $tmp = ['_' => 'storiesStealthMode'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['active_until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['cooldown_until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_StoriesStealthMode(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19011,8 +19047,8 @@ $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['expires'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 16) !== 0) $tmp['used_gift_slug'] = self::deserialize_string($stream);
 if (($flags & 32) !== 0) $tmp['multiplier'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Boost(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19027,9 +19063,9 @@ $tmp = ['_' => 'updatePeerWallpaper'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['wallpaper_overridden'] = ($flags & 2) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -19041,8 +19077,8 @@ if (($flags & 1) !== 0) $tmp['wallpaper'] = match (stream_get_contents($stream, 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_Reaction(mixed $stream): array {
 
@@ -19076,9 +19112,9 @@ $tmp['peer'] = match (stream_get_contents($stream, 4)) {
 '¿må' => [
 '_' => 'dialogPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -19092,8 +19128,8 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_updatePinnedSavedDialogs(mixed $stream): mixed {
 $tmp = ['_' => 'updatePinnedSavedDialogs'];
@@ -19102,8 +19138,8 @@ if (($flags & 1) !== 0) $tmp['order'] = self::deserialize_type_array_of_DialogPe
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_QuickReply(mixed $stream): array {
 
@@ -19148,16 +19184,16 @@ $tmp['email_pattern'] = self::deserialize_string($stream);
 $tmp['length'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 8) !== 0) $tmp['reset_available_period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 16) !== 0) $tmp['reset_pending_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_auth___sentCodeTypeSetUpEmailRequired(mixed $stream): mixed {
 $tmp = ['_' => 'auth.sentCodeTypeSetUpEmailRequired'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['apple_signin_allowed'] = ($flags & 1) !== 0;
 $tmp['google_signin_allowed'] = ($flags & 2) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_auth___sentCodeTypeFirebaseSms(mixed $stream): mixed {
 $tmp = ['_' => 'auth.sentCodeTypeFirebaseSms'];
@@ -19166,8 +19202,8 @@ if (($flags & 1) !== 0) $tmp['nonce'] = self::deserialize_bytes($stream);
 if (($flags & 2) !== 0) $tmp['receipt'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['push_timeout'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['length'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_auth___SentCodeType(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19286,8 +19322,17 @@ default => self::err($stream)
 }
 ;
 if (($flags & 4) !== 0) $tmp['timeout'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
+    }
+    private  function deserialize_userEmpty(mixed $stream): mixed {
+$tmp = [
+'_' => 'userEmpty',
+'id' => unpack('q', stream_get_contents($stream, 8))[1],
+];
+$this->peerDatabase->addUser($tmp);
+return $tmp;
+
     }
     private  function deserialize_userProfilePhoto(mixed $stream): mixed {
 $tmp = ['_' => 'userProfilePhoto'];
@@ -19297,8 +19342,8 @@ $tmp['personal'] = ($flags & 4) !== 0;
 $tmp['photo_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 2) !== 0) $tmp['stripped_thumb'] = self::deserialize_bytes($stream);
 $tmp['dc_id'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_UserProfilePhoto(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19312,6 +19357,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_user(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('user');
 $tmp = ['_' => 'user'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['self'] = ($flags & 1024) !== 0;
@@ -19413,15 +19459,14 @@ if (($flags2 & 512) !== 0) $tmp['profile_color'] = match (stream_get_contents($s
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addUser($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_User(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 '¡Ïr0' => $this->deserialize_type_User(self::gzdecode($stream)),
 default => self::err($stream)
@@ -19436,17 +19481,14 @@ if (($flags & 2) !== 0) $tmp['otherwise_relogin_days'] = unpack('l', stream_get_
 if (($flags & 1) !== 0) $tmp['tmp_sessions'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['future_auth_token'] = self::deserialize_bytes($stream);
 $tmp['user'] = match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 '¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_help___termsOfService(mixed $stream): mixed {
 $tmp = ['_' => 'help.termsOfService'];
@@ -19464,8 +19506,8 @@ $tmp['entities'] = self::deserialize_type_array_of_MessageEntity(match(stream_ge
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 2) !== 0) $tmp['min_age_confirm'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_help___TermsOfService(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19486,8 +19528,8 @@ x' => self::deserialize_help___termsOfService($stream),
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_auth___Authorization(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19502,8 +19544,8 @@ default => self::err($stream)
 $tmp = ['_' => 'auth.loggedOut'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['future_auth_token'] = self::deserialize_bytes($stream);
-
 return $tmp;
+
     }
     private  function deserialize_authorization(mixed $stream): mixed {
 $tmp = ['_' => 'authorization'];
@@ -19526,8 +19568,8 @@ $tmp['date_active'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['ip'] = self::deserialize_string($stream);
 $tmp['country'] = self::deserialize_string($stream);
 $tmp['region'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_WallPaper(mixed $stream): array {
 
@@ -19549,16 +19591,9 @@ default => self::err($stream)
                 $result = [];
                 for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
                     $result []= match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -19575,10 +19610,7 @@ default => self::err($stream)
                 $result = [];
                 for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
                     $result []= match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 '¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
 default => self::err($stream)
@@ -19696,8 +19728,8 @@ default => self::err($stream)
 $tmp['secure_random'] = self::deserialize_bytes($stream);
 if (($flags & 32) !== 0) $tmp['pending_reset_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 64) !== 0) $tmp['login_email_pattern'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_SecureSecretSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -19757,8 +19789,8 @@ default => self::err($stream)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_WebAuthorization(mixed $stream): array {
 
@@ -19835,8 +19867,8 @@ $tmp['type'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SecureRequiredType(mixed $stream): array {
 
@@ -20340,8 +20372,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1) !== 0) $tmp['privacy_policy_url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_auth___SentCode(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -20386,9 +20418,9 @@ if (($flags & 8) !== 0) $tmp['reply_to'] = match (stream_get_contents($stream, 4
 '9ùZ' => [
 '_' => 'messageReplyStoryHeader',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20404,8 +20436,8 @@ if (($flags & 128) !== 0) $tmp['entities'] = self::deserialize_type_array_of_Mes
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 33554432) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_updateShortChatMessage(mixed $stream): mixed {
 $tmp = ['_' => 'updateShortChatMessage'];
@@ -20433,9 +20465,9 @@ if (($flags & 8) !== 0) $tmp['reply_to'] = match (stream_get_contents($stream, 4
 '9ùZ' => [
 '_' => 'messageReplyStoryHeader',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20451,8 +20483,8 @@ if (($flags & 128) !== 0) $tmp['entities'] = self::deserialize_type_array_of_Mes
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 33554432) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Update(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -20566,9 +20598,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20809,9 +20841,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20829,9 +20861,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20901,9 +20933,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -20972,27 +21004,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -21168,9 +21180,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21195,9 +21207,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21230,9 +21242,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21254,9 +21266,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21270,9 +21282,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21369,9 +21381,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21385,9 +21397,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21401,9 +21413,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21489,9 +21501,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21608,9 +21620,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21630,9 +21642,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21656,9 +21668,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21684,9 +21696,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21708,9 +21720,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21718,9 +21730,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21738,9 +21750,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -21928,9 +21940,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22171,9 +22183,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22191,9 +22203,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22263,9 +22275,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22334,27 +22346,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -22530,9 +22522,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22557,9 +22549,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22592,9 +22584,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22616,9 +22608,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22632,9 +22624,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22731,9 +22723,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22747,9 +22739,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22763,9 +22755,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22851,9 +22843,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22970,9 +22962,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -22992,9 +22984,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23018,9 +23010,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23046,9 +23038,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23070,9 +23062,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23080,9 +23072,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23100,9 +23092,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23276,8 +23268,8 @@ if (($flags & 128) !== 0) $tmp['entities'] = self::deserialize_type_array_of_Mes
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 33554432) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_autoDownloadSettings(mixed $stream): mixed {
 $tmp = ['_' => 'autoDownloadSettings'];
@@ -23293,8 +23285,8 @@ $tmp['file_size_max'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['video_upload_maxbitrate'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['small_queue_active_operations_max'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['large_queue_active_operations_max'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_AutoDownloadSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23323,8 +23315,8 @@ $tmp = ['_' => 'account.contentSettings'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['sensitive_enabled'] = ($flags & 1) !== 0;
 $tmp['sensitive_can_change'] = ($flags & 2) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_globalPrivacySettings(mixed $stream): mixed {
 $tmp = ['_' => 'globalPrivacySettings'];
@@ -23334,8 +23326,8 @@ $tmp['keep_archived_unmuted'] = ($flags & 2) !== 0;
 $tmp['keep_archived_folders'] = ($flags & 4) !== 0;
 $tmp['hide_read_marks'] = ($flags & 8) !== 0;
 $tmp['new_noncontact_peers_require_premium'] = ($flags & 16) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_EmojiStatus(mixed $stream): array {
 
@@ -23368,8 +23360,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['photos'] = ($flags & 1) !== 0;
 $tmp['videos'] = ($flags & 2) !== 0;
 if (($flags & 4) !== 0) $tmp['video_max_size'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_AutoSaveSettings(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23387,9 +23379,9 @@ default => self::err($stream)
 'G-`' => [
 '_' => 'autoSaveException',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23421,8 +23413,8 @@ if (($flags & 16) !== 0) $tmp['users'] = self::deserialize_type_array_of_long(ma
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_BusinessRecipients(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23443,8 +23435,8 @@ $tmp['recipients'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ConnectedBot(mixed $stream): array {
 
@@ -23505,8 +23497,8 @@ if (($flags & 8) !== 0) $tmp['menu_button'] = match (stream_get_contents($stream
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_BotInfo(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23524,8 +23516,8 @@ $tmp['currency'] = self::deserialize_string($stream);
 $tmp['amount'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['bot_url'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['store_product'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PremiumGiftOption(mixed $stream): array {
 
@@ -23564,9 +23556,9 @@ default => self::err($stream)
 $tmp = ['_' => 'peerStories'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23576,8 +23568,8 @@ $tmp['stories'] = self::deserialize_type_array_of_StoryItem(match(stream_get_con
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_PeerStories(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23614,8 +23606,8 @@ $tmp['weekly_open'] = self::deserialize_type_array_of_BusinessWeeklyOpen(match(s
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_BusinessWorkHours(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23638,8 +23630,8 @@ default => self::err($stream)
 }
 ;
 $tmp['address'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_BusinessLocation(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23712,8 +23704,8 @@ $tmp['recipients'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_BusinessAwayMessage(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23724,6 +23716,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_userFull(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('userFull');
 $tmp = ['_' => 'userFull'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['blocked'] = ($flags & 1) !== 0;
@@ -23859,8 +23852,10 @@ if (($flags2 & 8) !== 0) $tmp['business_away_message'] = match (stream_get_conte
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addFullChat($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_UserFull(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -23932,9 +23927,9 @@ default => self::err($stream)
 '€ýè' => [
 '_' => 'peerBlocked',
 'peer_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -23988,9 +23983,9 @@ default => self::err($stream)
 '[ÀÍí' => [
 '_' => 'topPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24090,8 +24085,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_forumTopic(mixed $stream): mixed {
 $tmp = ['_' => 'forumTopic'];
@@ -24113,9 +24108,9 @@ $tmp['unread_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['unread_mentions_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['unread_reactions_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24133,8 +24128,8 @@ if (($flags & 16) !== 0) $tmp['draft'] = match (stream_get_contents($stream, 4))
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ForumTopic(mixed $stream): array {
 
@@ -24177,8 +24172,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_dialog(mixed $stream): mixed {
 $tmp = ['_' => 'dialog'];
@@ -24187,9 +24182,9 @@ $tmp['pinned'] = ($flags & 4) !== 0;
 $tmp['unread_mark'] = ($flags & 8) !== 0;
 $tmp['view_forum_as_messages'] = ($flags & 64) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24216,8 +24211,8 @@ default => self::err($stream)
 ;
 if (($flags & 16) !== 0) $tmp['folder_id'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 32) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_folder(mixed $stream): mixed {
 $tmp = ['_' => 'folder'];
@@ -24236,8 +24231,8 @@ if (($flags & 8) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_Folder(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -24258,9 +24253,9 @@ default => self::err($stream)
 }
 ;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24270,8 +24265,8 @@ $tmp['unread_muted_peers_count'] = unpack('l', stream_get_contents($stream, 4))[
 $tmp['unread_unmuted_peers_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['unread_muted_messages_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['unread_unmuted_messages_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_Dialog(mixed $stream): array {
 
@@ -24306,8 +24301,8 @@ default => self::err($stream)
 $tmp = ['_' => 'chatReactionsAll'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['allow_custom'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_ChatReactions(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -24328,6 +24323,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_chatFull(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('chatFull');
 $tmp = ['_' => 'chatFull'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['can_set_username'] = ($flags & 128) !== 0;
@@ -24394,9 +24390,9 @@ default => self::err($stream)
 ;
 if (($flags & 16384) !== 0) $tmp['ttl_period'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 32768) !== 0) $tmp['groupcall_default_join_as'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24423,8 +24419,10 @@ if (($flags & 262144) !== 0) $tmp['available_reactions'] = match (stream_get_con
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addFullChat($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_ChannelLocation(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -24450,6 +24448,7 @@ default => self::err($stream)
 ;
     }
     private  function deserialize_channelFull(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('channelFull');
 $tmp = ['_' => 'channelFull'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['can_view_participants'] = ($flags & 8) !== 0;
@@ -24560,9 +24559,9 @@ if (($flags & 33554432) !== 0) $tmp['pending_suggestions'] = self::deserialize_t
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 67108864) !== 0) $tmp['groupcall_default_join_as'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24574,9 +24573,9 @@ if (($flags & 268435456) !== 0) $tmp['recent_requesters'] = self::deserialize_ty
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 536870912) !== 0) $tmp['default_send_as'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -24618,8 +24617,10 @@ if (($flags2 & 1024) !== 0) $tmp['emojiset'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
+$this->referenceDatabase?->addOrigin($tmp);
+$this->peerDatabase->addFullChat($tmp);
 return $tmp;
+
     }
     private  function deserialize_type_ChatFull(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -24673,8 +24674,8 @@ if (($flags & 16) !== 0) $tmp['participants'] = self::deserialize_type_array_of_
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 $tmp['color'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_StickerSetCovered(mixed $stream): array {
 
@@ -24762,8 +24763,8 @@ if (($flags & 4) !== 0) $tmp['replies'] = match (stream_get_contents($stream, 4)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_MessageViews(mixed $stream): array {
 
@@ -24778,6 +24779,20 @@ default => self::err($stream)
                 }
                 return $result;    
             
+    }
+    private  function deserialize_messages___savedGifs(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('messages.savedGifs');
+$tmp = [
+'_' => 'messages.savedGifs',
+'hash' => unpack('q', stream_get_contents($stream, 8))[1],
+'gifs' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+];
+$this->referenceDatabase?->addOrigin($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_InlineBotSwitchPM(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -24827,8 +24842,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageText(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageText'];
@@ -24855,8 +24870,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageMediaGeo(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageMediaGeo'];
@@ -24888,8 +24903,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageMediaVenue(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageMediaVenue'];
@@ -24923,8 +24938,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageMediaContact(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageMediaContact'];
@@ -24948,8 +24963,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageMediaInvoice(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageMediaInvoice'];
@@ -25001,8 +25016,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMessageMediaWebPage(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMessageMediaWebPage'];
@@ -25033,8 +25048,8 @@ if (($flags & 4) !== 0) $tmp['reply_markup'] = match (stream_get_contents($strea
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_BotInlineMessage(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -25122,8 +25137,8 @@ $tmp['send_message'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_botInlineMediaResult(mixed $stream): mixed {
 $tmp = ['_' => 'botInlineMediaResult'];
@@ -25164,8 +25179,8 @@ $tmp['send_message'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_BotInlineResult(mixed $stream): array {
 
@@ -25217,15 +25232,15 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_messages___messageEditData(mixed $stream): mixed {
 $tmp = ['_' => 'messages.messageEditData'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['caption'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_messages___botCallbackAnswer(mixed $stream): mixed {
 $tmp = ['_' => 'messages.botCallbackAnswer'];
@@ -25236,8 +25251,8 @@ $tmp['native_ui'] = ($flags & 16) !== 0;
 if (($flags & 1) !== 0) $tmp['message'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['url'] = self::deserialize_string($stream);
 $tmp['cache_time'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_updates___State(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -25268,8 +25283,30 @@ $tmp['unread'] = self::deserialize_type_array_of_long(match(stream_get_contents(
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
+    }
+    private  function deserialize_messages___recentStickers(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('messages.recentStickers');
+$tmp = [
+'_' => 'messages.recentStickers',
+'hash' => unpack('q', stream_get_contents($stream, 8))[1],
+'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+'dates' => self::deserialize_type_array_of_int(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+];
+$this->referenceDatabase?->addOrigin($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_array_of_HighScore(mixed $stream): array {
 
@@ -25289,6 +25326,24 @@ default => self::err($stream)
                 }
                 return $result;    
             
+    }
+    private  function deserialize_messages___favedStickers(mixed $stream): mixed {
+$this->referenceDatabase?->addOriginContext('messages.favedStickers');
+$tmp = [
+'_' => 'messages.favedStickers',
+'hash' => unpack('q', stream_get_contents($stream, 8))[1],
+'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
+                'Äµ' => $stream,    
+                '¡Ïr0' => self::gzdecode_vector($stream)
+            }),
+];
+$this->referenceDatabase?->addOrigin($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_array_of_EmojiKeyword(mixed $stream): array {
 
@@ -25324,18 +25379,15 @@ $tmp = ['_' => 'urlAuthResultRequest'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['request_write_access'] = ($flags & 1) !== 0;
 $tmp['bot'] = match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 '¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 $tmp['domain'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_MessagePeerVote(mixed $stream): array {
 
@@ -25345,9 +25397,9 @@ return $tmp;
 '\\-Ì¶' => [
 '_' => 'messagePeerVote',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -25358,9 +25410,9 @@ default => self::err($stream)
 '¥Ít' => [
 '_' => 'messagePeerVoteInputOption',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -25370,9 +25422,9 @@ default => self::err($stream)
 'æö(F' => [
 '_' => 'messagePeerVoteMultiple',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -25408,8 +25460,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1) !== 0) $tmp['next_offset'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_DialogFilter(mixed $stream): array {
 
@@ -25437,8 +25489,8 @@ $tmp['filters'] = self::deserialize_type_array_of_DialogFilter(match(stream_get_
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_messages___discussionMessage(mixed $stream): mixed {
 $tmp = ['_' => 'messages.discussionMessage'];
@@ -25459,8 +25511,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_messages___historyImportParsed(mixed $stream): mixed {
 $tmp = ['_' => 'messages.historyImportParsed'];
@@ -25468,8 +25520,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['pm'] = ($flags & 1) !== 0;
 $tmp['group'] = ($flags & 2) !== 0;
 if (($flags & 4) !== 0) $tmp['title'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ExportedChatInvite(mixed $stream): array {
 
@@ -25517,8 +25569,8 @@ $tmp['user_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['about'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['approved_by'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ChatInviteImporter(mixed $stream): array {
 
@@ -25578,8 +25630,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SearchResultsPosition(mixed $stream): array {
 
@@ -25617,8 +25669,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1) !== 0) $tmp['next_offset'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_availableReaction(mixed $stream): mixed {
 $tmp = ['_' => 'availableReaction'];
@@ -25697,8 +25749,8 @@ if (($flags & 2) !== 0) $tmp['center_icon'] = match (stream_get_contents($stream
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_AvailableReaction(mixed $stream): array {
 
@@ -25799,8 +25851,8 @@ if (($flags & 1) !== 0) $tmp['colors'] = self::deserialize_type_array_of_AttachM
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_AttachMenuBotIcon(mixed $stream): array {
 
@@ -25835,8 +25887,8 @@ $tmp['icons'] = self::deserialize_type_array_of_AttachMenuBotIcon(match(stream_g
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_AttachMenuBot(mixed $stream): array {
 
@@ -25881,8 +25933,8 @@ if (($flags & 1) !== 0) $tmp['msg_id'] = match (stream_get_contents($stream, 4))
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_messages___transcribedAudio(mixed $stream): mixed {
 $tmp = ['_' => 'messages.transcribedAudio'];
@@ -25892,8 +25944,8 @@ $tmp['transcription_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['text'] = self::deserialize_string($stream);
 if (($flags & 2) !== 0) $tmp['trial_remains_num'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['trial_remains_until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_EmojiGroup(mixed $stream): array {
 
@@ -25932,24 +25984,24 @@ $tmp['app'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_savedDialog(mixed $stream): mixed {
 $tmp = ['_' => 'savedDialog'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['pinned'] = ($flags & 4) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
 $tmp['top_message'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SavedDialog(mixed $stream): array {
 
@@ -25986,8 +26038,8 @@ default => self::err($stream)
 ;
 if (($flags & 1) !== 0) $tmp['title'] = self::deserialize_string($stream);
 $tmp['count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SavedReactionTag(mixed $stream): array {
 
@@ -26052,8 +26104,8 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['final'] = ($flags & 1) !== 0;
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['timeout'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_Dialog(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -26088,8 +26140,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_updates___channelDifference(mixed $stream): mixed {
 $tmp = ['_' => 'updates.channelDifference'];
@@ -26113,8 +26165,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_storage___FileType(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -26241,8 +26293,9 @@ default => self::err($stream)
 }
 ;
 if (($flags & 65536) !== 0) $tmp['autologin_token'] = self::deserialize_string($stream);
-
+$this->API->populateConfig($tmp);
 return $tmp;
+
     }
     private  function deserialize_help___appUpdate(mixed $stream): mixed {
 $tmp = ['_' => 'help.appUpdate'];
@@ -26276,8 +26329,24 @@ if (($flags & 8) !== 0) $tmp['sticker'] = match (stream_get_contents($stream, 4)
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
+    }
+    private  function deserialize_help___support(mixed $stream): mixed {
+$tmp = [
+'_' => 'help.support',
+'phone_number' => self::deserialize_string($stream),
+'user' => match (stream_get_contents($stream, 4)) {
+'zK¼Ó' => self::deserialize_userEmpty($stream),
+'8D\\!' => self::deserialize_user($stream),
+'¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
+default => self::err($stream)
+}
+,
+];
+$this->API->populateSupportUser($tmp);
+return $tmp;
+
     }
     private  function deserialize_type_array_of_CdnPublicKey(mixed $stream): array {
 
@@ -26302,16 +26371,9 @@ return match (stream_get_contents($stream, 4)) {
 '|mhZ' => [
 '_' => 'chatInviteAlready',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -26324,16 +26386,9 @@ default => self::err($stream)
 '°\\ia' => [
 '_' => 'chatInvitePeek',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -26443,16 +26498,9 @@ default => self::err($stream)
 '|mhZ' => [
 '_' => 'chatInviteAlready',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -26465,16 +26513,9 @@ default => self::err($stream)
 '°\\ia' => [
 '_' => 'chatInvitePeek',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -26578,8 +26619,8 @@ if (($flags & 2) !== 0) $tmp['entities'] = self::deserialize_type_array_of_Messa
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_JSONObjectValue(mixed $stream): array {
 
@@ -26656,9 +26697,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['proxy'] = ($flags & 1) !== 0;
 $tmp['expires'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -26673,8 +26714,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
             });
 if (($flags & 2) !== 0) $tmp['psa_type'] = self::deserialize_string($stream);
 if (($flags & 4) !== 0) $tmp['psa_message'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_help___countryCode(mixed $stream): mixed {
 $tmp = ['_' => 'help.countryCode'];
@@ -26688,8 +26729,8 @@ if (($flags & 2) !== 0) $tmp['patterns'] = self::deserialize_type_array_of_strin
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_help___CountryCode(mixed $stream): array {
 
@@ -26716,8 +26757,8 @@ $tmp['country_codes'] = self::deserialize_type_array_of_help___CountryCode(match
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_help___Country(mixed $stream): array {
 
@@ -26744,8 +26785,8 @@ $tmp['currency'] = self::deserialize_string($stream);
 $tmp['amount'] = unpack('q', stream_get_contents($stream, 8))[1];
 $tmp['bot_url'] = self::deserialize_string($stream);
 if (($flags & 1) !== 0) $tmp['store_product'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PremiumSubscriptionOption(mixed $stream): array {
 
@@ -26851,8 +26892,8 @@ default => self::err($stream)
 ;
 if (($flags & 8) !== 0) $tmp['channel_min_level'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 16) !== 0) $tmp['group_min_level'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_help___PeerColorOption(mixed $stream): array {
 
@@ -26904,9 +26945,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -26942,8 +26983,8 @@ $tmp['invite'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_ForumTopic(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -26980,8 +27021,8 @@ if (($flags & 2) !== 0) $tmp['new_topic'] = match (stream_get_contents($stream, 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_ChannelAdminLogEventAction(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -27093,9 +27134,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27121,9 +27162,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27146,9 +27187,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27174,9 +27215,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27199,9 +27240,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27926,9 +27967,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27954,9 +27995,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -27979,9 +28020,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -28007,9 +28048,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -28032,9 +28073,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -28663,8 +28704,8 @@ if (($flags & 1) !== 0) $tmp['photo'] = match (stream_get_contents($stream, 4)) 
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_SponsoredWebPage(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -28681,9 +28722,9 @@ $tmp['recommended'] = ($flags & 32) !== 0;
 $tmp['show_peer_photo'] = ($flags & 64) !== 0;
 $tmp['random_id'] = self::deserialize_bytes($stream);
 if (($flags & 8) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -28692,16 +28733,9 @@ if (($flags & 16) !== 0) $tmp['chat_invite'] = match (stream_get_contents($strea
 '|mhZ' => [
 '_' => 'chatInviteAlready',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -28714,16 +28748,9 @@ default => self::err($stream)
 '°\\ia' => [
 '_' => 'chatInvitePeek',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -28763,8 +28790,8 @@ if (($flags & 2) !== 0) $tmp['entities'] = self::deserialize_type_array_of_Messa
 if (($flags & 2048) !== 0) $tmp['button_text'] = self::deserialize_string($stream);
 if (($flags & 128) !== 0) $tmp['sponsor_info'] = self::deserialize_string($stream);
 if (($flags & 256) !== 0) $tmp['additional_info'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SponsoredMessage(mixed $stream): array {
 
@@ -28796,23 +28823,23 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_sendAsPeer(mixed $stream): mixed {
 $tmp = ['_' => 'sendAsPeer'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['premium_required'] = ($flags & 1) !== 0;
 $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_SendAsPeer(mixed $stream): array {
 
@@ -28850,8 +28877,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 $tmp['pts'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PaymentFormMethod(mixed $stream): array {
 
@@ -28957,8 +28984,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_ShippingOption(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -29044,8 +29071,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_ShippingOption(mixed $stream): array {
 
@@ -29077,8 +29104,8 @@ if (($flags & 2) !== 0) $tmp['shipping_options'] = self::deserialize_type_array_
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_Updates(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -29200,9 +29227,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29443,9 +29470,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29463,9 +29490,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29535,9 +29562,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29606,27 +29633,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -29802,9 +29809,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29829,9 +29836,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29864,9 +29871,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29888,9 +29895,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -29904,9 +29911,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30003,9 +30010,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30019,9 +30026,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30035,9 +30042,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30123,9 +30130,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30242,9 +30249,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30264,9 +30271,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30290,9 +30297,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30318,9 +30325,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30342,9 +30349,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30352,9 +30359,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30372,9 +30379,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30499,8 +30506,8 @@ if (($flags & 1) !== 0) $tmp['saved_info'] = match (stream_get_contents($stream,
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_BankCardOpenUrl(mixed $stream): array {
 
@@ -30525,9 +30532,9 @@ $tmp = ['_' => 'payments.checkedGiftCode'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['via_giveaway'] = ($flags & 4) !== 0;
 if (($flags & 16) !== 0) $tmp['from_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30545,8 +30552,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_payments___giveawayInfo(mixed $stream): mixed {
 $tmp = ['_' => 'payments.giveawayInfo'];
@@ -30557,8 +30564,8 @@ $tmp['start_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['joined_too_early_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 4) !== 0) $tmp['admin_disallowed_chat_id'] = unpack('q', stream_get_contents($stream, 8))[1];
 if (($flags & 16) !== 0) $tmp['disallowed_country'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_payments___giveawayInfoResults(mixed $stream): mixed {
 $tmp = ['_' => 'payments.giveawayInfoResults'];
@@ -30570,8 +30577,8 @@ if (($flags & 1) !== 0) $tmp['gift_code_slug'] = self::deserialize_string($strea
 $tmp['finish_date'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['winners_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['activated_count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_GroupCallStreamChannel(mixed $stream): array {
 
@@ -30606,8 +30613,8 @@ $tmp['plural_code'] = self::deserialize_string($stream);
 $tmp['strings_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['translated_count'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['translations_url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_StatsDateRangeDays(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -30655,8 +30662,8 @@ default => self::err($stream)
 }
 ;
 if (($flags & 1) !== 0) $tmp['zoom_token'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_StatsGraph(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -30777,9 +30784,9 @@ default => self::err($stream)
 'Ð­óí' => [
 '_' => 'publicForwardStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30821,8 +30828,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_ExportedChatlistInvite(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -30881,8 +30888,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PeerStories(mixed $stream): array {
 
@@ -30922,8 +30929,8 @@ $tmp['stealth_mode'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_storyView(mixed $stream): mixed {
 $tmp = ['_' => 'storyView'];
@@ -30948,8 +30955,8 @@ if (($flags & 4) !== 0) $tmp['reaction'] = match (stream_get_contents($stream, 4
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_storyViewPublicForward(mixed $stream): mixed {
 $tmp = ['_' => 'storyViewPublicForward'];
@@ -30964,8 +30971,8 @@ $tmp['message'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_storyViewPublicRepost(mixed $stream): mixed {
 $tmp = ['_' => 'storyViewPublicRepost'];
@@ -30973,9 +30980,9 @@ $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['blocked'] = ($flags & 1) !== 0;
 $tmp['blocked_my_stories_from'] = ($flags & 2) !== 0;
 $tmp['peer_id'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -30991,8 +30998,8 @@ $tmp['story'] = match (stream_get_contents($stream, 4)) {
 default => self::err($stream)
 }
 ;
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_StoryView(mixed $stream): array {
 
@@ -31030,8 +31037,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1) !== 0) $tmp['next_offset'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_StoryViews(mixed $stream): array {
 
@@ -31055,9 +31062,9 @@ default => self::err($stream)
 'ÕÖ`' => [
 '_' => 'storyReaction',
 'peer_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -31094,9 +31101,9 @@ default => self::err($stream)
 'ÍÏ' => [
 '_' => 'storyReactionPublicRepost',
 'peer_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -31138,8 +31145,8 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
 if (($flags & 1) !== 0) $tmp['next_offset'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_Boost(mixed $stream): array {
 
@@ -31168,17 +31175,17 @@ $tmp['users'] = self::deserialize_type_array_of_User(match(stream_get_contents($
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_myBoost(mixed $stream): mixed {
 $tmp = ['_' => 'myBoost'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['slot'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 1) !== 0) $tmp['peer'] = match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -31186,8 +31193,8 @@ default => self::err($stream)
 $tmp['date'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['expires'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['cooldown_until_date'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_MyBoost(mixed $stream): array {
 
@@ -31251,8 +31258,8 @@ if (($flags & 4) !== 0) $tmp['my_boost_slots'] = self::deserialize_type_array_of
                 'Äµ' => $stream,    
                 '¡Ïr0' => self::gzdecode_vector($stream)
             });
-
 return $tmp;
+
     }
     private  function deserialize_smsjobs___status(mixed $stream): mixed {
 $tmp = ['_' => 'smsjobs.status'];
@@ -31265,8 +31272,8 @@ $tmp['total_sent'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['total_since'] = unpack('l', stream_get_contents($stream, 4))[1];
 if (($flags & 2) !== 0) $tmp['last_gift_slug'] = self::deserialize_string($stream);
 $tmp['terms_url'] = self::deserialize_string($stream);
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_Bool(mixed $stream): array {
 
@@ -31401,8 +31408,8 @@ default => self::err($stream)
 $tmp = ['_' => 'inputMessagesFilterPhoneCalls'];
 $flags = unpack('V', stream_get_contents($stream, 4))[1];
 $tmp['missed'] = ($flags & 1) !== 0;
-
 return $tmp;
+
     }
     private  function deserialize_type_MessagesFilter(mixed $stream): mixed {
 return match (stream_get_contents($stream, 4)) {
@@ -31519,8 +31526,8 @@ default => self::err($stream)
 }
 ;
 $tmp['count'] = unpack('l', stream_get_contents($stream, 4))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_messages___SearchCounter(mixed $stream): array {
 
@@ -31590,8 +31597,8 @@ if (($flags & 1) !== 0) $tmp['store_product'] = self::deserialize_string($stream
 if (($flags & 2) !== 0) $tmp['store_quantity'] = unpack('l', stream_get_contents($stream, 4))[1];
 $tmp['currency'] = self::deserialize_string($stream);
 $tmp['amount'] = unpack('q', stream_get_contents($stream, 8))[1];
-
 return $tmp;
+
     }
     private  function deserialize_type_array_of_PremiumGiftCodeOption(mixed $stream): array {
 
@@ -31674,10 +31681,7 @@ default => self::err($stream)
 ],
 'Ö­' => self::deserialize_authorization($stream),
 ',b™' => self::deserialize_peerNotifySettings($stream),
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 'ƒ‘' => [
 '_' => 'account.wallPapersNotModified',
@@ -31888,9 +31892,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32131,9 +32135,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32151,9 +32155,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32223,9 +32227,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32294,27 +32298,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -32490,9 +32474,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32517,9 +32501,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32552,9 +32536,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32576,9 +32560,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32592,9 +32576,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32691,9 +32675,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32707,9 +32691,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32723,9 +32707,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32811,9 +32795,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32930,9 +32914,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32952,9 +32936,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -32978,9 +32962,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33006,9 +32990,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33030,9 +33014,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33040,9 +33024,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33060,9 +33044,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33423,9 +33407,9 @@ default => self::err($stream)
 'Ùz' => [
 '_' => 'contacts.resolvedPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -33759,16 +33743,9 @@ default => self::err($stream)
 '|mhZ' => [
 '_' => 'chatInviteAlready',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -33781,16 +33758,9 @@ default => self::err($stream)
 '°\\ia' => [
 '_' => 'chatInvitePeek',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -33800,27 +33770,7 @@ default => self::err($stream)
 ,
 'expires' => unpack('l', stream_get_contents($stream, 4))[1],
 ],
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -33852,14 +33802,7 @@ default => self::err($stream)
 '¢\\è' => [
 '_' => 'messages.savedGifsNotModified',
 ],
-'* „' => [
-'_' => 'messages.savedGifs',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'gifs' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'* „' => self::deserialize_messages___savedGifs($stream),
 'öò!à' => self::deserialize_messages___botResults($stream),
 'æÝµ&' => self::deserialize_messages___messageEditData($stream),
 '¤^X6' => self::deserialize_messages___botCallbackAnswer($stream),
@@ -33903,22 +33846,7 @@ default => self::err($stream)
 'ø' => [
 '_' => 'messages.recentStickersNotModified',
 ],
-'V|Óˆ' => [
-'_' => 'messages.recentStickers',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'dates' => self::deserialize_type_array_of_int(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'V|Óˆ' => self::deserialize_messages___recentStickers($stream),
 'È©ËO' => [
 '_' => 'messages.archivedStickers',
 'count' => unpack('l', stream_get_contents($stream, 4))[1],
@@ -33961,18 +33889,7 @@ default => self::err($stream)
 'Ó¦ž' => [
 '_' => 'messages.favedStickersNotModified',
 ],
-'—µ,' => [
-'_' => 'messages.favedStickers',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'—µ,' => self::deserialize_messages___favedStickers($stream),
 '~IÂ' => [
 '_' => 'encryptedFileEmpty',
 ],
@@ -34552,20 +34469,7 @@ default => self::err($stream)
 '_' => 'help.inviteText',
 'message' => self::deserialize_string($stream),
 ],
-'öµÆ' => [
-'_' => 'help.support',
-'phone_number' => self::deserialize_string($stream),
-'user' => match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'8D\\!' => self::deserialize_user($stream),
-'¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
+'öµÆ' => self::deserialize_help___support($stream),
 '
 ä%W' => [
 '_' => 'cdnConfig',
@@ -34758,9 +34662,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -34976,9 +34880,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35219,9 +35123,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35239,9 +35143,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35311,9 +35215,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35382,27 +35286,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -35578,9 +35462,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35605,9 +35489,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35640,9 +35524,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35664,9 +35548,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35680,9 +35564,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35779,9 +35663,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35795,9 +35679,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35811,9 +35695,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -35899,9 +35783,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36018,9 +35902,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36040,9 +35924,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36066,9 +35950,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36094,9 +35978,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36118,9 +36002,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36128,9 +36012,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -36148,9 +36032,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -37292,10 +37176,7 @@ default => self::err($stream)
 ],
 'Ö­' => self::deserialize_authorization($stream),
 ',b™' => self::deserialize_peerNotifySettings($stream),
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'zK¼Ó' => self::deserialize_userEmpty($stream),
 '8D\\!' => self::deserialize_user($stream),
 'ƒ‘' => [
 '_' => 'account.wallPapersNotModified',
@@ -37506,9 +37387,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -37749,9 +37630,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -37769,9 +37650,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -37841,9 +37722,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -37912,27 +37793,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -38108,9 +37969,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38135,9 +37996,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38170,9 +38031,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38194,9 +38055,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38210,9 +38071,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38309,9 +38170,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38325,9 +38186,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38341,9 +38202,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38429,9 +38290,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38548,9 +38409,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38570,9 +38431,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38596,9 +38457,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38624,9 +38485,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38648,9 +38509,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38658,9 +38519,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -38678,9 +38539,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -39041,9 +38902,9 @@ default => self::err($stream)
 'Ùz' => [
 '_' => 'contacts.resolvedPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -39377,16 +39238,9 @@ default => self::err($stream)
 '|mhZ' => [
 '_' => 'chatInviteAlready',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -39399,16 +39253,9 @@ default => self::err($stream)
 '°\\ia' => [
 '_' => 'chatInvitePeek',
 'chat' => match (stream_get_contents($stream, 4)) {
-'e(V)' => [
-'_' => 'chatEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
+'e(V)' => self::deserialize_chatEmpty($stream),
 'VòËA' => self::deserialize_chat($stream),
-'§¡’e' => [
-'_' => 'chatForbidden',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-'title' => self::deserialize_string($stream),
-],
+'§¡’e' => self::deserialize_chatForbidden($stream),
 'ü­
 ' => self::deserialize_channel($stream),
 'Õ“Ô' => self::deserialize_channelForbidden($stream),
@@ -39418,27 +39265,7 @@ default => self::err($stream)
 ,
 'expires' => unpack('l', stream_get_contents($stream, 4))[1],
 ],
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -39470,14 +39297,7 @@ default => self::err($stream)
 '¢\\è' => [
 '_' => 'messages.savedGifsNotModified',
 ],
-'* „' => [
-'_' => 'messages.savedGifs',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'gifs' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'* „' => self::deserialize_messages___savedGifs($stream),
 'öò!à' => self::deserialize_messages___botResults($stream),
 'æÝµ&' => self::deserialize_messages___messageEditData($stream),
 '¤^X6' => self::deserialize_messages___botCallbackAnswer($stream),
@@ -39521,22 +39341,7 @@ default => self::err($stream)
 'ø' => [
 '_' => 'messages.recentStickersNotModified',
 ],
-'V|Óˆ' => [
-'_' => 'messages.recentStickers',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'dates' => self::deserialize_type_array_of_int(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'V|Óˆ' => self::deserialize_messages___recentStickers($stream),
 'È©ËO' => [
 '_' => 'messages.archivedStickers',
 'count' => unpack('l', stream_get_contents($stream, 4))[1],
@@ -39579,18 +39384,7 @@ default => self::err($stream)
 'Ó¦ž' => [
 '_' => 'messages.favedStickersNotModified',
 ],
-'—µ,' => [
-'_' => 'messages.favedStickers',
-'hash' => unpack('q', stream_get_contents($stream, 8))[1],
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'stickers' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'—µ,' => self::deserialize_messages___favedStickers($stream),
 '~IÂ' => [
 '_' => 'encryptedFileEmpty',
 ],
@@ -40170,20 +39964,7 @@ default => self::err($stream)
 '_' => 'help.inviteText',
 'message' => self::deserialize_string($stream),
 ],
-'öµÆ' => [
-'_' => 'help.support',
-'phone_number' => self::deserialize_string($stream),
-'user' => match (stream_get_contents($stream, 4)) {
-'zK¼Ó' => [
-'_' => 'userEmpty',
-'id' => unpack('q', stream_get_contents($stream, 8))[1],
-],
-'8D\\!' => self::deserialize_user($stream),
-'¡Ïr0' => self::deserialize_type_User(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-],
+'öµÆ' => self::deserialize_help___support($stream),
 '
 ä%W' => [
 '_' => 'cdnConfig',
@@ -40376,9 +40157,9 @@ default => self::err($stream)
 'ð' => [
 '_' => 'channelParticipantLeft',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -40594,9 +40375,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -40837,9 +40618,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -40857,9 +40638,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -40929,9 +40710,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41000,27 +40781,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -41196,9 +40957,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41223,9 +40984,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41258,9 +41019,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41282,9 +41043,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41298,9 +41059,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41397,9 +41158,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41413,9 +41174,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41429,9 +41190,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41517,9 +41278,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41636,9 +41397,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41658,9 +41419,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41684,9 +41445,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41712,9 +41473,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41736,9 +41497,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41746,9 +41507,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -41766,9 +41527,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -42854,7 +42615,7 @@ default => self::err($stream)
                 }
             }
             return $tmp;
-            
+
     }
     private  function deserialize_type_array_of_future_salt(mixed $stream): array {
 
@@ -43019,9 +42780,9 @@ default => self::err($stream)
 '_' => 'updateChatUserTyping',
 'chat_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'from_id' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43262,9 +43023,9 @@ default => self::err($stream)
 'ØÔŸ' => [
 '_' => 'notifyPeer',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43282,9 +43043,9 @@ default => self::err($stream)
 'cn"' => [
 '_' => 'notifyForumTopic',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43354,9 +43115,9 @@ default => self::err($stream)
 '¿!//' => [
 '_' => 'updateReadHistoryOutbox',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43425,27 +43186,7 @@ default => self::err($stream)
 'ª0Šh' => [
 '_' => 'updateNewStickerSet',
 'stickerset' => match (stream_get_contents($stream, 4)) {
-'?n' => [
-'_' => 'messages.stickerSet',
-'set' => match (stream_get_contents($stream, 4)) {
-'ÜNÑ-' => self::deserialize_stickerSet($stream),
-'¡Ïr0' => self::deserialize_type_StickerSet(self::gzdecode($stream)),
-default => self::err($stream)
-}
-,
-'packs' => self::deserialize_type_array_of_StickerPack(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'keywords' => self::deserialize_type_array_of_StickerKeyword(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-'documents' => self::deserialize_type_array_of_Document(match(stream_get_contents($stream, 4)) {    
-                'Äµ' => $stream,    
-                '¡Ïr0' => self::gzdecode_vector($stream)
-            }),
-],
+'?n' => self::deserialize_messages___stickerSet($stream),
 'ë$ùÓ' => [
 '_' => 'messages.stickerSetNotModified',
 ],
@@ -43621,9 +43362,9 @@ default => self::err($stream)
 'PÀT' => [
 '_' => 'updateChatDefaultBannedRights',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43648,9 +43389,9 @@ default => self::err($stream)
 'fs~j' => [
 '_' => 'updatePeerSettings',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43683,9 +43424,9 @@ default => self::err($stream)
 'îl†' => [
 '_' => 'updateDeleteScheduledMessages',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43707,9 +43448,9 @@ default => self::err($stream)
 '9¹‡' => [
 '_' => 'updateGeoLiveViewed',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43723,9 +43464,9 @@ default => self::err($stream)
 '_' => 'updateMessagePollVote',
 'poll_id' => unpack('q', stream_get_contents($stream, 8))[1],
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43822,9 +43563,9 @@ default => self::err($stream)
 './qM' => [
 '_' => 'updateBotCommands',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43838,9 +43579,9 @@ default => self::err($stream)
 'ÛÃcp' => [
 '_' => 'updatePendingJoinRequests',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43854,9 +43595,9 @@ default => self::err($stream)
 '†©ß' => [
 '_' => 'updateBotChatInviteRequester',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -43942,9 +43683,9 @@ default => self::err($stream)
 'Œ©sZ' => [
 '_' => 'updateMessageExtendedMedia',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44061,9 +43802,9 @@ default => self::err($stream)
 '˜·³u' => [
 '_' => 'updateStory',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44083,9 +43824,9 @@ default => self::err($stream)
 '+“N÷' => [
 '_' => 'updateReadStories',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44109,9 +43850,9 @@ default => self::err($stream)
 'ƒvb}' => [
 '_' => 'updateSentStoryReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44137,9 +43878,9 @@ default => self::err($stream)
 'œÔM' => [
 '_' => 'updateBotChatBoost',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44161,9 +43902,9 @@ default => self::err($stream)
 'ÎÓ!¬' => [
 '_' => 'updateBotMessageReaction',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44171,9 +43912,9 @@ default => self::err($stream)
 'msg_id' => unpack('l', stream_get_contents($stream, 4))[1],
 'date' => unpack('l', stream_get_contents($stream, 4))[1],
 'actor' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
@@ -44191,9 +43932,9 @@ default => self::err($stream)
 'YwË	' => [
 '_' => 'updateBotMessageReactions',
 'peer' => match (stream_get_contents($stream, 4)) {
-'"QY' => unpack('q', stream_get_contents($stream, 8))[1],
+'"QY' => self::deserialize_peerUser($stream),
 'šÆ6' => -unpack('q', stream_get_contents($stream, 8))[1],
-'7¥¢' => -1000000000000 - unpack('q', stream_get_contents($stream, 8))[1],
+'7¥¢' => self::deserialize_peerChannel($stream),
 '¡Ïr0' => self::deserialize_type_Peer(self::gzdecode($stream)),
 default => self::err($stream)
 }
