@@ -1881,6 +1881,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             ],
         );
     }
+    /** @internal */
     public function getInputDialogPeer(mixed $id): array
     {
         return ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)];

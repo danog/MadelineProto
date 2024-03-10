@@ -479,7 +479,7 @@ final class Blacklist {
             }
             $name = StrTools::toCamelCase($name);
             $name = str_ireplace(['mtproto', 'api'], ['MTProto', 'API'], $name);
-            $doc = 'public ';
+            $doc = 'final public ';
             if ($static) {
                 $doc .= 'static ';
             }
