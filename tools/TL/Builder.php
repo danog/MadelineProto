@@ -40,6 +40,7 @@ final class Builder
     private readonly array $idByPredicate;
     private readonly array $typeByPredicate;
     private readonly array $constructorByPredicate;
+    private readonly array $methodVectorTypes;
     private $output;
     public function __construct(
         TLSchema $settings,
@@ -68,17 +69,20 @@ final class Builder
                     $param['type'] = 'inflated';
                 }
 
-                if ($constructor['predicate'] === 'rpc_result' && $param['name'] === 'result')  {
-                    $param['type'] = 'MethodResult';
-                }
-
                 if ($param['name'] === 'random_bytes') {
                     $param['type'] = 'random_bytes';
+                }
+
+                if (isset($param['subtype'])) {
+                    $param['type'] = match ($param['type']) {
+                        'Vector t' => "Vector<{$param['subtype']}>",
+                        'vector' => "vector<{$param['subtype']}>",
+                    };
                 }
             }
 
             if (isset($constructor['layer'])) {
-                $constructor['predicate'] .= '_'.$constructor['layer'];
+                continue;
             }
             $constructor['id'] = $id;
 
@@ -87,15 +91,39 @@ final class Builder
             $typeByPredicate[$constructor['predicate']] = $constructor['type'];
             $byType[$constructor['type']][$id]= $constructor;
         }
-        $this->byType = $byType;
         $this->idByPredicate = $idByPredicate;
         $this->typeByPredicate = $typeByPredicate;
         $this->constructorByPredicate = $constructorByPredicate;
+
+        $methodConstructors = [];
+        $methodVectorTypes = [];
+        foreach ($this->TL->getMethods()->by_id as $c) {
+            ['type' => $type, 'method' => $name, 'encrypted' => $encrypted] = $c;
+            if (!$encrypted) {
+                continue;
+            }
+            // TODO
+            if ($type === 'X') {
+                continue;
+            }
+            if (isset($c['subtype'])) {
+                $methodVectorTypes[$name] = match ($c['type']) {
+                    'Vector t' => "Vector<{$c['subtype']}>",
+                    'vector' => "vector<{$c['subtype']}>",
+                };
+                continue;
+            }
+            $methodConstructors = array_merge($methodConstructors, $byType[$type]);
+        }
+
+        $byType['MethodResult'] = $methodConstructors;
+        $this->methodVectorTypes = $methodVectorTypes;
+        $this->byType = $byType;
     }
 
     private static function escapeConstructorName(array $constructor): string
     {
-        return str_replace(['.', ' '], '___', $constructor['predicate']).(isset($constructor['layer']) ?'_'.$constructor['layer'] : '');
+        return str_replace(['.', ' '], '___', $constructor['predicate']);
     }
     private static function escapeTypeName(string $name): string
     {
@@ -135,7 +163,22 @@ final class Builder
             $result .= $this->buildConstructor($predicate);
             $result .= ",\n";
         }
-        $result .= $this->idByPredicate['gzip_packed']." => ".$this->methodCall("deserialize$typeMethod", 'self::gzdecode($stream)').",\n";
+        if ($type === 'MethodResult') {
+            $result .= $this->idByPredicate['gzip_packed']." => ".$this->methodCall(
+                "deserialize$typeMethod",
+                'self::gzdecode($stream), $method'
+            ).",\n";
+            $result .= $this->idByPredicate['vector']." => match (\$method) {\n";
+            foreach ($this->methodVectorTypes as $method => $type) {
+                $result .= var_export($method, true) . ' => '.$this->buildType($type).",\n";
+            }
+            $result .= "},\n";
+        } else {
+            $result .= $this->idByPredicate['gzip_packed']." => ".$this->methodCall(
+                "deserialize$typeMethod",
+                'self::gzdecode($stream)'
+            ).",\n";
+        }
         $result .= "default => self::err(\$stream)\n";
         return $result."}\n";
     }
@@ -148,7 +191,25 @@ final class Builder
             'flags' => $flags,
             'params' => $params,
         ] = $constructor;
-        if ($flags) {
+
+        if ($predicate === 'rpc_result') {
+            $result = "\$tmp = ['_' => '$predicate', 'req_msg_id' => \$id = {$this->buildType('long')}];\n";
+            $result .= '$message = $this->connection->outgoing_messages[$id];
+            $method = $message->constructor;
+            if (isset($this->beforeMethodResponseDeserialization[$method])) {
+                foreach ($this->beforeMethodResponseDeserialization[$method] as $callback) {
+                    $callback($method);
+                }
+            }
+            $tmp["result"] = '.$this->buildType('MethodResult').';
+            if (isset($this->afterMethodResponseDeserialization[$method])) {
+                foreach ($this->afterMethodResponseDeserialization[$method] as $callback) {
+                    $callback($tmp);
+                }
+            }
+            return $tmp;
+            ';
+        } elseif ($flags) {
             $result = $this->buildConstructorFull($predicate, $params, $flags);
         } else {
             $result = $this->buildConstructorShort($predicate, $params, $flags);
@@ -159,11 +220,11 @@ final class Builder
         }
 
         $pre = '';
-        foreach ($this->TL->beforeConstructorDeserialization as $closure) {
+        foreach ($this->TL->beforeConstructorDeserialization[$predicate] ?? [] as $closure) {
             $pre .= self::methodFromClosure($closure)."('$predicate');\n";
         }
         $result = $pre.$result;
-        foreach ($this->TL->afterConstructorDeserialization as $closure) {
+        foreach ($this->TL->afterConstructorDeserialization[$predicate] ?? [] as $closure) {
             $result .= self::methodFromClosure($closure)."(\$tmp);\n";
         }
 
@@ -185,7 +246,7 @@ final class Builder
         foreach ($params as $param) {
             $name = $param['name'];
             if (!isset($param['pow'])) {
-                $code = $this->buildParam($param);
+                $code = $this->buildType($param['type']);
 
                 if (isset($flagNames[$name])) {
                     $result .= "\$$name = $code;\n";
@@ -199,7 +260,7 @@ final class Builder
                 $result .= "\$tmp['$name'] = $flag;\n";
                 continue;
             }
-            $code = $this->buildParam($param);
+            $code = $this->buildType($param['type']);
             $result .= "if ($flag) \$tmp['$name'] = $code;\n";
         }
         return "$result\nreturn \$tmp;";
@@ -208,7 +269,7 @@ final class Builder
     private function buildConstructorShort(string $predicate, array $params = []): string
     {
         if ($predicate === 'dataJSON') {
-            return 'json_decode('.$this->buildParam(['type' => 'string']).', true, 512, \\JSON_THROW_ON_ERROR)';
+            return 'json_decode('.$this->buildType('string').', true, 512, \\JSON_THROW_ON_ERROR)';
         }
         if ($predicate === 'jsonNull') {
             return 'null';
@@ -222,7 +283,7 @@ final class Builder
             $result .= "'_' => '$predicate',\n";
         }
         foreach ($params as $param) {
-            $code = $this->buildParam($param);
+            $code = $this->buildType($param['type']);
 
             if ($superBare) {
                 $result .= $code;
@@ -241,13 +302,49 @@ final class Builder
         return $result;
     }
 
-    private function buildParam(array $param): string
+    private array $createdVectors = [];
+    private function buildVector(string $type, bool $bare, ?string $payload = null): string
     {
-        if (isset($param['subtype'])) {
-            return $this->buildVector($param['subtype']);
+        if (!isset($this->createdVectors[$type])) {
+            $this->createdVectors[$type] = true;
+            if ($type === 'JSONObjectValue') {
+                $payload = '$result['.$this->buildType('string').'] = '.$this->buildType('JSONValue');
+            } elseif (isset($this->byType[$type])) {
+                $payload = '$result []= '.$this->buildTypes($this->byType[$type], $type);
+            } elseif ($payload === null) {
+                if ($type === '%MTMessage') {
+                    $type = 'MTmessage';
+                }
+                $payload = '$result []= '.$this->buildConstructor($type);
+            }
+            $this->m("deserialize_type_array_of_{$this->escapeTypeName($type)}", '
+                $result = [];
+                for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
+                    '.$payload.';
+                }
+                return $result;    
+            ', 'array', static: $type === 'JSONValue');
         }
+        return $this->methodCall(
+            "deserialize_type_array_of_{$this->escapeTypeName($type)}",
+            $bare ? '$stream' : 'match(stream_get_contents($stream, 4)) {    
+                '.$this->idByPredicate['vector'].' => $stream,    
+                '.$this->idByPredicate['gzip_packed'].' => self::gzdecode_vector($stream)
+            }'
+        );
+    }
 
-        return match ($type = $param['type']) {
+    private array $createdTypes = ['Object' => true];
+    private array $typeStack = [];
+    private function buildType(string $type): string
+    {
+        if (str_starts_with($type, 'Vector<')) {
+            return $this->buildVector(str_replace(['Vector<', '>'], '', $type), false);
+        }
+        if (str_starts_with($type, 'vector<')) {
+            return $this->buildVector(str_replace(['vector<', '>'], '', $type), true);
+        }
+        $tmp = match ($type) {
             '#' => "unpack('V', stream_get_contents(\$stream, 4))[1]",
             'int' => "unpack('l', stream_get_contents(\$stream, 4))[1]",
             'long' => "unpack('q', stream_get_contents(\$stream, 8))[1]",
@@ -263,46 +360,15 @@ final class Builder
                 $this->methodCall("deserialize_$type"),
             'inflated' =>
                 'new Types\Bytes(Tools::inflateStripped('.$this->methodCall("deserialize_string").'))',
-            default => $this->buildType($type)
+            default => null
         };
-    }
-
-    private array $createdVectors = [];
-    private function buildVector(string $type, ?string $payload = null): string
-    {
-        if (!isset($this->createdVectors[$type])) {
-            $this->createdVectors[$type] = true;
-            if ($type === 'JSONObjectValue') {
-                $payload = '$result['.$this->buildParam(['type' => 'string']).'] = '.$this->buildParam(['type' => 'JSONValue']);
-            } elseif (isset($this->byType[$type])) {
-                $payload = '$result []= '.$this->buildTypes($this->byType[$type], $type);
-            } elseif ($payload === null) {
-                if ($type === '%MTMessage') {
-                    $type = 'MTmessage';
-                }
-                $payload = '$result []= '.$this->buildConstructor($type);
-            }
-            $this->m("deserialize_type_array_of_{$this->escapeTypeName($type)}", '
-                $stream = match(stream_get_contents($stream, 4)) {    
-                    '.$this->idByPredicate['vector'].' => $stream,    
-                    '.$this->idByPredicate['gzip_packed'].' => self::gzdecode_vector($stream)
-                };
-                $result = [];
-                for ($x = unpack("V", stream_get_contents($stream, 4))[1]; $x > 0; --$x) {    
-                    '.$payload.';
-                }
-                return $result;    
-            ', 'array', static: $type === 'JSONValue');
+        if ($tmp !== null) {
+            return $tmp;
         }
-        return $this->methodCall("deserialize_type_array_of_{$this->escapeTypeName($type)}");
-    }
 
-    private array $createdTypes = ['Object' => true, 'MethodResult' => true];
-    private array $typeStack = [];
-    private function buildType(string $type): string
-    {
         if (!isset($this->createdTypes[$type])) {
             $this->createdTypes[$type] = true;
+
             $this->m(
                 "deserialize_type_{$this->escapeTypeName($type)}",
                 "return {$this->buildTypes($this->byType[$type], $type)};",
@@ -313,7 +379,7 @@ final class Builder
         $had = array_search($type, $this->typeStack) !== false;
         $this->typeStack []= $type;
         try {
-            if (!$had && $type !== 'MethodResult') {
+            if (!$had) {
                 return $this->buildTypes($this->byType[$type], $type);
             }
             return $this->methodCall("deserialize_type_{$this->escapeTypeName($type)}");
@@ -330,7 +396,7 @@ final class Builder
             : "self::$method($stream)";
     }
 
-    public function m(string $methodName, string $body, string $returnType = 'mixed', bool $public = false, bool $static = false): void
+    public function m(string $methodName, string $body, string $returnType = 'mixed', bool $public = false, bool $static = false, string $extraArg = ''): void
     {
         if (isset($this->methodsCreated[$methodName])) {
             throw new AssertionError("Already created $methodName!");
@@ -339,7 +405,7 @@ final class Builder
         $this->methodsCreated[$methodName] = $static;
         $public = $public ? 'public' : 'private';
         $static = $static ? 'static' : '';
-        $this->w("    $public $static function $methodName(mixed \$stream): $returnType {\n{$body}\n    }\n");
+        $this->w("    $public $static function $methodName(mixed \$stream$extraArg): $returnType {\n{$body}\n    }\n");
     }
     private function w(string $data): void
     {
@@ -431,19 +497,8 @@ final class Builder
         ', 'void');
 
         foreach (['int', 'long', 'double', 'strlong', 'string', 'bytes'] as $type) {
-            $this->buildVector($type, $this->buildParam(['type' => $type]));
+            $this->buildVector($type, false, '$result []= '.$this->buildType($type));
         }
-
-        $methodConstructors = [];
-        foreach ($this->TL->getMethods()->by_id as ['type' => $type]) {
-            // TODO
-            if ($type === 'X') {
-                continue;
-            }
-            $methodConstructors = array_merge($methodConstructors, $this->byType[$type]);
-        }
-
-        $this->m("deserialize_type_MethodResult", "return {$this->buildTypes($methodConstructors, 'MethodResult')};", 'mixed', false, static: false);
 
         $initial_constructors = array_filter(
             $this->constructorByPredicate,
