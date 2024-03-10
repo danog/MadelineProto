@@ -221,18 +221,18 @@ abstract class EventHandler extends AbstractAPI
                     }
                 };
             }
-            if ($this instanceof SimpleEventHandler) {
-                $last = null;
-                foreach (Tools::validateEventHandlerClass(static::class) as $issue) {
-                    if ($issue->severe) {
-                        $last = $issue;
-                    }
-                    $issue->log();
+
+            $last = null;
+            foreach (Tools::validateEventHandlerClass(static::class) as $issue) {
+                if ($issue->severe) {
+                    $last = $issue;
                 }
-                if ($last) {
-                    $last->throw();
-                }
+                $issue->log();
             }
+            if ($last) {
+                $last->throw();
+            }
+
             if ($has_any) {
                 /** @psalm-suppress UndefinedMethod */
                 $onAny = $this->onAny(...);
