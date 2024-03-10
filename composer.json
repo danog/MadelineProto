@@ -22,7 +22,6 @@
         "krakjoe/pthreads-polyfill": "*",
         "ext-pthreads": "*"
     },
-    "minimum-stability": "beta",
     "require": {
         "php-64bit": ">=8.1",
         "danog/primemodule": "^1",
@@ -36,7 +35,8 @@
         "ext-zlib": "*",
         "ext-fileinfo": "*",
         "amphp/amp": "^3",
-        "amphp/http-client": "^5.0.0-beta.17",
+        "amphp/http-client": "^5",
+        "amphp/websocket-client": "^2",
         "amphp/http": "^2",
         "amphp/socket": "^2",
         "amphp/dns": "^2",

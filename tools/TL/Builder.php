@@ -434,7 +434,7 @@ class Builder
             MinDatabase::class,
             SecurityException::class,
             AssertionError::class,
-            Lang::class
+            Lang::class,
         ] as $clazz) {
             $this->w("use {$clazz};\n");
         }
