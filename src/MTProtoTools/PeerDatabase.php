@@ -187,7 +187,11 @@ final class PeerDatabase implements TLCallback
                 $this->processUser($id);
             }
         }
-        return $this->db[$id];
+        $result = $this->db[$id];
+        if ($result !== null) {
+            $result['id'] = $id;
+        }
+        return $result;
     }
     public function isset(int $id): bool
     {
@@ -463,7 +467,7 @@ final class PeerDatabase implements TLCallback
         } else {
             $this->pendingDb[$chat] = [
                 '_' => 'channel',
-                'id' => DialogId::toSupergroupOrChannel($chat),
+                'id' => $chat,
             ];
             $this->processChat($chat);
         }
@@ -510,7 +514,7 @@ final class PeerDatabase implements TLCallback
                 || $chat['_'] === 'chatEmpty'
                 || $chat['_'] === 'chatForbidden'
             ) {
-                $existingChat = $this->db[-$chat['id']];
+                $existingChat = $this->db[$chat['id']];
                 if (!$existingChat || $existingChat != $chat) {
                     $this->API->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
                     if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
@@ -521,7 +525,7 @@ final class PeerDatabase implements TLCallback
                             'min' => $chat['min'] ?? false,
                         ];
                     }
-                    $this->db[-$chat['id']] = $chat;
+                    $this->db[$chat['id']] = $chat;
                 }
                 return;
             }
@@ -531,7 +535,7 @@ final class PeerDatabase implements TLCallback
             if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
                 throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
             }
-            $bot_api_id = DialogId::fromSupergroupOrChannel($chat['id']);
+            $bot_api_id = $chat['id'];
             $existingChat = $this->db[$bot_api_id];
             if (!isset($chat['access_hash']) && !($chat['min'] ?? false)) {
                 if (isset($existingChat['access_hash'])) {

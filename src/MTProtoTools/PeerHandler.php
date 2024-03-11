@@ -26,6 +26,7 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -136,7 +137,7 @@ trait PeerHandler
             if (isset($fwd['user_id']) && !($this->peerIsset($fwd['user_id']))) {
                 return false;
             }
-            if (isset($fwd['channel_id']) && !($this->peerIsset(DialogId::fromSupergroupOrChannel($fwd['channel_id'])))) {
+            if (isset($fwd['channel_id']) && !($this->peerIsset($fwd['channel_id']))) {
                 return false;
             }
         } catch (Exception $e) {
@@ -203,14 +204,14 @@ trait PeerHandler
                 case 'chat':
                 case 'chatForbidden':
                 case 'chatFull':
-                    return -$id['id'];
+                    return $id['id'];
                 case 'inputPeerChat':
                 case 'peerChat':
-                    return -$id['chat_id'];
+                    return $id['chat_id'];
                 case 'channelForbidden':
                 case 'channel':
                 case 'channelFull':
-                    return DialogId::fromSupergroupOrChannel($id['id']);
+                    return $id['id'];
                 case 'updatePeerBlocked':
                 case 'message':
                 case 'messageService':
@@ -220,9 +221,9 @@ trait PeerHandler
                         // It is a user, and it's not ourselves
                         || $id['peer_id'] !== $this->authorization['user']['id']
                     ) {
-                        return $this->getIdInternal($id['peer_id']);
+                        return $id['peer_id'];
                     }
-                    return $this->getIdInternal($id['from_id']);
+                    return $id['from_id'];
                 case 'peerChannel':
                 case 'inputChannel':
                 case 'inputPeerChannel':
@@ -242,7 +243,7 @@ trait PeerHandler
                 case 'updatePinnedChannelMessages':
                 case 'updateChannelMessageForwards':
                 case 'updateChannelUserTyping':
-                    return DialogId::fromSupergroupOrChannel($id['channel_id']);
+                    return $id['channel_id'];
                 case 'updateChatParticipants':
                     $id = $id['participants'];
                     // no break
@@ -252,7 +253,7 @@ trait PeerHandler
                 case 'updateChatParticipantAdmin':
                 case 'updateChatAdmins':
                 case 'updateChatPinnedMessage':
-                    return -$id['chat_id'];
+                    return $id['chat_id'];
                 case 'contact':
                 case 'updateUserTyping':
                 case 'updateUserStatus':
@@ -289,19 +290,6 @@ trait PeerHandler
                     return $this->getIdInternal($id['message']);
                 default:
                     throw new Exception('Invalid constructor given '.$id['_']);
-            }
-        }
-        if (\is_string($id)) {
-            if (str_contains($id, '#')) {
-                if (preg_match('/^channel#(\\d*)/', $id, $matches)) {
-                    return DialogId::fromSupergroupOrChannel((int) $matches[1]);
-                }
-                if (preg_match('/^chat#(\\d*)/', $id, $matches)) {
-                    return -((int) $matches[1]);
-                }
-                if (preg_match('/^user#(\\d*)/', $id, $matches)) {
-                    return (int) $matches[1];
-                }
             }
         }
         if (is_numeric($id)) {
@@ -502,7 +490,7 @@ trait PeerHandler
                 return ($constructor['self'] ?? false) ? ['_' => 'inputUserSelf'] : ['_' => 'inputUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
             if ($constructor['_'] === 'channel') {
-                return ['_' => 'inputChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
+                return ['_' => 'inputChannel', 'channel_id' => (-$constructor['id']) + Magic::ZERO_CHANNEL_ID, 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
         }
         if ($type === \danog\MadelineProto\API::INFO_TYPE_PEER) {
@@ -510,22 +498,14 @@ trait PeerHandler
                 return ($constructor['self'] ?? false) ? ['_' => 'inputPeerSelf'] : ['_' => 'inputPeerUser', 'user_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
             if ($constructor['_'] === 'channel') {
-                return ['_' => 'inputPeerChannel', 'channel_id' => $constructor['id'], 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
+                return ['_' => 'inputPeerChannel', 'channel_id' => (-$constructor['id']) + Magic::ZERO_CHANNEL_ID, 'access_hash' => $constructor['access_hash'], 'min' => $constructor['min'] ?? false];
             }
             if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
-                return ['_' => 'inputPeerChat', 'chat_id' => $constructor['id']];
+                return ['_' => 'inputPeerChat', 'chat_id' => -$constructor['id']];
             }
         }
         if ($type === \danog\MadelineProto\API::INFO_TYPE_ID) {
-            if ($constructor['_'] === 'user') {
-                return $constructor['id'];
-            }
-            if ($constructor['_'] === 'channel') {
-                return DialogId::fromSupergroupOrChannel($constructor['id']);
-            }
-            if ($constructor['_'] === 'chat' || $constructor['_'] === 'chatForbidden') {
-                return -$constructor['id'];
-            }
+            return $constructor['id'];
         }
         if ($type === \danog\MadelineProto\API::INFO_TYPE_TYPE) {
             if ($constructor['_'] === 'user') {
@@ -555,7 +535,7 @@ trait PeerHandler
             case 'chat':
             case 'chatForbidden':
                 $res['chat_id'] = $constructor['id'];
-                $res['bot_api_id'] = -$constructor['id'];
+                $res['bot_api_id'] = $constructor['id'];
                 $res['type'] = 'chat';
                 break;
             case 'channel':
@@ -564,7 +544,7 @@ trait PeerHandler
                     throw new PeerNotInDbException();
                 }
                 $res['channel_id'] = $constructor['id'];
-                $res['bot_api_id'] = DialogId::fromSupergroupOrChannel($constructor['id']);
+                $res['bot_api_id'] = $constructor['id'];
                 $res['type'] = $constructor['megagroup'] ?? false ? 'supergroup' : 'channel';
                 break;
             case 'channelForbidden':

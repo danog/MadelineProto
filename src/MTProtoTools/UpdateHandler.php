@@ -138,7 +138,7 @@ trait UpdateHandler
     private UpdateHandlerType $updateHandlerType = UpdateHandlerType::NOOP;
 
     private bool $got_state = false;
-    private CombinedUpdatesState $channels_state;
+    private CombinedUpdatesState $updateState;
     private DbArray $getUpdatesQueue;
     private int $getUpdatesQueueKey = 0;
     private SplQueue $updateQueue;
@@ -398,10 +398,10 @@ trait UpdateHandler
     public function loadUpdateState()
     {
         if (!$this->got_state) {
-            $this->channels_state->get(0, $this->getUpdatesState());
+            $this->updateState->get(0, $this->getUpdatesState());
             $this->got_state = true;
         }
-        return $this->channels_state->get(0);
+        return $this->updateState->get(0);
     }
     /**
      * Load channel state.
@@ -413,7 +413,7 @@ trait UpdateHandler
      */
     public function loadChannelState(?int $channelId = null, array $init = []): UpdatesState|array
     {
-        return $this->channels_state->get($channelId, $init);
+        return $this->updateState->get($channelId, $init);
     }
     /**
      * Get channel states.
@@ -422,7 +422,7 @@ trait UpdateHandler
      */
     public function getChannelStates(): CombinedUpdatesState
     {
-        return $this->channels_state;
+        return $this->updateState;
     }
     /**
      * Get update state.
@@ -593,14 +593,14 @@ trait UpdateHandler
                     $this,
                     $message,
                     $info,
-                    DialogId::fromSupergroupOrChannel($message['action']['channel_id']),
+                    $message['action']['channel_id'],
                 ),
                 'messageActionChannelMigrateFrom' => new DialogChannelMigrateFrom(
                     $this,
                     $message,
                     $info,
                     $message['action']['title'],
-                    -$message['action']['chat_id'],
+                    $message['action']['chat_id'],
                 ),
                 'messageActionGameScore' => new DialogGameScore(
                     $this,
@@ -907,11 +907,11 @@ trait UpdateHandler
                 $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
-                $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
+                $to_id = isset($updates['chat_id']) ? $updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
-                $message['from_id'] = $this->getInfo($from_id, API::INFO_TYPE_PEER);
-                $message['peer_id'] = $this->getInfo($to_id, API::INFO_TYPE_PEER);
+                $message['from_id'] = $from_id;
+                $message['peer_id'] = $to_id;
                 $this->populateMessageFlags($message);
                 return [['_' => 'updateNewMessage', 'message' => $message, 'pts' => $updates['pts'], 'pts_count' => $updates['pts_count']]];
             case 'updateNewOutgoingEncryptedMessage':
@@ -985,7 +985,7 @@ trait UpdateHandler
                 $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
-                $to_id = isset($updates['chat_id']) ? -$updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
+                $to_id = isset($updates['chat_id']) ? $updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {
                     $this->updaters[FeedLoop::GENERIC]->resume();
                     return;
@@ -1019,7 +1019,6 @@ trait UpdateHandler
         if (!DialogId::isSupergroupOrChannel($channelId)) {
             throw new Exception("You can only subscribe to channels or supergroups!");
         }
-        $channelId = DialogId::toSupergroupOrChannel($channelId);
         if (!$this->getChannelStates()->has($channelId)) {
             $this->loadChannelState($channelId, ['_' => 'updateChannelTooLong', 'pts' => 1]);
             $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);

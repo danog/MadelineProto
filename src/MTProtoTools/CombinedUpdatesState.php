@@ -30,30 +30,22 @@ final class CombinedUpdatesState
     /**
      * Update states.
      *
-     * @var array<UpdatesState>
+     * @var array<int, UpdatesState>
      */
     private array $states = [];
     /**
      * Constructor function.
-     *
-     * @param array $init Initial array of states
      */
-    public function __construct(array $init = [])
+    public function __construct()
     {
         $this->states[0] = new UpdatesState();
-        foreach ($init as $channel => $state) {
-            if (\is_array($state)) {
-                $state = new UpdatesState($state, $channel);
-            }
-            $this->states[$channel] = $state;
-        }
     }
     /**
      * Get or update multiple parameters.
      *
-     * @param  int                              $channel Channel to get info about (optional, if not provided returns the entire info array)
+     * @param  ?int                              $channel Channel to get info about (optional, if not provided returns the entire info array)
      * @param  array                            $init    Parameters to update
-     * @return UpdatesState|array<UpdatesState>
+     * @return ($channel is null ? array<int, UpdatesState> : UpdatesState)
      */
     public function get(?int $channel = null, array $init = []): UpdatesState|array
     {
@@ -84,15 +76,5 @@ final class CombinedUpdatesState
     public function has(int $channel): bool
     {
         return isset($this->states[$channel]);
-    }
-    /**
-     * Are we currently busy?
-     *
-     * @param int       $channel Channel to get info about
-     * @param null|bool $set     Busy flag to set before returning
-     */
-    public function syncLoading(int $channel, ?bool $set = null): bool
-    {
-        return $this->get($channel)->syncLoading($set);
     }
 }

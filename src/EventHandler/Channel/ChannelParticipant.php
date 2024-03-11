@@ -57,7 +57,7 @@ final class ChannelParticipant extends Update
     {
         parent::__construct($API);
         $this->viaChatlist = $rawChannelParticipant['via_chatlist'];
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawChannelParticipant['channel_id']);
+        $this->chatId = $rawChannelParticipant['channel_id'];
         $this->date = $rawChannelParticipant['date'];
         $this->actorId = $rawChannelParticipant['actor_id'];
         $this->userId = $rawChannelParticipant['user_id'];

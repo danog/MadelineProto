@@ -106,7 +106,7 @@ trait BotAPIFiles
                 if ($photoSize->getDialogId() < 0) {
                     $res['Chat'] = [
                         '_' => $photoSize->getDialogId() < -1000000000000 ? 'channel' : 'chat',
-                        'id' => $photoSize->getDialogId() < -1000000000000 ? DialogId::toSupergroupOrChannel($photoSize->getDialogId()) : -$photoSize->getDialogId(),
+                        'id' => $photoSize->getDialogId(),
                         'access_hash' => $photoSize->getDialogAccessHash(),
                         'photo' => [
                             '_' => 'chatPhoto',

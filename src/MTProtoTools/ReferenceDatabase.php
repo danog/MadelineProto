@@ -319,11 +319,11 @@ final class ReferenceDatabase implements TLCallback
                 break;
             case 'chatFull':
             case 'chat':
-                $origin['peer'] = -$data['id'];
+                $origin['peer'] = $data['id'];
                 break;
             case 'channelFull':
             case 'channel':
-                $origin['peer'] = DialogId::fromSupergroupOrChannel($data['id']);
+                $origin['peer'] = $data['id'];
                 break;
             case 'document':
                 foreach ($data['attributes'] as $attribute) {

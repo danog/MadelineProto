@@ -38,7 +38,7 @@ final class MessageForwards extends Update
     public function __construct(MTProto $API, array $rawMessageViews)
     {
         parent::__construct($API);
-        $this->chatId = DialogId::fromSupergroupOrChannel($rawMessageViews['channel_id']);
+        $this->chatId = $rawMessageViews['channel_id'];
         $this->id = $rawMessageViews['id'];
         $this->forwards = $rawMessageViews['forwards'];
     }

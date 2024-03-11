@@ -843,9 +843,29 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->updateQueue = $q;
         }
 
+        if (isset($this->channels_state)) {
+            $this->updateState = new CombinedUpdatesState;
+            foreach ($this->channels_state as $channelId => $state) {
+                $channelId = \danog\MadelineProto\MTProtoTools\DialogId::fromSupergroupOrChannel($channelId);
+                $this->updateState->get($channelId)->update(
+                    $channelId ? [
+                        'pts' => $state->pts(),
+                        'qts' => $state->qts(),
+                        'seq' => $state->seq(),
+                        'date' => $state->date(),
+                    ] : [
+                        'pts' => $state->pts()
+                    ]
+                );
+            }
+            unset($this->channels_state);
+            unset($this->feeders);
+            unset($this->updaters);
+        }
+
         $this->acceptChatMutex ??= new LocalKeyedMutex;
         $this->confirmChatMutex ??= new LocalKeyedMutex;
-        $this->channels_state ??= new CombinedUpdatesState;
+        $this->updateState ??= new CombinedUpdatesState;
         $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;
 
@@ -881,19 +901,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->TL->init($this->settings->getSchema(), $callbacks);
         }
 
-        $this->channels_state->get(FeedLoop::GENERIC);
-        foreach ($this->channels_state->get() as $state) {
-            $channelId = $state->getChannel();
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
+        $this->updateState->get(FeedLoop::GENERIC);
+        foreach ($this->updateState->get() as $state) {
+            $channelId = $state->channelId;
+            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
+            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
         }
-        if (!isset($this->seqUpdater)) {
-            $this->seqUpdater = new SeqLoop($this);
-        }
+        $this->seqUpdater ??= new SeqLoop($this);
     }
 
     /**
@@ -1056,11 +1070,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
-        if (isset($this->channels_state)) {
-            $channelIds = [];
-            foreach ($this->channels_state->get() as $state) {
-                $channelIds[] = $state->getChannel();
-            }
+        if (isset($this->updateState)) {
+            $channelIds = array_keys($this->updateState->get());
             sort($channelIds);
             foreach ($channelIds as $channelId) {
                 if (isset($this->feeders[$channelId])) {
@@ -1245,14 +1256,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
+        $new = new CombinedUpdatesState;
         $channelIds = [];
-        $newStates = [];
-        foreach ($this->channels_state->get() as $state) {
-            $channelIds[] = $state->getChannel();
-            $channelId = $state->getChannel();
+        foreach ($this->updateState->get() as $state) {
+            $channelIds[] = $state->channelId;
+            $channelId = $state->channelId;
             $pts = $state->pts();
             $pts = $channelId ? max(1, $pts - 1000000) : ($pts > 4000000 ? $pts - 1000000 : max(1, $pts - 1000000));
-            $newStates[$channelId] = new UpdatesState(['pts' => $pts], $channelId);
+            $new->get($channelId, ['pts' => $pts]);
         }
         sort($channelIds);
         foreach ($channelIds as $channelId) {
@@ -1263,7 +1274,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $this->updaters[$channelId]->stop();
             }
         }
-        $this->channels_state->__construct($newStates);
+        $this->updateState = $new;
         $this->startUpdateSystem();
     }
     /**
@@ -1279,19 +1290,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             return;
         }
         $this->logger('Starting update system');
-        $this->channels_state->get(FeedLoop::GENERIC);
-        $channelIds = [];
-        foreach ($this->channels_state->get() as $state) {
-            $channelIds[] = $state->getChannel();
-        }
-        sort($channelIds);
+        $this->updateState->get(FeedLoop::GENERIC);
+        $channelIds = array_keys($this->updateState->get());
         foreach ($channelIds as $channelId) {
-            if (!isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId] = new FeedLoop($this, $channelId);
-            }
-            if (!isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId] = new UpdateLoop($this, $channelId);
-            }
+            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
+            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
             $this->feeders[$channelId]->start();
             if (isset($this->feeders[$channelId])) {
                 $this->feeders[$channelId]->resume();

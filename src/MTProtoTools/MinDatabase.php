@@ -151,10 +151,10 @@ final class MinDatabase implements TLCallback
         switch ($location['_']) {
             case 'messageFwdHeader':
                 if (isset($location['from_id'])) {
-                    $peers[$this->API->getIdInternal($location['from_id'])] = true;
+                    $peers[$location['from_id']] = true;
                 }
                 if (isset($location['channel_id'])) {
-                    $peers[DialogId::fromSupergroupOrChannel($location['channel_id'])] = true;
+                    $peers[$location['channel_id']] = true;
                 }
                 break;
             case 'messageActionChatCreate':
@@ -164,9 +164,9 @@ final class MinDatabase implements TLCallback
                 }
                 break;
             case 'message':
-                $peers[$this->API->getIdInternal($location['peer_id'])] = true;
+                $peers[$location['peer_id']] = true;
                 if (isset($location['from_id'])) {
-                    $peers[$this->API->getIdInternal($location['from_id'])] = true;
+                    $peers[$location['from_id']] = true;
                 }
                 break;
             default:

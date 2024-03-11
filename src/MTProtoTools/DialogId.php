@@ -44,6 +44,8 @@ enum DialogId
     /**
      * Convert MTProto secret chat ID to bot API secret chat ID.
      *
+     * @internal
+     * 
      * @param int $id MTProto secret chat ID
      *
      * @return int Bot API secret chat ID
@@ -55,6 +57,8 @@ enum DialogId
     /**
      * Convert bot API secret chat ID to MTProto secret chat ID.
      *
+     * @internal
+     * 
      * @param int $id Bot API secret chat ID
      *
      * @return int MTProto secret chat ID
@@ -67,6 +71,8 @@ enum DialogId
 
     /**
      * Convert MTProto channel ID to bot API channel ID.
+     * 
+     * @internal
      *
      * @param int $id MTProto channel ID
      */
@@ -78,6 +84,8 @@ enum DialogId
     /**
      * Convert bot API channel ID to MTProto channel ID.
      *
+     * @internal
+     * 
      * @param int $id Bot API channel ID
      */
     public static function toSupergroupOrChannel(int $id): int

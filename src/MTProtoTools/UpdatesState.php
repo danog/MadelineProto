@@ -44,23 +44,13 @@ final class UpdatesState
      */
     private int $date = 1;
     /**
-     * Channel ID.
-     *
-     */
-    private int $channelId;
-    /**
-     * Is busy?
-     */
-    private bool $syncLoading = false;
-    /**
      * Init function.
      *
      * @param array $init      Initial parameters
      * @param int   $channelId Channel ID
      */
-    public function __construct(array $init = [], int $channelId = 0)
+    public function __construct(array $init = [], public readonly int $channelId = 0)
     {
-        $this->channelId = $channelId;
         $this->update($init);
     }
     /**
@@ -78,25 +68,6 @@ final class UpdatesState
     public function isChannel(): bool
     {
         return (bool) $this->channelId;
-    }
-    /**
-     * Get the channel ID.
-     */
-    public function getChannel(): int
-    {
-        return $this->channelId;
-    }
-    /**
-     * Are we currently busy?
-     *
-     * @param bool $set Update the currently busy flag
-     */
-    public function syncLoading(?bool $set = null): bool
-    {
-        if ($set !== null) {
-            $this->syncLoading = $set;
-        }
-        return $this->syncLoading;
     }
     /**
      * Update multiple parameters.
