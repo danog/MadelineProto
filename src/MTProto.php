@@ -637,7 +637,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Update state
             'got_state',
-            'channels_state',
+            'updateState',
             'msg_ids',
 
             // Version
