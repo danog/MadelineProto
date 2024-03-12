@@ -138,6 +138,8 @@ trait UpdateHandler
     private UpdateHandlerType $updateHandlerType = UpdateHandlerType::NOOP;
 
     private bool $got_state = false;
+    /** @deprecated */
+    private CombinedUpdatesState $channels_state;
     private CombinedUpdatesState $updateState;
     private DbArray $getUpdatesQueue;
     private int $getUpdatesQueueKey = 0;
@@ -907,7 +909,7 @@ trait UpdateHandler
                 $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
-                $to_id = isset($updates['chat_id']) ? $updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
+                $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
                 $message['_'] = 'message';
                 $message['from_id'] = $from_id;
@@ -985,7 +987,7 @@ trait UpdateHandler
                 $updates = array_merge($updates['request']['body'] ?? [], $updates);
                 unset($updates['request']);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
-                $to_id = isset($updates['chat_id']) ? $updates['chat_id'] : ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
+                $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {
                     $this->updaters[FeedLoop::GENERIC]->resume();
                     return;

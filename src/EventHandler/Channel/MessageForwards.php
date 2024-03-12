@@ -18,7 +18,6 @@ namespace danog\MadelineProto\EventHandler\Channel;
 
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * Indicates that the forward counter of a message in a channel has changed.

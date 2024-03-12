@@ -1042,7 +1042,7 @@ final class TL implements TLInterface
         ) {
             $x['id'] = -$x['id'];
         }
-    
+
         if ($x['_'] === 'dataJSON') {
             return json_decode($x['data'], true);
         } elseif ($constructorData['type'] === 'JSONValue') {

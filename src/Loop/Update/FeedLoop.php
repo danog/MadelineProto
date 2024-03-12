@@ -25,7 +25,6 @@ use danog\MadelineProto\AsyncTools;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
 
 /**

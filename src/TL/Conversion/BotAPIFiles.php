@@ -27,7 +27,6 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Lang;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 use const danog\Decoder\ANIMATION;
 use const danog\Decoder\AUDIO;

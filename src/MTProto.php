@@ -56,7 +56,6 @@ use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
-use danog\MadelineProto\MTProtoTools\UpdatesState;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
@@ -845,8 +844,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
         if (isset($this->channels_state)) {
             $this->updateState = new CombinedUpdatesState;
-            foreach ($this->channels_state as $channelId => $state) {
-                $channelId = \danog\MadelineProto\MTProtoTools\DialogId::fromSupergroupOrChannel($channelId);
+            foreach ($this->channels_state->get() as $channelId => $state) {
+                if ($channelId !== 0) {
+                    $channelId = \danog\MadelineProto\MTProtoTools\DialogId::fromSupergroupOrChannel($channelId);
+                }
                 $this->updateState->get($channelId)->update(
                     $channelId ? [
                         'pts' => $state->pts(),
@@ -854,13 +855,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                         'seq' => $state->seq(),
                         'date' => $state->date(),
                     ] : [
-                        'pts' => $state->pts()
+                        'pts' => $state->pts(),
                     ]
                 );
             }
-            unset($this->channels_state);
-            unset($this->feeders);
-            unset($this->updaters);
+            unset($this->channels_state, $this->feeders, $this->updaters);
+
         }
 
         $this->acceptChatMutex ??= new LocalKeyedMutex;
