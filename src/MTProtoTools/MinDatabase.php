@@ -67,7 +67,7 @@ final class MinDatabase implements TLCallback
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true],
+        'db' => ['innerMadelineProto' => true, 'intKey' => true],
     ];
 
     private LocalKeyedMutex $localMutex;

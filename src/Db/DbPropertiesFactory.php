@@ -20,6 +20,7 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\SerializerType;
+use danog\MadelineProto\Settings\Database\SqlAbstract;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
@@ -47,7 +48,12 @@ final class DbPropertiesFactory
                 ),
                 'innerMadelineProto' => false,
                 'cacheTtl' => $dbSettings->getCacheTtl(),
+                'intKey' => false,
             ], $config);
+
+            if ($dbSettings instanceof SqlAbstract) {
+                $dbSettings->intKey = $config['intKey'];
+            }
 
             if ($config['innerMadelineProto']
                 && $config['serializer'] !== SerializerType::IGBINARY

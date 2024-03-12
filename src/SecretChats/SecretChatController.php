@@ -61,9 +61,9 @@ final class SecretChatController implements Stringable
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'incoming' => ['innerMadelineProto' => true],
-        'outgoing' => ['innerMadelineProto' => true],
-        'randomIdMap' => ['innerMadelineProto' => true],
+        'incoming' => ['innerMadelineProto' => true, 'intKey' => true],
+        'outgoing' => ['innerMadelineProto' => true, 'intKey' => true],
+        'randomIdMap' => ['innerMadelineProto' => true, 'intKey' => true],
     ];
 
     /**

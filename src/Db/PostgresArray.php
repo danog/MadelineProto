@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Db;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\Database\Postgres as DatabasePostgres;
 use danog\MadelineProto\Settings\Database\SerializerType;
 
 /**
@@ -90,14 +91,18 @@ final class PostgresArray extends PostgresArrayBytea
     protected function prepareTable(): void
     {
         //Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
-
+        \assert($this->dbSettings instanceof DatabasePostgres);
+        $keyType = $this->dbSettings->intKey ? 'BIGINT' : 'VARCHAR(255)';
         $this->db->query("
             CREATE TABLE IF NOT EXISTS \"{$this->table}\"
             (
-                \"key\" VARCHAR(255) PRIMARY KEY NOT NULL,
+                \"key\" $keyType PRIMARY KEY NOT NULL,
                 \"value\" BYTEA NOT NULL
             );            
         ");
+        if ($this->dbSettings->intKey) {
+            $this->db->query("ALTER TABLE \"{$this->table}\" MODIFY \"key\" BIGINT");
+        }
     }
 
     protected function moveDataFromTableToTable(string $from, string $to): void

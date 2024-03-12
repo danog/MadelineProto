@@ -380,7 +380,7 @@ trait PeerHandler
         if (is_numeric($id)) {
             $id = (int) $id;
             Assert::true($id !== 0, "An invalid ID was specified!");
-            if (DialogId::getType($id) === DialogId::SECRET_CHAT) {
+            if (DialogId::isSecretChat($id)) {
                 $id = $this->getSecretChat($id)->otherID;
             }
             if (!$this->peerDatabase->isset($id)) {
@@ -645,7 +645,7 @@ trait PeerHandler
     public function getFullInfo(mixed $id): array
     {
         $partial = $this->getInfo($id);
-        if (DialogId::getType($partial['bot_api_id']) === DialogId::SECRET_CHAT) {
+        if (DialogId::isSecretChat($partial['bot_api_id'])) {
             return $partial;
         }
         $full = $this->peerDatabase->getFull($partial['bot_api_id']);

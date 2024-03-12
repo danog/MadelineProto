@@ -388,9 +388,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @see DbPropertiesFactory
      */
     protected static array $dbProperties = [
-        'sponsoredMessages' => ['innerMadelineProto' => true],
+        'sponsoredMessages' => ['innerMadelineProto' => true, 'intKey' => true],
         'channelParticipants' => ['innerMadelineProto' => true],
-        'getUpdatesQueue' => ['innerMadelineProto' => true],
+        'getUpdatesQueue' => ['innerMadelineProto' => true, 'intKey' => true],
         'session' => ['innerMadelineProto' => true, 'enableCache' => false, 'optimizeIfWastedGtMb' => 1],
     ];
 

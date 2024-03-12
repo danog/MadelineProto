@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Sql\Result;
+use Amp\Sql\SqlResult;
 use danog\MadelineProto\Db\Driver\Mysql;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -88,7 +88,7 @@ final class MysqlArray extends SqlArray
      *
      * @psalm-param self::STATEMENT_* $stmt
      */
-    protected function execute(string $sql, array $params = []): Result
+    protected function execute(string $sql, array $params = []): SqlResult
     {
         foreach ($params as $key => $value) {
             $value = $this->pdo->quote($value);
@@ -115,10 +115,13 @@ final class MysqlArray extends SqlArray
     protected function prepareTable(): void
     {
         //Logger::log("Creating/checking table {$this->table}", Logger::WARNING);
+        \assert($this->dbSettings instanceof DatabaseMysql);
+        $keyType = $this->dbSettings->intKey ? 'BIGINT' : 'VARCHAR(255)';
+
         $this->db->query("
             CREATE TABLE IF NOT EXISTS `{$this->table}`
             (
-                `key` VARCHAR(255) NOT NULL,
+                `key` $keyType NOT NULL,
                 `value` LONGBLOB NULL,
                 `ts` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (`key`)
@@ -127,7 +130,9 @@ final class MysqlArray extends SqlArray
             CHARACTER SET 'utf8mb4' 
             COLLATE 'utf8mb4_general_ci'
         ");
-        \assert($this->dbSettings instanceof DatabaseMysql);
+        if ($this->dbSettings->intKey) {
+            $this->db->query("ALTER TABLE `{$this->table}` MODIFY `key` BIGINT");
+        }
         if ($this->dbSettings->getOptimizeIfWastedGtMb() !== null) {
             try {
                 $database = $this->dbSettings->getDatabase();

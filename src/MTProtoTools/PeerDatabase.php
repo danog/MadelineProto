@@ -86,10 +86,12 @@ final class PeerDatabase implements TLCallback
         'db' => [
             'innerMadelineProto' => true,
             'table' => 'MTProto_chats',
+            'intKey' => true,
         ],
         'fullDb' => [
             'innerMadelineProto' => true,
             'table' => 'MTProto_full_chats',
+            'intKey' => true,
         ],
         'usernames' => [
             'innerMadelineProto' => true,

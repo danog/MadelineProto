@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Sql\Pool;
-use Amp\Sql\Result;
+use Amp\Sql\SqlConnectionPool;
+use Amp\Sql\SqlResult;
 
 /**
  * Generic SQL database backend.
@@ -30,7 +30,7 @@ use Amp\Sql\Result;
  */
 abstract class SqlArray extends DriverArray
 {
-    protected Pool $db;
+    protected SqlConnectionPool $db;
 
     protected const SQL_GET = 0;
     protected const SQL_SET = 1;
@@ -148,7 +148,7 @@ abstract class SqlArray extends DriverArray
      *
      * @psalm-param self::STATEMENT_* $stmt
      */
-    protected function execute(string $sql, array $params = []): Result
+    protected function execute(string $sql, array $params = []): SqlResult
     {
         return $this->db->prepare($sql)->execute($params);
     }
