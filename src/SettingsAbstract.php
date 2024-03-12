@@ -30,7 +30,7 @@ abstract class SettingsAbstract
     public function __sleep()
     {
         $result = [];
-        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
+        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PROTECTED) as $property) {
             $result []= $property->getName();
         }
         return $result;
@@ -44,7 +44,7 @@ abstract class SettingsAbstract
     {
         $class = new ReflectionClass($other);
         $defaults = $class->getDefaultProperties();
-        foreach ($class->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
+        foreach ($class->getProperties(ReflectionProperty::IS_PROTECTED) as $property) {
             $name = $property->getName();
             if ($name === 'changed') {
                 continue;
