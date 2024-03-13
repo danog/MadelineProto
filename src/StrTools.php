@@ -52,6 +52,8 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
+     *
+     * @return int<0, max>
      */
     public static function mbStrlen(string $text): int
     {
@@ -84,6 +86,80 @@ abstract class StrTools extends Extension
             'UTF-16',
         );
     }
+
+    /**
+     * Telegram UTF-8 multibyte strrpos.
+     *
+     * @param string   $haystack haystack
+     * @param string   $needle   needle
+     * @param integer  $offset   Offset
+     *
+     * @return int<0, max>|false
+     */
+    public static function mbStrrpos(string $haystack, string $needle, int $offset = 0): false|int
+    {
+        if ($offset > 0) {
+            $offset = \strlen(self::mbSubstr($haystack, 0, $offset));
+        } elseif ($offset < 0) {
+            $offset = -\strlen(self::mbSubstr($haystack, $offset));
+        }
+        $pos = strrpos($haystack, $needle, $offset);
+        if ($pos === false) {
+            return false;
+        }
+
+        return self::mbStrlen(substr($haystack, 0, $pos));
+    }
+    /**
+     * Telegram UTF-8 multibyte strpos.
+     *
+     * @param string   $haystack haystack
+     * @param string   $needle   needle
+     * @param integer  $offset   Offset
+     *
+     * @return int<0, max>|false
+     */
+    public static function mbStrpos(string $haystack, string $needle, int $offset = 0): false|int
+    {
+        if ($offset > 0) {
+            $offset = \strlen(self::mbSubstr($haystack, 0, $offset));
+        } elseif ($offset < 0) {
+            $offset = -\strlen(self::mbSubstr($haystack, $offset));
+        }
+        $pos = strpos($haystack, $needle, $offset);
+        if ($pos === false) {
+            return false;
+        }
+
+        return self::mbStrlen(substr($haystack, $offset, $pos));
+    }
+
+    /**
+     * Telegram UTF-8 multibyte substr replace.
+     *
+     * @param string   $string        String
+     * @param string   $replacement   Replacement
+     * @param integer  $offset        Offset
+     * @param ?integer  $length        Length
+     */
+    public static function mbSubstrReplace(string $string, string $replacement, int $offset, ?int $length = null): string
+    {
+        if ($length) {
+            if ($length > 0) {
+                $length = \strlen(self::mbSubstr($string, $offset, $length));
+            } else { // < 0
+                $length = -\strlen(self::mbSubstr($string, $offset, $length));
+            }
+        }
+        if ($offset > 0) {
+            $offset = \strlen(self::mbSubstr($string, 0, $offset));
+        } elseif ($offset < 0) {
+            $offset = -\strlen(self::mbSubstr($string, $offset));
+        }
+
+        return substr_replace($string, $replacement, $offset, $length);
+    }
+
     /**
      * Telegram UTF-8 multibyte split.
      *

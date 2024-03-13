@@ -26,6 +26,23 @@ class EntitiesTest extends TestCase
         $this->assertEquals('a👍', StrTools::mbSubstr('a👍a👍', 3));
         $this->assertEquals('🇺🇦', StrTools::mbSubstr('🇺🇦🇺🇦', 4));
 
+        $this->assertEquals('te', StrTools::mbSubstrReplace('test', '', 2));
+        $this->assertEquals('aяaa', StrTools::mbSubstrReplace('aяaя', 'a', 3));
+        $this->assertEquals('a👍', StrTools::mbSubstrReplace('a👍a👍', '👍', 1));
+        $this->assertEquals('aя', StrTools::mbSubstrReplace('aяaя', 'я', 1));
+
+        $this->assertEquals(3, StrTools::mbStrrpos("Hello", "l"));
+        $this->assertEquals(4, StrTools::mbStrrpos("Hяllяo", "я"));
+        $this->assertEquals(7, StrTools::mbStrrpos("Hel👍lo👍", "👍"));
+        $this->assertEquals(8, StrTools::mbStrrpos("Hel👍яloя👍", "я"));
+        $this->assertFalse(StrTools::mbStrrpos("Hяllяo", "👍"));
+
+        $this->assertEquals(2, StrTools::mbStrpos("Hello", "l"));
+        $this->assertEquals(3, StrTools::mbStrpos("Helяlo", "я"));
+        $this->assertEquals(2, StrTools::mbStrpos("Heяlяlo", "я"));
+        $this->assertEquals(4, StrTools::mbStrpos("Hell👍o", "👍"));
+        $this->assertFalse(StrTools::mbStrpos("Hell👍o", "я"));
+
         $this->assertEquals(['te', 'st'], StrTools::mbStrSplit('test', 2));
         $this->assertEquals(['aя', 'aя'], StrTools::mbStrSplit('aяaя', 2));
         $this->assertEquals(['a👍', 'a👍'], StrTools::mbStrSplit('a👍a👍', 3));
