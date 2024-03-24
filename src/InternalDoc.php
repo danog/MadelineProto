@@ -1764,6 +1764,43 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->sendSticker($peer, $file, $callback, $fileName, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder, $forceResend, $cancellation);
     }
     /**
+     * Sends a video.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
+     * @param string                                                        $caption                Caption of document
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param integer|null                                                  $ttl                     Time to live
+     * @param boolean                                                       $spoiler                 Whether the message is a spoiler
+     * @param boolean                                                       $roundMessage            Whether the message should be round
+     * @param boolean                                                       $supportsStreaming        Whether the video supports streaming
+     * @param boolean                                                       $noSound                 Whether the video has no sound
+     * @param integer|null                                                  $duration                Duration of the video
+     * @param integer|null                                                  $width                   Width of the video
+     * @param integer|null                                                  $height                  Height of the video
+     * @param integer|null                                                  $replyToMsgId            ID of message to reply to.
+     * @param integer|null                                                  $topMsgId                ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup             Keyboard information.
+     * @param integer|string|null                                           $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate            Schedule date.
+     * @param boolean                                                       $silent                  Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $noForwards              Whether to disable forwards for this message.
+     * @param boolean                                                       $background              Send this message as background message
+     * @param boolean                                                       $clearDraft              Clears the draft field
+     * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation            Cancellation.
+     *
+     */
+    final public function sendVideo(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, bool $roundMessage = false, bool $supportsStreaming = false, bool $noSound = false, ?int $duration = null, ?int $width = null, ?int $height = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->sendVideo($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $ttl, $spoiler, $roundMessage, $supportsStreaming, $noSound, $duration, $width, $height, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $cancellation);
+    }
+    /**
      * Set NOOP update handler, ignoring all updates.
      */
     final public function setNoop(): void

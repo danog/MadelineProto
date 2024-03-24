@@ -29,6 +29,7 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
@@ -109,6 +110,7 @@ trait FilesAbstraction
             type: Document::class,
             mimeType: $mimeType,
             thumb: $thumb,
+            attributes: [],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -188,6 +190,7 @@ trait FilesAbstraction
             type: Photo::class,
             mimeType: 'image/jpeg',
             thumb: null,
+            attributes: [],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -262,6 +265,7 @@ trait FilesAbstraction
             type: Sticker::class,
             mimeType: 'image/webp',
             thumb: null,
+            attributes: [],
             peer: $peer,
             file: $file,
             caption: '',
@@ -285,6 +289,110 @@ trait FilesAbstraction
         );
     }
     /**
+     * Sends a video.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
+     * @param string                                                        $caption                Caption of document
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param integer|null                                                  $ttl                     Time to live
+     * @param boolean                                                       $spoiler                 Whether the message is a spoiler
+     * @param boolean                                                       $roundMessage            Whether the message should be round
+     * @param boolean                                                       $supportsStreaming        Whether the video supports streaming
+     * @param boolean                                                       $noSound                 Whether the video has no sound
+     * @param integer|null                                                  $duration                Duration of the video
+     * @param integer|null                                                  $width                   Width of the video
+     * @param integer|null                                                  $height                  Height of the video
+     * @param integer|null                                                  $replyToMsgId            ID of message to reply to.
+     * @param integer|null                                                  $topMsgId                ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup             Keyboard information.
+     * @param integer|string|null                                           $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate            Schedule date.
+     * @param boolean                                                       $silent                  Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $noForwards              Whether to disable forwards for this message.
+     * @param boolean                                                       $background              Send this message as background message
+     * @param boolean                                                       $clearDraft              Clears the draft field
+     * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation            Cancellation.
+     *
+     */
+    public function sendVideo(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb = null,
+        string $caption = '',
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $ttl = null,
+        bool $spoiler = false,
+        bool $roundMessage = false,
+        bool $supportsStreaming = true,
+        bool $noSound = false,
+        ?int $duration = null,
+        ?int $width = null,
+        ?int $height = null,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        if ($file instanceof Message) {
+            $file = $file->media;
+            if ($file === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
+
+        $attributes = [
+            'round_message' => $roundMessage,
+            'supports_streaming' => $supportsStreaming,
+            'no_sound' => $noSound,
+            'duration' => $duration,
+            'w' => $width,
+            'h' => $height,
+        ];
+
+        return $this->sendMedia(
+            type: Video::class,
+            mimeType: 'video/mp4',
+            thumb: $thumb,
+            attributes: $attributes,
+            peer: $peer,
+            file: $file,
+            caption: $caption,
+            parseMode: $parseMode,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: $ttl,
+            spoiler: $spoiler,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: false,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
+    /**
      * Sends a media.
      *
      * @param class-string<Media> $type
@@ -296,6 +404,7 @@ trait FilesAbstraction
         ?string $mimeType,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb,
+        array $attributes,
         string $caption,
         ParseMode $parseMode,
         ?callable $callback,
@@ -352,6 +461,17 @@ trait FilesAbstraction
         }
 
         $attributes = match ($type) {
+            Video::class => [
+                [
+                    '_' => 'documentAttributeVideo',
+                    'round_message' => $file->roundMessage ?? $attributes['round_message'],
+                    'supports_streaming' => $file->supportsStreaming ?? $attributes['supports_streaming'],
+                    'no_sound' => $file->noSound ?? $attributes['no_sound'],
+                    'duration' => $file->duration ?? $attributes['duration'],
+                    'w' => $file->width ?? $attributes['w'],
+                    'h' => $file->height ?? $attributes['h'],
+                ],
+            ],
             default => [],
         };
         $attributes[] = ['_' => 'documentAttributeFilename', 'file_name' => $fileName];
@@ -487,6 +607,16 @@ trait FilesAbstraction
                     'mime_type' => $mimeType,
                     'attributes' => $attributes,
                 ],
+                Video::class => [
+                    '_' => 'inputMediaUploadedDocument',
+                    'spoiler' => $spoiler,
+                    'ttl_seconds' => $ttl,
+                    'force_file' => false,
+                    'file' => $file,
+                    'thumb' => $thumb,
+                    'mime_type' => $mimeType,
+                    'attributes' => $attributes,
+                ],
                 default => [
                     '_' => 'inputMediaUploadedDocument',
                     'spoiler' => $spoiler,
@@ -501,7 +631,7 @@ trait FilesAbstraction
             if ($reuseId) {
                 $media['_'] = match ($type) {
                     Photo::class => 'inputMediaPhoto',
-                    Sticker::class, Document::class => 'inputMediaDocument',
+                    Sticker::class, Document::class, Video::class => 'inputMediaDocument',
                 };
                 $media['id'] = $reuseId;
             } else {
