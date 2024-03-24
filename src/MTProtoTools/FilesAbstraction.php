@@ -28,6 +28,7 @@ use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
@@ -209,7 +210,80 @@ trait FilesAbstraction
             cancellation: $cancellation
         );
     }
+    /**
+     * Sends a sticker.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $noForwards             Whether to disable forwards for this message.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation           Cancellation.
+     *
+     */
+    public function sendSticker(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $updateStickersetsOrder = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        if ($file instanceof Message) {
+            $file = $file->media;
+            if ($file === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
 
+        return $this->sendMedia(
+            type: Sticker::class,
+            mimeType: 'image/webp',
+            thumb: null,
+            peer: $peer,
+            file: $file,
+            caption: '',
+            parseMode: ParseMode::TEXT,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: null,
+            spoiler: false,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: $updateStickersetsOrder,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
     /**
      * Sends a media.
      *
@@ -227,7 +301,7 @@ trait FilesAbstraction
         ?callable $callback,
         ?string $fileName,
         ?int $ttl,
-        bool $spoiler,
+        ?bool $spoiler,
         ?int $replyToMsgId,
         ?int $topMsgId,
         ?array $replyMarkup,
@@ -407,6 +481,12 @@ trait FilesAbstraction
                     'file' => $file,
                     'ttl_seconds' => $ttl,
                 ],
+                Sticker::class => [
+                    '_' => 'inputMediaUploadedDocument',
+                    'file' => $file,
+                    'mime_type' => $mimeType,
+                    'attributes' => $attributes,
+                ],
                 default => [
                     '_' => 'inputMediaUploadedDocument',
                     'spoiler' => $spoiler,
@@ -421,7 +501,7 @@ trait FilesAbstraction
             if ($reuseId) {
                 $media['_'] = match ($type) {
                     Photo::class => 'inputMediaPhoto',
-                    Document::class => 'inputMediaDocument',
+                    Sticker::class, Document::class => 'inputMediaDocument',
                 };
                 $media['id'] = $reuseId;
             } else {
