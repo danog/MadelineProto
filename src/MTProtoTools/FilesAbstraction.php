@@ -599,7 +599,9 @@ trait FilesAbstraction
         } else {
 
             if ($type === Video::class) {
-                if ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
+                if (Process::start('ffmpeg -version')->join() !== 0) {
+                    $this->logger->logger('Install ffmpeg for video info extraction!');
+                } elseif ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
                     $file = $this->getStream($file, $cancellation);
                     $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
                     $process = Process::start($ffmpeg);
