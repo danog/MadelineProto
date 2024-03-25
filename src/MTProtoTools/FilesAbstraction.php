@@ -23,6 +23,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
@@ -40,6 +41,7 @@ use danog\MadelineProto\TL\Types\Bytes;
 use Webmozart\Assert\Assert;
 
 use function Amp\ByteStream\buffer;
+use function Amp\ByteStream\pipe;
 
 /**
  * Manages upload and download of files.
@@ -593,6 +595,35 @@ trait FilesAbstraction
                 'cancellation' => $cancellation,
             ];
         } else {
+
+            if ($type === Video::class) {
+                $file = $this->getStream($file, $cancellation);
+                if ($thumb === null) {
+                    $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
+                    $process = Process::start($ffmpeg);
+                    pipe($file, $process->getStdin());
+                    $thumb = buffer($process->getStdout());
+                    $thumb = new ReadableBuffer($thumb);
+                }
+                if ($attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
+                    $ffmpeg = 'ffmpeg -i pipe: 2>&1';
+                    $process = Process::start($ffmpeg);
+                    pipe($file, $process->getStdin());
+                    $output = buffer($process->getStdout());
+                    if (preg_match('/(\d{3,4})x(\d{3,4})/', $output, $whMatch) and preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})/', $output, $dMatch)) {
+                        $width = $whMatch[1];
+                        $height = $whMatch[2];
+                        $hours = (int) $dMatch[1];
+                        $minutes = (int) $dMatch[2];
+                        $seconds = (int) $dMatch[3];
+                        $duration = $hours * 3600 + $minutes * 60 + $seconds;
+                        $attributes[0]['w'] ??= $width;
+                        $attributes[0]['h'] ??= $height;
+                        $attributes[0]['duration'] ??= $duration;
+                    }
+                }
+            }
+
             $method = 'messages.sendMedia';
             $media = match ($type) {
                 Photo::class => [
@@ -609,6 +640,7 @@ trait FilesAbstraction
                 ],
                 Video::class => [
                     '_' => 'inputMediaUploadedDocument',
+                    'nosound_video' => $attributes[0]['no_sound'],
                     'spoiler' => $spoiler,
                     'ttl_seconds' => $ttl,
                     'force_file' => false,
