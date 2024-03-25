@@ -599,26 +599,21 @@ trait FilesAbstraction
         } else {
 
             if ($type === Video::class) {
-                $file = $this->getStream($file, $cancellation);
-                if ($thumb === null) {
+                if ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
+                    $file = $this->getStream($file, $cancellation);
                     $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
                     $process = Process::start($ffmpeg);
                     async(fn () => pipe($file, $process->getStdin()))->finally(fn () => $process->getStdin()->close());
-                    $thumb = buffer($process->getStdout());
-                    $thumb = new ReadableBuffer($thumb);
-                }
-                if ($attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
-                    $ffmpeg = 'ffmpeg -i pipe: 2>&1';
-                    $process = Process::start($ffmpeg);
-                    async(fn () => pipe($file, $process->getStdin()))->finally(fn () => $process->getStdin()->close());
-                    $output = buffer($process->getStdout());
-                    if (preg_match('/(\d{3,4})x(\d{3,4})/', $output, $whMatch) and preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})/', $output, $dMatch)) {
-                        $width = $whMatch[1];
-                        $height = $whMatch[2];
-                        $hours = (int) $dMatch[1];
-                        $minutes = (int) $dMatch[2];
-                        $seconds = (int) $dMatch[3];
+                    $thumb ??= new ReadableBuffer(buffer($process->getStdout()));
+                    $output = buffer($process->getStderr());
+                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $output, $matches)) {
+                        $time = explode(':', $matches[1]);
+                        $hours = (int) $time[0];
+                        $minutes = (int) $time[1];
+                        $seconds = (int) $time[2];
                         $duration = $hours * 3600 + $minutes * 60 + $seconds;
+                        $width = $matches[2];
+                        $height = $matches[3];
                         $attributes[0]['w'] ??= $width;
                         $attributes[0]['h'] ??= $height;
                         $attributes[0]['duration'] ??= $duration;
