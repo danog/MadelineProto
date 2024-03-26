@@ -27,6 +27,7 @@ use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
@@ -397,6 +398,91 @@ trait FilesAbstraction
         );
     }
     /**
+     * Sends an audio.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
+     * @param string                                                        $caption                Caption of document
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param integer|null                                                  $duration                Duration of the audio
+     * @param string|null                                                   $title                   Title of the audio
+     * @param string|null                                                   $performer               Performer of the audio
+     * @param integer|null                                                  $replyToMsgId            ID of message to reply to.
+     * @param integer|null                                                  $topMsgId                ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup             Keyboard information.
+     * @param integer|string|null                                           $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate            Schedule date.
+     * @param boolean                                                       $silent                  Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $noForwards              Whether to disable forwards for this message.
+     * @param boolean                                                       $background              Send this message as background message
+     * @param boolean                                                       $clearDraft              Clears the draft field
+     * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
+     * @param ?Cancellation                                                  $cancellation            Cancellation.
+     *
+     */
+    public function sendAudio(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb = null,
+        string $caption = '',
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $duration = null,
+        ?string $title = null,
+        ?string $performer = null,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        $attributes = [
+            'duration' => $duration,
+            'title' => $title,
+            'performer' => $performer,
+        ];
+
+        return $this->sendMedia(
+            type: Audio::class,
+            mimeType: 'audio/mpeg',
+            thumb: $thumb,
+            attributes: $attributes,
+            peer: $peer,
+            file: $file,
+            caption: $caption,
+            parseMode: $parseMode,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: null,
+            spoiler: null,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: false,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
+
+    /**
      * Sends a media.
      *
      * @param class-string<Media> $type
@@ -474,6 +560,14 @@ trait FilesAbstraction
                     'duration' => $file->duration ?? $attributes['duration'],
                     'w' => $file->width ?? $attributes['w'],
                     'h' => $file->height ?? $attributes['h'],
+                ],
+            ],
+            Audio::class => [
+                [
+                    '_' => 'documentAttributeAudio',
+                    'duration' => $file->duration ?? $attributes['duration'],
+                    'title' => $file->title ?? $attributes['title'],
+                    'performer' => $file->performer ?? $attributes['performer'],
                 ],
             ],
             default => [],
@@ -651,6 +745,24 @@ trait FilesAbstraction
                 unset($stream);
                 unset($temp);
                 $file = new ReadableBuffer($file);
+            } elseif ($type === Audio::class) {
+                if (Process::start('ffmpeg -version')->join() !== 0) {
+                    $this->logger->logger('Install ffmpeg for audio info extraction!');
+                } elseif ($attributes[0]['duration'] === null) {
+                    $file = $this->getStream($file, $cancellation);
+                    $ffmpeg = 'ffmpeg -i pipe: 2>&1';
+                    $process = Process::start($ffmpeg);
+                    async(fn () => pipe($file, $process->getStdin()));
+                    $output = buffer($process->getStdout());
+                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $output, $matches)) {
+                        $time = explode(':', $matches[1]);
+                        $hours = (int) $time[0];
+                        $minutes = (int) $time[1];
+                        $seconds = (int) $time[2];
+                        $duration = $hours * 3600 + $minutes * 60 + $seconds;
+                        $attributes[0]['duration'] = $duration;
+                    }
+                }
             }
 
             $method = 'messages.sendMedia';
@@ -678,6 +790,13 @@ trait FilesAbstraction
                     'mime_type' => $mimeType,
                     'attributes' => $attributes,
                 ],
+                Audio::class => [
+                    '_' => 'inputMediaUploadedDocument',
+                    'file' => $file,
+                    'thumb' => $thumb,
+                    'mime_type' => $mimeType,
+                    'attributes' => $attributes,
+                ],
                 default => [
                     '_' => 'inputMediaUploadedDocument',
                     'spoiler' => $spoiler,
@@ -692,7 +811,7 @@ trait FilesAbstraction
             if ($reuseId) {
                 $media['_'] = match ($type) {
                     Photo::class => 'inputMediaPhoto',
-                    Sticker::class, Document::class, Video::class => 'inputMediaDocument',
+                    default => 'inputMediaDocument',
                 };
                 $media['id'] = $reuseId;
             } else {
