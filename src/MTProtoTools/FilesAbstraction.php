@@ -598,7 +598,9 @@ trait FilesAbstraction
             ];
         } else {
 
-            if ($type === Video::class) {
+            if ($reuseId) {
+                // Reuse
+            } elseif ($type === Video::class) {
                 if (Process::start('ffmpeg -version')->join() !== 0) {
                     $this->logger->logger('Install ffmpeg for video info extraction!');
                 } elseif ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
@@ -621,6 +623,34 @@ trait FilesAbstraction
                         $attributes[0]['duration'] ??= $duration;
                     }
                 }
+            } elseif ($type === Sticker::class) {
+                if (!extension_loaded('gd')) {
+                    throw Exception::extension('gd');
+                }
+                $file = buffer($this->getStream($file, $cancellation), $cancellation);
+                $img = imagecreatefromstring($file);
+                $width = imagesx($img);
+                $height = imagesy($img);
+                if ($width > $height) {
+                    $newWidth = 512;
+                    $newHeight = (int) (512 * $height / $width);
+                } elseif ($width < $height) {
+                    $newWidth = (int) (512 * $width / $height);
+                    $newHeight = 512;
+                } else {
+                    $newWidth = 512;
+                    $newHeight = 512;
+                }
+                $temp = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresized($temp, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                $stream = fopen('php://memory', 'r+');
+                imagewebp($temp, $stream);
+                rewind($stream);
+                $file = stream_get_contents($stream);
+                fclose($stream);
+                unset($stream);
+                unset($temp);
+                $file = new ReadableBuffer($file);
             }
 
             $method = 'messages.sendMedia';
