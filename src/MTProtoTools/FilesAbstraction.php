@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
+use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
@@ -43,7 +44,6 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
-use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\pipe;
 
 /**
@@ -481,7 +481,87 @@ trait FilesAbstraction
             cancellation: $cancellation
         );
     }
+    /**
+     * Sends a voice.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param integer|null                                                  $ttl                     Time to live
+     * @param integer|null                                                  $duration                Duration of the voice
+     * @param array|null                                                    $waveform                Waveform of the voice
+     * @param integer|null                                                  $replyToMsgId            ID of message to reply to.
+     * @param integer|null                                                  $topMsgId                ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup             Keyboard information.
+     * @param integer|string|null                                           $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate            Schedule date.
+     * @param boolean                                                       $silent                  Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $noForwards              Whether to disable forwards for this message.
+     * @param boolean                                                       $background              Send this message as background message
+     * @param boolean                                                       $clearDraft              Clears the draft field
+     * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
+     * @param ?Cancellation                                                  $cancellation            Cancellation.
+     *
+     */
+    public function sendVoice(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $caption = '',
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $ttl = null,
+        ?int $duration = null,
+        ?array $waveform = null,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        $attributes = [
+            'duration' => $duration,
+            'waveform' => $waveform,
+        ];
 
+        return $this->sendMedia(
+            type: Voice::class,
+            mimeType: 'audio/ogg',
+            thumb: null,
+            attributes: $attributes,
+            peer: $peer,
+            file: $file,
+            caption: $caption,
+            parseMode: $parseMode,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: $ttl,
+            spoiler: null,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: false,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
     /**
      * Sends a media.
      *
@@ -568,6 +648,14 @@ trait FilesAbstraction
                     'duration' => $file->duration ?? $attributes['duration'],
                     'title' => $file->title ?? $attributes['title'],
                     'performer' => $file->performer ?? $attributes['performer'],
+                ],
+            ],
+            Voice::class => [
+                [
+                    '_' => 'documentAttributeAudio',
+                    'voice' => true,
+                    'duration' => $file->duration ?? $attributes['duration'],
+                    'waveform' => $file->waveform ?? $attributes['waveform'],
                 ],
             ],
             default => [],
@@ -745,7 +833,7 @@ trait FilesAbstraction
                 unset($stream);
                 unset($temp);
                 $file = new ReadableBuffer($file);
-            } elseif ($type === Audio::class) {
+            } elseif ($type === Audio::class or $type === Voice::class) {
                 if (Process::start('ffmpeg -version')->join() !== 0) {
                     $this->logger->logger('Install ffmpeg for audio info extraction!');
                 } elseif ($attributes[0]['duration'] === null) {
@@ -794,6 +882,12 @@ trait FilesAbstraction
                     '_' => 'inputMediaUploadedDocument',
                     'file' => $file,
                     'thumb' => $thumb,
+                    'mime_type' => $mimeType,
+                    'attributes' => $attributes,
+                ],
+                Voice::class => [
+                    '_' => 'inputMediaUploadedDocument',
+                    'file' => $file,
                     'mime_type' => $mimeType,
                     'attributes' => $attributes,
                 ],
