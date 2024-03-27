@@ -188,7 +188,7 @@ trait ResponseHandler
             $response = $response['result'];
         }
         if (!isset($this->outgoing_messages[$requestId])) {
-            $this->API->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
+            $this->API->logger("Got a response $message with message ID $requestId, but there is no request!", Logger::ERROR);
             return;
         }
         /** @var MTProtoOutgoingMessage */
