@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Db\MemoryArray;
+use danog\AsyncOrm\MemoryArray;
 use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**

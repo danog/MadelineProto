@@ -22,7 +22,9 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use AssertionError;
 use danog\Decoder\FileId;
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\Decoder\FileIdType;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoBig;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoSmall;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -34,10 +36,6 @@ use danog\MadelineProto\Tools;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG;
-use const danog\Decoder\PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL;
-
-use const danog\Decoder\PROFILE_PHOTO;
 use const SORT_NUMERIC;
 use function Amp\async;
 use function Amp\Future\await;
@@ -821,18 +819,22 @@ trait PeerHandler
                 'small' => $res['photo']['sizes'][0],
                 'big' => Tools::maxSize($res['photo']['sizes']),
             ] as $type => $size) {
-                $fileId = new FileId;
-                $fileId->setId($res['photo']['id']);
-                $fileId->setAccessHash($res['photo']['access_hash']);
-                $fileId->setFileReference((string) $res['photo']['file_reference']);
-                $fileId->setDcId($res['photo']['dc_id']);
-                $fileId->setType(PROFILE_PHOTO);
+                $photoSize = $type === 'small'
+                        ? PhotoSizeSourceDialogPhotoSmall::class
+                        : PhotoSizeSourceDialogPhotoBig::class;
+                $photoSize = new $photoSize(
+                    dialogId: $res['id'],
+                    dialogAccessHash: $res['access_hash'],
+                );
 
-                $photoSize = new PhotoSizeSourceDialogPhoto($type === 'small' ? PHOTOSIZE_SOURCE_DIALOGPHOTO_SMALL : PHOTOSIZE_SOURCE_DIALOGPHOTO_BIG);
-                $photoSize->setDialogId($res['id']);
-                $photoSize->setDialogAccessHash($res['access_hash'] ?? 0);
-
-                $fileId->setPhotoSizeSource($photoSize);
+                $fileId = new FileId(
+                    dcId: $res['photo']['dc_id'],
+                    type: FileIdType::PROFILE_PHOTO,
+                    id: $res['photo']['id'],
+                    accessHash: $res['photo']['access_hash'],
+                    fileReference: $res['photo']['file_reference'] ?? null,
+                    photoSizeSource: $photoSize
+                );
 
                 $photo[$type.'_file_id'] = (string) $fileId;
                 $photo[$type.'_file_unique_id'] = $fileId->getUniqueBotAPI();

@@ -21,15 +21,13 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
+use danog\Decoder\FileIdType;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 use Throwable;
-
-use const danog\Decoder\ENCRYPTED;
-use const danog\Decoder\TYPES_IDS;
 
 /**
  * @internal
@@ -319,12 +317,13 @@ trait BotAPI
                 $res['file_size'] = $data['document']['size'];
                 $res['mime_type'] = $data['document']['mime_type'];
 
-                $fileId = new FileId;
-                $fileId->setId($data['document']['id']);
-                $fileId->setAccessHash($data['document']['access_hash']);
-                $fileId->setFileReference((string) ($data['document']['file_reference'] ?? ''));
-                $fileId->setDcId($data['document']['dc_id']);
-                $fileId->setType(TYPES_IDS[$type_name]);
+                $fileId = new FileId(
+                    id: $data['document']['id'],
+                    accessHash: $data['document']['access_hash'],
+                    fileReference: $data['document']['file_reference'] ?? null,
+                    dcId: $data['document']['dc_id'],
+                    type: FileIdType::from($type_name)
+                );
 
                 $res['file_id'] = (string) $fileId;
                 $res['file_unique_id'] = $fileId->getUniqueBotAPI();
@@ -336,12 +335,13 @@ trait BotAPI
                 $data = $data['file'];
                 // no break
             case 'encryptedFile':
-                $fileId = new FileId;
-                $fileId->setId($data['id']);
-                $fileId->setAccessHash($data['access_hash']);
-                $fileId->setFileReference('');
-                $fileId->setDcId($data['dc_id']);
-                $fileId->setType(ENCRYPTED);
+                $fileId = new FileId(
+                    id: $data['id'],
+                    accessHash: $data['access_hash'],
+                    fileReference: null,
+                    dcId: $data['dc_id'],
+                    type: FileIdType::ENCRYPTED
+                );
 
                 $res = [
                     'file_id' => (string) $fileId,

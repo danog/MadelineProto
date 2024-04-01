@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings;
 
-use danog\MadelineProto\Db\DbArray;
+use danog\AsyncOrm\DbArray;
 use danog\MadelineProto\SettingsAbstract;
 
 /**

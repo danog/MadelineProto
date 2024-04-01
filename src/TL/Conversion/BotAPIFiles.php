@@ -21,24 +21,13 @@ declare(strict_types=1);
 namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
+use danog\Decoder\FileIdType;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Lang;
-
-use const danog\Decoder\ANIMATION;
-use const danog\Decoder\AUDIO;
-use const danog\Decoder\DOCUMENT;
-use const danog\Decoder\PHOTO;
-use const danog\Decoder\PHOTOSIZE_SOURCE_THUMBNAIL;
-use const danog\Decoder\PROFILE_PHOTO;
-use const danog\Decoder\STICKER;
-use const danog\Decoder\THUMBNAIL;
-use const danog\Decoder\VIDEO;
-use const danog\Decoder\VIDEO_NOTE;
-use const danog\Decoder\VOICE;
 
 /**
  * @internal
@@ -47,28 +36,20 @@ trait BotAPIFiles
 {
     private function photosizeToBotAPI($photoSize, $photo, $thumbnail = false): array
     {
-        $fileId = new FileId;
-        $fileId->setId($photo['id'] ?? 0);
-        $fileId->setAccessHash($photo['access_hash'] ?? 0);
-        $fileId->setFileReference((string) ($photo['file_reference'] ?? ''));
-        $fileId->setDcId($photo['dc_id'] ?? 0);
-
-        if (isset($photoSize['location']['local_id'])) {
-            $fileId->setLocalId($photoSize['location']['local_id']);
-            $fileId->setVolumeId($photoSize['location']['volume_id']);
-        }
-
-        $photoSizeSource = new PhotoSizeSourceThumbnail(PHOTOSIZE_SOURCE_THUMBNAIL);
-        $photoSizeSource->setThumbType($photoSize['type']);
-
-        if ($photo['_'] === 'photo') {
-            $photoSizeSource->setThumbFileType(PHOTO);
-            $fileId->setType(PHOTO);
-        } else {
-            $photoSizeSource->setThumbFileType(THUMBNAIL);
-            $fileId->setType(THUMBNAIL);
-        }
-        $fileId->setPhotoSizeSource($photoSizeSource);
+        $photoSizeSource = new PhotoSizeSourceThumbnail(
+            thumbType: $photoSize['type'],
+            thumbFileType: $photo['_'] === 'photo' ? FileIdType::PHOTO : FileIdType::THUMBNAIL
+        );
+        $fileId = new FileId(
+            id: $photo['id'] ?? 0,
+            type: $photo['_'] === 'photo' ? FileIdType::PHOTO : FileIdType::THUMBNAIL,
+            accessHash: $photo['access_hash'] ?? 0,
+            fileReference: $photo['file_reference'] ?? null,
+            dcId: $photo['dc_id'] ?? 0,
+            localId: $photoSize['location']['local_id'] ?? null,
+            volumeId: $photoSize['location']['volume_id'] ?? null,
+            photoSizeSource: $photoSizeSource
+        );
 
         return [
             'file_id' => (string) $fileId,
@@ -90,108 +71,108 @@ trait BotAPIFiles
     {
         $fileId = FileId::fromBotAPI($fileId);
 
-        if (!\in_array($fileId->getVersion(), [2, 4], true)) {
-            throw new Exception("Invalid bot API file ID version {$fileId->getVersion()}");
+        if (!\in_array($fileId->version, [2, 4], true)) {
+            throw new Exception("Invalid bot API file ID version {$fileId->version}");
         }
 
-        $photoSize = $fileId->hasPhotoSizeSource() ? $fileId->getPhotoSizeSource() : null;
+        $photoSize = $fileId->photoSizeSource;
 
         $res = null;
-        switch ($fileId->getType()) {
-            case PROFILE_PHOTO:
+        switch ($fileId->type) {
+            case FileIdType::PROFILE_PHOTO:
                 /**
                  * @var PhotoSizeSourceDialogPhoto $photoSize
                  */
-                if ($photoSize->getDialogId() < 0) {
+                if ($photoSize->dialogId < 0) {
                     $res['Chat'] = [
-                        '_' => $photoSize->getDialogId() < -1000000000000 ? 'channel' : 'chat',
-                        'id' => $photoSize->getDialogId(),
-                        'access_hash' => $photoSize->getDialogAccessHash(),
+                        '_' => $photoSize->dialogId < -1000000000000 ? 'channel' : 'chat',
+                        'id' => $photoSize->dialogId,
+                        'access_hash' => $photoSize->dialogAccessHash,
                         'photo' => [
                             '_' => 'chatPhoto',
-                            'dc_id' => $fileId->getDcId(),
-                            'photo_id' => $fileId->getId(),
+                            'dc_id' => $fileId->dcId,
+                            'photo_id' => $fileId->id,
                         ],
                         'min' => true,
                     ];
-                    if ($fileId->hasVolumeId()) {
+                    if ($fileId->volumeId) {
                         $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
                             '_' => 'fileLocationToBeDeprecated',
-                            'volume_id' => $fileId->getVolumeId(),
-                            'local_id' => $fileId->getLocalId(),
+                            'volume_id' => $fileId->volumeId,
+                            'local_id' => $fileId->localId,
                         ];
                     }
                     return $res;
                 }
                 $res['User'] = [
                     '_' => 'user',
-                    'id' => $photoSize->getDialogId(),
-                    'access_hash' => $photoSize->getDialogAccessHash(),
+                    'id' => $photoSize->dialogId,
+                    'access_hash' => $photoSize->dialogAccessHash,
                     'photo' => [
                         '_' => 'userProfilePhoto',
-                        'dc_id' => $fileId->getDcId(),
-                        'photo_id' => $fileId->getId(),
+                        'dc_id' => $fileId->dcId,
+                        'photo_id' => $fileId->id,
                     ],
                     'min' => true,
                 ];
-                if ($fileId->hasVolumeId()) {
+                if ($fileId->localId !== null) {
                     $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
                         '_' => 'fileLocationToBeDeprecated',
-                        'volume_id' => $fileId->getVolumeId(),
-                        'local_id' => $fileId->getLocalId(),
+                        'volume_id' => $fileId->volumeId,
+                        'local_id' => $fileId->localId,
                     ];
                 }
                 return $res;
-            case THUMBNAIL:
+            case FileIdType::THUMBNAIL:
                 /**
                  * @var PhotoSizeSourceThumbnail $photoSize
                  */
                 $res['InputFileLocation'] = [
-                    '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
-                    'id' => $fileId->getId(),
-                    'access_hash' => $fileId->getAccessHash(),
-                    'file_reference' => $fileId->getFileReference(),
-                    'thumb_size' => $photoSize->getThumbType(),
+                    '_' => $photoSize->thumbFileType === FileIdType::THUMBNAIL ? 'inputDocumentFileLocation' : 'inputPhotoFileLocation',
+                    'id' => $fileId->id,
+                    'access_hash' => $fileId->accessHash,
+                    'file_reference' => $fileId->fileReference,
+                    'thumb_size' => $photoSize->thumbType,
                 ];
-                $res['name'] = $fileId->getId().'_'.$photoSize->getThumbType();
+                $res['name'] = $fileId->id.'_'.$photoSize->thumbType;
                 $res['ext'] = 'jpg';
                 $res['mime'] = 'image/jpeg';
                 $res['InputMedia'] = [
-                    '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputMediaDocument' : 'inputMediaPhoto',
+                    '_' => $photoSize->thumbFileType === FileIdType::THUMBNAIL ? 'inputMediaDocument' : 'inputMediaPhoto',
                     'id' => [
-                        '_' => $photoSize->getThumbFileType() === THUMBNAIL ? 'inputDocument' : 'inputPhoto',
-                        'id' => $fileId->getId(),
-                        'access_hash' => $fileId->getAccessHash(),
-                        'file_reference' => $fileId->getFileReference(),
+                        '_' => $photoSize->thumbFileType === FileIdType::THUMBNAIL ? 'inputDocument' : 'inputPhoto',
+                        'id' => $fileId->id,
+                        'access_hash' => $fileId->accessHash,
+                        'file_reference' => $fileId->fileReference,
                     ],
                 ];
                 if ($res['InputMedia']['id']['_'] === 'inputPhoto') {
                     $res['InputMedia']['id']['sizes'] = [
                         [
                             '_' => 'photoSize',
-                            'type' => $photoSize->getThumbType(),
+                            'type' => $photoSize->thumbType,
                         ],
                     ];
                 }
                 return $res;
-            case PHOTO:
+            case FileIdType::PHOTO:
                 $constructor = [
                     '_' => 'photo',
-                    'id' => $fileId->getId(),
-                    'access_hash' => $fileId->getAccessHash(),
-                    'file_reference' => $fileId->getFileReference(),
-                    'dc_id' => $fileId->getDcId(),
+                    'id' => $fileId->id,
+                    'access_hash' => $fileId->accessHash,
+                    'file_reference' => $fileId->fileReference,
+                    'dc_id' => $fileId->dcId,
                     'sizes' => [],
                 ];
                 $constructor['sizes'][] = [
                     '_' => 'photoSize',
-                    'type' => $photoSize instanceof PhotoSizeSourceThumbnail ? $photoSize->getThumbType() : '',
+                    'type' => $photoSize instanceof PhotoSizeSourceThumbnail ? $photoSize->thumbType : '',
                     'location' => [
                         '_' => $photoSize instanceof PhotoSizeSourceLegacy ? 'fileLocation' : 'fileLocationToBeDeprecated',
-                        'dc_id' => $fileId->getDcId(),
-                        'local_id' => $fileId->hasLocalId() ? $fileId->getLocalId() : null,
-                        'volume_id' => $fileId->hasVolumeId() ? $fileId->getVolumeId() : null,
-                        'secret' => $photoSize instanceof PhotoSizeSourceLegacy ? $photoSize->getSecret() : '',
+                        'dc_id' => $fileId->dcId,
+                        'local_id' => $fileId->localId,
+                        'volume_id' => $fileId->volumeId,
+                        'secret' => $photoSize instanceof PhotoSizeSourceLegacy ? $photoSize->secret : '',
                     ],
                 ];
                 $res['MessageMedia'] = [
@@ -200,22 +181,22 @@ trait BotAPIFiles
                     'caption' => '',
                 ];
                 return $res;
-            case VOICE:
+            case FileIdType::VOICE:
                 $attribute = [
                     '_' => 'documentAttributeAudio',
                     'voice' => true,
                 ];
                 break;
-            case VIDEO:
+            case FileIdType::VIDEO:
                 $attribute = [
                     '_' => 'documentAttributeVideo',
                     'round_message' => false,
                 ];
                 break;
-            case DOCUMENT:
+            case FileIdType::DOCUMENT:
                 $attribute = [];
                 break;
-            case STICKER:
+            case FileIdType::STICKER:
                 $attribute = [
                     '_' => 'documentAttributeSticker',
                     'alt' => '',
@@ -223,30 +204,30 @@ trait BotAPIFiles
                 if ($photoSize instanceof PhotoSizeSourceStickersetThumbnail) {
                     $attribute['stickerset'] = [
                         '_' => 'inputStickerSetID',
-                        'id' => $photoSize->getStickerSetId(),
-                        'access_hash' => $photoSize->getStickerSetAccessHash(),
+                        'id' => $photoSize->stickerSetId,
+                        'access_hash' => $photoSize->stickerSetAccessHash,
                     ];
                 }
                 break;
-            case AUDIO:
+            case FileIdType::AUDIO:
                 $attribute = ['_' => 'documentAttributeAudio', 'voice' => false];
                 break;
-            case ANIMATION:
+            case FileIdType::ANIMATION:
                 $attribute = ['_' => 'documentAttributeAnimated'];
                 break;
-            case VIDEO_NOTE:
+            case FileIdType::VIDEO_NOTE:
                 $attribute = ['_' => 'documentAttributeVideo', 'round_message' => true];
                 break;
             default:
-                throw new Exception(sprintf(Lang::$current_lang['file_type_invalid'], $fileId->getTypeName()));
+                throw new Exception(sprintf(Lang::$current_lang['file_type_invalid'], $fileId->type->name));
         }
 
         $constructor = [
             '_' => 'document',
-            'id' => $fileId->getId(),
-            'access_hash' => $fileId->getAccessHash(),
-            'file_reference' => $fileId->getFileReference(),
-            'dc_id' => $fileId->getDcId(),
+            'id' => $fileId->id,
+            'access_hash' => $fileId->accessHash,
+            'file_reference' => $fileId->fileReference,
+            'dc_id' => $fileId->dcId,
             'mime_type' => 'application/octet-stream',
             'attributes' => $attribute ? [$attribute] : [],
         ];

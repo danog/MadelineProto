@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Db\RedisArray;
+use danog\AsyncOrm\RedisArray;
 
 /**
  * Redis backend settings.

@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Db\PostgresArrayBytea;
+use danog\AsyncOrm\PostgresArrayBytea;
 
 /**
  * Postgres backend settings.

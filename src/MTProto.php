@@ -34,11 +34,14 @@ use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbAutoProperties;
+use danog\AsyncOrm\Driver\MemoryArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\Settings as OrmSettings;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesFactory;
-use danog\MadelineProto\Db\DbPropertiesTrait;
-use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
@@ -113,7 +116,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use Login;
     use Loop;
     use Start;
-    use DbPropertiesTrait;
+    use DbAutoProperties;
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
@@ -219,6 +222,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Cached parameters for fetching channel participants.
      *
      */
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
     public DbArray $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
@@ -232,8 +236,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public array $qres = [];
     /**
      * Sponsored message database.
-     *
      */
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     public DbArray $sponsoredMessages;
     /**
      * Latest chat message ID map for update handling.
@@ -380,19 +384,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Nullcache array for storing main session file to DB.
      */
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR, cacheTtl: 0, optimizeIfWastedMb: 1)]
     public DbArray $session;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'sponsoredMessages' => ['innerMadelineProto' => true, 'intKey' => true],
-        'channelParticipants' => ['innerMadelineProto' => true],
-        'getUpdatesQueue' => ['innerMadelineProto' => true, 'intKey' => true],
-        'session' => ['innerMadelineProto' => true, 'enableCache' => false, 'optimizeIfWastedGtMb' => 1],
-    ];
 
     /**
      * Returns an instance of a client by session name.
@@ -571,6 +564,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $prefix = $this->tmpDbPrefix;
         }
         return (string) $prefix;
+    }
+    /** @internal */
+    public function getDbSettings(): OrmSettings
+    {
+
     }
 
     /**
@@ -879,18 +877,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->initDb(...), $this);
+        $db []= async($this->initDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
         foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }
         await($db);
-
-        if (isset($this->chats) && $this->chats instanceof MemoryArray) {
-            $this->peerDatabase->importLegacy(
-                $this->chats,
-                $this->full_chats,
-            );
-        }
 
         if (!isset($this->TL)) {
             $this->TL = new TL($this);

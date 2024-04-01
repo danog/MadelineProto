@@ -17,7 +17,7 @@
 namespace danog\MadelineProto\Settings\Database;
 
 use AssertionError;
-use danog\MadelineProto\Db\MysqlArray;
+use danog\AsyncOrm\MysqlArray;
 
 /**
  * MySQL backend settings.

@@ -24,8 +24,8 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use AssertionError;
+use danog\AsyncOrm\DbAutoProperties;
 use danog\Loop\PeriodicLoop;
-use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
@@ -49,13 +49,8 @@ use function Amp\File\listFiles;
  */
 abstract class EventHandler extends AbstractAPI
 {
-    use DbPropertiesTrait {
-        DbPropertiesTrait::initDb as private internalInitDb;
-    }
-
-    protected function getDbPrefix(): string
-    {
-        return $this->wrapper->getAPI()->getDbPrefix();
+    use DbAutoProperties {
+        DbAutoProperties::initDb as private internalInitDb;
     }
 
     private static bool $includingPlugins = false;
@@ -133,9 +128,12 @@ abstract class EventHandler extends AbstractAPI
             $this->wrapper = $MadelineProto;
             $this->exportNamespaces();
 
-            if (isset(static::$dbProperties)) {
-                $this->internalInitDb($this->wrapper->getAPI());
-            }
+            \assert($this->wrapper instanceof MTProto);
+            $this->internalInitDb(
+                $this->wrapper->getDbSettings(),
+                $this->wrapper->getDbPrefix(),
+            );
+
             if ($main) {
                 $this->setReportPeers($this->getReportPeers());
             }

@@ -17,6 +17,7 @@
 namespace danog\MadelineProto;
 
 use danog\Decoder\FileId;
+use danog\Decoder\FileIdType;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AbstractSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -26,15 +27,6 @@ use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
-
-use const danog\Decoder\ANIMATION;
-use const danog\Decoder\AUDIO;
-use const danog\Decoder\DOCUMENT;
-use const danog\Decoder\PHOTO;
-use const danog\Decoder\STICKER;
-use const danog\Decoder\VIDEO;
-use const danog\Decoder\VIDEO_NOTE;
-use const danog\Decoder\VOICE;
 
 /**
  * Indicates a bot API file ID to upload using sendDocument, sendPhoto etc...
@@ -62,15 +54,15 @@ final class BotApiFileId
      */
     public function getTypeClass(): string
     {
-        return match (FileId::fromBotAPI($this->fileId)->getType()) {
-            PHOTO => Photo::class,
-            VOICE => Voice::class,
-            VIDEO => Video::class,
-            DOCUMENT => Document::class,
-            STICKER => AbstractSticker::class,
-            VIDEO_NOTE => RoundVideo::class,
-            AUDIO => Audio::class,
-            ANIMATION => Gif::class
+        return match (FileId::fromBotAPI($this->fileId)->type) {
+            FileIdType::PHOTO => Photo::class,
+            FileIdType::VOICE => Voice::class,
+            FileIdType::VIDEO => Video::class,
+            FileIdType::DOCUMENT => Document::class,
+            FileIdType::STICKER => AbstractSticker::class,
+            FileIdType::VIDEO_NOTE => RoundVideo::class,
+            FileIdType::AUDIO => Audio::class,
+            FileIdType::ANIMATION => Gif::class
         };
     }
 }

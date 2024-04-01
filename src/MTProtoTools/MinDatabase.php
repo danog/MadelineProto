@@ -21,8 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbAutoProperties;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -36,7 +39,7 @@ use Revolt\EventLoop;
  */
 final class MinDatabase implements TLCallback
 {
-    use DbPropertiesTrait;
+    use DbAutoProperties;
 
     public const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     public const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
@@ -46,6 +49,7 @@ final class MinDatabase implements TLCallback
      * References indexed by location.
      *
      */
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     private DbArray $db;
     private array $pendingDb = [];
     /**
@@ -61,15 +65,6 @@ final class MinDatabase implements TLCallback
 
     private int $v = 0;
 
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true, 'intKey' => true],
-    ];
-
     private LocalKeyedMutex $localMutex;
     public function __construct(MTProto $API)
     {
@@ -84,17 +79,13 @@ final class MinDatabase implements TLCallback
     {
         return ['db', 'pendingDb', 'API', 'v'];
     }
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix();
-    }
     public function __wakeup(): void
     {
         $this->localMutex = new LocalKeyedMutex;
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             $this->db->clear();
             $this->pendingDb = [];

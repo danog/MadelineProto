@@ -24,8 +24,9 @@ use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbPropertiesTrait;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -56,27 +57,19 @@ final class SecretChatController implements Stringable
     }
 
     /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'incoming' => ['innerMadelineProto' => true, 'intKey' => true],
-        'outgoing' => ['innerMadelineProto' => true, 'intKey' => true],
-        'randomIdMap' => ['innerMadelineProto' => true, 'intKey' => true],
-    ];
-
-    /**
      * @var DbArray<int, array>
      */
+    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
     private DbArray $incoming;
     /**
      * @var DbArray<int, array>
      */
+    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
     private DbArray $outgoing;
     /**
      * @var DbArray<int, list{int, bool}> Seq, outgoing
      */
+    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
     private DbArray $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;

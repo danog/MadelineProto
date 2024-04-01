@@ -21,8 +21,11 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbAutoProperties;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
@@ -39,7 +42,7 @@ use Webmozart\Assert\Assert;
  */
 final class ReferenceDatabase implements TLCallback
 {
-    use DbPropertiesTrait;
+    use DbAutoProperties;
 
     protected function getDbPrefix(): string
     {
@@ -79,6 +82,7 @@ final class ReferenceDatabase implements TLCallback
     /**
      * References indexed by location.
      */
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
     private DbArray $db;
     /**
      * @var array<string, list{string, int, array}>
@@ -90,15 +94,6 @@ final class ReferenceDatabase implements TLCallback
     private bool $refresh = false;
     private int $refreshCount = 0;
     private int $v = 0;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true],
-    ];
 
     private LocalKeyedMutex $flushMutex;
     public function __construct(private MTProto $API)
@@ -116,7 +111,7 @@ final class ReferenceDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
         if ($this->v === 0) {
             $this->db->clear();
             $this->pendingDb = [];
