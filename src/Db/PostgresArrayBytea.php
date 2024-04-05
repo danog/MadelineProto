@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Db;
 
-use Amp\Postgres\ByteA;
+use Amp\Postgres\PostgresByteA;
 use danog\MadelineProto\Db\Driver\Postgres;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -90,10 +90,10 @@ class PostgresArrayBytea extends SqlArray
     protected function setSerializer(SerializerType $serializer): void
     {
         $this->serializer = match ($serializer) {
-            SerializerType::SERIALIZE => static fn ($v) => new ByteA(serialize($v)),
-            SerializerType::IGBINARY => static fn ($v) => new ByteA(igbinary_serialize($v)),
-            SerializerType::JSON => static fn ($v) => new ByteA(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
-            SerializerType::STRING => static fn ($v) => new ByteA(\strval($v)),
+            SerializerType::SERIALIZE => static fn ($v) => new PostgresByteA(serialize($v)),
+            SerializerType::IGBINARY => static fn ($v) => new PostgresByteA(igbinary_serialize($v)),
+            SerializerType::JSON => static fn ($v) => new PostgresByteA(json_encode($v, JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)),
+            SerializerType::STRING => static fn ($v) => new PostgresByteA(\strval($v)),
         };
         $this->deserializer = match ($serializer) {
             SerializerType::SERIALIZE => \unserialize(...),
