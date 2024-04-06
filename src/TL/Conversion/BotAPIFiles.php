@@ -44,7 +44,9 @@ trait BotAPIFiles
             id: $photo['id'] ?? 0,
             type: $photo['_'] === 'photo' ? FileIdType::PHOTO : FileIdType::THUMBNAIL,
             accessHash: $photo['access_hash'] ?? 0,
-            fileReference: $photo['file_reference'] ?? null,
+            fileReference: $photo['file_reference'] === null
+            ? null
+            : (string) $photo['file_reference'],
             dcId: $photo['dc_id'] ?? 0,
             localId: $photoSize['location']['local_id'] ?? null,
             volumeId: $photoSize['location']['volume_id'] ?? null,

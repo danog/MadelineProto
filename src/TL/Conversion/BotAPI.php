@@ -320,7 +320,9 @@ trait BotAPI
                 $fileId = new FileId(
                     id: $data['document']['id'],
                     accessHash: $data['document']['access_hash'],
-                    fileReference: $data['document']['file_reference'] ?? null,
+                    fileReference: $data['document']['file_reference'] === null
+                        ? null
+                        : (string) $data['document']['file_reference'],
                     dcId: $data['document']['dc_id'],
                     type: FileIdType::from($type_name)
                 );

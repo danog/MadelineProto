@@ -832,7 +832,9 @@ trait PeerHandler
                     type: FileIdType::PROFILE_PHOTO,
                     id: $res['photo']['id'],
                     accessHash: $res['photo']['access_hash'],
-                    fileReference: $res['photo']['file_reference'] ?? null,
+                    fileReference: $res['photo']['file_reference'] === null
+                        ? null
+                        : (string) $res['photo']['file_reference'],
                     photoSizeSource: $photoSize
                 );
 
