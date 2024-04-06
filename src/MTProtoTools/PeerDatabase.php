@@ -130,7 +130,13 @@ final class PeerDatabase implements TLCallback
                 ValueType::SCALAR
             );
             $old = $old->build();
+            $kk = 0;
+            $total = count($old);
             foreach ($old as $k => $v) {
+                $kk++;
+                if ($kk % 500 === 0 || $kk === $total) {
+                    $this->API->logger("Migrating username database ($kk/$total)...");
+                }
                 $this->usernames[$k] = $v;
             }
             $old->clear();
