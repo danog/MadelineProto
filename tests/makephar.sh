@@ -163,6 +163,7 @@ k
 rm -f madeline.phar testing.madeline*
 
 tail -F MadelineProto.log &
+tail -F tests/MadelineProto.log &
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1
