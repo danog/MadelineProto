@@ -58,17 +58,17 @@ final class PeerDatabase implements TLCallback
      * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_chats')]
-    private DbArray $db;
+    private $db;
     /**
      * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_full_chats')]
-    private DbArray $fullDb;
+    private $fullDb;
     /**
      * @var DbArray<string, int>
      */
     #[OrmMappedArray(KeyType::STRING, ValueType::INT)]
-    private DbArray $usernames;
+    private $usernames;
     private bool $hasInfo = true;
     private bool $hasUsernames = true;
 

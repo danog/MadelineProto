@@ -144,8 +144,9 @@ trait UpdateHandler
     /** @deprecated */
     private CombinedUpdatesState $channels_state;
     private CombinedUpdatesState $updateState;
+    /** @var DbArray<int, array> */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    private DbArray $getUpdatesQueue;
+    private $getUpdatesQueue;
     private int $getUpdatesQueueKey = 0;
     private SplQueue $updateQueue;
 

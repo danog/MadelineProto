@@ -4,7 +4,9 @@ namespace danog\MadelineProto;
 
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbAutoProperties;
+use danog\AsyncOrm\Driver\MemoryArray as DriverMemoryArray;
 use danog\MadelineProto\Db\CachedArray;
+use danog\MadelineProto\Db\MemoryArray;
 use ReflectionClass;
 
 /** @internal */
@@ -17,8 +19,12 @@ trait LegacyMigrator
     {
         $res = [];
         $closure = function (string $propName): void {
-            if (isset($this->{$propName}) && $this->{$propName} instanceof CachedArray) {
-                unset($this->{$propName});
+            if (isset($this->{$propName})) {
+                if ($this->{$propName} instanceof CachedArray) {
+                    unset($this->{$propName});
+                } elseif ($this->{$propName} instanceof MemoryArray) {
+                    $this->{$propName} = new DriverMemoryArray($this->{$propName}->getArrayCopy());
+                }
             }
         };
         foreach ((new ReflectionClass(static::class))->getProperties() as $property) {

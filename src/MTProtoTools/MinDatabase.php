@@ -48,9 +48,10 @@ final class MinDatabase implements TLCallback
     /**
      * References indexed by location.
      *
+     * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    private DbArray $db;
+    private $db;
     private array $pendingDb = [];
     /**
      * Temporary cache during deserialization.

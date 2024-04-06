@@ -6,10 +6,11 @@ if (class_exists('\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray')) {
     return;
 }
 
+use ArrayObject;
 use AssertionError;
+use Countable;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
-use danog\AsyncOrm\Driver\MemoryArray;
 use danog\AsyncOrm\Internal\Containers\CacheContainer;
 use danog\AsyncOrm\Internal\Driver\MysqlArray;
 use danog\AsyncOrm\Internal\Driver\PostgresArray;
@@ -23,9 +24,42 @@ class_alias(MysqlArray::class, '\\danog\\MadelineProto\\Db\\MysqlArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArrayBytea');
 class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\RedisArray');
-class_alias(MemoryArray::class, '\\danog\\MadelineProto\\Db\\MemoryArray');
 class_alias(CacheContainer::class, '\\danog\\MadelineProto\\Db\\CacheContainer');
+class_alias(Countable::class, '\\danog\\MadelineProto\\Db\\DbArray');
 
+/** @deprecated */
+final class MemoryArray extends ArrayObject
+{
+    public function unset(string|int $key): void
+    {
+        throw new AssertionError("Unreachable");
+    }
+    public function set(string|int $key, mixed $value): void
+    {
+        throw new AssertionError("Unreachable");
+    }
+    public function get(string|int $key): mixed
+    {
+        throw new AssertionError("Unreachable");
+    }
+    public function clear(): void
+    {
+        throw new AssertionError("Unreachable");
+    }
+    public function count(): int
+    {
+        throw new AssertionError("Unreachable");
+    }
+    public function getIterator(): \Iterator
+    {
+        throw new AssertionError("Unreachable");
+    }
+
+    public static function getInstance(DbArrayBuilder $config, DbArray|null $previous): DbArray
+    {
+        throw new AssertionError("Unreachable");
+    }
+}
 /** @deprecated */
 final class CachedArray extends DbArray
 {

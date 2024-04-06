@@ -57,17 +57,17 @@ final class SecretChatController implements Stringable
      * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    private DbArray $incoming;
+    private $incoming;
     /**
      * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    private DbArray $outgoing;
+    private $outgoing;
     /**
      * @var DbArray<int, list{int, bool}> Seq, outgoing
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    private DbArray $randomIdMap;
+    private $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
     private int $remote_in_seq_no = 0;

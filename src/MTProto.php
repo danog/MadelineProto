@@ -224,9 +224,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Cached parameters for fetching channel participants.
      *
+     * @var DbArray<string, array>
      */
     #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
-    public DbArray $channelParticipants;
+    public $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
      *
@@ -239,9 +240,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public array $qres = [];
     /**
      * Sponsored message database.
+     *
+     * @var DbArray<int, array>
      */
     #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
-    public DbArray $sponsoredMessages;
+    public $sponsoredMessages;
     /**
      * Latest chat message ID map for update handling.
      *
@@ -387,8 +390,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Nullcache array for storing main session file to DB.
      */
-    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR, cacheTtl: 0, optimizeIfWastedMb: 1)]
-    public DbArray $session;
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR, cacheTtl: 0, optimizeIfWastedMb: 1, tablePostfix: 'session')]
+    public DbArray $sessionDb;
 
     /**
      * Returns an instance of a client by session name.
@@ -408,10 +411,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function serializeSession(object $data)
     {
         /** @psalm-suppress TypeDoesNotContainType */
-        if (!isset($this->session) || $this->session instanceof MemoryArray) {
+        if (!isset($this->sessionDb) || $this->sessionDb instanceof MemoryArray) {
             return $data;
         }
-        $this->session['data'] = $data;
+        $this->sessionDb['data'] = $data;
 
         $db = [];
         $db []= async($this->referenceDatabase->saveDbProperties(...));

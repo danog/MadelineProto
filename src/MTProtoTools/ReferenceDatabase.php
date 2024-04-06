@@ -77,9 +77,10 @@ final class ReferenceDatabase implements TLCallback
     private const V = 1;
     /**
      * References indexed by location.
+     * @var DbArray<string, array>
      */
     #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
-    private DbArray $db;
+    private $db;
     /**
      * @var array<string, list{string, int, array}>
      */
