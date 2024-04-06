@@ -1163,6 +1163,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $this->settings = new Settings;
             } else {
                 if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
+                    $this->setupLogger();
                     $this->logger->logger("Generic settings have changed!", Logger::WARNING);
                     $this->upgradeMadelineProto();
                 }
@@ -1207,6 +1208,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             || $this->settings->getSchema()->hasChanged()
             || $this->settings->getSchema()->needsUpgrade()
             || $this->v !== API::RELEASE)) {
+            $this->setupLogger();
             $this->logger->logger("Generic settings have changed!", Logger::WARNING);
             if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
                 $this->upgradeMadelineProto();
