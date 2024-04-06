@@ -131,7 +131,7 @@ final class PeerDatabase implements TLCallback
             );
             $old = $old->build();
             $kk = 0;
-            $total = count($old);
+            $total = \count($old);
             foreach ($old as $k => $v) {
                 $kk++;
                 if ($kk % 500 === 0 || $kk === $total) {
