@@ -64,6 +64,9 @@ if ($loader) {
         ], true)) {
             continue;
         }
+        if (str_starts_with($class, 'Symfony\\Thanks')) {
+            continue;
+        }
         if (str_starts_with($class, 'PhabelVendor\\Symfony\\Component\\Console') || str_starts_with($class, 'Phabel\\Symfony\\Component\\Console') || str_ends_with($class, 'Test') || class_exists($class) || interface_exists($class)) {
             continue;
         }
