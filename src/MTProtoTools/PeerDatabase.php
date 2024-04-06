@@ -25,6 +25,7 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
@@ -49,7 +50,7 @@ final class PeerDatabase implements TLCallback
 {
     use LegacyMigrator;
 
-    private const V = 0;
+    private const V = 1;
 
     /**
      * Chats.
@@ -66,7 +67,7 @@ final class PeerDatabase implements TLCallback
     /**
      * @var DbArray<string, int>
      */
-    #[OrmMappedArray(KeyType::STRING, ValueType::INT, tablePostfix: 'MTProto_usernames')]
+    #[OrmMappedArray(KeyType::STRING, ValueType::INT)]
     private DbArray $usernames;
     private bool $hasInfo = true;
     private bool $hasUsernames = true;
@@ -121,6 +122,19 @@ final class PeerDatabase implements TLCallback
 
         if (!$this->API->settings->getDb()->getEnableUsernameDb()) {
             $this->usernames->clear();
+        } elseif ($this->v === 0) {
+            $old = new DbArrayBuilder(
+                $this->API->getDbPrefix().'_MTProto_usernames',
+                $this->API->getDbSettings(),
+                KeyType::STRING,
+                ValueType::SCALAR
+            );
+            $old = $old->build();
+            foreach ($old as $k => $v) {
+                $this->usernames[$k] = $v;
+            }
+            $old->clear();
+            $this->v = self::V;
         }
 
         EventLoop::queue(function (): void {
