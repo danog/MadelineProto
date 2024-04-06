@@ -23,10 +23,10 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Sync\LocalKeyedMutex;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
@@ -39,7 +39,7 @@ use Revolt\EventLoop;
  */
 final class MinDatabase implements TLCallback
 {
-    use DbAutoProperties;
+    use LegacyMigrator;
 
     public const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     public const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];

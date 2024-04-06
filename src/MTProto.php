@@ -37,7 +37,6 @@ use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\Driver\MemoryArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\Settings as OrmSettings;
@@ -117,9 +116,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use Login;
     use Loop;
     use Start;
-    use DbAutoProperties {
-        DbAutoProperties::initDbProperties as private internalInitDbProperties;
-        DbAutoProperties::saveDbProperties as private internalSaveDbProperties;
+    use LegacyMigrator {
+        LegacyMigrator::initDbProperties as private internalInitDbProperties;
+        LegacyMigrator::saveDbProperties as private internalSaveDbProperties;
     }
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;

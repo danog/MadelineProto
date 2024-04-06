@@ -25,10 +25,10 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
@@ -47,7 +47,7 @@ use Webmozart\Assert\Assert;
  */
 final class PeerDatabase implements TLCallback
 {
-    use DbAutoProperties;
+    use LegacyMigrator;
 
     private const V = 0;
 

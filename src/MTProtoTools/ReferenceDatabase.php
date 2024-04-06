@@ -23,10 +23,10 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Sync\LocalKeyedMutex;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -42,7 +42,7 @@ use Webmozart\Assert\Assert;
  */
 final class ReferenceDatabase implements TLCallback
 {
-    use DbAutoProperties;
+    use LegacyMigrator;
 
     // Reference from a document
     public const DOCUMENT_LOCATION = 0;

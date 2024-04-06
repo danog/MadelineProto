@@ -26,9 +26,9 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -51,7 +51,7 @@ use Webmozart\Assert\Assert;
  */
 final class SecretChatController implements Stringable
 {
-    use DbAutoProperties;
+    use LegacyMigrator;
 
     /**
      * @var DbArray<int, array>

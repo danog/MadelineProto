@@ -24,7 +24,6 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalMutex;
 use AssertionError;
-use danog\AsyncOrm\DbAutoProperties;
 use danog\Loop\PeriodicLoop;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
@@ -49,9 +48,9 @@ use function Amp\File\listFiles;
  */
 abstract class EventHandler extends AbstractAPI
 {
-    use DbAutoProperties {
-        DbAutoProperties::initDbProperties as private internalInitDbProperties;
-        DbAutoProperties::saveDbProperties as private privateInternalSaveDbProperties;
+    use LegacyMigrator {
+        LegacyMigrator::initDbProperties as private internalInitDbProperties;
+        LegacyMigrator::saveDbProperties as private privateInternalSaveDbProperties;
     }
 
     /** @internal Do not use manually. */
