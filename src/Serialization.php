@@ -220,10 +220,13 @@ abstract class Serialization
         } else {
             $unserialized = null;
         }
-        if ($unserialized instanceof DriverArray || $unserialized instanceof DbArrayBuilder || !$exists) {
-            if ($settings instanceof Settings) {
-                $settings = $settings->getDb();
-            }
+        if ($settings instanceof Settings) {
+            $settings = $settings->getDb();
+        }
+        if ($unserialized instanceof DriverArray
+            || $unserialized instanceof DbArrayBuilder
+            || (!$exists && $settings instanceof DriverDatabaseAbstract)
+        ) {
             $tableName = null;
             $array = null;
             if ($settings instanceof DriverDatabaseAbstract
