@@ -93,6 +93,11 @@ echo '{
             "email": "daniil@daniil.it"
         }
     ],
+    "config": {
+        "allow-plugins": {
+            "symfony/thanks": true
+        }
+    }
     "repositories": [
         {
             "type": "path",
