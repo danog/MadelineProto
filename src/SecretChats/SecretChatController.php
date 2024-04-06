@@ -26,7 +26,9 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
-use danog\AsyncOrm\DbPropertiesTrait;
+use danog\AsyncOrm\DbAutoProperties;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -49,27 +51,22 @@ use Webmozart\Assert\Assert;
  */
 final class SecretChatController implements Stringable
 {
-    use DbPropertiesTrait;
-
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix().'_'.$this->id;
-    }
+    use DbAutoProperties;
 
     /**
      * @var DbArray<int, array>
      */
-    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     private DbArray $incoming;
     /**
      * @var DbArray<int, array>
      */
-    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     private DbArray $outgoing;
     /**
      * @var DbArray<int, list{int, bool}> Seq, outgoing
      */
-    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     private DbArray $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
@@ -143,7 +140,10 @@ final class SecretChatController implements Stringable
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties(
+            $this->API->getDbSettings(),
+            $this->API->getDbPrefix().'_'.$this->id.'_'
+        );
     }
 
     public function startFeedLoop(): void

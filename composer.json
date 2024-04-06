@@ -59,7 +59,8 @@
         "bacon/bacon-qr-code": "^2.0",
         "nikic/php-parser": "^5",
         "revolt/event-loop": "^1.0.5",
-        "danog/async-orm": "^1.0"
+        "danog/async-orm": "^1.0",
+        "symfony/thanks": "^1.3"
     },
     "require-dev": {
         "ext-ctype": "*",
@@ -140,7 +141,8 @@
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
             "phabel/phabel": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/thanks": true
         }
     }
 }

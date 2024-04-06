@@ -16,15 +16,46 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\AsyncOrm\PostgresArrayBytea;
+use Amp\Postgres\PostgresConfig;
+use danog\AsyncOrm\Serializer\Igbinary;
+use danog\AsyncOrm\Serializer\Native;
+use danog\AsyncOrm\Settings;
+use danog\AsyncOrm\Settings\PostgresSettings;
 
 /**
  * Postgres backend settings.
  */
 final class Postgres extends SqlAbstract
 {
-    public function getDriverClass(): string
+    public function getOrmSettings(): Settings
     {
-        return PostgresArrayBytea::class;
+        $host = str_replace(['tcp://', 'unix://'], '', $this->getUri());
+        if ($host[0] === '/') {
+            $port = 0;
+        } else {
+            $host = explode(':', $host, 2);
+            if (\count($host) === 2) {
+                [$host, $port] = $host;
+            } else {
+                $host = $host[0];
+                $port = PostgresConfig::DEFAULT_PORT;
+            }
+        }
+        $config = new PostgresConfig(
+            host: $host,
+            port: (int) $port,
+            user: $this->getUsername(),
+            password: $this->getPassword(),
+            database: $this->getDatabase()
+        );
+        return new PostgresSettings(
+            $config,
+            match ($this->serializer) {
+                SerializerType::IGBINARY => new Igbinary,
+                SerializerType::SERIALIZE => new Native,
+                null => null
+            },
+            $this->cacheTtl,
+        );
     }
 }

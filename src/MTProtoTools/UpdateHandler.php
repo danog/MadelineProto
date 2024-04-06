@@ -30,6 +30,8 @@ use Amp\TimeoutException;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
@@ -142,7 +144,7 @@ trait UpdateHandler
     /** @deprecated */
     private CombinedUpdatesState $channels_state;
     private CombinedUpdatesState $updateState;
-    #[OrmMappedArray(KeyType::INT, ValueType::BEST)]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
     private DbArray $getUpdatesQueue;
     private int $getUpdatesQueueKey = 0;
     private SplQueue $updateQueue;

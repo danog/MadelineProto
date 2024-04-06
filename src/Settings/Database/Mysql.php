@@ -16,8 +16,12 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
+use Amp\Mysql\MysqlConfig;
 use AssertionError;
-use danog\AsyncOrm\MysqlArray;
+use danog\AsyncOrm\Serializer\Igbinary;
+use danog\AsyncOrm\Serializer\Native;
+use danog\AsyncOrm\Settings;
+use danog\AsyncOrm\Settings\MysqlSettings;
 
 /**
  * MySQL backend settings.
@@ -66,8 +70,36 @@ final class Mysql extends SqlAbstract
     {
         return $this->optimizeIfWastedGtMb;
     }
-    public function getDriverClass(): string
+
+    public function getOrmSettings(): Settings
     {
-        return MysqlArray::class;
+        $host = str_replace(['tcp://', 'unix://'], '', $this->getUri());
+        if ($host[0] === '/') {
+            $port = 0;
+        } else {
+            $host = explode(':', $host, 2);
+            if (\count($host) === 2) {
+                [$host, $port] = $host;
+            } else {
+                $host = $host[0];
+                $port = MysqlConfig::DEFAULT_PORT;
+            }
+        }
+        $config = new MysqlConfig(
+            host: $host,
+            port: (int) $port,
+            user: $this->getUsername(),
+            password: $this->getPassword(),
+            database: $this->getDatabase()
+        );
+        return new MysqlSettings(
+            $config,
+            match ($this->serializer) {
+                SerializerType::IGBINARY => new Igbinary,
+                SerializerType::SERIALIZE => new Native,
+                null => null
+            },
+            $this->cacheTtl,
+        );
     }
 }

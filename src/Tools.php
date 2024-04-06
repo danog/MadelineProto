@@ -472,6 +472,8 @@ abstract class Tools extends AsyncTools
     /**
      * Get maximum photo size.
      *
+     * @param array<array{w: int, h: int, type: string, ...}> $sizes
+     *
      * @internal
      */
     public static function maxSize(array $sizes): array
@@ -497,7 +499,7 @@ abstract class Tools extends AsyncTools
                 }
             }
         }
-        Assert::isArray($max);
+        \assert($max !== null);
         return $max;
     }
     /**

@@ -239,6 +239,7 @@ trait Start
                 $title = Lang::$current_lang['loginChoosePromptWeb'];
                 $optionBot = htmlentities(Lang::$current_lang['loginOptionBot']);
                 $optionUser = htmlentities(Lang::$current_lang['loginOptionUser']);
+                \assert(isset($_SERVER['REQUEST_URI']));
                 $trailer = '
                 <div id="qr-code-container" style="display: none">
                     <p>'.htmlentities(Lang::$current_lang['loginWebQr']).'</p>

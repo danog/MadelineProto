@@ -409,7 +409,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             return $data;
         }
         $this->session['data'] = $data;
-        return $this->session;
+        return $this->getDbPrefix().'session';
     }
 
     /**
@@ -563,12 +563,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->tmpDbPrefix ??= 'tmp_'.hash('xxh3', $this->getSessionName());
             $prefix = $this->tmpDbPrefix;
         }
-        return (string) $prefix;
+        return ((string) $prefix).'_';
     }
     /** @internal */
     public function getDbSettings(): OrmSettings
     {
-
+        return $this->settings->getDb()->getOrmSettings();
     }
 
     /**
@@ -957,6 +957,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->initPromise = $deferred->getFuture();
 
         try {
+            $this->updateSettings($settings);
+
             // Setup logger
             $this->setupLogger();
             if (!$this->ipcServer) {

@@ -50,7 +50,7 @@ use function Amp\File\listFiles;
 abstract class EventHandler extends AbstractAPI
 {
     use DbAutoProperties {
-        DbAutoProperties::initDb as private internalInitDb;
+        DbAutoProperties::initDbProperties as private internalInitDb;
     }
 
     private static bool $includingPlugins = false;
@@ -128,10 +128,12 @@ abstract class EventHandler extends AbstractAPI
             $this->wrapper = $MadelineProto;
             $this->exportNamespaces();
 
-            \assert($this->wrapper instanceof MTProto);
+            if (isset(static::$dbProperties)) {
+                throw new AssertionError("Please switch to using OrmMappedArray annotations for mapped ORM properties!");
+            }
             $this->internalInitDb(
-                $this->wrapper->getDbSettings(),
-                $this->wrapper->getDbPrefix(),
+                $this->wrapper->getAPI()->getDbSettings(),
+                $this->wrapper->getAPI()->getDbPrefix(),
             );
 
             if ($main) {
