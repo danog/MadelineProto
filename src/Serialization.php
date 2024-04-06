@@ -220,29 +220,35 @@ abstract class Serialization
         } else {
             $unserialized = null;
         }
-        if ($unserialized instanceof DriverArray || \is_string($unserialized) || !$exists) {
+        if ($unserialized instanceof DriverArray || $unserialized instanceof DbArrayBuilder || !$exists) {
             if ($settings instanceof Settings) {
                 $settings = $settings->getDb();
             }
+            $tableName = null;
+            $array = null;
             if ($settings instanceof DriverDatabaseAbstract
                 && $prefix = $settings->getEphemeralFilesystemPrefix()
             ) {
                 $tableName = "{$prefix}_MTProto_session";
             } elseif ($unserialized instanceof DriverArray) {
-                $tableName = ((array) $unserialized)["\0*\0table"];
+                $unserialized = (array) $unserialized;
+                $tableName = $unserialized["\0*\0table"];
+                $settings = $unserialized["\0*\0dbSettings"];
             } else {
-                $tableName = $unserialized;
+                \assert($unserialized instanceof DbArrayBuilder);
+                $array = $unserialized->build();
             }
-            $unserialized = null;
             if ($tableName !== null && $settings instanceof DriverDatabaseAbstract) {
                 Logger::log('Extracting session from database...');
-                $unserialized = (new DbArrayBuilder(
+                $array = (new DbArrayBuilder(
                     $tableName,
                     $settings->getOrmSettings(),
                     KeyType::STRING,
                     ValueType::SCALAR,
-                ))->build()->get('data');
+                ))->build();
             }
+            \assert($array !== null);
+            $unserialized = $array->get('data');
             if (!$unserialized && $exists) {
                 throw new Exception('Could not extract session from database!');
             }

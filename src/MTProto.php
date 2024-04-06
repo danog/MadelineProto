@@ -36,6 +36,7 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\DbAutoProperties;
 use danog\AsyncOrm\Driver\MemoryArray;
 use danog\AsyncOrm\KeyType;
@@ -422,7 +423,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $db []= async($this->event_handler_instance->internalSaveDbProperties(...));
         }
         await($db);
-        return $this->getDbPrefix().'session';
+        return new DbArrayBuilder(
+            $this->getDbPrefix().'session',
+            $this->getDbSettings(),
+            KeyType::STRING,
+            ValueType::SCALAR
+        );
     }
 
     /**

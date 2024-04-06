@@ -107,6 +107,7 @@ final class ReferenceDatabase implements TLCallback
     }
     public function init(): void
     {
+        var_dump($this->db);
         $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
         if ($this->v === 0) {
             $this->db->clear();
