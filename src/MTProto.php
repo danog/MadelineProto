@@ -936,7 +936,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         $this->settings->setSchema(new TLSchema);
 
-        $this->resetMTProtoSession(true, true);
+        $this->resetMTProtoSession("upgrading madelineproto", true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
         $this->initialize($this->settings);
@@ -1013,7 +1013,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 Lang::$currentPercentage = 0;
             }
             // Reset MTProto session (not related to user session)
-            $this->resetMTProtoSession();
+            $this->resetMTProtoSession("wakeup");
             // Update settings from constructor
             $this->updateSettings($settings);
             // Update TL callbacks
@@ -1250,14 +1250,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @param boolean $auth_key Whether to reset the auth key
      * @internal
      */
-    public function resetMTProtoSession(bool $de = true, bool $auth_key = false): void
+    public function resetMTProtoSession(string $why, bool $de = true, bool $auth_key = false): void
     {
         if (!\is_object($this->datacenter)) {
             throw new Exception(Lang::$current_lang['session_corrupted']);
         }
         foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
             if ($de) {
-                $socket->resetSession();
+                $socket->resetSession("resetMTProtoSession: $why");
             }
             if ($auth_key) {
                 $socket->setTempAuthKey(null);

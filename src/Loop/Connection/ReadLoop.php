@@ -78,7 +78,7 @@ final class ReadLoop extends Loop
             });
             return self::STOP;
         } catch (SecurityException $e) {
-            $this->connection->resetSession();
+            $this->connection->resetSession("security exception {$e->getMessage()}");
             $this->API->logger("Got security exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
             $this->connection->reconnect();
             throw $e;
@@ -89,7 +89,7 @@ final class ReadLoop extends Loop
                     if ($this->shared->hasTempAuthKey()) {
                         $this->API->logger("WARNING: Resetting auth key in DC {$this->datacenter}...", Logger::WARNING);
                         $this->shared->setTempAuthKey(null);
-                        $this->shared->resetSession();
+                        $this->shared->resetSession("-404");
                         foreach ($this->connection->new_outgoing as $message) {
                             $message->resetSent();
                         }
@@ -201,7 +201,7 @@ final class ReadLoop extends Loop
                 $session_id = substr($decrypted_data, 8, 8);
                 if ($session_id !== $this->connection->session_id) {
                     $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
-                    $this->connection->resetSession();
+                    $this->connection->resetSession("session ID mismatch");
                     throw new NothingInTheSocketException();
                 }
                 $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));

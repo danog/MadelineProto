@@ -225,7 +225,7 @@ trait ResponseHandler
                 case 17:
                     $this->time_delta = ($message->getMsgId() >> 32) - time();
                     $this->API->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
-                    $this->API->resetMTProtoSession();
+                    $this->API->resetMTProtoSession("time delta update");
                     $this->shared->setTempAuthKey(null);
                     EventLoop::queue($this->shared->initAuthorization(...));
                     EventLoop::queue($this->methodRecall(...), $requestId);

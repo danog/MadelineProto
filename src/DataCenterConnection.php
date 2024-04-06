@@ -394,10 +394,10 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * Reset MTProto sessions.
      */
-    public function resetSession(): void
+    public function resetSession(string $why): void
     {
         foreach ($this->connections as $socket) {
-            $socket->resetSession();
+            $socket->resetSession($why);
         }
     }
     /**
