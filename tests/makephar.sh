@@ -97,7 +97,7 @@ echo '{
         "allow-plugins": {
             "symfony/thanks": true
         }
-    }
+    },
     "repositories": [
         {
             "type": "path",
