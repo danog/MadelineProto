@@ -94,7 +94,7 @@ final class PeerDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_PeerDatabase_');
         if (!$this->API->settings->getDb()->getEnableFullPeerDb()) {
             $this->fullDb->clear();
         }

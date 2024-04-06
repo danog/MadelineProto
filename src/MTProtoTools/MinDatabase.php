@@ -85,7 +85,7 @@ final class MinDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_MinDatabase_');
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             $this->db->clear();
             $this->pendingDb = [];

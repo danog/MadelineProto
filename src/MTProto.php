@@ -423,7 +423,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         await($db);
         return new DbArrayBuilder(
-            $this->getDbPrefix().'session',
+            $this->getDbPrefix().'_MTProto_session',
             $this->getDbSettings(),
             KeyType::STRING,
             ValueType::SCALAR
@@ -581,7 +581,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->tmpDbPrefix ??= 'tmp_'.hash('xxh3', $this->getSessionName());
             $prefix = $this->tmpDbPrefix;
         }
-        return ((string) $prefix).'_';
+        return (string) $prefix;
     }
     /** @internal */
     public function getDbSettings(): OrmSettings
@@ -895,7 +895,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
+        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix().'_MTProto_');
         foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }

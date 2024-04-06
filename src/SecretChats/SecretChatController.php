@@ -142,7 +142,7 @@ final class SecretChatController implements Stringable
     {
         $this->initDbProperties(
             $this->API->getDbSettings(),
-            $this->API->getDbPrefix().'_'.$this->id.'_'
+            $this->API->getDbPrefix().'_SecretChatController_'.$this->id.'_'
         );
     }
 

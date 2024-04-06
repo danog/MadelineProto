@@ -139,7 +139,7 @@ abstract class EventHandler extends AbstractAPI
             }
             $this->internalInitDbProperties(
                 $this->wrapper->getAPI()->getDbSettings(),
-                $this->wrapper->getAPI()->getDbPrefix(),
+                $this->wrapper->getAPI()->getDbPrefix().'_EventHandler_',
             );
 
             if ($main) {
