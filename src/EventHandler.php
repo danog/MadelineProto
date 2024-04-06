@@ -50,7 +50,14 @@ use function Amp\File\listFiles;
 abstract class EventHandler extends AbstractAPI
 {
     use DbAutoProperties {
-        DbAutoProperties::initDbProperties as private internalInitDb;
+        DbAutoProperties::initDbProperties as private internalInitDbProperties;
+        DbAutoProperties::saveDbProperties as private privateInternalSaveDbProperties;
+    }
+
+    /** @internal Do not use manually. */
+    final public function internalSaveDbProperties(): void
+    {
+        $this->privateInternalSaveDbProperties();
     }
 
     private static bool $includingPlugins = false;
@@ -131,7 +138,7 @@ abstract class EventHandler extends AbstractAPI
             if (isset(static::$dbProperties)) {
                 throw new AssertionError("Please switch to using OrmMappedArray annotations for mapped ORM properties!");
             }
-            $this->internalInitDb(
+            $this->internalInitDbProperties(
                 $this->wrapper->getAPI()->getDbSettings(),
                 $this->wrapper->getAPI()->getDbPrefix(),
             );

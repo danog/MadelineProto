@@ -116,7 +116,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use Login;
     use Loop;
     use Start;
-    use DbAutoProperties;
+    use DbAutoProperties {
+        DbAutoProperties::initDbProperties as private internalInitDbProperties;
+        DbAutoProperties::saveDbProperties as private internalSaveDbProperties;
+    }
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
@@ -409,7 +412,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             return $data;
         }
         $this->session['data'] = $data;
-        $this->saveDbProperties();
+
+        $db = [];
+        $db []= async($this->referenceDatabase->saveDbProperties(...));
+        $db []= async($this->minDatabase->saveDbProperties(...));
+        $db []= async($this->peerDatabase->saveDbProperties(...));
+        $db []= async($this->internalSaveDbProperties(...));
+        if (isset($this->event_handler_instance)) {
+            $db []= async($this->event_handler_instance->internalSaveDbProperties(...));
+        }
+        await($db);
         return $this->getDbPrefix().'session';
     }
 
@@ -878,7 +890,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->innerInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
+        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
         foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }
