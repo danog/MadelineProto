@@ -978,8 +978,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->initPromise = $deferred->getFuture();
 
         try {
-            $this->updateSettings($settings);
-
             // Setup logger
             $this->setupLogger();
             if (!$this->ipcServer) {
