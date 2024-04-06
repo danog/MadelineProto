@@ -292,7 +292,7 @@ trait ResponseHandler
             $response['error_code'] = 500;
         }
         if (str_starts_with($response['error_message'], 'FILE_REFERENCE_')
-            && $request->shouldRefreshReferences()
+            && !$request->shouldRefreshReferences()
         ) {
             $this->API->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
             $this->gotResponseForOutgoingMessage($request);
