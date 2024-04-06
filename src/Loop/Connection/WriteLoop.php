@@ -154,6 +154,7 @@ final class WriteLoop extends Loop
             $has_state = false;
             $has_resend = false;
             $has_http_wait = false;
+            $has_init = false;
             foreach ($this->connection->pendingOutgoing as $k => $message) {
                 if ($message->unencrypted) {
                     continue;
@@ -211,6 +212,11 @@ final class WriteLoop extends Loop
                 if ($message->isMethod && $constructor !== 'http_wait' && $constructor !== 'ping_delay_disconnect' && $constructor !== 'auth.bindTempAuthKey') {
                     if (!$this->shared->getTempAuthKey()->isInited()) {
                         if ($constructor === 'help.getConfig' || $constructor === 'upload.getCdnFile') {
+                            if ($has_init) {
+                                $skipped = true;
+                                break;
+                            }
+                            $has_init = true;
                             $this->API->logger(sprintf('Writing client info (also executing %s)...', $constructor), Logger::NOTICE);
                             $MTmessage['body'] = ($this->API->getTL()->serializeMethod('invokeWithLayer', [
                                 'layer' => $this->API->settings->getSchema()->getLayer(),
