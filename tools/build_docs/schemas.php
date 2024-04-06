@@ -32,16 +32,3 @@ function maxLayer(array $schemas): int
     $schemas = array_keys($schemas);
     return end($schemas);
 }
-
-/**
- * Init docs.
- *
- * @param array $layers Scheme array
- * @internal
- *
- * @return array Documentation information for old docs
- */
-function initDocs(array $layers): array
-{
-    return [];
-}

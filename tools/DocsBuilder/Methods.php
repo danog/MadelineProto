@@ -282,7 +282,6 @@ trait Methods
             if (\in_array(strtolower($name), ['update2fa', 'getdialogids', 'getdialogs', 'getfulldialogs', 'getpwrchat', 'getfullinfo', 'getinfo', 'getid', 'getself', '__magic_construct', '__construct', '__destruct', '__sleep', '__wakeup'], true)) {
                 continue;
             }
-            var_dump($name, $method->getDocComment());
             $doc = $method->getDocComment();
             if (str_contains($doc, '@internal') || str_contains($doc, '@deprecated')) {
                 continue;

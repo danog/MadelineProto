@@ -469,7 +469,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getPinnedStories.html" name="stories.getPinnedStories">Fetch the stories pinned on a peer's profile: stories.getPinnedStories</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoriesArchive.html" name="stories.getStoriesArchive">Fetch the story archive » of a peer we control: stories.getStoriesArchive</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessageEditData.html" name="messages.getMessageEditData">Find out if a media message's caption can be edited: messages.getMessageEditData</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callfork-generator-amp-future-callable-callable-mixed-args-amp-future-t" name="callFork">Fork a new green thread and execute the passed function in the background: callFork</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callfork-closure-callable-mixed-args-amp-future-t" name="callFork">Fork a new green thread and execute the passed function in the background: callFork</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastforwardmessages-mixed-from_peer-list-int-message_ids-bool-drop_author-false-danog-madelineproto-broadcast-filter-filter-null-bool-pin-false-float-null-delay-null-int" name="broadcastForwardMessages">Forwards a list of messages to all peers (users, chats, channels) of the bot: broadcastForwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.forwardMessages.html" name="messages.forwardMessages">Forwards messages by their IDs: messages.forwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genvectorhash-array-longs-string" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
@@ -775,7 +775,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callplayonhold-int-id-danog-madelineproto-localfile-danog-madelineproto-remoteurl-amp-bytestream-readablestream-files-void" name="callPlayOnHold">Play files on hold in call: callPlayOnHold</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#posmod-int-a-int-b-int" name="posmod">Positive modulo: posmod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotCallbackAnswer.html" name="messages.getBotCallbackAnswer">Press an inline callback button and get a callback answer from the bot: messages.getBotCallbackAnswer</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#openbuffered-danog-madelineproto-localfile-danog-madelineproto-remoteurl-amp-bytestream-readablestream-stream-amp-cancellation-cancellation-null-callable" name="openBuffered">Provide a buffered reader for a file, URL or amp stream: openBuffered</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#openbuffered-danog-madelineproto-localfile-danog-madelineproto-remoteurl-amp-bytestream-readablestream-stream-amp-cancellation-cancellation-null-closure-string" name="openBuffered">Provide a buffered reader for a file, URL or amp stream: openBuffered</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getstream-danog-madelineproto-eventhandler-message-danog-madelineproto-eventhandler-media-danog-madelineproto-localfile-danog-madelineproto-remoteurl-danog-madelineproto-botapifileid-amp-bytestream-readablestream-stream-amp-cancellation-cancellation-null-amp-bytestream-readablestream" name="getStream">Provide a stream for a file, URL or amp stream: getStream</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineBotResults.html" name="messages.getInlineBotResults">Query an inline bot: messages.getInlineBotResults</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.setCallRating.html" name="phone.setCallRating">Rate a call, returns info about the rating message sent to the official VoIP bot: phone.setCallRating</a>
@@ -1004,21 +1004,38 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrappin-array-message-danog-madelineproto-eventhandler-pinned" name="wrapPin">Wrap a Pin constructor into an abstract Pinned object: wrapPin</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapmedia-array-media-bool-protected-false-danog-madelineproto-eventhandler-media" name="wrapMedia">Wrap a media constructor into an abstract Media object: wrapMedia</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#wrapupdate-array-update-danog-madelineproto-eventhandler-update" name="wrapUpdate">Wrap an Update constructor into an abstract Update object: wrapUpdate</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.createBusinessChatLink.html" name="account.createBusinessChatLink">account.createBusinessChatLink</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.deleteBusinessChatLink.html" name="account.deleteBusinessChatLink">account.deleteBusinessChatLink</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.disablePeerConnectedBot.html" name="account.disablePeerConnectedBot">account.disablePeerConnectedBot</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.editBusinessChatLink.html" name="account.editBusinessChatLink">account.editBusinessChatLink</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getBotBusinessConnection.html" name="account.getBotBusinessConnection">account.getBotBusinessConnection</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getBusinessChatLinks.html" name="account.getBusinessChatLinks">account.getBusinessChatLinks</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getConnectedBots.html" name="account.getConnectedBots">account.getConnectedBots</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.resolveBusinessChatLink.html" name="account.resolveBusinessChatLink">account.resolveBusinessChatLink</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.toggleConnectedBotPaused.html" name="account.toggleConnectedBotPaused">account.toggleConnectedBotPaused</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBirthday.html" name="account.updateBirthday">account.updateBirthday</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessAwayMessage.html" name="account.updateBusinessAwayMessage">account.updateBusinessAwayMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessGreetingMessage.html" name="account.updateBusinessGreetingMessage">account.updateBusinessGreetingMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessIntro.html" name="account.updateBusinessIntro">account.updateBusinessIntro</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessLocation.html" name="account.updateBusinessLocation">account.updateBusinessLocation</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessWorkHours.html" name="account.updateBusinessWorkHours">account.updateBusinessWorkHours</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateConnectedBot.html" name="account.updateConnectedBot">account.updateConnectedBot</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updatePersonalChannel.html" name="account.updatePersonalChannel">account.updatePersonalChannel</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urldecode-string-data-string" name="base64urlDecode">base64URL decode: base64urlDecode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reportSponsoredMessage.html" name="channels.reportSponsoredMessage">channels.reportSponsoredMessage</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.restrictSponsoredMessages.html" name="channels.restrictSponsoredMessages">channels.restrictSponsoredMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setBoostsToUnblockRestrictions.html" name="channels.setBoostsToUnblockRestrictions">channels.setBoostsToUnblockRestrictions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setEmojiStickers.html" name="channels.setEmojiStickers">channels.setEmojiStickers</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getBirthdays.html" name="contacts.getBirthdays">contacts.getBirthdays</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/fragment.getCollectibleInfo.html" name="fragment.getCollectibleInfo">fragment.getCollectibleInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getTimezonesList.html" name="help.getTimezonesList">help.getTimezonesList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/invokeWithBusinessConnection.html" name="invokeWithBusinessConnection">invokeWithBusinessConnection</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkQuickReplyShortcut.html" name="messages.checkQuickReplyShortcut">messages.checkQuickReplyShortcut</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteQuickReplyMessages.html" name="messages.deleteQuickReplyMessages">messages.deleteQuickReplyMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteQuickReplyShortcut.html" name="messages.deleteQuickReplyShortcut">messages.deleteQuickReplyShortcut</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editQuickReplyShortcut.html" name="messages.editQuickReplyShortcut">messages.editQuickReplyShortcut</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultTagReactions.html" name="messages.getDefaultTagReactions">messages.getDefaultTagReactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMyStickers.html" name="messages.getMyStickers">messages.getMyStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getOutboxReadDate.html" name="messages.getOutboxReadDate">messages.getOutboxReadDate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getQuickReplies.html" name="messages.getQuickReplies">messages.getQuickReplies</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getQuickReplyMessages.html" name="messages.getQuickReplyMessages">messages.getQuickReplyMessages</a>
@@ -1036,6 +1053,10 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.join.html" name="smsjobs.join">smsjobs.join</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.leave.html" name="smsjobs.leave">smsjobs.leave</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.updateSettings.html" name="smsjobs.updateSettings">smsjobs.updateSettings</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueStats.html" name="stats.getBroadcastRevenueStats">stats.getBroadcastRevenueStats</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueTransactions.html" name="stats.getBroadcastRevenueTransactions">stats.getBroadcastRevenueTransactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueWithdrawalUrl.html" name="stats.getBroadcastRevenueWithdrawalUrl">stats.getBroadcastRevenueWithdrawalUrl</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.replaceSticker.html" name="stickers.replaceSticker">stickers.replaceSticker</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getIsPremiumRequiredToContact.html" name="users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.  
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)

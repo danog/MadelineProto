@@ -65,7 +65,6 @@ $docs = [
         'readme'      => false,
     ],
 ];
-$docs = array_merge($docs, initDocs($schemas));
 
 $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(

@@ -409,6 +409,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             return $data;
         }
         $this->session['data'] = $data;
+        $this->saveDbProperties();
         return $this->getDbPrefix().'session';
     }
 
@@ -877,7 +878,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->initDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
+        $db []= async($this->innerInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix());
         foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }

@@ -220,11 +220,11 @@ trait Files
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param callable(int, int, ?Cancellation): string $callable  Callable (offset, length) => data
+     * @param (callable(int, int, ?Cancellation): string) $callable  Callable (offset, length) => data
      * @param integer                                   $size      File size
      * @param string                                    $mime      Mime type
      * @param string                                    $fileName  File name
-     * @param callable(float, float, float): void       $cb        Status callback
+     * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
      * @param boolean                                   $encrypted Whether to encrypt file for secret chats
      *
