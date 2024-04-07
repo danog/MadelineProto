@@ -59,7 +59,7 @@
         "bacon/bacon-qr-code": "^2.0",
         "nikic/php-parser": "^5",
         "revolt/event-loop": "^1.0.5",
-        "danog/async-orm": "^1.0",
+        "danog/async-orm": "^1.0.1",
         "symfony/thanks": "^1.3"
     },
     "require-dev": {
