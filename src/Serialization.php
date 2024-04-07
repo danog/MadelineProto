@@ -223,15 +223,18 @@ abstract class Serialization
         if ($settings instanceof Settings) {
             $settings = $settings->getDb();
         }
+        $prefix = null;
         if ($unserialized instanceof DriverArray
             || $unserialized instanceof DbArrayBuilder
-            || (!$exists && $settings instanceof DriverDatabaseAbstract)
+            || (
+                !$exists
+                && $settings instanceof DriverDatabaseAbstract
+                && $prefix = $settings->getEphemeralFilesystemPrefix()
+            )
         ) {
             $tableName = null;
             $array = null;
-            if ($settings instanceof DriverDatabaseAbstract
-                && $prefix = $settings->getEphemeralFilesystemPrefix()
-            ) {
+            if ($prefix !== null) {
                 $tableName = "{$prefix}_MTProto_session";
             } elseif ($unserialized instanceof DriverArray) {
                 $unserialized = (array) $unserialized;

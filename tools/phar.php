@@ -140,7 +140,7 @@ class Installer
                     'Content-Type: application/json',
                     sprintf(
                         'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
-                        'MProto v7',
+                        'MP v8',
                         \function_exists('php_uname') ? @php_uname('s') : 'Unknown',
                         \function_exists('php_uname') ? @php_uname('r') : 'Unknown',
                         $phpVersion,
