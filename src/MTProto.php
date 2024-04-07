@@ -410,7 +410,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function serializeSession(object $data)
     {
-        $this->waitForInit();
+        // Force migration
+        $this->getDbAutoProperties();
         /** @psalm-suppress TypeDoesNotContainType */
         if (!isset($this->sessionDb) || $this->sessionDb instanceof MemoryArray) {
             return $data;
