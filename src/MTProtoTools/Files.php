@@ -25,6 +25,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Http\Client\Request;
 use AssertionError;
+use danog\Decoder\FileIdType;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -676,9 +677,9 @@ trait Files
      */
     public static function extractBotAPIFile(array $info): array|null
     {
-        foreach (\danog\Decoder\TYPES as $type) {
-            if (isset($info[$type]) && \is_array($info[$type])) {
-                $method = $type;
+        foreach (FileIdType::cases() as $type) {
+            if (isset($info[$type->value]) && \is_array($info[$type->value])) {
+                $method = $type->valye;
                 break;
             }
         }
