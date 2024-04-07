@@ -8,7 +8,6 @@ if (class_exists('\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray')) {
 
 use ArrayObject;
 use AssertionError;
-use Countable;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\Internal\Containers\CacheContainer;
