@@ -10,7 +10,6 @@ use danog\MadelineProto\Bug74586Exception;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\DataCenterConnection;
-use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\Doc\MethodDoc;
 use danog\MadelineProto\Doc\NamespaceDoc;
 use danog\MadelineProto\DocsBuilder;
@@ -109,9 +108,6 @@ $filter = static function (string $class) use ($ignore): bool {
     || str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
     || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
         return false;
-    }
-    if ($class === DbPropertiesTrait::class) {
-        return true;
     }
     $class = new ReflectionClass($class);
     return !$class->isTrait();

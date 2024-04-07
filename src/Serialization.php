@@ -27,11 +27,12 @@ use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\TimeoutException;
 use AssertionError;
-use danog\MadelineProto\Db\DbPropertiesFactory;
-use danog\MadelineProto\Db\DriverArray;
+use danog\AsyncOrm\DbArrayBuilder;
+use danog\AsyncOrm\Driver\DriverArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
-use danog\MadelineProto\Settings\DatabaseAbstract;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -219,40 +220,40 @@ abstract class Serialization
         } else {
             $unserialized = null;
         }
-        if ($unserialized instanceof DriverArray || !$exists) {
-            \assert($unserialized instanceof DriverArray || $unserialized === null);
-            if ($settings instanceof Settings) {
-                $settings = $settings->getDb();
+        if ($settings instanceof Settings) {
+            $settings = $settings->getDb();
+        }
+        if ($unserialized instanceof DriverArray
+            || $unserialized instanceof DbArrayBuilder
+            || (!$exists && $settings instanceof DriverDatabaseAbstract)
+        ) {
+            $tableName = null;
+            $array = null;
+            if ($settings instanceof DriverDatabaseAbstract
+                && $prefix = $settings->getEphemeralFilesystemPrefix()
+            ) {
+                $tableName = "{$prefix}_MTProto_session";
+            } elseif ($unserialized instanceof DriverArray) {
+                $unserialized = (array) $unserialized;
+                $tableName = $unserialized["\0*\0table"];
+                $settings = $unserialized["\0*\0dbSettings"];
+            } else {
+                \assert($unserialized instanceof DbArrayBuilder);
+                $array = $unserialized->build();
             }
-            if ($settings instanceof DatabaseAbstract) {
-                if (!$exists
-                    && $settings instanceof DriverDatabaseAbstract
-                    && $prefix = $settings->getEphemeralFilesystemPrefix()
-                ) {
-                    $tableName = "{$prefix}_MTProto_session";
-                } else {
-                    $tableName = $unserialized
-                        ? $unserialized->__toString()
-                        : null;
-                }
-                if ($tableName !== null) {
-                    Logger::log('Extracting session from database...');
-                    $unserialized = DbPropertiesFactory::get(
-                        $settings,
-                        $tableName,
-                        ['enableCache' => false],
-                        $unserialized,
-                    )['data'];
-                }
-                if (!$unserialized && $exists) {
-                    throw new Exception('Could not extract session from database!');
-                }
-            } elseif ($unserialized !== null) {
-                $unserialized->initStartup();
-                $unserialized = $unserialized['data'];
-                if (!$unserialized) {
-                    throw new Exception('Could not extract session from database!');
-                }
+            if ($tableName !== null && $settings instanceof DriverDatabaseAbstract) {
+                Logger::log('Extracting session from database...');
+                $array = (new DbArrayBuilder(
+                    $tableName,
+                    $settings->getOrmSettings(),
+                    KeyType::STRING,
+                    ValueType::SCALAR,
+                ))->build();
+            }
+            \assert($array !== null);
+            $unserialized = $array->get('data');
+            if (!$unserialized && $exists) {
+                throw new Exception('Could not extract session from database!');
             }
         }
         \assert($unserialized instanceof APIWrapper || $unserialized === null);

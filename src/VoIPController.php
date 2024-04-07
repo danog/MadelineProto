@@ -257,6 +257,7 @@ final class VoIPController
             }
             $visualization = [];
             $length = new BigInteger(\count(Magic::$emojis));
+            \assert(isset($this->call['g_a']) && \is_string($this->call['g_a']));
             foreach (str_split(hash('sha256', $key.str_pad($this->call['g_a'], 256, \chr(0), STR_PAD_LEFT), true), 8) as $number) {
                 $number[0] = \chr(\ord($number[0]) & 0x7f);
                 $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
@@ -513,6 +514,7 @@ final class VoIPController
     }
     private static function readString(BufferedReader $buffer): string
     {
+        /** @psalm-suppress InvalidArgument */
         return $buffer->readLength(\ord($buffer->readLength(1)));
     }
     private static function readBuffer(BufferedReader $buffer): string

@@ -137,23 +137,23 @@ interface Account
     /**
      * Get privacy settings of current account.
      *
-     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'} $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'}|array{_: 'inputPrivacyKeyBirthday'} $key Peer category whose privacy settings should be fetched @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}|array{_: 'privacyValueAllowPremium'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
     public function getPrivacy(array $key, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Change privacy settings of current account.
      *
-     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'} $key New privacy rule @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
-     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueAllowCloseFriends'}>|array<never, never> $rules Array of Peers to which the privacy rule will apply. @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
+     * @param array{_: 'inputPrivacyKeyStatusTimestamp'}|array{_: 'inputPrivacyKeyChatInvite'}|array{_: 'inputPrivacyKeyPhoneCall'}|array{_: 'inputPrivacyKeyPhoneP2P'}|array{_: 'inputPrivacyKeyForwards'}|array{_: 'inputPrivacyKeyProfilePhoto'}|array{_: 'inputPrivacyKeyPhoneNumber'}|array{_: 'inputPrivacyKeyAddedByPhone'}|array{_: 'inputPrivacyKeyVoiceMessages'}|array{_: 'inputPrivacyKeyAbout'}|array{_: 'inputPrivacyKeyBirthday'} $key New privacy rule @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyKey.html
+     * @param list<array{_: 'inputPrivacyValueAllowContacts'}|array{_: 'inputPrivacyValueAllowAll'}|array{_: 'inputPrivacyValueAllowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueDisallowContacts'}|array{_: 'inputPrivacyValueDisallowAll'}|array{_: 'inputPrivacyValueDisallowUsers', users?: list<array|int|string>}|array{_: 'inputPrivacyValueAllowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueDisallowChatParticipants', chats?: list<int>}|array{_: 'inputPrivacyValueAllowCloseFriends'}|array{_: 'inputPrivacyValueAllowPremium'}>|array<never, never> $rules Array of Peers to which the privacy rule will apply. @see https://docs.madelineproto.xyz/API_docs/types/InputPrivacyRule.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}|array{_: 'privacyValueAllowPremium'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
      */
     public function setPrivacy(array $key, array $rules = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1070,7 +1070,7 @@ interface Account
     /**
      *
      *
-     * @param array{_: 'inputBusinessRecipients', existing_chats?: bool, new_chats?: bool, contacts?: bool, non_contacts?: bool, exclude_selected?: bool, users?: list<array|int|string>} $recipients @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessRecipients.html
+     * @param array{_: 'inputBusinessBotRecipients', existing_chats?: bool, new_chats?: bool, contacts?: bool, non_contacts?: bool, exclude_selected?: bool, users?: list<array|int|string>, exclude_users?: list<array|int|string>} $recipients @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessBotRecipients.html
      * @param bool $can_reply
      * @param bool $deleted
      * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
@@ -1087,7 +1087,118 @@ interface Account
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
-     * @return array{_: 'account.connectedBots', connected_bots: list<array{_: 'connectedBot', recipients: array{_: 'businessRecipients', existing_chats: bool, new_chats: bool, contacts: bool, non_contacts: bool, exclude_selected: bool, users?: list<int>}, can_reply: bool, bot_id: int}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ConnectedBots.html
+     * @return array{_: 'account.connectedBots', connected_bots: list<array{_: 'connectedBot', recipients: array{_: 'businessBotRecipients', existing_chats: bool, new_chats: bool, contacts: bool, non_contacts: bool, exclude_selected: bool, users?: list<int>, exclude_users?: list<int>}, can_reply: bool, bot_id: int}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ConnectedBots.html
      */
     public function getConnectedBots(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     */
+    public function getBotBusinessConnection(string|null $connection_id = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessIntro', title?: string, description?: string, sticker?: array} $intro @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessIntro.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBusinessIntro(array|null $intro = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function toggleConnectedBotPaused(bool $paused, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function disablePeerConnectedBot(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'birthday', day?: int, month?: int, year?: int} $birthday @see https://docs.madelineproto.xyz/API_docs/types/Birthday.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updateBirthday(array|null $birthday = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessChatLink', message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}>, title?: string} $link @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessChatLink.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int} @see https://docs.madelineproto.xyz/API_docs/types/BusinessChatLink.html
+     */
+    public function createBusinessChatLink(array $link, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array{_: 'inputBusinessChatLink', message?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}>, title?: string} $link @see https://docs.madelineproto.xyz/API_docs/types/InputBusinessChatLink.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int} @see https://docs.madelineproto.xyz/API_docs/types/BusinessChatLink.html
+     */
+    public function editBusinessChatLink(array $link, string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function deleteBusinessChatLink(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'account.businessChatLinks', links: list<array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.BusinessChatLinks.html
+     */
+    public function getBusinessChatLinks(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'account.resolvedBusinessChatLinks', peer: array|int|string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ResolvedBusinessChatLinks.html
+     */
+    public function resolveBusinessChatLink(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array|int|string $channel @see https://docs.madelineproto.xyz/API_docs/types/InputChannel.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function updatePersonalChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

@@ -23,7 +23,7 @@
         "ext-pthreads": "*"
     },
     "require": {
-        "php-64bit": ">=8.1",
+        "php-64bit": ">=8.2",
         "danog/primemodule": "^1",
         "symfony/polyfill-mbstring": "*",
         "ext-mbstring": "*",
@@ -46,7 +46,7 @@
         "amphp/postgres": "^2",
         "danog/dns-over-https": "^1",
         "amphp/http-client-cookies": "^2",
-        "danog/tg-file-decoder": "^0.1",
+        "danog/tg-file-decoder": "^1",
         "league/uri": "^7",
         "danog/ipc": "^1",
         "amphp/log": "^2",
@@ -58,11 +58,11 @@
         "webmozart/assert": "^1.11",
         "bacon/bacon-qr-code": "^2.0",
         "nikic/php-parser": "^5",
-        "revolt/event-loop": "^1.0.5"
+        "revolt/event-loop": "^1.0.5",
+        "danog/async-orm": "^1.0.1",
+        "symfony/thanks": "^1.3"
     },
     "require-dev": {
-        "phpdocumentor/reflection-docblock": "dev-master",
-        "phpdocumentor/type-resolver": "1.x-dev@dev",
         "ext-ctype": "*",
         "danog/phpdoc": "^0.1.7",
         "phpunit/phpunit": "^9",
@@ -141,7 +141,8 @@
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
             "phabel/phabel": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/thanks": true
         }
     }
 }

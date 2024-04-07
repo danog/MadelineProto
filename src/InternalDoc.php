@@ -91,6 +91,8 @@ abstract class InternalDoc
     public $premium;
     /** @var \danog\MadelineProto\Namespace\Smsjobs $smsjobs */
     public $smsjobs;
+    /** @var \danog\MadelineProto\Namespace\Fragment $fragment */
+    public $fragment;
 
     /**
      * Export APIFactory instance with the specified namespace.
@@ -140,6 +142,8 @@ abstract class InternalDoc
         $this->premium->setWrapper($this->wrapper);
         $this->smsjobs ??= new \danog\MadelineProto\Namespace\AbstractAPI('smsjobs');
         $this->smsjobs->setWrapper($this->wrapper);
+        $this->fragment ??= new \danog\MadelineProto\Namespace\AbstractAPI('fragment');
+        $this->fragment->setWrapper($this->wrapper);
     }
     /**
          * Convert MTProto parameters to bot API parameters.
@@ -2136,11 +2140,11 @@ abstract class InternalDoc
      * The callable must accept two parameters: int $offset, int $size
      * The callable must return a string with the contest of the file at the specified offset and size.
      *
-     * @param callable(int, int, ?Cancellation): string $callable  Callable (offset, length) => data
+     * @param (callable(int, int, ?Cancellation): string) $callable  Callable (offset, length) => data
      * @param integer                                   $size      File size
      * @param string                                    $mime      Mime type
      * @param string                                    $fileName  File name
-     * @param callable(float, float, float): void       $cb        Status callback
+     * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
      * @param boolean                                   $encrypted Whether to encrypt file for secret chats
      *

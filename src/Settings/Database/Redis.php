@@ -16,16 +16,28 @@
 
 namespace danog\MadelineProto\Settings\Database;
 
-use danog\MadelineProto\Db\RedisArray;
+use Amp\Redis\RedisConfig;
+use danog\AsyncOrm\Serializer\Igbinary;
+use danog\AsyncOrm\Serializer\Native;
+use danog\AsyncOrm\Settings;
+use danog\AsyncOrm\Settings\RedisSettings;
 
 /**
  * Redis backend settings.
  */
 final class Redis extends DriverDatabaseAbstract
 {
-    public function getDriverClass(): string
+    public function getOrmSettings(): Settings
     {
-        return RedisArray::class;
+        return new RedisSettings(
+            RedisConfig::fromUri($this->uri)->withDatabase($this->database)->withPassword($this->password),
+            match ($this->serializer) {
+                SerializerType::IGBINARY => new Igbinary,
+                SerializerType::SERIALIZE => new Native,
+                null => null
+            },
+            $this->cacheTtl,
+        );
     }
     /**
      * Database number.

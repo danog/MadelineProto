@@ -16,7 +16,7 @@
 
 namespace danog\MadelineProto\Settings;
 
-use danog\MadelineProto\Db\DbArray;
+use danog\AsyncOrm\Settings;
 use danog\MadelineProto\SettingsAbstract;
 
 /**
@@ -145,6 +145,5 @@ abstract class DatabaseAbstract extends SettingsAbstract
         return $this;
     }
 
-    /** @return class-string<DbArray> */
-    abstract public function getDriverClass(): string;
+    abstract public function getOrmSettings(): Settings;
 }

@@ -188,7 +188,7 @@ trait ResponseHandler
             $response = $response['result'];
         }
         if (!isset($this->outgoing_messages[$requestId])) {
-            $this->API->logger("Got a reponse $message with message ID $requestId, but there is no request!", Logger::FATAL_ERROR);
+            $this->API->logger("Got a response $message with message ID $requestId, but there is no request!", Logger::ERROR);
             return;
         }
         /** @var MTProtoOutgoingMessage */
@@ -225,7 +225,7 @@ trait ResponseHandler
                 case 17:
                     $this->time_delta = ($message->getMsgId() >> 32) - time();
                     $this->API->logger('Set time delta to ' . $this->time_delta, Logger::WARNING);
-                    $this->API->resetMTProtoSession();
+                    $this->API->resetMTProtoSession("time delta update");
                     $this->shared->setTempAuthKey(null);
                     EventLoop::queue($this->shared->initAuthorization(...));
                     EventLoop::queue($this->methodRecall(...), $requestId);
@@ -291,7 +291,9 @@ trait ResponseHandler
         if ($response['error_message'] === 'PERSISTENT_TIMESTAMP_OUTDATED') {
             $response['error_code'] = 500;
         }
-        if (str_starts_with($response['error_message'], 'FILE_REFERENCE_')) {
+        if (str_starts_with($response['error_message'], 'FILE_REFERENCE_')
+            && !$request->shouldRefreshReferences()
+        ) {
             $this->API->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
             $this->gotResponseForOutgoingMessage($request);
             $msgId = $request->getMsgId();

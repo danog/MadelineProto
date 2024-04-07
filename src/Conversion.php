@@ -33,7 +33,7 @@ final class Conversion
     /**
      * Prepare API instance.
      *
-     * @param array<int, string> $authorization Authorization info
+     * @param array<int, string> $authorization Authorization info, DC ID => auth key
      */
     public static function importAuthorization(array $authorization, int $main_dc_id, string $session, ?SettingsAbstract $settings = null): API
     {

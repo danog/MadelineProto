@@ -99,9 +99,9 @@ trait Session
     /**
      * Reset MTProto session.
      */
-    public function resetSession(): void
+    public function resetSession(string $why): void
     {
-        $this->API->logger("Resetting session in DC {$this->datacenterId}...", Logger::WARNING);
+        $this->API->logger("Resetting session in DC {$this->datacenterId} due to $why...", Logger::WARNING);
         $this->session_id = Tools::random(8);
         $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
@@ -172,7 +172,7 @@ trait Session
     public function createSession(): void
     {
         if ($this->session_id === null) {
-            $this->resetSession();
+            $this->resetSession("creating initial session");
         }
         $this->abstractionQueueMutex ??= new LocalKeyedMutex;
     }

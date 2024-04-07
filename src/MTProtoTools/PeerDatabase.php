@@ -23,16 +23,18 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
-use danog\MadelineProto\Db\MemoryArray;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbArrayBuilder;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Settings\Database\SerializerType;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
 use InvalidArgumentException;
@@ -46,29 +48,27 @@ use Webmozart\Assert\Assert;
  */
 final class PeerDatabase implements TLCallback
 {
-    use DbPropertiesTrait;
+    use LegacyMigrator;
 
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix();
-    }
-
-    private const V = 0;
+    private const V = 1;
 
     /**
      * Chats.
      *
      * @var DbArray<int, array>
      */
-    private DbArray $db;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_chats')]
+    private $db;
     /**
      * @var DbArray<int, array>
      */
-    private DbArray $fullDb;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_full_chats')]
+    private $fullDb;
     /**
      * @var DbArray<string, int>
      */
-    private DbArray $usernames;
+    #[OrmMappedArray(KeyType::STRING, ValueType::INT)]
+    private $usernames;
     private bool $hasInfo = true;
     private bool $hasUsernames = true;
 
@@ -76,29 +76,6 @@ final class PeerDatabase implements TLCallback
     private array $pendingDb = [];
 
     private int $v = self::V;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'db' => [
-            'innerMadelineProto' => true,
-            'table' => 'MTProto_chats',
-            'intKey' => true,
-        ],
-        'fullDb' => [
-            'innerMadelineProto' => true,
-            'table' => 'MTProto_full_chats',
-            'intKey' => true,
-        ],
-        'usernames' => [
-            'innerMadelineProto' => true,
-            'innerMadelineProtoSerializer' => SerializerType::STRING,
-            'table' => 'MTProto_usernames',
-        ],
-    ];
 
     private LocalMutex $decacheMutex;
     private LocalKeyedMutex $mutex;
@@ -118,7 +95,7 @@ final class PeerDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_PeerDatabase_');
         if (!$this->API->settings->getDb()->getEnableFullPeerDb()) {
             $this->fullDb->clear();
         }
@@ -145,6 +122,25 @@ final class PeerDatabase implements TLCallback
 
         if (!$this->API->settings->getDb()->getEnableUsernameDb()) {
             $this->usernames->clear();
+        } elseif ($this->v === 0) {
+            $old = new DbArrayBuilder(
+                $this->API->getDbPrefix().'_MTProto_usernames',
+                $this->API->getDbSettings(),
+                KeyType::STRING,
+                ValueType::SCALAR
+            );
+            $old = $old->build();
+            $kk = 0;
+            $total = \count($old);
+            foreach ($old as $k => $v) {
+                $kk++;
+                if ($kk % 500 === 0 || $kk === $total) {
+                    $this->API->logger("Migrating username database ($kk/$total)...");
+                }
+                $this->usernames[$k] = $v;
+            }
+            $old->clear();
+            $this->v = self::V;
         }
 
         EventLoop::queue(function (): void {
@@ -153,23 +149,6 @@ final class PeerDatabase implements TLCallback
                 EventLoop::queue($key < 0 ? $this->processChat(...) : $this->processUser(...), $key);
             }
         });
-    }
-    public function importLegacy(MemoryArray $chats, MemoryArray $fullChats): void
-    {
-        foreach ($chats as $id => $chat) {
-            $this->db[$id] = $chat;
-            if ($this->API->settings->getDb()->getEnableUsernameDb()) {
-                foreach (self::getUsernames($chat) as $username) {
-                    $this->usernames[$username] = (int) $id;
-                }
-            }
-        }
-        if (!$this->API->settings->getDb()->getEnableFullPeerDb()) {
-            return;
-        }
-        foreach ($fullChats as $id => $chat) {
-            $this->fullDb[$id] = $chat;
-        }
     }
 
     public function getFull(int $id): ?array

@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\TLCallback;
@@ -36,7 +39,7 @@ use Revolt\EventLoop;
  */
 final class MinDatabase implements TLCallback
 {
-    use DbPropertiesTrait;
+    use LegacyMigrator;
 
     public const SWITCH_CONSTRUCTORS = ['inputChannel', 'inputUser', 'inputPeerUser', 'inputPeerChannel'];
     public const CATCH_PEERS = ['message', 'messageService', 'peerUser', 'peerChannel', 'messageEntityMentionName', 'messageFwdHeader', 'messageActionChatCreate', 'messageActionChatAddUser', 'messageActionChatDeleteUser', 'messageActionChatJoinedByLink'];
@@ -45,8 +48,10 @@ final class MinDatabase implements TLCallback
     /**
      * References indexed by location.
      *
+     * @var DbArray<int, array>
      */
-    private DbArray $db;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
+    private $db;
     private array $pendingDb = [];
     /**
      * Temporary cache during deserialization.
@@ -60,15 +65,6 @@ final class MinDatabase implements TLCallback
     private MTProto $API;
 
     private int $v = 0;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true, 'intKey' => true],
-    ];
 
     private LocalKeyedMutex $localMutex;
     public function __construct(MTProto $API)
@@ -84,17 +80,13 @@ final class MinDatabase implements TLCallback
     {
         return ['db', 'pendingDb', 'API', 'v'];
     }
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix();
-    }
     public function __wakeup(): void
     {
         $this->localMutex = new LocalKeyedMutex;
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_MinDatabase_');
         if (!$this->API->getSettings()->getDb()->getEnableMinDb()) {
             $this->db->clear();
             $this->pendingDb = [];

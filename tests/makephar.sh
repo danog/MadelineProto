@@ -86,13 +86,17 @@ echo '{
     "require": {
         "danog/madelineproto": "'$COMPOSER_TAG'"
     },
-    "minimum-stability": "beta",
     "authors": [
         {
             "name": "Daniil Gentili",
             "email": "daniil@daniil.it"
         }
     ],
+    "config": {
+        "allow-plugins": {
+            "symfony/thanks": true
+        }
+    },
     "repositories": [
         {
             "type": "path",
@@ -106,7 +110,6 @@ php $(which composer) dumpautoload --optimize
 rm -rf vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 mkdir -p vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
 cp vendor/danog/madelineproto/src/Ipc/Runner/entry.php vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
-cd ..
 
 branch="-$BRANCH"
 cd $madelinePath
@@ -158,6 +161,7 @@ k
 rm -f madeline.phar testing.madeline*
 
 tail -F MadelineProto.log &
+tail -F tests/MadelineProto.log &
 
 echo "Testing with previous version..."
 export ACTIONS_FORCE_PREVIOUS=1

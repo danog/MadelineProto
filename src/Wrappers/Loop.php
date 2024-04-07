@@ -69,6 +69,7 @@ trait Loop
                 $url = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0] ?? '';
                 $query = http_build_query($params);
 
+                /** @psalm-suppress InternalMethod */
                 WebRunner::selfStart("$url?$query");
 
                 $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");

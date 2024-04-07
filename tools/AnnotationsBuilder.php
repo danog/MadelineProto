@@ -468,6 +468,12 @@ final class Blacklist {
                     Logger::log("{$name} should be STATIC!", Logger::FATAL_ERROR);
                 }
             }
+            if ($name === 'initDbProperties') {
+                continue;
+            }
+            if ($name === 'saveDbProperties') {
+                continue;
+            }
             if ($name == 'methodCallAsyncRead') {
                 $name = 'methodCall';
             } elseif (stripos($name, 'async') !== false) {

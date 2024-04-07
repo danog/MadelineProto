@@ -24,8 +24,11 @@ use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Secret\SecretFeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
@@ -48,36 +51,23 @@ use Webmozart\Assert\Assert;
  */
 final class SecretChatController implements Stringable
 {
-    use DbPropertiesTrait;
-
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix().'_'.$this->id;
-    }
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'incoming' => ['innerMadelineProto' => true, 'intKey' => true],
-        'outgoing' => ['innerMadelineProto' => true, 'intKey' => true],
-        'randomIdMap' => ['innerMadelineProto' => true, 'intKey' => true],
-    ];
+    use LegacyMigrator;
 
     /**
      * @var DbArray<int, array>
      */
-    private DbArray $incoming;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
+    private $incoming;
     /**
      * @var DbArray<int, array>
      */
-    private DbArray $outgoing;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
+    private $outgoing;
     /**
      * @var DbArray<int, list{int, bool}> Seq, outgoing
      */
-    private DbArray $randomIdMap;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
+    private $randomIdMap;
     private int $in_seq_no = 0;
     private int $out_seq_no = 0;
     private int $remote_in_seq_no = 0;
@@ -150,7 +140,10 @@ final class SecretChatController implements Stringable
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties(
+            $this->API->getDbSettings(),
+            $this->API->getDbPrefix().'_SecretChatController_'.$this->id.'_'
+        );
     }
 
     public function startFeedLoop(): void

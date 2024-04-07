@@ -21,9 +21,12 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesTrait;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -39,12 +42,8 @@ use Webmozart\Assert\Assert;
  */
 final class ReferenceDatabase implements TLCallback
 {
-    use DbPropertiesTrait;
+    use LegacyMigrator;
 
-    protected function getDbPrefix(): string
-    {
-        return $this->API->getDbPrefix();
-    }
     // Reference from a document
     public const DOCUMENT_LOCATION = 0;
     // Reference from a photo
@@ -78,8 +77,10 @@ final class ReferenceDatabase implements TLCallback
     private const V = 1;
     /**
      * References indexed by location.
+     * @var DbArray<string, array>
      */
-    private DbArray $db;
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
+    private $db;
     /**
      * @var array<string, list{string, int, array}>
      */
@@ -90,15 +91,6 @@ final class ReferenceDatabase implements TLCallback
     private bool $refresh = false;
     private int $refreshCount = 0;
     private int $v = 0;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'db' => ['innerMadelineProto' => true],
-    ];
 
     private LocalKeyedMutex $flushMutex;
     public function __construct(private MTProto $API)
@@ -116,7 +108,7 @@ final class ReferenceDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDb($this->API);
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_ReferenceDatabase_');
         if ($this->v === 0) {
             $this->db->clear();
             $this->pendingDb = [];

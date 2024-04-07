@@ -142,7 +142,7 @@ final class SessionPaths
     /**
      * Serialize object to file.
      */
-    public function serialize(object $object, string $path): void
+    public function serialize(object|string $object, string $path): void
     {
         Logger::log("Waiting for exclusive lock of $path.lock...");
         $unlock = Tools::flock("$path.lock", LOCK_EX, 0.1);
@@ -173,7 +173,7 @@ final class SessionPaths
      *
      * @param string $path Object path, defaults to session path
      */
-    public function unserialize(string $path = ''): ?object
+    public function unserialize(string $path = ''): object|string|null
     {
         $path = $path ?: $this->sessionPath;
 

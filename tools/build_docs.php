@@ -25,7 +25,12 @@ use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use danog\PhpDoc\PhpDoc;
 use danog\PhpDoc\PhpDoc\MethodDoc;
-use phpDocumentor\Reflection\DocBlockFactory;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
+use PHPStan\PhpDocParser\Lexer\Lexer;
+use PHPStan\PhpDocParser\Parser\ConstExprParser;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPStan\PhpDocParser\Parser\TokenIterator;
+use PHPStan\PhpDocParser\Parser\TypeParser;
 
 use function Amp\File\read;
 
@@ -65,7 +70,6 @@ $docs = [
         'readme'      => false,
     ],
 ];
-$docs = array_merge($docs, initDocs($schemas));
 
 $logger->logger('Creating annotations...', Logger::NOTICE);
 $doc = new \danog\MadelineProto\AnnotationsBuilder(
@@ -135,9 +139,27 @@ foreach ($files as $file) {
 ksort($orderedfiles);
 
 /** @internal */
+function getSummary(string $phpdoc): string
+{
+    $lexer = new Lexer();
+    $constExprParser = new ConstExprParser();
+    $typeParser = new TypeParser($constExprParser);
+    $parser = new PhpDocParser(
+        $typeParser,
+        $constExprParser,
+        textBetweenTagsBelongsToDescription: true
+    );
+    foreach ($parser->parse(new TokenIterator($lexer->tokenize($phpdoc)))->children as $t) {
+        if ($t instanceof PhpDocTextNode) {
+            return explode("\n", $t->text)[0];
+        }
+    }
+    return '';
+}
+
+/** @internal */
 function printTypes(array $types, string $type): string
 {
-    $b = DocBlockFactory::createInstance();
     $phpdoc = PhpDoc::fromNamespace();
     $data = '';
     foreach ($types as $class) {
@@ -149,7 +171,7 @@ function printTypes(array $types, string $type): string
         if (!$refl->getDocComment()) {
             throw new AssertionError("No documentation for $class!");
         }
-        $f = $b->create($refl->getDocComment())->getSummary();
+        $f = getSummary($refl->getDocComment());
         if ($refl->hasMethod('__construct')) {
             $c = $refl->getMethod('__construct');
             if ($c->getParameters() && $type === 'attributefilters') {

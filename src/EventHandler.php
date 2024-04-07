@@ -25,7 +25,6 @@ use Amp\Future;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\Loop\PeriodicLoop;
-use danog\MadelineProto\Db\DbPropertiesTrait;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
@@ -49,13 +48,15 @@ use function Amp\File\listFiles;
  */
 abstract class EventHandler extends AbstractAPI
 {
-    use DbPropertiesTrait {
-        DbPropertiesTrait::initDb as private internalInitDb;
+    use LegacyMigrator {
+        LegacyMigrator::initDbProperties as private internalInitDbProperties;
+        LegacyMigrator::saveDbProperties as private privateInternalSaveDbProperties;
     }
 
-    protected function getDbPrefix(): string
+    /** @internal Do not use manually. */
+    final public function internalSaveDbProperties(): void
     {
-        return $this->wrapper->getAPI()->getDbPrefix();
+        $this->privateInternalSaveDbProperties();
     }
 
     private static bool $includingPlugins = false;
@@ -134,8 +135,13 @@ abstract class EventHandler extends AbstractAPI
             $this->exportNamespaces();
 
             if (isset(static::$dbProperties)) {
-                $this->internalInitDb($this->wrapper->getAPI());
+                throw new AssertionError("Please switch to using OrmMappedArray annotations for mapped ORM properties!");
             }
+            $this->internalInitDbProperties(
+                $this->wrapper->getAPI()->getDbSettings(),
+                $this->wrapper->getAPI()->getDbPrefix().'_EventHandler_',
+            );
+
             if ($main) {
                 $this->setReportPeers($this->getReportPeers());
             }

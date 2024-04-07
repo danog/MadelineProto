@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of MadelineProto.
@@ -14,51 +16,23 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Db;
-
-use Countable;
+namespace danog\MadelineProto\TL;
 
 /**
- * DB type interface.
- *
- * @template TKey as array-key
- * @template TValue
+ * @internal
  */
-interface DbType extends Countable
+class SecretBuilder extends Builder
 {
-    /**
-     * Check if element is set.
-     *
-     * @param TKey $key
-     */
-    public function isset(string|int $key): bool;
-    /**
-     * Unset element.
-     *
-     * @param TKey $key
-     */
-    public function unset(string|int $key): void;
-    /**
-     * Set element.
-     *
-     * @param TKey   $key
-     * @param TValue $value
-     */
-    public function set(string|int $key, mixed $value): void;
-    /**
-     * Get element.
-     *
-     * @param TKey $index
-     */
-    public function offsetGet(mixed $index): mixed;
-    /**
-     * Clear all elements.
-     */
-    public function clear(): void;
-    /**
-     * Get iterator.
-     *
-     * @psalm-return \Traversable<TKey, TValue>
-     */
-    public function getIterator(): \Traversable;
+    protected function buildMain(): void
+    {
+        $initial_constructors = array_filter(
+            $this->constructorByPredicate,
+            static fn (array $arr) => (
+                $arr['type'] === 'DecryptedMessage'
+                || $arr['type'] === 'DecryptedMessageMedia'
+            )
+        );
+
+        $this->m("deserialize_type_Object", "return {$this->buildTypes($initial_constructors, 'Object')};", 'mixed', true, static: false);
+    }
 }

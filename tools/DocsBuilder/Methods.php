@@ -28,7 +28,6 @@ use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 use danog\PhpDoc\PhpDoc;
 use danog\PhpDoc\PhpDoc\MethodDoc;
-use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -276,20 +275,17 @@ trait Methods
         /** @psalm-suppress UndefinedClass */
         $phpdoc = PhpDoc::fromNamespace(\danog\MadelineProto::class);
         $phpdoc->resolveAliases();
-        $builder = DocBlockFactory::createInstance();
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $name = $method->getName();
             if (\in_array(strtolower($name), ['update2fa', 'getdialogids', 'getdialogs', 'getfulldialogs', 'getpwrchat', 'getfullinfo', 'getinfo', 'getid', 'getself', '__magic_construct', '__construct', '__destruct', '__sleep', '__wakeup'], true)) {
                 continue;
             }
-            var_dump($name, $method->getDocComment());
             $doc = $method->getDocComment();
             if (str_contains($doc, '@internal') || str_contains($doc, '@deprecated')) {
                 continue;
             }
             if ($doc) {
-                $doc = $builder->create($doc);
-                $doc = explode("\n", $doc->getSummary())[0];
+                $doc = getSummary($doc);
             }
             if (!$doc) {
                 throw new AssertionError($name);

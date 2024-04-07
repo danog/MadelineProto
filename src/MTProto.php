@@ -34,11 +34,14 @@ use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
+use danog\AsyncOrm\Annotations\OrmMappedArray;
+use danog\AsyncOrm\DbArray;
+use danog\AsyncOrm\DbArrayBuilder;
+use danog\AsyncOrm\Driver\MemoryArray;
+use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\Settings as OrmSettings;
+use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\Db\DbArray;
-use danog\MadelineProto\Db\DbPropertiesFactory;
-use danog\MadelineProto\Db\DbPropertiesTrait;
-use danog\MadelineProto\Db\MemoryArray;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
@@ -113,7 +116,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use Login;
     use Loop;
     use Start;
-    use DbPropertiesTrait;
+    use LegacyMigrator {
+        LegacyMigrator::initDbProperties as private internalInitDbProperties;
+        LegacyMigrator::saveDbProperties as private internalSaveDbProperties;
+    }
     use Broadcast;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
@@ -218,8 +224,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Cached parameters for fetching channel participants.
      *
+     * @var DbArray<string, array>
      */
-    public DbArray $channelParticipants;
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
+    public $channelParticipants;
     /**
      * When we last stored data in remote peer database (now doesn't exist anymore).
      *
@@ -233,8 +241,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Sponsored message database.
      *
+     * @var DbArray<int, array>
      */
-    public DbArray $sponsoredMessages;
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR)]
+    public $sponsoredMessages;
     /**
      * Latest chat message ID map for update handling.
      *
@@ -380,19 +390,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Nullcache array for storing main session file to DB.
      */
-    public DbArray $session;
-
-    /**
-     * List of properties stored in database (memory or external).
-     *
-     * @see DbPropertiesFactory
-     */
-    protected static array $dbProperties = [
-        'sponsoredMessages' => ['innerMadelineProto' => true, 'intKey' => true],
-        'channelParticipants' => ['innerMadelineProto' => true],
-        'getUpdatesQueue' => ['innerMadelineProto' => true, 'intKey' => true],
-        'session' => ['innerMadelineProto' => true, 'enableCache' => false, 'optimizeIfWastedGtMb' => 1],
-    ];
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR, cacheTtl: 0, optimizeIfWastedMb: 1, tablePostfix: 'session')]
+    public DbArray $sessionDb;
 
     /**
      * Returns an instance of a client by session name.
@@ -411,12 +410,29 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function serializeSession(object $data)
     {
+        // Force migration
+        $this->getDbAutoProperties();
         /** @psalm-suppress TypeDoesNotContainType */
-        if (!isset($this->session) || $this->session instanceof MemoryArray) {
+        if (!isset($this->sessionDb) || $this->sessionDb instanceof MemoryArray) {
             return $data;
         }
-        $this->session['data'] = $data;
-        return $this->session;
+        $this->sessionDb['data'] = $data;
+
+        $db = [];
+        $db []= async($this->referenceDatabase->saveDbProperties(...));
+        $db []= async($this->minDatabase->saveDbProperties(...));
+        $db []= async($this->peerDatabase->saveDbProperties(...));
+        $db []= async($this->internalSaveDbProperties(...));
+        if (isset($this->event_handler_instance)) {
+            $db []= async($this->event_handler_instance->internalSaveDbProperties(...));
+        }
+        await($db);
+        return new DbArrayBuilder(
+            $this->getDbPrefix().'_MTProto_session',
+            $this->getDbSettings(),
+            KeyType::STRING,
+            ValueType::SCALAR
+        );
     }
 
     /**
@@ -571,6 +587,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $prefix = $this->tmpDbPrefix;
         }
         return (string) $prefix;
+    }
+    /** @internal */
+    public function getDbSettings(): OrmSettings
+    {
+        return $this->settings->getDb()->getOrmSettings();
     }
 
     /**
@@ -879,18 +900,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
         $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->initDb(...), $this);
+        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix().'_MTProto_');
         foreach ($this->secretChats as $chat) {
             $db []= async($chat->init(...));
         }
         await($db);
-
-        if (isset($this->chats) && $this->chats instanceof MemoryArray) {
-            $this->peerDatabase->importLegacy(
-                $this->chats,
-                $this->full_chats,
-            );
-        }
 
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
@@ -924,7 +938,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         $this->settings->setSchema(new TLSchema);
 
-        $this->resetMTProtoSession(true, true);
+        $this->resetMTProtoSession("upgrading madelineproto", true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
         $this->initialize($this->settings);
@@ -999,7 +1013,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 Lang::$currentPercentage = 0;
             }
             // Reset MTProto session (not related to user session)
-            $this->resetMTProtoSession();
+            $this->resetMTProtoSession("wakeup");
             // Update settings from constructor
             $this->updateSettings($settings);
             // Update TL callbacks
@@ -1157,6 +1171,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $this->settings = new Settings;
             } else {
                 if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
+                    $this->setupLogger();
                     $this->logger->logger("Generic settings have changed!", Logger::WARNING);
                     $this->upgradeMadelineProto();
                 }
@@ -1201,6 +1216,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             || $this->settings->getSchema()->hasChanged()
             || $this->settings->getSchema()->needsUpgrade()
             || $this->v !== API::RELEASE)) {
+            $this->setupLogger();
             $this->logger->logger("Generic settings have changed!", Logger::WARNING);
             if ($this->v !== API::RELEASE || $this->settings->getSchema()->needsUpgrade()) {
                 $this->upgradeMadelineProto();
@@ -1234,14 +1250,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @param boolean $auth_key Whether to reset the auth key
      * @internal
      */
-    public function resetMTProtoSession(bool $de = true, bool $auth_key = false): void
+    public function resetMTProtoSession(string $why, bool $de = true, bool $auth_key = false): void
     {
         if (!\is_object($this->datacenter)) {
             throw new Exception(Lang::$current_lang['session_corrupted']);
         }
         foreach ($this->datacenter->getDataCenterConnections() as $id => $socket) {
             if ($de) {
-                $socket->resetSession();
+                $socket->resetSession("resetMTProtoSession: $why");
             }
             if ($auth_key) {
                 $socket->setTempAuthKey(null);

@@ -50,11 +50,6 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
     protected string $uri = 'tcp://127.0.0.1';
 
     /**
-     * @internal Internal value used by inner settings, do not change.
-     */
-    public bool $intKey = false;
-
-    /**
      * Get maximum connection limit.
      *
      * @return positive-int

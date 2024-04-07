@@ -20,6 +20,4 @@ enum SerializerType: string
 {
     case SERIALIZE = 'serialize';
     case IGBINARY = 'igbinary';
-    case JSON = 'json';
-    case STRING = 'string';
 }

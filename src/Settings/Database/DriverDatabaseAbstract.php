@@ -25,6 +25,8 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
 {
     /**
      * For how long to keep records in memory after last read, for cached backends.
+     *
+     * @var int<0, max>
      */
     protected int $cacheTtl = 5 * 60;
     /**
