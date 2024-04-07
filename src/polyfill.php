@@ -25,7 +25,6 @@ class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArrayBytea');
 class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\RedisArray');
 class_alias(CacheContainer::class, '\\danog\\MadelineProto\\Db\\CacheContainer');
-class_alias(Countable::class, '\\danog\\MadelineProto\\Db\\DbArray');
 
 /** @deprecated */
 final class MemoryArray extends ArrayObject
