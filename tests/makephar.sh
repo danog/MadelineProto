@@ -86,7 +86,6 @@ echo '{
     "require": {
         "danog/madelineproto": "'$COMPOSER_TAG'"
     },
-    "minimum-stability": "beta",
     "authors": [
         {
             "name": "Daniil Gentili",
@@ -111,7 +110,7 @@ php $(which composer) dumpautoload --optimize
 rm -rf vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 mkdir -p vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
 cp vendor/danog/madelineproto/src/Ipc/Runner/entry.php vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
-cd ..
+cat vendor/danog/madelineproto/src/MTProtoTools/Files.php
 
 branch="-$BRANCH"
 cd $madelinePath
