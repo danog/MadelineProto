@@ -679,7 +679,7 @@ trait Files
     {
         foreach (FileIdType::cases() as $type) {
             if (isset($info[$type->value]) && \is_array($info[$type->value])) {
-                $method = $type->valye;
+                $method = $type->value;
                 break;
             }
         }
