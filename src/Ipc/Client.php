@@ -241,6 +241,7 @@ final class Client extends ClientAbstract
             $method === 'messages.editInlineBotMessage' ||
             $method === 'messages.uploadMedia' ||
             $method === 'messages.sendMedia' ||
+            $method === 'stories.sendStory' ||
             $method === 'messages.editMessage'
         ) && isset($args['media']) && \is_array($args['media'])) {
             $this->processMedia($args['media'], $args['cancellation'] ?? null, true);
