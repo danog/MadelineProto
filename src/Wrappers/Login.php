@@ -355,6 +355,8 @@ trait Login
         $this->fullGetSelf();
         $this->getPhoneConfig();
         $this->startUpdateSystem();
+        $this->initDb();
+        $this->serialize();
         return $authorization;
     }
     /**

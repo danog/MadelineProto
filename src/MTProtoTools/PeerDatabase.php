@@ -497,7 +497,7 @@ final class PeerDatabase implements TLCallback
             ) {
                 $existingChat = $this->db[$chat['id']];
                 if (!$existingChat || $existingChat != $chat) {
-                    $this->API->logger("Updated chat -{$chat['id']}", Logger::ULTRA_VERBOSE);
+                    $this->API->logger("Updated chat {$chat['id']}", Logger::ULTRA_VERBOSE);
                     if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                         $chat = [
                             '_' => $chat['_'],
