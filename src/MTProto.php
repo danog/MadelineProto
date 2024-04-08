@@ -896,15 +896,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->minDatabase ??= new MinDatabase($this);
         $this->peerDatabase ??= new PeerDatabase($this);
 
-        $db = [];
-        $db []= async($this->referenceDatabase->init(...));
-        $db []= async($this->minDatabase->init(...));
-        $db []= async($this->peerDatabase->init(...));
-        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix().'_MTProto_');
-        foreach ($this->secretChats as $chat) {
-            $db []= async($chat->init(...));
-        }
-        await($db);
+        $this->initDb();
 
         if (!isset($this->TL)) {
             $this->TL = new TL($this);
@@ -924,6 +916,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->seqUpdater ??= new SeqLoop($this);
     }
 
+    /** @internal */
+    public function initDb(): void
+    {
+        $db = [];
+        $db []= async($this->referenceDatabase->init(...));
+        $db []= async($this->minDatabase->init(...));
+        $db []= async($this->peerDatabase->init(...));
+        $db []= async($this->internalInitDbProperties(...), $this->getDbSettings(), $this->getDbPrefix().'_MTProto_');
+        foreach ($this->secretChats as $chat) {
+            $db []= async($chat->init(...));
+        }
+        await($db);
+    }
     /**
      * Upgrade MadelineProto instance.
      */
