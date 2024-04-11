@@ -57,17 +57,17 @@ final class PeerDatabase implements TLCallback
      *
      * @var DbArray<int, array>
      */
-    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_chats')]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: '_MTProto_chats')]
     private $db;
     /**
      * @var DbArray<int, array>
      */
-    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: 'MTProto_full_chats')]
+    #[OrmMappedArray(KeyType::INT, ValueType::SCALAR, tablePostfix: '_MTProto_full_chats')]
     private $fullDb;
     /**
      * @var DbArray<string, int>
      */
-    #[OrmMappedArray(KeyType::STRING, ValueType::INT)]
+    #[OrmMappedArray(KeyType::STRING, ValueType::INT, tablePostfix: '_PeerDatabase_usernames')]
     private $usernames;
     private bool $hasInfo = true;
     private bool $hasUsernames = true;
@@ -95,7 +95,7 @@ final class PeerDatabase implements TLCallback
     }
     public function init(): void
     {
-        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_PeerDatabase_');
+        $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix());
         if (!$this->API->settings->getDb()->getEnableFullPeerDb()) {
             $this->fullDb->clear();
         }
