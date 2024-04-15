@@ -60,7 +60,8 @@
         "nikic/php-parser": "^5.0.2",
         "revolt/event-loop": "^1.0.6",
         "danog/async-orm": "^1.0.2",
-        "symfony/thanks": "^1.3"
+        "symfony/thanks": "^1.3",
+        "danog/telegram-entities": "^1.0"
     },
     "require-dev": {
         "ext-ctype": "*",
@@ -72,7 +73,8 @@
         "amphp/http-server": "^3.3",
         "revolt/event-loop-adapter-react": "^1.1.1",
         "dg/bypass-finals": "dev-master",
-        "brianium/paratest": "^6.11.1"
+        "brianium/paratest": "^6.11.1",
+        "vimeo/psalm": "dev-master"
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
@@ -131,11 +133,6 @@
         "bin": "echo 'bin not installed'",
         "post-install-cmd": ["@composer bin all install --ansi"],
         "post-update-cmd": ["@composer bin all update --ansi"]
-    },
-    "extra": {
-        "phabel": {
-            "revision": 0
-        }
     },
     "config": {
         "allow-plugins": {

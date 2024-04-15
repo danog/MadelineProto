@@ -1,8 +1,6 @@
 {
     "require": {
-        "vimeo/psalm": "dev-master",
         "ennexa/amp-update-cache": "dev-master",
-        "phpunit/phpunit": "^9",
         "amphp/php-cs-fixer-config": "v2.x-dev",
         "slevomat/coding-standard": "^8.7",
         "squizlabs/php_codesniffer": "^3.7",

@@ -128,7 +128,7 @@ final class DoHWrapper
      *
      * @return ConnectionContext[]
      */
-    public function generateContexts(string $uri, ConnectContext $context = null): array
+    public function generateContexts(string $uri, ?ConnectContext $context = null): array
     {
         $ctxs = [];
         $combos = [
