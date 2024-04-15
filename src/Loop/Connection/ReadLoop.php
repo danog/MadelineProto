@@ -22,7 +22,7 @@ namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\PendingReadError;
 use Amp\ByteStream\StreamException;
-use Amp\Websocket\ClosedException;
+use Amp\Websocket\WebsocketClosedException;
 use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
@@ -130,7 +130,7 @@ final class ReadLoop extends Loop
         }
         try {
             $buffer = $this->connection->stream->getReadBuffer($payload_length);
-        } catch (ClosedException $e) {
+        } catch (WebsocketClosedException $e) {
             $this->API->logger($e->getReason());
             if (str_starts_with($e->getReason(), '       ')) {
                 $payload = -((int) substr($e->getReason(), 7));

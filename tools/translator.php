@@ -34,6 +34,7 @@ final class Lang
     public static array $lang = %s;
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
+    /** @var array<string, string> */
     public static array $current_lang = %s;
 }';
 

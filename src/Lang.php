@@ -1550,6 +1550,7 @@ If you intentionally deleted this account, ignore this message.',
     ];
 
     // THIS WILL BE OVERWRITTEN BY $lang["en"]
+    /** @var array<string, string> */
     public static array $current_lang = [
         '2fa_uncalled' => 'I\'m not waiting for the password! Please call the phoneLogin and the completePhoneLogin methods first!',
         'accepting_call' => 'Accepting call from %s...',
