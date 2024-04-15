@@ -31,7 +31,7 @@ use function stream_get_contents;
 final class Conversion
 {
     /**
-     * Prepare API instance.
+     * Import authorization from raw auth key and DC id.
      *
      * @param array<int, string> $authorization Authorization info, DC ID => auth key
      */

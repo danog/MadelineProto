@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto;
 
+use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\MadelineProto\EventHandler\Media;
@@ -54,7 +55,8 @@ final class BotApiFileId
      */
     public function getTypeClass(): string
     {
-        return match (FileId::fromBotAPI($this->fileId)->type) {
+        $f = FileId::fromBotAPI($this->fileId);
+        return match ($f->type) {
             FileIdType::PHOTO => Photo::class,
             FileIdType::VOICE => Voice::class,
             FileIdType::VIDEO => Video::class,
@@ -62,7 +64,8 @@ final class BotApiFileId
             FileIdType::STICKER => AbstractSticker::class,
             FileIdType::VIDEO_NOTE => RoundVideo::class,
             FileIdType::AUDIO => Audio::class,
-            FileIdType::ANIMATION => Gif::class
+            FileIdType::ANIMATION => Gif::class,
+            default => throw new AssertionError("Cannot use bot API file ID of type ".$f->type->value)
         };
     }
 }

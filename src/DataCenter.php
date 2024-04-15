@@ -140,7 +140,7 @@ final class DataCenter
      *
      * @internal
      */
-    private static function normalizeBindToOption(string $bindTo = null): ?string
+    private static function normalizeBindToOption(?string $bindTo = null): ?string
     {
         if ($bindTo === null) {
             return null;

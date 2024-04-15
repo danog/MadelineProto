@@ -40,8 +40,9 @@ use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\TL\Conversion\MarkdownEntities;
+use danog\TelegramEntities\Entities;
+use danog\TelegramEntities\EntityTools;
 use Throwable;
-use Webmozart\Assert\Assert;
 
 /**
  * Some tools.
@@ -55,15 +56,7 @@ abstract class StrTools extends Extension
      */
     public static function mbStrlen(string $text): int
     {
-        $length = 0;
-        $textlength = \strlen($text);
-        for ($x = 0; $x < $textlength; $x++) {
-            $char = \ord($text[$x]);
-            if (($char & 0xc0) != 0x80) {
-                $length += 1 + ($char >= 0xf0 ? 1 : 0);
-            }
-        }
-        return $length;
+        return EntityTools::mbStrlen($text);
     }
     /**
      * Telegram UTF-8 multibyte substring.
@@ -74,15 +67,7 @@ abstract class StrTools extends Extension
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
-        return mb_convert_encoding(
-            substr(
-                mb_convert_encoding($text, 'UTF-16'),
-                $offset<<1,
-                $length === null ? null : ($length<<1),
-            ),
-            'UTF-8',
-            'UTF-16',
-        );
+        return EntityTools::mbSubstr($text, $offset, $length);
     }
     /**
      * Telegram UTF-8 multibyte split.
@@ -93,13 +78,7 @@ abstract class StrTools extends Extension
      */
     public static function mbStrSplit(string $text, int $length): array
     {
-        $result = [];
-        foreach (str_split(mb_convert_encoding($text, 'UTF-16'), $length<<1) as $chunk) {
-            $chunk = mb_convert_encoding($chunk, 'UTF-8', 'UTF-16');
-            Assert::string($chunk);
-            $result []= $chunk;
-        }
-        return $result;
+        return EntityTools::mbStrSplit($text, $length);
     }
     /**
      * Manually convert HTML to a message and a set of entities.
@@ -222,7 +201,7 @@ abstract class StrTools extends Extension
      */
     public static function htmlEscape(string $what): string
     {
-        return htmlspecialchars($what, ENT_QUOTES|ENT_SUBSTITUTE|ENT_XML1);
+        return EntityTools::htmlEscape($what);
     }
     /**
      * Escape string for markdown.
@@ -231,51 +210,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownEscape(string $what): string
     {
-        return str_replace(
-            [
-                '\\',
-                '_',
-                '*',
-                '[',
-                ']',
-                '(',
-                ')',
-                '~',
-                '`',
-                '>',
-                '#',
-                '+',
-                '-',
-                '=',
-                '|',
-                '{',
-                '}',
-                '.',
-                '!',
-            ],
-            [
-                '\\\\',
-                '\\_',
-                '\\*',
-                '\\[',
-                '\\]',
-                '\\(',
-                '\\)',
-                '\\~',
-                '\\`',
-                '\\>',
-                '\\#',
-                '\\+',
-                '\\-',
-                '\\=',
-                '\\|',
-                '\\{',
-                '\\}',
-                '\\.',
-                '\\!',
-            ],
-            $what
-        );
+        return EntityTools::markdownEscape($what);
     }
     /**
      * Escape string for markdown codeblock.
@@ -284,7 +219,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownCodeblockEscape(string $what): string
     {
-        return str_replace('```', '\\```', $what);
+        return EntityTools::markdownCodeblockEscape($what);
     }
     /**
      * Escape string for markdown code section.
@@ -293,7 +228,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownCodeEscape(string $what): string
     {
-        return str_replace('`', '\\`', $what);
+        return EntityTools::markdownCodeEscape($what);
     }
     /**
      * Escape string for URL.
@@ -302,7 +237,7 @@ abstract class StrTools extends Extension
      */
     public static function markdownUrlEscape(string $what): string
     {
-        return str_replace(')', '\\)', $what);
+        return EntityTools::markdownUrlEscape($what);
     }
     /**
      * Escape type name.
