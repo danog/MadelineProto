@@ -543,6 +543,7 @@ final class Ogg
                 }
             }
         }
+        \assert(isset($opus));
         $checkErr = static function (int|CData $err) use ($opus): void {
             if ($err instanceof CData) {
                 $err = $err->cdata;

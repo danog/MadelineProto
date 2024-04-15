@@ -57,7 +57,7 @@ final class ExitFailure
         $this->props = $props;
     }
 
-    public function getException(): object
+    public function getException(): \Throwable
     {
         $prev = new MadelineProtoException("Client backtrace");
 
