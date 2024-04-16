@@ -111,6 +111,7 @@ trait FilesLogic
 
             Assert::true(isset($_SERVER['REQUEST_METHOD']));
 
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
             $result = ResponseInfo::parseHeaders(
                 $_SERVER['REQUEST_METHOD'],
                 $headers,
