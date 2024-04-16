@@ -20,6 +20,7 @@
         <ignoreFiles>
             <directory name="vendor" />
             <file name="src/TL/TLParser.php" />
+            <file name="src/InternalDoc.php" />
             <file name="src/TL/SecretTLParser.php" />
         </ignoreFiles>
     </projectFiles>
