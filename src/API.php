@@ -296,12 +296,6 @@ final class API extends AbstractAPI
             $forceFull = $forceFull || $settings->getSlow();
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
-            $db = $settings->getDb();
-            if ($db instanceof DriverDatabaseAbstract) {
-                $forceFull = (bool) $db->getEphemeralFilesystemPrefix();
-            }
-        } elseif ($settings instanceof DriverDatabaseAbstract) {
-            $forceFull = (bool) $settings->getEphemeralFilesystemPrefix();
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 

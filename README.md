@@ -888,6 +888,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setTyping.html" name="messages.setTyping">Sends a current user typing event (see SendMessageAction for all event types) to a conversation partner or group: messages.setTyping</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.sendCustomRequest.html" name="bots.sendCustomRequest">Sends a custom request; for bots only: bots.sendCustomRequest</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendDocument" name="sendDocument">Sends a document: sendDocument</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendGif" name="sendGif">Sends a gif: sendGif</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastMessages" name="broadcastMessages">Sends a list of messages to all peers (users, chats, channels) of the bot: broadcastMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html" name="messages.sendMessage">Sends a message to a chat: messages.sendMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendMessageToAdmins" name="sendMessageToAdmins">Sends a message to all report peers (admins of the bot): sendMessageToAdmins</a>
@@ -895,7 +896,11 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendMessage" name="sendMessage">Sends a message: sendMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendPhoto" name="sendPhoto">Sends a photo: sendPhoto</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendEncryptedService.html" name="messages.sendEncryptedService">Sends a service message to a secret chat: messages.sendEncryptedService</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendSticker" name="sendSticker">Sends a sticker: sendSticker</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendEncrypted.html" name="messages.sendEncrypted">Sends a text message to a secret chat: messages.sendEncrypted</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendVideo" name="sendVideo">Sends a video: sendVideo</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendVoice" name="sendVoice">Sends a voice: sendVoice</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendAudio" name="sendAudio">Sends an audio: sendAudio</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendCustomEvent" name="sendCustomEvent">Sends an updateCustomEvent update to the event handler: sendCustomEvent</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#setNoop" name="setNoop">Set NOOP update handler, ignoring all updates: setNoop</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setChatWallPaper.html" name="messages.setChatWallPaper">Set a custom wallpaper » in a specific private chat with another user: messages.setChatWallPaper</a>

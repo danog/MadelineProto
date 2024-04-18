@@ -28,9 +28,9 @@ use danog\MadelineProto\RPCErrorException;
 final class ChannelMessage extends Message
 {
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessage, array $info)
+    public function __construct(MTProto $API, array $rawMessage, array $info, bool $scheduled)
     {
-        parent::__construct($API, $rawMessage, $info);
+        parent::__construct($API, $rawMessage, $info, $scheduled);
     }
 
     /**

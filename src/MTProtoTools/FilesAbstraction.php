@@ -27,10 +27,12 @@ use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Media\AbstractVideo;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
+use danog\MadelineProto\EventHandler\Media\RoundVideo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
@@ -105,13 +107,6 @@ trait FilesAbstraction
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
-        if ($file instanceof Message) {
-            $file = $file->media;
-            if ($file === null) {
-                throw new AssertionError("The message must be a media message!");
-            }
-        }
-
         return $this->sendMedia(
             type: Document::class,
             mimeType: $mimeType,
@@ -185,13 +180,6 @@ trait FilesAbstraction
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
-        if ($file instanceof Message) {
-            $file = $file->media;
-            if ($file === null) {
-                throw new AssertionError("The message must be a media message!");
-            }
-        }
-
         return $this->sendMedia(
             type: Photo::class,
             mimeType: 'image/jpeg',
@@ -245,8 +233,11 @@ trait FilesAbstraction
     public function sendSticker(
         int|string $peer,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $emoji = '',
         ?callable $callback = null,
         ?string $fileName = null,
+        ?string $mimeType = null,
+        ?int $ttl = null,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -260,25 +251,18 @@ trait FilesAbstraction
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
-        if ($file instanceof Message) {
-            $file = $file->media;
-            if ($file === null) {
-                throw new AssertionError("The message must be a media message!");
-            }
-        }
-
         return $this->sendMedia(
             type: Sticker::class,
-            mimeType: 'image/webp',
+            mimeType: $mimeType,
             thumb: null,
             attributes: [],
             peer: $peer,
             file: $file,
-            caption: '',
+            caption: $emoji,
             parseMode: ParseMode::TEXT,
             callback: $callback,
             fileName: $fileName,
-            ttl: null,
+            ttl: $ttl,
             spoiler: false,
             silent: $silent,
             background: $background,
@@ -335,6 +319,7 @@ trait FilesAbstraction
         ParseMode $parseMode = ParseMode::TEXT,
         ?callable $callback = null,
         ?string $fileName = null,
+        string $mimeType = 'video/mp4',
         ?int $ttl = null,
         bool $spoiler = false,
         bool $roundMessage = false,
@@ -353,29 +338,21 @@ trait FilesAbstraction
         bool $background = false,
         bool $clearDraft = false,
         bool $forceResend = false,
+        bool $updateStickersetsOrder = false,
         ?Cancellation $cancellation = null,
     ): Message {
-        if ($file instanceof Message) {
-            $file = $file->media;
-            if ($file === null) {
-                throw new AssertionError("The message must be a media message!");
-            }
-        }
-
-        $attributes = [
-            'round_message' => $roundMessage,
-            'supports_streaming' => $supportsStreaming,
-            'no_sound' => $noSound,
-            'duration' => $duration,
-            'w' => $width,
-            'h' => $height,
-        ];
-
         return $this->sendMedia(
             type: Video::class,
-            mimeType: 'video/mp4',
+            mimeType: $mimeType,
             thumb: $thumb,
-            attributes: $attributes,
+            attributes: [
+                'round_message' => $roundMessage,
+                'supports_streaming' => $supportsStreaming,
+                'no_sound' => $noSound,
+                'duration' => $duration,
+                'w' => $width,
+                'h' => $height,
+            ],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -388,7 +365,7 @@ trait FilesAbstraction
             background: $background,
             clearDraft: $clearDraft,
             noForwards: $noForwards,
-            updateStickersetsOrder: false,
+            updateStickersetsOrder: $updateStickersetsOrder,
             replyToMsgId: $replyToMsgId,
             topMsgId: $topMsgId,
             replyMarkup: $replyMarkup,
@@ -449,7 +426,7 @@ trait FilesAbstraction
     ): Message {
         return $this->sendMedia(
             type: Gif::class,
-            mimeType: 'image/gif',
+            mimeType: 'video/mp4',
             thumb: $thumb,
             attributes: [],
             peer: $peer,
@@ -510,9 +487,11 @@ trait FilesAbstraction
         ParseMode $parseMode = ParseMode::TEXT,
         ?callable $callback = null,
         ?string $fileName = null,
+        ?string $mimeType = null,
         ?int $duration = null,
         ?string $title = null,
         ?string $performer = null,
+        ?int $ttl = null,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -525,25 +504,23 @@ trait FilesAbstraction
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
     ): Message {
-        $attributes = [
-            'duration' => $duration,
-            'title' => $title,
-            'performer' => $performer,
-        ];
-
         return $this->sendMedia(
             type: Audio::class,
-            mimeType: 'audio/mpeg',
+            mimeType: $mimeType,
             thumb: $thumb,
-            attributes: $attributes,
+            attributes: [
+                'duration' => $duration,
+                'title' => $title,
+                'performer' => $performer,
+            ],
             peer: $peer,
             file: $file,
             caption: $caption,
             parseMode: $parseMode,
             callback: $callback,
             fileName: $fileName,
-            ttl: null,
-            spoiler: null,
+            ttl: $ttl,
+            spoiler: false,
             silent: $silent,
             background: $background,
             clearDraft: $clearDraft,
@@ -624,7 +601,7 @@ trait FilesAbstraction
             callback: $callback,
             fileName: $fileName,
             ttl: $ttl,
-            spoiler: null,
+            spoiler: false,
             silent: $silent,
             background: $background,
             clearDraft: $clearDraft,
@@ -657,7 +634,7 @@ trait FilesAbstraction
         ?callable $callback,
         ?string $fileName,
         ?int $ttl,
-        ?bool $spoiler,
+        bool $spoiler,
         ?int $replyToMsgId,
         ?int $topMsgId,
         ?array $replyMarkup,
@@ -671,6 +648,13 @@ trait FilesAbstraction
         bool $forceResend,
         ?Cancellation $cancellation,
     ): Message {
+        if ($file instanceof Message) {
+            $file = $file->media;
+            if ($file === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
+
         $peer = $this->getId($peer);
         if ($file instanceof Media) {
             $fileName ??= $file->fileName;
@@ -711,28 +695,50 @@ trait FilesAbstraction
             Video::class => [
                 [
                     '_' => 'documentAttributeVideo',
-                    'round_message' => $file->roundMessage ?? $attributes['round_message'],
-                    'supports_streaming' => $file->supportsStreaming ?? $attributes['supports_streaming'],
-                    'no_sound' => $file->noSound ?? $attributes['no_sound'],
-                    'duration' => $file->duration ?? $attributes['duration'],
-                    'w' => $file->width ?? $attributes['w'],
-                    'h' => $file->height ?? $attributes['h'],
+                    'round_message' => $file instanceof RoundVideo
+                        ? true
+                        : $attributes['round_message'],
+                    'supports_streaming' => $file instanceof AbstractVideo
+                        ? $file->supportsStreaming
+                        : $attributes['supports_streaming'],
+                    'no_sound' => $file instanceof Gif
+                        ? true
+                        : $attributes['no_sound'],
+                    'duration' => $file instanceof AbstractVideo
+                        ? $file->duration
+                        : $attributes['duration'],
+                    'w' => $file instanceof AbstractVideo
+                        ? $file->width
+                        : $attributes['w'],
+                    'h' => $file instanceof AbstractVideo
+                        ? $file->height
+                        : $attributes['h'],
                 ],
             ],
             Audio::class => [
                 [
                     '_' => 'documentAttributeAudio',
-                    'duration' => $file->duration ?? $attributes['duration'],
-                    'title' => $file->title ?? $attributes['title'],
-                    'performer' => $file->performer ?? $attributes['performer'],
+                    'duration' => $file instanceof Audio
+                        ? $file->duration
+                        : $attributes['duration'],
+                    'title' => $file instanceof Audio
+                        ? $file->title
+                        : $attributes['title'],
+                    'performer' => $file instanceof Audio
+                        ? $file->performer
+                        : $attributes['performer'],
                 ],
             ],
             Voice::class => [
                 [
                     '_' => 'documentAttributeAudio',
                     'voice' => true,
-                    'duration' => $file->duration ?? $attributes['duration'],
-                    'waveform' => $file->waveform ?? $attributes['waveform'],
+                    'duration' => $file instanceof Voice
+                        ? $file->duration
+                        : $attributes['duration'],
+                    'waveform' => $file instanceof Voice
+                        ? $file->waveform
+                        : $attributes['waveform'],
                 ],
             ],
             Gif::class => [['_' => 'documentAttributeAnimated']],
@@ -867,7 +873,7 @@ trait FilesAbstraction
                     $file = $this->getStream($file, $cancellation);
                     $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
                     $process = Process::start($ffmpeg);
-                    async(fn () => pipe($file, $process->getStdin()))->finally(fn () => $process->getStdin()->close());
+                    async(static fn () => pipe($file, $process->getStdin()))->finally(static fn () => $process->getStdin()->close());
                     $thumb ??= new ReadableBuffer(buffer($process->getStdout()));
                     $output = buffer($process->getStderr());
                     if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $output, $matches)) {
@@ -884,7 +890,7 @@ trait FilesAbstraction
                     }
                 }
             } elseif ($type === Sticker::class) {
-                if (!extension_loaded('gd')) {
+                if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
                 $file = buffer($this->getStream($file, $cancellation), $cancellation);
@@ -908,8 +914,8 @@ trait FilesAbstraction
                 rewind($stream);
                 $file = stream_get_contents($stream);
                 fclose($stream);
-                unset($stream);
-                unset($temp);
+                unset($stream, $temp);
+
                 $file = new ReadableBuffer($file);
             } elseif ($type === Audio::class or $type === Voice::class) {
                 if (Process::start('ffmpeg -version')->join() !== 0) {
@@ -918,7 +924,7 @@ trait FilesAbstraction
                     $file = $this->getStream($file, $cancellation);
                     $ffmpeg = 'ffmpeg -i pipe: 2>&1';
                     $process = Process::start($ffmpeg);
-                    async(fn () => pipe($file, $process->getStdin()));
+                    async(static fn () => pipe($file, $process->getStdin()));
                     $output = buffer($process->getStdout());
                     if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $output, $matches)) {
                         $time = explode(':', $matches[1]);

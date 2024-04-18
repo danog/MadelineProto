@@ -27,9 +27,9 @@ use danog\MadelineProto\MTProto;
 class SecretMessage extends AbstractPrivateMessage
 {
     /** @internal */
-    public function __construct(MTProto $API, array $rawMessage, array $info)
+    public function __construct(MTProto $API, array $rawMessage, array $info, bool $scheduled)
     {
-        parent::__construct($API, $rawMessage, $info);
+        parent::__construct($API, $rawMessage, $info, $scheduled);
     }
 
     public function getReply(string $class = SecretMessage::class): ?SecretMessage

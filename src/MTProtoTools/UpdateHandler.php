@@ -449,7 +449,7 @@ trait UpdateHandler
     {
         try {
             return match ($update['_']) {
-                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage','updateNewOutgoingEncryptedMessage' => $this->wrapMessage($update['message']),
+                'updateNewChannelMessage', 'updateNewMessage', 'updateNewScheduledMessage', 'updateEditMessage', 'updateEditChannelMessage','updateNewEncryptedMessage','updateNewOutgoingEncryptedMessage' => $this->wrapMessage($update['message'], $update['_'] === 'updateNewScheduledMessage'),
                 'updatePinnedMessages', 'updatePinnedChannelMessages' => $this->wrapPin($update),
                 'updateBotCallbackQuery' => isset($update['game_short_name'])
                     ? new ChatGameQuery($this, $update)
@@ -508,7 +508,7 @@ trait UpdateHandler
     /**
      * Wrap a Message constructor into an abstract Message object.
      */
-    public function wrapMessage(array $message): ?AbstractMessage
+    public function wrapMessage(array $message, bool $scheduled = false): ?AbstractMessage
     {
         if ($message['_'] === 'messageEmpty') {
             return null;
@@ -779,12 +779,12 @@ trait UpdateHandler
             return null;
         }
         if ($message['_'] === 'encryptedMessage') {
-            return new SecretMessage($this, $message, $info);
+            return new SecretMessage($this, $message, $info, $scheduled);
         }
         return match ($info['type']) {
-            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info),
-            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info),
-            API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info),
+            API::PEER_TYPE_BOT, API::PEER_TYPE_USER => new PrivateMessage($this, $message, $info, $scheduled),
+            API::PEER_TYPE_GROUP, API::PEER_TYPE_SUPERGROUP => new GroupMessage($this, $message, $info, $scheduled),
+            API::PEER_TYPE_CHANNEL => new ChannelMessage($this, $message, $info, $scheduled),
         };
     }
     /**
