@@ -488,7 +488,7 @@ final class Connection
             if ($res['type'] !== 'chat') {
                 throw new Exception('chat_id is not a chat id (only normal groups allowed, not supergroups)!');
             }
-            $arguments['chat_id'] = $res['chat_id'];
+            $arguments['chat_id'] = -$res['chat_id'];
         } elseif ($method === 'photos.updateProfilePhoto') {
             if (isset($arguments['id'])) {
                 if (!\is_array($arguments['id'])) {
