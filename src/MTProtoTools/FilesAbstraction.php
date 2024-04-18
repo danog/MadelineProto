@@ -23,6 +23,9 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use Amp\CompositeCancellation;
+use Amp\DeferredCancellation;
+use Amp\NullCancellation;
 use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
@@ -43,11 +46,14 @@ use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\Bytes;
+use danog\MadelineProto\Tools;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
 use function Amp\ByteStream\pipe;
+use function Amp\ByteStream\splitLines;
+use function Amp\Future\await;
 
 /**
  * Manages upload and download of files.
@@ -692,7 +698,7 @@ trait FilesAbstraction
         }
 
         $attributes = match ($type) {
-            Video::class => [
+            Video::class, Gif::class => [
                 [
                     '_' => 'documentAttributeVideo',
                     'round_message' => $file instanceof RoundVideo
@@ -741,9 +747,11 @@ trait FilesAbstraction
                         : $attributes['waveform'],
                 ],
             ],
-            Gif::class => [['_' => 'documentAttributeAnimated']],
             default => [],
         };
+        if ($type === Gif::class) {
+            $attributes []= ['_' => 'documentAttributeAnimated'];
+        }
         $attributes[] = ['_' => 'documentAttributeFilename', 'file_name' => $fileName];
 
         if (DialogId::isSecretChat($peer)) {
@@ -866,17 +874,27 @@ trait FilesAbstraction
 
             if ($reuseId) {
                 // Reuse
-            } elseif ($type === Video::class) {
-                if (Process::start('ffmpeg -version')->join() !== 0) {
+            } elseif ($type === Video::class || $type === Gif::class) {
+                if (!Tools::canUseFFmpeg($cancellation)) {
                     $this->logger->logger('Install ffmpeg for video info extraction!');
                 } elseif ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
-                    $file = $this->getStream($file, $cancellation);
+                    $dl = new DeferredCancellation;
+                    $copy = $this->getStream($file, new CompositeCancellation($dl->getCancellation(), $cancellation ?? new NullCancellation));
                     $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
-                    $process = Process::start($ffmpeg);
-                    async(static fn () => pipe($file, $process->getStdin()))->finally(static fn () => $process->getStdin()->close());
-                    $thumb ??= new ReadableBuffer(buffer($process->getStdout()));
-                    $output = buffer($process->getStderr());
-                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $output, $matches)) {
+                    $process = Process::start($ffmpeg, cancellation: $cancellation);
+                    $stdin = $process->getStdin();
+                    async(pipe(...), $copy, $stdin, $cancellation)->finally(static function () use ($stdin, $dl): void {
+                        $stdin->close();
+                        $dl->cancel();
+                    })->ignore();
+                    [$stdout, $stderr] = await([
+                        async(buffer(...), $process->getStdout(), $cancellation),
+                        async(buffer(...), $process->getStderr(), $cancellation),
+                    ]);
+                    $thumb ??= new ReadableBuffer($stdout);
+                    $process->join($cancellation);
+
+                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $stderr, $matches)) {
                         $time = explode(':', $matches[1]);
                         $hours = (int) $time[0];
                         $minutes = (int) $time[1];
@@ -889,44 +907,37 @@ trait FilesAbstraction
                         $attributes[0]['duration'] ??= $duration;
                     }
                 }
-            } elseif ($type === Sticker::class) {
-                if (!\extension_loaded('gd')) {
-                    throw Exception::extension('gd');
-                }
-                $file = buffer($this->getStream($file, $cancellation), $cancellation);
-                $img = imagecreatefromstring($file);
-                $width = imagesx($img);
-                $height = imagesy($img);
-                if ($width > $height) {
-                    $newWidth = 512;
-                    $newHeight = (int) (512 * $height / $width);
-                } elseif ($width < $height) {
-                    $newWidth = (int) (512 * $width / $height);
-                    $newHeight = 512;
-                } else {
-                    $newWidth = 512;
-                    $newHeight = 512;
-                }
-                $temp = imagecreatetruecolor($newWidth, $newHeight);
-                imagecopyresized($temp, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-                $stream = fopen('php://memory', 'r+');
-                imagewebp($temp, $stream);
-                rewind($stream);
-                $file = stream_get_contents($stream);
-                fclose($stream);
-                unset($stream, $temp);
-
-                $file = new ReadableBuffer($file);
-            } elseif ($type === Audio::class or $type === Voice::class) {
-                if (Process::start('ffmpeg -version')->join() !== 0) {
+            } elseif ($type === Audio::class || $type === Voice::class) {
+                if (!Tools::canUseFFmpeg($cancellation)) {
                     $this->logger->logger('Install ffmpeg for audio info extraction!');
-                } elseif ($attributes[0]['duration'] === null) {
-                    $file = $this->getStream($file, $cancellation);
-                    $ffmpeg = 'ffmpeg -i pipe: 2>&1';
-                    $process = Process::start($ffmpeg);
-                    async(static fn () => pipe($file, $process->getStdin()));
-                    $output = buffer($process->getStdout());
-                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $output, $matches)) {
+                } elseif ($attributes[0]['duration'] === null || $attributes[0]['title'] === null || $attributes[0]['performer'] === null) {
+                    $dl = new DeferredCancellation;
+                    $copy = $this->getStream($file, new CompositeCancellation($dl->getCancellation(), $cancellation ?? new NullCancellation));
+                    // Todo: cover
+                    $ffmpeg = 'ffmpeg -i pipe: -f ffmetadata -';
+                    $process = Process::start($ffmpeg, cancellation: $cancellation);
+                    $stdin = $process->getStdin();
+                    $stdout = $process->getStdout();
+                    async(pipe(...), $copy, $stdin, $cancellation)->finally(static function () use ($stdin, $dl): void {
+                        $stdin->close();
+                        $dl->cancel();
+                    })->ignore();
+                    [$result, $stderr] = await([
+                        async(static function () use ($stdout, $cancellation): array {
+                            $result = [];
+                            foreach (splitLines($stdout, $cancellation) as $line) {
+                                if (!str_contains($line, '=')) {
+                                    continue;
+                                }
+                                [$k, $v] = explode("=", $line, 2);
+                                $result[strtolower($k)] = $v;
+                            }
+                            return $result;
+                        }),
+                        async(buffer(...), $process->getStderr(), $cancellation),
+                    ]);
+                    $process->join($cancellation);
+                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $stderr, $matches)) {
                         $time = explode(':', $matches[1]);
                         $hours = (int) $time[0];
                         $minutes = (int) $time[1];
@@ -934,6 +945,8 @@ trait FilesAbstraction
                         $duration = $hours * 3600 + $minutes * 60 + $seconds;
                         $attributes[0]['duration'] = $duration;
                     }
+                    $attributes[0]['title'] ??= $result['title'] ?? null;
+                    $attributes[0]['performer'] ??= $result['artist'] ?? null;
                 }
             }
 

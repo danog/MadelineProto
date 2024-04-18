@@ -355,6 +355,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::canConvertOgg();
     }
     /**
+     * Whether we can convert any audio/video file using ffmpeg.
+     */
+    final public static function canUseFFmpeg(?\Amp\Cancellation $cancellation = null): bool
+    {
+        return \danog\MadelineProto\Tools::canUseFFmpeg($cancellation);
+    }
+    /**
      * Cancel a running broadcast.
      *
      * @param integer $id Broadcast ID

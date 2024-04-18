@@ -29,6 +29,7 @@ use Amp\File\File;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\Process\Process;
 use ArrayAccess;
 use Closure;
 use Countable;
@@ -907,5 +908,23 @@ abstract class Tools extends AsyncTools
             self::$canConvert = false;
         }
         return self::$canConvert;
+    }
+
+    private static ?bool $canFFmpeg = null;
+    /**
+     * Whether we can convert any audio/video file using ffmpeg.
+     */
+    public static function canUseFFmpeg(?Cancellation $cancellation = null): bool
+    {
+        if (self::$canFFmpeg !== null) {
+            return self::$canFFmpeg;
+        }
+        try {
+            self::$canFFmpeg = Process::start('ffmpeg -version', cancellation: $cancellation)->join($cancellation) === 0;
+        } catch (\Throwable $e) {
+            Logger::log("An error occurred while attempting conversion: $e");
+            self::$canFFmpeg = false;
+        }
+        return self::$canFFmpeg;
     }
 }
