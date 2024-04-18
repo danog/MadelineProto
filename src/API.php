@@ -30,7 +30,6 @@ use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
-use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use Revolt\EventLoop;

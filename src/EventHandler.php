@@ -54,6 +54,59 @@ abstract class EventHandler extends AbstractAPI
     }
 
     /** @internal Do not use manually. */
+    final private function __construct()
+    {
+        // Dummy code that is NEVER executed, needed to avoid issues during Psalm analysis.
+
+        /** @var \danog\MadelineProto\Namespace\Auth $auth */
+        $this->auth = $auth;
+        /** @var \danog\MadelineProto\Namespace\Account $account */
+        $this->account = $account;
+        /** @var \danog\MadelineProto\Namespace\Users $users */
+        $this->users = $users;
+        /** @var \danog\MadelineProto\Namespace\Contacts $contacts */
+        $this->contacts = $contacts;
+        /** @var \danog\MadelineProto\Namespace\Messages $messages */
+        $this->messages = $messages;
+        /** @var \danog\MadelineProto\Namespace\Updates $updates */
+        $this->updates = $updates;
+        /** @var \danog\MadelineProto\Namespace\Photos $photos */
+        $this->photos = $photos;
+        /** @var \danog\MadelineProto\Namespace\Upload $upload */
+        $this->upload = $upload;
+        /** @var \danog\MadelineProto\Namespace\Help $help */
+        $this->help = $help;
+        /** @var \danog\MadelineProto\Namespace\Channels $channels */
+        $this->channels = $channels;
+        /** @var \danog\MadelineProto\Namespace\Bots $bots */
+        $this->bots = $bots;
+        /** @var \danog\MadelineProto\Namespace\Payments $payments */
+        $this->payments = $payments;
+        /** @var \danog\MadelineProto\Namespace\Stickers $stickers */
+        $this->stickers = $stickers;
+        /** @var \danog\MadelineProto\Namespace\Phone $phone */
+        $this->phone = $phone;
+        /** @var \danog\MadelineProto\Namespace\Langpack $langpack */
+        $this->langpack = $langpack;
+        /** @var \danog\MadelineProto\Namespace\Folders $folders */
+        $this->folders = $folders;
+        /** @var \danog\MadelineProto\Namespace\Stats $stats */
+        $this->stats = $stats;
+        /** @var \danog\MadelineProto\Namespace\Chatlists $chatlists */
+        $this->chatlists = $chatlists;
+        /** @var \danog\MadelineProto\Namespace\Stories $stories */
+        $this->stories = $stories;
+        /** @var \danog\MadelineProto\Namespace\Premium $premium */
+        $this->premium = $premium;
+        /** @var \danog\MadelineProto\Namespace\Smsjobs $smsjobs */
+        $this->smsjobs = $smsjobs;
+        /** @var \danog\MadelineProto\Namespace\Fragment $fragment */
+        $this->fragment = $fragment;
+        /** @var \danog\MadelineProto\APIWrapper $wrapper */
+        $this->wrapper = $wrapper;
+    }
+
+    /** @internal Do not use manually. */
     final public function internalSaveDbProperties(): void
     {
         $this->privateInternalSaveDbProperties();
@@ -251,7 +304,8 @@ abstract class EventHandler extends AbstractAPI
 
             $plugins = self::$pluginCache[static::class];
             foreach ($plugins as $class) {
-                $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? new $class;
+                $refl = new ReflectionClass($class);
+                $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? $refl->newInstanceWithoutConstructor();
                 $pluginsNew[$class] = $plugin;
                 [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
                 if (!$plugin->isPluginEnabled()) {

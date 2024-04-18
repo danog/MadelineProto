@@ -27,6 +27,7 @@ use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\PluginEventHandler;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\UpdateHandlerType;
+use ReflectionClass;
 
 /**
  * Event handler.
@@ -82,7 +83,8 @@ trait Events
         $this->event_handler = $eventHandler;
         if (!$this->event_handler_instance instanceof $this->event_handler) {
             $class_name = $this->event_handler;
-            $this->event_handler_instance = new $class_name;
+            $refl = new ReflectionClass($class_name);
+            $this->event_handler_instance = $refl->newInstanceWithoutConstructor();
         }
 
         $pluginsNew = [];
