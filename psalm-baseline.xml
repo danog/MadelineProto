@@ -1513,9 +1513,9 @@
       <code><![CDATA[$this->length]]></code>
       <code><![CDATA[$this->offset]]></code>
     </MixedAssignment>
-    <UnhandledMatchCondition>
+    <MixedOperand>
       <code><![CDATA[$entity['_'] ?? $entity['type']]]></code>
-    </UnhandledMatchCondition>
+    </MixedOperand>
   </file>
   <file src="src/EventHandler/Message/Entities/Pre.php">
     <MixedAssignment>
@@ -5775,11 +5775,11 @@
     </ArgumentTypeCoercion>
     <InvalidArgument>
       <code><![CDATA[$entities]]></code>
+      <code><![CDATA[$entities]]></code>
     </InvalidArgument>
-    <PossiblyInvalidPropertyFetch>
-      <code><![CDATA[$entity->length]]></code>
-      <code><![CDATA[$entity->offset]]></code>
-    </PossiblyInvalidPropertyFetch>
+    <PossiblyInvalidMethodCall>
+      <code><![CDATA[toBotAPI]]></code>
+    </PossiblyInvalidMethodCall>
   </file>
   <file src="src/Stream/ADNLTransport/ADNLStream.php">
     <MissingPropertyType>
@@ -6458,7 +6458,6 @@
       <code><![CDATA[$attribute['file_name']]]></code>
       <code><![CDATA[$button['url']]]></code>
       <code><![CDATA[$button['url']]]></code>
-      <code><![CDATA[$data['_']]]></code>
       <code><![CDATA[$data['access_hash']]]></code>
       <code><![CDATA[$data['dc_id']]]></code>
       <code><![CDATA[$data['document']['access_hash']]]></code>
@@ -6565,7 +6564,6 @@
       <code><![CDATA[$button]]></code>
       <code><![CDATA[$data]]></code>
       <code><![CDATA[$data]]></code>
-      <code><![CDATA[$data['custom_emoji_id']]]></code>
       <code><![CDATA[$element]]></code>
       <code><![CDATA[$entity]]></code>
       <code><![CDATA[$entity]]></code>
