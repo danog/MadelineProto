@@ -116,58 +116,13 @@ abstract class StrTools extends Extension
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
-        $insertions = [];
         if (isset($entities[0]) && \is_array($entities[0])) {
             $entities = MessageEntity::fromRawEntities($entities);
         }
-        foreach ($entities as $entity) {
-            [$offset, $length] = [$entity->offset, $entity->length];
-            $insertions[$offset] ??= '';
-            $insertions[$offset] .= match (true) {
-                $entity instanceof Bold => '<b>',
-                $entity instanceof Italic => '<i>',
-                $entity instanceof Code => '<code>',
-                $entity instanceof Pre => $entity->language !== '' ? '<pre language="'.$entity->language.'">' : '<pre>',
-                $entity instanceof TextUrl => '<a href="'.$entity->url.'">',
-                $entity instanceof Strike => '<s>',
-                $entity instanceof Underline => '<u>',
-                $entity instanceof Blockquote => '<blockquote>',
-                $entity instanceof Url => '<a href="'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Email => '<a href="mailto:'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Phone => '<a href="phone:'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Mention => '<a href="https://t.me/'.StrTools::htmlEscape(self::mbSubstr($message, $offset+1, $length-1)).'">',
-                $entity instanceof Spoiler => $allowTelegramTags ? '<tg-spoiler>' : '',
-                $entity instanceof CustomEmoji => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity->documentId.'">' : '',
-                $entity instanceof MentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
-                $entity instanceof InputMentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
-                default => '',
-            };
-            $offset += $length;
-            $insertions[$offset] = match (true) {
-                $entity instanceof Bold => '</b>',
-                $entity instanceof Italic => '</i>',
-                $entity instanceof Code => '</code>',
-                $entity instanceof Pre => '</pre>',
-                $entity instanceof TextUrl, $entity instanceof Url, $entity instanceof Email, $entity instanceof Mention, $entity instanceof Phone => '</a>',
-                $entity instanceof Strike => '</s>',
-                $entity instanceof Underline => '</u>',
-                $entity instanceof Blockquote => '</blockquote>',
-                $entity instanceof Spoiler => $allowTelegramTags ? '</tg-spoiler>' : '',
-                $entity instanceof CustomEmoji => $allowTelegramTags ? "</tg-emoji>" : '',
-                $entity instanceof MentionName => $allowTelegramTags ? '</a>' : '',
-                $entity instanceof InputMentionName => $allowTelegramTags ? '</a>' : '',
-                default => '',
-            } . ($insertions[$offset] ?? '');
+        foreach ($entities as &$e) {
+            $e = $e->toBotAPI();
         }
-        ksort($insertions);
-        $final = '';
-        $pos = 0;
-        foreach ($insertions as $offset => $insertion) {
-            $final .= StrTools::htmlEscape(StrTools::mbSubstr($message, $pos, $offset-$pos));
-            $final .= $insertion;
-            $pos = $offset;
-        }
-        return str_replace("\n", "<br>", $final.StrTools::htmlEscape(StrTools::mbSubstr($message, $pos)));
+        return (new Entities($message, $entities))->toHTML($allowTelegramTags);
     }
     /**
      * Convert to camelCase.

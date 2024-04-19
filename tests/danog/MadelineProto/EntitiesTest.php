@@ -44,17 +44,7 @@ class EntitiesTest extends TestCase
         $result = ['text' => $entities->message];
         $entities = $entities->entities;
         foreach ($entities as &$entity) {
-            switch ($entity['_']) {
-                case 'messageEntityMentionName':
-                case 'inputMessageEntityMentionName':
-                    unset($entity['_']);
-                    $entity['type'] = 'text_mention';
-                    $entity['user'] = $entity['user_id'];
-                    unset($entity['user_id']);
-                    break;
-                default:
-                    $entity = MTProto::MTProtoEntityToBotAPI($entity);
-            }
+            $entity = $entity->toBotAPI();
         }
         $result['entities'] = $entities;
         return $result;
