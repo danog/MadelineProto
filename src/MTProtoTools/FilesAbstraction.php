@@ -824,6 +824,8 @@ trait FilesAbstraction
                     $thumb = stream_get_contents($stream);
                     fclose($stream);
                     unset($stream);
+                } else {
+                    $attributes []= ['_' => 'documentAttributeImageSize', 'w' => $width, 'h' => $height];
                 }
             } elseif ($type === Video::class || $type === Gif::class) {
                 $this->extractVideoInfo(true, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);

@@ -34,6 +34,6 @@ final class VideoSticker extends Sticker
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $stickerAttribute, $extraAttribute['w'], $extraAttribute['h'], $protected);
-        $this->duration = $extraAttribute['duration'];
+        $this->duration = $extraAttribute['duration'] ?? 0.0;
     }
 }

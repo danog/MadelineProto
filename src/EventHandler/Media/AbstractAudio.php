@@ -35,6 +35,6 @@ abstract class AbstractAudio extends Media
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $audioAttribute['duration'];
+        $this->duration = $audioAttribute['duration'] ?? 0;
     }
 }
