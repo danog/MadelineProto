@@ -736,6 +736,7 @@ trait FilesAbstraction
             Audio::class => [
                 [
                     '_' => 'documentAttributeAudio',
+                    'voice' => false,
                     'duration' => $file instanceof Audio
                         ? $file->duration
                         : $attributesOrig['duration'],
@@ -878,6 +879,10 @@ trait FilesAbstraction
                 $message['media']['key'] = $file['key'];
                 $message['media']['iv'] = $file['iv'];
                 $message['media']['size'] = $file['size'];
+            } elseif (\is_array($file)) {
+                $message['media']['key'] = $file['key'];
+                $message['media']['iv'] = $file['iv'];
+                $message['media']['size'] = $file['size'];
             } else {
                 $file = $this->uploadEncrypted($file, $fileName ?? '', $callback, $cancellation);
                 $message['media']['key'] = $file['key'];
@@ -1016,10 +1021,10 @@ trait FilesAbstraction
 
         return [$fileFuture->await(), (new finfo())->buffer($buff, FILEINFO_MIME_TYPE)];
     }
-    private function extractAudioInfo(bool $force, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    private function extractAudioInfo(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
         if (!Tools::canUseFFmpeg($cancellation)) {
-            if ($force) {
+            if ($secret) {
                 throw new AssertionError('Install ffmpeg for audio info extraction!');
             }
             $this->logger->logger('Install ffmpeg for audio info extraction!');
@@ -1063,7 +1068,7 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
         [$stdout, $stderr] = await($f);
 
         $process->join($cancellation);
@@ -1073,7 +1078,7 @@ trait FilesAbstraction
             $minutes = (int) $time[1];
             $seconds = (int) $time[2];
             $duration = $hours * 3600 + $minutes * 60 + $seconds;
-            $attributes[0]['duration'] ??= $duration;
+            $attributes[0]['duration'] ??= (int) $duration;
         }
         if (preg_match('/TITLE\s*:\s*(.+)/', $stderr, $matches)) {
             $attributes[0]['title'] ??= $matches[1];
@@ -1089,10 +1094,10 @@ trait FilesAbstraction
         $file = $fileFuture->await();
     }
 
-    private function extractVideoInfo(bool $force, string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    private function extractVideoInfo(bool $secret, string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
         if (!Tools::canUseFFmpeg($cancellation)) {
-            if ($force) {
+            if ($secret) {
                 throw new AssertionError('Install ffmpeg for video info extraction!');
             }
             $this->logger->logger('Install ffmpeg for video info extraction!');
@@ -1135,7 +1140,7 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
         [$stdout, $stderr] = await($f);
 
         $thumb ??= new ReadableBuffer($stdout);
@@ -1149,9 +1154,9 @@ trait FilesAbstraction
             $duration = $hours * 3600 + $minutes * 60 + $seconds;
             $width = $matches[2];
             $height = $matches[3];
-            $attributes[0]['w'] ??= $width;
-            $attributes[0]['h'] ??= $height;
-            $attributes[0]['duration'] ??= $duration;
+            $attributes[0]['w'] ??= (int) $width;
+            $attributes[0]['h'] ??= (int) $height;
+            $attributes[0]['duration'] ??= (int) $duration;
         }
 
         $file = $fileFuture->await();

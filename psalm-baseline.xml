@@ -4037,6 +4037,9 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/MTProtoTools/FilesAbstraction.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[\is_array($file)]]></code>
+    </DocblockTypeContradiction>
     <MixedArgument>
       <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
       <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
@@ -4058,6 +4061,9 @@
       <code><![CDATA[$attributes[0]['performer']]]></code>
       <code><![CDATA[$attributes[0]['title']]]></code>
       <code><![CDATA[$attributes[0]['w']]]></code>
+      <code><![CDATA[$file['iv']]]></code>
+      <code><![CDATA[$file['key']]]></code>
+      <code><![CDATA[$file['size']]]></code>
     </MixedArrayAccess>
     <MixedArrayAssignment>
       <code><![CDATA[$attributes[0]['duration']]]></code>
@@ -4076,8 +4082,11 @@
       <code><![CDATA[$attributes[0]['w']]]></code>
       <code><![CDATA[$message['media']['iv']]]></code>
       <code><![CDATA[$message['media']['iv']]]></code>
+      <code><![CDATA[$message['media']['iv']]]></code>
       <code><![CDATA[$message['media']['key']]]></code>
       <code><![CDATA[$message['media']['key']]]></code>
+      <code><![CDATA[$message['media']['key']]]></code>
+      <code><![CDATA[$message['media']['size']]]></code>
       <code><![CDATA[$message['media']['size']]]></code>
       <code><![CDATA[$message['media']['size']]]></code>
       <code><![CDATA[$thumb]]></code>
