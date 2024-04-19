@@ -35,6 +35,7 @@ use danog\MadelineProto\EventHandler\Plugin\RestartPlugin;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
@@ -103,6 +104,9 @@ class MyEventHandler extends SimpleEventHandler
         $this->logger($this->getFullInfo('MadelineProto'));
 
         $this->sendMessageToAdmins("The bot was started!");
+
+        $this->sendAudio(peer: 'danogentili', file: new LocalFile('/home/daniil/Music/01. Madge - 2WORLDS.flac'));
+        $this->sendVideo(peer: 'danogentili', file: new LocalFile('/home/daniil/m.mp4'));
     }
 
     /**

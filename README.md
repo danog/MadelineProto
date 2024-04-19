@@ -1002,6 +1002,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContactSignUpNotification.html" name="account.getContactSignUpNotification">Whether the user will receive notifications when contacts sign up: account.getContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isAltervista" name="isAltervista">Whether this is altervista: isAltervista</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#canConvertOgg" name="canConvertOgg">Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot: canConvertOgg</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#canUseFFmpeg" name="canUseFFmpeg">Whether we can convert any audio/video file using ffmpeg: canUseFFmpeg</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isIpc" name="isIpc">Whether we're an IPC client instance: isIpc</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isIpcWorker" name="isIpcWorker">Whether we're an IPC server process (as opposed to an event handler): isIpcWorker</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isTestMode" name="isTestMode">Whether we're currently connected to the test DCs: isTestMode</a>
