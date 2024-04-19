@@ -1031,14 +1031,15 @@ trait FilesAbstraction
         $process = Process::start('ffmpeg -i pipe: -f image2pipe -', cancellation: $cancellation);
         $stdin = $process->getStdin();
         $stdout = $process->getStdout();
-        $p = new Pipe(1024*1024);
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $stdin, $p->getSink()), $fileName ?? '', $callback, cancellation: $cancellation));
-
         $f = [
             async(buffer(...), $process->getStdout(), $cancellation),
             async(buffer(...), $process->getStderr(), $cancellation),
         ];
+        $streams = [$stdin];
+
         if ($mimeType === null) {
+            $p = new Pipe(1024*1024);
+            $streams []= $p->getSink();
             $f []= async(static function () use ($p, $cancellation, &$mimeType): void {
                 $buff = '';
                 while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
@@ -1051,6 +1052,8 @@ trait FilesAbstraction
                 $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
             });
         }
+
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));
         [$stdout, $stderr] = await($f);
 
         $process->join($cancellation);
@@ -1060,7 +1063,7 @@ trait FilesAbstraction
             $minutes = (int) $time[1];
             $seconds = (int) $time[2];
             $duration = $hours * 3600 + $minutes * 60 + $seconds;
-            $attributes[0]['duration'] = $duration;
+            $attributes[0]['duration'] ??= $duration;
         }
         if (preg_match('/TITLE\s*:\s*(.+)/', $stderr, $matches)) {
             $attributes[0]['title'] ??= $matches[1];
@@ -1098,14 +1101,14 @@ trait FilesAbstraction
         $ffmpeg = 'ffmpeg -i pipe: -ss '.$thumbSeek.' -frames:v 1 -f image2pipe -';
         $process = Process::start($ffmpeg, cancellation: $cancellation);
         $stdin = $process->getStdin();
-        $p = new Pipe(1024*1024);
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $stdin, $p->getSink()), $fileName ?? '', $callback, cancellation: $cancellation));
-
         $f = [
             async(buffer(...), $process->getStdout(), $cancellation),
             async(buffer(...), $process->getStderr(), $cancellation),
         ];
+        $streams = [$stdin];
         if ($mimeType === null) {
+            $p = new Pipe(1024*1024);
+            $streams []= $p->getSink();
             $f []= async(static function () use ($p, $cancellation, &$mimeType): void {
                 $buff = '';
                 while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
@@ -1118,6 +1121,8 @@ trait FilesAbstraction
                 $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
             });
         }
+
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));
         [$stdout, $stderr] = await($f);
 
         $thumb ??= new ReadableBuffer($stdout);
