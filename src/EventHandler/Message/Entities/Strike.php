@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Strike extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'strikethrough', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

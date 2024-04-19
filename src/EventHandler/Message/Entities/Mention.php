@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Mention extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'mention', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

@@ -16,4 +16,8 @@ final class TextUrl extends MessageEntity
         parent::__construct($rawEntities);
         $this->url = $rawEntities['url'];
     }
+    public function toBotAPI(): array
+    {
+        return ['type' => 'text_link', 'offset' => $this->offset, 'length' => $this->length, 'url' => $this->url];
+    }
 }

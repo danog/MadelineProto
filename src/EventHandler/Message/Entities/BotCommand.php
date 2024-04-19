@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class BotCommand extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'bot_command', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

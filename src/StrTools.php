@@ -20,22 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
-use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\Code;
-use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
-use danog\MadelineProto\EventHandler\Message\Entities\Email;
-use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
-use danog\MadelineProto\EventHandler\Message\Entities\Italic;
 use danog\MadelineProto\EventHandler\Message\Entities\Mention;
-use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
-use danog\MadelineProto\EventHandler\Message\Entities\Phone;
-use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
-use danog\MadelineProto\EventHandler\Message\Entities\Strike;
-use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
-use danog\MadelineProto\EventHandler\Message\Entities\Underline;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\TelegramEntities\Entities;

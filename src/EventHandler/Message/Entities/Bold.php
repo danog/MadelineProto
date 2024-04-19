@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Bold extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'bold', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

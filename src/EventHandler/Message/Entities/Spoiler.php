@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Spoiler extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'spoiler', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

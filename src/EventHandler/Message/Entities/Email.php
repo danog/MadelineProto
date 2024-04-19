@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Email extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'email', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

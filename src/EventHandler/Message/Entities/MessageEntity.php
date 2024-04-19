@@ -31,7 +31,12 @@ abstract class MessageEntity implements JsonSerializable
      */
     public static function fromRawEntities(array $entities): array
     {
-        return array_map(static fn (array $entity): MessageEntity => match ($entity['_'] ?? $entity['type']) {
+        return array_map(self::fromRawEntity(...), $entities);
+    }
+
+    public static function fromRawEntity(array $entity): self
+    {
+        return match ($entity['_'] ?? $entity['type']) {
             'mention', 'messageEntityMention' => new Mention($entity),
             'hashtag', 'messageEntityHashtag' => new Hashtag($entity),
             'bot_command', 'messageEntityBotCommand' => new BotCommand($entity),
@@ -48,86 +53,18 @@ abstract class MessageEntity implements JsonSerializable
             'cashtag', 'messageEntityCashtag' => new Cashtag($entity),
             'underline', 'messageEntityUnderline' => new Underline($entity),
             'strikethrough', 'messageEntityStrike' => new Strike($entity),
-            'blockquote', 'messageEntityBlockquote' => new Blockquote($entity),
+            'block_quote', 'messageEntityBlockquote' => new Blockquote($entity),
             'messageEntityBankCard' => new BankCard($entity),
             'spoiler', 'messageEntitySpoiler' => new Spoiler($entity),
             'custom_emoji', 'messageEntityCustomEmoji' => new CustomEmoji($entity),
-        }, $entities);
+            default => throw new AssertionError("Unknown entity type: ".($entity['_'] ?? $entity['type']))
+        };
     }
-
 
     /**
      * Convert entity to bot API entity.
      */
-    public function toBotAPI(): array
-    {
-        $data = ['offset' => $this->offset, 'length' => $this->length];
-        switch (true) {
-            case $this instanceof CustomEmoji:
-                $data['type'] = 'custom_emoji';
-                $data['custom_emoji_id'] = $this->documentId;
-                return $data;
-            case $this instanceof Phone:
-                $data['type'] = 'phone_number';
-                return $data;
-            case $this instanceof Blockquote:
-                $data['type'] = 'block_quote';
-                return $data;
-            case $this instanceof Mention:
-                $data['type'] = 'mention';
-                return $data;
-            case $this instanceof Hashtag:
-                $data['type'] = 'hashtag';
-                return $data;
-            case $this instanceof BotCommand:
-                $data['type'] = 'bot_command';
-                return $data;
-            case $this instanceof Url:
-                $data['type'] = 'url';
-                return $data;
-            case $this instanceof TextUrl:
-                $data['type'] = 'text_url';
-                $data['url'] = $this->url;
-                return $data;
-            case $this instanceof Email:
-                $data['type'] = 'email';
-                return $data;
-            case $this instanceof Bold:
-                $data['type'] = 'bold';
-                return $data;
-            case $this instanceof Strike:
-                $data['type'] = 'strikethrough';
-                return $data;
-            case $this instanceof Spoiler:
-                $data['type'] = 'spoiler';
-                return $data;
-            case $this instanceof Underline:
-                $data['type'] = 'underline';
-                return $data;
-            case $this instanceof Italic:
-                $data['type'] = 'italic';
-                return $data;
-            case $this instanceof Code:
-                $data['type'] = 'code';
-                return $data;
-            case $this instanceof Pre:
-                $data['type'] = 'pre';
-                $data['language'] = $this->language;
-                return $data;
-            case $this instanceof TextUrl:
-                $data['type'] = 'text_url';
-                return $data;
-            case $this instanceof Mention:
-                $data['type'] = 'mention';
-                return $data;
-            case $this instanceof MentionName:
-                $data['type'] = 'text_mention';
-                $data['user'] = ['id' => $this->userId];
-                return $data;
-            default:
-                throw new AssertionError("Unreachable");
-        }
-    }
+    abstract public function toBotAPI(): array;
 
     /** @internal */
     public function jsonSerialize(): mixed
