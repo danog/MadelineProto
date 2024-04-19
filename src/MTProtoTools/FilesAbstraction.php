@@ -237,10 +237,11 @@ trait FilesAbstraction
     public function sendSticker(
         int|string $peer,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $mimeType,
         string $emoji = '',
+        array $stickerSet = ['_' => 'inputStickerSetEmpty'],
         ?callable $callback = null,
         ?string $fileName = null,
-        ?string $mimeType = null,
         ?int $ttl = null,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
@@ -259,10 +260,10 @@ trait FilesAbstraction
             type: Sticker::class,
             mimeType: $mimeType,
             thumb: null,
-            attributesOrig: [],
+            attributesOrig: ['_' => 'documentAttributeSticker', 'alt' => $emoji, 'stickerset' => $stickerSet],
             peer: $peer,
             file: $file,
-            caption: $emoji,
+            caption: '',
             parseMode: ParseMode::TEXT,
             callback: $callback,
             fileName: $fileName,
@@ -760,6 +761,7 @@ trait FilesAbstraction
                         : $attributesOrig['waveform'],
                 ],
             ],
+            Sticker::class => [$attributesOrig],
             default => [],
         };
         if ($type === Gif::class) {
@@ -791,7 +793,7 @@ trait FilesAbstraction
             $width = 0;
             $height = 0;
 
-            if ($type === Photo::class) {
+            if ($type === Photo::class || $type === Sticker::class) {
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
@@ -799,34 +801,36 @@ trait FilesAbstraction
                 $img = imagecreatefromstring($file);
                 $width = imagesx($img);
                 $height = imagesy($img);
-                if ($width > $height) {
-                    $thumb_width = 90;
-                    $thumb_height = (int) (90*$height/$width);
-                } elseif ($width < $height) {
-                    $thumb_width = (int) (90*$width/$height);
-                    $thumb_height = 90;
-                } else {
-                    $thumb_width = 90;
-                    $thumb_height = 90;
-                }
-                Assert::lessThanEq($thumb_height, 90);
-                Assert::lessThanEq($thumb_width, 90);
-                $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
-                imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
-
-                $stream = fopen('php://memory', 'r+');
-                imagepng($thumb, $stream);
-                rewind($stream);
-                $thumb = stream_get_contents($stream);
-                fclose($stream);
-                unset($stream);
                 $file = new ReadableBuffer($file);
+                if ($type === Photo::class) {
+                    if ($width > $height) {
+                        $thumb_width = 90;
+                        $thumb_height = (int) (90*$height/$width);
+                    } elseif ($width < $height) {
+                        $thumb_width = (int) (90*$width/$height);
+                        $thumb_height = 90;
+                    } else {
+                        $thumb_width = 90;
+                        $thumb_height = 90;
+                    }
+                    Assert::lessThanEq($thumb_height, 90);
+                    Assert::lessThanEq($thumb_width, 90);
+                    $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
+                    imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+
+                    $stream = fopen('php://memory', 'r+');
+                    imagepng($thumb, $stream);
+                    rewind($stream);
+                    $thumb = stream_get_contents($stream);
+                    fclose($stream);
+                    unset($stream);
+                }
             } elseif ($type === Video::class || $type === Gif::class) {
                 $this->extractVideoInfo(true, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($type === Audio::class || $type === Voice::class) {
                 $this->extractAudioInfo(true, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($mimeType === null) {
-                $mimeType = $this->extractMime($file, $fileName, $callback, $cancellation);
+                $mimeType = $this->extractMime(true, $file, $fileName, $callback, $cancellation);
             }
 
             if ($thumb !== null && $thumb_width === 0) {
@@ -904,7 +908,7 @@ trait FilesAbstraction
             } elseif ($type === Audio::class || $type === Voice::class) {
                 $this->extractAudioInfo(false, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($mimeType === null) {
-                $mimeType = $this->extractMime($file, $fileName, $callback, $cancellation);
+                $mimeType = $this->extractMime(false, $file, $fileName, $callback, $cancellation);
             }
 
             $method = 'messages.sendMedia';
@@ -1002,14 +1006,11 @@ trait FilesAbstraction
         return $res;
     }
 
-    /**
-     * @return list{array, string}
-     */
-    private function extractMime(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation): array
+    private function extractMime(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation): string
     {
         $file = $this->getStream($file, $cancellation);
         $p = new Pipe(1024*1024);
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $p->getSink()), $fileName ?? '', $callback, cancellation: $cancellation));
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $p->getSink()), $fileName ?? '', $callback, $secret, $cancellation));
 
         $buff = '';
         while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
@@ -1019,7 +1020,8 @@ trait FilesAbstraction
         $p->getSource()->close();
         unset($p);
 
-        return [$fileFuture->await(), (new finfo())->buffer($buff, FILEINFO_MIME_TYPE)];
+        $file = $fileFuture->await();
+        return  (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
     }
     private function extractAudioInfo(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
@@ -1029,7 +1031,7 @@ trait FilesAbstraction
             }
             $this->logger->logger('Install ffmpeg for audio info extraction!');
             if ($mimeType === null) {
-                [$file, $mimeType] = $this->extractMime($file, $fileName, $callback, $cancellation);
+                $mimeType = $this->extractMime($secret, $file, $fileName, $callback, $cancellation);
             }
             return;
         }
@@ -1102,7 +1104,7 @@ trait FilesAbstraction
             }
             $this->logger->logger('Install ffmpeg for video info extraction!');
             if ($mimeType === null) {
-                [$file, $mimeType] = $this->extractMime($file, $fileName, $callback, $cancellation);
+                $mimeType = $this->extractMime($secret, $file, $fileName, $callback, $cancellation);
             }
             return;
         }
@@ -1143,7 +1145,9 @@ trait FilesAbstraction
         $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
         [$stdout, $stderr] = await($f);
 
-        $thumb ??= new ReadableBuffer($stdout);
+        if ($stdout !== '') {
+            $thumb ??= new ReadableBuffer($stdout);
+        }
         $process->join($cancellation);
 
         if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $stderr, $matches)) {

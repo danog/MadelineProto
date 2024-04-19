@@ -4115,6 +4115,8 @@
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
     </ReferenceConstraintViolation>
   </file>
   <file src="src/MTProtoTools/FilesLogic.php">
@@ -5483,7 +5485,7 @@
       <code><![CDATA[SecretMessage]]></code>
     </MoreSpecificReturnType>
     <PossiblyNullOperand>
-      <code><![CDATA[$user['user_id']]]></code>
+      <code><![CDATA[$user]]></code>
     </PossiblyNullOperand>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$user['user_id']]]></code>

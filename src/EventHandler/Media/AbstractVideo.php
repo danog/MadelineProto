@@ -44,9 +44,9 @@ abstract class AbstractVideo extends Media
         bool $protected,
     ) {
         parent::__construct($API, $rawMedia, $protected);
-        $this->duration = $attribute['duration'];
+        $this->duration = $attribute['duration'] ?? 0.0;
         $this->supportsStreaming = $attribute['supports_streaming'] ?? false;
-        $this->width = $attribute['w'];
-        $this->height = $attribute['h'];
+        $this->width = $attribute['w'] ?? 0;
+        $this->height = $attribute['h'] ?? 0;
     }
 }
