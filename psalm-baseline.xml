@@ -4050,6 +4050,7 @@
             $params
         )]]></code>
       <code><![CDATA[$thumb]]></code>
+      <code><![CDATA[$thumb]]></code>
     </MixedArgument>
     <MixedArrayAccess>
       <code><![CDATA[$attributes[0]['duration']]]></code>

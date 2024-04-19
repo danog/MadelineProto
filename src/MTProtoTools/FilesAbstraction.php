@@ -24,6 +24,7 @@ use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use Amp\Http\Client\Request;
 use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
@@ -51,6 +52,7 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
+use function Amp\File\openFile;
 use function Amp\Future\await;
 
 /**
@@ -62,6 +64,37 @@ use function Amp\Future\await;
  */
 trait FilesAbstraction
 {
+    /**
+     * Provide a stream for a file, URL or amp stream.
+     */
+    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null): ReadableStream
+    {
+        if ($stream instanceof LocalFile) {
+            return openFile($stream->file, 'r');
+        }
+        if ($stream instanceof RemoteUrl) {
+            $request = new Request($stream->url);
+            $request->setTransferTimeout(INF);
+            return $this->getHTTPClient()->request(
+                $request,
+                $cancellation
+            )->getBody();
+        }
+        if ($stream instanceof Message) {
+            $stream = $stream->media;
+            if ($stream === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
+        if ($stream instanceof Media) {
+            return $stream->getStream(cancellation: $cancellation);
+        }
+        if ($stream instanceof BotApiFileId) {
+            return $this->downloadToReturnedStream($stream, cancellation: $cancellation);
+        }
+        return $stream;
+    }
+
     /**
      * Sends a document.
      *

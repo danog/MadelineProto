@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\ByteStream\ReadableStream;
 use Amp\Cache\Cache;
 use Amp\Cache\LocalCache;
 use Amp\Cancellation;
@@ -33,7 +32,6 @@ use Amp\Http\Client\Request;
 use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
-use AssertionError;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
@@ -42,7 +40,6 @@ use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\Settings as OrmSettings;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -85,7 +82,6 @@ use Webmozart\Assert\Assert;
 use function Amp\async;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
-use function Amp\File\openFile;
 use function Amp\Future\await;
 
 use function time;
@@ -738,37 +734,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function getHTTPClient(): HttpClient
     {
         return $this->datacenter->getHTTPClient();
-    }
-
-    /**
-     * Provide a stream for a file, URL or amp stream.
-     */
-    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null): ReadableStream
-    {
-        if ($stream instanceof LocalFile) {
-            return openFile($stream->file, 'r');
-        }
-        if ($stream instanceof RemoteUrl) {
-            $request = new Request($stream->url);
-            $request->setTransferTimeout(INF);
-            return $this->getHTTPClient()->request(
-                $request,
-                $cancellation
-            )->getBody();
-        }
-        if ($stream instanceof Message) {
-            $stream = $stream->media;
-            if ($stream === null) {
-                throw new AssertionError("The message must be a media message!");
-            }
-        }
-        if ($stream instanceof Media) {
-            return $stream->getStream(cancellation: $cancellation);
-        }
-        if ($stream instanceof BotApiFileId) {
-            return $this->downloadToReturnedStream($stream, cancellation: $cancellation);
-        }
-        return $stream;
     }
 
     /**
