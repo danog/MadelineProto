@@ -4446,6 +4446,7 @@
     <MixedArrayAccess>
       <code><![CDATA[$entity['_']]]></code>
       <code><![CDATA[$entity['user_id']]]></code>
+      <code><![CDATA[$full['User']['access_hash']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
