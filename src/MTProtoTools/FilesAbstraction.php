@@ -1047,10 +1047,10 @@ trait FilesAbstraction
                 }
                 $p->getSink()->close();
                 $p->getSource()->close();
-                unset($p);
 
                 $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
             });
+            unset($p);
         }
 
         $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));
@@ -1116,10 +1116,10 @@ trait FilesAbstraction
                 }
                 $p->getSink()->close();
                 $p->getSource()->close();
-                unset($p);
 
                 $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
             });
+            unset($p);
         }
 
         $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, cancellation: $cancellation));

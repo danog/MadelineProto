@@ -2120,7 +2120,7 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                                       $fileName  File name
      * @param callable                                                                     $cb        Callback
      * @param boolean                                                                      $encrypted Whether to encrypt file for secret chats
