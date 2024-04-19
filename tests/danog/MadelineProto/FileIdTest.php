@@ -65,8 +65,8 @@ class FileIdTest extends MadelineTestCase
     public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
-        self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
-        unlink("/tmp/$fileIdStr");
+        self::$MadelineProto->downloadToFile($fileIdStr, sys_get_temp_dir()."/$fileIdStr");
+        unlink(sys_get_temp_dir()."/$fileIdStr");
         $this->assertTrue(true);
     }
     /**

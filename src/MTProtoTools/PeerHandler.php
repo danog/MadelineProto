@@ -826,7 +826,7 @@ trait PeerHandler
                         : PhotoSizeSourceDialogPhotoBig::class;
                 $photoSize = new $photoSize(
                     dialogId: $res['id'],
-                    dialogAccessHash: $res['access_hash'],
+                    dialogAccessHash: $full['Chat']['access_hash'] ?? $full['User']['access_hash'],
                 );
 
                 $fileId = new FileId(

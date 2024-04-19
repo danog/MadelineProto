@@ -33,7 +33,7 @@ abstract class MadelineTestCase extends TestCase
             'testing.madeline',
             $settings
         );
-        $unlock = Tools::flock('/tmp/login.flock', LOCK_EX);
+        $unlock = Tools::flock(sys_get_temp_dir().'/login.flock', LOCK_EX);
         self::$MadelineProto->botLogin(getenv('BOT_TOKEN'));
         $unlock();
     }
