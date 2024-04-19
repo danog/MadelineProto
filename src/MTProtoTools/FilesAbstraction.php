@@ -887,10 +887,9 @@ trait FilesAbstraction
             if ($reuseId) {
                 // Reuse
             } elseif ($type === Video::class || $type === Gif::class) {
-                $this->extractVideoInfo($attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+                $this->extractVideoInfo(false, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($type === Audio::class || $type === Voice::class) {
-                $this->extractAudioInfo($file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
-
+                $this->extractAudioInfo(false, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($mimeType === null) {
                 $mimeType = $this->extractMime($file, $fileName, $callback, $cancellation);
             }
@@ -1009,9 +1008,12 @@ trait FilesAbstraction
 
         return [$fileFuture->await(), (new finfo())->buffer($buff, FILEINFO_MIME_TYPE)];
     }
-    private function extractAudioInfo(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    private function extractAudioInfo(bool $force, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
         if (!Tools::canUseFFmpeg($cancellation)) {
+            if ($force) {
+                throw new AssertionError('Install ffmpeg for audio info extraction!');
+            }
             $this->logger->logger('Install ffmpeg for audio info extraction!');
             if ($mimeType === null) {
                 [$file, $mimeType] = $this->extractMime($file, $fileName, $callback, $cancellation);
@@ -1079,9 +1081,12 @@ trait FilesAbstraction
         $file = $fileFuture->await();
     }
 
-    private function extractVideoInfo(string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    private function extractVideoInfo(bool $force, string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
         if (!Tools::canUseFFmpeg($cancellation)) {
+            if ($force) {
+                throw new AssertionError('Install ffmpeg for video info extraction!');
+            }
             $this->logger->logger('Install ffmpeg for video info extraction!');
             if ($mimeType === null) {
                 [$file, $mimeType] = $this->extractMime($file, $fileName, $callback, $cancellation);
