@@ -1500,6 +1500,9 @@
     </MixedAssignment>
   </file>
   <file src="src/EventHandler/Message/Entities/MentionName.php">
+    <MixedArrayAccess>
+      <code><![CDATA[$rawEntities['user']['id']]]></code>
+    </MixedArrayAccess>
     <MixedAssignment>
       <code><![CDATA[$this->userId]]></code>
     </MixedAssignment>
@@ -1510,6 +1513,9 @@
       <code><![CDATA[$this->length]]></code>
       <code><![CDATA[$this->offset]]></code>
     </MixedAssignment>
+    <UnhandledMatchCondition>
+      <code><![CDATA[$entity['_'] ?? $entity['type']]]></code>
+    </UnhandledMatchCondition>
   </file>
   <file src="src/EventHandler/Message/Entities/Pre.php">
     <MixedAssignment>
@@ -6613,7 +6619,7 @@
       <code><![CDATA[$res['performer']]]></code>
       <code><![CDATA[$res['sticker_set']]]></code>
       <code><![CDATA[$res['title']]]></code>
-      <code><![CDATA[$res['title']]]></code>
+      <code><![CDATA[$res['waveform']]]></code>
       <code><![CDATA[$res['width']]]></code>
       <code><![CDATA[$res['width']]]></code>
       <code><![CDATA[$row]]></code>
@@ -6749,12 +6755,6 @@
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$message]]></code>
     </MixedArgument>
-  </file>
-  <file src="src/TL/Conversion/MarkdownEntities.php">
-    <DocblockTypeContradiction>
-      <code><![CDATA[$posClose === false]]></code>
-      <code><![CDATA[$posClose === false]]></code>
-    </DocblockTypeContradiction>
   </file>
   <file src="src/TL/Conversion/TD.php">
     <MixedArgument>
