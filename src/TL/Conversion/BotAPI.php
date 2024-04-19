@@ -267,7 +267,7 @@ trait BotAPI
                                 $res['title'] = $attribute['title'];
                             }
                             if (isset($attribute['waveform'])) {
-                                $res['title'] = $attribute['waveform'];
+                                $res['waveform'] = $attribute['waveform'];
                             }
                             break;
                         case 'documentAttributeVideo':
