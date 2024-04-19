@@ -4040,10 +4040,13 @@
     <MixedArgument>
       <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
       <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
       <code><![CDATA[$this->methodCallAsyncRead(
             $method,
             $params
         )]]></code>
+      <code><![CDATA[$thumb]]></code>
     </MixedArgument>
     <MixedArrayAccess>
       <code><![CDATA[$attributes[0]['duration']]]></code>
@@ -4099,6 +4102,8 @@
       <code><![CDATA[\is_array($media['file'])]]></code>
     </RedundantConditionGivenDocblockType>
     <ReferenceConstraintViolation>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
     </ReferenceConstraintViolation>

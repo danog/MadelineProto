@@ -820,13 +820,21 @@ trait FilesAbstraction
                 fclose($stream);
                 unset($stream);
                 $file = new ReadableBuffer($file);
-            } elseif ($thumb !== null) {
+            } elseif ($type === Video::class || $type === Gif::class) {
+                $this->extractVideoInfo(true, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+            } elseif ($type === Audio::class || $type === Voice::class) {
+                $this->extractAudioInfo(true, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+            } elseif ($mimeType === null) {
+                $mimeType = $this->extractMime($file, $fileName, $callback, $cancellation);
+            }
+
+            if ($thumb !== null && $thumb_width === 0) {
                 $thumb = buffer($this->getStream($thumb, $cancellation), $cancellation);
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
                 [$thumb_width, $thumb_height] = getimagesizefromstring($thumb);
-            } elseif ($file instanceof Media) {
+            } elseif ($thumb === null && $file instanceof Media) {
                 $thumb = $file->thumb;
                 $thumb_width = $file->thumbWidth;
                 $thumb_height = $file->thumbHeight;
