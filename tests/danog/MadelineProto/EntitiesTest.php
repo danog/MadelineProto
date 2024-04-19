@@ -153,6 +153,7 @@ class EntitiesTest extends TestCase
                         'type' => 'bold',
                     ],
                 ],
+                'test<b>test</b>',
             ],
             [
                 'html',
@@ -283,7 +284,7 @@ class EntitiesTest extends TestCase
             [
                 'markdown',
                 "a\n```php\n<?php\necho 'yay';\n```",
-                "a\n<?php\necho 'yay';\n",
+                "a\n<?php\necho 'yay';",
                 [
                     [
                         'offset' => 2,
