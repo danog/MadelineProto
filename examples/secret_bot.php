@@ -91,6 +91,13 @@ class SecretHandler extends SimpleEventHandler
             caption: 'This file was uploaded using MadelineProto',
         );
 
+        // Photo as document, secret chat
+        $this->sendDocumentPhoto(
+            peer: $update->chatId,
+            file: new LocalFile('tests/faust.jpg'),
+            caption: 'This file was uploaded using MadelineProto',
+        );
+
         // GIF, secret chat
         $this->sendGif(
             peer: $update->chatId,

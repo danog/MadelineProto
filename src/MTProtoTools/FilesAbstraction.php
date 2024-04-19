@@ -32,6 +32,7 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AbstractVideo;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
@@ -219,6 +220,79 @@ trait FilesAbstraction
     ): Message {
         return $this->sendMedia(
             type: Photo::class,
+            mimeType: 'image/jpeg',
+            thumb: null,
+            attributesOrig: [],
+            peer: $peer,
+            file: $file,
+            caption: $caption,
+            parseMode: $parseMode,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: $ttl,
+            spoiler: $spoiler,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: $updateStickersetsOrder,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
+    /**
+     * Sends a photo.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation           Cancellation.
+     *
+     */
+    public function sendDocumentPhoto(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $caption = '',
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $ttl = null,
+        bool $spoiler = false,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $updateStickersetsOrder = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        return $this->sendMedia(
+            type: DocumentPhoto::class,
             mimeType: 'image/jpeg',
             thumb: null,
             attributesOrig: [],
@@ -826,7 +900,7 @@ trait FilesAbstraction
             $width = 0;
             $height = 0;
 
-            if ($type === Photo::class || $type === Sticker::class) {
+            if ($type === Photo::class || $type === DocumentPhoto::class || $type === Sticker::class) {
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
@@ -835,7 +909,7 @@ trait FilesAbstraction
                 $width = imagesx($img);
                 $height = imagesy($img);
                 $file = new ReadableBuffer($file);
-                if ($type === Photo::class) {
+                if ($type === Photo::class || $type === DocumentPhoto::class) {
                     if ($width > $height) {
                         $thumb_width = 90;
                         $thumb_height = (int) (90*$height/$width);
@@ -857,6 +931,10 @@ trait FilesAbstraction
                     $thumb = stream_get_contents($stream);
                     fclose($stream);
                     unset($stream);
+
+                    if ($type === DocumentPhoto::class) {
+                        $attributes []= ['_' => 'documentAttributeImageSize', 'w' => $width, 'h' => $height];
+                    }
                 } else {
                     $attributes []= ['_' => 'documentAttributeImageSize', 'w' => $width, 'h' => $height];
                 }
@@ -944,6 +1022,12 @@ trait FilesAbstraction
                 $this->extractAudioInfo(false, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($mimeType === null) {
                 $mimeType = $this->extractMime(false, $file, $fileName, $callback, $cancellation);
+            }
+
+            if ($type === DocumentPhoto::class) {
+                $attributes []= [
+                    '_' => 'documentAttributeImageSize',
+                ];
             }
 
             $method = 'messages.sendMedia';
