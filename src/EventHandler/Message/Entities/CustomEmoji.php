@@ -14,6 +14,6 @@ final class CustomEmoji extends MessageEntity
     protected function __construct(array $rawEntities)
     {
         parent::__construct($rawEntities);
-        $this->documentId = $rawEntities['document_id'];
+        $this->documentId = $rawEntities['document_id'] ?? $rawEntities['custom_emoji_id'];
     }
 }

@@ -1197,9 +1197,9 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    final public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
+    final public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TextEntities
     {
         return \danog\MadelineProto\StrTools::htmlToMessageEntities($html);
     }
@@ -1366,9 +1366,9 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\MarkdownEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    final public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
+    final public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TextEntities
     {
         return \danog\MadelineProto\StrTools::markdownToMessageEntities($markdown);
     }

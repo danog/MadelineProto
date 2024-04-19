@@ -30,28 +30,27 @@ abstract class MessageEntity implements JsonSerializable
      */
     public static function fromRawEntities(array $entities): array
     {
-        return array_map(static fn (array $entity): MessageEntity => match ($entity['_']) {
-            'messageEntityMention' => new Mention($entity),
-            'messageEntityHashtag' => new Hashtag($entity),
-            'messageEntityBotCommand' => new BotCommand($entity),
-            'messageEntityEmail' => new Email($entity),
-            'messageEntityBold' => new Bold($entity),
-            'messageEntityItalic' => new Italic($entity),
-            'messageEntityUrl' => new Url($entity),
-            'messageEntityCode' => new Code($entity),
-            'messageEntityPre' => new Pre($entity),
-            'messageEntityTextUrl' => new TextUrl($entity),
-            'messageEntityMentionName' => new MentionName($entity),
+        return array_map(static fn (array $entity): MessageEntity => match ($entity['_'] ?? $entity['type']) {
+            'text_mention', 'messageEntityMention' => new Mention($entity),
+            'hashtag', 'messageEntityHashtag' => new Hashtag($entity),
+            'bot_command', 'messageEntityBotCommand' => new BotCommand($entity),
+            'email', 'messageEntityEmail' => new Email($entity),
+            'bold', 'messageEntityBold' => new Bold($entity),
+            'italic', 'messageEntityItalic' => new Italic($entity),
+            'url', 'messageEntityUrl' => new Url($entity),
+            'code', 'messageEntityCode' => new Code($entity),
+            'pre', 'messageEntityPre' => new Pre($entity),
+            'text_link', 'messageEntityTextUrl' => new TextUrl($entity),
+            'text_mention', 'messageEntityMentionName' => new MentionName($entity),
             'inputMessageEntityMentionName' => new InputMentionName($entity),
-            'messageEntityPhone' => new Phone($entity),
-            'messageEntityCashtag' => new Cashtag($entity),
-            'messageEntityUnderline' => new Underline($entity),
-            'messageEntityStrike' => new Strike($entity),
-            'messageEntityBlockquote' => new Blockquote($entity),
+            'phone_number', 'messageEntityPhone' => new Phone($entity),
+            'cashtag', 'messageEntityCashtag' => new Cashtag($entity),
+            'underline', 'messageEntityUnderline' => new Underline($entity),
+            'strikethrough', 'messageEntityStrike' => new Strike($entity),
+            'blockquote', 'messageEntityBlockquote' => new Blockquote($entity),
             'messageEntityBankCard' => new BankCard($entity),
-            'messageEntitySpoiler' => new Spoiler($entity),
-            'messageEntityCustomEmoji' => new CustomEmoji($entity),
-            default => new Unknown($entity)
+            'spoiler', 'messageEntitySpoiler' => new Spoiler($entity),
+            'custom_emoji', 'messageEntityCustomEmoji' => new CustomEmoji($entity),
         }, $entities);
     }
 

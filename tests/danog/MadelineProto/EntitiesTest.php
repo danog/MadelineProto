@@ -6,6 +6,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\MarkdownEntities;
 use danog\MadelineProto\Tools;
@@ -31,14 +32,14 @@ class EntitiesTest extends TestCase
         $this->assertEquals(['a👍', 'a👍'], StrTools::mbStrSplit('a👍a👍', 3));
         $this->assertEquals(['🇺🇦', '🇺🇦'], StrTools::mbStrSplit('🇺🇦🇺🇦', 4));
     }
-    private static function sendMessage(string $message, string $parse_mode): DOMEntities|MarkdownEntities
+    private static function sendMessage(string $message, string $parse_mode): TextEntities
     {
         return match ($parse_mode) {
-            'html' => (new DOMEntities($message)),
-            'markdown' => (new MarkdownEntities($message)),
+            'html' => TextEntities::fromHtml($message),
+            'markdown' => TextEntities::fromMarkdown($message),
         };
     }
-    private static function MTProtoToBotAPI(DOMEntities|MarkdownEntities $entities): array
+    private static function MTProtoToBotAPI(TextEntities $entities): array
     {
         $result = ['text' => $entities->message];
         $entities = $entities->entities;

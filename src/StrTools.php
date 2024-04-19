@@ -37,9 +37,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\Strike;
 use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
 use danog\MadelineProto\EventHandler\Message\Entities\Underline;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
-use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
-use danog\MadelineProto\TL\Conversion\MarkdownEntities;
 use danog\TelegramEntities\Entities;
 use danog\TelegramEntities\EntityTools;
 use Throwable;
@@ -89,11 +87,11 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
+    public static function htmlToMessageEntities(string $html): TextEntities
     {
-        return new DOMEntities($html);
+        return TextEntities::fromHtml($html);
     }
     /**
      * Manually convert markdown to a message and a set of entities.
@@ -104,11 +102,11 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\MarkdownEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
+    public static function markdownToMessageEntities(string $markdown): TextEntities
     {
-        return new MarkdownEntities($markdown);
+        return TextEntities::fromMarkdown($markdown);
     }
     /**
      * Convert a message and a set of entities to HTML.
@@ -273,9 +271,9 @@ abstract class StrTools extends Extension
             return $markdown;
         }
         try {
-            return (new MarkdownEntities($markdown))->message;
+            return Entities::fromMarkdown($markdown)->message;
         } catch (Throwable) {
-            return (new MarkdownEntities(str_replace('_', '\\_', $markdown)))->message;
+            return Entities::fromMarkdown(str_replace('_', '\\_', $markdown))->message;
         }
     }
 }
