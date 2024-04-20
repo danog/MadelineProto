@@ -14,6 +14,10 @@ final class MentionName extends MessageEntity
     protected function __construct(array $rawEntities)
     {
         parent::__construct($rawEntities);
-        $this->userId = $rawEntities['user_id'];
+        $this->userId = $rawEntities['user_id'] ?? $rawEntities['user']['id'];
+    }
+    public function toBotAPI(): array
+    {
+        return ['type' => 'text_mention', 'offset' => $this->offset, 'length' => $this->length, 'user' => ['id' => $this->userId]];
     }
 }

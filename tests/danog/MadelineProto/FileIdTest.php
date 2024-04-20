@@ -22,7 +22,10 @@ class FileIdTest extends MadelineTestCase
      */
     public static function stripFileReference(string $fileId): string
     {
-        return (string) FileId::fromBotAPI($fileId)->setFileReference('')->setVersion(0);
+        $res = FileId::fromBotAPI($fileId);
+        $res->fileReference = '';
+        $res->version = 0;
+        return (string) $res;
     }
     /**
      * Strip access hash (and possibly ID) from file ID.
@@ -31,7 +34,9 @@ class FileIdTest extends MadelineTestCase
      */
     public static function stripForChat(string $fileId): string
     {
-        return (string) FileId::fromBotAPI($fileId)->setAccessHash(0);
+        $res = FileId::fromBotAPI($fileId);
+        $res->accessHash = 0;
+        return (string) $res;
     }
 
     /**
@@ -60,8 +65,8 @@ class FileIdTest extends MadelineTestCase
     public function testDownload(string $type, string $fileIdStr, string $uniqueFileIdStr, array $fullInfo): void
     {
         self::$MadelineProto->logger("Trying to download $fileIdStr");
-        self::$MadelineProto->downloadToFile($fileIdStr, "/tmp/$fileIdStr");
-        unlink("/tmp/$fileIdStr");
+        self::$MadelineProto->downloadToFile($fileIdStr, sys_get_temp_dir()."/$fileIdStr");
+        unlink(sys_get_temp_dir()."/$fileIdStr");
         $this->assertTrue(true);
     }
     /**

@@ -20,26 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
-use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\Code;
-use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
-use danog\MadelineProto\EventHandler\Message\Entities\Email;
-use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
-use danog\MadelineProto\EventHandler\Message\Entities\Italic;
 use danog\MadelineProto\EventHandler\Message\Entities\Mention;
-use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
-use danog\MadelineProto\EventHandler\Message\Entities\Phone;
-use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
-use danog\MadelineProto\EventHandler\Message\Entities\Strike;
-use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
-use danog\MadelineProto\EventHandler\Message\Entities\Underline;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
-use danog\MadelineProto\TL\Conversion\DOMEntities;
 use danog\MadelineProto\TL\Conversion\Extension;
-use danog\MadelineProto\TL\Conversion\MarkdownEntities;
 use danog\TelegramEntities\Entities;
 use danog\TelegramEntities\EntityTools;
 use Throwable;
@@ -89,11 +75,11 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
+    public static function htmlToMessageEntities(string $html): TextEntities
     {
-        return new DOMEntities($html);
+        return TextEntities::fromHtml($html);
     }
     /**
      * Manually convert markdown to a message and a set of entities.
@@ -104,11 +90,11 @@ abstract class StrTools extends Extension
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\MarkdownEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
+    public static function markdownToMessageEntities(string $markdown): TextEntities
     {
-        return new MarkdownEntities($markdown);
+        return TextEntities::fromMarkdown($markdown);
     }
     /**
      * Convert a message and a set of entities to HTML.
@@ -118,58 +104,13 @@ abstract class StrTools extends Extension
      */
     public static function entitiesToHtml(string $message, array $entities, bool $allowTelegramTags = false): string
     {
-        $insertions = [];
         if (isset($entities[0]) && \is_array($entities[0])) {
             $entities = MessageEntity::fromRawEntities($entities);
         }
-        foreach ($entities as $entity) {
-            [$offset, $length] = [$entity->offset, $entity->length];
-            $insertions[$offset] ??= '';
-            $insertions[$offset] .= match (true) {
-                $entity instanceof Bold => '<b>',
-                $entity instanceof Italic => '<i>',
-                $entity instanceof Code => '<code>',
-                $entity instanceof Pre => $entity->language !== '' ? '<pre language="'.$entity->language.'">' : '<pre>',
-                $entity instanceof TextUrl => '<a href="'.$entity->url.'">',
-                $entity instanceof Strike => '<s>',
-                $entity instanceof Underline => '<u>',
-                $entity instanceof Blockquote => '<blockquote>',
-                $entity instanceof Url => '<a href="'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Email => '<a href="mailto:'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Phone => '<a href="phone:'.StrTools::htmlEscape(self::mbSubstr($message, $offset, $length)).'">',
-                $entity instanceof Mention => '<a href="https://t.me/'.StrTools::htmlEscape(self::mbSubstr($message, $offset+1, $length-1)).'">',
-                $entity instanceof Spoiler => $allowTelegramTags ? '<tg-spoiler>' : '',
-                $entity instanceof CustomEmoji => $allowTelegramTags ? '<tg-emoji emoji-id="'.$entity->documentId.'">' : '',
-                $entity instanceof MentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
-                $entity instanceof InputMentionName => $allowTelegramTags ? '<a href="tg://user?id='.$entity->userId.'">' : '',
-                default => '',
-            };
-            $offset += $length;
-            $insertions[$offset] = match (true) {
-                $entity instanceof Bold => '</b>',
-                $entity instanceof Italic => '</i>',
-                $entity instanceof Code => '</code>',
-                $entity instanceof Pre => '</pre>',
-                $entity instanceof TextUrl, $entity instanceof Url, $entity instanceof Email, $entity instanceof Mention, $entity instanceof Phone => '</a>',
-                $entity instanceof Strike => '</s>',
-                $entity instanceof Underline => '</u>',
-                $entity instanceof Blockquote => '</blockquote>',
-                $entity instanceof Spoiler => $allowTelegramTags ? '</tg-spoiler>' : '',
-                $entity instanceof CustomEmoji => $allowTelegramTags ? "</tg-emoji>" : '',
-                $entity instanceof MentionName => $allowTelegramTags ? '</a>' : '',
-                $entity instanceof InputMentionName => $allowTelegramTags ? '</a>' : '',
-                default => '',
-            } . ($insertions[$offset] ?? '');
+        foreach ($entities as &$e) {
+            $e = $e->toBotAPI();
         }
-        ksort($insertions);
-        $final = '';
-        $pos = 0;
-        foreach ($insertions as $offset => $insertion) {
-            $final .= StrTools::htmlEscape(StrTools::mbSubstr($message, $pos, $offset-$pos));
-            $final .= $insertion;
-            $pos = $offset;
-        }
-        return str_replace("\n", "<br>", $final.StrTools::htmlEscape(StrTools::mbSubstr($message, $pos)));
+        return (new Entities($message, $entities))->toHTML($allowTelegramTags);
     }
     /**
      * Convert to camelCase.
@@ -273,9 +214,9 @@ abstract class StrTools extends Extension
             return $markdown;
         }
         try {
-            return (new MarkdownEntities($markdown))->message;
+            return Entities::fromMarkdown($markdown)->message;
         } catch (Throwable) {
-            return (new MarkdownEntities(str_replace('_', '\\_', $markdown)))->message;
+            return Entities::fromMarkdown(str_replace('_', '\\_', $markdown))->message;
         }
     }
 }

@@ -20,12 +20,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
-use Amp\CompositeCancellation;
-use Amp\DeferredCancellation;
-use Amp\NullCancellation;
+use Amp\Http\Client\Request;
 use Amp\Process\Process;
 use AssertionError;
 use danog\MadelineProto\BotApiFileId;
@@ -33,6 +32,7 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AbstractVideo;
 use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
+use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
@@ -45,14 +45,15 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\StreamDuplicator;
 use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
+use finfo;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
-use function Amp\ByteStream\pipe;
-use function Amp\ByteStream\splitLines;
+use function Amp\File\openFile;
 use function Amp\Future\await;
 
 /**
@@ -64,6 +65,37 @@ use function Amp\Future\await;
  */
 trait FilesAbstraction
 {
+    /**
+     * Provide a stream for a file, URL or amp stream.
+     */
+    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null): ReadableStream
+    {
+        if ($stream instanceof LocalFile) {
+            return openFile($stream->file, 'r');
+        }
+        if ($stream instanceof RemoteUrl) {
+            $request = new Request($stream->url);
+            $request->setTransferTimeout(INF);
+            return $this->getHTTPClient()->request(
+                $request,
+                $cancellation
+            )->getBody();
+        }
+        if ($stream instanceof Message) {
+            $stream = $stream->media;
+            if ($stream === null) {
+                throw new AssertionError("The message must be a media message!");
+            }
+        }
+        if ($stream instanceof Media) {
+            return $stream->getStream(cancellation: $cancellation);
+        }
+        if ($stream instanceof BotApiFileId) {
+            return $this->downloadToReturnedStream($stream, cancellation: $cancellation);
+        }
+        return $stream;
+    }
+
     /**
      * Sends a document.
      *
@@ -117,7 +149,7 @@ trait FilesAbstraction
             type: Document::class,
             mimeType: $mimeType,
             thumb: $thumb,
-            attributes: [],
+            attributesOrig: [],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -190,7 +222,80 @@ trait FilesAbstraction
             type: Photo::class,
             mimeType: 'image/jpeg',
             thumb: null,
-            attributes: [],
+            attributesOrig: [],
+            peer: $peer,
+            file: $file,
+            caption: $caption,
+            parseMode: $parseMode,
+            callback: $callback,
+            fileName: $fileName,
+            ttl: $ttl,
+            spoiler: $spoiler,
+            silent: $silent,
+            background: $background,
+            clearDraft: $clearDraft,
+            noForwards: $noForwards,
+            updateStickersetsOrder: $updateStickersetsOrder,
+            replyToMsgId: $replyToMsgId,
+            topMsgId: $topMsgId,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
+            sendAs: $sendAs,
+            forceResend: $forceResend,
+            cancellation: $cancellation
+        );
+    }
+    /**
+     * Sends a photo.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation           Cancellation.
+     *
+     */
+    public function sendDocumentPhoto(
+        int|string $peer,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $caption = '',
+        ParseMode $parseMode = ParseMode::TEXT,
+        ?callable $callback = null,
+        ?string $fileName = null,
+        ?int $ttl = null,
+        bool $spoiler = false,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        bool $updateStickersetsOrder = false,
+        bool $forceResend = false,
+        ?Cancellation $cancellation = null,
+    ): Message {
+        return $this->sendMedia(
+            type: DocumentPhoto::class,
+            mimeType: 'image/jpeg',
+            thumb: null,
+            attributesOrig: [],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -239,10 +344,11 @@ trait FilesAbstraction
     public function sendSticker(
         int|string $peer,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $mimeType,
         string $emoji = '',
+        array $stickerSet = ['_' => 'inputStickerSetEmpty'],
         ?callable $callback = null,
         ?string $fileName = null,
-        ?string $mimeType = null,
         ?int $ttl = null,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
@@ -261,10 +367,10 @@ trait FilesAbstraction
             type: Sticker::class,
             mimeType: $mimeType,
             thumb: null,
-            attributes: [],
+            attributesOrig: ['_' => 'documentAttributeSticker', 'alt' => $emoji, 'stickerset' => $stickerSet],
             peer: $peer,
             file: $file,
-            caption: $emoji,
+            caption: '',
             parseMode: ParseMode::TEXT,
             callback: $callback,
             fileName: $fileName,
@@ -334,6 +440,7 @@ trait FilesAbstraction
         ?int $duration = null,
         ?int $width = null,
         ?int $height = null,
+        string $thumbSeek = '00:00:01.000',
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -351,13 +458,14 @@ trait FilesAbstraction
             type: Video::class,
             mimeType: $mimeType,
             thumb: $thumb,
-            attributes: [
+            attributesOrig: [
                 'round_message' => $roundMessage,
                 'supports_streaming' => $supportsStreaming,
                 'no_sound' => $noSound,
                 'duration' => $duration,
                 'w' => $width,
                 'h' => $height,
+                'thumbSeek' => $thumbSeek,
             ],
             peer: $peer,
             file: $file,
@@ -418,6 +526,10 @@ trait FilesAbstraction
         ?string $fileName = null,
         ?int $ttl = null,
         bool $spoiler = false,
+        ?int $duration = null,
+        ?int $width = null,
+        ?int $height = null,
+        string $thumbSeek = '00:00:01.000',
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -434,7 +546,15 @@ trait FilesAbstraction
             type: Gif::class,
             mimeType: 'video/mp4',
             thumb: $thumb,
-            attributes: [],
+            attributesOrig: [
+                'round_message' => false,
+                'supports_streaming' => true,
+                'no_sound' => true,
+                'duration' => $duration,
+                'w' => $width,
+                'h' => $height,
+                'thumbSeek' => $thumbSeek,
+            ],
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -514,7 +634,7 @@ trait FilesAbstraction
             type: Audio::class,
             mimeType: $mimeType,
             thumb: $thumb,
-            attributes: [
+            attributesOrig: [
                 'duration' => $duration,
                 'title' => $title,
                 'performer' => $performer,
@@ -599,7 +719,7 @@ trait FilesAbstraction
             type: Voice::class,
             mimeType: 'audio/ogg',
             thumb: null,
-            attributes: $attributes,
+            attributesOrig: $attributes,
             peer: $peer,
             file: $file,
             caption: $caption,
@@ -634,7 +754,7 @@ trait FilesAbstraction
         ?string $mimeType,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb,
-        array $attributes,
+        array $attributesOrig,
         string $caption,
         ParseMode $parseMode,
         ?callable $callback,
@@ -703,36 +823,37 @@ trait FilesAbstraction
                     '_' => 'documentAttributeVideo',
                     'round_message' => $file instanceof RoundVideo
                         ? true
-                        : $attributes['round_message'],
+                        : $attributesOrig['round_message'],
                     'supports_streaming' => $file instanceof AbstractVideo
                         ? $file->supportsStreaming
-                        : $attributes['supports_streaming'],
+                        : $attributesOrig['supports_streaming'],
                     'no_sound' => $file instanceof Gif
                         ? true
-                        : $attributes['no_sound'],
+                        : $attributesOrig['no_sound'],
                     'duration' => $file instanceof AbstractVideo
                         ? $file->duration
-                        : $attributes['duration'],
+                        : $attributesOrig['duration'],
                     'w' => $file instanceof AbstractVideo
                         ? $file->width
-                        : $attributes['w'],
+                        : $attributesOrig['w'],
                     'h' => $file instanceof AbstractVideo
                         ? $file->height
-                        : $attributes['h'],
+                        : $attributesOrig['h'],
                 ],
             ],
             Audio::class => [
                 [
                     '_' => 'documentAttributeAudio',
+                    'voice' => false,
                     'duration' => $file instanceof Audio
                         ? $file->duration
-                        : $attributes['duration'],
+                        : $attributesOrig['duration'],
                     'title' => $file instanceof Audio
                         ? $file->title
-                        : $attributes['title'],
+                        : $attributesOrig['title'],
                     'performer' => $file instanceof Audio
                         ? $file->performer
-                        : $attributes['performer'],
+                        : $attributesOrig['performer'],
                 ],
             ],
             Voice::class => [
@@ -741,12 +862,13 @@ trait FilesAbstraction
                     'voice' => true,
                     'duration' => $file instanceof Voice
                         ? $file->duration
-                        : $attributes['duration'],
+                        : $attributesOrig['duration'],
                     'waveform' => $file instanceof Voice
                         ? $file->waveform
-                        : $attributes['waveform'],
+                        : $attributesOrig['waveform'],
                 ],
             ],
+            Sticker::class => [$attributesOrig],
             default => [],
         };
         if ($type === Gif::class) {
@@ -778,7 +900,7 @@ trait FilesAbstraction
             $width = 0;
             $height = 0;
 
-            if ($type === Photo::class) {
+            if ($type === Photo::class || $type === DocumentPhoto::class || $type === Sticker::class) {
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
@@ -786,35 +908,51 @@ trait FilesAbstraction
                 $img = imagecreatefromstring($file);
                 $width = imagesx($img);
                 $height = imagesy($img);
-                if ($width > $height) {
-                    $thumb_width = 90;
-                    $thumb_height = (int) (90*$height/$width);
-                } elseif ($width < $height) {
-                    $thumb_width = (int) (90*$width/$height);
-                    $thumb_height = 90;
-                } else {
-                    $thumb_width = 90;
-                    $thumb_height = 90;
-                }
-                Assert::lessThanEq($thumb_height, 90);
-                Assert::lessThanEq($thumb_width, 90);
-                $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
-                imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
-
-                $stream = fopen('php://memory', 'r+');
-                imagepng($thumb, $stream);
-                rewind($stream);
-                $thumb = stream_get_contents($stream);
-                fclose($stream);
-                unset($stream);
                 $file = new ReadableBuffer($file);
-            } elseif ($thumb !== null) {
+                if ($type === Photo::class || $type === DocumentPhoto::class) {
+                    if ($width > $height) {
+                        $thumb_width = 90;
+                        $thumb_height = (int) (90*$height/$width);
+                    } elseif ($width < $height) {
+                        $thumb_width = (int) (90*$width/$height);
+                        $thumb_height = 90;
+                    } else {
+                        $thumb_width = 90;
+                        $thumb_height = 90;
+                    }
+                    Assert::lessThanEq($thumb_height, 90);
+                    Assert::lessThanEq($thumb_width, 90);
+                    $thumb = imagecreatetruecolor($thumb_width, $thumb_height);
+                    imagecopyresized($thumb, $img, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+
+                    $stream = fopen('php://memory', 'r+');
+                    imagepng($thumb, $stream);
+                    rewind($stream);
+                    $thumb = stream_get_contents($stream);
+                    fclose($stream);
+                    unset($stream);
+
+                    if ($type === DocumentPhoto::class) {
+                        $attributes []= ['_' => 'documentAttributeImageSize', 'w' => $width, 'h' => $height];
+                    }
+                } else {
+                    $attributes []= ['_' => 'documentAttributeImageSize', 'w' => $width, 'h' => $height];
+                }
+            } elseif ($type === Video::class || $type === Gif::class) {
+                $this->extractVideoInfo(true, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+            } elseif ($type === Audio::class || $type === Voice::class) {
+                $this->extractAudioInfo(true, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+            } elseif ($mimeType === null) {
+                $mimeType = $this->extractMime(true, $file, $fileName, $callback, $cancellation);
+            }
+
+            if ($thumb !== null && $thumb_width === 0) {
                 $thumb = buffer($this->getStream($thumb, $cancellation), $cancellation);
                 if (!\extension_loaded('gd')) {
                     throw Exception::extension('gd');
                 }
                 [$thumb_width, $thumb_height] = getimagesizefromstring($thumb);
-            } elseif ($file instanceof Media) {
+            } elseif ($thumb === null && $file instanceof Media) {
                 $thumb = $file->thumb;
                 $thumb_width = $file->thumbWidth;
                 $thumb_height = $file->thumbHeight;
@@ -858,6 +996,10 @@ trait FilesAbstraction
                 $message['media']['key'] = $file['key'];
                 $message['media']['iv'] = $file['iv'];
                 $message['media']['size'] = $file['size'];
+            } elseif (\is_array($file)) {
+                $message['media']['key'] = $file['key'];
+                $message['media']['iv'] = $file['iv'];
+                $message['media']['size'] = $file['size'];
             } else {
                 $file = $this->uploadEncrypted($file, $fileName ?? '', $callback, $cancellation);
                 $message['media']['key'] = $file['key'];
@@ -875,79 +1017,17 @@ trait FilesAbstraction
             if ($reuseId) {
                 // Reuse
             } elseif ($type === Video::class || $type === Gif::class) {
-                if (!Tools::canUseFFmpeg($cancellation)) {
-                    $this->logger->logger('Install ffmpeg for video info extraction!');
-                } elseif ($thumb === null || $attributes[0]['duration'] === null || $attributes[0]['w'] === null || $attributes[0]['h'] === null) {
-                    $dl = new DeferredCancellation;
-                    $copy = $this->getStream($file, new CompositeCancellation($dl->getCancellation(), $cancellation ?? new NullCancellation));
-                    $ffmpeg = 'ffmpeg -i pipe: -ss 00:00:01.000 -frames:v 1 -f image2pipe -vcodec mjpeg pipe:1';
-                    $process = Process::start($ffmpeg, cancellation: $cancellation);
-                    $stdin = $process->getStdin();
-                    async(pipe(...), $copy, $stdin, $cancellation)->finally(static function () use ($stdin, $dl): void {
-                        $stdin->close();
-                        $dl->cancel();
-                    })->ignore();
-                    [$stdout, $stderr] = await([
-                        async(buffer(...), $process->getStdout(), $cancellation),
-                        async(buffer(...), $process->getStderr(), $cancellation),
-                    ]);
-                    $thumb ??= new ReadableBuffer($stdout);
-                    $process->join($cancellation);
-
-                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $stderr, $matches)) {
-                        $time = explode(':', $matches[1]);
-                        $hours = (int) $time[0];
-                        $minutes = (int) $time[1];
-                        $seconds = (int) $time[2];
-                        $duration = $hours * 3600 + $minutes * 60 + $seconds;
-                        $width = $matches[2];
-                        $height = $matches[3];
-                        $attributes[0]['w'] ??= $width;
-                        $attributes[0]['h'] ??= $height;
-                        $attributes[0]['duration'] ??= $duration;
-                    }
-                }
+                $this->extractVideoInfo(false, $attributesOrig['thumbSeek'], $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
             } elseif ($type === Audio::class || $type === Voice::class) {
-                if (!Tools::canUseFFmpeg($cancellation)) {
-                    $this->logger->logger('Install ffmpeg for audio info extraction!');
-                } elseif ($attributes[0]['duration'] === null || $attributes[0]['title'] === null || $attributes[0]['performer'] === null) {
-                    $dl = new DeferredCancellation;
-                    $copy = $this->getStream($file, new CompositeCancellation($dl->getCancellation(), $cancellation ?? new NullCancellation));
-                    // Todo: cover
-                    $ffmpeg = 'ffmpeg -i pipe: -f ffmetadata -';
-                    $process = Process::start($ffmpeg, cancellation: $cancellation);
-                    $stdin = $process->getStdin();
-                    $stdout = $process->getStdout();
-                    async(pipe(...), $copy, $stdin, $cancellation)->finally(static function () use ($stdin, $dl): void {
-                        $stdin->close();
-                        $dl->cancel();
-                    })->ignore();
-                    [$result, $stderr] = await([
-                        async(static function () use ($stdout, $cancellation): array {
-                            $result = [];
-                            foreach (splitLines($stdout, $cancellation) as $line) {
-                                if (!str_contains($line, '=')) {
-                                    continue;
-                                }
-                                [$k, $v] = explode("=", $line, 2);
-                                $result[strtolower($k)] = $v;
-                            }
-                            return $result;
-                        }),
-                        async(buffer(...), $process->getStderr(), $cancellation),
-                    ]);
-                    $process->join($cancellation);
-                    if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $stderr, $matches)) {
-                        $time = explode(':', $matches[1]);
-                        $hours = (int) $time[0];
-                        $minutes = (int) $time[1];
-                        $seconds = (int) $time[2];
-                        $duration = $hours * 3600 + $minutes * 60 + $seconds;
-                        $attributes[0]['duration'] = $duration;
-                    }
-                    $attributes[0]['title'] ??= $result['title'] ?? null;
-                    $attributes[0]['performer'] ??= $result['artist'] ?? null;
-                }
+                $this->extractAudioInfo(false, $file, $fileName, $callback, $cancellation, $mimeType, $attributes, $thumb);
+            } elseif ($mimeType === null) {
+                $mimeType = $this->extractMime(false, $file, $fileName, $callback, $cancellation);
+            }
+
+            if ($type === DocumentPhoto::class) {
+                $attributes []= [
+                    '_' => 'documentAttributeImageSize',
+                ];
             }
 
             $method = 'messages.sendMedia';
@@ -1014,7 +1094,7 @@ trait FilesAbstraction
                     default => 'inputMediaDocument',
                 };
                 $media['id'] = $reuseId;
-            } else {
+            } elseif (!\is_array($media['file'])) {
                 $media['file'] = $this->upload($media['file'], $fileName ?? '', $callback, cancellation: $cancellation);
             }
 
@@ -1043,5 +1123,165 @@ trait FilesAbstraction
         )));
         \assert($res !== null);
         return $res;
+    }
+
+    private function extractMime(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation): string
+    {
+        $file = $this->getStream($file, $cancellation);
+        $p = new Pipe(1024*1024);
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $p->getSink()), $fileName ?? '', $callback, $secret, $cancellation));
+
+        $buff = '';
+        while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
+            $buff .= $chunk;
+        }
+        $p->getSink()->close();
+        $p->getSource()->close();
+        unset($p);
+
+        $file = $fileFuture->await();
+        return  (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+    }
+    private function extractAudioInfo(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    {
+        if (!Tools::canUseFFmpeg($cancellation)) {
+            if ($secret) {
+                throw new AssertionError('Install ffmpeg for audio info extraction!');
+            }
+            $this->logger->logger('Install ffmpeg for audio info extraction!');
+            if ($mimeType === null) {
+                $mimeType = $this->extractMime($secret, $file, $fileName, $callback, $cancellation);
+            }
+            return;
+        }
+        if (!(
+            $attributes[0]['duration'] === null
+            || $attributes[0]['title'] === null
+            || $attributes[0]['performer'] === null
+            || $thumb === null
+        )) {
+            return;
+        }
+
+        $file = $this->getStream($file, $cancellation);
+        $process = Process::start('ffmpeg -i pipe: -f image2pipe -', cancellation: $cancellation);
+        $stdin = $process->getStdin();
+        $stdout = $process->getStdout();
+        $f = [
+            async(buffer(...), $process->getStdout(), $cancellation),
+            async(buffer(...), $process->getStderr(), $cancellation),
+        ];
+        $streams = [$stdin];
+
+        if ($mimeType === null) {
+            $p = new Pipe(1024*1024);
+            $streams []= $p->getSink();
+            $f []= async(static function () use ($p, $cancellation, &$mimeType): void {
+                $buff = '';
+                while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
+                    $buff .= $chunk;
+                }
+                $p->getSink()->close();
+                $p->getSource()->close();
+
+                $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+            });
+            unset($p);
+        }
+
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
+        [$stdout, $stderr] = await($f);
+
+        $process->join($cancellation);
+        if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2})~', $stderr, $matches)) {
+            $time = explode(':', $matches[1]);
+            $hours = (int) $time[0];
+            $minutes = (int) $time[1];
+            $seconds = (int) $time[2];
+            $duration = $hours * 3600 + $minutes * 60 + $seconds;
+            $attributes[0]['duration'] ??= (int) $duration;
+        }
+        if (preg_match('/TITLE\s*:\s*(.+)/', $stderr, $matches)) {
+            $attributes[0]['title'] ??= $matches[1];
+        }
+        if (preg_match('/ARTIST\s*:\s*(.+)/', $stderr, $matches)) {
+            $attributes[0]['performer'] ??= $matches[1];
+        }
+        if ($stdout !== '') {
+            // Todo check if jpg, but should be jpg in most cases anyway
+            $thumb ??= new ReadableBuffer($stdout);
+        }
+
+        $file = $fileFuture->await();
+    }
+
+    private function extractVideoInfo(bool $secret, string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
+    {
+        if (!Tools::canUseFFmpeg($cancellation)) {
+            if ($secret) {
+                throw new AssertionError('Install ffmpeg for video info extraction!');
+            }
+            $this->logger->logger('Install ffmpeg for video info extraction!');
+            if ($mimeType === null) {
+                $mimeType = $this->extractMime($secret, $file, $fileName, $callback, $cancellation);
+            }
+            return;
+        }
+        if (!(
+            $thumb === null
+            || $attributes[0]['duration'] === null
+            || $attributes[0]['w'] === null
+            || $attributes[0]['h'] === null
+        )) {
+            return;
+        }
+
+        $file = $this->getStream($file, $cancellation);
+        $ffmpeg = 'ffmpeg -i pipe: -ss '.$thumbSeek.' -frames:v 1 -f image2pipe -';
+        $process = Process::start($ffmpeg, cancellation: $cancellation);
+        $stdin = $process->getStdin();
+        $f = [
+            async(buffer(...), $process->getStdout(), $cancellation),
+            async(buffer(...), $process->getStderr(), $cancellation),
+        ];
+        $streams = [$stdin];
+        if ($mimeType === null) {
+            $p = new Pipe(1024*1024);
+            $streams []= $p->getSink();
+            $f []= async(static function () use ($p, $cancellation, &$mimeType): void {
+                $buff = '';
+                while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
+                    $buff .= $chunk;
+                }
+                $p->getSink()->close();
+                $p->getSource()->close();
+
+                $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+            });
+            unset($p);
+        }
+
+        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
+        [$stdout, $stderr] = await($f);
+
+        if ($stdout !== '') {
+            $thumb ??= new ReadableBuffer($stdout);
+        }
+        $process->join($cancellation);
+
+        if (preg_match('~Duration: (\d{2}:\d{2}:\d{2}\.\d{2}),.*? (\d{3,4})x(\d{3,4})~s', $stderr, $matches)) {
+            $time = explode(':', $matches[1]);
+            $hours = (int) $time[0];
+            $minutes = (int) $time[1];
+            $seconds = (int) $time[2];
+            $duration = $hours * 3600 + $minutes * 60 + $seconds;
+            $width = $matches[2];
+            $height = $matches[3];
+            $attributes[0]['w'] ??= (int) $width;
+            $attributes[0]['h'] ??= (int) $height;
+            $attributes[0]['duration'] ??= (int) $duration;
+        }
+
+        $file = $fileFuture->await();
     }
 }

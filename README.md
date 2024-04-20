@@ -81,7 +81,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [QR code login (user)](https://docs.madelineproto.xyz/docs/LOGIN.html#qr-code-user)
 * [Features](https://docs.madelineproto.xyz/docs/FEATURES.html) - MadelineProto can do everything official clients can do, and more!
 * [Requirements](https://docs.madelineproto.xyz/docs/REQUIREMENTS.html) - MadelineProto requires the mbstring, xml, json, fileinfo, gmp, openssl, iconv, gd extensions to function properly.
-* [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html) - MadelineProto offers an official MadelineProto docker image for the linux/amd64, linux/arm64 and linux/riscv64 platforms @ hub.madelineproto.xyz/danog/madelineproto.  
+* [MadelineProto on Docker](https://docs.madelineproto.xyz/docs/DOCKER.html) - MadelineProto offers an official MadelineProto docker image for the linux/amd64, linux/arm64 and linux/riscv64 platforms @ hub.madelineproto.xyz/danog/madelineproto.
   * [Getting started](https://docs.madelineproto.xyz/docs/DOCKER.html#getting-started)
     * [CLI bot (recommended)](https://docs.madelineproto.xyz/docs/DOCKER.html#cli-bot-recommended)
     * [Databases on docker](https://docs.madelineproto.xyz/docs/DOCKER.html#databases-on-docker)
@@ -91,8 +91,8 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
   * [Composer from scratch](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-scratch)
-* [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html) - MadelineProto can be used to broadcast messages to all users, chats and channels of a bot or userbot.  
-* [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html) - Update handling can be done in different ways: 
+* [Broadcasting messages to all users](https://docs.madelineproto.xyz/docs/BROADCAST.html) - MadelineProto can be used to broadcast messages to all users, chats and channels of a bot or userbot.
+* [Handling updates (new messages & other events)](https://docs.madelineproto.xyz/docs/UPDATES.html) - Update handling can be done in different ways:
   * [Async Event driven](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Full example](https://docs.madelineproto.xyz/docs/UPDATES.html#async-event-driven)
     * [Bound methods](https://docs.madelineproto.xyz/docs/UPDATES.html#bound-methods)
@@ -160,12 +160,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Configuration](https://docs.madelineproto.xyz/docs/UPDATES.html#configuration)
   * [Creating and uploading text files](https://docs.madelineproto.xyz/docs/UPDATES.html#creating-and-uploading-text-files)
   * [Logging](https://docs.madelineproto.xyz/docs/UPDATES.html#logging)
-* [Database](https://docs.madelineproto.xyz/docs/DATABASE.html) - MadelineProto optionally can keep some of its internal data in a database, such as mysql, mariadb, postgres or redis (you can also add your own!), reducing RAM usage.   
+* [Database](https://docs.madelineproto.xyz/docs/DATABASE.html) - MadelineProto optionally can keep some of its internal data in a database, such as mysql, mariadb, postgres or redis (you can also add your own!), reducing RAM usage.
   * [\danog\MadelineProto\Settings\Database\Memory: Memory backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Memory.html)
   * [\danog\MadelineProto\Settings\Database\Mysql: MySQL backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Mysql.html)
   * [\danog\MadelineProto\Settings\Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [\danog\MadelineProto\Settings\Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
-* [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html) - MadelineProto has lots of settings that can be used to modify the behaviour of the library.  
+* [Settings](https://docs.madelineproto.xyz/docs/SETTINGS.html) - MadelineProto has lots of settings that can be used to modify the behaviour of the library.
   * [AppInfo: App information.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/AppInfo.html)
   * [Auth: Cryptography settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Auth.html)
   * [Connection: Connection settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Connection.html)
@@ -184,12 +184,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Database\Postgres: Postgres backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Postgres.html)
   * [Database\Redis: Redis backend settings.](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Database/Redis.html)
 * [Getting info about the current user](https://docs.madelineproto.xyz/docs/SELF.html) - Here's how you can fetch info about the currently logged in user
-* [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html) - MadelineProto can throw lots of different exceptions.  
+* [Exceptions](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html) - MadelineProto can throw lots of different exceptions.
   * [List of exception types](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#list-of-exception-types)
   * [Pretty TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#pretty-tl-trace)
   * [Getting the TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#getting-the-tl-trace)
-* [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html) - If you make too many requests to telegram, you might get FLOOD_WAITed for a while. To avoid these flood waits, you must calculate the flood wait rate.  
-* [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html) - MadelineProto provides a unified class for logging messages to the logging destination defined in settings.  
+* [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html) - If you make too many requests to telegram, you might get FLOOD_WAITed for a while. To avoid these flood waits, you must calculate the flood wait rate.
+* [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html) - MadelineProto provides a unified class for logging messages to the logging destination defined in settings.
 * [Telegram VoIP phone calls](https://docs.madelineproto.xyz/docs/CALLS.html) - MadelineProto provides an easy wrapper to work with phone calls.
   * [Requesting a call](https://docs.madelineproto.xyz/docs/CALLS.html#requesting-a-call)
   * [Playing audio files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-audio-files)
@@ -199,13 +199,13 @@ Want to add your own open-source project to this list? [Click here!](https://doc
   * [Bot API file IDs](https://docs.madelineproto.xyz/docs/FILES.html#bot-api-file-ids)
   * [Uploading & sending files](https://docs.madelineproto.xyz/docs/FILES.html#sending-files)
     * [Security notice](https://docs.madelineproto.xyz/docs/FILES.html#security-notice)
-    * [Photos](https://docs.madelineproto.xyz/docs/FILES.html#inputmediauploadedphoto)
-    * [Documents](https://docs.madelineproto.xyz/docs/FILES.html#inputmediauploadeddocument)
-      * [Documents](https://docs.madelineproto.xyz/docs/FILES.html#documentattributefilename-to-send-a-document)
-      * [Photos as documents](https://docs.madelineproto.xyz/docs/FILES.html#documentattributeimagesize-to-send-a-photo-as-document)
-      * [GIFs](https://docs.madelineproto.xyz/docs/FILES.html#documentattributeanimated-to-send-a-gif)
-      * [Videos](https://docs.madelineproto.xyz/docs/FILES.html#documentattributevideo-to-send-a-video)
-      * [Audio & Voice](https://docs.madelineproto.xyz/docs/FILES.html#documentattributeaudio-to-send-an-audio-file)
+    * [Photos](https://docs.madelineproto.xyz/docs/FILES.html#photos)
+    * [Photos as documents](https://docs.madelineproto.xyz/docs/FILES.html#documents)
+    * [Documents](https://docs.madelineproto.xyz/docs/FILES.html#documents)
+    * [GIFs](https://docs.madelineproto.xyz/docs/FILES.html#gifs)
+    * [Videos](https://docs.madelineproto.xyz/docs/FILES.html#videos)
+    * [Music](https://docs.madelineproto.xyz/docs/FILES.html#music)
+    * [Voice](https://docs.madelineproto.xyz/docs/FILES.html#voice)
   * [Uploading files](https://docs.madelineproto.xyz/docs/FILES.html#uploading-files)
   * [Reusing uploaded files](https://docs.madelineproto.xyz/docs/FILES.html#reusing-uploaded-files)
   * [Renaming files](https://docs.madelineproto.xyz/docs/FILES.html#renaming-files)
@@ -257,7 +257,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
         * [Async flock](https://docs.madelineproto.xyz/docs/ASYNC.html#async-flock)
       * [MadelineProto async loop APIs](https://docs.madelineproto.xyz/docs/ASYNC.html#async-loop-apis)
 * [FAQ](https://docs.madelineproto.xyz/docs/FAQ.html) - Here's a list of common MadelineProto questions and answers.
-* [Upgrading from MadelineProto v7 to v8](https://docs.madelineproto.xyz/docs/UPGRADING.html) - MadelineProto v8 is a major MadelineProto update, that removes a large number of long-deprecated APIs: I've created this upgrade checklist, to simplify the upgrade process.  
+* [Upgrading from MadelineProto v7 to v8](https://docs.madelineproto.xyz/docs/UPGRADING.html) - MadelineProto v8 is a major MadelineProto update, that removes a large number of long-deprecated APIs: I've created this upgrade checklist, to simplify the upgrade process.
 * [Using methods](https://docs.madelineproto.xyz/docs/USING_METHODS.html) - There are simplifications for many, if not all of, these methods.
   * [Named arguments](https://docs.madelineproto.xyz/docs/USING_METHODS.html#named-arguments)
   * [Peers](https://docs.madelineproto.xyz/docs/USING_METHODS.html#peers)
@@ -344,7 +344,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkHistoryImportPeer.html" name="messages.checkHistoryImportPeer">Check whether chat history exported from another chat app can be imported into a specific Telegram chat, click here for more info »: messages.checkHistoryImportPeer</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#hasSecretChat" name="hasSecretChat">Check whether secret chat exists: hasSecretChat</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.checkShortName.html" name="stickers.checkShortName">Check whether the given short name is available: stickers.checkShortName</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.checkGroupCall.html" name="phone.checkGroupCall">Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.  : phone.checkGroupCall</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.checkGroupCall.html" name="phone.checkGroupCall">Check whether the group call Server Forwarding Unit is currently receiving the streams with the specified WebRTC source IDs.: phone.checkGroupCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/bots.canSendMessage.html" name="bots.canSendMessage">Check whether the specified bot can send us messages: bots.canSendMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.canSendStory.html" name="stories.canSendStory">Check whether we can post stories as the specified peer: stories.canSendStory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.canPurchasePremium.html" name="payments.canPurchasePremium">Checks whether Telegram Premium purchase is possible. Must be called before in-store Premium purchase, official apps only: payments.canPurchasePremium</a>
@@ -359,7 +359,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#completePhoneLogin" name="completePhoneLogin">Complet user login using login code: completePhoneLogin</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#complete2faLogin" name="complete2faLogin">Complete 2FA login: complete2faLogin</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#completeSignup" name="completeSignup">Complete signup to Telegram: completeSignup</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.startHistoryImport.html" name="messages.startHistoryImport">Complete the history import process, importing all messages into the chat.  : messages.startHistoryImport</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.startHistoryImport.html" name="messages.startHistoryImport">Complete the history import process, importing all messages into the chat.: messages.startHistoryImport</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.confirmPhone.html" name="account.confirmPhone">Confirm a phone number to cancel account deletion, for more info click here »: account.confirmPhone</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.receivedMessages.html" name="messages.receivedMessages">Confirms receipt of messages by a client, cancels PUSH-notification sending: messages.receivedMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#MTProtoToBotAPI" name="MTProtoToBotAPI">Convert MTProto parameters to bot API parameters: MTProtoToBotAPI</a>
@@ -473,7 +473,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#broadcastForwardMessages" name="broadcastForwardMessages">Forwards a list of messages to all peers (users, chats, channels) of the bot: broadcastForwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.forwardMessages.html" name="messages.forwardMessages">Forwards messages by their IDs: messages.forwardMessages</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#genVectorHash" name="genVectorHash">Generate MTProto vector hash: genVectorHash</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportLoginToken.html" name="auth.exportLoginToken">Generate a login token, for login via QR code.  : auth.exportLoginToken</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.exportLoginToken.html" name="auth.exportLoginToken">Generate a login token, for login via QR code.: auth.exportLoginToken</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.exportStoryLink.html" name="stories.exportStoryLink">Generate a story deep link for a specific story: stories.exportStoryLink</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.exportInvoice.html" name="payments.exportInvoice">Generate an invoice deep link: payments.exportInvoice</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.exportContactToken.html" name="contacts.exportContactToken">Generates a temporary profile link for the currently logged-in user: contacts.exportContactToken</a>
@@ -545,7 +545,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getInlineGameHighScores.html" name="messages.getInlineGameHighScores">Get highscores of a game sent using an inline bot: messages.getInlineGameHighScores</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getGameHighScores.html" name="messages.getGameHighScores">Get highscores of a game: messages.getGameHighScores</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getInactiveChannels.html" name="channels.getInactiveChannels">Get inactive channels and supergroups: channels.getInactiveChannels</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamChannels.html" name="phone.getGroupCallStreamChannels">Get info about RTMP streams in a group call or livestream.  : phone.getGroupCallStreamChannels</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamChannels.html" name="phone.getGroupCallStreamChannels">Get info about RTMP streams in a group call or livestream.: phone.getGroupCallStreamChannels</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPaper.html" name="account.getWallPaper">Get info about a certain wallpaper: account.getWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getParticipant.html" name="channels.getParticipant">Get info about a channel/supergroup participant: channels.getParticipant</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getExportedChatInvite.html" name="messages.getExportedChatInvite">Get info about a chat invite: messages.getExportedChatInvite</a>
@@ -630,7 +630,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryReactionsList.html" name="stories.getStoryReactionsList">Get the reaction and interaction list of a story posted to a channel, along with the sender of each reaction: stories.getStoryReactionsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerColors.html" name="help.getPeerColors">Get the set of accent color palettes » that can be used for message accents: help.getPeerColors</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPeerProfileColors.html" name="help.getPeerProfileColors">Get the set of accent color palettes » that can be used in profile page backgrounds: help.getPeerProfileColors</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getContactIDs.html" name="contacts.getContactIDs">Get the telegram IDs of all contacts.  : contacts.getContactIDs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getContactIDs.html" name="contacts.getContactIDs">Get the telegram IDs of all contacts.: contacts.getContactIDs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getTheme.html" name="account.getTheme">Get theme information: account.getTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getForumTopics.html" name="channels.getForumTopics">Get topics of a forum: channels.getForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getType" name="getType">Get type of peer: getType</a>
@@ -751,12 +751,12 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.getStoryViewsList.html" name="stories.getStoryViewsList">Obtain the list of users that have viewed a specific story we posted: stories.getStoryViewsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.importContactToken.html" name="contacts.importContactToken">Obtain user info from a temporary profile link: contacts.importContactToken</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getMyBoosts.html" name="premium.getMyBoosts">Obtain which peers are we currently boosting, and how many boost slots we have left: premium.getMyBoosts</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMessagePublicForwards.html" name="stats.getMessagePublicForwards">Obtains a list of messages, indicating to which other public channels was a channel message forwarded.  : stats.getMessagePublicForwards</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getMessagePublicForwards.html" name="stats.getMessagePublicForwards">Obtains a list of messages, indicating to which other public channels was a channel message forwarded.: stats.getMessagePublicForwards</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.getSendAs.html" name="channels.getSendAs">Obtains a list of peers that can be used to send messages in a specific group: channels.getSendAs</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getStreamPipe" name="getStreamPipe">Obtains a pipe that can be used to upload a file from a stream: getStreamPipe</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getBoostsList.html" name="premium.getBoostsList">Obtains info about the boosts that were applied to a certain channel (admins only): premium.getBoostsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkHistoryImport.html" name="messages.checkHistoryImport">Obtains information about a chat export file, generated by a foreign chat app, click here for more info about imported chats »: messages.checkHistoryImport</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotPrecheckoutResults.html" name="messages.setBotPrecheckoutResults">Once the user has confirmed their payment and shipping details, the bot receives an updateBotPrecheckoutQuery update.  : messages.setBotPrecheckoutResults</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotPrecheckoutResults.html" name="messages.setBotPrecheckoutResults">Once the user has confirmed their payment and shipping details, the bot receives an updateBotPrecheckoutQuery update.: messages.setBotPrecheckoutResults</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getUpdates" name="getUpdates">Only useful when consuming MadelineProto updates through an API in another language (like Javascript), **absolutely not recommended when directly writing MadelineProto bots**: getUpdates</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestAppWebView.html" name="messages.requestAppWebView">Open a bot mini app from a direct Mini App deep link, sending over user information after user confirmation: messages.requestAppWebView</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestWebView.html" name="messages.requestWebView">Open a bot mini app, sending over user information after user confirmation: messages.requestWebView</a>
@@ -827,7 +827,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#restart" name="restart">Restart update loop: restart</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#resumePlay" name="resumePlay">Resumes playback of the current audio file in the call: resumePlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rethrow" name="rethrow">Rethrow exception into event loop: rethrow</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAllDrafts.html" name="messages.getAllDrafts">Return all message drafts.  : messages.getAllDrafts</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAllDrafts.html" name="messages.getAllDrafts">Return all message drafts.: messages.getAllDrafts</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getSettings" name="getSettings">Return current settings: getSettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAuthorizationForm.html" name="account.getAuthorizationForm">Returns a Telegram Passport authorization form for sharing data with a service: account.getAuthorizationForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getWallPapers.html" name="account.getWallPapers">Returns a list of available wallpapers: account.getWallPapers</a>
@@ -894,6 +894,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendMessageToAdmins" name="sendMessageToAdmins">Sends a message to all report peers (admins of the bot): sendMessageToAdmins</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendEncryptedFile.html" name="messages.sendEncryptedFile">Sends a message with a file attachment to a secret chat: messages.sendEncryptedFile</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendMessage" name="sendMessage">Sends a message: sendMessage</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendDocumentPhoto" name="sendDocumentPhoto">Sends a photo: sendDocumentPhoto</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendPhoto" name="sendPhoto">Sends a photo: sendPhoto</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendEncryptedService.html" name="messages.sendEncryptedService">Sends a service message to a secret chat: messages.sendEncryptedService</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#sendSticker" name="sendSticker">Sends a sticker: sendSticker</a>
@@ -993,7 +994,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.verifyPhone.html" name="account.verifyPhone">Verify a phone number for telegram passport: account.verifyPhone</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.verifyEmail.html" name="account.verifyEmail">Verify an email address: account.verifyEmail</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.confirmPasswordEmail.html" name="account.confirmPasswordEmail">Verify an email to use as 2FA recovery method: account.confirmPasswordEmail</a>
-    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.searchSentMedia.html" name="messages.searchSentMedia">View and search recently sent media.  : messages.searchSentMedia</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.searchSentMedia.html" name="messages.searchSentMedia">View and search recently sent media.: messages.searchSentMedia</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendVote.html" name="messages.sendVote">Vote in a poll: messages.sendVote</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#skipPlay" name="skipPlay">When called, skips to the next file in the playlist: skipPlay</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateDeviceLocked.html" name="account.updateDeviceLocked">When client-side passcode lock feature is enabled, will not show message texts in incoming PUSH notifications: account.updateDeviceLocked</a>
@@ -1002,6 +1003,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getContactSignUpNotification.html" name="account.getContactSignUpNotification">Whether the user will receive notifications when contacts sign up: account.getContactSignUpNotification</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isAltervista" name="isAltervista">Whether this is altervista: isAltervista</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#canConvertOgg" name="canConvertOgg">Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot: canConvertOgg</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#canUseFFmpeg" name="canUseFFmpeg">Whether we can convert any audio/video file using ffmpeg: canUseFFmpeg</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isIpc" name="isIpc">Whether we're an IPC client instance: isIpc</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isIpcWorker" name="isIpcWorker">Whether we're an IPC server process (as opposed to an event handler): isIpcWorker</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#isTestMode" name="isTestMode">Whether we're currently connected to the test DCs: isTestMode</a>
@@ -1063,7 +1065,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueWithdrawalUrl.html" name="stats.getBroadcastRevenueWithdrawalUrl">stats.getBroadcastRevenueWithdrawalUrl</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.replaceSticker.html" name="stickers.replaceSticker">stickers.replaceSticker</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getIsPremiumRequiredToContact.html" name="users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a>
-* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.  
+* [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
   * [Credits](https://docs.madelineproto.xyz/docs/CONTRIB.html#credits)

@@ -21,13 +21,10 @@ use danog\MadelineProto\EventHandler\Attributes\Handler;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\SimpleEventHandler;
-
-use function Amp\async;
-use function Amp\File\read;
-use function Amp\Future\await;
 
 /*
  * Various ways to load MadelineProto
@@ -86,234 +83,58 @@ class SecretHandler extends SimpleEventHandler
         if (isset($this->sent[$update->chatId])) {
             return;
         }
-        $secret_media = [];
-
-        // Photo uploaded as document, secret chat
-        $secret_media['document_photo'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/faust.jpg',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/faust.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/faust.jpg'),
-                    'caption' => 'This file was uploaded using MadelineProto',
-                    'file_name' => 'faust.jpg',
-                    'size' => filesize('tests/faust.jpg'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeImageSize',
-                            'w' => 1280,
-                            'h' => 914,
-                        ],
-                    ],
-                ],
-            ],
-        ];
 
         // Photo, secret chat
-        $secret_media['photo'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/faust.jpg',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaPhoto',
-                    'thumb' => read('tests/faust.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'caption' => 'This file was uploaded using MadelineProto',
-                    'size' => filesize('tests/faust.jpg'),
-                    'w' => 1280,
-                    'h' => 914,
-                ],
-            ],
-        ];
+        $this->sendPhoto(
+            peer: $update->chatId,
+            file: new LocalFile('tests/faust.jpg'),
+            caption: 'This file was uploaded using MadelineProto',
+        );
+
+        // Photo as document, secret chat
+        $this->sendDocumentPhoto(
+            peer: $update->chatId,
+            file: new LocalFile('tests/faust.jpg'),
+            caption: 'This file was uploaded using MadelineProto',
+        );
 
         // GIF, secret chat
-        $secret_media['gif'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/pony.mp4',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/pony.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/pony.mp4'),
-                    'caption' => 'test',
-                    'file_name' => 'pony.mp4',
-                    'size' => filesize('tests/faust.jpg'),
-                    'attributes' => [
-                        ['_' => 'documentAttributeAnimated'],
-                    ],
-                ],
-            ],
-        ];
+        $this->sendGif(
+            peer: $update->chatId,
+            file: new LocalFile('tests/pony.mp4'),
+            caption: 'This file was uploaded using MadelineProto',
+        );
 
         // Sticker, secret chat
-        $secret_media['sticker'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/lel.webp',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/lel.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/lel.webp'),
-                    'caption' => 'test',
-                    'file_name' => 'lel.webp',
-                    'size' => filesize('tests/lel.webp'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeImageSize',
-                            'w' => 512,
-                            'h' => 510,
-                        ],
-                        [
-                            '_' => 'documentAttributeSticker',
-                            'alt' => 'LEL',
-                            'stickerset' => ['_' => 'inputStickerSetEmpty'],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $this->sendSticker(
+            peer: $update->chatId,
+            file: new LocalFile('tests/lel.webp'),
+            mimeType: "image/webp"
+        );
 
-        // Document, secrey chat
-        $secret_media['document'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/60',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/faust.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => 'magic/magic',
-                    'caption' => 'test',
-                    'file_name' => 'magic.magic',
-                    'size' => filesize('tests/60'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeFilename',
-                            'file_name' => 'fairy',
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        // Document, secret chat
+        $this->sendDocument(
+            peer: $update->chatId,
+            file: new LocalFile('tests/60'),
+            fileName: 'fairy'
+        );
 
         // Video, secret chat
-        $secret_media['video'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/swing.mp4',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/swing.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/swing.mp4'),
-                    'caption' => 'test',
-                    'file_name' => 'swing.mp4',
-                    'size' => filesize('tests/swing.mp4'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeVideo',
-                            'duration' => 5,
-                            'w' => 1280,
-                            'h' => 720,
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $this->sendVideo(
+            peer: $update->chatId,
+            file: new LocalFile('tests/swing.mp4'),
+        );
 
         // audio, secret chat
-        $secret_media['audio'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/mosconi.mp3',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/faust.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/mosconi.mp3'),
-                    'caption' => 'test',
-                    'file_name' => 'mosconi.mp3',
-                    'size' => filesize('tests/mosconi.mp3'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeAudio',
-                            'voice' => false,
-                            'duration' => 1,
-                            'title' => 'AH NON LO SO IO',
-                            'performer' => 'IL DIO GERMANO MOSCONI',
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $this->sendAudio(
+            peer: $update->chatId,
+            file: new LocalFile('tests/mosconi.mp3'),
+        );
 
-        $secret_media['voice'] = [
-            'peer' => $update->chatId,
-            'file' => 'tests/mosconi.mp3',
-            'message' => [
-                '_' => 'decryptedMessage',
-                'ttl' => 0,
-                'message' => '',
-                'media' => [
-                    '_' => 'decryptedMessageMediaDocument',
-                    'thumb' => read('tests/faust.preview.jpg'),
-                    'thumb_w' => 90,
-                    'thumb_h' => 90,
-                    'mime_type' => mime_content_type('tests/mosconi.mp3'),
-                    'caption' => 'test',
-                    'file_name' => 'mosconi.mp3',
-                    'size' => filesize('tests/mosconi.mp3'),
-                    'attributes' => [
-                        [
-                            '_' => 'documentAttributeAudio',
-                            'voice' => true,
-                            'duration' => 1,
-                            'title' => 'AH NON LO SO IO',
-                            'performer' => 'IL DIO GERMANO MOSCONI',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $promises = [];
-        foreach ($secret_media as $type => $smessage) {
-            $promises []= async($this->messages->sendEncryptedFile(...), $smessage);
-        }
-        await($promises);
+        $this->sendVoice(
+            peer: $update->chatId,
+            file: new LocalFile('tests/mosconi.mp3'),
+        );
 
         $i = 0;
         while ($i < 10) {

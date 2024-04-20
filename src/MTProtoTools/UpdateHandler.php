@@ -711,7 +711,7 @@ trait UpdateHandler
                     $info,
                     $this->wrapMedia($message['action']['photo'])
                 ),
-                'messageActionRequestedPeer' => new DialogPeerRequested(
+                'messageActionRequestedPeerSentMe' => new DialogPeerRequested(
                     $this,
                     $message,
                     $info,

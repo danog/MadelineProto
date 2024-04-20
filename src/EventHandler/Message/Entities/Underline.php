@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Underline extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'underline', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

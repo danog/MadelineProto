@@ -67,7 +67,8 @@ trait AuthKeyHandler
         if ($user['type'] !== 'user') {
             throw new AssertionError("Can only create a secret chat with a user!");
         }
-        $this->logger->logger('Creating secret chat with '.$user['user_id'].'...', Logger::VERBOSE);
+        $user = $user['user_id'];
+        $this->logger->logger('Creating secret chat with '.$user.'...', Logger::VERBOSE);
         $dh_config = ($this->getDhConfig());
         $this->logger->logger('Generating a...', Logger::VERBOSE);
         $a = new BigInteger(Tools::random(256), 256);

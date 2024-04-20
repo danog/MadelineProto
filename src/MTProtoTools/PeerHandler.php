@@ -223,6 +223,7 @@ trait PeerHandler
                     }
                     return $id['from_id'];
                 case 'peerChannel':
+                case 'requestedPeerChannel':
                 case 'inputChannel':
                 case 'inputPeerChannel':
                 case 'inputChannelFromMessage':
@@ -276,6 +277,7 @@ trait PeerHandler
                 case 'inputPeerUser':
                 case 'inputUser':
                 case 'peerUser':
+                case 'requestedPeerUser':
                 case 'messageEntityMentionName':
                 case 'messageActionChatDeleteUser':
                     return $id['user_id'];
@@ -824,7 +826,7 @@ trait PeerHandler
                         : PhotoSizeSourceDialogPhotoBig::class;
                 $photoSize = new $photoSize(
                     dialogId: $res['id'],
-                    dialogAccessHash: $res['access_hash'],
+                    dialogAccessHash: $full['Chat']['access_hash'] ?? $full['User']['access_hash'],
                 );
 
                 $fileId = new FileId(

@@ -22,11 +22,12 @@ namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
-use danog\MadelineProto\Lang;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
+use danog\TelegramEntities\Entities;
 use Throwable;
 
 /**
@@ -267,7 +268,7 @@ trait BotAPI
                                 $res['title'] = $attribute['title'];
                             }
                             if (isset($attribute['waveform'])) {
-                                $res['title'] = $attribute['waveform'];
+                                $res['waveform'] = $attribute['waveform'];
                             }
                             break;
                         case 'documentAttributeVideo':
@@ -361,75 +362,7 @@ trait BotAPI
      */
     public static function MTProtoEntityToBotAPI(array $data): array
     {
-        switch ($data['_']) {
-            case 'messageEntityCustomEmoji':
-                $data['type'] = 'custom_emoji';
-                $data['custom_emoji_id'] = $data['document_id'];
-                unset($data['_'], $data['document_id']);
-                return $data;
-            case 'messageEntityPhone':
-                unset($data['_']);
-                $data['type'] = 'phone_number';
-                return $data;
-            case 'messageEntityBlockquote':
-                unset($data['_']);
-                $data['type'] = 'block_quote';
-                return $data;
-            case 'messageEntityMention':
-                unset($data['_']);
-                $data['type'] = 'mention';
-                return $data;
-            case 'messageEntityHashtag':
-                unset($data['_']);
-                $data['type'] = 'hashtag';
-                return $data;
-            case 'messageEntityBotCommand':
-                unset($data['_']);
-                $data['type'] = 'bot_command';
-                return $data;
-            case 'messageEntityUrl':
-                unset($data['_']);
-                $data['type'] = 'url';
-                return $data;
-            case 'messageEntityEmail':
-                unset($data['_']);
-                $data['type'] = 'email';
-                return $data;
-            case 'messageEntityBold':
-                unset($data['_']);
-                $data['type'] = 'bold';
-                return $data;
-            case 'messageEntityStrike':
-                unset($data['_']);
-                $data['type'] = 'strikethrough';
-                return $data;
-            case 'messageEntitySpoiler':
-                unset($data['_']);
-                $data['type'] = 'spoiler';
-                return $data;
-            case 'messageEntityUnderline':
-                unset($data['_']);
-                $data['type'] = 'underline';
-                return $data;
-            case 'messageEntityItalic':
-                unset($data['_']);
-                $data['type'] = 'italic';
-                return $data;
-            case 'messageEntityCode':
-                unset($data['_']);
-                $data['type'] = 'code';
-                return $data;
-            case 'messageEntityPre':
-                unset($data['_']);
-                $data['type'] = 'pre';
-                return $data;
-            case 'messageEntityTextUrl':
-                unset($data['_']);
-                $data['type'] = 'text_url';
-                return $data;
-            default:
-                throw new Exception(sprintf(Lang::$current_lang['botapi_conversion_error'], $data['_']));
-        }
+        return MessageEntity::fromRawEntity($data)->toBotAPI();
     }
     /**
      * Convert bot API parameters to MTProto parameters.
@@ -474,12 +407,12 @@ trait BotAPI
             $arguments['parse_mode'] = str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $entities = new MarkdownEntities($arguments[$key]);
+            $entities = Entities::fromMarkdown($arguments[$key]);
             $arguments[$key] = $entities->message;
             $arguments['entities'] = array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);
         } elseif (stripos($arguments['parse_mode'], 'html') !== false) {
-            $entities = new DOMEntities($arguments[$key]);
+            $entities = Entities::fromHtml($arguments[$key]);
             $arguments[$key] = $entities->message;
             $arguments['entities'] = array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);

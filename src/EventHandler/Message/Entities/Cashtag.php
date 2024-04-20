@@ -7,4 +7,8 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Cashtag extends MessageEntity
 {
+    public function toBotAPI(): array
+    {
+        return ['type' => 'cashtag', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

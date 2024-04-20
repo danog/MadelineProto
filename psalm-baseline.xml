@@ -611,9 +611,6 @@
     <UnresolvableInclude>
       <code><![CDATA[require $file]]></code>
     </UnresolvableInclude>
-    <UnsafeInstantiation>
-      <code><![CDATA[new $class]]></code>
-    </UnsafeInstantiation>
   </file>
   <file src="src/EventHandler/AbstractMessage.php">
     <InvalidReturnStatement>
@@ -1503,6 +1500,9 @@
     </MixedAssignment>
   </file>
   <file src="src/EventHandler/Message/Entities/MentionName.php">
+    <MixedArrayAccess>
+      <code><![CDATA[$rawEntities['user']['id']]]></code>
+    </MixedArrayAccess>
     <MixedAssignment>
       <code><![CDATA[$this->userId]]></code>
     </MixedAssignment>
@@ -1513,6 +1513,9 @@
       <code><![CDATA[$this->length]]></code>
       <code><![CDATA[$this->offset]]></code>
     </MixedAssignment>
+    <MixedOperand>
+      <code><![CDATA[$entity['_'] ?? $entity['type']]]></code>
+    </MixedOperand>
   </file>
   <file src="src/EventHandler/Message/Entities/Pre.php">
     <MixedAssignment>
@@ -2230,77 +2233,6 @@
       <code><![CDATA[$id]]></code>
       <code><![CDATA[$id]]></code>
     </TypeDoesNotContainType>
-  </file>
-  <file src="src/InternalDoc.php">
-    <InvalidReturnStatement>
-      <code><![CDATA[$this->wrapper->getAPI()->getEventHandler($class)]]></code>
-    </InvalidReturnStatement>
-    <InvalidReturnType>
-      <code><![CDATA[T|EventHandlerProxy|__PHP_Incomplete_Class|null]]></code>
-    </InvalidReturnType>
-    <MissingParamType>
-      <code><![CDATA[$data]]></code>
-    </MissingParamType>
-    <MixedReturnStatement>
-      <code><![CDATA[$this->wrapper->getAPI()->downloadToDir($messageMedia, $dir, $cb, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->downloadToDir($messageMedia, $dir, $cb, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->downloadToFile($messageMedia, $file, $cb, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->downloadToFile($messageMedia, $file, $cb, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromTgfile($media, $cb, $encrypted, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted, $cancellation)]]></code>
-      <code><![CDATA[$this->wrapper->getAPI()->uploadFromUrl($url, $size, $fileName, $cb, $encrypted, $cancellation)]]></code>
-    </MixedReturnStatement>
-    <PossiblyInvalidPropertyAssignmentValue>
-      <code><![CDATA[$this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account')]]></code>
-      <code><![CDATA[$this->auth ??= new \danog\MadelineProto\Namespace\AbstractAPI('auth')]]></code>
-      <code><![CDATA[$this->bots ??= new \danog\MadelineProto\Namespace\AbstractAPI('bots')]]></code>
-      <code><![CDATA[$this->channels ??= new \danog\MadelineProto\Namespace\AbstractAPI('channels')]]></code>
-      <code><![CDATA[$this->chatlists ??= new \danog\MadelineProto\Namespace\AbstractAPI('chatlists')]]></code>
-      <code><![CDATA[$this->contacts ??= new \danog\MadelineProto\Namespace\AbstractAPI('contacts')]]></code>
-      <code><![CDATA[$this->folders ??= new \danog\MadelineProto\Namespace\AbstractAPI('folders')]]></code>
-      <code><![CDATA[$this->fragment ??= new \danog\MadelineProto\Namespace\AbstractAPI('fragment')]]></code>
-      <code><![CDATA[$this->help ??= new \danog\MadelineProto\Namespace\AbstractAPI('help')]]></code>
-      <code><![CDATA[$this->langpack ??= new \danog\MadelineProto\Namespace\AbstractAPI('langpack')]]></code>
-      <code><![CDATA[$this->messages ??= new \danog\MadelineProto\Namespace\AbstractAPI('messages')]]></code>
-      <code><![CDATA[$this->payments ??= new \danog\MadelineProto\Namespace\AbstractAPI('payments')]]></code>
-      <code><![CDATA[$this->phone ??= new \danog\MadelineProto\Namespace\AbstractAPI('phone')]]></code>
-      <code><![CDATA[$this->photos ??= new \danog\MadelineProto\Namespace\AbstractAPI('photos')]]></code>
-      <code><![CDATA[$this->premium ??= new \danog\MadelineProto\Namespace\AbstractAPI('premium')]]></code>
-      <code><![CDATA[$this->smsjobs ??= new \danog\MadelineProto\Namespace\AbstractAPI('smsjobs')]]></code>
-      <code><![CDATA[$this->stats ??= new \danog\MadelineProto\Namespace\AbstractAPI('stats')]]></code>
-      <code><![CDATA[$this->stickers ??= new \danog\MadelineProto\Namespace\AbstractAPI('stickers')]]></code>
-      <code><![CDATA[$this->stories ??= new \danog\MadelineProto\Namespace\AbstractAPI('stories')]]></code>
-      <code><![CDATA[$this->updates ??= new \danog\MadelineProto\Namespace\AbstractAPI('updates')]]></code>
-      <code><![CDATA[$this->upload ??= new \danog\MadelineProto\Namespace\AbstractAPI('upload')]]></code>
-      <code><![CDATA[$this->users ??= new \danog\MadelineProto\Namespace\AbstractAPI('users')]]></code>
-    </PossiblyInvalidPropertyAssignmentValue>
-    <PossiblyUndefinedMethod>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-      <code><![CDATA[setWrapper]]></code>
-    </PossiblyUndefinedMethod>
   </file>
   <file src="src/Ipc/Client.php">
     <ArgumentTypeCoercion>
@@ -4111,19 +4043,61 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/MTProtoTools/FilesAbstraction.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[\is_array($file)]]></code>
+    </DocblockTypeContradiction>
     <MixedArgument>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
+      <code><![CDATA[$attributesOrig['thumbSeek']]]></code>
       <code><![CDATA[$this->methodCallAsyncRead(
             $method,
             $params
         )]]></code>
+      <code><![CDATA[$thumb]]></code>
+      <code><![CDATA[$thumb]]></code>
     </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['h']]]></code>
+      <code><![CDATA[$attributes[0]['h']]]></code>
+      <code><![CDATA[$attributes[0]['no_sound']]]></code>
+      <code><![CDATA[$attributes[0]['performer']]]></code>
+      <code><![CDATA[$attributes[0]['title']]]></code>
+      <code><![CDATA[$attributes[0]['w']]]></code>
+      <code><![CDATA[$file['iv']]]></code>
+      <code><![CDATA[$file['key']]]></code>
+      <code><![CDATA[$file['size']]]></code>
+    </MixedArrayAccess>
+    <MixedArrayAssignment>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['h']]]></code>
+      <code><![CDATA[$attributes[0]['performer']]]></code>
+      <code><![CDATA[$attributes[0]['title']]]></code>
+      <code><![CDATA[$attributes[0]['w']]]></code>
+    </MixedArrayAssignment>
     <MixedAssignment>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['duration']]]></code>
+      <code><![CDATA[$attributes[0]['h']]]></code>
+      <code><![CDATA[$attributes[0]['performer']]]></code>
+      <code><![CDATA[$attributes[0]['title']]]></code>
+      <code><![CDATA[$attributes[0]['w']]]></code>
+      <code><![CDATA[$message['media']['iv']]]></code>
       <code><![CDATA[$message['media']['iv']]]></code>
       <code><![CDATA[$message['media']['iv']]]></code>
       <code><![CDATA[$message['media']['key']]]></code>
       <code><![CDATA[$message['media']['key']]]></code>
+      <code><![CDATA[$message['media']['key']]]></code>
       <code><![CDATA[$message['media']['size']]]></code>
       <code><![CDATA[$message['media']['size']]]></code>
+      <code><![CDATA[$message['media']['size']]]></code>
+      <code><![CDATA[$thumb]]></code>
+      <code><![CDATA[$thumb]]></code>
     </MixedAssignment>
     <MoreSpecificReturnType>
       <code><![CDATA[Message]]></code>
@@ -4134,6 +4108,23 @@
       <code><![CDATA[$media['file']]]></code>
       <code><![CDATA[$media['file']]]></code>
     </PossiblyInvalidArgument>
+    <PossiblyNullArgument>
+      <code><![CDATA[$stderr]]></code>
+      <code><![CDATA[$stderr]]></code>
+      <code><![CDATA[$stderr]]></code>
+      <code><![CDATA[$stderr]]></code>
+    </PossiblyNullArgument>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[\is_array($media['file'])]]></code>
+    </RedundantConditionGivenDocblockType>
+    <ReferenceConstraintViolation>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$file]]></code>
+    </ReferenceConstraintViolation>
   </file>
   <file src="src/MTProtoTools/FilesLogic.php">
     <MissingClosureReturnType>
@@ -4180,13 +4171,9 @@
       <code><![CDATA[$file]]></code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
       <code><![CDATA[$body]]></code>
       <code><![CDATA[$size]]></code>
     </PossiblyNullArgument>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$_SERVER['REQUEST_METHOD']]]></code>
-    </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedMethod>
       <code><![CDATA[seek]]></code>
       <code><![CDATA[seek]]></code>
@@ -4459,6 +4446,7 @@
     <MixedArrayAccess>
       <code><![CDATA[$entity['_']]]></code>
       <code><![CDATA[$entity['user_id']]]></code>
+      <code><![CDATA[$full['User']['access_hash']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
@@ -5147,6 +5135,14 @@
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$timeout !== null]]></code>
     </RedundantConditionGivenDocblockType>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+      <code><![CDATA[$update['_'] === 'updateNewScheduledMessage']]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/MTProtoTools/UpdatesState.php">
     <MixedOperand>
@@ -5497,7 +5493,7 @@
       <code><![CDATA[SecretMessage]]></code>
     </MoreSpecificReturnType>
     <PossiblyNullOperand>
-      <code><![CDATA[$user['user_id']]]></code>
+      <code><![CDATA[$user]]></code>
     </PossiblyNullOperand>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$user['user_id']]]></code>
@@ -5780,11 +5776,11 @@
     </ArgumentTypeCoercion>
     <InvalidArgument>
       <code><![CDATA[$entities]]></code>
+      <code><![CDATA[$entities]]></code>
     </InvalidArgument>
-    <PossiblyInvalidPropertyFetch>
-      <code><![CDATA[$entity->length]]></code>
-      <code><![CDATA[$entity->offset]]></code>
-    </PossiblyInvalidPropertyFetch>
+    <PossiblyInvalidMethodCall>
+      <code><![CDATA[toBotAPI]]></code>
+    </PossiblyInvalidMethodCall>
   </file>
   <file src="src/Stream/ADNLTransport/ADNLStream.php">
     <MissingPropertyType>
@@ -6433,6 +6429,14 @@
       <code><![CDATA[ClosedException]]></code>
     </UndefinedClass>
   </file>
+  <file src="src/StreamDuplicator.php">
+    <MissingTemplateParam>
+      <code><![CDATA[IteratorAggregate]]></code>
+    </MissingTemplateParam>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$outputs]]></code>
+    </PropertyTypeCoercion>
+  </file>
   <file src="src/TL/Conversion/BotAPI.php">
     <MissingParamType>
       <code><![CDATA[$markup]]></code>
@@ -6455,7 +6459,6 @@
       <code><![CDATA[$attribute['file_name']]]></code>
       <code><![CDATA[$button['url']]]></code>
       <code><![CDATA[$button['url']]]></code>
-      <code><![CDATA[$data['_']]]></code>
       <code><![CDATA[$data['access_hash']]]></code>
       <code><![CDATA[$data['dc_id']]]></code>
       <code><![CDATA[$data['document']['access_hash']]]></code>
@@ -6562,7 +6565,6 @@
       <code><![CDATA[$button]]></code>
       <code><![CDATA[$data]]></code>
       <code><![CDATA[$data]]></code>
-      <code><![CDATA[$data['custom_emoji_id']]]></code>
       <code><![CDATA[$element]]></code>
       <code><![CDATA[$entity]]></code>
       <code><![CDATA[$entity]]></code>
@@ -6616,7 +6618,7 @@
       <code><![CDATA[$res['performer']]]></code>
       <code><![CDATA[$res['sticker_set']]]></code>
       <code><![CDATA[$res['title']]]></code>
-      <code><![CDATA[$res['title']]]></code>
+      <code><![CDATA[$res['waveform']]]></code>
       <code><![CDATA[$res['width']]]></code>
       <code><![CDATA[$res['width']]]></code>
       <code><![CDATA[$row]]></code>
@@ -6752,12 +6754,6 @@
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$message]]></code>
     </MixedArgument>
-  </file>
-  <file src="src/TL/Conversion/MarkdownEntities.php">
-    <DocblockTypeContradiction>
-      <code><![CDATA[$posClose === false]]></code>
-      <code><![CDATA[$posClose === false]]></code>
-    </DocblockTypeContradiction>
   </file>
   <file src="src/TL/Conversion/TD.php">
     <MixedArgument>
@@ -7909,9 +7905,6 @@
       <code><![CDATA[$this->pluginInstances[$class]]]></code>
       <code><![CDATA[$this->pluginInstances[$class]]]></code>
     </PossiblyInvalidArrayOffset>
-    <UnsafeInstantiation>
-      <code><![CDATA[new $class_name]]></code>
-    </UnsafeInstantiation>
   </file>
   <file src="src/Wrappers/Login.php">
     <InvalidFalsableReturnType>

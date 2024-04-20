@@ -1197,9 +1197,9 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\DOMEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    final public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TL\Conversion\DOMEntities
+    final public static function htmlToMessageEntities(string $html): \danog\MadelineProto\TextEntities
     {
         return \danog\MadelineProto\StrTools::htmlToMessageEntities($html);
     }
@@ -1366,9 +1366,9 @@ abstract class InternalDoc
      *
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
-     * @return \danog\MadelineProto\TL\Conversion\MarkdownEntities Object containing message and entities
+     * @return TextEntities Object containing message and entities
      */
-    final public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TL\Conversion\MarkdownEntities
+    final public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TextEntities
     {
         return \danog\MadelineProto\StrTools::markdownToMessageEntities($markdown);
     }
@@ -1715,6 +1715,34 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->sendDocument($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $mimeType, $ttl, $spoiler, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder, $forceResend, $cancellation);
     }
     /**
+     * Sends a photo.
+     *
+     * Please use named arguments to call this method.
+     *
+     * @param integer|string                                                $peer                   Destination peer or username.
+     * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
+     * @param string                                                        $caption                Caption of document
+     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
+     * @param ParseMode                                                     $parseMode              Text parse mode for the caption
+     * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
+     * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
+     * @param array|null                                                    $replyMarkup            Keyboard information.
+     * @param integer|null                                                  $sendAs                 Peer to send the message as.
+     * @param integer|null                                                  $scheduleDate           Schedule date.
+     * @param boolean                                                       $silent                 Whether to send the message silently, without triggering notifications.
+     * @param boolean                                                       $background             Send this message as background message
+     * @param boolean                                                       $clearDraft             Clears the draft field
+     * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
+     * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
+     * @param Cancellation                                                  $cancellation           Cancellation.
+     *
+     */
+    final public function sendDocumentPhoto(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    {
+        return $this->wrapper->getAPI()->sendDocumentPhoto($peer, $file, $caption, $parseMode, $callback, $fileName, $ttl, $spoiler, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder, $forceResend, $cancellation);
+    }
+    /**
      * Sends a gif.
      *
      * Please use named arguments to call this method.
@@ -1741,9 +1769,9 @@ abstract class InternalDoc
      * @param ?Cancellation                                                  $cancellation            Cancellation.
      *
      */
-    final public function sendGif(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    final public function sendGif(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, bool $spoiler = false, ?int $duration = null, ?int $width = null, ?int $height = null, string $thumbSeek = '00:00:01.000', ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
-        return $this->wrapper->getAPI()->sendGif($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $ttl, $spoiler, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $cancellation);
+        return $this->wrapper->getAPI()->sendGif($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $ttl, $spoiler, $duration, $width, $height, $thumbSeek, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $cancellation);
     }
     /**
      * Sends a message.
@@ -1836,9 +1864,11 @@ abstract class InternalDoc
      * @param Cancellation                                                  $cancellation           Cancellation.
      *
      */
-    final public function sendSticker(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $emoji = '', ?callable $callback = null, ?string $fileName = null, ?string $mimeType = null, ?int $ttl = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    final public function sendSticker(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $mimeType, string $emoji = '', array $stickerSet = [
+        '_' => 'inputStickerSetEmpty',
+    ], ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
-        return $this->wrapper->getAPI()->sendSticker($peer, $file, $emoji, $callback, $fileName, $mimeType, $ttl, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder, $forceResend, $cancellation);
+        return $this->wrapper->getAPI()->sendSticker($peer, $file, $mimeType, $emoji, $stickerSet, $callback, $fileName, $ttl, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $updateStickersetsOrder, $forceResend, $cancellation);
     }
     /**
      * Sends a video.
@@ -1873,9 +1903,9 @@ abstract class InternalDoc
      * @param Cancellation                                                  $cancellation            Cancellation.
      *
      */
-    final public function sendVideo(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, string $mimeType = 'video/mp4', ?int $ttl = null, bool $spoiler = false, bool $roundMessage = false, bool $supportsStreaming = true, bool $noSound = false, ?int $duration = null, ?int $width = null, ?int $height = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $forceResend = false, bool $updateStickersetsOrder = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    final public function sendVideo(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream|null $thumb = null, string $caption = '', \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::TEXT, ?callable $callback = null, ?string $fileName = null, string $mimeType = 'video/mp4', ?int $ttl = null, bool $spoiler = false, bool $roundMessage = false, bool $supportsStreaming = true, bool $noSound = false, ?int $duration = null, ?int $width = null, ?int $height = null, string $thumbSeek = '00:00:01.000', ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $forceResend = false, bool $updateStickersetsOrder = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
-        return $this->wrapper->getAPI()->sendVideo($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $mimeType, $ttl, $spoiler, $roundMessage, $supportsStreaming, $noSound, $duration, $width, $height, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $updateStickersetsOrder, $cancellation);
+        return $this->wrapper->getAPI()->sendVideo($peer, $file, $thumb, $caption, $parseMode, $callback, $fileName, $mimeType, $ttl, $spoiler, $roundMessage, $supportsStreaming, $noSound, $duration, $width, $height, $thumbSeek, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $updateStickersetsOrder, $cancellation);
     }
     /**
      * Sends a voice.
@@ -2120,7 +2150,7 @@ abstract class InternalDoc
     /**
      * Upload file.
      *
-     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|string|array|resource $file      File, URL or Telegram file to upload
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|string|array|resource $file      File, URL or Telegram file to upload
      * @param string                                                                       $fileName  File name
      * @param callable                                                                     $cb        Callback
      * @param boolean                                                                      $encrypted Whether to encrypt file for secret chats

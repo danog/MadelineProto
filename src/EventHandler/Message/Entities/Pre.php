@@ -16,4 +16,12 @@ final class Pre extends MessageEntity
         parent::__construct($rawEntities);
         $this->language = $rawEntities['language'];
     }
+    public function toBotAPI(): array
+    {
+        $res = ['type' => 'pre', 'offset' => $this->offset, 'length' => $this->length];
+        if ($this->language !== '') {
+            $res['language'] = $this->language;
+        }
+        return $res;
+    }
 }
