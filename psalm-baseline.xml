@@ -1331,6 +1331,7 @@
     <LessSpecificReturnStatement>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
+      <code><![CDATA[array_values(array_filter($result))]]></code>
     </LessSpecificReturnStatement>
     <MixedArgument>
       <code><![CDATA[$fwdFrom['channel_post'] ?? null]]></code>
@@ -1435,6 +1436,7 @@
     <MoreSpecificReturnType>
       <code><![CDATA[Message]]></code>
       <code><![CDATA[Message]]></code>
+      <code><![CDATA[non-empty-list<Message>]]></code>
     </MoreSpecificReturnType>
     <NullableReturnStatement>
       <code><![CDATA[$this->getClient()->wrapMessage($this->getClient()->extractMessage($result))]]></code>
@@ -4424,6 +4426,7 @@
       <code><![CDATA[(int) $result]]></code>
     </RedundantCastGivenDocblockType>
     <RedundantConditionGivenDocblockType>
+      <code><![CDATA[$result !== null]]></code>
       <code><![CDATA[$result !== null]]></code>
       <code><![CDATA[(int) $result]]></code>
     </RedundantConditionGivenDocblockType>

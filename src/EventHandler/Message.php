@@ -504,6 +504,8 @@ abstract class Message extends AbstractMessage
      * @param boolean $score When forwarding games, whether to include your score in the game
      * @param integer|null $scheduleDate Schedule date.
      * @param integer|string|null $sendAs Peer to send the message as.
+     *
+     * @return non-empty-list<Message>
      */
     public function forward(
         int|string $peer,
@@ -536,8 +538,8 @@ abstract class Message extends AbstractMessage
                 'drop_media_captions' => $dropCaption,
             ]
         );
-        $result = \array_slice($this->getClient()->extractUpdates($result), \count($id));
-        return array_map($this->getClient()->wrapMessage(...), $result);
+        $result = array_map($this->getClient()->wrapUpdate(...), $this->getClient()->extractUpdates($result));
+        return array_values(array_filter($result));
     }
 
     protected readonly string $html;
