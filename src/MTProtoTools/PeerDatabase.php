@@ -153,7 +153,11 @@ final class PeerDatabase implements TLCallback
 
     public function getFull(int $id): ?array
     {
-        return $this->fullDb[$id];
+        $result = $this->fullDb[$id];
+        if ($result !== null) {
+            $result['id'] = $id;
+        }
+        return $result;
     }
     public function expireFull(int $id): void
     {
