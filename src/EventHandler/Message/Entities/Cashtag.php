@@ -11,4 +11,8 @@ final class Cashtag extends MessageEntity
     {
         return ['type' => 'cashtag', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityCashtag', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

@@ -11,4 +11,8 @@ final class Code extends MessageEntity
     {
         return ['type' => 'code', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityCode', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

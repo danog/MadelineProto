@@ -4,6 +4,26 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\EventHandler\Message\Entities\BankCard;
+use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
+use danog\MadelineProto\EventHandler\Message\Entities\Bold;
+use danog\MadelineProto\EventHandler\Message\Entities\BotCommand;
+use danog\MadelineProto\EventHandler\Message\Entities\Cashtag;
+use danog\MadelineProto\EventHandler\Message\Entities\Code;
+use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
+use danog\MadelineProto\EventHandler\Message\Entities\Email;
+use danog\MadelineProto\EventHandler\Message\Entities\Hashtag;
+use danog\MadelineProto\EventHandler\Message\Entities\Italic;
+use danog\MadelineProto\EventHandler\Message\Entities\Mention;
+use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\Entities\Phone;
+use danog\MadelineProto\EventHandler\Message\Entities\Pre;
+use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
+use danog\MadelineProto\EventHandler\Message\Entities\Strike;
+use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
+use danog\MadelineProto\EventHandler\Message\Entities\Underline;
+use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tools;
@@ -28,6 +48,38 @@ class EntitiesTest extends TestCase
         $this->assertEquals(['aя', 'aя'], StrTools::mbStrSplit('aяaя', 2));
         $this->assertEquals(['a👍', 'a👍'], StrTools::mbStrSplit('a👍a👍', 3));
         $this->assertEquals(['🇺🇦', '🇺🇦'], StrTools::mbStrSplit('🇺🇦🇺🇦', 4));
+    }
+    /**
+     * @dataProvider provideEntityObjects
+     */
+    public function testAllEntities(MessageEntity $message): void
+    {
+        $this->assertTrue(MessageEntity::fromRawEntity($message->toBotAPI()) == $message);
+        $this->assertTrue(MessageEntity::fromRawEntity($message->toMTProto()) == $message);
+    }
+    public static function provideEntityObjects(): array
+    {
+        return [
+            [new BankCard(1, 2)],
+            [new Blockquote(1, 2)],
+            [new Bold(1, 2)],
+            [new BotCommand(1, 2)],
+            [new Cashtag(1, 2)],
+            [new Code(1, 2)],
+            [new CustomEmoji(1, 2, 12345)],
+            [new Email(1, 2)],
+            [new Hashtag(1, 2)],
+            [new Italic(1, 2)],
+            [new MentionName(1, 2, 12345)],
+            [new Mention(1, 2)],
+            [new Phone(1, 2)],
+            [new Pre(1, 2, "language")],
+            [new Spoiler(1, 2)],
+            [new Strike(1, 2)],
+            [new TextUrl(1, 2, "https://google.com")],
+            [new Underline(1, 2)],
+            [new Url(1, 2)],
+        ];
     }
     private static function sendMessage(string $message, string $parse_mode): TextEntities
     {

@@ -11,4 +11,8 @@ final class Mention extends MessageEntity
     {
         return ['type' => 'mention', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityMention', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

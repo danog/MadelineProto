@@ -11,4 +11,8 @@ final class Bold extends MessageEntity
     {
         return ['type' => 'bold', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityBold', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

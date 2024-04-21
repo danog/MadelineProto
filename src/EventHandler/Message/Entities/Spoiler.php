@@ -11,4 +11,8 @@ final class Spoiler extends MessageEntity
     {
         return ['type' => 'spoiler', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntitySpoiler', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

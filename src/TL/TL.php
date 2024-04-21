@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -578,6 +579,9 @@ final class TL implements TLInterface
                 if (\is_string($object)) {
                     return $object;
                 }
+        }
+        if ($object instanceof MessageEntity) {
+            $object = $object->toMTProto();
         }
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];

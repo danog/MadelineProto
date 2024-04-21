@@ -11,4 +11,8 @@ final class Italic extends MessageEntity
     {
         return ['type' => 'italic', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityItalic', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

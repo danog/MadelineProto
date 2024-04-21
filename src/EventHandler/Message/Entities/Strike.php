@@ -11,4 +11,8 @@ final class Strike extends MessageEntity
     {
         return ['type' => 'strikethrough', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityStrike', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

@@ -11,4 +11,8 @@ final class Email extends MessageEntity
     {
         return ['type' => 'email', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityEmail', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

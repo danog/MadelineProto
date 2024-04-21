@@ -11,4 +11,8 @@ final class Blockquote extends MessageEntity
     {
         return ['type' => 'block_quote', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityBlockquote', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

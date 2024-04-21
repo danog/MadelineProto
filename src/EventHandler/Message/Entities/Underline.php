@@ -11,4 +11,8 @@ final class Underline extends MessageEntity
     {
         return ['type' => 'underline', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityUnderline', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

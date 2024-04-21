@@ -11,4 +11,8 @@ final class Hashtag extends MessageEntity
     {
         return ['type' => 'hashtag', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityHashtag', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

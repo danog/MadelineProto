@@ -11,4 +11,8 @@ final class Url extends MessageEntity
     {
         return ['type' => 'url', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityUrl', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }

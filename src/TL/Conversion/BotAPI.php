@@ -27,7 +27,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
-use danog\TelegramEntities\Entities;
 use Throwable;
 
 /**
@@ -407,12 +406,12 @@ trait BotAPI
             $arguments['parse_mode'] = str_replace('textParseMode', '', $arguments['parse_mode']['_']);
         }
         if (stripos($arguments['parse_mode'], 'markdown') !== false) {
-            $entities = Entities::fromMarkdown($arguments[$key]);
+            $entities = StrTools::markdownToMessageEntities($arguments[$key]);
             $arguments[$key] = $entities->message;
             $arguments['entities'] = array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);
         } elseif (stripos($arguments['parse_mode'], 'html') !== false) {
-            $entities = Entities::fromHtml($arguments[$key]);
+            $entities = StrTools::htmlToMessageEntities($arguments[$key]);
             $arguments[$key] = $entities->message;
             $arguments['entities'] = array_merge($arguments['entities'] ?? [], $entities->entities);
             unset($arguments['parse_mode']);

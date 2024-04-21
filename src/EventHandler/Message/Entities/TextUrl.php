@@ -7,17 +7,24 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class TextUrl extends MessageEntity
 {
-    /** The actual URL */
-    public readonly string $url;
+    public function __construct(
+        /** Offset of message entity within message (in UTF-16 code units) */
+        public readonly int $offset,
 
-    /** @internal  */
-    protected function __construct(array $rawEntities)
-    {
-        parent::__construct($rawEntities);
-        $this->url = $rawEntities['url'];
+        /** Length of message entity within message (in UTF-16 code units) */
+        public readonly int $length,
+
+        /** The actual URL */
+        public readonly string $url
+    ) {
     }
+
     public function toBotAPI(): array
     {
         return ['type' => 'text_link', 'offset' => $this->offset, 'length' => $this->length, 'url' => $this->url];
+    }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityTextUrl', 'offset' => $this->offset, 'length' => $this->length, 'url' => $this->url];
     }
 }

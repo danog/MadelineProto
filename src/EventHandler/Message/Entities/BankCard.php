@@ -11,4 +11,8 @@ final class BankCard extends MessageEntity
     {
         return ['type' => 'bank_card', 'offset' => $this->offset, 'length' => $this->length];
     }
+    public function toMTProto(): array
+    {
+        return ['_' => 'messageEntityBankCard', 'offset' => $this->offset, 'length' => $this->length];
+    }
 }
