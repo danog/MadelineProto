@@ -67,6 +67,7 @@ final class GarbageCollector
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
                 gc_collect_cycles();
+                self::$memoryConsumption = self::getMemoryConsumption();
                 /*self::$memoryConsumption = self::getMemoryConsumption();
                 $cleanedMemory = $currentMemory - self::$memoryConsumption;
                 if (!Magic::$suspendPeriodicLogging) {
