@@ -1489,43 +1489,63 @@
       <code><![CDATA[ChannelMessage]]></code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="src/EventHandler/Message/Entities/CustomEmoji.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->documentId]]></code>
-    </MixedAssignment>
-  </file>
-  <file src="src/EventHandler/Message/Entities/InputMentionName.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->userId]]></code>
-    </MixedAssignment>
-  </file>
-  <file src="src/EventHandler/Message/Entities/MentionName.php">
+  <file src="src/EventHandler/Message/Entities/MessageEntity.php">
+    <MixedArgument>
+      <code><![CDATA[$entity['document_id'] ?? $entity['custom_emoji_id']]]></code>
+      <code><![CDATA[$entity['language']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['length']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['offset']]]></code>
+      <code><![CDATA[$entity['url']]]></code>
+      <code><![CDATA[$entity['user_id']]]></code>
+      <code><![CDATA[$entity['user_id'] ?? $entity['user']['id']]]></code>
+    </MixedArgument>
     <MixedArrayAccess>
-      <code><![CDATA[$rawEntities['user']['id']]]></code>
+      <code><![CDATA[$entity['user']['id']]]></code>
     </MixedArrayAccess>
     <MixedAssignment>
-      <code><![CDATA[$this->userId]]></code>
-    </MixedAssignment>
-  </file>
-  <file src="src/EventHandler/Message/Entities/MessageEntity.php">
-    <MixedAssignment>
       <code><![CDATA[$res[$prop->getName()]]]></code>
-      <code><![CDATA[$this->length]]></code>
-      <code><![CDATA[$this->offset]]></code>
     </MixedAssignment>
     <MixedOperand>
       <code><![CDATA[$entity['_'] ?? $entity['type']]]></code>
     </MixedOperand>
-  </file>
-  <file src="src/EventHandler/Message/Entities/Pre.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->language]]></code>
-    </MixedAssignment>
-  </file>
-  <file src="src/EventHandler/Message/Entities/TextUrl.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->url]]></code>
-    </MixedAssignment>
   </file>
   <file src="src/EventHandler/Message/GroupMessage.php">
     <LessSpecificReturnStatement>
