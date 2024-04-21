@@ -625,7 +625,7 @@
                 $arr['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($client, ['peer' => $this->senderId, 'story' => $arr])
                     : new Story($client, ['peer' => $this->senderId, 'story' => $arr]),
-            $result
+            $result,
         )]]></code>
     </LessSpecificReturnStatement>
     <MixedArgument>
@@ -641,14 +641,14 @@
             'stories.getPeerStories',
             [
                 'peer' => $this->senderId,
-            ]
+            ],
         )['stories']]]></code>
       <code><![CDATA[$client->methodCallAsyncRead(
             'stories.getStoriesByID',
             [
                 'peer' => $this->senderId,
                 'id' => array_column($result, 'id'),
-            ]
+            ],
         )['stories']]]></code>
       <code><![CDATA[$messages[0]]]></code>
       <code><![CDATA[$rawMessage['chat_id']]]></code>
@@ -677,7 +677,7 @@
             [
                 'channel' => $this->chatId,
                 'id' => [['_' => 'inputMessageReplyTo', 'id' => $this->id]],
-            ]
+            ],
         )['messages']]]></code>
     </MixedArrayAccess>
     <MixedAssignment>
@@ -713,19 +713,19 @@
                     'peer' => $this->chatId,
                     'channel' => $this->chatId,
                     'max_id' => $readAll ? 0 : $this->id,
-                ]
+                ],
             )]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'contacts.block',
             [
                 'id' => $this->senderId,
-            ]
+            ],
         )]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'contacts.unblock',
             [
                 'id' => $this->senderId,
-            ]
+            ],
         )]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'messages.setTyping',
@@ -733,21 +733,21 @@
                 'peer' => $this->senderId,
                 'top_msg_id' => $this->topicId,
                 'action' => $action,
-            ]
+            ],
         )]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'messages.togglePeerTranslations',
             [
                 'peer' => $this->chatId,
                 'disabled' => false,
-            ]
+            ],
         )]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'messages.togglePeerTranslations',
             [
                 'peer' => $this->chatId,
                 'disabled' => true,
-            ]
+            ],
         )]]></code>
     </MixedReturnStatement>
     <MoreSpecificReturnType>

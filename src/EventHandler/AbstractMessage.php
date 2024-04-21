@@ -702,10 +702,10 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function replySticker(
         Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        string $mimeType,
         string $emoji = '',
         ?callable $callback = null,
         ?string $fileName = null,
-        ?string $mimeType = null,
         ?int $ttl = null,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
