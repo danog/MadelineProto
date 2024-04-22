@@ -466,6 +466,9 @@ trait BotAPI
         $offset = 0;
         for ($k = 0; $k < \count($args['entities']); $k++) {
             $entity = $args['entities'][$k];
+            if ($entity instanceof MessageEntity) {
+                $entity = $entity->toMTProto();
+            }
             do {
                 while ($entity['offset'] > $offset + StrTools::mbStrlen($multiple_args[$i]['message'])) {
                     $offset += StrTools::mbStrlen($multiple_args[$i]['message']);
