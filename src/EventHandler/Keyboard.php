@@ -49,7 +49,7 @@ abstract class Keyboard
      */
     public function pressByCoordinates(int $row, int $column, bool $waitForResult): mixed
     {
-        return $this->buttons[$row][$column]->click(!$waitForResult);
+        return $this->buttons[$row - 1][$column - 1]->click(!$waitForResult);
     }
 
     /**
