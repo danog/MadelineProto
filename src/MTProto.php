@@ -1724,8 +1724,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                             ],
                         ],
                     );
-                    deleteFile($path);
                 }
+                deleteFile($path);
             }
             $sent = false;
             foreach ($this->reportDest as $id) {
