@@ -66,7 +66,6 @@ use const PHP_SAPI;
 
 use const STR_PAD_RIGHT;
 use function Amp\File\openFile;
-use function Amp\File\read;
 use function unpack;
 
 /**
@@ -712,7 +711,7 @@ abstract class Tools extends AsyncTools
         }
         $plugin = is_subclass_of($class, PluginEventHandler::class);
         $file = (new ReflectionClass($class))->getFileName();
-        $code = read($file);
+        $code = file_get_contents($file);
         $code = (new ParserFactory)->createForNewestSupportedVersion()->parse($code);
         Assert::notNull($code);
         $traverser = new NodeTraverser;

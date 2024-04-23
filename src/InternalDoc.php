@@ -1081,9 +1081,9 @@ abstract class InternalDoc
     /**
      * Provide a stream for a file, URL or amp stream.
      */
-    final public function getStream(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null): \Amp\ByteStream\ReadableStream
+    final public function getStream(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null, ?int &$size = null): \Amp\ByteStream\ReadableStream
     {
-        return $this->wrapper->getAPI()->getStream($stream, $cancellation);
+        return $this->wrapper->getAPI()->getStream($stream, $cancellation, $size);
     }
     /**
      * Obtains a pipe that can be used to upload a file from a stream.

@@ -124,21 +124,6 @@ if (!getenv('GITHUB_SHA') && stripos(($MadelineProto->readline('Do you want to m
  */
 if (!getenv('GITHUB_SHA') && stripos(($MadelineProto->readline('Do you want to handle incoming calls? (y/n): ')) ?? '', 'y') !== false) {
     $howmany = $MadelineProto->readline('How many calls would you like me to handle? ');
-    $offset = 0;
-    while ($howmany > 0) {
-        $updates = $MadelineProto->getUpdates(['offset' => $offset, 'limit' => 50, 'timeout' => 0]); // Just like in the bot API, you can specify an offset, a limit and a timeout
-        foreach ($updates as $update) {
-            $MadelineProto->logger($update);
-            $offset = $update['update_id'] + 1; // Just like in the bot API, the offset must be set to the last update_id
-            switch ($update['update']['_']) {
-                case 'updatePhoneCall':
-                    if (is_object($update['update']['phone_call']) && $update['update']['phone_call']->getCallState() === VoIP::CALL_STATE_INCOMING) {
-                        $update['update']['phone_call']->accept()->play('input.raw')->then('input.raw')->playOnHold(['input.raw'])->setOutputFile('output.raw');
-                        $howmany--;
-                    }
-            }
-        }
-    }
 }
 
 /*

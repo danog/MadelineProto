@@ -4131,6 +4131,12 @@
       <code><![CDATA[$media['file']]]></code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
+      <code><![CDATA[$size]]></code>
+      <code><![CDATA[$size]]></code>
+      <code><![CDATA[$size]]></code>
+      <code><![CDATA[$size]]></code>
+      <code><![CDATA[$size]]></code>
+      <code><![CDATA[$size]]></code>
       <code><![CDATA[$stderr]]></code>
       <code><![CDATA[$stderr]]></code>
       <code><![CDATA[$stderr]]></code>

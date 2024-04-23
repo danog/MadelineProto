@@ -24,6 +24,8 @@ use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Process\Process;
 use AssertionError;
@@ -53,6 +55,7 @@ use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
+use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\Future\await;
 
@@ -65,21 +68,31 @@ use function Amp\Future\await;
  */
 trait FilesAbstraction
 {
+    private static ?HttpClient $client;
     /**
      * Provide a stream for a file, URL or amp stream.
      */
-    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null): ReadableStream
+    public function getStream(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $stream, ?Cancellation $cancellation = null, ?int &$size = null): ReadableStream
     {
         if ($stream instanceof LocalFile) {
+            $size = getSize($stream->file);
             return openFile($stream->file, 'r');
         }
         if ($stream instanceof RemoteUrl) {
+            self::$client ??= HttpClientBuilder::buildDefault();
             $request = new Request($stream->url);
             $request->setTransferTimeout(INF);
-            return $this->getHTTPClient()->request(
+            $request->setBodySizeLimit(512 * 1024 * 8000);
+            $response = self::$client->request(
                 $request,
                 $cancellation
-            )->getBody();
+            );
+            if (($status = $response->getStatus()) !== 200) {
+                throw new Exception("Wrong status code: {$status} ".$response->getReason());
+            }
+            $size = (int) ($response->getHeader('content-length') ?? $size);
+            $stream = $response->getBody();
+            return $stream;
         }
         if ($stream instanceof Message) {
             $stream = $stream->media;
@@ -88,9 +101,11 @@ trait FilesAbstraction
             }
         }
         if ($stream instanceof Media) {
+            $size = $stream->size;
             return $stream->getStream(cancellation: $cancellation);
         }
         if ($stream instanceof BotApiFileId) {
+            $size = $stream->size;
             return $this->downloadToReturnedStream($stream, cancellation: $cancellation);
         }
         return $stream;
@@ -1127,9 +1142,18 @@ trait FilesAbstraction
 
     private function extractMime(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation): string
     {
-        $file = $this->getStream($file, $cancellation);
+        $size = 0;
+        $file = $this->getStream($file, $cancellation, $size);
         $p = new Pipe(1024*1024);
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, $p->getSink()), $fileName ?? '', $callback, $secret, $cancellation));
+        $fileFuture = async(fn () => $this->uploadFromStream(
+            new StreamDuplicator($file, $p->getSink()),
+            $size,
+            'application/octet-stream',
+            $fileName ?? '',
+            $callback,
+            $secret,
+            $cancellation
+        ));
 
         $buff = '';
         while (\strlen($buff) < 1024*1024 && null !== $chunk = $p->getSource()->read($cancellation)) {
@@ -1140,7 +1164,7 @@ trait FilesAbstraction
         unset($p);
 
         $file = $fileFuture->await();
-        return  (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+        return (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
     }
     private function extractAudioInfo(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
@@ -1163,7 +1187,8 @@ trait FilesAbstraction
             return;
         }
 
-        $file = $this->getStream($file, $cancellation);
+        $size = 0;
+        $file = $this->getStream($file, $cancellation, $size);
         $process = Process::start('ffmpeg -i pipe: -f image2pipe -', cancellation: $cancellation);
         $stdin = $process->getStdin();
         $stdout = $process->getStdout();
@@ -1189,7 +1214,15 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
+        $fileFuture = async(fn () => $this->uploadFromStream(
+            new StreamDuplicator($file, ...$streams),
+            $size,
+            'application/octet-stream',
+            $fileName ?? '',
+            $callback,
+            $secret,
+            $cancellation
+        ));
         [$stdout, $stderr] = await($f);
 
         $process->join($cancellation);
@@ -1236,7 +1269,8 @@ trait FilesAbstraction
             return;
         }
 
-        $file = $this->getStream($file, $cancellation);
+        $size = 0;
+        $file = $this->getStream($file, $cancellation, $size);
         $ffmpeg = 'ffmpeg -i pipe: -ss '.$thumbSeek.' -frames:v 1 -f image2pipe -';
         $process = Process::start($ffmpeg, cancellation: $cancellation);
         $stdin = $process->getStdin();
@@ -1261,7 +1295,15 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->upload(new StreamDuplicator($file, ...$streams), $fileName ?? '', $callback, $secret, $cancellation));
+        $fileFuture = async(fn () => $this->uploadFromStream(
+            new StreamDuplicator($file, ...$streams),
+            $size,
+            'application/octet-stream',
+            $fileName ?? '',
+            $callback,
+            $secret,
+            $cancellation
+        ));
         [$stdout, $stderr] = await($f);
 
         if ($stdout !== '') {
