@@ -579,6 +579,7 @@ interface Messages
      * Search for messages and peers globally.
      *
      * @param array{_: 'inputMessagesFilterEmpty'}|array{_: 'inputMessagesFilterPhotos'}|array{_: 'inputMessagesFilterVideo'}|array{_: 'inputMessagesFilterPhotoVideo'}|array{_: 'inputMessagesFilterDocument'}|array{_: 'inputMessagesFilterUrl'}|array{_: 'inputMessagesFilterGif'}|array{_: 'inputMessagesFilterVoice'}|array{_: 'inputMessagesFilterMusic'}|array{_: 'inputMessagesFilterChatPhotos'}|array{_: 'inputMessagesFilterPhoneCalls', missed?: bool}|array{_: 'inputMessagesFilterRoundVoice'}|array{_: 'inputMessagesFilterRoundVideo'}|array{_: 'inputMessagesFilterMyMentions'}|array{_: 'inputMessagesFilterGeo'}|array{_: 'inputMessagesFilterContacts'}|array{_: 'inputMessagesFilterPinned'} $filter Global search filter @see https://docs.madelineproto.xyz/API_docs/types/MessagesFilter.html
+     * @param bool $broadcasts_only
      * @param int $folder_id [Peer folder ID, for more info click here](https://core.telegram.org/api/folders#peer-folders)
      * @param string $q Query
      * @param int $min_date If a positive value was specified, the method will return only messages with date bigger than min\_date
@@ -592,7 +593,7 @@ interface Messages
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.messages', messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate?: array, offset_id_offset?: array, messages: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
      */
-    public function searchGlobal(array $filter, int|null $folder_id = null, string|null $q = '', int|null $min_date = 0, int|null $max_date = 0, int|null $offset_rate = 0, array|int|string|null $offset_peer = null, int|null $offset_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function searchGlobal(array $filter, bool|null $broadcasts_only = null, int|null $folder_id = null, string|null $q = '', int|null $min_date = 0, int|null $max_date = 0, int|null $offset_rate = 0, array|int|string|null $offset_peer = null, int|null $offset_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Reorder installed stickersets.
@@ -1936,12 +1937,13 @@ interface Messages
      *
      * @param array{_: 'chatReactionsNone'}|array{_: 'chatReactionsAll', allow_custom?: bool}|array{_: 'chatReactionsSome', reactions?: list<array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon?: string}|array{_: 'reactionCustomEmoji', document_id?: int}>} $available_reactions Allowed reaction emojis @see https://docs.madelineproto.xyz/API_docs/types/ChatReactions.html
      * @param array|int|string $peer Group where to apply changes @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param int $reactions_limit
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function setChatAvailableReactions(array $available_reactions, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function setChatAvailableReactions(array $available_reactions, array|int|string|null $peer = null, int|null $reactions_limit = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Obtain available [message reactions »](https://core.telegram.org/api/reactions).

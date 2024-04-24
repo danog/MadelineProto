@@ -80,8 +80,10 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
+use function Amp\ByteStream\pipe;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
+use function Amp\File\openFile;
 use function Amp\Future\await;
 
 use function time;
@@ -1706,26 +1708,29 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if ($this->settings->getLogger()->getType() === Logger::FILE_LOGGER
                 && $path = $this->settings->getLogger()->getExtra()) {
                 $temp = tempnam(sys_get_temp_dir(), 'madelinelog');
-                copy($path, $temp);
+                pipe(openFile($path, 'r'), openFile($temp, 'w'));
                 $path = $temp;
-                if (!getSize($path)) {
-                    $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
-                } else {
-                    $file = $this->methodCallAsyncRead(
-                        'messages.uploadMedia',
-                        [
-                            'peer' => $this->reportDest[0],
-                            'media' => [
-                                '_' => 'inputMediaUploadedDocument',
-                                'file' => $path,
-                                'attributes' => [
-                                    ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log'],
+                try {
+                    if (!getSize($path)) {
+                        $message = "!!! WARNING !!!\nThe logfile is empty, please DO NOT delete the logfile to avoid errors in MadelineProto!\n\n$message";
+                    } else {
+                        $file = $this->methodCallAsyncRead(
+                            'messages.uploadMedia',
+                            [
+                                'peer' => $this->reportDest[0],
+                                'media' => [
+                                    '_' => 'inputMediaUploadedDocument',
+                                    'file' => $path,
+                                    'attributes' => [
+                                        ['_' => 'documentAttributeFilename', 'file_name' => 'MadelineProto.log'],
+                                    ],
                                 ],
                             ],
-                        ],
-                    );
+                        );
+                    }
+                } finally {
+                    deleteFile($path);
                 }
-                deleteFile($path);
             }
             $sent = false;
             foreach ($this->reportDest as $id) {

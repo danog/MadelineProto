@@ -193,7 +193,7 @@ interface Account
     /**
      * Verify a new phone number to associate to the current account.
      *
-     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, unknown_number?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
      * @param string $phone_number New phone number
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -259,7 +259,7 @@ interface Account
     /**
      * Send confirmation code to cancel account deletion, for more info [click here »](https://core.telegram.org/api/account-deletion).
      *
-     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, unknown_number?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
      * @param string $hash The hash from the service notification, for more info [click here »](https://core.telegram.org/api/account-deletion)
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -394,7 +394,7 @@ interface Account
     /**
      * Send the verification phone code for telegram [passport](https://core.telegram.org/passport).
      *
-     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
+     * @param array{_: 'codeSettings', allow_flashcall?: bool, current_number?: bool, allow_app_hash?: bool, allow_missed_call?: bool, allow_firebase?: bool, unknown_number?: bool, logout_tokens?: list<string>, token?: string, app_sandbox?: bool} $settings Phone code settings @see https://docs.madelineproto.xyz/API_docs/types/CodeSettings.html
      * @param string $phone_number The phone number to verify
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -1201,4 +1201,34 @@ interface Account
      * @param ?\Amp\Cancellation $cancellation Cancellation
      */
     public function updatePersonalChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     */
+    public function toggleSponsoredMessages(bool $enabled, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'reactionsNotifySettings', sound: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, show_previews: bool, messages_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, stories_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}} @see https://docs.madelineproto.xyz/API_docs/types/ReactionsNotifySettings.html
+     */
+    public function getReactionsNotifySettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param array{_: 'reactionsNotifySettings', sound: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}, show_previews: bool, messages_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, stories_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}} $settings @see https://docs.madelineproto.xyz/API_docs/types/ReactionsNotifySettings.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'reactionsNotifySettings', sound: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, show_previews: bool, messages_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, stories_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}} @see https://docs.madelineproto.xyz/API_docs/types/ReactionsNotifySettings.html
+     */
+    public function setReactionsNotifySettings(array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }
