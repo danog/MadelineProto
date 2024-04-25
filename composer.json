@@ -61,7 +61,7 @@
         "revolt/event-loop": "^1.0.6",
         "danog/async-orm": "^1.0.2",
         "symfony/thanks": "^1.3",
-        "danog/telegram-entities": "^1.0.1"
+        "danog/telegram-entities": "^1.0.2"
     },
     "require-dev": {
         "ext-ctype": "*",
