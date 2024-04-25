@@ -1026,10 +1026,12 @@ final class TL implements TLInterface
                 $x['chat_id'] = -$x['chat_id'];
             }
         }
+        if (isset($x['migrated_from_chat_id'])) {
+            $x['migrated_from_chat_id'] = -$x['migrated_from_chat_id'];
+        }
+
         if (isset($x['channel_id'])) {
             $x['channel_id'] = Magic::ZERO_CHANNEL_ID - $x['channel_id'];
-        } elseif (isset($x['migrated_from_chat_id'])) {
-            $x['migrated_from_chat_id'] = -$x['migrated_from_chat_id'];
         } elseif (isset($x['random_bytes'])) {
             if (\strlen((string) $x['random_bytes']) < 15) {
                 throw new SecurityException('Random_bytes is too small!');
