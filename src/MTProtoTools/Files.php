@@ -712,7 +712,7 @@ trait Files
      * @param mixed $messageMedia File ID
      *
      * @return array{
-     *      ext?: string,
+     *      ext: string,
      *      name: string,
      *      mime: string,
      *      size: int,
@@ -731,6 +731,8 @@ trait Files
             $pathinfo = pathinfo($messageMedia->fileName);
             if (isset($pathinfo['extension'])) {
                 $res['ext'] = '.'.$pathinfo['extension'];
+            } else {
+                $res['ext'] = '';
             }
             $res['name'] = $pathinfo['filename'];
             return $res;
@@ -757,6 +759,8 @@ trait Files
                 $pathinfo = pathinfo($messageMedia['file_name']);
                 if (isset($pathinfo['extension'])) {
                     $res['ext'] = '.'.$pathinfo['extension'];
+                } else {
+                    $res['ext'] = '';
                 }
                 $res['name'] = $pathinfo['filename'];
                 return $res;
@@ -798,6 +802,8 @@ trait Files
                     $pathinfo = pathinfo($messageMedia['file_name']);
                     if (isset($pathinfo['extension'])) {
                         $res['ext'] = '.'.$pathinfo['extension'];
+                    } else {
+                        $res['ext'] = '';
                     }
                     $res['name'] = $pathinfo['filename'];
                 }
@@ -813,6 +819,8 @@ trait Files
                                 $pathinfo = pathinfo($attribute['file_name']);
                                 if (isset($pathinfo['extension'])) {
                                     $res['ext'] = '.'.$pathinfo['extension'];
+                                } else {
+                                    $res['ext'] = '';
                                 }
                                 $res['name'] = $pathinfo['filename'];
                                 break;

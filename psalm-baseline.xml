@@ -119,6 +119,11 @@
       <code><![CDATA[\is_callable($callable)]]></code>
     </RedundantConditionGivenDocblockType>
   </file>
+  <file src="src/BotApiFileId.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$size <= 0]]></code>
+    </DocblockTypeContradiction>
+  </file>
   <file src="src/Broadcast/Action/ActionForward.php">
     <MixedArgument>
       <code><![CDATA[$updates]]></code>
@@ -3763,7 +3768,9 @@
       <code><![CDATA[$offset['offset']]]></code>
       <code><![CDATA[$offset['part_end_at'] - $offset['part_start_at']]]></code>
       <code><![CDATA[$offset['part_start_at']]]></code>
+      <code><![CDATA[$photo]]></code>
       <code><![CDATA[$res['mime'] ?? 'image/jpeg']]></code>
+      <code><![CDATA[$size]]></code>
       <code><![CDATA[$this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $this->authorized_dc)]]></code>
       <code><![CDATA[$this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $this->authorized_dc)]]></code>
       <code><![CDATA[$url]]></code>
@@ -3866,6 +3873,10 @@
       <code><![CDATA[$res['encryption_iv']]]></code>
       <code><![CDATA[$res['encryption_key']]]></code>
       <code><![CDATA[$res['file_token']]]></code>
+      <code><![CDATA[$res['photo'][$big ? 'big_file_id' : 'small_file_id']]]></code>
+      <code><![CDATA[$res['photo'][$big ? 'big_file_size' : 'small_file_size']]]></code>
+      <code><![CDATA[$res['photo']['dc_id']]]></code>
+      <code><![CDATA[$res['photo']['id']]]></code>
       <code><![CDATA[$res['request_token']]]></code>
       <code><![CDATA[$res['type']]]></code>
       <code><![CDATA[$res['type']]]></code>
@@ -3930,6 +3941,7 @@
       <code><![CDATA[$messageMedia['cdn_key']]]></code>
       <code><![CDATA[$messageMedia['decrypted_message']['media']['file']]]></code>
       <code><![CDATA[$messageMedia['file_token']]]></code>
+      <code><![CDATA[$photo]]></code>
       <code><![CDATA[$res]]></code>
       <code><![CDATA[$res]]></code>
       <code><![CDATA[$res]]></code>
@@ -3967,6 +3979,7 @@
       <code><![CDATA[$res['thumb_size']]]></code>
       <code><![CDATA[$res['thumb_size']]]></code>
       <code><![CDATA[$res['thumb_size']]]></code>
+      <code><![CDATA[$size]]></code>
       <code><![CDATA[$t]]></code>
       <code><![CDATA[$url]]></code>
     </MixedAssignment>
@@ -3991,6 +4004,8 @@
       <code><![CDATA[$res['name']]]></code>
       <code><![CDATA[$res['name']]]></code>
       <code><![CDATA[$res['name']]]></code>
+      <code><![CDATA[$res['photo']['dc_id']]]></code>
+      <code><![CDATA[$res['photo']['id']]]></code>
     </MixedOperand>
     <MixedPropertyTypeCoercion>
       <code><![CDATA[$this->cdn_hashes]]></code>
@@ -4060,7 +4075,6 @@
       <code><![CDATA[$cb(100, $speed, $time)]]></code>
     </TooManyArguments>
     <TypeDoesNotContainType>
-      <code><![CDATA[$res['ext'] === '']]></code>
       <code><![CDATA[$res['ext'] === '']]></code>
     </TypeDoesNotContainType>
   </file>
@@ -4467,6 +4481,7 @@
       <code><![CDATA[$res['photo']['dc_id']]]></code>
       <code><![CDATA[$res['photo']['id']]]></code>
       <code><![CDATA[$res['photo']['sizes']]]></code>
+      <code><![CDATA[$size['type']]]></code>
       <code><![CDATA[$total_count]]></code>
       <code><![CDATA[$total_count]]></code>
       <code><![CDATA[$total_count]]></code>
@@ -4475,7 +4490,6 @@
     <MixedArrayAccess>
       <code><![CDATA[$entity['_']]]></code>
       <code><![CDATA[$entity['user_id']]]></code>
-      <code><![CDATA[$full['User']['access_hash']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
@@ -4524,6 +4538,8 @@
       <code><![CDATA[$res['photo']['sizes']]]></code>
       <code><![CDATA[$res['photo']['sizes']]]></code>
       <code><![CDATA[$res['photo']['sizes'][0]]]></code>
+      <code><![CDATA[$size['size']]]></code>
+      <code><![CDATA[$size['type']]]></code>
       <code><![CDATA[$support['user']['id']]]></code>
       <code><![CDATA[$this->TL->getConstructors()->findByPredicate($constructor['_'])['type']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
@@ -4564,6 +4580,7 @@
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
+      <code><![CDATA[$photo[$type.'_file_size']]]></code>
       <code><![CDATA[$res[$key]]]></code>
       <code><![CDATA[$res[$key]]]></code>
       <code><![CDATA[$res[$key]]]></code>
@@ -4639,9 +4656,6 @@
     <PossiblyNullArrayOffset>
       <code><![CDATA[$res['participants']]]></code>
     </PossiblyNullArrayOffset>
-    <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$res['id']]]></code>
-    </PossiblyUndefinedArrayOffset>
     <RedundantFunctionCall>
       <code><![CDATA[array_values]]></code>
     </RedundantFunctionCall>

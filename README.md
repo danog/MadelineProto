@@ -530,7 +530,6 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getDhConfig" name="getDhConfig">Get diffie-hellman configuration: getDhConfig</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDiscussionMessage.html" name="messages.getDiscussionMessage">Get discussion message from the associated discussion group of a channel to show it on top of the comment section, without actually joining the group: messages.getDiscussionMessage</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getDownloadInfo" name="getDownloadInfo">Get download info of file: getDownloadInfo</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPropicInfo" name="getPropicInfo">Get download info of the propic of a user: getPropicInfo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getDownloadLink" name="getDownloadLink">Get download link of media file: getDownloadLink</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getEventHandler" name="getEventHandler">Get event handler (or plugin instance): getEventHandler</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getExtensionFromLocation" name="getExtensionFromLocation">Get extension from file location: getExtensionFromLocation</a>
@@ -644,6 +643,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getSecretMessage" name="getSecretMessage">Gets a secret chat message: getSecretMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getNotifySettings.html" name="account.getNotifySettings">Gets current notification settings for a given user/group, from all users/all groups: account.getNotifySettings</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFeaturedEmojiStickers.html" name="messages.getFeaturedEmojiStickers">Gets featured custom emoji stickersets: messages.getFeaturedEmojiStickers</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPropicInfo" name="getPropicInfo">Gets info of the propic of a user: getPropicInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/premium.getBoostsStatus.html" name="premium.getBoostsStatus">Gets the current number of boosts of a channel: premium.getBoostsStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultHistoryTTL.html" name="messages.getDefaultHistoryTTL">Gets the default value of the Time-To-Live setting, applied to all new chats: messages.getDefaultHistoryTTL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiStickers.html" name="messages.getEmojiStickers">Gets the list of currently installed custom emoji stickersets: messages.getEmojiStickers</a>
