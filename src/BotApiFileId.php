@@ -36,7 +36,7 @@ final class BotApiFileId
 {
     /**
      * @param string  $fileId    The file ID
-     * @param integer $size      The file size
+     * @param int<1, max> $size      The file size
      * @param string  $fileName  The original file name
      * @param bool    $protected Whether the original file is protected
      */
@@ -46,6 +46,9 @@ final class BotApiFileId
         public readonly string $fileName,
         public readonly bool $protected
     ) {
+        if ($size <= 0) {
+            throw new AssertionError("The specified size must be >= 0!");
+        }
     }
 
     /**

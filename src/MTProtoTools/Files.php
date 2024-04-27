@@ -26,6 +26,7 @@ use Amp\Future;
 use Amp\Http\Client\Request;
 use AssertionError;
 use danog\Decoder\FileIdType;
+use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AnimatedSticker;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -658,17 +659,15 @@ trait Files
         return $this->genAllFile($constructor);
     }
     /**
-     * Get download info of the propic of a user
-     * Returns an array with the following structure:.
-     *
-     * `$info['ext']` - The file extension
-     * `$info['name']` - The file name, without the extension
-     * `$info['mime']` - The file mime type
-     * `$info['size']` - The file size
+     * Gets info of the propic of a user.
      */
-    public function getPropicInfo($data): array
+    public function getPropicInfo($data, bool $big = true): BotApiFileId
     {
-        return $this->getDownloadInfo($this->peerDatabase->get($this->getId($data)));
+        $res = $this->getPwrChat($data, false);
+        $photo = $res['photo'][$big ? 'big_file_id' : 'small_file_id'];
+        $size = $res['photo'][$big ? 'big_file_size' : 'small_file_size'];
+        $name = $res['photo']['id'].'_'.($big ? 'big' : 'small').'_'.$res['photo']['dc_id'];
+        return new BotApiFileId($photo, $size, $name, false);
     }
     /**
      * Extract file info from bot API message.
@@ -713,7 +712,7 @@ trait Files
      * @param mixed $messageMedia File ID
      *
      * @return array{
-     *      ext: string,
+     *      ext?: string,
      *      name: string,
      *      mime: string,
      *      size: int,
@@ -726,6 +725,16 @@ trait Files
      */
     public function getDownloadInfo(mixed $messageMedia): array
     {
+        if ($messageMedia instanceof BotApiFileId) {
+            $res = $this->getDownloadInfo($messageMedia->fileId);
+            $res['size'] = $messageMedia->size;
+            $pathinfo = pathinfo($messageMedia->fileName);
+            if (isset($pathinfo['extension'])) {
+                $res['ext'] = '.'.$pathinfo['extension'];
+            }
+            $res['name'] = $pathinfo['filename'];
+            return $res;
+        }
         if ($messageMedia instanceof Message) {
             $messageMedia = $messageMedia->media;
         }
@@ -1051,7 +1060,7 @@ trait Files
                 });
             };
         }
-        if ($end === -1 && isset($messageMedia['size'])) {
+        if ($end === -1 && isset($messageMedia['size']) && $messageMedia['size'] !== 0) {
             $end = $messageMedia['size'];
         }
         $part_size ??= 1024 * 1024;

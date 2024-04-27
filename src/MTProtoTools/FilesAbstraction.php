@@ -804,9 +804,7 @@ trait FilesAbstraction
         } elseif ($file instanceof RemoteUrl) {
             $fileName ??= basename($file->url);
         } elseif ($file instanceof BotApiFileId) {
-            if ($fileName === null) {
-                throw new AssertionError("A file name must be provided when uploading a bot API file ID!");
-            }
+            $fileName ??= $file->fileName;
         } elseif ($file instanceof ReadableStream) {
             if ($fileName === null) {
                 throw new AssertionError("A file name must be provided when uploading a stream!");

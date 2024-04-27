@@ -1032,6 +1032,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateBusinessWorkHours.html" name="account.updateBusinessWorkHours">account.updateBusinessWorkHours</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updateConnectedBot.html" name="account.updateConnectedBot">account.updateConnectedBot</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.updatePersonalChannel.html" name="account.updatePersonalChannel">account.updatePersonalChannel</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.reportMissingCode.html" name="auth.reportMissingCode">auth.reportMissingCode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urlDecode" name="base64urlDecode">base64URL decode: base64urlDecode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reportSponsoredMessage.html" name="channels.reportSponsoredMessage">channels.reportSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.restrictSponsoredMessages.html" name="channels.restrictSponsoredMessages">channels.restrictSponsoredMessages</a>

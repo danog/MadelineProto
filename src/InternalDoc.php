@@ -787,7 +787,7 @@ abstract class InternalDoc
      * @param mixed $messageMedia File ID
      *
      * @return array{
-     *      ext: string,
+     *      ext?: string,
      *      name: string,
      *      mime: string,
      *      size: int,
@@ -995,17 +995,11 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPlugin($class);
     }
     /**
-     * Get download info of the propic of a user
-     * Returns an array with the following structure:.
-     *
-     * `$info['ext']` - The file extension
-     * `$info['name']` - The file name, without the extension
-     * `$info['mime']` - The file mime type
-     * `$info['size']` - The file size
+     * Gets info of the propic of a user.
      */
-    final public function getPropicInfo($data): array
+    final public function getPropicInfo($data, bool $big = true): \danog\MadelineProto\BotApiFileId
     {
-        return $this->wrapper->getAPI()->getPropicInfo($data);
+        return $this->wrapper->getAPI()->getPropicInfo($data, $big);
     }
     /**
      * Get PSR logger.

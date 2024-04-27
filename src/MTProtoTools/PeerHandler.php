@@ -23,8 +23,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use AssertionError;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoBig;
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoSmall;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -676,7 +675,7 @@ trait PeerHandler
     public function getPwrChat(mixed $id, bool $fullfetch = true): array
     {
         try {
-            $full = $fullfetch && $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
+            $full = $this->getSettings()->getDb()->getEnableFullPeerDb() ? $this->getFullInfo($id) : $this->getInfo($id);
         } catch (Throwable) {
             $full = $this->getInfo($id);
         }
@@ -821,25 +820,23 @@ trait PeerHandler
                 'small' => $res['photo']['sizes'][0],
                 'big' => Tools::maxSize($res['photo']['sizes']),
             ] as $type => $size) {
-                $photoSize = $type === 'small'
-                        ? PhotoSizeSourceDialogPhotoSmall::class
-                        : PhotoSizeSourceDialogPhotoBig::class;
-                $photoSize = new $photoSize(
-                    dialogId: $res['id'],
-                    dialogAccessHash: $full['Chat']['access_hash'] ?? $full['User']['access_hash'],
+                $photoSizeSource = new PhotoSizeSourceThumbnail(
+                    thumbType: $size['type'],
+                    thumbFileType: FileIdType::PHOTO
                 );
 
                 $fileId = new FileId(
                     dcId: $res['photo']['dc_id'],
-                    type: FileIdType::PROFILE_PHOTO,
+                    type: FileIdType::PHOTO,
                     id: $res['photo']['id'],
                     accessHash: $res['photo']['access_hash'],
                     fileReference: $res['photo']['file_reference'] === null
                         ? null
                         : (string) $res['photo']['file_reference'],
-                    photoSizeSource: $photoSize
+                    photoSizeSource: $photoSizeSource
                 );
 
+                $photo[$type.'_file_size'] = $size['size'];
                 $photo[$type.'_file_id'] = (string) $fileId;
                 $photo[$type.'_file_unique_id'] = $fileId->getUniqueBotAPI();
             }
