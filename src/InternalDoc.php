@@ -787,7 +787,7 @@ abstract class InternalDoc
      * @param mixed $messageMedia File ID
      *
      * @return array{
-     *      ext?: string,
+     *      ext: string,
      *      name: string,
      *      mime: string,
      *      size: int,
