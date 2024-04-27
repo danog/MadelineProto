@@ -227,6 +227,9 @@ trait BotAPI
                 $data['user'] = ($this->getPwrChat($data['user_id'], false));
                 unset($data['user_id']);
                 return $data;
+            case 'photo':
+                $data = ['photo' => $data];
+                // no break
             case 'messageMediaPhoto':
                 if (isset($data['caption'])) {
                     $res['caption'] = $data['caption'];

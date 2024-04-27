@@ -28,6 +28,7 @@ use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
+use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
@@ -255,7 +256,7 @@ final class PeerDatabase implements TLCallback
      */
     public function fullChatLastUpdated(mixed $id): int
     {
-        return $this->getFull($id)['last_update'] ?? 0;
+        return $this->getFull($id)['inserted'] ?? 0;
     }
 
     private function recacheChatUsername(int $id, ?array $old, array $new): void
@@ -584,9 +585,18 @@ final class PeerDatabase implements TLCallback
      */
     private function addFullChat(array $full): void
     {
+        foreach (['chat_photo', 'personal_photo', 'fallback_photo', 'profile_photo'] as $k) {
+            if (isset($full[$k])) {
+                if ($full[$k]['_'] === 'photoEmpty') {
+                    unset($full[$k]);
+                } else {
+                    $full[$k] = new Photo($this->API, $full[$k], false);
+                }
+            }
+        }
         $this->fullDb[$this->API->getIdInternal($full)] = [
             'full' => $full,
-            'last_update' => time(),
+            'inserted' => time(),
         ];
     }
 

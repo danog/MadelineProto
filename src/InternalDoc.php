@@ -997,9 +997,9 @@ abstract class InternalDoc
     /**
      * Gets info of the propic of a user.
      */
-    final public function getPropicInfo($data, bool $big = true): \danog\MadelineProto\BotApiFileId
+    final public function getPropicInfo($data): ?\danog\MadelineProto\EventHandler\Media\Photo
     {
-        return $this->wrapper->getAPI()->getPropicInfo($data, $big);
+        return $this->wrapper->getAPI()->getPropicInfo($data);
     }
     /**
      * Get PSR logger.

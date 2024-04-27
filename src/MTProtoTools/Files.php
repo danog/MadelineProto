@@ -661,13 +661,9 @@ trait Files
     /**
      * Gets info of the propic of a user.
      */
-    public function getPropicInfo($data, bool $big = true): BotApiFileId
+    public function getPropicInfo($data): ?Photo
     {
-        $res = $this->getPwrChat($data, false);
-        $photo = $res['photo'][$big ? 'big_file_id' : 'small_file_id'];
-        $size = $res['photo'][$big ? 'big_file_size' : 'small_file_size'];
-        $name = $res['photo']['id'].'_'.($big ? 'big' : 'small').'_'.$res['photo']['dc_id'];
-        return new BotApiFileId($photo, $size, $name, false);
+        return $this->getPwrChat($data, false)['photo'] ?? null;
     }
     /**
      * Extract file info from bot API message.

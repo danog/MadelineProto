@@ -21,9 +21,6 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use AssertionError;
-use danog\Decoder\FileId;
-use danog\Decoder\FileIdType;
-use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -633,7 +630,7 @@ trait PeerHandler
      */
     public function fullChatLastUpdated(mixed $id): int
     {
-        return $this->peerDatabase->getFull($this->getIdInternal($id))['last_update'] ?? 0;
+        return $this->peerDatabase->getFull($this->getIdInternal($id))['inserted'] ?? 0;
     }
     /**
      * Get full info about peer, returns an FullInfo object.
@@ -648,7 +645,7 @@ trait PeerHandler
             return $partial;
         }
         $full = $this->peerDatabase->getFull($partial['bot_api_id']);
-        if (time() - ($full['last_update'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
+        if (time() - ($full['inserted'] ?? 0) < $this->getSettings()->getPeer()->getFullInfoCacheTime()) {
             return array_merge($partial, $full);
         }
         switch ($partial['type']) {
@@ -693,8 +690,14 @@ trait PeerHandler
                         $res[$key] = $full['full'][$key];
                     }
                 }
-                if (isset($full['full']['profile_photo']['sizes'])) {
+                if (isset($full['full']['profile_photo'])) {
                     $res['photo'] = $full['full']['profile_photo'];
+                }
+                if (isset($full['full']['fallback_photo'])) {
+                    $res['fallback_photo'] = $full['full']['fallback_photo'];
+                }
+                if (isset($full['full']['personal_photo'])) {
+                    $res['personal_photo'] = $full['full']['personal_photo'];
                 }
                 break;
             case 'chat':
@@ -711,7 +714,7 @@ trait PeerHandler
                 if (isset($res['admins_enabled'])) {
                     $res['all_members_are_administrators'] = !$res['admins_enabled'];
                 }
-                if (isset($full['full']['chat_photo']['sizes'])) {
+                if (isset($full['full']['chat_photo'])) {
                     $res['photo'] = $full['full']['chat_photo'];
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
@@ -733,7 +736,7 @@ trait PeerHandler
                         $res[$key] = $full['full'][$key];
                     }
                 }
-                if (isset($full['full']['chat_photo']['sizes'])) {
+                if (isset($full['full']['chat_photo'])) {
                     $res['photo'] = $full['full']['chat_photo'];
                 }
                 if (isset($full['full']['exported_invite']['link'])) {
@@ -813,34 +816,6 @@ trait PeerHandler
         }
         if (!$fullfetch) {
             unset($res['participants']);
-        }
-        if (isset($res['photo'])) {
-            $photo = [];
-            foreach ([
-                'small' => $res['photo']['sizes'][0],
-                'big' => Tools::maxSize($res['photo']['sizes']),
-            ] as $type => $size) {
-                $photoSizeSource = new PhotoSizeSourceThumbnail(
-                    thumbType: $size['type'],
-                    thumbFileType: FileIdType::PHOTO
-                );
-
-                $fileId = new FileId(
-                    dcId: $res['photo']['dc_id'],
-                    type: FileIdType::PHOTO,
-                    id: $res['photo']['id'],
-                    accessHash: $res['photo']['access_hash'],
-                    fileReference: $res['photo']['file_reference'] === null
-                        ? null
-                        : (string) $res['photo']['file_reference'],
-                    photoSizeSource: $photoSizeSource
-                );
-
-                $photo[$type.'_file_size'] = $size['size'];
-                $photo[$type.'_file_id'] = (string) $fileId;
-                $photo[$type.'_file_unique_id'] = $fileId->getUniqueBotAPI();
-            }
-            $res['photo'] += $photo;
         }
         return $res;
     }
