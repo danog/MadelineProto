@@ -129,6 +129,7 @@ class Installer
             $postData['downloads'][] = [
                 'name' => $name,
                 'version' => $version,
+                'downloaded' => false,
             ];
         }
 
@@ -139,12 +140,13 @@ class Installer
                 'header' => [
                     'Content-Type: application/json',
                     sprintf(
-                        'User-Agent: Composer/%s (%s; %s; %s; %s%s)',
-                        'MP v8',
+                        'User-Agent: Composer/%s (%s; %s; %s; %s%s%s; MadelineProto)',
+                        '2.7.4',
                         \function_exists('php_uname') ? @php_uname('s') : 'Unknown',
                         \function_exists('php_uname') ? @php_uname('r') : 'Unknown',
                         $phpVersion,
-                        'streams',
+                        'cURL 8.7.1',
+                        '; Platform-PHP '.PHP_VERSION,
                         getenv('CI') ? '; CI' : ''
                     ),
                 ],

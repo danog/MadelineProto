@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Poll\MultiplePoll;
 use danog\MadelineProto\EventHandler\Poll\PollAnswer;
 use danog\MadelineProto\EventHandler\Poll\QuizPoll;
@@ -35,6 +36,13 @@ abstract class AbstractPoll implements JsonSerializable
 
     /** The question of the poll */
     public readonly string $question;
+
+    /**
+     * Styled text entities in the question of the poll.
+     *
+     * @var list<MessageEntity>
+     */
+    public readonly array $questionEntities;
 
     /** @var list<PollAnswer> The possible answers */
     public readonly array $answers;
@@ -56,7 +64,8 @@ abstract class AbstractPoll implements JsonSerializable
     {
         $this->id           = $rawPoll['poll']['id'];
         $this->closed       = $rawPoll['poll']['closed'];
-        $this->question     = $rawPoll['poll']['question'];
+        $this->question     = $rawPoll['poll']['question']['text'];
+        $this->questionEntities = MessageEntity::fromRawEntities($rawPoll['poll']['question']['entities']);
         $this->closeDate    = $rawPoll['poll']['close_date'] ?? null;
         $this->closePeriod  = $rawPoll['poll']['close_period'] ?? null;
         $this->recentVoters = $rawPoll['results']['recent_voters'] ?? [];

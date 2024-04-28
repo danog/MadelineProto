@@ -772,6 +772,7 @@
   <file src="src/EventHandler/AbstractPoll.php">
     <MixedArgument>
       <code><![CDATA[$rawPoll['poll']['answers']]]></code>
+      <code><![CDATA[$rawPoll['poll']['question']['entities']]]></code>
       <code><![CDATA[$rawPoll['results']['results'] ?? []]]></code>
       <code><![CDATA[$result[$key] ?? []]]></code>
       <code><![CDATA[$value]]></code>
@@ -784,6 +785,9 @@
       <code><![CDATA[$rawPoll['poll']['id']]]></code>
       <code><![CDATA[$rawPoll['poll']['multiple_choice']]]></code>
       <code><![CDATA[$rawPoll['poll']['question']]]></code>
+      <code><![CDATA[$rawPoll['poll']['question']]]></code>
+      <code><![CDATA[$rawPoll['poll']['question']['entities']]]></code>
+      <code><![CDATA[$rawPoll['poll']['question']['text']]]></code>
       <code><![CDATA[$rawPoll['poll']['quiz']]]></code>
       <code><![CDATA[$rawPoll['results']['results']]]></code>
       <code><![CDATA[$rawPoll['results']['total_voters']]]></code>
@@ -1790,8 +1794,13 @@
   </file>
   <file src="src/EventHandler/Poll/PollAnswer.php">
     <MixedArgument>
+      <code><![CDATA[$rawAnswer['text']['entities']]]></code>
       <code><![CDATA[$res['option']]]></code>
     </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$rawAnswer['text']['entities']]]></code>
+      <code><![CDATA[$rawAnswer['text']['text']]]></code>
+    </MixedArrayAccess>
     <MixedAssignment>
       <code><![CDATA[$res[$prop->getName()]]]></code>
       <code><![CDATA[$this->chosen]]></code>
