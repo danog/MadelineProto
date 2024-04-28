@@ -21,6 +21,7 @@ use danog\MadelineProto\EventHandler\Poll\MultiplePoll;
 use danog\MadelineProto\EventHandler\Poll\PollAnswer;
 use danog\MadelineProto\EventHandler\Poll\QuizPoll;
 use danog\MadelineProto\EventHandler\Poll\SinglePoll;
+use danog\MadelineProto\StrTools;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
@@ -97,6 +98,27 @@ abstract class AbstractPoll implements JsonSerializable
             $out[] = new PollAnswer($merge);
         }
         return $out;
+    }
+
+    protected readonly string $htmlQuestion;
+    protected readonly string $htmlQuestionTelegram;
+
+    /**
+     * Get an HTML version of the question.
+     *
+     * @psalm-suppress InaccessibleProperty
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
+     */
+    public function getQuestionHTML(bool $allowTelegramTags = false): string
+    {
+        if (!$this->questionEntities) {
+            return StrTools::htmlEscape($this->question);
+        }
+        if ($allowTelegramTags) {
+            return $this->htmlQuestionTelegram ??= StrTools::entitiesToHtml($this->question, $this->questionEntities, $allowTelegramTags);
+        }
+        return $this->htmlQuestion ??= StrTools::entitiesToHtml($this->question, $this->questionEntities, $allowTelegramTags);
     }
 
     /** @internal */

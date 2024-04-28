@@ -27,18 +27,18 @@ final class QuizPoll extends AbstractPoll
     public readonly ?string $solution;
 
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text in quiz solution */
-    public readonly array $entities;
+    public readonly array $solutionEntities;
 
     /** @internal */
     public function __construct(array $rawPoll)
     {
         parent::__construct($rawPoll);
         $this->solution = $rawPoll['results']['solution'] ?? null;
-        $this->entities = MessageEntity::fromRawEntities($rawPoll['results']['solution_entites'] ?? []);
+        $this->solutionEntities = MessageEntity::fromRawEntities($rawPoll['results']['solution_entites'] ?? []);
     }
 
-    protected readonly string $html;
-    protected readonly string $htmlTelegram;
+    protected readonly string $htmlSolution;
+    protected readonly string $htmlSolutionTelegram;
 
     /**
      * Get an HTML version of the solution.
@@ -47,17 +47,17 @@ final class QuizPoll extends AbstractPoll
      *
      * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
-    public function getHTML(bool $allowTelegramTags = false): ?string
+    public function getSolutionHTML(bool $allowTelegramTags = false): ?string
     {
         if ($this->solution === null) {
             return null;
         }
-        if (!$this->entities) {
+        if (!$this->solutionEntities) {
             return StrTools::htmlEscape($this->solution);
         }
         if ($allowTelegramTags) {
-            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->solution, $this->entities, $allowTelegramTags);
+            return $this->htmlSolutionTelegram ??= StrTools::entitiesToHtml($this->solution, $this->solutionEntities, $allowTelegramTags);
         }
-        return $this->html ??= StrTools::entitiesToHtml($this->solution, $this->entities, $allowTelegramTags);
+        return $this->htmlSolution ??= StrTools::entitiesToHtml($this->solution, $this->solutionEntities, $allowTelegramTags);
     }
 }

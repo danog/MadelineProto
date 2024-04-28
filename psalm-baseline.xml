@@ -803,6 +803,10 @@
       <code><![CDATA[$this->totalVoters]]></code>
       <code><![CDATA[$value]]></code>
     </MixedAssignment>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$htmlQuestion]]></code>
+      <code><![CDATA[$htmlQuestionTelegram]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/AbstractPrivateMessage.php">
     <PropertyNotSetInConstructor>
@@ -1792,6 +1796,12 @@
       <code><![CDATA[$API->getIdInternal($rawPinned)]]></code>
     </PossiblyNullPropertyAssignmentValue>
   </file>
+  <file src="src/EventHandler/Poll/MultiplePoll.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[MultiplePoll]]></code>
+      <code><![CDATA[MultiplePoll]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="src/EventHandler/Poll/PollAnswer.php">
     <MixedArgument>
       <code><![CDATA[$rawAnswer['text']['entities']]]></code>
@@ -1808,6 +1818,10 @@
       <code><![CDATA[$this->text]]></code>
       <code><![CDATA[$this->voters]]></code>
     </MixedAssignment>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$html]]></code>
+      <code><![CDATA[$htmlTelegram]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Poll/QuizPoll.php">
     <MixedArgument>
@@ -1817,8 +1831,16 @@
       <code><![CDATA[$this->solution]]></code>
     </MixedAssignment>
     <PropertyNotSetInConstructor>
-      <code><![CDATA[$html]]></code>
-      <code><![CDATA[$htmlTelegram]]></code>
+      <code><![CDATA[$htmlSolution]]></code>
+      <code><![CDATA[$htmlSolutionTelegram]]></code>
+      <code><![CDATA[QuizPoll]]></code>
+      <code><![CDATA[QuizPoll]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/EventHandler/Poll/SinglePoll.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[SinglePoll]]></code>
+      <code><![CDATA[SinglePoll]]></code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Privacy.php">
