@@ -663,6 +663,9 @@ trait Files
      */
     public function getPropicInfo($data): ?Photo
     {
+        if (!$this->getSettings()->getDb()->getEnableFullPeerDb()) {
+            throw new AssertionError("getPropicInfo cannot be used if the full peer database is disabled!");
+        }
         return $this->getPwrChat($data, false)['photo'] ?? null;
     }
     /**

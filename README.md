@@ -1056,6 +1056,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteQuickReplyShortcut.html" name="messages.deleteQuickReplyShortcut">messages.deleteQuickReplyShortcut</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editQuickReplyShortcut.html" name="messages.editQuickReplyShortcut">messages.editQuickReplyShortcut</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultTagReactions.html" name="messages.getDefaultTagReactions">messages.getDefaultTagReactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiStickerGroups.html" name="messages.getEmojiStickerGroups">messages.getEmojiStickerGroups</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMyStickers.html" name="messages.getMyStickers">messages.getMyStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getOutboxReadDate.html" name="messages.getOutboxReadDate">messages.getOutboxReadDate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getQuickReplies.html" name="messages.getQuickReplies">messages.getQuickReplies</a>
