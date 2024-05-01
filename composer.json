@@ -1,6 +1,6 @@
 {
     "name": "danog/madelineproto",
-    "description": "PHP implementation of telegram's MTProto protocol.",
+    "description": "Async PHP client API for the telegram MTProto protocol.",
     "type": "project",
     "license": "AGPL-3.0-only",
     "homepage": "https://docs.madelineproto.xyz",

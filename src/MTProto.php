@@ -593,12 +593,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         Magic::start(light: false);
         // Parse and store settings
         $this->updateSettingsInternal($settings, false);
-        // Start IPC server
-        if (!$this->ipcServer) {
-            $this->ipcServer = new Server($this);
-            $this->ipcServer->setIpcPath($this->wrapper->getSession());
-        }
-        $this->ipcServer->start();
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
         // Load rsa keys
@@ -900,6 +894,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        // Start IPC server
+        if (!$this->ipcServer) {
+            $this->ipcServer = new Server($this);
+            $this->ipcServer->setIpcPath($this->wrapper->getSession());
+        }
+        $this->ipcServer->start();
         if (!isset($this->updateQueue)) {
             $q = new SplQueue;
             $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
@@ -1030,11 +1030,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         try {
             // Setup logger
             $this->setupLogger();
-            if (!$this->ipcServer) {
-                $this->ipcServer = new Server($this);
-                $this->ipcServer->setIpcPath($this->wrapper->getSession());
-            }
-            $this->ipcServer->start();
 
             // Cleanup old properties, init new stuffs
             $this->cleanupProperties();

@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.0.1';
+    public const RELEASE = '8.1.0';
     /**
      * We're not logged in.
      *
