@@ -24,6 +24,8 @@ use Amp\DeferredFuture;
 use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
 use phpseclib3\Math\BigInteger;
+use Prometheus\CollectorRegistry;
+use Prometheus\Storage\InMemory;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -204,6 +206,7 @@ final class Magic
      * Whether there's a basedir limitation.
      */
     public static bool $hasBasedirLimitation = false;
+    public static CollectorRegistry $prometheus;
     /**
      * Encoded emojis.
      *
@@ -337,6 +340,14 @@ final class Magic
                 }
             }
         }
+        self::$prometheus = new CollectorRegistry(new InMemory);
+        $alloc = self::$prometheus->registerGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", ["pid"]);
+        $inuse = self::$prometheus->registerGauge("", "php_memstats_inuse_bytes", "RAM actually used by PHP", ["pid"]);
+        $labels = self::$pid ? [(string) self::$pid] : [];
+        EventLoop::repeat(1.0, function () use ($alloc, $inuse, $labels): void {
+            $alloc->set((float) memory_get_usage(true), $labels);
+            $inuse->set((float) memory_get_usage(false), $labels);
+        });
         GarbageCollector::start();
         self::$inited = true;
     }
