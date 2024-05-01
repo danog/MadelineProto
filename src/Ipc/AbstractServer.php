@@ -25,12 +25,14 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
+use Closure;
 use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
@@ -48,7 +50,18 @@ use function Amp\delay;
  */
 abstract class AbstractServer extends Loop
 {
-    use InternalLoop;
+    use InternalLoop {
+        __construct as private internalInit;
+    }
+    /**
+     * @var Closure(int): void
+     */
+    private Closure $connectionGauge;
+    public function __construct(MTProto $API)
+    {
+        $this->internalInit($API);
+        $this->connectionGauge = $API->getPromGauge("", "ipc_server_connections", "Number of IPC server connections");
+    }
     /**
      * Server version.
      */
@@ -204,6 +217,7 @@ abstract class AbstractServer extends Loop
     {
         $this->API->waitForInit();
         $this->API->logger('Accepted IPC client connection!');
+        ($this->connectionGauge)(1);
 
         $id = 0;
         $payload = null;
@@ -214,6 +228,7 @@ abstract class AbstractServer extends Loop
         } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
+            ($this->connectionGauge)(-1);
             EventLoop::queue(function () use ($socket, $payload): void {
                 try {
                     $socket->disconnect();

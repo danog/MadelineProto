@@ -63,9 +63,11 @@ final class GarbageCollector
         }
         self::$started = true;
 
-        EventLoop::unreference(EventLoop::repeat(1, static function (): void {
+        $counter = Magic::getCounter("", "explicit_gc_count", "Number of times the GC was explicitly invoked", []);
+        EventLoop::unreference(EventLoop::repeat(1, static function () use ($counter): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
+                $counter();
                 gc_collect_cycles();
                 self::$memoryConsumption = self::getMemoryConsumption();
                 /*self::$memoryConsumption = self::getMemoryConsumption();

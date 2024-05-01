@@ -32,6 +32,7 @@ use Amp\Http\Client\Request;
 use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
+use Closure;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
@@ -73,6 +74,10 @@ use danog\MadelineProto\Wrappers\Events;
 use danog\MadelineProto\Wrappers\Login;
 use danog\MadelineProto\Wrappers\Loop;
 use danog\MadelineProto\Wrappers\Start;
+use Prometheus\Counter;
+use Prometheus\Gauge;
+use Prometheus\Histogram;
+use Prometheus\Summary;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
 use SplQueue;
@@ -504,6 +509,77 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         } finally {
             $initDeferred->complete();
         }
+    }
+
+    /**
+     * Returns a closure linked to the specified prometheus gauge.
+     *
+     * @internal
+     * 
+     * @return Closure(int): void
+     */
+    public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): Closure
+    {
+        return Magic::getGauge(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+        );
+    }
+
+    /**
+     * Returns a closure linked to the specified prometheus counter.
+     *
+     * @internal
+     * 
+     * @return Closure(): void Call to increment the counter
+     */
+    public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): Closure
+    {
+        return Magic::getCounter(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+        );
+    }
+
+    /**
+     * Returns a closure linked to the specified prometheus summary.
+     *
+     * @internal
+     * 
+     * @return Closure(float): void
+     */
+    public function getPromSummary(string $namespace, string $name, string $help, $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
+    {
+        return Magic::getSummary(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            $maxAgeSeconds,
+            $quantiles
+        );
+    }
+
+    /**
+     * Returns a closure linked to the specified prometheus histogram.
+     *
+     * @internal
+     * 
+     * @return Closure(float): void
+     */
+    public function getPromHistogram(string $namespace, string $name, string $help, $labels = [], ?array $buckets = null): Closure
+    {
+        return Magic::getHistogram(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            $buckets
+        );
     }
 
     /**

@@ -31,7 +31,7 @@ use Revolt\EventLoop;
  *
  * @internal
  */
-final class ServerCallback extends Server
+final class ServerCallback extends AbstractServer
 {
     /**
      * Timeout watcher list, indexed by socket ID.

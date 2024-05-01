@@ -20,13 +20,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
-use danog\MadelineProto\MTProto;
-
 /**
  * IPC server.
  *
  * @internal
  */
-final class Server extends AbstractServer {
+final class Server extends AbstractServer
+{
 
 }
