@@ -515,8 +515,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns a closure linked to the specified prometheus gauge.
      *
      * @internal
-     * 
-     * @return Closure(int): void
+     *
+     * @param array<string, string> $labels
+     *
+     * @return Closure(int|float): void
      */
     public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): Closure
     {
@@ -532,7 +534,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns a closure linked to the specified prometheus counter.
      *
      * @internal
-     * 
+     *
+     * @param array<string, string> $labels
+     *
      * @return Closure(): void Call to increment the counter
      */
     public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): Closure
@@ -549,10 +553,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns a closure linked to the specified prometheus summary.
      *
      * @internal
-     * 
+     *
+     * @param array<string, string> $labels
+     * @param ?list<float> $quantiles
+     *
      * @return Closure(float): void
      */
-    public function getPromSummary(string $namespace, string $name, string $help, $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
+    public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
     {
         return Magic::getSummary(
             $namespace,
@@ -568,10 +575,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns a closure linked to the specified prometheus histogram.
      *
      * @internal
-     * 
+     *
+     * @param array<string, string> $labels
+     * @param ?list<float> $buckets
+     *
      * @return Closure(float): void
      */
-    public function getPromHistogram(string $namespace, string $name, string $help, $labels = [], ?array $buckets = null): Closure
+    public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): Closure
     {
         return Magic::getHistogram(
             $namespace,
@@ -894,6 +904,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        $this->updateCtr = $this->getPromCounter("", "update_count", "Number of received updates since the session was created");
         // Start IPC server
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);

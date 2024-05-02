@@ -2292,6 +2292,25 @@
       <code><![CDATA[$id]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="src/Ipc/AbstractServer.php">
+    <MixedAssignment>
+      <code><![CDATA[$payload]]></code>
+      <code><![CDATA[$payload[1]]]></code>
+      <code><![CDATA[$result]]></code>
+    </MixedAssignment>
+    <MixedMethodCall>
+      <code><![CDATA[disconnect]]></code>
+    </MixedMethodCall>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$callback]]></code>
+      <code><![CDATA[$server]]></code>
+      <code><![CDATA[AbstractServer]]></code>
+    </PropertyNotSetInConstructor>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$payload === self::SHUTDOWN]]></code>
+      <code><![CDATA[$payload === self::SHUTDOWN]]></code>
+    </TypeDoesNotContainType>
+  </file>
   <file src="src/Ipc/Client.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[$class]]></code>
@@ -2443,29 +2462,15 @@
     </UnresolvableInclude>
   </file>
   <file src="src/Ipc/Server.php">
-    <MixedAssignment>
-      <code><![CDATA[$payload]]></code>
-      <code><![CDATA[$payload[1]]]></code>
-      <code><![CDATA[$result]]></code>
-    </MixedAssignment>
-    <MixedMethodCall>
-      <code><![CDATA[disconnect]]></code>
-    </MixedMethodCall>
     <PropertyNotSetInConstructor>
-      <code><![CDATA[$callback]]></code>
-      <code><![CDATA[$server]]></code>
+      <code><![CDATA[Server]]></code>
     </PropertyNotSetInConstructor>
-    <TypeDoesNotContainType>
-      <code><![CDATA[$payload === self::SHUTDOWN]]></code>
-      <code><![CDATA[$payload === self::SHUTDOWN]]></code>
-    </TypeDoesNotContainType>
   </file>
   <file src="src/Ipc/ServerCallback.php">
     <MissingReturnType>
       <code><![CDATA[unwrap]]></code>
     </MissingReturnType>
     <PropertyNotSetInConstructor>
-      <code><![CDATA[ServerCallback]]></code>
       <code><![CDATA[ServerCallback]]></code>
     </PropertyNotSetInConstructor>
   </file>

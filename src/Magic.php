@@ -208,6 +208,7 @@ final class Magic
      */
     public static bool $hasBasedirLimitation = false;
     private static CollectorRegistry $prometheus;
+    /** @var array<string, string> */
     private static array $promLabels;
     /**
      * Encoded emojis.
@@ -351,22 +352,22 @@ final class Magic
         $alloc = self::getGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", []);
         $inuse = self::getGauge("", "php_memstats_inuse_bytes", "RAM actually used by PHP", []);
         EventLoop::unreference(EventLoop::repeat(1.0, static function () use ($alloc, $inuse): void {
-            $alloc((float) memory_get_usage(true));
-            $inuse((float) memory_get_usage(false));
+            $alloc(memory_get_usage(true));
+            $inuse(memory_get_usage(false));
         }));
         GarbageCollector::start();
         self::$inited = true;
     }
     /**
      * @param array<string, string> $labels
-     * @return Closure(int): void
+     * @return Closure(int|float): void
      */
     public static function getGauge(string $namespace, string $name, string $help, array $labels): Closure
     {
         $labels += self::$promLabels;
         $gauge = self::$prometheus->getOrRegisterGauge($namespace, $name, $help, array_keys($labels));
         $labels = array_values($labels);
-        return static function (int $by) use ($labels, $gauge): void {
+        return static function (int|float $by) use ($labels, $gauge): void {
             $gauge->incBy($by);
         };
     }
@@ -385,6 +386,7 @@ final class Magic
     }
     /**
      * @param array<string, string> $labels
+     * @param ?list<float> $buckets
      * @return Closure(float): void
      */
     public static function getHistogram(string $namespace, string $name, string $help, array $labels, ?array $buckets = null): Closure
@@ -392,12 +394,13 @@ final class Magic
         $labels += self::$promLabels;
         $gauge = self::$prometheus->getOrRegisterHistogram($namespace, $name, $help, array_keys($labels), $buckets);
         $labels = array_values($labels);
-        return static function ($value) use ($labels, $gauge): void {
+        return static function (float $value) use ($labels, $gauge): void {
             $gauge->observe($value, $labels);
         };
     }
     /**
      * @param array<string, string> $labels
+     * @param ?list<float> $quantiles
      * @return Closure(float): void
      */
     public static function getSummary(string $namespace, string $name, string $help, array $labels, int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
@@ -405,7 +408,7 @@ final class Magic
         $labels += self::$promLabels;
         $gauge = self::$prometheus->getOrRegisterSummary($namespace, $name, $help, array_keys($labels), $maxAgeSeconds, $quantiles);
         $labels = array_values($labels);
-        return static function ($value) use ($labels, $gauge): void {
+        return static function (float $value) use ($labels, $gauge): void {
             $gauge->observe($value, $labels);
         };
     }

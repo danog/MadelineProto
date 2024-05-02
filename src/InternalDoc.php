@@ -995,46 +995,6 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPlugin($class);
     }
     /**
-     * Returns a closure linked to the specified prometheus counter.
-     *
-     * @return Closure(): void Call to increment the counter
-     */
-    final public function getPromCounter(string $namespace, string $name, string $help, array $labels = [
-    ]): \Closure
-    {
-        return $this->wrapper->getAPI()->getPromCounter($namespace, $name, $help, $labels);
-    }
-    /**
-     * Returns a closure linked to the specified prometheus gauge.
-     *
-     * @return Closure(float): void
-     */
-    final public function getPromGauge(string $namespace, string $name, string $help, array $labels = [
-    ]): \Closure
-    {
-        return $this->wrapper->getAPI()->getPromGauge($namespace, $name, $help, $labels);
-    }
-    /**
-     * Returns a closure linked to the specified prometheus histogram.
-     *
-     * @return Closure(float): void
-     */
-    final public function getPromHistogram(string $namespace, string $name, string $help, $labels = [
-    ], ?array $buckets = null): \Closure
-    {
-        return $this->wrapper->getAPI()->getPromHistogram($namespace, $name, $help, $labels, $buckets);
-    }
-    /**
-     * Returns a closure linked to the specified prometheus summary.
-     *
-     * @return Closure(float): void
-     */
-    final public function getPromSummary(string $namespace, string $name, string $help, $labels = [
-    ], int $maxAgeSeconds = 600, ?array $quantiles = null): \Closure
-    {
-        return $this->wrapper->getAPI()->getPromSummary($namespace, $name, $help, $labels, $maxAgeSeconds, $quantiles);
-    }
-    /**
      * Gets info of the propic of a user.
      */
     final public function getPropicInfo($data): ?\danog\MadelineProto\EventHandler\Media\Photo
