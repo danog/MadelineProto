@@ -62,7 +62,7 @@
         "danog/async-orm": "^1.0.2",
         "symfony/thanks": "^1.3",
         "danog/telegram-entities": "^1.0.2",
-        "promphp/prometheus_client_php": "^2.10"
+        "danog/better-prometheus": "^0.1.0"
     },
     "require-dev": {
         "ext-ctype": "*",

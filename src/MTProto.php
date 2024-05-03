@@ -32,7 +32,6 @@ use Amp\Http\Client\Request;
 use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
-use Closure;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
@@ -40,6 +39,11 @@ use danog\AsyncOrm\Driver\MemoryArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\Settings as OrmSettings;
 use danog\AsyncOrm\ValueType;
+use danog\BetterPrometheus\BetterCollectorRegistry;
+use danog\BetterPrometheus\BetterCounter;
+use danog\BetterPrometheus\BetterGauge;
+use danog\BetterPrometheus\BetterHistogram;
+use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
@@ -77,6 +81,7 @@ use danog\MadelineProto\Wrappers\Start;
 use Prometheus\Counter;
 use Prometheus\Gauge;
 use Prometheus\Histogram;
+use Prometheus\Storage\InMemory;
 use Prometheus\Summary;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -512,17 +517,15 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
-     * Returns a closure linked to the specified prometheus gauge.
+     * Creates and returns a prometheus gauge.
      *
      * @internal
      *
      * @param array<string, string> $labels
-     *
-     * @return Closure(int|float): void
      */
-    public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): Closure
+    public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): BetterGauge
     {
-        return Magic::getGauge(
+        return $this->prometheus->getOrRegisterGauge(
             $namespace,
             $name,
             $help,
@@ -531,17 +534,15 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
-     * Returns a closure linked to the specified prometheus counter.
+     * Creates and returns a prometheus counter.
      *
      * @internal
      *
      * @param array<string, string> $labels
-     *
-     * @return Closure(): void Call to increment the counter
      */
-    public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): Closure
+    public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): BetterCounter
     {
-        return Magic::getCounter(
+        return $this->prometheus->getOrRegisterCounter(
             $namespace,
             $name,
             $help,
@@ -550,18 +551,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
-     * Returns a closure linked to the specified prometheus summary.
+     * Creates and returns a prometheus summary.
      *
      * @internal
      *
      * @param array<string, string> $labels
-     * @param ?list<float> $quantiles
-     *
-     * @return Closure(float): void
+     * @param ?non-empty-list<float> $quantiles
      */
-    public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
+    public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): BetterSummary
     {
-        return Magic::getSummary(
+        return $this->prometheus->getOrRegisterSummary(
             $namespace,
             $name,
             $help,
@@ -572,18 +571,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
-     * Returns a closure linked to the specified prometheus histogram.
+     * Creates and returns a prometheus histogram.
      *
      * @internal
      *
      * @param array<string, string> $labels
-     * @param ?list<float> $buckets
-     *
-     * @return Closure(float): void
+     * @param ?non-empty-list<float> $buckets
      */
-    public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): Closure
+    public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): BetterHistogram
     {
-        return Magic::getHistogram(
+        return $this->prometheus->getOrRegisterHistogram(
             $namespace,
             $name,
             $help,
@@ -897,6 +894,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->ipcServer = null;
         }
     }
+
+    private BetterCollectorRegistry $prometheus;
     /**
      * Clean up properties from previous versions of MadelineProto.
      *
@@ -904,6 +903,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        $this->prometheus ??= new BetterCollectorRegistry(new InMemory, false);
         $this->updateCtr = $this->getPromCounter("", "update_count", "Number of received updates since the session was created");
         // Start IPC server
         if (!$this->ipcServer) {

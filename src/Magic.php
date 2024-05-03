@@ -22,11 +22,8 @@ namespace danog\MadelineProto;
 
 use Amp\DeferredFuture;
 use Amp\SignalException;
-use Closure;
 use danog\MadelineProto\TL\Conversion\Extension;
 use phpseclib3\Math\BigInteger;
-use Prometheus\CollectorRegistry;
-use Prometheus\Storage\InMemory;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -207,9 +204,6 @@ final class Magic
      * Whether there's a basedir limitation.
      */
     public static bool $hasBasedirLimitation = false;
-    private static CollectorRegistry $prometheus;
-    /** @var array<string, string> */
-    private static array $promLabels;
     /**
      * Encoded emojis.
      *
@@ -343,74 +337,8 @@ final class Magic
                 }
             }
         }
-        self::$prometheus = new CollectorRegistry(new InMemory);
-        self::$promLabels = ['release' => API::RELEASE];
-        if (self::$pid !== null) {
-            self::$promLabels['pid'] = (string) self::$pid;
-        }
-
-        $alloc = self::getGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", []);
-        $inuse = self::getGauge("", "php_memstats_inuse_bytes", "RAM actually used by PHP", []);
-        EventLoop::unreference(EventLoop::repeat(1.0, static function () use ($alloc, $inuse): void {
-            $alloc(memory_get_usage(true));
-            $inuse(memory_get_usage(false));
-        }));
         GarbageCollector::start();
         self::$inited = true;
-    }
-    /**
-     * @param array<string, string> $labels
-     * @return Closure(int|float): void
-     */
-    public static function getGauge(string $namespace, string $name, string $help, array $labels): Closure
-    {
-        $labels += self::$promLabels;
-        $gauge = self::$prometheus->getOrRegisterGauge($namespace, $name, $help, array_keys($labels));
-        $labels = array_values($labels);
-        return static function (int|float $by) use ($labels, $gauge): void {
-            $gauge->incBy($by);
-        };
-    }
-    /**
-     * @param array<string, string> $labels
-     * @return Closure(): void
-     */
-    public static function getCounter(string $namespace, string $name, string $help, array $labels): Closure
-    {
-        $labels += self::$promLabels;
-        $gauge = self::$prometheus->getOrRegisterCounter($namespace, $name, $help, array_keys($labels));
-        $labels = array_values($labels);
-        return static function () use ($labels, $gauge): void {
-            $gauge->inc($labels);
-        };
-    }
-    /**
-     * @param array<string, string> $labels
-     * @param ?list<float> $buckets
-     * @return Closure(float): void
-     */
-    public static function getHistogram(string $namespace, string $name, string $help, array $labels, ?array $buckets = null): Closure
-    {
-        $labels += self::$promLabels;
-        $gauge = self::$prometheus->getOrRegisterHistogram($namespace, $name, $help, array_keys($labels), $buckets);
-        $labels = array_values($labels);
-        return static function (float $value) use ($labels, $gauge): void {
-            $gauge->observe($value, $labels);
-        };
-    }
-    /**
-     * @param array<string, string> $labels
-     * @param ?list<float> $quantiles
-     * @return Closure(float): void
-     */
-    public static function getSummary(string $namespace, string $name, string $help, array $labels, int $maxAgeSeconds = 600, ?array $quantiles = null): Closure
-    {
-        $labels += self::$promLabels;
-        $gauge = self::$prometheus->getOrRegisterSummary($namespace, $name, $help, array_keys($labels), $maxAgeSeconds, $quantiles);
-        $labels = array_values($labels);
-        return static function (float $value) use ($labels, $gauge): void {
-            $gauge->observe($value, $labels);
-        };
     }
     /**
      * Check if this is a POSIX fork of the main PHP process.

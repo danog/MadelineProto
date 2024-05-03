@@ -20,6 +20,9 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\SignalException;
 use AssertionError;
+use danog\BetterPrometheus\BetterCollectorRegistry;
+use danog\BetterPrometheus\BetterGauge;
+use Prometheus\Storage\InMemory;
 use ReflectionFiber;
 use Revolt\EventLoop;
 use Throwable;
@@ -56,6 +59,10 @@ final class GarbageCollector
      */
     private static int $memoryConsumption = 0;
 
+    private static BetterCollectorRegistry $prometheus;
+    private static BetterGauge $alloc;
+    private static BetterGauge $inuse;
+
     public static function start(): void
     {
         if (self::$started) {
@@ -63,11 +70,20 @@ final class GarbageCollector
         }
         self::$started = true;
 
-        $counter = Magic::getCounter("", "explicit_gc_count", "Number of times the GC was explicitly invoked", []);
+        self::$prometheus = new BetterCollectorRegistry(new InMemory);
+        $promLabels = ['madeline_version' => API::RELEASE];
+        if (Magic::$pid !== null) {
+            $promLabels['pid'] = (string) Magic::$pid;
+        }
+
+        self::$alloc = self::$prometheus->registerGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", $promLabels);
+        self::$inuse = self::$prometheus->registerGauge("", "php_memstats_inuse_bytes", "RAM actually used by PHP", $promLabels);
+
+        $counter = self::$prometheus->registerCounter("", "explicit_gc_count", "Number of times the GC was explicitly invoked", $promLabels);
         EventLoop::unreference(EventLoop::repeat(1, static function () use ($counter): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
-                $counter();
+                $counter->inc();
                 gc_collect_cycles();
                 self::$memoryConsumption = self::getMemoryConsumption();
                 /*self::$memoryConsumption = self::getMemoryConsumption();
@@ -161,7 +177,10 @@ final class GarbageCollector
     private static function getMemoryConsumption(): int
     {
         //self::$map ??= new WeakMap;
-        $memory = round(memory_get_usage()/1024/1024, 1);
+        self::$alloc->set(memory_get_usage(true));
+        $inuse = memory_get_usage();
+        self::$inuse->set($inuse);
+        $memory = round($inuse/1024/1024, 1);
         /*if (!Magic::$suspendPeriodicLogging) {
             Logger::log("Memory consumption: $memory Mb", Logger::ULTRA_VERBOSE);
         }*/

@@ -28,11 +28,11 @@ use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutException;
 use AssertionError;
-use Closure;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
+use danog\BetterPrometheus\BetterCounter;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
@@ -1261,11 +1261,10 @@ trait UpdateHandler
 
         $this->handleUpdate($update);
     }
-    /** @var Closure(): void */
-    private Closure $updateCtr;
+    private BetterCounter $updateCtr;
     private function handleUpdate(array $update): void
     {
-        ($this->updateCtr)(['type' => $update['_']]);
+        $this->updateCtr->inc(['type' => $update['_']]);
         /** @var UpdateHandlerType::EVENT_HANDLER|UpdateHandlerType::WEBHOOK|UpdateHandlerType::GET_UPDATES $this->updateHandlerType */
         match ($this->updateHandlerType) {
             UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler($update),
