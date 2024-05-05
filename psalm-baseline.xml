@@ -3291,6 +3291,7 @@
     <PossiblyInvalidArrayAccess>
       <code><![CDATA[$this->getSelf()['bot']]]></code>
       <code><![CDATA[$this->getSelf()['id']]]></code>
+      <code><![CDATA[$this->getSelf()['id']]]></code>
       <code><![CDATA[$this->getSelf()['premium']]]></code>
     </PossiblyInvalidArrayAccess>
     <PossiblyNullArgument>
@@ -4945,6 +4946,7 @@
       <code><![CDATA[$update]]></code>
       <code><![CDATA[$update]]></code>
       <code><![CDATA[$update]]></code>
+      <code><![CDATA[['type' => $update['_']]]]></code>
     </MixedArgumentTypeCoercion>
     <MixedArrayAccess>
       <code><![CDATA[$action['_']]]></code>
