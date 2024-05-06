@@ -102,6 +102,7 @@ final class WriteLoop extends Loop
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
+                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
                     continue;
                 }
                 $skipped_all = false;
@@ -118,6 +119,7 @@ final class WriteLoop extends Loop
                 $this->API->logger("Sent $message as unencrypted message to DC $this->datacenter!", Logger::ULTRA_VERBOSE);
 
                 unset($this->connection->pendingOutgoing[$k]);
+                $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
                 $message->setMsgId($message_id);
                 $this->connection->outgoing_messages[$message_id] = $message;
                 $this->connection->new_outgoing[$message_id] = $message;
@@ -160,11 +162,13 @@ final class WriteLoop extends Loop
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
+                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
                     $this->API->logger("Skipping resending of $message, we already got a reply in DC $this->datacenter");
                     continue;
                 }
                 if ($message instanceof Container) {
                     unset($this->connection->pendingOutgoing[$k]);
+                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
                     continue;
                 }
                 $constructor = $message->constructor;
@@ -321,6 +325,8 @@ final class WriteLoop extends Loop
                 $this->API->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
                 $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(array_values($keys));
+                $this->connection->outgoingCtr?->inc();
+                $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
                 $keys[$this->connection->pendingOutgoingKey++] = $message_id;
                 $message_data = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
                 $message_data_length = \strlen($message_data);
@@ -374,6 +380,7 @@ final class WriteLoop extends Loop
                     }
                 });
             }
+            $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
         } while ($this->connection->pendingOutgoing && !$skipped);
         if (empty($this->connection->pendingOutgoing)) {
             $this->connection->pendingOutgoing = [];

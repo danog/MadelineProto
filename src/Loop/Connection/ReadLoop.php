@@ -247,6 +247,7 @@ final class ReadLoop extends Loop
 
             $this->connection->new_incoming->enqueue($message);
             $this->connection->incoming_messages[$message_id] = $message;
+            $this->connection->incomingCtr?->inc();
         } finally {
             $this->connection->reading(false);
         }

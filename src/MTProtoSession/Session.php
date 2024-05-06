@@ -21,6 +21,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\Sync\LocalKeyedMutex;
+use danog\BetterPrometheus\BetterCounter;
+use danog\BetterPrometheus\BetterGauge;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -40,6 +42,9 @@ trait Session
     use SeqNoHandler;
     use CallHandler;
     use Reliable;
+    public ?BetterGauge $pendingOutgoingGauge;
+    public ?BetterCounter $incomingCtr;
+    public ?BetterCounter $outgoingCtr;
     /**
      * Incoming message array.
      *
@@ -171,6 +176,9 @@ trait Session
      */
     public function createSession(): void
     {
+        $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages", "Number of not-yet sent outgoing MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
+        $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of received MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
+        $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages", "Number of sent MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
         if ($this->session_id === null) {
             $this->resetSession("creating initial session");
         }

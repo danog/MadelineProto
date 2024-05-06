@@ -145,6 +145,7 @@ trait ResponseHandler
             $this->checkInSeqNo($newMessage);
             $newMessage->setSeqNo(null);
             $tmp->enqueue($newMessage);
+            $this->connection->incomingCtr?->inc();
             $this->incoming_messages[$msg['msg_id']] = $newMessage;
         }
         $this->checkInSeqNo($message);
@@ -160,6 +161,7 @@ trait ResponseHandler
         } else {
             $this->msgIdHandler->checkIncomingMessageId($referencedMsgId, true);
             $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId, $message->unencrypted);
+            $this->connection->incomingCtr?->inc();
             $this->incoming_messages[$referencedMsgId] = $message;
             $this->handleMessages([$message]);
         }

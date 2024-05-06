@@ -579,6 +579,8 @@ final class Connection
             unset($body);
         }
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
+        $this->outgoingCtr?->inc();
+        $this->pendingOutgoingGauge?->set(count($this->pendingOutgoing));
         if (isset($this->writer)) {
             $this->writer->resume();
         }
