@@ -42,9 +42,12 @@ trait Session
     use SeqNoHandler;
     use CallHandler;
     use Reliable;
-    public ?BetterGauge $pendingOutgoingGauge;
-    public ?BetterCounter $incomingCtr;
-    public ?BetterCounter $outgoingCtr;
+    public ?BetterGauge $pendingOutgoingGauge = null;
+    public ?BetterCounter $incomingCtr = null;
+    public ?BetterCounter $outgoingCtr = null;
+    public ?BetterCounter $incomingBytesCtr = null;
+    public ?BetterCounter $outgoingBytesCtr = null;
+    public ?BetterCounter $rpcErrors = null;
     /**
      * Incoming message array.
      *
@@ -176,9 +179,13 @@ trait Session
      */
     public function createSession(): void
     {
-        $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages", "Number of not-yet sent outgoing MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
-        $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of received MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
-        $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages", "Number of sent MTProto messages", ['datacenter' => $this->datacenter, 'connection' => $this->id]);
+        $labels = ['datacenter' => (string) $this->datacenter, 'connection' => (string) $this->id];
+        $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages", "Number of not-yet sent outgoing MTProto messages", $labels);
+        $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages", "Number of received MTProto messages", $labels);
+        $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of sent MTProto messages", $labels);
+        $this->incomingBytesCtr = $this->API->getPromCounter("MadelineProto", "incoming_bytes", "Number of received bytes", $labels);
+        $this->outgoingBytesCtr = $this->API->getPromCounter("MadelineProto", "outgoing_bytes", "Number of sent bytes", $labels);
+        $this->rpcErrors = $this->API->getPromCounter("MadelineProto", "rpc_errors", "Number of received RPC errors by type", $labels);
         if ($this->session_id === null) {
             $this->resetSession("creating initial session");
         }

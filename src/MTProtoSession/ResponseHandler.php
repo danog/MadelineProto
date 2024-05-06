@@ -145,7 +145,7 @@ trait ResponseHandler
             $this->checkInSeqNo($newMessage);
             $newMessage->setSeqNo(null);
             $tmp->enqueue($newMessage);
-            $this->connection->incomingCtr?->inc();
+            $this->incomingCtr?->inc();
             $this->incoming_messages[$msg['msg_id']] = $newMessage;
         }
         $this->checkInSeqNo($message);
@@ -161,7 +161,7 @@ trait ResponseHandler
         } else {
             $this->msgIdHandler->checkIncomingMessageId($referencedMsgId, true);
             $message = new MTProtoIncomingMessage($content['orig_message'], $referencedMsgId, $message->unencrypted);
-            $this->connection->incomingCtr?->inc();
+            $this->incomingCtr?->inc();
             $this->incoming_messages[$referencedMsgId] = $message;
             $this->handleMessages([$message]);
         }
@@ -276,10 +276,16 @@ trait ResponseHandler
         EventLoop::queue($request->reply(...), $response);
     }
     /**
+     * @param array{error_message: string, error_code: int} $response
      * @return (callable(): Throwable)|null
      */
     private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
+        if ($response['error_code'] === 420) {
+            $this->rpcErrors?->inc(['message' => preg_replace('/\d+/', '', $response['error_message']), 'code' => (string) $response['error_code']]);
+        } else {
+            $this->rpcErrors?->inc(['message' => $response['error_message'], 'code' => (string) $response['error_code']]);
+        }
         if ($request->isMethod
             && $request->constructor !== 'auth.bindTempAuthKey'
             && $this->shared->hasTempAuthKey()

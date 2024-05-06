@@ -139,10 +139,13 @@ final class ReadLoop extends Loop
             }
             throw $e;
         }
+        /** @var int $payload_length */
         if ($payload_length & (1 << 31)) {
             $this->API->logger("Received quick ACK $payload_length from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
+            $this->connection->incomingBytesCtr?->incBy(4);
             return null;
         }
+        $this->connection->incomingBytesCtr?->incBy(4+$payload_length);
         if ($payload_length <= 16) {
             $code = Tools::unpackSignedInt($buffer->bufferRead(4));
             if ($code === -1 && $payload_length >= 8) {
@@ -177,6 +180,7 @@ final class ReadLoop extends Loop
                     if ($left < (-$message_length & 15)) {
                         $this->API->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
                     }
+                    $this->connection->incomingBytesCtr?->incBy($left);
                     $buffer->bufferRead($left);
                 }
             } elseif ($auth_key_id === $this->shared->getTempAuthKey()->getID()) {
@@ -187,6 +191,7 @@ final class ReadLoop extends Loop
                 $payload_length -= $left;
                 $decrypted_data = Crypt::igeDecrypt($buffer->bufferRead($payload_length), $aes_key, $aes_iv);
                 if ($left) {
+                    $this->connection->incomingBytesCtr?->incBy($left);
                     $buffer->bufferRead($left);
                 }
                 if ($message_key != substr(hash('sha256', substr($this->shared->getTempAuthKey()->getAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {

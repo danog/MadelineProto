@@ -102,7 +102,7 @@ final class WriteLoop extends Loop
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
-                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+                    $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                     continue;
                 }
                 $skipped_all = false;
@@ -112,14 +112,15 @@ final class WriteLoop extends Loop
                 $pad_length = -$length & 15;
                 $pad_length += 16 * Tools::randomInt(modulus: 16);
                 $pad = Tools::random($pad_length);
-                $buffer = $this->connection->stream->getWriteBuffer(8 + 8 + 4 + $pad_length + $length);
+                $buffer = $this->connection->stream->getWriteBuffer($total_len = 8 + 8 + 4 + $pad_length + $length);
                 $buffer->bufferWrite("\0\0\0\0\0\0\0\0".Tools::packSignedLong($message_id).Tools::packUnsignedInt($length).$message->getSerializedBody().$pad);
                 $this->connection->httpSent();
+                $this->connection->outgoingBytesCtr?->incBy($total_len);
 
                 $this->API->logger("Sent $message as unencrypted message to DC $this->datacenter!", Logger::ULTRA_VERBOSE);
 
                 unset($this->connection->pendingOutgoing[$k]);
-                $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+                $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                 $message->setMsgId($message_id);
                 $this->connection->outgoing_messages[$message_id] = $message;
                 $this->connection->new_outgoing[$message_id] = $message;
@@ -162,13 +163,13 @@ final class WriteLoop extends Loop
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
                     unset($this->connection->pendingOutgoing[$k]);
-                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+                    $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                     $this->API->logger("Skipping resending of $message, we already got a reply in DC $this->datacenter");
                     continue;
                 }
                 if ($message instanceof Container) {
                     unset($this->connection->pendingOutgoing[$k]);
-                    $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+                    $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                     continue;
                 }
                 $constructor = $message->constructor;
@@ -326,7 +327,7 @@ final class WriteLoop extends Loop
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
                 $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(array_values($keys));
                 $this->connection->outgoingCtr?->inc();
-                $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+                $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                 $keys[$this->connection->pendingOutgoingKey++] = $message_id;
                 $message_data = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
                 $message_data_length = \strlen($message_data);
@@ -353,9 +354,10 @@ final class WriteLoop extends Loop
             //$ack = unpack('V', substr($message_key_large, 0, 4))[1] | (1 << 31);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->shared->getTempAuthKey()->getAuthKey());
             $message = $this->shared->getTempAuthKey()->getID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
-            $buffer = $this->connection->stream->getWriteBuffer(\strlen($message));
+            $buffer = $this->connection->stream->getWriteBuffer($total_len = \strlen($message));
             $buffer->bufferWrite($message);
             $this->connection->httpSent();
+            $this->connection->outgoingBytesCtr?->incBy($total_len);
             $this->API->logger("Sent encrypted payload to DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
 
             if ($ackCount) {
@@ -380,7 +382,7 @@ final class WriteLoop extends Loop
                     }
                 });
             }
-            $this->connection->pendingOutgoingGauge?->set(count($this->connection->pendingOutgoing));
+            $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
         } while ($this->connection->pendingOutgoing && !$skipped);
         if (empty($this->connection->pendingOutgoing)) {
             $this->connection->pendingOutgoing = [];
