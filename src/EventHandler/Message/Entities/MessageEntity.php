@@ -30,8 +30,11 @@ abstract class MessageEntity implements JsonSerializable
         return array_map(self::fromRawEntity(...), $entities);
     }
 
-    public static function fromRawEntity(array $entity): self
+    public static function fromRawEntity(array|self $entity): self
     {
+        if ($entity instanceof self) {
+            return $entity;
+        }
         return match ($entity['_'] ?? $entity['type']) {
             'mention', 'messageEntityMention' => new Mention($entity['offset'], $entity['length']),
             'hashtag', 'messageEntityHashtag' => new Hashtag($entity['offset'], $entity['length']),

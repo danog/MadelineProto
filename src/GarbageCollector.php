@@ -59,7 +59,7 @@ final class GarbageCollector
      */
     private static int $memoryConsumption = 0;
 
-    private static BetterCollectorRegistry $prometheus;
+    public static BetterCollectorRegistry $prometheus;
     private static BetterGauge $alloc;
     private static BetterGauge $inuse;
 

@@ -39,7 +39,6 @@ use danog\AsyncOrm\Driver\MemoryArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\Settings as OrmSettings;
 use danog\AsyncOrm\ValueType;
-use danog\BetterPrometheus\BetterCollectorRegistry;
 use danog\BetterPrometheus\BetterCounter;
 use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
@@ -81,7 +80,7 @@ use danog\MadelineProto\Wrappers\Start;
 use Prometheus\Counter;
 use Prometheus\Gauge;
 use Prometheus\Histogram;
-use Prometheus\Storage\InMemory;
+use Prometheus\RendererInterface;
 use Prometheus\Summary;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -517,15 +516,28 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
+     * Renders prometheus stats using the specified renderer.
+     */
+    public function renderPromStats(RendererInterface $renderer): string
+    {
+        return $renderer->render(
+            GarbageCollector::$prometheus->storageAdapter->collect()
+        );
+    }
+
+    /**
      * Creates and returns a prometheus gauge.
      *
-     * @internal
+     * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
      */
-    public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): BetterGauge
+    public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): ?BetterGauge
     {
-        return $this->prometheus->getOrRegisterGauge(
+        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+            return null;
+        }
+        return GarbageCollector::$prometheus->getOrRegisterGauge(
             $namespace,
             $name,
             $help,
@@ -536,13 +548,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Creates and returns a prometheus counter.
      *
-     * @internal
+     * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
      */
-    public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): BetterCounter
+    public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): ?BetterCounter
     {
-        return $this->prometheus->getOrRegisterCounter(
+        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+            return null;
+        }
+        return GarbageCollector::$prometheus->getOrRegisterCounter(
             $namespace,
             $name,
             $help,
@@ -553,14 +568,17 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Creates and returns a prometheus summary.
      *
-     * @internal
+     * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $quantiles
      */
-    public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): BetterSummary
+    public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): ?BetterSummary
     {
-        return $this->prometheus->getOrRegisterSummary(
+        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+            return null;
+        }
+        return GarbageCollector::$prometheus->getOrRegisterSummary(
             $namespace,
             $name,
             $help,
@@ -573,14 +591,17 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Creates and returns a prometheus histogram.
      *
-     * @internal
+     * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $buckets
      */
-    public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): BetterHistogram
+    public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): ?BetterHistogram
     {
-        return $this->prometheus->getOrRegisterHistogram(
+        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+            return null;
+        }
+        return GarbageCollector::$prometheus->getOrRegisterHistogram(
             $namespace,
             $name,
             $help,
@@ -895,7 +916,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
     }
 
-    private BetterCollectorRegistry $prometheus;
     /**
      * Clean up properties from previous versions of MadelineProto.
      *
@@ -903,7 +923,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
-        $this->prometheus ??= new BetterCollectorRegistry(new InMemory, false);
         $this->updateCtr = $this->getPromCounter("", "update_count", "Number of received updates since the session was created");
         // Start IPC server
         if (!$this->ipcServer) {

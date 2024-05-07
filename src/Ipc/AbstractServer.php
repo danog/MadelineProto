@@ -53,7 +53,7 @@ abstract class AbstractServer extends Loop
     use InternalLoop {
         __construct as private internalInit;
     }
-    private BetterGauge $connectionGauge;
+    private ?BetterGauge $connectionGauge;
     public function __construct(MTProto $API)
     {
         $this->internalInit($API);
@@ -214,7 +214,7 @@ abstract class AbstractServer extends Loop
     {
         $this->API->waitForInit();
         $this->API->logger('Accepted IPC client connection!');
-        $this->connectionGauge->inc();
+        $this->connectionGauge?->inc();
 
         $id = 0;
         $payload = null;
@@ -225,7 +225,7 @@ abstract class AbstractServer extends Loop
         } catch (Throwable $e) {
             Logger::log("Exception in IPC connection: $e");
         } finally {
-            $this->connectionGauge->dec();
+            $this->connectionGauge?->dec();
             EventLoop::queue(function () use ($socket, $payload): void {
                 try {
                     $socket->disconnect();

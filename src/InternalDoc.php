@@ -995,6 +995,56 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPlugin($class);
     }
     /**
+     * Creates and returns a prometheus counter.
+     *
+     * Returns null if prometheus stats are disabled.
+     *
+     * @param array<string, string> $labels
+     */
+    final public function getPromCounter(string $namespace, string $name, string $help, array $labels = [
+    ]): ?\danog\BetterPrometheus\BetterCounter
+    {
+        return $this->wrapper->getAPI()->getPromCounter($namespace, $name, $help, $labels);
+    }
+    /**
+     * Creates and returns a prometheus gauge.
+     *
+     * Returns null if prometheus stats are disabled.
+     *
+     * @param array<string, string> $labels
+     */
+    final public function getPromGauge(string $namespace, string $name, string $help, array $labels = [
+    ]): ?\danog\BetterPrometheus\BetterGauge
+    {
+        return $this->wrapper->getAPI()->getPromGauge($namespace, $name, $help, $labels);
+    }
+    /**
+     * Creates and returns a prometheus histogram.
+     *
+     * Returns null if prometheus stats are disabled.
+     *
+     * @param array<string, string> $labels
+     * @param ?non-empty-list<float> $buckets
+     */
+    final public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [
+    ], ?array $buckets = null): ?\danog\BetterPrometheus\BetterHistogram
+    {
+        return $this->wrapper->getAPI()->getPromHistogram($namespace, $name, $help, $labels, $buckets);
+    }
+    /**
+     * Creates and returns a prometheus summary.
+     *
+     * Returns null if prometheus stats are disabled.
+     *
+     * @param array<string, string> $labels
+     * @param ?non-empty-list<float> $quantiles
+     */
+    final public function getPromSummary(string $namespace, string $name, string $help, array $labels = [
+    ], int $maxAgeSeconds = 600, ?array $quantiles = null): ?\danog\BetterPrometheus\BetterSummary
+    {
+        return $this->wrapper->getAPI()->getPromSummary($namespace, $name, $help, $labels, $maxAgeSeconds, $quantiles);
+    }
+    /**
      * Gets info of the propic of a user.
      */
     final public function getPropicInfo($data): ?\danog\MadelineProto\EventHandler\Media\Photo
@@ -1558,6 +1608,13 @@ abstract class InternalDoc
     final public function refreshPeerCache(mixed ...$ids): void
     {
         $this->wrapper->getAPI()->refreshPeerCache(...$ids);
+    }
+    /**
+     * Renders prometheus stats using the specified renderer.
+     */
+    final public function renderPromStats(\Prometheus\RendererInterface $renderer): string
+    {
+        return $this->wrapper->getAPI()->renderPromStats($renderer);
     }
     /**
      * Report an error to the previously set peer.

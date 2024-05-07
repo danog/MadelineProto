@@ -22,6 +22,8 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use AssertionError;
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
+use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -108,7 +110,15 @@ trait PeerHandler
     {
         try {
             foreach ($entities as $entity) {
-                if ($entity['_'] === 'messageEntityMentionName' || $entity['_'] === 'inputMessageEntityMentionName') {
+                if ($entity instanceof MentionName) {
+                    if (!($this->peerIsset($entity->userId))) {
+                        return false;
+                    }
+                } elseif ($entity instanceof InputMentionName) {
+                    if (!($this->peerIsset($entity->userId))) {
+                        return false;
+                    }
+                } elseif (\is_array($entity) && ($entity['_'] === 'messageEntityMentionName' || $entity['_'] === 'inputMessageEntityMentionName')) {
                     if (!($this->peerIsset($entity['user_id']))) {
                         return false;
                     }

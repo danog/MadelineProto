@@ -1261,10 +1261,10 @@ trait UpdateHandler
 
         $this->handleUpdate($update);
     }
-    private BetterCounter $updateCtr;
+    private ?BetterCounter $updateCtr;
     private function handleUpdate(array $update): void
     {
-        $this->updateCtr->inc(['type' => $update['_']]);
+        $this->updateCtr?->inc(['type' => $update['_']]);
         /** @var UpdateHandlerType::EVENT_HANDLER|UpdateHandlerType::WEBHOOK|UpdateHandlerType::GET_UPDATES $this->updateHandlerType */
         match ($this->updateHandlerType) {
             UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler($update),

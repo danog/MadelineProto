@@ -2301,6 +2301,9 @@
     <MixedMethodCall>
       <code><![CDATA[disconnect]]></code>
     </MixedMethodCall>
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$API->getPromGauge("", "ipc_server_connections", "Number of IPC server connections")]]></code>
+    </PossiblyNullPropertyAssignmentValue>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$callback]]></code>
       <code><![CDATA[$server]]></code>
@@ -2736,9 +2739,6 @@
       <code><![CDATA[$message_data]]></code>
       <code><![CDATA[$message_key]]></code>
     </PossiblyNullArgument>
-    <PossiblyNullOperand>
-      <code><![CDATA[$payload_length]]></code>
-    </PossiblyNullOperand>
     <PossiblyNullReference>
       <code><![CDATA[getReadBuffer]]></code>
       <code><![CDATA[reset]]></code>
@@ -3102,6 +3102,17 @@
       <code><![CDATA[new DataCenter($this)]]></code>
       <code><![CDATA[new PeerDatabase($this)]]></code>
     </DocblockTypeContradiction>
+    <ImpureMethodCall>
+      <code><![CDATA[fromSupergroupOrChannel]]></code>
+      <code><![CDATA[load]]></code>
+      <code><![CDATA[load]]></code>
+      <code><![CDATA[updateDefault]]></code>
+    </ImpureMethodCall>
+    <ImpureStaticProperty>
+      <code><![CDATA[GarbageCollector::$prometheus]]></code>
+      <code><![CDATA[Logger::$default]]></code>
+      <code><![CDATA[Magic::$isIpcWorker]]></code>
+    </ImpureStaticProperty>
     <InvalidArgument>
       <code><![CDATA[$callbacks]]></code>
       <code><![CDATA[$callbacks]]></code>
@@ -3309,6 +3320,9 @@
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
     </PossiblyNullArrayAccess>
+    <PossiblyNullPropertyAssignmentValue>
+      <code><![CDATA[$this->getPromCounter("", "update_count", "Number of received updates since the session was created")]]></code>
+    </PossiblyNullPropertyAssignmentValue>
     <PossiblyNullReference>
       <code><![CDATA[init]]></code>
       <code><![CDATA[saveDbProperties]]></code>
@@ -3599,20 +3613,6 @@
       <code><![CDATA[$response]]></code>
       <code><![CDATA[$response['_']]]></code>
       <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_code']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
-      <code><![CDATA[$response['error_message']]]></code>
       <code><![CDATA[$response['new_server_salt']]]></code>
     </MixedArgument>
     <MixedArgumentTypeCoercion>
@@ -3668,9 +3668,6 @@
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
-    <RiskyCast>
-      <code><![CDATA[preg_replace('/[^0-9]+/', '', $response['error_message'])]]></code>
-    </RiskyCast>
   </file>
   <file src="src/MTProtoSession/Session.php">
     <MissingConstructor>
