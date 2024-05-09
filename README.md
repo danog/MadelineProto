@@ -394,6 +394,10 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.uploadWallPaper.html" name="account.uploadWallPaper">Create and upload a new wallpaper: account.uploadWallPaper</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#arr" name="arr">Create array: arr</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.createChat.html" name="messages.createChat">Creates a new chat: messages.createChat</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPromCounter" name="getPromCounter">Creates and returns a prometheus counter: getPromCounter</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPromGauge" name="getPromGauge">Creates and returns a prometheus gauge: getPromGauge</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPromHistogram" name="getPromHistogram">Creates and returns a prometheus histogram: getPromHistogram</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getPromSummary" name="getPromSummary">Creates and returns a prometheus summary: getPromSummary</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.deleteChannel.html" name="channels.deleteChannel">Delete a channel/supergroup: channels.deleteChannel</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteExportedChatInvite.html" name="messages.deleteExportedChatInvite">Delete a chat invite: messages.deleteExportedChatInvite</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteChat.html" name="messages.deleteChat">Delete a chat: messages.deleteChat</a>
@@ -798,6 +802,7 @@ Want to add your own open-source project to this list? [Click here!](https://doc
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.removeStickerFromSet.html" name="stickers.removeStickerFromSet">Remove a sticker from the set where it belongs, bots only. The sticker set must have been created by the bot: stickers.removeStickerFromSet</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.resetSaved.html" name="contacts.resetSaved">Removes all contacts without an associated Telegram account: contacts.resetSaved</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.renameStickerSet.html" name="stickers.renameStickerSet">Renames a stickerset, bots only: stickers.renameStickerSet</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#renderPromStats" name="renderPromStats">Renders prometheus stats using the specified renderer: renderPromStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reorderUsernames.html" name="channels.reorderUsernames">Reorder active usernames: channels.reorderUsernames</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateDialogFiltersOrder.html" name="messages.updateDialogFiltersOrder">Reorder folders: messages.updateDialogFiltersOrder</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reorderStickerSets.html" name="messages.reorderStickerSets">Reorder installed stickersets: messages.reorderStickerSets</a>
