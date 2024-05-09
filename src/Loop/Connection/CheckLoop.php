@@ -45,7 +45,7 @@ final class CheckLoop extends Loop
     public function __construct(Connection $connection)
     {
         $this->initCommon($connection);
-        $this->resendTimeout = $this->API->settings->getRpc()->getRpcResendTimeout();
+        $this->resendTimeout = (int) ($this->API->settings->getRpc()->getRpcResendTimeout() * 1_000_000_000.0);
     }
     /**
      * Main loop.
@@ -113,7 +113,7 @@ final class CheckLoop extends Loop
                                         $this->API->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
                                         $reply[] = $message_id;
                                     } elseif ($chr & 32) {
-                                        if ($message->getSent() + $this->resendTimeout < time()) {
+                                        if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
                                             if ($message->isCancellationRequested()) {
                                                 unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
 
@@ -143,7 +143,7 @@ final class CheckLoop extends Loop
         } else {
             foreach ($this->connection->new_outgoing as $message_id => $message) {
                 if ($message->wasSent()
-                    && $message->getSent() + $this->timeout < time()
+                    && $message->getSent() + $this->timeout < hrtime(true)
                     && $message->unencrypted
                 ) {
                     $this->API->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);

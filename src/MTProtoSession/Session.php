@@ -159,7 +159,7 @@ trait Session
             if ($message->canGarbageCollect()) {
                 $count++;
             } else {
-                $ago = time() - $message->getSent();
+                $ago = (hrtime(true) - $message->getSent()) / 1_000_000_000;
                 if ($ago > 2) {
                     $this->API->logger("Can't garbage collect $message in DC {$this->datacenter}, no response has been received or it wasn't yet handled!", Logger::VERBOSE);
                 }

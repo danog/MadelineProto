@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\SignalException;
+use danog\BetterPrometheus\BetterHistogram;
 use danog\Loop\Loop;
 use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Lang;
@@ -43,6 +44,7 @@ use const PHP_EOL;
 /**
  * Manages responses.
  *
+ * @property ?BetterHistogram $requestLatencies
  * @internal
  */
 trait ResponseHandler
@@ -279,6 +281,10 @@ trait ResponseHandler
                 'error_message' => 'OK',
                 'error_code' => '200'
             ]);
+            $this->requestLatencies?->observe(
+                hrtime(true) - $request->getSent(),
+                ['method' => $request->constructor]
+            );
         }
 
         EventLoop::queue($request->reply(...), $response);
@@ -295,6 +301,10 @@ trait ResponseHandler
                 'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
                 'error_code' => (string) $response['error_code']
             ]);
+            $this->requestLatencies?->observe(
+                hrtime(true) - $request->getSent(),
+                ['method' => $request->constructor]
+            );
         }
         if ($request->isMethod
             && $request->constructor !== 'auth.bindTempAuthKey'
@@ -335,7 +345,7 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(time() + 5*60);
+                    $request->setSent(hrtime(true) + (5*60 * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     $prev = $request->previousQueuedMessage;
@@ -387,7 +397,7 @@ trait ResponseHandler
                     $this->API->logger("Resending $request due to {$response['error_message']}");
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(time() + 5*60);
+                    $request->setSent(hrtime(true) + (5*60 * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);
@@ -458,7 +468,7 @@ trait ResponseHandler
                     $this->API->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
-                    $request->setSent(time() + $seconds);
+                    $request->setSent(hrtime(true) + ($seconds * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
                     \assert($msgId !== null);

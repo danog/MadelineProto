@@ -75,7 +75,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
         $this->content = $content;
         $this->msgId = $msgId;
 
-        $this->received = time();
+        $this->received = hrtime(true);
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$content['_']]));
         if (!$this->contentRelated) {
