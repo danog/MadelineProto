@@ -61,6 +61,6 @@ trait Common
         $this->connection = $connection;
         $this->datacenter = $connection->getDatacenterID();
         $this->shared = $connection->getShared();
-        $this->timeout = (int)($this->shared->getSettings()->getTimeout() * 1_000_000_000.0);
+        $this->timeout = (int) ($this->shared->getSettings()->getTimeout() * 1_000_000_000.0);
     }
 }

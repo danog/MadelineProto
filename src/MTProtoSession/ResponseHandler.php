@@ -279,10 +279,10 @@ trait ResponseHandler
             $this->requestResponse->inc([
                 'method' => $request->constructor,
                 'error_message' => 'OK',
-                'error_code' => '200'
+                'error_code' => '200',
             ]);
             $this->requestLatencies?->observe(
-                hrtime(true) - $request->getSent(),
+                (hrtime(true) - $request->getSent()) / 1_000_000_000.0,
                 ['method' => $request->constructor]
             );
         }
@@ -299,10 +299,10 @@ trait ResponseHandler
             $this->requestResponse->inc([
                 'method' => $request->constructor,
                 'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
-                'error_code' => (string) $response['error_code']
+                'error_code' => (string) $response['error_code'],
             ]);
             $this->requestLatencies?->observe(
-                hrtime(true) - $request->getSent(),
+                (hrtime(true) - $request->getSent()) / 1_000_000_000.0,
                 ['method' => $request->constructor]
             );
         }

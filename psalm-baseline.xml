@@ -2301,9 +2301,6 @@
     <MixedMethodCall>
       <code><![CDATA[disconnect]]></code>
     </MixedMethodCall>
-    <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$API->getPromGauge("", "ipc_server_connections", "Number of IPC server connections")]]></code>
-    </PossiblyNullPropertyAssignmentValue>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$callback]]></code>
       <code><![CDATA[$server]]></code>
@@ -3320,9 +3317,6 @@
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['id']]]></code>
     </PossiblyNullArrayAccess>
-    <PossiblyNullPropertyAssignmentValue>
-      <code><![CDATA[$this->getPromCounter("", "update_count", "Number of received updates since the session was created")]]></code>
-    </PossiblyNullPropertyAssignmentValue>
     <PossiblyNullReference>
       <code><![CDATA[init]]></code>
       <code><![CDATA[saveDbProperties]]></code>
@@ -3656,7 +3650,7 @@
     </MixedOperand>
     <PossiblyInvalidArgument>
       <code><![CDATA[$response]]></code>
-      <code><![CDATA[time() + $seconds]]></code>
+      <code><![CDATA[hrtime(true) + ($seconds * 1_000_000_000)]]></code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
       <code><![CDATA[$msgId]]></code>
@@ -3665,6 +3659,10 @@
       <code><![CDATA[$msgId]]></code>
       <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
+    <PossiblyNullOperand>
+      <code><![CDATA[$request->getSent()]]></code>
+      <code><![CDATA[$request->getSent()]]></code>
+    </PossiblyNullOperand>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
@@ -4509,8 +4507,6 @@
       <code><![CDATA[$total_count]]></code>
     </MixedArgument>
     <MixedArrayAccess>
-      <code><![CDATA[$entity['_']]]></code>
-      <code><![CDATA[$entity['user_id']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
