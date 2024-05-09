@@ -923,7 +923,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
-        $this->updateCtr = $this->getPromCounter("", "update_count", "Number of received updates since the session was created");
+        $this->updateCtr = $this->getPromCounter("MadelineProto", "update_count", "Number of received updates since the session was created");
         // Start IPC server
         if (!$this->ipcServer) {
             $this->ipcServer = new Server($this);

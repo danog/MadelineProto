@@ -23,6 +23,7 @@ namespace danog\MadelineProto\MTProtoSession;
 use Amp\Sync\LocalKeyedMutex;
 use danog\BetterPrometheus\BetterCounter;
 use danog\BetterPrometheus\BetterGauge;
+use danog\BetterPrometheus\BetterHistogram;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -47,7 +48,10 @@ trait Session
     public ?BetterCounter $outgoingCtr = null;
     public ?BetterCounter $incomingBytesCtr = null;
     public ?BetterCounter $outgoingBytesCtr = null;
-    public ?BetterCounter $rpcErrors = null;
+
+    public ?BetterHistogram $requestLatencies = null;
+
+    public ?BetterCounter $requestResponse = null;
     /**
      * Incoming message array.
      *
@@ -185,7 +189,8 @@ trait Session
         $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of sent MTProto messages", $labels);
         $this->incomingBytesCtr = $this->API->getPromCounter("MadelineProto", "incoming_bytes", "Number of received bytes", $labels);
         $this->outgoingBytesCtr = $this->API->getPromCounter("MadelineProto", "outgoing_bytes", "Number of sent bytes", $labels);
-        $this->rpcErrors = $this->API->getPromCounter("MadelineProto", "rpc_errors", "Number of received RPC errors by type", $labels);
+        $this->requestResponse = $this->API->getPromCounter("MadelineProto", "request_responses", "Received RPC error or success status of requests by method.", $labels);
+        $this->requestLatencies = $this->API->getPromHistogram("MadelineProto", "request_latencies", "Request latency by method", $labels);
         if ($this->session_id === null) {
             $this->resetSession("creating initial session");
         }

@@ -40,7 +40,7 @@ use function strlen;
  */
 final class WriteLoop extends Loop
 {
-    public const MAX_COUNT = 1020;
+    private const MAX_COUNT = 1020;
     private const MAX_SIZE = 1 << 15;
     public const MAX_IDS = 8192;
 
@@ -197,7 +197,7 @@ final class WriteLoop extends Loop
 
                 $body_length = \strlen($message->getSerializedBody());
                 $actual_length = $body_length + 32;
-                if ($total_length && $total_length + $actual_length > 32760 || $count >= 1020) {
+                if ($total_length && $total_length + $actual_length > 32760 || $count >= self::MAX_COUNT) {
                     $this->API->logger('Length overflow, postponing part of payload', Logger::ULTRA_VERBOSE);
                     break;
                 }

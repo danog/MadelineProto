@@ -273,6 +273,14 @@ trait ResponseHandler
         }
         $this->gotResponseForOutgoingMessage($request);
 
+        if ($this->requestResponse !== null) {
+            $this->requestResponse->inc([
+                'method' => $request->constructor,
+                'error_message' => 'OK',
+                'error_code' => '200'
+            ]);
+        }
+
         EventLoop::queue($request->reply(...), $response);
     }
     /**
@@ -281,10 +289,12 @@ trait ResponseHandler
      */
     private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
-        if ($response['error_code'] === 420) {
-            $this->rpcErrors?->inc(['message' => preg_replace('/\d+/', '', $response['error_message']), 'code' => (string) $response['error_code']]);
-        } else {
-            $this->rpcErrors?->inc(['message' => $response['error_message'], 'code' => (string) $response['error_code']]);
+        if ($this->requestResponse !== null) {
+            $this->requestResponse->inc([
+                'method' => $request->constructor,
+                'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
+                'error_code' => (string) $response['error_code']
+            ]);
         }
         if ($request->isMethod
             && $request->constructor !== 'auth.bindTempAuthKey'

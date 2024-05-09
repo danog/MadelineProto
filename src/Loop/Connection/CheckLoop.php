@@ -60,7 +60,7 @@ final class CheckLoop extends Loop
         }
         if ($this->shared->hasTempAuthKey()) {
             $full_message_ids = $this->connection->getPendingCalls();
-            foreach (array_chunk($full_message_ids, 8192) as $message_ids) {
+            foreach (array_chunk($full_message_ids, WriteLoop::MAX_IDS) as $message_ids) {
                 $deferred = new DeferredFuture();
                 $list = '';
                 // Don't edit this here pls
