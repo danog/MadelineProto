@@ -20,13 +20,13 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Types\Button;
@@ -1041,7 +1041,7 @@ final class TL implements TLInterface
             || $x['_'] === 'channelForbidden'
             || $x['_'] === 'channelFull'
         ) {
-            $x['id'] = DialogId::fromSupergroupOrChannel($x['id']);
+            $x['id'] = DialogId::fromSupergroupOrChannelId($x['id']);
         } elseif ($x['_'] === 'chat'
             || $x['_'] === 'chatForbidden'
             || $x['_'] === 'chatFull'

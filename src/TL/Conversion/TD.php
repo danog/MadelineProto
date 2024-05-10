@@ -20,8 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL\Conversion;
 
+use danog\DialogId\DialogId;
 use danog\MadelineProto\Lang;
-use danog\MadelineProto\MTProtoTools\DialogId;
 
 /**
  * @internal

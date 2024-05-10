@@ -33,6 +33,7 @@ use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
 use danog\BetterPrometheus\BetterCounter;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;

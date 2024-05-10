@@ -33,7 +33,7 @@ use Amp\Process\Process;
 use ArrayAccess;
 use Closure;
 use Countable;
-use danog\MadelineProto\MTProtoTools\DialogId;
+use danog\DialogId\DialogId;
 use Fiber;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
@@ -587,7 +587,7 @@ abstract class Tools extends AsyncTools
         }
         // t.me/c/<channelId>
         if (preg_match('@t\.me/c/(\d+)@', $link, $matches)) {
-            return [false, DialogId::fromSupergroupOrChannel((int) $matches[1])];
+            return [false, DialogId::fromSupergroupOrChannelId((int) $matches[1])];
         }
         // Invite links
         if (preg_match('@(?:t|telegram)\\.(?:me|dog)/(joinchat/|\+)?([a-z0-9_-]*)@i', $link, $matches)) {

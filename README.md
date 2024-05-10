@@ -67,16 +67,17 @@ The following open source projects were created using MadelineProto: you can dir
 * [`pipesbot.php`](https://github.com/danog/pipesbot) - Creating inline bots and using other inline bots via a userbot!
 * [`bot.php`](https://github.com/danog/MadelineProto/blob/v8/examples/bot.php) - Examples for how to use filters, updates, get download links for any file, Telegram Stories and much more!
 
+Want to add your own open-source project to this list? [Click here!](https://docs.madelineproto.xyz/FOSS.html)
+
 Some of MadelineProto's core components are also available as separate, standalone libraries:
 
-- [danog/async-orm](https://github.com/danog/AsyncOrm) -  Async ORM based on AMPHP v3 and fibers. 
-- [danog/telegram-entities](https://github.com/danog/telegram-entities) -  A library to work with Telegram UTF-16 styled text entities. 
-- [danog/tg-file-decoder](https://github.com/danog/tg-file-decoder) -  A library to work with Telegram bot API file IDs.
+- [danog/async-orm](https://github.com/danog/AsyncOrm) - Async ORM based on AMPHP v3 and fibers. 
+- [danog/telegram-entities](https://github.com/danog/telegram-entities) - A library to work with Telegram UTF-16 styled text entities. 
+- [danog/tg-file-decoder](https://github.com/danog/tg-file-decoder) - A library to work with Telegram bot API file IDs.
+- [danog/tg-dialog-id](https://github.com/danog/tg-dialog-id) - A library to work with Telegram bot API dialog IDs. 
 - [danog/loop](https://github.com/danog/loop) - Loop/actor model abstraction for AMPHP.
-- [danog/ipc](https://github.com/danog/ipc) -  Async IPC component for AMPHP.
+- [danog/ipc](https://github.com/danog/ipc) - Async IPC component for AMPHP.
 - [danog/dns-over-https](https://github.com/danog/dns-over-https) - Async DNS-over-HTTPS resolution for AMPHP. 
-
-Want to add your own open-source project to this list? [Click here!](https://docs.madelineproto.xyz/FOSS.html)
 
 ## Documentation
 

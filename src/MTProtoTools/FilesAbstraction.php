@@ -29,6 +29,7 @@ use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Process\Process;
 use AssertionError;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\AbstractVideo;

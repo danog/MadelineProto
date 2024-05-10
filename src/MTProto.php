@@ -940,7 +940,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->updateState = new CombinedUpdatesState;
             foreach ($this->channels_state->get() as $channelId => $state) {
                 if ($channelId !== 0) {
-                    $channelId = \danog\MadelineProto\MTProtoTools\DialogId::fromSupergroupOrChannel($channelId);
+                    $channelId = \danog\DialogId\DialogId::fromSupergroupOrChannelId($channelId);
                 }
                 $this->updateState->get($channelId)->update(
                     $channelId ? [

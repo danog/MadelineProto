@@ -22,11 +22,11 @@ namespace danog\MadelineProto\SecretChats;
 
 use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\MTProtoTools\DialogId;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;

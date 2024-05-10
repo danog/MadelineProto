@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use AssertionError;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
