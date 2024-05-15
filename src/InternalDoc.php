@@ -1611,8 +1611,10 @@ abstract class InternalDoc
     }
     /**
      * Renders prometheus stats using the specified renderer.
+     *
+     * By default uses the text renderer.
      */
-    final public function renderPromStats(\Prometheus\RendererInterface $renderer): string
+    final public function renderPromStats(?\Prometheus\RendererInterface $renderer = null): string
     {
         return $this->wrapper->getAPI()->renderPromStats($renderer);
     }

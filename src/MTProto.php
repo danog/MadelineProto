@@ -81,6 +81,7 @@ use Prometheus\Counter;
 use Prometheus\Gauge;
 use Prometheus\Histogram;
 use Prometheus\RendererInterface;
+use Prometheus\RenderTextFormat;
 use Prometheus\Summary;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -517,10 +518,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
     /**
      * Renders prometheus stats using the specified renderer.
+     *
+     * By default uses the text renderer.
      */
-    public function renderPromStats(RendererInterface $renderer): string
+    public function renderPromStats(?RendererInterface $renderer = null): string
     {
-        return $renderer->render(
+        return ($renderer ?? new RenderTextFormat)->render(
             GarbageCollector::$prometheus->storageAdapter->collect()
         );
     }
