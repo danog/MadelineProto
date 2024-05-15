@@ -1307,6 +1307,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!$this->settings->getAppInfo()->hasApiInfo()) {
             throw new Exception(Lang::$current_lang['api_not_set'], 0, null, 'MadelineProto', 1);
         }
+        /** @var Settings $this->settings */
 
         // Setup logger
         if ($this->settings->getLogger()->hasChanged() || !isset($this->logger)) {

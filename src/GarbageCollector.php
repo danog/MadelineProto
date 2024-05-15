@@ -77,10 +77,10 @@ final class GarbageCollector
             $promLabels['pid'] = (string) $pid;
         }
 
-        self::$alloc = self::$prometheus->registerGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", $promLabels);
-        self::$inuse = self::$prometheus->registerGauge("", "php_memstats_inuse_bytes", "RAM actually used by PHP", $promLabels);
+        self::$alloc = self::$prometheus->registerGauge("MadelineProto", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", $promLabels);
+        self::$inuse = self::$prometheus->registerGauge("MadelineProto", "php_memstats_inuse_bytes", "RAM actually used by PHP", $promLabels);
 
-        $counter = self::$prometheus->registerCounter("", "explicit_gc_count", "Number of times the GC was explicitly invoked", $promLabels);
+        $counter = self::$prometheus->registerCounter("MadelineProto", "explicit_gc_count", "Number of times the GC was explicitly invoked", $promLabels);
         EventLoop::unreference(EventLoop::repeat(1, static function () use ($counter): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {
