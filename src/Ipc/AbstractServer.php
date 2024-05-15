@@ -57,7 +57,8 @@ abstract class AbstractServer extends Loop
     public function __construct(MTProto $API)
     {
         $this->internalInit($API);
-        $this->connectionGauge = $API->getPromGauge("", "ipc_server_connections", "Number of IPC server connections");
+        $this->connectionGauge = $API->getPromGauge("MadelineProto", "ipc_server_connections", "Number of IPC server connections");
+        $this->connectionGauge?->set(0);
     }
     /**
      * Server version.
