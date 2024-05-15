@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Settings;
 
+use Amp\Socket\SocketAddress;
 use danog\MadelineProto\SettingsAbstract;
 
 /**
@@ -27,6 +28,11 @@ final class Prometheus extends SettingsAbstract
      * Whether to enable prometheus stat reporting for this session.
      */
     protected bool $enablePrometheus = false;
+    /**
+     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     */
+    protected ?SocketAddress $prometheusEndpoint = null;
+
     /**
      * Whether to enable additional prometheus stat reporting for this session.
      */
@@ -41,5 +47,22 @@ final class Prometheus extends SettingsAbstract
     public function getEnablePrometheus(): bool
     {
         return $this->enablePrometheus;
+    }
+
+    /**
+     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     */
+    public function setPrometheusEndpoint(?SocketAddress $endpoint): self
+    {
+        $this->prometheusEndpoint = $endpoint;
+        return $this;
+    }
+
+    /**
+     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     */
+    public function getPrometheusEndpoint(): ?SocketAddress
+    {
+        return $this->prometheusEndpoint;
     }
 }

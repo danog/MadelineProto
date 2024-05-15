@@ -29,6 +29,12 @@ use Amp\Future;
 use Amp\Future\UnhandledFutureError;
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\Request;
+use Amp\Http\HttpStatus;
+use Amp\Http\Server\DefaultErrorHandler;
+use Amp\Http\Server\Request as ServerRequest;
+use Amp\Http\Server\RequestHandler;
+use Amp\Http\Server\Response as ServerResponse;
+use Amp\Http\Server\SocketHttpServer;
 use Amp\SignalException;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
@@ -919,6 +925,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
     }
 
+    private ?SocketHttpServer $promServer = null;
     /**
      * Clean up properties from previous versions of MadelineProto.
      *
@@ -926,6 +933,30 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        $endpoint = $this->getSettings()->getPrometheus()->getPrometheusEndpoint();
+        $this->promServer?->stop();
+        if ($endpoint === null) {
+            $this->promServer = null;
+        } else {
+            $this->promServer = SocketHttpServer::createForDirectAccess(
+                $this->getPsrLogger()
+            );
+            $this->promServer->expose($endpoint);
+            $this->promServer->start(new class($this) implements RequestHandler {
+                public function __construct(
+                    private readonly MTProto $API
+                ) {
+                }
+                public function handleRequest(ServerRequest $request): ServerResponse
+                {
+                    return new ServerResponse(
+                        status: HttpStatus::OK,
+                        headers: ['Content-Type' => 'text/plain'],
+                        body: $this->API->renderPromStats(),
+                    );
+                }
+            }, new DefaultErrorHandler);
+        }
         $this->updateCtr = $this->getPromCounter("MadelineProto", "update_count", "Number of received updates since the session was created");
         // Start IPC server
         if (!$this->ipcServer) {
