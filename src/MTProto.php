@@ -938,7 +938,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'php_version' => PHP_VERSION,
             'php_version_id' => PHP_VERSION_ID,
             'madeline_version' => API::RELEASE,
-            'pid' => Magic::getPid() ?? 'unknown',
         ]);
         $endpoint = $this->getSettings()->getPrometheus()->getMetricsBindTo();
         $this->promServer?->stop();
