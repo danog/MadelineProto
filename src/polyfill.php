@@ -6,6 +6,10 @@ if (class_exists('\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray')) {
     return;
 }
 
+if (\PHP_OS_FAMILY === 'Windows') {
+    echo "WARNING: MadelineProto runs around 10x slower on windows due to OS and PHP limitations. Make sure to deploy MadelineProto in production only on Linux or Mac OS machines for maximum performance.".PHP_EOL;
+}
+
 use danog\AsyncOrm\Internal\Containers\CacheContainer;
 use danog\AsyncOrm\Internal\Driver\MysqlArray;
 use danog\AsyncOrm\Internal\Driver\PostgresArray;
