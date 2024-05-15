@@ -70,10 +70,11 @@ final class GarbageCollector
         }
         self::$started = true;
 
-        self::$prometheus = new BetterCollectorRegistry(new InMemory);
-        $promLabels = ['madeline_version' => API::RELEASE];
-        if (Magic::$pid !== null) {
-            $promLabels['pid'] = (string) Magic::$pid;
+        self::$prometheus = new BetterCollectorRegistry(new InMemory, false);
+        $promLabels = [];
+        $pid = Magic::getPid();
+        if ($pid !== null) {
+            $promLabels['pid'] = (string) $pid;
         }
 
         self::$alloc = self::$prometheus->registerGauge("", "php_memstats_alloc_bytes", "RAM allocated by the PHP memory pool", $promLabels);

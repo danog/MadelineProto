@@ -25,44 +25,64 @@ use danog\MadelineProto\SettingsAbstract;
 final class Prometheus extends SettingsAbstract
 {
     /**
-     * Whether to enable prometheus stat reporting for this session.
+     * Whether to enable prometheus stat collection for this session.
      */
-    protected bool $enablePrometheus = false;
+    protected bool $enableCollection = false;
     /**
      * Whether to expose prometheus metrics on the specified endpoint via HTTP.
      */
-    protected ?SocketAddress $prometheusEndpoint = null;
+    protected ?SocketAddress $metricsBindTo = null;
+    /**
+     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
+     */
+    protected bool $returnMetricsFromStartAndLoop = false;
 
     /**
-     * Whether to enable additional prometheus stat reporting for this session.
+     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
      */
-    public function setEnablePrometheus(bool $enable): self
+    public function setReturnMetricsFromStartAndLoop(bool $enable): self
     {
-        $this->enablePrometheus = $enable;
+        $this->returnMetricsFromStartAndLoop = $enable;
         return $this;
     }
     /**
-     * Whether additional prometheus stat reporting is enabled for this session.
+     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
      */
-    public function getEnablePrometheus(): bool
+    public function getReturnMetricsFromStartAndLoop(): bool
     {
-        return $this->enablePrometheus;
+        return $this->returnMetricsFromStartAndLoop;
+    }
+
+    /**
+     * Whether to enable additional prometheus stat collection for this session.
+     */
+    public function setEnableCollection(bool $enable): self
+    {
+        $this->enableCollection = $enable;
+        return $this;
+    }
+    /**
+     * Whether additional prometheus stat collection is enabled for this session.
+     */
+    public function getEnableCollection(): bool
+    {
+        return $this->enableCollection;
     }
 
     /**
      * Whether to expose prometheus metrics on the specified endpoint via HTTP.
      */
-    public function setPrometheusEndpoint(?SocketAddress $endpoint): self
+    public function setMetricsBindTo(?SocketAddress $metricsBindTo): self
     {
-        $this->prometheusEndpoint = $endpoint;
+        $this->metricsBindTo = $metricsBindTo;
         return $this;
     }
 
     /**
      * Whether to expose prometheus metrics on the specified endpoint via HTTP.
      */
-    public function getPrometheusEndpoint(): ?SocketAddress
+    public function getMetricsBindTo(): ?SocketAddress
     {
-        return $this->prometheusEndpoint;
+        return $this->metricsBindTo;
     }
 }

@@ -360,6 +360,11 @@ final class Magic
             return self::$can_getmypid = false;
         }
     }
+    public static function getPid(): ?int
+    {
+        self::isFork();
+        return self::$pid;
+    }
     /**
      * Get current working directory.
      */

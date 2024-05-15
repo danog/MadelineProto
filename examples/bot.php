@@ -45,6 +45,8 @@ use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
 use danog\MadelineProto\VoIP;
 
+use function Amp\Socket\SocketAddress\fromString;
+
 // MadelineProto is already loaded
 if (class_exists(API::class)) {
     // Otherwise, if a stable version of MadelineProto was installed via composer, load composer autoloader
@@ -309,6 +311,15 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Redis)->setDatabase(0)->setPassword('pony'));
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
+
+// You can also enable collection of prometheus metrics.
+// $settings->getPrometheus()->setEnableCollection(true);
+
+// Metrics can be returned by an autoconfigured http://127.0.0.1:12345 HTTP server.
+// $settings->getPrometheus()->setMetricsBindTo(fromString("127.0.0.1:12345"));
+
+// Metrics can also be returned by the current script via web, if called with a ?metrics query string
+// $settings->getPrometheus()->setReturnMetricsFromStartAndLoop(true);
 
 // For users or bots
 MyEventHandler::startAndLoop('bot.madeline', $settings);

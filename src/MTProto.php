@@ -543,7 +543,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): ?BetterGauge
     {
-        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterGauge(
@@ -563,7 +563,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): ?BetterCounter
     {
-        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterCounter(
@@ -584,7 +584,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): ?BetterSummary
     {
-        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterSummary(
@@ -607,7 +607,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): ?BetterHistogram
     {
-        if (!$this->getSettings()->getPrometheus()->getEnablePrometheus()) {
+        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterHistogram(
@@ -933,11 +933,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
-        $endpoint = $this->getSettings()->getPrometheus()->getPrometheusEndpoint();
+        $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
+        $info?->set(1, [
+            'php_version' => PHP_VERSION,
+            'php_version_id' => PHP_VERSION_ID,
+            'madeline_version' => API::RELEASE,
+            'pid' => Magic::getPid() ?? 'unknown',
+        ]);
+        $endpoint = $this->getSettings()->getPrometheus()->getMetricsBindTo();
         $this->promServer?->stop();
         if ($endpoint === null) {
             $this->promServer = null;
         } else {
+            /** @psalm-suppress ImpureMethodCall */
             $this->promServer = SocketHttpServer::createForDirectAccess(
                 $this->getPsrLogger()
             );
@@ -1309,6 +1317,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->logger->logger("The database settings have changed!", Logger::WARNING);
             $this->cleanupProperties();
             $this->settings->getDb()->applyChanges();
+        }
+        if ($this->settings->getPrometheus()->hasChanged()) {
+            $this->logger->logger("The prometheus settings have changed!", Logger::WARNING);
+            $this->cleanupProperties();
+            $this->settings->getPrometheus()->applyChanges();
         }
         if ($this->settings->getSerialization()->hasChanged()) {
             $this->logger->logger("The serialization settings have changed!", Logger::WARNING);
