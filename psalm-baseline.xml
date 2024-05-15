@@ -3100,7 +3100,6 @@
       <code><![CDATA[new PeerDatabase($this)]]></code>
     </DocblockTypeContradiction>
     <ImpureMethodCall>
-      <code><![CDATA[getPid]]></code>
       <code><![CDATA[load]]></code>
       <code><![CDATA[load]]></code>
       <code><![CDATA[updateDefault]]></code>
@@ -3114,12 +3113,6 @@
     <InvalidArgument>
       <code><![CDATA[$callbacks]]></code>
       <code><![CDATA[$callbacks]]></code>
-      <code><![CDATA[[
-            'php_version' => PHP_VERSION,
-            'php_version_id' => PHP_VERSION_ID,
-            'madeline_version' => API::RELEASE,
-            'pid' => Magic::getPid() ?? 'unknown',
-        ]]]></code>
     </InvalidArgument>
     <InvalidReturnStatement>
       <code><![CDATA[array_merge(

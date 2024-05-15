@@ -936,7 +936,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
         $info?->set(1, [
             'php_version' => PHP_VERSION,
-            'php_version_id' => PHP_VERSION_ID,
             'madeline_version' => API::RELEASE,
         ]);
         $endpoint = $this->getSettings()->getPrometheus()->getMetricsBindTo();
