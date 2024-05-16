@@ -125,7 +125,7 @@ final class WriteLoop extends Loop
                 $this->connection->outgoing_messages[$message_id] = $message;
                 $this->connection->new_outgoing[$message_id] = $message;
 
-                if ($message->getSent() === null) {
+                if ($message->getSent() === null && $message->isMethod) {
                     $this->connection->inFlightGauge?->inc([
                         'method' => $message->constructor,
                     ]);
@@ -376,7 +376,7 @@ final class WriteLoop extends Loop
                 if ($message->hasPromise()) {
                     $this->connection->new_outgoing[$message_id] = $message;
                 }
-                if ($message->getSent() === null) {
+                if ($message->getSent() === null && $message->isMethod) {
                     $this->connection->inFlightGauge?->inc([
                         'method' => $message->constructor,
                     ]);
