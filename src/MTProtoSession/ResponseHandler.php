@@ -281,8 +281,11 @@ trait ResponseHandler
                 'error_message' => 'OK',
                 'error_code' => '200',
             ]);
-            $this->requestLatencies?->observe(
-                (hrtime(true) - $request->getSent()) / 1_000_000_000.0,
+            $this->inFlightGauge->dec([
+                'method' => $request->constructor,
+            ]);
+            $this->requestLatencies->observe(
+                hrtime(true) - $request->getSent(),
                 ['method' => $request->constructor]
             );
         }
@@ -301,8 +304,11 @@ trait ResponseHandler
                 'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
                 'error_code' => (string) $response['error_code'],
             ]);
-            $this->requestLatencies?->observe(
-                (hrtime(true) - $request->getSent()) / 1_000_000_000.0,
+            $this->inFlightGauge->dec([
+                'method' => $request->constructor,
+            ]);
+            $this->requestLatencies->observe(
+                hrtime(true) - $request->getSent(),
                 ['method' => $request->constructor]
             );
         }

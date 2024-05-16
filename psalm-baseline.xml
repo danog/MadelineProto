@@ -3643,6 +3643,12 @@
       <code><![CDATA[$request->getSent()]]></code>
       <code><![CDATA[$request->getSent()]]></code>
     </PossiblyNullOperand>
+    <PossiblyNullReference>
+      <code><![CDATA[dec]]></code>
+      <code><![CDATA[dec]]></code>
+      <code><![CDATA[observe]]></code>
+      <code><![CDATA[observe]]></code>
+    </PossiblyNullReference>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>

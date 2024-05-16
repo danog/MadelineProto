@@ -44,6 +44,7 @@ trait Session
     use CallHandler;
     use Reliable;
     public ?BetterGauge $pendingOutgoingGauge = null;
+    public ?BetterGauge $inFlightGauge = null;
     public ?BetterCounter $incomingCtr = null;
     public ?BetterCounter $outgoingCtr = null;
     public ?BetterCounter $incomingBytesCtr = null;
@@ -185,12 +186,34 @@ trait Session
     {
         $labels = ['datacenter' => (string) $this->datacenter, 'connection' => (string) $this->id];
         $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages", "Number of not-yet sent outgoing MTProto messages", $labels);
+        $this->inFlightGauge = $this->API->getPromGauge("MadelineProto", "inflight_requests", "Number of in-flight requests", $labels);
         $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages", "Number of received MTProto messages", $labels);
         $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of sent MTProto messages", $labels);
         $this->incomingBytesCtr = $this->API->getPromCounter("MadelineProto", "incoming_bytes", "Number of received bytes", $labels);
         $this->outgoingBytesCtr = $this->API->getPromCounter("MadelineProto", "outgoing_bytes", "Number of sent bytes", $labels);
         $this->requestResponse = $this->API->getPromCounter("MadelineProto", "request_responses", "Received RPC error or success status of requests by method.", $labels);
-        $this->requestLatencies = $this->API->getPromHistogram("MadelineProto", "request_latencies", "Request latency by method", $labels);
+        $this->requestLatencies = $this->API->getPromHistogram(
+            "MadelineProto",
+            "request_latencies",
+            "Request latency in nanoseconds by method",
+            $labels,
+            [
+                5_000_000,
+                10_000_000,
+                25_000_000,
+                50_000_000,
+                75_000_000,
+                100_000_000,
+                250_000_000,
+                500_000_000,
+                750_000_000,
+                1000_000_000,
+                2500_000_000,
+                5000_000_000,
+                7500_000_000,
+                10000_000_000,
+            ]
+        );
         if ($this->session_id === null) {
             $this->resetSession("creating initial session");
         }
