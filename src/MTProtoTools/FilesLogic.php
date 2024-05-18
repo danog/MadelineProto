@@ -240,14 +240,7 @@ trait FilesLogic
         if ($result->shouldServe()) {
             $pipe = new Pipe(1024 * 1024);
             [$start, $end] = $result->getServeRange();
-            EventLoop::queue(function() use($messageMedia, &$pipe, $cb, $start, $end, $cancellation) {
-                try {
-                    $this->downloadToStream($messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
-                } catch (\Throwable $exception) {
-                    Logger::log($exception, Logger::ERROR);
-                }
-                $pipe->getSink()->close();
-            });
+            EventLoop::queue($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
             $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();
