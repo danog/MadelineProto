@@ -1140,10 +1140,10 @@ trait Files
             foreach ($params as $key => $param) {
                 $cancellation?->throwIfRequested();
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable, $cancellation);
+                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable, $cancellation)->ignore();
                 $previous_promise->map(static function (int $res) use (&$size): void {
                     $size += $res;
-                });
+                })->ignore();
                 $promises[] = $previous_promise;
                 if (\count($promises) === $parallel_chunks) {
                     // 20 mb at a time, for a typical bandwidth of 1gbps

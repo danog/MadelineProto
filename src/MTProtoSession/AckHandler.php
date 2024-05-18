@@ -98,7 +98,7 @@ trait AckHandler
     {
         $settings = $this->shared->getSettings();
         $global = $this->shared->getGenericSettings();
-        $dropTimeout = $global->getRpc()->getRpcDropTimeout();
+        $dropTimeout = (int)($global->getRpc()->getRpcDropTimeout() * 1_000_000_000.0);
         $timeout = (int) ($settings->getTimeout() * 1_000_000_000.0);
         $pfs = $global->getAuth()->getPfs();
         $unencrypted = !$this->shared->hasTempAuthKey();
@@ -122,6 +122,7 @@ trait AckHandler
                     continue;
                 }
                 if ($message->getSent() + $dropTimeout < hrtime(true)) {
+                    Logger::log('No reply for message: ' . $message, Logger::WARNING);
                     $this->handleReject($message, static fn () => new TimeoutException('Request timeout'));
                     continue;
                 }
