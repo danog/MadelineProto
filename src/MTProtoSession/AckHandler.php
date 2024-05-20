@@ -98,7 +98,7 @@ trait AckHandler
     {
         $settings = $this->shared->getSettings();
         $global = $this->shared->getGenericSettings();
-        $dropTimeout = (int)($global->getRpc()->getRpcDropTimeout() * 1_000_000_000.0);
+        $dropTimeout = (int) ($global->getRpc()->getRpcDropTimeout() * 1_000_000_000.0);
         $timeout = (int) ($settings->getTimeout() * 1_000_000_000.0);
         $pfs = $global->getAuth()->getPfs();
         $unencrypted = !$this->shared->hasTempAuthKey();
