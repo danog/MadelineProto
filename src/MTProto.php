@@ -935,6 +935,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private function cleanupProperties(): void
     {
+        if ($this->getSettings()->getMetrics()->getEnableMemprofCollection()) {
+            if (!\extension_loaded('memprof')) {
+                throw Exception::extension('memprof');
+            }
+            if (!memprof_enabled()) {
+                throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
+            }
+        }
         $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
         $info?->set(1, [
             'php_version' => PHP_VERSION,
@@ -964,7 +972,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                             body: $this->API->renderPromStats(),
                         );
                     }
-                    if ($request->getUri()->getPath() === '/debug/pprof') {
+                    if ($request->getUri()->getPath() === '/debug/pprof'
+                        && $this->API->getSettings()->getMetrics()->getEnableMemprofCollection()
+                    ) {
                         return new ServerResponse(
                             status: HttpStatus::OK,
                             headers: ['Content-Type' => 'text/plain'],

@@ -316,6 +316,7 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->getMetrics()->setEnablePrometheusCollection(true);
 
 // You can also enable collection of additional memory profiling metrics.
+// Note: you must also set the MEMPROF_PROFILE=1 environment variable or GET parameter.
 // $settings->getMetrics()->setEnableMemprofCollection(true);
 
 // Metrics can be returned by an autoconfigured http://127.0.0.1:12345 HTTP server.
