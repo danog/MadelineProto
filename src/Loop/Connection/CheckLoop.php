@@ -56,7 +56,7 @@ final class CheckLoop extends Loop
             return self::PAUSE;
         }
         if (!$this->connection->hasPendingCalls()) {
-            return $this->timeout;
+            return $this->timeoutSeconds;
         }
         if ($this->shared->hasTempAuthKey()) {
             $full_message_ids = $this->connection->getPendingCalls();
@@ -151,7 +151,7 @@ final class CheckLoop extends Loop
                 }
             }
         }
-        return $this->timeout;
+        return $this->timeoutSeconds;
     }
     /**
      * Loop name.

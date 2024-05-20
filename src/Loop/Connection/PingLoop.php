@@ -67,7 +67,7 @@ final class PingLoop extends Loop
                 $this->API->logger((string) $e);
             }
         });
-        return $this->timeout;
+        return $this->timeoutSeconds;
     }
     /**
      * Get loop name.
