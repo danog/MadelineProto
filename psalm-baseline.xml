@@ -2666,6 +2666,7 @@
       <code><![CDATA[CheckLoop]]></code>
       <code><![CDATA[CheckLoop]]></code>
       <code><![CDATA[CheckLoop]]></code>
+      <code><![CDATA[CheckLoop]]></code>
     </PropertyNotSetInConstructor>
     <UninitializedProperty>
       <code><![CDATA[$this->API]]></code>
@@ -2673,6 +2674,7 @@
   </file>
   <file src="src/Loop/Connection/CleanupLoop.php">
     <PropertyNotSetInConstructor>
+      <code><![CDATA[CleanupLoop]]></code>
       <code><![CDATA[CleanupLoop]]></code>
       <code><![CDATA[CleanupLoop]]></code>
       <code><![CDATA[CleanupLoop]]></code>
@@ -2696,6 +2698,7 @@
       <code><![CDATA[getSettings]]></code>
     </PossiblyNullReference>
     <PropertyNotSetInConstructor>
+      <code><![CDATA[PingLoop]]></code>
       <code><![CDATA[PingLoop]]></code>
       <code><![CDATA[PingLoop]]></code>
       <code><![CDATA[PingLoop]]></code>
@@ -3320,10 +3323,6 @@
       <code><![CDATA[\is_int($dc_id)]]></code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
-    <UndefinedFunction>
-      <code><![CDATA[memprof_dump_pprof($file)]]></code>
-      <code><![CDATA[memprof_enabled()]]></code>
-    </UndefinedFunction>
     <UnsupportedReferenceUsage>
       <code><![CDATA[Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()]]]></code>
     </UnsupportedReferenceUsage>
@@ -4194,7 +4193,6 @@
     </MixedArgument>
     <MixedArgumentTypeCoercion>
       <code><![CDATA[$cb]]></code>
-      <code><![CDATA[$result->getHeaders()]]></code>
     </MixedArgumentTypeCoercion>
     <MixedAssignment>
       <code><![CDATA[$file]]></code>
@@ -4804,8 +4802,6 @@
       <code><![CDATA[$length]]></code>
       <code><![CDATA[$seek_end]]></code>
       <code><![CDATA[$size]]></code>
-      <code><![CDATA[$subValue]]></code>
-      <code><![CDATA[$value]]></code>
     </MixedAssignment>
     <MixedOperand>
       <code><![CDATA[$seek_end]]></code>
