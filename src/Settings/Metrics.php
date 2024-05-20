@@ -20,25 +20,30 @@ use Amp\Socket\SocketAddress;
 use danog\MadelineProto\SettingsAbstract;
 
 /**
- * Prometheus settings.
+ * Metric settings.
  */
-final class Prometheus extends SettingsAbstract
+final class Metrics extends SettingsAbstract
 {
     /**
-     * Whether to enable prometheus stat collection for this session.
+     * Whether to enable additional prometheus stat collection for this session.
      */
-    protected bool $enableCollection = false;
+    protected bool $enablePrometheusCollection = false;
     /**
-     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     * Whether to enable memprof memory stat collection for this session.
+     */
+    protected bool $enableMemprofCollection = false;
+
+    /**
+     * Whether to expose metrics on the specified endpoint via HTTP.
      */
     protected ?SocketAddress $metricsBindTo = null;
     /**
-     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
+     * Whether to expose metrics with startAndLoop, by providing a ?metrics or ?pprof query string.
      */
     protected bool $returnMetricsFromStartAndLoop = false;
 
     /**
-     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
+     * Whether to expose prometheus/memprof metrics with startAndLoop, by providing a ?metrics or ?pprof query string.
      */
     public function setReturnMetricsFromStartAndLoop(bool $enable): self
     {
@@ -46,7 +51,7 @@ final class Prometheus extends SettingsAbstract
         return $this;
     }
     /**
-     * Whether to expose prometheus metrics with startAndLoop, by providing a ?metrics query string.
+     * Whether to expose prometheus/memprof metrics with startAndLoop, by providing a ?metrics or ?pprof query string.
      */
     public function getReturnMetricsFromStartAndLoop(): bool
     {
@@ -56,21 +61,37 @@ final class Prometheus extends SettingsAbstract
     /**
      * Whether to enable additional prometheus stat collection for this session.
      */
-    public function setEnableCollection(bool $enable): self
+    public function setEnablePrometheusCollection(bool $enable): self
     {
-        $this->enableCollection = $enable;
+        $this->enablePrometheusCollection = $enable;
         return $this;
     }
     /**
      * Whether additional prometheus stat collection is enabled for this session.
      */
-    public function getEnableCollection(): bool
+    public function getEnablePrometheusCollection(): bool
     {
-        return $this->enableCollection;
+        return $this->enablePrometheusCollection;
     }
 
     /**
-     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     * Whether to enable memprof memory stat collection for this session.
+     */
+    public function setEnableMemprofCollection(bool $enable): self
+    {
+        $this->enableMemprofCollection = $enable;
+        return $this;
+    }
+    /**
+     * Whether to enable memprof memory stat collection for this session.
+     */
+    public function getEnableMemprofCollection(): bool
+    {
+        return $this->enableMemprofCollection;
+    }
+
+    /**
+     * Whether to expose metrics on the specified endpoint via HTTP.
      */
     public function setMetricsBindTo(?SocketAddress $metricsBindTo): self
     {
@@ -79,7 +100,7 @@ final class Prometheus extends SettingsAbstract
     }
 
     /**
-     * Whether to expose prometheus metrics on the specified endpoint via HTTP.
+     * Whether to expose metrics on the specified endpoint via HTTP.
      */
     public function getMetricsBindTo(): ?SocketAddress
     {

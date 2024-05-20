@@ -31,7 +31,7 @@ use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Filter\FilterAllowAll;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\Settings\Prometheus;
+use danog\MadelineProto\Settings\Metrics;
 use Generator;
 use PhpParser\Node\Name;
 use ReflectionAttribute;
@@ -130,16 +130,19 @@ abstract class EventHandler extends AbstractAPI
         self::cachePlugins(static::class);
         $settings ??= new SettingsEmpty;
         $API = new API($session, $settings);
-        $prometheus = false;
         if ($settings instanceof Settings) {
-            $settings = $settings->getPrometheus();
+            $settings = $settings->getMetrics();
         }
-        if ($settings instanceof Prometheus) {
-            $prometheus = $settings->getReturnMetricsFromStartAndLoop();
-        }
-        if (isset($_GET['metrics']) && $prometheus) {
-            Tools::closeConnection($API->renderPromStats());
-            return;
+        if ($settings instanceof Metrics
+            && $settings->getReturnMetricsFromStartAndLoop()
+        ) {
+            if (isset($_GET['metrics'])) {
+                Tools::closeConnection($API->renderPromStats());
+                return;
+            } elseif (isset($_GET['pprof'])) {
+                Tools::closeConnection($API->getMemoryProfile());
+                return;
+            }
         }
         $API->startAndLoopInternal(static::class);
     }

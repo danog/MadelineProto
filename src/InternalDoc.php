@@ -940,6 +940,13 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::getMaxMaps();
     }
     /**
+     * Get memory profile with memprof.
+     */
+    final public function getMemoryProfile(): string
+    {
+        return $this->wrapper->getAPI()->getMemoryProfile();
+    }
+    /**
      * Get TL namespaces.
      */
     final public function getMethodNamespaces(): array

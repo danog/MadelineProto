@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableBuffer;
 use Amp\Cache\Cache;
 use Amp\Cache\LocalCache;
 use Amp\Cancellation;
@@ -65,6 +66,7 @@ use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
+use danog\MadelineProto\MTProtoTools\ResponseInfo;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\TLSchema;
@@ -543,7 +545,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): ?BetterGauge
     {
-        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
+        if (!$this->getSettings()->getMetrics()->getEnablePrometheusCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterGauge(
@@ -563,7 +565,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): ?BetterCounter
     {
-        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
+        if (!$this->getSettings()->getMetrics()->getEnablePrometheusCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterCounter(
@@ -584,7 +586,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): ?BetterSummary
     {
-        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
+        if (!$this->getSettings()->getMetrics()->getEnablePrometheusCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterSummary(
@@ -607,7 +609,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): ?BetterHistogram
     {
-        if (!$this->getSettings()->getPrometheus()->getEnableCollection()) {
+        if (!$this->getSettings()->getMetrics()->getEnablePrometheusCollection()) {
             return null;
         }
         return GarbageCollector::$prometheus->getOrRegisterHistogram(
@@ -938,7 +940,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'php_version' => PHP_VERSION,
             'madeline_version' => API::RELEASE,
         ]);
-        $endpoint = $this->getSettings()->getPrometheus()->getMetricsBindTo();
+        $endpoint = $this->getSettings()->getMetrics()->getMetricsBindTo();
         $this->promServer?->stop();
         if ($endpoint === null) {
             $this->promServer = null;
@@ -955,10 +957,25 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 }
                 public function handleRequest(ServerRequest $request): ServerResponse
                 {
+                    if ($request->getUri()->getPath() === '/metrics') {
+                        return new ServerResponse(
+                            status: HttpStatus::OK,
+                            headers: ['Content-Type' => 'text/plain'],
+                            body: $this->API->renderPromStats(),
+                        );
+                    }
+                    if ($request->getUri()->getPath() === '/debug/pprof') {
+                        return new ServerResponse(
+                            status: HttpStatus::OK,
+                            headers: ['Content-Type' => 'text/plain'],
+                            body: $this->API->getMemoryProfile(),
+                        );
+                    }
+                    $result = ResponseInfo::error(HttpStatus::NOT_FOUND);
                     return new ServerResponse(
-                        status: HttpStatus::OK,
-                        headers: ['Content-Type' => 'text/plain'],
-                        body: $this->API->renderPromStats(),
+                        $result->getCode(),
+                        $result->getHeaders(),
+                        $result->getCodeExplanation()
                     );
                 }
             }, new DefaultErrorHandler);
@@ -1317,10 +1334,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->cleanupProperties();
             $this->settings->getDb()->applyChanges();
         }
-        if ($this->settings->getPrometheus()->hasChanged()) {
+        if ($this->settings->getMetrics()->hasChanged()) {
             $this->logger->logger("The prometheus settings have changed!", Logger::WARNING);
             $this->cleanupProperties();
-            $this->settings->getPrometheus()->applyChanges();
+            $this->settings->getMetrics()->applyChanges();
         }
         if ($this->settings->getSerialization()->hasChanged()) {
             $this->logger->logger("The serialization settings have changed!", Logger::WARNING);
@@ -1900,9 +1917,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
     }
     /**
-     * Report memory profile with memprof.
+     * Get memory profile with memprof.
      */
-    public function reportMemoryProfile(): void
+    public function getMemoryProfile(): string
     {
         if (!\extension_loaded('memprof')) {
             throw Exception::extension('memprof');
@@ -1910,14 +1927,24 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!memprof_enabled()) {
             throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
         }
-
-        $current = "Current memory usage: ".round(memory_get_usage()/1024/1024, 1) . " MB";
         $file = fopen('php://memory', 'r+');
         memprof_dump_pprof($file);
         fseek($file, 0);
+
+        return stream_get_contents($file);
+    }
+
+    /**
+     * Report memory profile with memprof.
+     */
+    public function reportMemoryProfile(): void
+    {
+        $pprof = $this->getMemoryProfile();
+
+        $current = "Current memory usage: ".round(memory_get_usage()/1024/1024, 1) . " MB";
         $file = [
             '_' => 'inputMediaUploadedDocument',
-            'file' => $file,
+            'file' => new ReadableBuffer($pprof),
             'attributes' => [
                 ['_' => 'documentAttributeFilename', 'file_name' => 'report.pprof'],
             ],

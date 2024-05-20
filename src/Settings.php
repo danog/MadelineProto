@@ -24,8 +24,8 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 use danog\MadelineProto\Settings\Files;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Settings\Logger;
+use danog\MadelineProto\Settings\Metrics;
 use danog\MadelineProto\Settings\Peer;
-use danog\MadelineProto\Settings\Prometheus;
 use danog\MadelineProto\Settings\RPC;
 use danog\MadelineProto\Settings\SecretChats;
 use danog\MadelineProto\Settings\Serialization;
@@ -55,9 +55,9 @@ final class Settings extends SettingsAbstract
      */
     protected Files $files;
     /**
-     * Prometheus settings.
+     * Metrics settings.
      */
-    protected Prometheus $prometheus;
+    protected Metrics $metrics;
     /**
      * IPC server settings.
      */
@@ -110,7 +110,7 @@ final class Settings extends SettingsAbstract
         $this->files = new Files;
         $this->logger = new Logger;
         $this->peer = new Peer;
-        $this->prometheus = new Prometheus;
+        $this->metrics = new Metrics;
         $this->rpc = new RPC;
         $this->secretChats = new SecretChats;
         $this->serialization = new Serialization;
@@ -125,8 +125,8 @@ final class Settings extends SettingsAbstract
         if (!isset($this->voip)) {
             $this->voip = new VoIP;
         }
-        if (!isset($this->prometheus)) {
-            $this->prometheus = new Prometheus;
+        if (!isset($this->metrics)) {
+            $this->metrics = new Metrics;
         }
     }
     /**
@@ -145,8 +145,8 @@ final class Settings extends SettingsAbstract
                 $this->connection->merge($settings);
             } elseif ($settings instanceof Files) {
                 $this->files->merge($settings);
-            } elseif ($settings instanceof Prometheus) {
-                $this->prometheus->merge($settings);
+            } elseif ($settings instanceof Metrics) {
+                $this->metrics->merge($settings);
             } elseif ($settings instanceof Logger) {
                 $this->logger->merge($settings);
             } elseif ($settings instanceof Peer) {
@@ -178,7 +178,7 @@ final class Settings extends SettingsAbstract
         $this->auth->merge($settings->auth);
         $this->connection->merge($settings->connection);
         $this->files->merge($settings->files);
-        $this->prometheus->merge($settings->prometheus);
+        $this->metrics->merge($settings->metrics);
         $this->logger->merge($settings->logger);
         $this->peer->merge($settings->peer);
         $this->rpc->merge($settings->rpc);
@@ -277,21 +277,21 @@ final class Settings extends SettingsAbstract
     }
 
     /**
-     * Get prometheus settings.
+     * Get metrics settings.
      */
-    public function getPrometheus(): Prometheus
+    public function getMetrics(): Metrics
     {
-        return $this->prometheus;
+        return $this->metrics;
     }
 
     /**
-     * Set prometheus settings.
+     * Set metrics settings.
      *
-     * @param Prometheus $prometheus File management settings.
+     * @param Metrics $metrics File management settings.
      */
-    public function setPrometheus(Prometheus $prometheus): self
+    public function setMetrics(Metrics $metrics): self
     {
-        $this->prometheus = $prometheus;
+        $this->metrics = $metrics;
 
         return $this;
     }

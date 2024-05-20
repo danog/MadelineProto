@@ -49,6 +49,8 @@ final class ResponseInfo
     private int $code = HttpStatus::OK;
     /**
      * Header array.
+     *
+     * @var array<non-empty-string, string|list<string>>
      */
     private array $headers = [];
     /**
@@ -124,7 +126,7 @@ final class ResponseInfo
         } elseif ($size > 0) {
             $this->headers['Content-Length'] = (string) $size;
         }
-        $this->headers['Content-Type'] = $messageMedia['mime'];
+        $this->headers['Content-Type'] = (string) $messageMedia['mime'];
         $this->headers['Cache-Control'] = 'max-age=31556926';
         $this->headers['Content-Transfer-Encoding'] = 'Binary';
         $this->headers['Accept-Ranges'] = 'bytes';
@@ -207,7 +209,7 @@ final class ResponseInfo
     /**
      * Get header array.
      *
-     * @return array Header array
+     * @return array<non-empty-string, string|list<string>> Header array
      */
     public function getHeaders(): array
     {
