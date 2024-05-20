@@ -312,14 +312,27 @@ $settings->getLogger()->setLevel(Logger::LEVEL_ULTRA_VERBOSE);
 // $settings->setDb((new Postgres)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 // $settings->setDb((new Mysql)->setDatabase('MadelineProto')->setUsername('daniil')->setPassword('pony'));
 
-// You can also enable collection of prometheus metrics.
-// $settings->getPrometheus()->setEnableCollection(true);
+// You can also enable collection of additional prometheus metrics.
+// $settings->getMetrics()->setEnablePrometheusCollection(true);
+
+// You can also enable collection of additional memory profiling metrics.
+// $settings->getMetrics()->setEnableMemprofCollection(true);
 
 // Metrics can be returned by an autoconfigured http://127.0.0.1:12345 HTTP server.
-// $settings->getPrometheus()->setMetricsBindTo(fromString("127.0.0.1:12345"));
+//
+// Endpoints:
+//
+// /metrics - Prometheus metrics
+// /debug/pprof - PProf memory profile for pyroscope
+//
+// $settings->getMetrics()->setMetricsBindTo(fromString("127.0.0.1:12345"));
 
-// Metrics can also be returned by the current script via web, if called with a ?metrics query string
-// $settings->getPrometheus()->setReturnMetricsFromStartAndLoop(true);
+// Metrics can also be returned by the current script via web, if called with a specific query string:
+//
+// ?metrics - Prometheus metrics
+// ?pprof - PProf memory profile for pyroscope
+//
+// $settings->getMetrics()->setReturnMetricsFromStartAndLoop(true);
 
 // For users or bots
 MyEventHandler::startAndLoop('bot.madeline', $settings);

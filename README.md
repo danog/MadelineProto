@@ -589,6 +589,7 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getLogger" name="getLogger">Get logger: getLogger</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getMaxMaps" name="getMaxMaps">Get maximum number of memory-mapped regions, UNIX only: getMaxMaps</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/account.getAutoDownloadSettings.html" name="account.getAutoDownloadSettings">Get media autodownload settings: account.getAutoDownloadSettings</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getMemoryProfile" name="getMemoryProfile">Get memory profile with memprof: getMemoryProfile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getSplitRanges.html" name="messages.getSplitRanges">Get message ranges for saving the user's chat history: messages.getSplitRanges</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessageReactionsList.html" name="messages.getMessageReactionsList">Get message reaction list, along with the sender of each reaction: messages.getMessageReactionsList</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMessagesReactions.html" name="messages.getMessagesReactions">Get message reactions »: messages.getMessagesReactions</a>
