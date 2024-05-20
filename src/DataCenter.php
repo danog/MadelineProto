@@ -186,15 +186,16 @@ final class DataCenter
      */
     private function generateContexts(int $dc_number): ContextIterator
     {
-        $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
-        $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
+        $settings = $this->getSettings();
+        $test = $settings->getTestMode() ? 'test' : 'main';
+        $ipv6 = $settings->getIpv6() ? 'ipv6' : 'ipv4';
         if (!isset($this->API->dcList[$test][$ipv6][$dc_number])) {
             throw new AssertionError("No info for DC $dc_number!");
         }
 
         $ctxs = [];
         $combos = [];
-        $default = match ($this->getSettings()->getProtocol()) {
+        $default = match ($settings->getProtocol()) {
             AbridgedStream::class =>
                 [[DefaultStream::class, []], [BufferedRawStream::class, []], [AbridgedStream::class, []]],
             IntermediateStream::class =>
@@ -210,13 +211,13 @@ final class DataCenter
             UdpBufferedStream::class =>
                 [[DefaultStream::class, []], [UdpBufferedStream::class, []]],
         };
-        if ($this->getSettings()->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
+        if ($settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
         }
         if (!\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
-            switch ($this->getSettings()->getTransport()) {
+            switch ($settings->getTransport()) {
                 case DefaultStream::class:
-                    if ($this->getSettings()->getObfuscated()) {
+                    if ($settings->getObfuscated()) {
                         $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
                     }
                     break;
@@ -241,7 +242,7 @@ final class DataCenter
             }
         }
         $proxyCombos = [];
-        foreach ($this->getSettings()->getProxies() as $proxy => $extras) {
+        foreach ($settings->getProxies() as $proxy => $extras) {
             foreach ($extras as $extra) {
                 if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
                     $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
@@ -273,7 +274,7 @@ final class DataCenter
                 }
             }
         }
-        if ($this->getSettings()->getRetry()) {
+        if ($settings->getRetry()) {
             $combos = array_merge($proxyCombos, $combos);
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
         } elseif ($proxyCombos) {
@@ -281,19 +282,19 @@ final class DataCenter
         }
         $combos = array_unique($combos, SORT_REGULAR);
 
-        $bind = self::normalizeBindToOption($this->getSettings()->getBindTo());
+        $bind = self::normalizeBindToOption($settings->getBindTo());
         $onlyIPv6 = null;
         if ($bind !== null) {
             $onlyIPv6 = InternetAddress::fromString($bind)->getVersion() === InternetAddressVersion::IPv6
                 ? 'ipv6'
                 : 'ipv4';
         }
-        $context = (new ConnectContext())->withConnectTimeout($this->getSettings()->getTimeout())->withBindTo($bind);
+        $context = (new ConnectContext())->withConnectTimeout($settings->getTimeout())->withBindTo($bind);
         foreach ($combos as $combo) {
             foreach ([true, false] as $useDoH) {
                 $ipv6Combos = [
-                    $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4',
-                    $this->getSettings()->getIpv6() ? 'ipv4' : 'ipv6',
+                    $settings->getIpv6() ? 'ipv6' : 'ipv4',
+                    $settings->getIpv6() ? 'ipv4' : 'ipv6',
                 ];
                 foreach ($ipv6Combos as $ipv6) {
                     if ($onlyIPv6 !== null && $onlyIPv6 !== $ipv6) {
@@ -310,14 +311,14 @@ final class DataCenter
                     foreach (array_unique([$port, 443, 80, 88, 5222]) as $port) {
                         $stream = end($combo)[0];
                         if ($stream === HttpsStream::class) {
-                            $subdomain = $this->getSettings()->getSslSubdomains()[abs($dc_number)] ?? null;
+                            $subdomain = $settings->getSslSubdomains()[abs($dc_number)] ?? null;
                             if (!$subdomain) {
                                 continue;
                             }
                             if (DataCenter::isMedia($dc_number)) {
                                 $subdomain .= '-1';
                             }
-                            $path = $this->getSettings()->getTestMode() ? 'apiw_test1' : 'apiw1';
+                            $path = $settings->getTestMode() ? 'apiw_test1' : 'apiw1';
                             $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                         } elseif ($stream === HttpStream::class) {
                             $uri = 'tcp://'.$address.':'.$port.'/api';
@@ -337,17 +338,17 @@ final class DataCenter
                             if (\in_array($stream[0], [WsStream::class, WssStream::class], true) && $stream[1] === []) {
                                 $stream[1] = $this->dohWrapper->webSocketConnector;
                                 if ($stream[0] === WssStream::class) {
-                                    $subdomain = $this->getSettings()->getSslSubdomains()[abs($dc_number)] ?? null;
+                                    $subdomain = $settings->getSslSubdomains()[abs($dc_number)] ?? null;
                                     if (!$subdomain) {
                                         continue;
                                     }
                                     if (DataCenter::isMedia($dc_number)) {
                                         $subdomain .= '-1';
                                     }
-                                    $path = $this->getSettings()->getTestMode() ? 'apiws_test' : 'apiws';
+                                    $path = $settings->getTestMode() ? 'apiws_test' : 'apiws';
                                     $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
                                 } else {
-                                    $path = $this->getSettings()->getTestMode() ? 'apiws_test' : 'apiws';
+                                    $path = $settings->getTestMode() ? 'apiws_test' : 'apiws';
                                     $uri = 'tcp://'.$address.':'.$port.'/'.$path;
                                 }
                                 $ctx->setUri($uri);

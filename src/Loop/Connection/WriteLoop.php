@@ -325,7 +325,7 @@ final class WriteLoop extends Loop
             if ($count > 1 || $has_seq) {
                 $this->API->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
-                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container(array_values($keys));
+                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container($this->connection, array_values($keys));
                 $this->connection->outgoingCtr?->inc();
                 $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                 $keys[$this->connection->pendingOutgoingKey++] = $message_id;

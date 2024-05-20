@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+use danog\MadelineProto\Connection;
+
 /**
  * Outgoing container message.
  *
@@ -39,10 +41,10 @@ final class Container extends MTProtoOutgoingMessage
      *
      * @param list<int> $ids
      */
-    public function __construct(array $ids)
+    public function __construct(Connection $connection, array $ids)
     {
         $this->ids = $ids;
-        parent::__construct([], 'msg_container', '', false, false);
+        parent::__construct($connection, [], 'msg_container', '', false, false);
     }
     /**
      * Get message IDs.
