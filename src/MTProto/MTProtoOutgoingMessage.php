@@ -129,12 +129,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     ) {
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
-        if ($isMethod) {
-            $connection->inFlightGauge?->inc([
-                'method' => $this->constructor,
-            ]);
-        }
-
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(static fn () => throw $e));
     }
