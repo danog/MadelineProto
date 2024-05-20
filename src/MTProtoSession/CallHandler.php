@@ -164,6 +164,7 @@ trait CallHandler
             $encrypted = true;
         }
         $message = new MTProtoOutgoingMessage(
+            connection: $this,
             body: $args,
             constructor: $method,
             type: $methodInfo['type'],
@@ -198,6 +199,7 @@ trait CallHandler
     {
         $this->sendMessage(
             new MTProtoOutgoingMessage(
+                connection: $this,
                 body: $args,
                 constructor: $object,
                 type: '',

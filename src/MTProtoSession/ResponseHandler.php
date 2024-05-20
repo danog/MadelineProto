@@ -275,20 +275,11 @@ trait ResponseHandler
         }
         $this->gotResponseForOutgoingMessage($request);
 
-        if ($this->requestResponse !== null) {
-            $this->requestResponse->inc([
-                'method' => $request->constructor,
-                'error_message' => 'OK',
-                'error_code' => '200',
-            ]);
-            $this->inFlightGauge->dec([
-                'method' => $request->constructor,
-            ]);
-            $this->requestLatencies->observe(
-                hrtime(true) - $request->getSent(),
-                ['method' => $request->constructor]
-            );
-        }
+        $this->requestResponse?->inc([
+            'method' => $request->constructor,
+            'error_message' => 'OK',
+            'error_code' => '200',
+        ]);
 
         EventLoop::queue($request->reply(...), $response);
     }
@@ -298,20 +289,12 @@ trait ResponseHandler
      */
     private function handleRpcError(MTProtoOutgoingMessage $request, array $response): ?callable
     {
-        if ($this->requestResponse !== null) {
-            $this->requestResponse->inc([
-                'method' => $request->constructor,
-                'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
-                'error_code' => (string) $response['error_code'],
-            ]);
-            $this->inFlightGauge->dec([
-                'method' => $request->constructor,
-            ]);
-            $this->requestLatencies->observe(
-                hrtime(true) - $request->getSent(),
-                ['method' => $request->constructor]
-            );
-        }
+        $this->requestResponse?->inc([
+            'method' => $request->constructor,
+            'error_message' => preg_replace('/\d+/', 'X', $response['error_message']),
+            'error_code' => (string) $response['error_code'],
+        ]);
+
         if ($request->isMethod
             && $request->constructor !== 'auth.bindTempAuthKey'
             && $this->shared->hasTempAuthKey()

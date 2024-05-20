@@ -24,6 +24,7 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Exception;
 use Revolt\EventLoop;
 use Throwable;
@@ -103,6 +104,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * @param boolean                 $unencrypted Is this an unencrypted message?
      */
     public function __construct(
+        private readonly Connection $connection,
         private ?array $body,
         public readonly string $constructor,
         public readonly string $type,
@@ -126,6 +128,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly ?Cancellation $cancellation = null
     ) {
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
+
+        if ($isMethod) {
+            $connection->inFlightGauge?->inc([
+                'method' => $this->constructor,
+            ]);
+        }
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(static fn () => throw $e));
@@ -154,8 +162,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     public function sent(): void
     {
-        if ($this->state & self::STATE_REPLIED) {
-            //throw new Exception("Trying to resend already replied message $this!");
+        if ($this->sent === null && $this->isMethod) {
+            $this->connection->inFlightGauge?->inc([
+                'method' => $this->constructor,
+            ]);
         }
         $this->state |= self::STATE_SENT;
         $this->sent = hrtime(true);
@@ -177,12 +187,22 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             // It can happen, no big deal
             return;
         }
-        $this->serializedBody = null;
-        $this->body = null;
-
         if (!($this->state & self::STATE_SENT)) {
             $this->sent();
         }
+
+        if ($this->isMethod) {
+            $this->connection->inFlightGauge?->dec([
+                'method' => $this->constructor,
+            ]);
+            $this->connection->requestLatencies?->observe(
+                hrtime(true) - $this->sent,
+                ['method' => $this->constructor]
+            );
+        }
+
+        $this->serializedBody = null;
+        $this->body = null;
 
         $this->state |= self::STATE_REPLIED;
         if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors
