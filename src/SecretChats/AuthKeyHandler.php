@@ -233,8 +233,9 @@ trait AuthKeyHandler
      * Discard secret chat.
      *
      * @param int $chat Secret chat ID
+     * @param bool $deleteHistory If true, deletes the entire chat history for the other user as well.
      */
-    public function discardSecretChat(int $chat): void
+    public function discardSecretChat(int $chat, bool $deleteHistory = false): void
     {
         $this->logger->logger('Discarding secret chat '.$chat.'...', Logger::VERBOSE);
         if (isset($this->secretChats[$chat])) {
@@ -244,7 +245,7 @@ trait AuthKeyHandler
             unset($this->temp_requested_secret_chats[$chat]);
         }
         try {
-            $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat]);
+            $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat, 'delete_history' => $deleteHistory]);
         } catch (RPCErrorException $e) {
             if ($e->rpc !== 'ENCRYPTION_ALREADY_DECLINED') {
                 throw $e;

@@ -422,10 +422,11 @@ abstract class InternalDoc
      * Discard secret chat.
      *
      * @param int $chat Secret chat ID
+     * @param bool $deleteHistory If true, deletes the entire chat history for the other user as well.
      */
-    final public function discardSecretChat(int $chat): void
+    final public function discardSecretChat(int $chat, bool $deleteHistory = false): void
     {
-        $this->wrapper->getAPI()->discardSecretChat($chat);
+        $this->wrapper->getAPI()->discardSecretChat($chat, $deleteHistory);
     }
     /**
      * Downloads a file to the browser using the specified session file.
