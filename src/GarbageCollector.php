@@ -90,7 +90,7 @@ final class GarbageCollector
             }
         }));
 
-        if (!\defined('MADELINE_RELEASE_URL')) {
+        if (!\defined('MADELINE_RELEASE_URL') || \defined('MADELINEPROTO_TEST')) {
             return;
         }
         $client = HttpClientBuilder::buildDefault();
