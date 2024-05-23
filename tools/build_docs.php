@@ -336,7 +336,7 @@ $readme = implode('## ', $readme);
 file_put_contents('README.md', $readme);
 file_put_contents('docs/docs/index.md', '---
 title: MadelineProto
-description: PHP client/server for the telegram MTProto protocol (a better tg-cli)
+description: Async PHP client API for the telegram MTProto protocol
 nav_order: 1
 image: https://docs.madelineproto.xyz/favicons/android-chrome-256x256.png
 ---
