@@ -118,6 +118,9 @@ trait AckHandler
                     continue;
                 }
                 if ($message->constructor === 'msgs_state_req' || $message->constructor === 'ping_delay_disconnect') {
+                    if ($message->constructor === 'msgs_state_req') {
+                        $message->reply(static fn () => new TimeoutException('Request timeout'));
+                    }
                     unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     continue;
                 }
