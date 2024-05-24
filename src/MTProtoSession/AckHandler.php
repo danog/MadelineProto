@@ -117,14 +117,9 @@ trait AckHandler
                 if (!$unencrypted && $pfsNotBound && $message->constructor !== 'auth.bindTempAuthKey') {
                     continue;
                 }
-                if ($message->constructor === 'msgs_state_req' || $message->constructor === 'ping_delay_disconnect') {
-                    if ($message->constructor === 'msgs_state_req') {
-                        $message->reply(static fn () => new TimeoutException('Request timeout'));
-                    }
-                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
-                    continue;
-                }
-                if ($message->getSent() + $dropTimeout < hrtime(true)) {
+                if ($message->constructor === 'msgs_state_req' || $message->constructor === 'ping_delay_disconnect'
+                    || ($message->getSent() + $dropTimeout < hrtime(true))
+                ) {
                     Logger::log('No reply for message: ' . $message, Logger::WARNING);
                     $this->handleReject($message, static fn () => new TimeoutException('Request timeout'));
                     continue;
