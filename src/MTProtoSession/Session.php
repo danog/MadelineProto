@@ -185,13 +185,13 @@ trait Session
     public function createSession(): void
     {
         $labels = ['datacenter' => (string) $this->datacenter, 'connection' => (string) $this->id];
-        $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages", "Number of not-yet sent outgoing MTProto messages", $labels);
-        $this->inFlightGauge = $this->API->getPromGauge("MadelineProto", "inflight_requests", "Number of in-flight requests", $labels);
-        $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages", "Number of received MTProto messages", $labels);
-        $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages", "Number of sent MTProto messages", $labels);
-        $this->incomingBytesCtr = $this->API->getPromCounter("MadelineProto", "incoming_bytes", "Number of received bytes", $labels);
-        $this->outgoingBytesCtr = $this->API->getPromCounter("MadelineProto", "outgoing_bytes", "Number of sent bytes", $labels);
-        $this->requestResponse = $this->API->getPromCounter("MadelineProto", "request_responses", "Received RPC error or success status of requests by method.", $labels);
+        $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages_count", "Number of not-yet sent outgoing MTProto messages", $labels);
+        $this->inFlightGauge = $this->API->getPromGauge("MadelineProto", "inflight_requests_count", "Number of in-flight requests", $labels);
+        $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages_count", "Number of received MTProto messages", $labels);
+        $this->outgoingCtr = $this->API->getPromCounter("MadelineProto", "outgoing_mtproto_messages_count", "Number of sent MTProto messages", $labels);
+        $this->incomingBytesCtr = $this->API->getPromCounter("MadelineProto", "incoming_bytes_count", "Number of received bytes", $labels);
+        $this->outgoingBytesCtr = $this->API->getPromCounter("MadelineProto", "outgoing_bytes_count", "Number of sent bytes", $labels);
+        $this->requestResponse = $this->API->getPromCounter("MadelineProto", "request_responses_count", "Received RPC error or success status of requests by method.", $labels);
         $this->requestLatencies = $this->API->getPromHistogram(
             "MadelineProto",
             "request_latencies",
