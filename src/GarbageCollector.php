@@ -76,6 +76,7 @@ final class GarbageCollector
         self::$inuse = self::$prometheus->registerGauge("MadelineProto", "php_memstats_inuse_bytes", "RAM actually used by PHP");
 
         $counter = self::$prometheus->registerCounter("MadelineProto", "explicit_gc_count", "Number of times the GC was explicitly invoked");
+        $counter->incBy(0);
         EventLoop::unreference(EventLoop::repeat(1, static function () use ($counter): void {
             $currentMemory = self::getMemoryConsumption();
             if ($currentMemory > self::$memoryConsumption + self::$memoryDiffMb) {

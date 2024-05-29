@@ -99,6 +99,7 @@ $order = [
     'FEATURES',
     'REQUIREMENTS',
     'DOCKER',
+    'METRICS',
     'INSTALLATION',
     'BROADCAST',
     'UPDATES',

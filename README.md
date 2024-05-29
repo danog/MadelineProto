@@ -97,6 +97,7 @@ Some of MadelineProto's core components are also available as separate, standalo
     * [Databases on docker](https://docs.madelineproto.xyz/docs/DOCKER.html#databases-on-docker)
     * [Web docker](https://docs.madelineproto.xyz/docs/DOCKER.html#web-docker)
     * [Custom extensions](https://docs.madelineproto.xyz/docs/DOCKER.html#custom-extensions)
+* [Metrics](https://docs.madelineproto.xyz/docs/METRICS.html) - MadelineProto can expose many useful metrics, that can be visualized using the official MadelineProto Grafana dashboard.
 * [Installation](https://docs.madelineproto.xyz/docs/INSTALLATION.html) - There are various ways to install MadelineProto:
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)
   * [Composer from existing project](https://docs.madelineproto.xyz/docs/INSTALLATION.html#composer-from-existing-project)
