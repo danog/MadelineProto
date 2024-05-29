@@ -298,6 +298,9 @@ trait FilesLogic
         if ($upload && isset($media['file']) && !\is_array($media['file'])) {
             $media['file'] = $this->upload($media['file'], cancellation: $cancellation);
         }
+        if ($upload && isset($media['thumb']) && !\is_array($media['thumb'])) {
+            $media['thumb'] = $this->upload($media['thumb'], cancellation: $cancellation);
+        }
     }
     /**
      * Upload file.
