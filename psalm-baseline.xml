@@ -4179,6 +4179,8 @@
       <code><![CDATA[$l]]></code>
       <code><![CDATA[$media['file']]]></code>
       <code><![CDATA[$media['file']]]></code>
+      <code><![CDATA[$media['thumb']]]></code>
+      <code><![CDATA[$media['thumb']]]></code>
       <code><![CDATA[$media['url']]]></code>
       <code><![CDATA[$media['url']->getFile()]]></code>
       <code><![CDATA[$size]]></code>
