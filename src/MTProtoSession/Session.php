@@ -195,7 +195,7 @@ trait Session
         $this->requestLatencies = $this->API->getPromHistogram(
             "MadelineProto",
             "request_latencies",
-            "Request latency in nanoseconds by method",
+            "Successful request latency in nanoseconds by method",
             $labels,
             [
                 5_000_000,

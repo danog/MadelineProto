@@ -189,10 +189,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             $this->connection->inFlightGauge?->dec([
                 'method' => $this->constructor,
             ]);
-            $this->connection->requestLatencies?->observe(
-                hrtime(true) - $this->sent,
-                ['method' => $this->constructor]
-            );
+            if (!\is_callable($result)) {
+                $this->connection->requestLatencies?->observe(
+                    hrtime(true) - $this->sent,
+                    ['method' => $this->constructor]
+                );
+            }
         }
 
         $this->serializedBody = null;
