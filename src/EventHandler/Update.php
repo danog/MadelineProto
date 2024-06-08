@@ -23,6 +23,10 @@ use ReflectionProperty;
 
 /**
  * Represents a generic update.
+ *
+ * NOTE: use serialize(), not json_encode() to serialize updates.
+ *
+ * json_encode() may only be used for logging updates.
  */
 abstract class Update extends IpcCapable implements JsonSerializable
 {

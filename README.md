@@ -1053,18 +1053,25 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#base64urlDecode" name="base64urlDecode">base64URL decode: base64urlDecode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.reportSponsoredMessage.html" name="channels.reportSponsoredMessage">channels.reportSponsoredMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.restrictSponsoredMessages.html" name="channels.restrictSponsoredMessages">channels.restrictSponsoredMessages</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.searchPosts.html" name="channels.searchPosts">channels.searchPosts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setBoostsToUnblockRestrictions.html" name="channels.setBoostsToUnblockRestrictions">channels.setBoostsToUnblockRestrictions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/channels.setEmojiStickers.html" name="channels.setEmojiStickers">channels.setEmojiStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.getBirthdays.html" name="contacts.getBirthdays">contacts.getBirthdays</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/fragment.getCollectibleInfo.html" name="fragment.getCollectibleInfo">fragment.getCollectibleInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getTimezonesList.html" name="help.getTimezonesList">help.getTimezonesList</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/invokeWithApnsSecret.html" name="invokeWithApnsSecret">invokeWithApnsSecret</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/invokeWithBusinessConnection.html" name="invokeWithBusinessConnection">invokeWithBusinessConnection</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/invokeWithGooglePlayIntegrity.html" name="invokeWithGooglePlayIntegrity">invokeWithGooglePlayIntegrity</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.checkQuickReplyShortcut.html" name="messages.checkQuickReplyShortcut">messages.checkQuickReplyShortcut</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteFactCheck.html" name="messages.deleteFactCheck">messages.deleteFactCheck</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteQuickReplyMessages.html" name="messages.deleteQuickReplyMessages">messages.deleteQuickReplyMessages</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.deleteQuickReplyShortcut.html" name="messages.deleteQuickReplyShortcut">messages.deleteQuickReplyShortcut</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editFactCheck.html" name="messages.editFactCheck">messages.editFactCheck</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editQuickReplyShortcut.html" name="messages.editQuickReplyShortcut">messages.editQuickReplyShortcut</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getAvailableEffects.html" name="messages.getAvailableEffects">messages.getAvailableEffects</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getDefaultTagReactions.html" name="messages.getDefaultTagReactions">messages.getDefaultTagReactions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiStickerGroups.html" name="messages.getEmojiStickerGroups">messages.getEmojiStickerGroups</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getFactCheck.html" name="messages.getFactCheck">messages.getFactCheck</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getMyStickers.html" name="messages.getMyStickers">messages.getMyStickers</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getOutboxReadDate.html" name="messages.getOutboxReadDate">messages.getOutboxReadDate</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getQuickReplies.html" name="messages.getQuickReplies">messages.getQuickReplies</a>
@@ -1076,6 +1083,11 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateSavedReactionTag.html" name="messages.updateSavedReactionTag">messages.updateSavedReactionTag</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleDecode" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleEncode" name="rleEncode">null-byte RLE encode: rleEncode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsStatus.html" name="payments.getStarsStatus">payments.getStarsStatus</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsTopupOptions.html" name="payments.getStarsTopupOptions">payments.getStarsTopupOptions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsTransactions.html" name="payments.getStarsTransactions">payments.getStarsTransactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.refundStarsCharge.html" name="payments.refundStarsCharge">payments.refundStarsCharge</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.sendStarsForm.html" name="payments.sendStarsForm">payments.sendStarsForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.finishJob.html" name="smsjobs.finishJob">smsjobs.finishJob</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.getSmsJob.html" name="smsjobs.getSmsJob">smsjobs.getSmsJob</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.getStatus.html" name="smsjobs.getStatus">smsjobs.getStatus</a>
