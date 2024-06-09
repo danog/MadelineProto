@@ -168,7 +168,7 @@ class RPCErrorException extends \Exception
                 $res = json_decode(
                     (
                         HttpClientBuilder::buildDefault()
-                        ->request(new Request('https://rpc.pwrtelegram.xyz/?method='.$method.'&code='.$code.'&error='.$error))
+                        ->request(new Request('https://report-rpc-error.madelineproto.xyz/?method='.$method.'&code='.$code.'&error='.$error))
                     )->getBody()->buffer(),
                     true,
                 );
