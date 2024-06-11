@@ -49,6 +49,7 @@ use danog\MadelineProto\EventHandler\Delete\DeleteScheduledMessages;
 use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
+use danog\MadelineProto\EventHandler\Message\CommentReply;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
@@ -778,7 +779,7 @@ trait UpdateHandler
             };
         }
         if (($info['User']['username'] ?? '') === 'replies') {
-            return null;
+            return new CommentReply($this, $message, $info, $scheduled);
         }
         if ($message['_'] === 'encryptedMessage') {
             return new SecretMessage($this, $message, $info, $scheduled);

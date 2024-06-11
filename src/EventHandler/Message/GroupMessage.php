@@ -29,7 +29,7 @@ use Webmozart\Assert\InvalidArgumentException;
 /**
  * Represents an incoming or outgoing group message.
  */
-final class GroupMessage extends Message
+class GroupMessage extends Message
 {
     /**
      * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
