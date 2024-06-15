@@ -213,7 +213,7 @@ class RPCErrorException extends \Exception
         string $rpc,
         int $code,
         string $caller,
-        ?Exception $previous = null
+        ?\Exception $previous = null
     ): self {
         // Start match
         match ($rpc) {
@@ -740,7 +740,7 @@ class RPCErrorException extends \Exception
         public readonly string $description,
         int $code,
         private readonly string $caller,
-        ?Exception $previous = null
+        ?\Exception $previous = null
     ) {
         parent::__construct($rpc, $code, $previous);
         $this->prettifyTL($caller);
