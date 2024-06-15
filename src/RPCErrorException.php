@@ -148,7 +148,8 @@ class RPCErrorException extends \Exception
                 || preg_match('/FILE_PART_\d*_MISSING/', $error)
                 || !preg_match('/^[a-zA-Z0-9\._]+$/', $method)
                 || ($error === 'Timeout' && !\in_array(strtolower($method), ['messages.getbotcallbackanswer', 'messages.getinlinebotresults'], true))
-                || ($error === 'BOT_MISSING' && \in_array($method, ['stickers.changeStickerPosition', 'stickers.createStickerSet', 'messages.uploadMedia'], true));
+                || ($error === 'BOT_MISSING' && \in_array($method, ['stickers.changeStickerPosition', 'stickers.createStickerSet', 'messages.uploadMedia'], true))
+                || is_numeric($method);
     }
 
     /**
