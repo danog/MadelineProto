@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GifContentTypeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GIF_CONTENT_TYPE_INVALID', 400, $caller, $previous);
+        parent::__construct('GIF_CONTENT_TYPE_INVALID', 'GIF content-type invalid.', 400, $caller, $previous);
     }
 }

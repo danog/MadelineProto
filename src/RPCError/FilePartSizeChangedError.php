@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilePartSizeChangedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_PART_SIZE_CHANGED', 400, $caller, $previous);
+        parent::__construct('FILE_PART_SIZE_CHANGED', 'Provided file part size has changed.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EmoticonStickerpackMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EMOTICON_STICKERPACK_MISSING', 400, $caller, $previous);
+        parent::__construct('EMOTICON_STICKERPACK_MISSING', 'inputStickerSetDice.emoji cannot be empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TaskAlreadyExistsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TASK_ALREADY_EXISTS', 400, $caller, $previous);
+        parent::__construct('TASK_ALREADY_EXISTS', 'An email reset was already requested.', 400, $caller, $previous);
     }
 }

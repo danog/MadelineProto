@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ScheduleBotNotAllowedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SCHEDULE_BOT_NOT_ALLOWED', 400, $caller, $previous);
+        parent::__construct('SCHEDULE_BOT_NOT_ALLOWED', 'Bots cannot schedule messages.', 400, $caller, $previous);
     }
 }

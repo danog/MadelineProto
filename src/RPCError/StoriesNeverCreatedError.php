@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StoriesNeverCreatedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STORIES_NEVER_CREATED', 400, $caller, $previous);
+        parent::__construct('STORIES_NEVER_CREATED', 'This peer hasn\'t ever posted any stories.', 400, $caller, $previous);
     }
 }

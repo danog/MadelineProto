@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TopicDeletedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOPIC_DELETED', 406, $caller, $previous);
+        parent::__construct('TOPIC_DELETED', 'The specified topic was deleted.', 406, $caller, $previous);
     }
 }

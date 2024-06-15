@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordRecoveryExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_RECOVERY_EXPIRED', 400, $caller, $previous);
+        parent::__construct('PASSWORD_RECOVERY_EXPIRED', 'The recovery code has expired.', 400, $caller, $previous);
     }
 }

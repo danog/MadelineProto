@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('CHANNEL_ID_INVALID', 'The specified supergroup ID is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilterIncludeEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILTER_INCLUDE_EMPTY', 400, $caller, $previous);
+        parent::__construct('FILTER_INCLUDE_EMPTY', 'The include_peers vector of the filter is empty.', 400, $caller, $previous);
     }
 }

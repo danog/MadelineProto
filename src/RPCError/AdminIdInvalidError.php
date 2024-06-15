@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AdminIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ADMIN_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('ADMIN_ID_INVALID', 'The specified admin ID is invalid.', 400, $caller, $previous);
     }
 }

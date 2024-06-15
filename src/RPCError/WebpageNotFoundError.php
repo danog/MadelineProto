@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebpageNotFoundError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBPAGE_NOT_FOUND', 400, $caller, $previous);
+        parent::__construct('WEBPAGE_NOT_FOUND', 'A preview for the specified webpage `url` could not be generated.', 400, $caller, $previous);
     }
 }

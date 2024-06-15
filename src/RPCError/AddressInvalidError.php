@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AddressInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ADDRESS_INVALID', 400, $caller, $previous);
+        parent::__construct('ADDRESS_INVALID', 'The specified geopoint address is invalid.', 400, $caller, $previous);
     }
 }

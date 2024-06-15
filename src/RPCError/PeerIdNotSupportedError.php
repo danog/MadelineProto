@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PeerIdNotSupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PEER_ID_NOT_SUPPORTED', 400, $caller, $previous);
+        parent::__construct('PEER_ID_NOT_SUPPORTED', 'The provided peer ID is not supported.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FromPeerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FROM_PEER_INVALID', 400, $caller, $previous);
+        parent::__construct('FROM_PEER_INVALID', 'The specified from_id is invalid.', 400, $caller, $previous);
     }
 }

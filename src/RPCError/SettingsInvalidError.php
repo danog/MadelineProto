@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SettingsInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SETTINGS_INVALID', 400, $caller, $previous);
+        parent::__construct('SETTINGS_INVALID', 'Invalid settings were provided.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PrivacyKeyInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PRIVACY_KEY_INVALID', 400, $caller, $previous);
+        parent::__construct('PRIVACY_KEY_INVALID', 'The privacy key is invalid.', 400, $caller, $previous);
     }
 }

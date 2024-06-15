@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoCropSizeSmallError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_CROP_SIZE_SMALL', 400, $caller, $previous);
+        parent::__construct('PHOTO_CROP_SIZE_SMALL', 'Photo is too small.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotResponseTimeoutError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_RESPONSE_TIMEOUT', 400, $caller, $previous);
+        parent::__construct('BOT_RESPONSE_TIMEOUT', 'A timeout occurred while fetching data from the bot.', 400, $caller, $previous);
     }
 }

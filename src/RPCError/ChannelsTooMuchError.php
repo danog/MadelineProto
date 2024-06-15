@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelsTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNELS_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('CHANNELS_TOO_MUCH', 'You have joined too many channels/supergroups.', 400, $caller, $previous);
     }
 }

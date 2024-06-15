@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilePartEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_PART_EMPTY', 400, $caller, $previous);
+        parent::__construct('FILE_PART_EMPTY', 'The provided file part is empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SendCodeUnavailableError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEND_CODE_UNAVAILABLE', 406, $caller, $previous);
+        parent::__construct('SEND_CODE_UNAVAILABLE', 'Returned when all available options for this type of number were already used (e.g. flash-call, then SMS, then this error might be returned to trigger a second resend).', 406, $caller, $previous);
     }
 }

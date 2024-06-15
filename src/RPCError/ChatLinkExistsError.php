@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatLinkExistsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_LINK_EXISTS', 400, $caller, $previous);
+        parent::__construct('CHAT_LINK_EXISTS', 'The chat is public, you can\'t hide the history to new users.', 400, $caller, $previous);
     }
 }

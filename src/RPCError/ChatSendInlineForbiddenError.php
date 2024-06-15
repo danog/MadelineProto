@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatSendInlineForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_SEND_INLINE_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_SEND_INLINE_FORBIDDEN', 'You can\'t send inline messages in this group.', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerThumbPngNopngError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_THUMB_PNG_NOPNG', 400, $caller, $previous);
+        parent::__construct('STICKER_THUMB_PNG_NOPNG', 'Incorrect stickerset thumb file provided, PNG / WEBP expected.', 400, $caller, $previous);
     }
 }

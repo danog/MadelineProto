@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoContentUrlEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_CONTENT_URL_EMPTY', 400, $caller, $previous);
+        parent::__construct('PHOTO_CONTENT_URL_EMPTY', 'Photo URL invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TakeoutRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TAKEOUT_REQUIRED', 403, $caller, $previous);
+        parent::__construct('TAKEOUT_REQUIRED', 'A [takeout](https://core.telegram.org/api/takeout) session needs to be initialized first, [see here &raquo; for more info](/api/takeout).', 403, $caller, $previous);
     }
 }

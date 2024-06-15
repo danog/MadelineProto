@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ReactionsTooManyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REACTIONS_TOO_MANY', 400, $caller, $previous);
+        parent::__construct('REACTIONS_TOO_MANY', 'The message already has exactly `reactions_uniq_max` reaction emojis, you can\'t react with a new emoji, see [the docs for more info &raquo;](/api/config#client-configuration).', 400, $caller, $previous);
     }
 }

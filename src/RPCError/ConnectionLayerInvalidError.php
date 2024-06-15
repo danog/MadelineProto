@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ConnectionLayerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CONNECTION_LAYER_INVALID', 400, $caller, $previous);
+        parent::__construct('CONNECTION_LAYER_INVALID', 'Layer invalid.', 400, $caller, $previous);
     }
 }

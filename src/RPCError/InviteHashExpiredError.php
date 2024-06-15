@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteHashExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_HASH_EXPIRED', 406, $caller, $previous);
+        parent::__construct('INVITE_HASH_EXPIRED', 'The invite link has expired.', 406, $caller, $previous);
     }
 }

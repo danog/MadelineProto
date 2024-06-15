@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatGuestSendForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_GUEST_SEND_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_GUEST_SEND_FORBIDDEN', 'You join the discussion group before commenting, see [here &raquo;](/api/discussion#requiring-users-to-join-the-group) for more info.', 403, $caller, $previous);
     }
 }

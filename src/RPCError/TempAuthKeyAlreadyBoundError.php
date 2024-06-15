@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TempAuthKeyAlreadyBoundError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TEMP_AUTH_KEY_ALREADY_BOUND', 400, $caller, $previous);
+        parent::__construct('TEMP_AUTH_KEY_ALREADY_BOUND', 'The passed temporary key is already bound to another **perm_auth_key_id**.', 400, $caller, $previous);
     }
 }

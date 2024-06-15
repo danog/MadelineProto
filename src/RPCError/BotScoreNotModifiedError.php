@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotScoreNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_SCORE_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('BOT_SCORE_NOT_MODIFIED', 'The score wasn\'t modified.', 400, $caller, $previous);
     }
 }

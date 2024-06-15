@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SrpPasswordChangedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SRP_PASSWORD_CHANGED', 400, $caller, $previous);
+        parent::__construct('SRP_PASSWORD_CHANGED', 'Password has changed.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RangesInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RANGES_INVALID', 400, $caller, $previous);
+        parent::__construct('RANGES_INVALID', 'Invalid range provided.', 400, $caller, $previous);
     }
 }

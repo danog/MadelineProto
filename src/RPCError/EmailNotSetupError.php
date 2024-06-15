@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EmailNotSetupError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EMAIL_NOT_SETUP', 400, $caller, $previous);
+        parent::__construct('EMAIL_NOT_SETUP', 'In order to change the login email with emailVerifyPurposeLoginChange, an existing login email must already be set using emailVerifyPurposeLoginSetup.', 400, $caller, $previous);
     }
 }

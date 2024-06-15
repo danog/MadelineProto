@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InvitesTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITES_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('INVITES_TOO_MUCH', 'The maximum number of per-folder invites specified by the `chatlist_invites_limit_default`/`chatlist_invites_limit_premium` [client configuration parameters &raquo;](/api/config#chatlist-invites-limit-default) was reached.', 400, $caller, $previous);
     }
 }

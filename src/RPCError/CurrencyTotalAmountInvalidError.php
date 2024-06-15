@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CurrencyTotalAmountInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CURRENCY_TOTAL_AMOUNT_INVALID', 400, $caller, $previous);
+        parent::__construct('CURRENCY_TOTAL_AMOUNT_INVALID', 'The total amount of all prices is invalid.', 400, $caller, $previous);
     }
 }

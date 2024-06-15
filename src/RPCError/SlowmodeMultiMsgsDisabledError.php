@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SlowmodeMultiMsgsDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SLOWMODE_MULTI_MSGS_DISABLED', 400, $caller, $previous);
+        parent::__construct('SLOWMODE_MULTI_MSGS_DISABLED', 'Slowmode is enabled, you cannot forward multiple messages to this group.', 400, $caller, $previous);
     }
 }

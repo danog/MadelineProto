@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PrivacyPremiumRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PRIVACY_PREMIUM_REQUIRED', 406, $caller, $previous);
+        parent::__construct('PRIVACY_PREMIUM_REQUIRED', 'You need a [Telegram Premium subscription](https://core.telegram.org/api/premium) to send a message to this user.', 406, $caller, $previous);
     }
 }

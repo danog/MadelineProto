@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatSendVoicesForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_SEND_VOICES_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_SEND_VOICES_FORBIDDEN', 'You can\'t send voice recordings in this chat.', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class Sha256HashInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SHA256_HASH_INVALID', 400, $caller, $previous);
+        parent::__construct('SHA256_HASH_INVALID', 'The provided SHA256 hash is invalid.', 400, $caller, $previous);
     }
 }

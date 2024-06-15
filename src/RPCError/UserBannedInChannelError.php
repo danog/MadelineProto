@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserBannedInChannelError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_BANNED_IN_CHANNEL', 400, $caller, $previous);
+        parent::__construct('USER_BANNED_IN_CHANNEL', 'You\'re banned from sending messages in supergroups/channels.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SendMessageMediaInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEND_MESSAGE_MEDIA_INVALID', 400, $caller, $previous);
+        parent::__construct('SEND_MESSAGE_MEDIA_INVALID', 'Invalid media provided.', 400, $caller, $previous);
     }
 }

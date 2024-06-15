@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotGroupsBlockedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_GROUPS_BLOCKED', 400, $caller, $previous);
+        parent::__construct('BOT_GROUPS_BLOCKED', 'This bot can\'t be added to groups.', 400, $caller, $previous);
     }
 }

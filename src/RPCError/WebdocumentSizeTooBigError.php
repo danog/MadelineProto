@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebdocumentSizeTooBigError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBDOCUMENT_SIZE_TOO_BIG', 400, $caller, $previous);
+        parent::__construct('WEBDOCUMENT_SIZE_TOO_BIG', 'Webdocument is too big!', 400, $caller, $previous);
     }
 }

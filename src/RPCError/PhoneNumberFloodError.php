@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNumberFloodError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NUMBER_FLOOD', 400, $caller, $previous);
+        parent::__construct('PHONE_NUMBER_FLOOD', 'You asked for the code too many times.', 400, $caller, $previous);
     }
 }

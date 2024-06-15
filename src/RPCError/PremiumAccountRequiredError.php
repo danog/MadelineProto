@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PremiumAccountRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PREMIUM_ACCOUNT_REQUIRED', 403, $caller, $previous);
+        parent::__construct('PREMIUM_ACCOUNT_REQUIRED', 'A premium account is required to execute this action.', 403, $caller, $previous);
     }
 }

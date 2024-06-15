@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QuizCorrectAnswerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_CORRECT_ANSWER_INVALID', 400, $caller, $previous);
+        parent::__construct('QUIZ_CORRECT_ANSWER_INVALID', 'An invalid value was provided to the correct_answers field.', 400, $caller, $previous);
     }
 }

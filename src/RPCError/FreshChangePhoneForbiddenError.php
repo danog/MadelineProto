@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FreshChangePhoneForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FRESH_CHANGE_PHONE_FORBIDDEN', 406, $caller, $previous);
+        parent::__construct('FRESH_CHANGE_PHONE_FORBIDDEN', 'You can\'t change phone number right after logging in, please wait at least 24 hours.', 406, $caller, $previous);
     }
 }

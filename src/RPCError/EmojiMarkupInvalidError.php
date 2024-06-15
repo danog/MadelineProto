@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EmojiMarkupInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EMOJI_MARKUP_INVALID', 400, $caller, $previous);
+        parent::__construct('EMOJI_MARKUP_INVALID', 'The specified `video_emoji_markup` was invalid.', 400, $caller, $previous);
     }
 }

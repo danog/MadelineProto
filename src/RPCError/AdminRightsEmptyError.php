@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AdminRightsEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ADMIN_RIGHTS_EMPTY', 400, $caller, $previous);
+        parent::__construct('ADMIN_RIGHTS_EMPTY', 'The chatAdminRights constructor passed in keyboardButtonRequestPeer.peer_type.user_admin_rights has no rights set (i.e. flags is 0).', 400, $caller, $previous);
     }
 }

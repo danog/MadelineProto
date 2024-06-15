@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RightForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RIGHT_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('RIGHT_FORBIDDEN', 'Your admin rights do not allow you to do this.', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QueryIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUERY_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('QUERY_ID_INVALID', 'The query ID is invalid.', 400, $caller, $previous);
     }
 }

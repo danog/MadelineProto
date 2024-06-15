@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MsgWaitFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MSG_WAIT_FAILED', 400, $caller, $previous);
+        parent::__construct('MSG_WAIT_FAILED', 'A waiting call returned an error.', 400, $caller, $previous);
     }
 }

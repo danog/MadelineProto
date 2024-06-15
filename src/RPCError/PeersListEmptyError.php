@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PeersListEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PEERS_LIST_EMPTY', 400, $caller, $previous);
+        parent::__construct('PEERS_LIST_EMPTY', 'The specified list of peers is empty.', 400, $caller, $previous);
     }
 }

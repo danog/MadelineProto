@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ArticleTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ARTICLE_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('ARTICLE_TITLE_EMPTY', 'The title of the article is empty.', 400, $caller, $previous);
     }
 }

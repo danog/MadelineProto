@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TokenEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOKEN_EMPTY', 400, $caller, $previous);
+        parent::__construct('TOKEN_EMPTY', 'The specified token is empty.', 400, $caller, $previous);
     }
 }

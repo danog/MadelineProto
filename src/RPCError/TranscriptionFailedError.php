@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TranscriptionFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TRANSCRIPTION_FAILED', 400, $caller, $previous);
+        parent::__construct('TRANSCRIPTION_FAILED', 'Audio transcription failed.', 400, $caller, $previous);
     }
 }

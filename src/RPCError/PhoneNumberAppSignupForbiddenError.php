@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNumberAppSignupForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NUMBER_APP_SIGNUP_FORBIDDEN', 400, $caller, $previous);
+        parent::__construct('PHONE_NUMBER_APP_SIGNUP_FORBIDDEN', 'You can\'t sign up using this app.', 400, $caller, $previous);
     }
 }

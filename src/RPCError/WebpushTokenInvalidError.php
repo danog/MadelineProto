@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebpushTokenInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBPUSH_TOKEN_INVALID', 400, $caller, $previous);
+        parent::__construct('WEBPUSH_TOKEN_INVALID', 'The specified web push token is invalid.', 400, $caller, $previous);
     }
 }

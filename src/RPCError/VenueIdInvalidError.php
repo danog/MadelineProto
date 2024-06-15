@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class VenueIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('VENUE_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('VENUE_ID_INVALID', 'The specified venue ID is invalid.', 400, $caller, $previous);
     }
 }

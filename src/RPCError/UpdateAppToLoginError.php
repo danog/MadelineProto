@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UpdateAppToLoginError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('UPDATE_APP_TO_LOGIN', 406, $caller, $previous);
+        parent::__construct('UPDATE_APP_TO_LOGIN', 'Please update to the latest version of MadelineProto to login.', 406, $caller, $previous);
     }
 }

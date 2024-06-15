@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelPrivateError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_PRIVATE', 406, $caller, $previous);
+        parent::__construct('CHANNEL_PRIVATE', 'You haven\'t joined this channel/supergroup.', 406, $caller, $previous);
     }
 }

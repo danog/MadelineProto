@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelPublicGroupNaError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_PUBLIC_GROUP_NA', 403, $caller, $previous);
+        parent::__construct('CHANNEL_PUBLIC_GROUP_NA', 'channel/supergroup not available.', 403, $caller, $previous);
     }
 }

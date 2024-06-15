@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserDeletedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_DELETED', 403, $caller, $previous);
+        parent::__construct('USER_DELETED', 'You can\'t send this secret message because the other participant deleted their account.', 403, $caller, $previous);
     }
 }

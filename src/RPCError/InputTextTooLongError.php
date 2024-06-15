@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InputTextTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INPUT_TEXT_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('INPUT_TEXT_TOO_LONG', 'The specified text is too long.', 400, $caller, $previous);
     }
 }

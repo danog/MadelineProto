@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SearchWithLinkNotSupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEARCH_WITH_LINK_NOT_SUPPORTED', 400, $caller, $previous);
+        parent::__construct('SEARCH_WITH_LINK_NOT_SUPPORTED', 'You cannot provide a search query and an invite link at the same time.', 400, $caller, $previous);
     }
 }

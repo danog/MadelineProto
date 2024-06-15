@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SendMessageTypeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEND_MESSAGE_TYPE_INVALID', 400, $caller, $previous);
+        parent::__construct('SEND_MESSAGE_TYPE_INVALID', 'The message type is invalid.', 400, $caller, $previous);
     }
 }

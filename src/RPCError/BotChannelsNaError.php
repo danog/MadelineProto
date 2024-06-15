@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotChannelsNaError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_CHANNELS_NA', 400, $caller, $previous);
+        parent::__construct('BOT_CHANNELS_NA', 'Bots can\'t edit admin privileges.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotAppShortnameInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_APP_SHORTNAME_INVALID', 400, $caller, $previous);
+        parent::__construct('BOT_APP_SHORTNAME_INVALID', 'The specified bot app short name is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('GROUPCALL_FORBIDDEN', 'The group call has already ended.', 403, $caller, $previous);
     }
 }

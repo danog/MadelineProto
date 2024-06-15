@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FileTokenInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_TOKEN_INVALID', 400, $caller, $previous);
+        parent::__construct('FILE_TOKEN_INVALID', 'The specified file token is invalid.', 400, $caller, $previous);
     }
 }

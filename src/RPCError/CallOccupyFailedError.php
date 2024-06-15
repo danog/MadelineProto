@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CallOccupyFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CALL_OCCUPY_FAILED', 400, $caller, $previous);
+        parent::__construct('CALL_OCCUPY_FAILED', 'The call failed because the user is already making another call.', 400, $caller, $previous);
     }
 }

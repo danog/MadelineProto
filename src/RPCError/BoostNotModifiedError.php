@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BoostNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOOST_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('BOOST_NOT_MODIFIED', 'You\'re already [boosting](https://core.telegram.org/api/boost) the specified channel.', 400, $caller, $previous);
     }
 }

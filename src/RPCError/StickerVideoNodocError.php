@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerVideoNodocError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_VIDEO_NODOC', 400, $caller, $previous);
+        parent::__construct('STICKER_VIDEO_NODOC', 'You must send the video sticker as a document.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PeerHistoryEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PEER_HISTORY_EMPTY', 400, $caller, $previous);
+        parent::__construct('PEER_HISTORY_EMPTY', 'You can\'t pin an empty chat with a user.', 400, $caller, $previous);
     }
 }

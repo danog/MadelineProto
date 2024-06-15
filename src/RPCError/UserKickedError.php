@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserKickedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_KICKED', 400, $caller, $previous);
+        parent::__construct('USER_KICKED', 'This user was kicked from this supergroup/channel.', 400, $caller, $previous);
     }
 }

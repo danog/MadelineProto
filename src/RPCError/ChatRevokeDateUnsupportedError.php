@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatRevokeDateUnsupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_REVOKE_DATE_UNSUPPORTED', 400, $caller, $previous);
+        parent::__construct('CHAT_REVOKE_DATE_UNSUPPORTED', '`min_date` and `max_date` are not available for using with non-user peers.', 400, $caller, $previous);
     }
 }

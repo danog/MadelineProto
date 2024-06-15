@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FreshResetAuthorisationForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FRESH_RESET_AUTHORISATION_FORBIDDEN', 406, $caller, $previous);
+        parent::__construct('FRESH_RESET_AUTHORISATION_FORBIDDEN', 'You can\'t logout other sessions if less than 24 hours have passed since you logged on the current session.', 406, $caller, $previous);
     }
 }

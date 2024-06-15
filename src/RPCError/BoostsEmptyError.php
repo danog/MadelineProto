@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BoostsEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOOSTS_EMPTY', 400, $caller, $previous);
+        parent::__construct('BOOSTS_EMPTY', 'No boost slots were specified.', 400, $caller, $previous);
     }
 }

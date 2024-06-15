@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatAboutNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_ABOUT_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('CHAT_ABOUT_NOT_MODIFIED', 'About text has not changed.', 400, $caller, $previous);
     }
 }

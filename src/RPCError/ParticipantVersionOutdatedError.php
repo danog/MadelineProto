@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ParticipantVersionOutdatedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PARTICIPANT_VERSION_OUTDATED', 400, $caller, $previous);
+        parent::__construct('PARTICIPANT_VERSION_OUTDATED', 'The other participant does not use an up to date telegram client with support for calls.', 400, $caller, $previous);
     }
 }

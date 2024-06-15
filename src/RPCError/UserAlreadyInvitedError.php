@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserAlreadyInvitedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_ALREADY_INVITED', 400, $caller, $previous);
+        parent::__construct('USER_ALREADY_INVITED', 'You have already invited this user.', 400, $caller, $previous);
     }
 }

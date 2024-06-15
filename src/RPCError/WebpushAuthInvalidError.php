@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebpushAuthInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBPUSH_AUTH_INVALID', 400, $caller, $previous);
+        parent::__construct('WEBPUSH_AUTH_INVALID', 'The specified web push authentication secret is invalid.', 400, $caller, $previous);
     }
 }

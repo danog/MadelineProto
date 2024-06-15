@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MultiMediaTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MULTI_MEDIA_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('MULTI_MEDIA_TOO_LONG', 'Too many media files for album.', 400, $caller, $previous);
     }
 }

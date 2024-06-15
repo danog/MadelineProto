@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebpageMediaEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBPAGE_MEDIA_EMPTY', 400, $caller, $previous);
+        parent::__construct('WEBPAGE_MEDIA_EMPTY', 'Webpage media empty.', 400, $caller, $previous);
     }
 }

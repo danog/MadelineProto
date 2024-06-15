@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class VideoFileInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('VIDEO_FILE_INVALID', 400, $caller, $previous);
+        parent::__construct('VIDEO_FILE_INVALID', 'The specified video file is invalid.', 400, $caller, $previous);
     }
 }

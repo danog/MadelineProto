@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickersEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKERS_EMPTY', 400, $caller, $previous);
+        parent::__construct('STICKERS_EMPTY', 'No sticker provided.', 400, $caller, $previous);
     }
 }

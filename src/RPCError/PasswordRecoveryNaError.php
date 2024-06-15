@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordRecoveryNaError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_RECOVERY_NA', 400, $caller, $previous);
+        parent::__construct('PASSWORD_RECOVERY_NA', 'No email was set, can\'t recover password via email.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FileReferenceExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_REFERENCE_EXPIRED', 400, $caller, $previous);
+        parent::__construct('FILE_REFERENCE_EXPIRED', 'File reference expired, it must be refetched as described in [the documentation](https://core.telegram.org/api/file_reference).', 400, $caller, $previous);
     }
 }

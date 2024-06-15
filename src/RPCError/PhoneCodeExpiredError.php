@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneCodeExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_CODE_EXPIRED', 400, $caller, $previous);
+        parent::__construct('PHONE_CODE_EXPIRED', 'The phone code you provided has expired.', 400, $caller, $previous);
     }
 }

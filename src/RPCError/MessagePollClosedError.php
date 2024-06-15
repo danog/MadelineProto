@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessagePollClosedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_POLL_CLOSED', 400, $caller, $previous);
+        parent::__construct('MESSAGE_POLL_CLOSED', 'Poll closed.', 400, $caller, $previous);
     }
 }

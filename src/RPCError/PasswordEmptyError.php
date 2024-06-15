@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_EMPTY', 400, $caller, $previous);
+        parent::__construct('PASSWORD_EMPTY', 'The provided password is empty.', 400, $caller, $previous);
     }
 }

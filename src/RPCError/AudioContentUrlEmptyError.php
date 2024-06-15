@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AudioContentUrlEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('AUDIO_CONTENT_URL_EMPTY', 400, $caller, $previous);
+        parent::__construct('AUDIO_CONTENT_URL_EMPTY', 'The remote URL specified in the content field is empty.', 400, $caller, $previous);
     }
 }

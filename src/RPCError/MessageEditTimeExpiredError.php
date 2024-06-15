@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessageEditTimeExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_EDIT_TIME_EXPIRED', 400, $caller, $previous);
+        parent::__construct('MESSAGE_EDIT_TIME_EXPIRED', 'You can\'t edit this message anymore, too much time has passed since its creation.', 400, $caller, $previous);
     }
 }

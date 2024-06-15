@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_INVALID', 400, $caller, $previous);
+        parent::__construct('BOT_INVALID', 'This is not a valid bot.', 400, $caller, $previous);
     }
 }

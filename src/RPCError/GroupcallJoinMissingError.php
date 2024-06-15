@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallJoinMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_JOIN_MISSING', 400, $caller, $previous);
+        parent::__construct('GROUPCALL_JOIN_MISSING', 'You haven\'t joined this group call.', 400, $caller, $previous);
     }
 }

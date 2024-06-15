@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessageIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('MESSAGE_ID_INVALID', 'The provided message id is invalid.', 400, $caller, $previous);
     }
 }

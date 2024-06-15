@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CallPeerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CALL_PEER_INVALID', 400, $caller, $previous);
+        parent::__construct('CALL_PEER_INVALID', 'The provided call peer object is invalid.', 400, $caller, $previous);
     }
 }

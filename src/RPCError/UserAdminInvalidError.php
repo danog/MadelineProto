@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserAdminInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_ADMIN_INVALID', 400, $caller, $previous);
+        parent::__construct('USER_ADMIN_INVALID', 'You\'re not an admin.', 400, $caller, $previous);
     }
 }

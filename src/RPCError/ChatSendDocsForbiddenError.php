@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatSendDocsForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_SEND_DOCS_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_SEND_DOCS_FORBIDDEN', 'You can\'t send documents in this chat.', 403, $caller, $previous);
     }
 }

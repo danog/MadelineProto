@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SensitiveChangeForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SENSITIVE_CHANGE_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('SENSITIVE_CHANGE_FORBIDDEN', 'You can\'t change your sensitive content settings.', 403, $caller, $previous);
     }
 }

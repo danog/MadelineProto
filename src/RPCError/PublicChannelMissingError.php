@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PublicChannelMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PUBLIC_CHANNEL_MISSING', 403, $caller, $previous);
+        parent::__construct('PUBLIC_CHANNEL_MISSING', 'You can only export group call invite links for public chats or channels.', 403, $caller, $previous);
     }
 }

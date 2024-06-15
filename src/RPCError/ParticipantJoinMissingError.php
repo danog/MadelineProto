@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ParticipantJoinMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PARTICIPANT_JOIN_MISSING', 403, $caller, $previous);
+        parent::__construct('PARTICIPANT_JOIN_MISSING', 'Trying to enable a presentation, when the user hasn\'t joined the Video Chat with [phone.joinGroupCall](https://core.telegram.org/method/phone.joinGroupCall).', 403, $caller, $previous);
     }
 }

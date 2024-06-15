@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaGroupedInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_GROUPED_INVALID', 400, $caller, $previous);
+        parent::__construct('MEDIA_GROUPED_INVALID', 'You tried to send media of different types in an album.', 400, $caller, $previous);
     }
 }

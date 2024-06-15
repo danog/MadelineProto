@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QuizCorrectAnswersEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_CORRECT_ANSWERS_EMPTY', 400, $caller, $previous);
+        parent::__construct('QUIZ_CORRECT_ANSWERS_EMPTY', 'No correct quiz answer was specified.', 400, $caller, $previous);
     }
 }

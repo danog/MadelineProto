@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ResetRequestMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RESET_REQUEST_MISSING', 400, $caller, $previous);
+        parent::__construct('RESET_REQUEST_MISSING', 'No password reset is in progress.', 400, $caller, $previous);
     }
 }

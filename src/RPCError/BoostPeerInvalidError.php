@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BoostPeerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOOST_PEER_INVALID', 400, $caller, $previous);
+        parent::__construct('BOOST_PEER_INVALID', 'The specified `boost_peer` is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class DataTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('DATA_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('DATA_TOO_LONG', 'Data too long.', 400, $caller, $previous);
     }
 }

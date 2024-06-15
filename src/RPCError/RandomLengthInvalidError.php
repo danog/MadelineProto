@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RandomLengthInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RANDOM_LENGTH_INVALID', 400, $caller, $previous);
+        parent::__construct('RANDOM_LENGTH_INVALID', 'Random length invalid.', 400, $caller, $previous);
     }
 }

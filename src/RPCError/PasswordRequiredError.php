@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_REQUIRED', 400, $caller, $previous);
+        parent::__construct('PASSWORD_REQUIRED', 'A [2FA password](https://core.telegram.org/api/srp) must be configured to use Telegram Passport.', 400, $caller, $previous);
     }
 }

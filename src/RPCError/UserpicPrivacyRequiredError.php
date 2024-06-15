@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserpicPrivacyRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERPIC_PRIVACY_REQUIRED', 406, $caller, $previous);
+        parent::__construct('USERPIC_PRIVACY_REQUIRED', 'You need to disable privacy settings for your profile picture in order to make your geolocation public.', 406, $caller, $previous);
     }
 }

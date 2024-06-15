@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatAboutTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_ABOUT_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('CHAT_ABOUT_TOO_LONG', 'Chat about too long.', 400, $caller, $previous);
     }
 }

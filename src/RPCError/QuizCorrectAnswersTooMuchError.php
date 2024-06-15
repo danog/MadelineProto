@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QuizCorrectAnswersTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_CORRECT_ANSWERS_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('QUIZ_CORRECT_ANSWERS_TOO_MUCH', 'You specified too many correct answers in a quiz, quizzes can only have one right answer!', 400, $caller, $previous);
     }
 }

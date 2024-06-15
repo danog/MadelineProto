@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoThumbUrlEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_THUMB_URL_EMPTY', 400, $caller, $previous);
+        parent::__construct('PHOTO_THUMB_URL_EMPTY', 'Photo thumbnail URL is empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class LangPackInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('LANG_PACK_INVALID', 400, $caller, $previous);
+        parent::__construct('LANG_PACK_INVALID', 'The provided language pack is invalid.', 400, $caller, $previous);
     }
 }

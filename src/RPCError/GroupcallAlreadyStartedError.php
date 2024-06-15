@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallAlreadyStartedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_ALREADY_STARTED', 403, $caller, $previous);
+        parent::__construct('GROUPCALL_ALREADY_STARTED', 'The groupcall has already started, you can join directly using [phone.joinGroupCall](https://core.telegram.org/method/phone.joinGroupCall).', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ShortNameOccupiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SHORT_NAME_OCCUPIED', 400, $caller, $previous);
+        parent::__construct('SHORT_NAME_OCCUPIED', 'The specified short name is already in use.', 400, $caller, $previous);
     }
 }

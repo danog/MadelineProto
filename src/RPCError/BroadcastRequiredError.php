@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BroadcastRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BROADCAST_REQUIRED', 400, $caller, $previous);
+        parent::__construct('BROADCAST_REQUIRED', 'This method can only be called on a channel, please use stats.getMegagroupStats for supergroups.', 400, $caller, $previous);
     }
 }

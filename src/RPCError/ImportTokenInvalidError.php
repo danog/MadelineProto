@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ImportTokenInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('IMPORT_TOKEN_INVALID', 400, $caller, $previous);
+        parent::__construct('IMPORT_TOKEN_INVALID', 'The specified token is invalid.', 400, $caller, $previous);
     }
 }

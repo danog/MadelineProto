@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelParicipantMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_PARICIPANT_MISSING', 400, $caller, $previous);
+        parent::__construct('CHANNEL_PARICIPANT_MISSING', 'The current user is not in the channel.', 400, $caller, $previous);
     }
 }

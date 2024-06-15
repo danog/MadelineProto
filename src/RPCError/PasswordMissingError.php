@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_MISSING', 400, $caller, $previous);
+        parent::__construct('PASSWORD_MISSING', 'You must enable 2FA in order to transfer ownership of a channel.', 400, $caller, $previous);
     }
 }

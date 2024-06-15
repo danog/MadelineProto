@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FileTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('FILE_TITLE_EMPTY', 'An empty file title was specified.', 400, $caller, $previous);
     }
 }

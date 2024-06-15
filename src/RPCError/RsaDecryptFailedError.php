@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RsaDecryptFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RSA_DECRYPT_FAILED', 400, $caller, $previous);
+        parent::__construct('RSA_DECRYPT_FAILED', 'Internal RSA decryption failed.', 400, $caller, $previous);
     }
 }

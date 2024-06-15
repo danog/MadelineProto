@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class OptionsTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('OPTIONS_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('OPTIONS_TOO_MUCH', 'Too many options provided.', 400, $caller, $previous);
     }
 }

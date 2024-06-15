@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AccessTokenInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ACCESS_TOKEN_INVALID', 400, $caller, $previous);
+        parent::__construct('ACCESS_TOKEN_INVALID', 'Access token invalid.', 400, $caller, $previous);
     }
 }

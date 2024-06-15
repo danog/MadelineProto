@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteRequestSentError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_REQUEST_SENT', 400, $caller, $previous);
+        parent::__construct('INVITE_REQUEST_SENT', 'You have successfully requested to join this chat or channel.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UsernamePurchaseAvailableError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERNAME_PURCHASE_AVAILABLE', 400, $caller, $previous);
+        parent::__construct('USERNAME_PURCHASE_AVAILABLE', 'The specified username can be purchased on https://fragment.com.', 400, $caller, $previous);
     }
 }

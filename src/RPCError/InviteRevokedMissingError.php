@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteRevokedMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_REVOKED_MISSING', 400, $caller, $previous);
+        parent::__construct('INVITE_REVOKED_MISSING', 'The specified invite link was already revoked or is invalid.', 400, $caller, $previous);
     }
 }

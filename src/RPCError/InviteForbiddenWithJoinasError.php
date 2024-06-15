@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteForbiddenWithJoinasError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_FORBIDDEN_WITH_JOINAS', 400, $caller, $previous);
+        parent::__construct('INVITE_FORBIDDEN_WITH_JOINAS', 'If the user has anonymously joined a group call as a channel, they can\'t invite other users to the group call because that would cause deanonymization, because the invite would be sent using the original user ID, not the anonymized channel ID.', 400, $caller, $previous);
     }
 }

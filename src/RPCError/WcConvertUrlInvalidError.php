@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WcConvertUrlInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WC_CONVERT_URL_INVALID', 400, $caller, $previous);
+        parent::__construct('WC_CONVERT_URL_INVALID', 'WC convert URL invalid.', 400, $caller, $previous);
     }
 }

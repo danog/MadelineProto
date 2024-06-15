@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserPublicMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_PUBLIC_MISSING', 400, $caller, $previous);
+        parent::__construct('USER_PUBLIC_MISSING', 'Cannot generate a link to stories posted by a peer without a username.', 400, $caller, $previous);
     }
 }

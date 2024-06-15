@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerGifDimensionsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_GIF_DIMENSIONS', 400, $caller, $previous);
+        parent::__construct('STICKER_GIF_DIMENSIONS', 'The specified video sticker has invalid dimensions.', 400, $caller, $previous);
     }
 }

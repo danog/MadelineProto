@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GiftSlugExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GIFT_SLUG_EXPIRED', 400, $caller, $previous);
+        parent::__construct('GIFT_SLUG_EXPIRED', 'The specified gift slug has expired.', 400, $caller, $previous);
     }
 }

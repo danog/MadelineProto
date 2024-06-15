@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TopicsEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOPICS_EMPTY', 400, $caller, $previous);
+        parent::__construct('TOPICS_EMPTY', 'You specified no topic IDs.', 400, $caller, $previous);
     }
 }

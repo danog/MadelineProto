@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessageIdsEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_IDS_EMPTY', 400, $caller, $previous);
+        parent::__construct('MESSAGE_IDS_EMPTY', 'No message ids were provided.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilterTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILTER_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('FILTER_TITLE_EMPTY', 'The title field of the filter is empty.', 400, $caller, $previous);
     }
 }

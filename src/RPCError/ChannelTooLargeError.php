@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelTooLargeError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_TOO_LARGE', 406, $caller, $previous);
+        parent::__construct('CHANNEL_TOO_LARGE', 'Channel is too large to be deleted; this error is issued when trying to delete channels with more than 1000 members (subject to change).', 406, $caller, $previous);
     }
 }

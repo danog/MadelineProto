@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SwitchPmTextEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SWITCH_PM_TEXT_EMPTY', 400, $caller, $previous);
+        parent::__construct('SWITCH_PM_TEXT_EMPTY', 'The switch_pm.text field was empty.', 400, $caller, $previous);
     }
 }

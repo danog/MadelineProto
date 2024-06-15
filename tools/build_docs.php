@@ -41,18 +41,25 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
+$map = [];
+
 $year = date('Y');
 $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
 foreach ($errors['result'] as $code => $sub) {
     if (abs($code) === 500 || $code < 0) {
         continue;
     }
+    $code = var_export($code, true);
     foreach ($sub as $err => $_) {
-        if (str_contains($err, '%')) {
+        $camel = ucfirst(StrTools::toCamelCase(strtolower($err))).'Error';
+        if (!preg_match('/^\w+$/', $camel)) {
             continue;
         }
-        $human = $errors['human_result'][$err];
-        $camel = ucfirst(StrTools::toCamelCase(strtolower($err))).'Error';
+        $human = $humanOrig = $errors['human_result'][$err];
+        $err = var_export($err, true);
+        $human = var_export($human, true);
+
+        $map[$err] = [$human, $code, "\\danog\\MadelineProto\\RPCError\\$camel"];
         $phpCode = <<< PHP
             <?php declare(strict_types=1);
             /**
@@ -76,18 +83,30 @@ foreach ($errors['result'] as $code => $sub) {
             use danog\MadelineProto\RPCErrorException;
 
             /**
-             * $human
+             * $humanOrig
              */
             final class $camel extends RPCErrorException
             {
-                public function __construct(string \$caller, ?\\Exception \$previous = null) {
-                    parent::__construct('$err', $code, \$caller, \$previous);
+                protected function __construct(string \$caller, ?\\Exception \$previous = null) {
+                    parent::__construct($err, $human, $code, \$caller, \$previous);
                 }
             }
             PHP;
         file_put_contents("src/RPCError/$camel.php", $phpCode);
     }
 }
+
+$err = file_get_contents('src/RPCErrorException.php');
+$err = preg_replace_callback('|// Start match.*// End match|sim', static function ($matches) use ($map) {
+    $data = "match (\$rpc) {\n";
+    foreach ($map as $err => [$human, $code, $class]) {
+        $data .= "$err => new $class(\$caller, \$previous),\n";
+    }
+    $data .= "default => new self(\$rpc, self::report(\$rpc, \$code, \$caller), \$code, \$caller, \$previous)\n";
+    $data .= "};\n";
+    return "// Start match\n$data\n// End match";
+}, $err);
+file_put_contents('src/RPCErrorException.php', $err);
 
 require 'tools/translator.php';
 

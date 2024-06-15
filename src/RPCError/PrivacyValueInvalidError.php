@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PrivacyValueInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PRIVACY_VALUE_INVALID', 400, $caller, $previous);
+        parent::__construct('PRIVACY_VALUE_INVALID', 'The specified privacy rule combination is invalid.', 400, $caller, $previous);
     }
 }

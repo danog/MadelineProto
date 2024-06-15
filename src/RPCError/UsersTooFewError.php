@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UsersTooFewError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERS_TOO_FEW', 400, $caller, $previous);
+        parent::__construct('USERS_TOO_FEW', 'Not enough users (to create a chat, for example).', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotCommandDescriptionInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_COMMAND_DESCRIPTION_INVALID', 400, $caller, $previous);
+        parent::__construct('BOT_COMMAND_DESCRIPTION_INVALID', 'The specified command description is invalid.', 400, $caller, $previous);
     }
 }

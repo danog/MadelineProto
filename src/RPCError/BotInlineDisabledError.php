@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotInlineDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_INLINE_DISABLED', 400, $caller, $previous);
+        parent::__construct('BOT_INLINE_DISABLED', 'This bot can\'t be used in inline mode.', 400, $caller, $previous);
     }
 }

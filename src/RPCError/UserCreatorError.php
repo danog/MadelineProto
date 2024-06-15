@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserCreatorError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_CREATOR', 400, $caller, $previous);
+        parent::__construct('USER_CREATOR', 'You can\'t leave this channel, because you\'re its creator.', 400, $caller, $previous);
     }
 }

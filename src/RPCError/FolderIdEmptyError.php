@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FolderIdEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FOLDER_ID_EMPTY', 400, $caller, $previous);
+        parent::__construct('FOLDER_ID_EMPTY', 'An empty folder ID was specified.', 400, $caller, $previous);
     }
 }

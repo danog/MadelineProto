@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ScheduleDateTooLateError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SCHEDULE_DATE_TOO_LATE', 400, $caller, $previous);
+        parent::__construct('SCHEDULE_DATE_TOO_LATE', 'You can\'t schedule a message this far in the future.', 400, $caller, $previous);
     }
 }

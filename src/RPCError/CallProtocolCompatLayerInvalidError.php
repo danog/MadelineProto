@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CallProtocolCompatLayerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CALL_PROTOCOL_COMPAT_LAYER_INVALID', 406, $caller, $previous);
+        parent::__construct('CALL_PROTOCOL_COMPAT_LAYER_INVALID', 'The other side of the call does not support any of the VoIP protocols supported by the local client, as specified by the `protocol.layer` and `protocol.library_versions` fields.', 406, $caller, $previous);
     }
 }

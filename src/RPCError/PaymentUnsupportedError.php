@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PaymentUnsupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PAYMENT_UNSUPPORTED', 406, $caller, $previous);
+        parent::__construct('PAYMENT_UNSUPPORTED', 'A detailed description of the error will be received separately as described [here &raquo;](https://core.telegram.org/api/errors#406-not-acceptable).', 406, $caller, $previous);
     }
 }

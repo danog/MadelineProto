@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatRestrictedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_RESTRICTED', 400, $caller, $previous);
+        parent::__construct('CHAT_RESTRICTED', 'You can\'t send messages in this chat, you were restricted.', 400, $caller, $previous);
     }
 }

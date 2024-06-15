@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserBotRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_BOT_REQUIRED', 400, $caller, $previous);
+        parent::__construct('USER_BOT_REQUIRED', 'This method can only be called by a bot.', 400, $caller, $previous);
     }
 }

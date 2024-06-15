@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PasswordHashInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PASSWORD_HASH_INVALID', 400, $caller, $previous);
+        parent::__construct('PASSWORD_HASH_INVALID', 'The provided password hash is invalid.', 400, $caller, $previous);
     }
 }

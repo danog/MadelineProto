@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FileReferenceEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_REFERENCE_EMPTY', 400, $caller, $previous);
+        parent::__construct('FILE_REFERENCE_EMPTY', 'An empty [file reference](https://core.telegram.org/api/file_reference) was specified.', 400, $caller, $previous);
     }
 }

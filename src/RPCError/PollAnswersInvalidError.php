@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PollAnswersInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('POLL_ANSWERS_INVALID', 400, $caller, $previous);
+        parent::__construct('POLL_ANSWERS_INVALID', 'Invalid poll answers were provided.', 400, $caller, $previous);
     }
 }

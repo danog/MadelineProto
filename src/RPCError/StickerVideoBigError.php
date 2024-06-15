@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerVideoBigError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_VIDEO_BIG', 400, $caller, $previous);
+        parent::__construct('STICKER_VIDEO_BIG', 'The specified video sticker is too big.', 400, $caller, $previous);
     }
 }

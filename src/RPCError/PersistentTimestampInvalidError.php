@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PersistentTimestampInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PERSISTENT_TIMESTAMP_INVALID', 400, $caller, $previous);
+        parent::__construct('PERSISTENT_TIMESTAMP_INVALID', 'Persistent timestamp invalid.', 400, $caller, $previous);
     }
 }

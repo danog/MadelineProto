@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoExtInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_EXT_INVALID', 400, $caller, $previous);
+        parent::__construct('PHOTO_EXT_INVALID', 'The extension of the photo is invalid.', 400, $caller, $previous);
     }
 }

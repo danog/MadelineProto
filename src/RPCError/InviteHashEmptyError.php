@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteHashEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_HASH_EMPTY', 400, $caller, $previous);
+        parent::__construct('INVITE_HASH_EMPTY', 'The invite hash is empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TitleInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TITLE_INVALID', 400, $caller, $previous);
+        parent::__construct('TITLE_INVALID', 'The specified stickerpack title is invalid.', 400, $caller, $previous);
     }
 }

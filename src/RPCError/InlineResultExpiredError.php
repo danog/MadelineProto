@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InlineResultExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INLINE_RESULT_EXPIRED', 400, $caller, $previous);
+        parent::__construct('INLINE_RESULT_EXPIRED', 'The inline query expired.', 400, $caller, $previous);
     }
 }

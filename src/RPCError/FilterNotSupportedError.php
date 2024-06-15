@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilterNotSupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILTER_NOT_SUPPORTED', 400, $caller, $previous);
+        parent::__construct('FILTER_NOT_SUPPORTED', 'The specified filter cannot be used in this context.', 400, $caller, $previous);
     }
 }

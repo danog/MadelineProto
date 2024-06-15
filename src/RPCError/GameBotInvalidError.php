@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GameBotInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GAME_BOT_INVALID', 400, $caller, $previous);
+        parent::__construct('GAME_BOT_INVALID', 'Bots can\'t send another bot\'s game.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaVideoStoryMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_VIDEO_STORY_MISSING', 400, $caller, $previous);
+        parent::__construct('MEDIA_VIDEO_STORY_MISSING', 'A non-story video cannot be repubblished as a story (emitted when trying to resend a non-story video as a story using inputDocument).', 400, $caller, $previous);
     }
 }

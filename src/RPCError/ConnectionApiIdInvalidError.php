@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ConnectionApiIdInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CONNECTION_API_ID_INVALID', 400, $caller, $previous);
+        parent::__construct('CONNECTION_API_ID_INVALID', 'The provided API id is invalid.', 400, $caller, $previous);
     }
 }

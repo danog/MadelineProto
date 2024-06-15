@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CreateCallFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CREATE_CALL_FAILED', 400, $caller, $previous);
+        parent::__construct('CREATE_CALL_FAILED', 'An error occurred while creating the call.', 400, $caller, $previous);
     }
 }

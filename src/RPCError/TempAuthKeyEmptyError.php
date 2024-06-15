@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TempAuthKeyEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TEMP_AUTH_KEY_EMPTY', 400, $caller, $previous);
+        parent::__construct('TEMP_AUTH_KEY_EMPTY', 'No temporary auth key provided.', 400, $caller, $previous);
     }
 }

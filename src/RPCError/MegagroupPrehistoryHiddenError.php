@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MegagroupPrehistoryHiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEGAGROUP_PREHISTORY_HIDDEN', 400, $caller, $previous);
+        parent::__construct('MEGAGROUP_PREHISTORY_HIDDEN', 'Group with hidden history for new members can\'t be set as discussion groups.', 400, $caller, $previous);
     }
 }

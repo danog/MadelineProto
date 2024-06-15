@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MsgTooOldError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MSG_TOO_OLD', 400, $caller, $previous);
+        parent::__construct('MSG_TOO_OLD', '[`chat_read_mark_expire_period` seconds](https://core.telegram.org/api/config#chat-read-mark-expire-period) have passed since the message was sent, read receipts were deleted.', 400, $caller, $previous);
     }
 }

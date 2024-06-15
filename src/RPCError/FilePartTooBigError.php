@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilePartTooBigError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_PART_TOO_BIG', 400, $caller, $previous);
+        parent::__construct('FILE_PART_TOO_BIG', 'The uploaded file part is too big.', 400, $caller, $previous);
     }
 }

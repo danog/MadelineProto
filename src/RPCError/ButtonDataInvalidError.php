@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ButtonDataInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BUTTON_DATA_INVALID', 400, $caller, $previous);
+        parent::__construct('BUTTON_DATA_INVALID', 'The data of one or more of the buttons you provided is invalid.', 400, $caller, $previous);
     }
 }

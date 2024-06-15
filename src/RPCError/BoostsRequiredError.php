@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BoostsRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOOSTS_REQUIRED', 400, $caller, $previous);
+        parent::__construct('BOOSTS_REQUIRED', 'The specified channel must first be [boosted by its users](https://core.telegram.org/api/boost) in order to perform this action.', 400, $caller, $previous);
     }
 }

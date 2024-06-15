@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebdocumentUrlInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBDOCUMENT_URL_INVALID', 400, $caller, $previous);
+        parent::__construct('WEBDOCUMENT_URL_INVALID', 'The specified webdocument URL is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ReplyToUserInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REPLY_TO_USER_INVALID', 400, $caller, $previous);
+        parent::__construct('REPLY_TO_USER_INVALID', 'The replied-to user is invalid.', 400, $caller, $previous);
     }
 }

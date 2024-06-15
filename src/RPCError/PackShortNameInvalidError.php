@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PackShortNameInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PACK_SHORT_NAME_INVALID', 400, $caller, $previous);
+        parent::__construct('PACK_SHORT_NAME_INVALID', 'Short pack name invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class NewSettingsInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('NEW_SETTINGS_INVALID', 400, $caller, $previous);
+        parent::__construct('NEW_SETTINGS_INVALID', 'The new password settings are invalid.', 400, $caller, $previous);
     }
 }

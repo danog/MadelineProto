@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AdminRankEmojiNotAllowedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ADMIN_RANK_EMOJI_NOT_ALLOWED', 400, $caller, $previous);
+        parent::__construct('ADMIN_RANK_EMOJI_NOT_ALLOWED', 'An admin rank cannot contain emojis.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RevoteNotAllowedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REVOTE_NOT_ALLOWED', 400, $caller, $previous);
+        parent::__construct('REVOTE_NOT_ALLOWED', 'You cannot change your vote.', 400, $caller, $previous);
     }
 }

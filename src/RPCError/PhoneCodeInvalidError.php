@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneCodeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_CODE_INVALID', 400, $caller, $previous);
+        parent::__construct('PHONE_CODE_INVALID', 'The provided phone code is invalid.', 400, $caller, $previous);
     }
 }

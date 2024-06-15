@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ButtonTextInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BUTTON_TEXT_INVALID', 400, $caller, $previous);
+        parent::__construct('BUTTON_TEXT_INVALID', 'The specified button text is invalid.', 400, $caller, $previous);
     }
 }

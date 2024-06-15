@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AlbumPhotosTooManyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ALBUM_PHOTOS_TOO_MANY', 400, $caller, $previous);
+        parent::__construct('ALBUM_PHOTOS_TOO_MANY', 'You have uploaded too many profile photos, delete some before retrying.', 400, $caller, $previous);
     }
 }

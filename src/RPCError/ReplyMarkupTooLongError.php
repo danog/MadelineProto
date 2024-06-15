@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ReplyMarkupTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REPLY_MARKUP_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('REPLY_MARKUP_TOO_LONG', 'The specified reply_markup is too long.', 400, $caller, $previous);
     }
 }

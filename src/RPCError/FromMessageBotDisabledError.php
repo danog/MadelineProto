@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FromMessageBotDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FROM_MESSAGE_BOT_DISABLED', 400, $caller, $previous);
+        parent::__construct('FROM_MESSAGE_BOT_DISABLED', 'Bots can\'t use fromMessage min constructors.', 400, $caller, $previous);
     }
 }

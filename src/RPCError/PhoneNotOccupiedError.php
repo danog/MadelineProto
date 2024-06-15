@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNotOccupiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NOT_OCCUPIED', 400, $caller, $previous);
+        parent::__construct('PHONE_NOT_OCCUPIED', 'No user is associated to the specified phone number.', 400, $caller, $previous);
     }
 }

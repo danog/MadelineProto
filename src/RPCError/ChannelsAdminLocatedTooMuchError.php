@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelsAdminLocatedTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNELS_ADMIN_LOCATED_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('CHANNELS_ADMIN_LOCATED_TOO_MUCH', 'The user has reached the limit of public geogroups.', 400, $caller, $previous);
     }
 }

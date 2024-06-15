@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('CHAT_NOT_MODIFIED', 'No changes were made to chat information because the new information you passed is identical to the current information.', 400, $caller, $previous);
     }
 }

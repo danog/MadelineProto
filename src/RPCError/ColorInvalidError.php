@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ColorInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('COLOR_INVALID', 400, $caller, $previous);
+        parent::__construct('COLOR_INVALID', 'The specified color palette ID was invalid.', 400, $caller, $previous);
     }
 }

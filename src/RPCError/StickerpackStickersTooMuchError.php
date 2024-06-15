@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerpackStickersTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKERPACK_STICKERS_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('STICKERPACK_STICKERS_TOO_MUCH', 'There are too many stickers in this stickerpack, you can\'t add any more.', 400, $caller, $previous);
     }
 }

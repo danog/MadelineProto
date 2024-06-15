@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatPublicRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_PUBLIC_REQUIRED', 400, $caller, $previous);
+        parent::__construct('CHAT_PUBLIC_REQUIRED', 'You can only enable join requests in public groups.', 400, $caller, $previous);
     }
 }

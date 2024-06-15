@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InputFilterInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INPUT_FILTER_INVALID', 400, $caller, $previous);
+        parent::__construct('INPUT_FILTER_INVALID', 'The specified filter is invalid.', 400, $caller, $previous);
     }
 }

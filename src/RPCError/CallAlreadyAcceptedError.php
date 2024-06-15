@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CallAlreadyAcceptedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CALL_ALREADY_ACCEPTED', 400, $caller, $previous);
+        parent::__construct('CALL_ALREADY_ACCEPTED', 'The call was already accepted.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserRestrictedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_RESTRICTED', 406, $caller, $previous);
+        parent::__construct('USER_RESTRICTED', 'You\'re spamreported, you can\'t create channels or chats.', 406, $caller, $previous);
     }
 }

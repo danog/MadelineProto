@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TtlMediaInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TTL_MEDIA_INVALID', 400, $caller, $previous);
+        parent::__construct('TTL_MEDIA_INVALID', 'Invalid media Time To Live was provided.', 400, $caller, $previous);
     }
 }

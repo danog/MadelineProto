@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatForwardsRestrictedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_FORWARDS_RESTRICTED', 406, $caller, $previous);
+        parent::__construct('CHAT_FORWARDS_RESTRICTED', 'You can\'t forward messages from a protected chat.', 406, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ButtonUrlInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BUTTON_URL_INVALID', 400, $caller, $previous);
+        parent::__construct('BUTTON_URL_INVALID', 'Button URL invalid.', 400, $caller, $previous);
     }
 }

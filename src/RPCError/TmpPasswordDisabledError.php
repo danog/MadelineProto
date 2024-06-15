@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TmpPasswordDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TMP_PASSWORD_DISABLED', 400, $caller, $previous);
+        parent::__construct('TMP_PASSWORD_DISABLED', 'The temporary password is disabled.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilePartsInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_PARTS_INVALID', 400, $caller, $previous);
+        parent::__construct('FILE_PARTS_INVALID', 'The number of file parts is invalid.', 400, $caller, $previous);
     }
 }

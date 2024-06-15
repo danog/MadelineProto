@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerPngNopngError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_PNG_NOPNG', 400, $caller, $previous);
+        parent::__construct('STICKER_PNG_NOPNG', 'One of the specified stickers is not a valid PNG file.', 400, $caller, $previous);
     }
 }

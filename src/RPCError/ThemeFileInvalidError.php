@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ThemeFileInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('THEME_FILE_INVALID', 400, $caller, $previous);
+        parent::__construct('THEME_FILE_INVALID', 'Invalid theme file provided.', 400, $caller, $previous);
     }
 }

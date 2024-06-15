@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class NewSettingsEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('NEW_SETTINGS_EMPTY', 400, $caller, $previous);
+        parent::__construct('NEW_SETTINGS_EMPTY', 'No password is set on the current account, and no new password was specified in `new_settings`.', 400, $caller, $previous);
     }
 }

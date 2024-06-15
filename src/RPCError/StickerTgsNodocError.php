@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerTgsNodocError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_TGS_NODOC', 400, $caller, $previous);
+        parent::__construct('STICKER_TGS_NODOC', 'You must send the animated sticker as a document.', 400, $caller, $previous);
     }
 }

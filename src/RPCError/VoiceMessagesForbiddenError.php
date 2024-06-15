@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class VoiceMessagesForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('VOICE_MESSAGES_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('VOICE_MESSAGES_FORBIDDEN', 'This user\'s privacy settings forbid you from sending voice messages.', 403, $caller, $previous);
     }
 }

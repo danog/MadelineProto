@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatAdminInviteRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_ADMIN_INVITE_REQUIRED', 403, $caller, $previous);
+        parent::__construct('CHAT_ADMIN_INVITE_REQUIRED', 'You do not have the rights to do this.', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotOnesideNotAvailError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_ONESIDE_NOT_AVAIL', 400, $caller, $previous);
+        parent::__construct('BOT_ONESIDE_NOT_AVAIL', 'Bots can\'t pin messages in PM just for themselves.', 400, $caller, $previous);
     }
 }

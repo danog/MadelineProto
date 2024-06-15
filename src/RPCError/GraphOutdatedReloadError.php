@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GraphOutdatedReloadError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GRAPH_OUTDATED_RELOAD', 400, $caller, $previous);
+        parent::__construct('GRAPH_OUTDATED_RELOAD', 'The graph is outdated, please get a new async token using stats.getBroadcastStats.', 400, $caller, $previous);
     }
 }

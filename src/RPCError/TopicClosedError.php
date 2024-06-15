@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TopicClosedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOPIC_CLOSED', 406, $caller, $previous);
+        parent::__construct('TOPIC_CLOSED', 'This topic was closed, you can\'t send messages to it anymore.', 406, $caller, $previous);
     }
 }

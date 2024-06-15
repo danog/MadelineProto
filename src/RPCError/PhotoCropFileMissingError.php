@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoCropFileMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_CROP_FILE_MISSING', 400, $caller, $previous);
+        parent::__construct('PHOTO_CROP_FILE_MISSING', 'Photo crop file missing.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserIsBlockedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_IS_BLOCKED', 403, $caller, $previous);
+        parent::__construct('USER_IS_BLOCKED', 'You were blocked by this user.', 403, $caller, $previous);
     }
 }

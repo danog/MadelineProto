@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EmailVerifyExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EMAIL_VERIFY_EXPIRED', 400, $caller, $previous);
+        parent::__construct('EMAIL_VERIFY_EXPIRED', 'The verification email has expired.', 400, $caller, $previous);
     }
 }

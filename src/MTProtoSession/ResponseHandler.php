@@ -235,7 +235,7 @@ trait ResponseHandler
                     EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
-            $this->handleReject($request, static fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
+            $this->handleReject($request, static fn () => RPCErrorException::make('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
             return;
         }
 
@@ -356,7 +356,7 @@ trait ResponseHandler
                     EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 303:
                 $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($this->API->isTestMode()) {
@@ -400,7 +400,7 @@ trait ResponseHandler
                     }
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 401:
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':
@@ -422,7 +422,7 @@ trait ResponseHandler
                             EventLoop::queue(
                                 $this->handleReject(...),
                                 $request,
-                                static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor)
+                                static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor)
                             );
                             return null;
                         }
@@ -449,7 +449,7 @@ trait ResponseHandler
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 420:
                 $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
@@ -470,7 +470,7 @@ trait ResponseHandler
                 }
                 // no break
             default:
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
         }
     }
 }

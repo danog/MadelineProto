@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EditBotInviteForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EDIT_BOT_INVITE_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('EDIT_BOT_INVITE_FORBIDDEN', 'Normal users can\'t edit invites that were created by bots.', 403, $caller, $previous);
     }
 }

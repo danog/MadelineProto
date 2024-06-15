@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserAlreadyParticipantError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_ALREADY_PARTICIPANT', 400, $caller, $previous);
+        parent::__construct('USER_ALREADY_PARTICIPANT', 'The user is already in the group.', 400, $caller, $previous);
     }
 }

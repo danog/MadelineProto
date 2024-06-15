@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class VideoTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('VIDEO_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('VIDEO_TITLE_EMPTY', 'The specified video title is empty.', 400, $caller, $previous);
     }
 }

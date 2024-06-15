@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PrivacyTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PRIVACY_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('PRIVACY_TOO_LONG', 'Too many privacy rules were specified, the current limit is 1000.', 400, $caller, $previous);
     }
 }

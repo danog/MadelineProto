@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StoryNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STORY_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('STORY_NOT_MODIFIED', 'The new story information you passed is equal to the previous story information, thus it wasn\'t modified.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InputUserDeactivatedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INPUT_USER_DEACTIVATED', 400, $caller, $previous);
+        parent::__construct('INPUT_USER_DEACTIVATED', 'The specified user was deleted.', 400, $caller, $previous);
     }
 }

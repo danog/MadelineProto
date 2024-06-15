@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessageDeleteForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_DELETE_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('MESSAGE_DELETE_FORBIDDEN', 'You can\'t delete one of the messages you tried to delete, most likely because it is a service message.', 403, $caller, $previous);
     }
 }

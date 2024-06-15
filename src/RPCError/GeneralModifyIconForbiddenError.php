@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GeneralModifyIconForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GENERAL_MODIFY_ICON_FORBIDDEN', 400, $caller, $previous);
+        parent::__construct('GENERAL_MODIFY_ICON_FORBIDDEN', 'You can\'t modify the icon of the "General" topic.', 400, $caller, $previous);
     }
 }

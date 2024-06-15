@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ThemeFormatInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('THEME_FORMAT_INVALID', 400, $caller, $previous);
+        parent::__construct('THEME_FORMAT_INVALID', 'Invalid theme format provided.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WallpaperNotFoundError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WALLPAPER_NOT_FOUND', 400, $caller, $previous);
+        parent::__construct('WALLPAPER_NOT_FOUND', 'The specified wallpaper could not be found.', 400, $caller, $previous);
     }
 }

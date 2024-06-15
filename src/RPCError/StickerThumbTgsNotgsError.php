@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerThumbTgsNotgsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_THUMB_TGS_NOTGS', 400, $caller, $previous);
+        parent::__construct('STICKER_THUMB_TGS_NOTGS', 'Incorrect stickerset TGS thumb file provided.', 400, $caller, $previous);
     }
 }

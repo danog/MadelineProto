@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InlineBotRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INLINE_BOT_REQUIRED', 403, $caller, $previous);
+        parent::__construct('INLINE_BOT_REQUIRED', 'Only the inline bot can edit message.', 403, $caller, $previous);
     }
 }

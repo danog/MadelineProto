@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QuizAnswerMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_ANSWER_MISSING', 400, $caller, $previous);
+        parent::__construct('QUIZ_ANSWER_MISSING', 'You can forward a quiz while hiding the original author only after choosing an option in the quiz.', 400, $caller, $previous);
     }
 }

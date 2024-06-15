@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EmojiNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EMOJI_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('EMOJI_NOT_MODIFIED', 'The theme wasn\'t changed.', 400, $caller, $previous);
     }
 }

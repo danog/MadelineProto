@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SearchQueryEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEARCH_QUERY_EMPTY', 400, $caller, $previous);
+        parent::__construct('SEARCH_QUERY_EMPTY', 'The search query is empty.', 400, $caller, $previous);
     }
 }

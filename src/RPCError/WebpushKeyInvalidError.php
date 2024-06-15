@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebpushKeyInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBPUSH_KEY_INVALID', 400, $caller, $previous);
+        parent::__construct('WEBPUSH_KEY_INVALID', 'The specified web push elliptic curve Diffie-Hellman public key is invalid.', 400, $caller, $previous);
     }
 }

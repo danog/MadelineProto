@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EncryptionAlreadyAcceptedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENCRYPTION_ALREADY_ACCEPTED', 400, $caller, $previous);
+        parent::__construct('ENCRYPTION_ALREADY_ACCEPTED', 'Secret chat already accepted.', 400, $caller, $previous);
     }
 }

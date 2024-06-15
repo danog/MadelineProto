@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ResultsTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RESULTS_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('RESULTS_TOO_MUCH', 'Too many results were provided.', 400, $caller, $previous);
     }
 }

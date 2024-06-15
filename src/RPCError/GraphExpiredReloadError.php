@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GraphExpiredReloadError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GRAPH_EXPIRED_RELOAD', 400, $caller, $previous);
+        parent::__construct('GRAPH_EXPIRED_RELOAD', 'This graph has expired, please obtain a new graph token.', 400, $caller, $previous);
     }
 }

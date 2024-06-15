@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_EMPTY', 400, $caller, $previous);
+        parent::__construct('MEDIA_EMPTY', 'The provided media object is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNumberUnoccupiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NUMBER_UNOCCUPIED', 400, $caller, $previous);
+        parent::__construct('PHONE_NUMBER_UNOCCUPIED', 'The phone number is not yet being used.', 400, $caller, $previous);
     }
 }

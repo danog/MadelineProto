@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelsAdminPublicTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNELS_ADMIN_PUBLIC_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('CHANNELS_ADMIN_PUBLIC_TOO_MUCH', 'You\'re admin of too many public channels, make some channels private to change the username of this channel.', 400, $caller, $previous);
     }
 }

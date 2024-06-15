@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChannelTooBigError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHANNEL_TOO_BIG', 400, $caller, $previous);
+        parent::__construct('CHANNEL_TOO_BIG', 'This channel has too many participants (>1000) to be deleted.', 400, $caller, $previous);
     }
 }

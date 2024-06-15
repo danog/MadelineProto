@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('CHAT_TITLE_EMPTY', 'No chat title provided.', 400, $caller, $previous);
     }
 }

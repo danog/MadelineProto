@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StoryIdEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STORY_ID_EMPTY', 400, $caller, $previous);
+        parent::__construct('STORY_ID_EMPTY', 'You specified no story IDs.', 400, $caller, $previous);
     }
 }

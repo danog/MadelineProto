@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhonePasswordFloodError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_PASSWORD_FLOOD', 406, $caller, $previous);
+        parent::__construct('PHONE_PASSWORD_FLOOD', 'You have tried logging in too many times.', 406, $caller, $previous);
     }
 }

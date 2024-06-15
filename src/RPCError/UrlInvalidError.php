@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UrlInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('URL_INVALID', 400, $caller, $previous);
+        parent::__construct('URL_INVALID', 'Invalid URL provided.', 400, $caller, $previous);
     }
 }

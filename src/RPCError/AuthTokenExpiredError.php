@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AuthTokenExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('AUTH_TOKEN_EXPIRED', 400, $caller, $previous);
+        parent::__construct('AUTH_TOKEN_EXPIRED', 'The authorization token has expired.', 400, $caller, $previous);
     }
 }

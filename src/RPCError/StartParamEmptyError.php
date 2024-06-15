@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StartParamEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('START_PARAM_EMPTY', 400, $caller, $previous);
+        parent::__construct('START_PARAM_EMPTY', 'The start parameter is empty.', 400, $caller, $previous);
     }
 }

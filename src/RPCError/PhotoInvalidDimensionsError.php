@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhotoInvalidDimensionsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHOTO_INVALID_DIMENSIONS', 400, $caller, $previous);
+        parent::__construct('PHOTO_INVALID_DIMENSIONS', 'The photo dimensions are invalid.', 400, $caller, $previous);
     }
 }

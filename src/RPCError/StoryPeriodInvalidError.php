@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StoryPeriodInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STORY_PERIOD_INVALID', 400, $caller, $previous);
+        parent::__construct('STORY_PERIOD_INVALID', 'The specified story period is invalid for this account.', 400, $caller, $previous);
     }
 }

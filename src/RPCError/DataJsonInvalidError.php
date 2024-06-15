@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class DataJsonInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('DATA_JSON_INVALID', 400, $caller, $previous);
+        parent::__construct('DATA_JSON_INVALID', 'The provided JSON data is invalid.', 400, $caller, $previous);
     }
 }

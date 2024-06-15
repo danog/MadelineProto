@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneHashExpiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_HASH_EXPIRED', 400, $caller, $previous);
+        parent::__construct('PHONE_HASH_EXPIRED', 'An invalid or expired `phone_code_hash` was provided.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TypesEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TYPES_EMPTY', 400, $caller, $previous);
+        parent::__construct('TYPES_EMPTY', 'No top peer type was provided.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ThemeMimeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('THEME_MIME_INVALID', 400, $caller, $previous);
+        parent::__construct('THEME_MIME_INVALID', 'The theme\'s MIME type is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PublicKeyRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PUBLIC_KEY_REQUIRED', 400, $caller, $previous);
+        parent::__construct('PUBLIC_KEY_REQUIRED', 'A public key is required.', 400, $caller, $previous);
     }
 }

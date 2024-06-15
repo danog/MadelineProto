@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class LangCodeNotSupportedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('LANG_CODE_NOT_SUPPORTED', 400, $caller, $previous);
+        parent::__construct('LANG_CODE_NOT_SUPPORTED', 'The specified language code is not supported.', 400, $caller, $previous);
     }
 }

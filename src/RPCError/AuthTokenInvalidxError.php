@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AuthTokenInvalidxError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('AUTH_TOKEN_INVALIDX', 400, $caller, $previous);
+        parent::__construct('AUTH_TOKEN_INVALIDX', 'The specified auth token is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatWriteForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_WRITE_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_WRITE_FORBIDDEN', 'You can\'t write in this chat.', 403, $caller, $previous);
     }
 }

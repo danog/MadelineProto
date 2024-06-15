@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AudioTitleEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('AUDIO_TITLE_EMPTY', 400, $caller, $previous);
+        parent::__construct('AUDIO_TITLE_EMPTY', 'An empty audio title was provided.', 400, $caller, $previous);
     }
 }

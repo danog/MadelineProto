@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ImportFormatUnrecognizedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('IMPORT_FORMAT_UNRECOGNIZED', 400, $caller, $previous);
+        parent::__construct('IMPORT_FORMAT_UNRECOGNIZED', 'The specified chat export file was exported from an unsupported chat app.', 400, $caller, $previous);
     }
 }

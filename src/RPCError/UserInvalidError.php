@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_INVALID', 403, $caller, $previous);
+        parent::__construct('USER_INVALID', 'Invalid user provided.', 403, $caller, $previous);
     }
 }

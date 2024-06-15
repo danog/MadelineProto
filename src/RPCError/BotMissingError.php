@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_MISSING', 400, $caller, $previous);
+        parent::__construct('BOT_MISSING', 'Only bots can call this method, please use [@stickers](https://t.me/stickers) if you\'re a user.', 400, $caller, $previous);
     }
 }

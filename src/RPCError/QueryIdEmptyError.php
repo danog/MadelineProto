@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QueryIdEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUERY_ID_EMPTY', 400, $caller, $previous);
+        parent::__construct('QUERY_ID_EMPTY', 'The query ID is empty.', 400, $caller, $previous);
     }
 }

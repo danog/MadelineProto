@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ConnectionAppVersionEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CONNECTION_APP_VERSION_EMPTY', 400, $caller, $previous);
+        parent::__construct('CONNECTION_APP_VERSION_EMPTY', 'App version is empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotWebviewDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_WEBVIEW_DISABLED', 400, $caller, $previous);
+        parent::__construct('BOT_WEBVIEW_DISABLED', 'A webview cannot be opened in the specified conditions: emitted for example if `from_bot_menu` or `url` are set and `peer` is not the chat with the bot.', 400, $caller, $previous);
     }
 }

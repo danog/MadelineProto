@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickersetInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKERSET_INVALID', 406, $caller, $previous);
+        parent::__construct('STICKERSET_INVALID', 'The provided sticker set is invalid.', 406, $caller, $previous);
     }
 }

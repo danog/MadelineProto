@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BroadcastPublicVotersForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BROADCAST_PUBLIC_VOTERS_FORBIDDEN', 400, $caller, $previous);
+        parent::__construct('BROADCAST_PUBLIC_VOTERS_FORBIDDEN', 'You can\'t forward polls with public voters.', 400, $caller, $previous);
     }
 }

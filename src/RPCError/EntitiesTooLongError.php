@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EntitiesTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENTITIES_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('ENTITIES_TOO_LONG', 'You provided too many styled message entities.', 400, $caller, $previous);
     }
 }

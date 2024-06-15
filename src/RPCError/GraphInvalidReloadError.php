@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GraphInvalidReloadError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GRAPH_INVALID_RELOAD', 400, $caller, $previous);
+        parent::__construct('GRAPH_INVALID_RELOAD', 'Invalid graph token provided, please reload the stats and provide the updated token.', 400, $caller, $previous);
     }
 }

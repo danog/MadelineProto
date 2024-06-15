@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ErrorTextEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ERROR_TEXT_EMPTY', 400, $caller, $previous);
+        parent::__construct('ERROR_TEXT_EMPTY', 'The provided error message is empty.', 400, $caller, $previous);
     }
 }

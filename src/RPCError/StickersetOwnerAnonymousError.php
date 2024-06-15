@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickersetOwnerAnonymousError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKERSET_OWNER_ANONYMOUS', 406, $caller, $previous);
+        parent::__construct('STICKERSET_OWNER_ANONYMOUS', 'Provided stickerset can\'t be installed as group stickerset to prevent admin deanonymization.', 406, $caller, $previous);
     }
 }

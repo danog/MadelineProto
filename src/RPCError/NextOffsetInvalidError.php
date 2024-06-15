@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class NextOffsetInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('NEXT_OFFSET_INVALID', 400, $caller, $previous);
+        parent::__construct('NEXT_OFFSET_INVALID', 'The specified offset is longer than 64 bytes.', 400, $caller, $previous);
     }
 }

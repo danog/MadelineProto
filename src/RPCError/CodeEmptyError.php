@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CodeEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CODE_EMPTY', 400, $caller, $previous);
+        parent::__construct('CODE_EMPTY', 'The provided code is empty.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PackShortNameOccupiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PACK_SHORT_NAME_OCCUPIED', 400, $caller, $previous);
+        parent::__construct('PACK_SHORT_NAME_OCCUPIED', 'A stickerpack with this name already exists.', 400, $caller, $previous);
     }
 }

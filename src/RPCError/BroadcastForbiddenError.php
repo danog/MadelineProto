@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BroadcastForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BROADCAST_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('BROADCAST_FORBIDDEN', 'Channel poll voters and reactions cannot be fetched to prevent deanonymization.', 403, $caller, $previous);
     }
 }

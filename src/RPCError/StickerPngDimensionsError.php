@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerPngDimensionsError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_PNG_DIMENSIONS', 400, $caller, $previous);
+        parent::__construct('STICKER_PNG_DIMENSIONS', 'Sticker png dimensions invalid.', 400, $caller, $previous);
     }
 }

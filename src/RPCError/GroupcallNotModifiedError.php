@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('GROUPCALL_NOT_MODIFIED', 'Group call settings weren\'t modified.', 400, $caller, $previous);
     }
 }

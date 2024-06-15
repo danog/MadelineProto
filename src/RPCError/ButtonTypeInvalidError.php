@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ButtonTypeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BUTTON_TYPE_INVALID', 400, $caller, $previous);
+        parent::__construct('BUTTON_TYPE_INVALID', 'The type of one or more of the buttons you provided is invalid.', 400, $caller, $previous);
     }
 }

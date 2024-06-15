@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ReactionEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REACTION_EMPTY', 400, $caller, $previous);
+        parent::__construct('REACTION_EMPTY', 'Empty reaction provided.', 400, $caller, $previous);
     }
 }

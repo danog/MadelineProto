@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FilerefUpgradeNeededError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILEREF_UPGRADE_NEEDED', 406, $caller, $previous);
+        parent::__construct('FILEREF_UPGRADE_NEEDED', 'The client has to be updated in order to support [file references](https://core.telegram.org/api/file_reference).', 406, $caller, $previous);
     }
 }

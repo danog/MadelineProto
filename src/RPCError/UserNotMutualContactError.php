@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserNotMutualContactError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_NOT_MUTUAL_CONTACT', 403, $caller, $previous);
+        parent::__construct('USER_NOT_MUTUAL_CONTACT', 'The provided user is not a mutual contact.', 403, $caller, $previous);
     }
 }

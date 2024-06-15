@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AuthBytesInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('AUTH_BYTES_INVALID', 400, $caller, $previous);
+        parent::__construct('AUTH_BYTES_INVALID', 'The provided authorization is invalid.', 400, $caller, $previous);
     }
 }

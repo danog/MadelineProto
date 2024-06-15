@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CustomReactionsTooManyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CUSTOM_REACTIONS_TOO_MANY', 400, $caller, $previous);
+        parent::__construct('CUSTOM_REACTIONS_TOO_MANY', 'Too many custom reactions were specified.', 400, $caller, $previous);
     }
 }

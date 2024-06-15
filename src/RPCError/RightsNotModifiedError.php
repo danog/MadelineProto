@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class RightsNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RIGHTS_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('RIGHTS_NOT_MODIFIED', 'The new admin rights are equal to the old rights, no change was made.', 400, $caller, $previous);
     }
 }

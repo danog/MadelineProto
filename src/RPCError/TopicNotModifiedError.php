@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TopicNotModifiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOPIC_NOT_MODIFIED', 400, $caller, $previous);
+        parent::__construct('TOPIC_NOT_MODIFIED', 'The updated topic info is equal to the current topic info, nothing was changed.', 400, $caller, $previous);
     }
 }

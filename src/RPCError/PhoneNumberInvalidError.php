@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNumberInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NUMBER_INVALID', 406, $caller, $previous);
+        parent::__construct('PHONE_NUMBER_INVALID', 'The phone number is invalid.', 406, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatSendStickersForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_SEND_STICKERS_FORBIDDEN', 403, $caller, $previous);
+        parent::__construct('CHAT_SEND_STICKERS_FORBIDDEN', 'You can\'t send stickers in this chat.', 403, $caller, $previous);
     }
 }

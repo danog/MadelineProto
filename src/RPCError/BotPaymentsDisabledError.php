@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BotPaymentsDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_PAYMENTS_DISABLED', 400, $caller, $previous);
+        parent::__construct('BOT_PAYMENTS_DISABLED', 'Please enable bot payments in botfather before calling this method.', 400, $caller, $previous);
     }
 }

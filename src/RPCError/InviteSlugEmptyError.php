@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class InviteSlugEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('INVITE_SLUG_EMPTY', 400, $caller, $previous);
+        parent::__construct('INVITE_SLUG_EMPTY', 'The specified invite slug is empty.', 400, $caller, $previous);
     }
 }

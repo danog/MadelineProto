@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PhoneNumberBannedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PHONE_NUMBER_BANNED', 400, $caller, $previous);
+        parent::__construct('PHONE_NUMBER_BANNED', 'The provided phone number is banned from telegram.', 400, $caller, $previous);
     }
 }

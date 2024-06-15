@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatInvitePermanentError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_INVITE_PERMANENT', 400, $caller, $previous);
+        parent::__construct('CHAT_INVITE_PERMANENT', 'You can\'t set an expiration date on permanent invite links.', 400, $caller, $previous);
     }
 }

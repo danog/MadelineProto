@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ParticipantsTooFewError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PARTICIPANTS_TOO_FEW', 400, $caller, $previous);
+        parent::__construct('PARTICIPANTS_TOO_FEW', 'Not enough participants.', 400, $caller, $previous);
     }
 }

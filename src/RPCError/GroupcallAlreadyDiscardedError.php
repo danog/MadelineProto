@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallAlreadyDiscardedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_ALREADY_DISCARDED', 400, $caller, $previous);
+        parent::__construct('GROUPCALL_ALREADY_DISCARDED', 'The group call was already discarded.', 400, $caller, $previous);
     }
 }

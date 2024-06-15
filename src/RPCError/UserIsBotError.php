@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserIsBotError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_IS_BOT', 400, $caller, $previous);
+        parent::__construct('USER_IS_BOT', 'Bots can\'t send messages to other bots.', 400, $caller, $previous);
     }
 }

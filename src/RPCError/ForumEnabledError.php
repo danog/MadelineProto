@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ForumEnabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FORUM_ENABLED', 400, $caller, $previous);
+        parent::__construct('FORUM_ENABLED', 'You can\'t execute the specified action because the group is a [forum](https://core.telegram.org/api/forum), disable forum functionality to continue.', 400, $caller, $previous);
     }
 }

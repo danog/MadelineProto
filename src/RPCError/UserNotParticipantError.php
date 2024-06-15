@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserNotParticipantError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_NOT_PARTICIPANT', 400, $caller, $previous);
+        parent::__construct('USER_NOT_PARTICIPANT', 'You\'re not a member of this supergroup/channel.', 400, $caller, $previous);
     }
 }

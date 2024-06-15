@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UsageLimitInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USAGE_LIMIT_INVALID', 400, $caller, $previous);
+        parent::__construct('USAGE_LIMIT_INVALID', 'The specified usage limit is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaCaptionTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_CAPTION_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('MEDIA_CAPTION_TOO_LONG', 'The caption is too long.', 400, $caller, $previous);
     }
 }

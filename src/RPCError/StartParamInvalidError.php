@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StartParamInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('START_PARAM_INVALID', 400, $caller, $previous);
+        parent::__construct('START_PARAM_INVALID', 'Start parameter invalid.', 400, $caller, $previous);
     }
 }

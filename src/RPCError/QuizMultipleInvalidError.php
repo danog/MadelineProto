@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class QuizMultipleInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_MULTIPLE_INVALID', 400, $caller, $previous);
+        parent::__construct('QUIZ_MULTIPLE_INVALID', 'Quizzes can\'t have the multiple_choice flag set!', 400, $caller, $previous);
     }
 }

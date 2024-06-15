@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_INVALID', 400, $caller, $previous);
+        parent::__construct('MEDIA_INVALID', 'Media invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MediaTypeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEDIA_TYPE_INVALID', 400, $caller, $previous);
+        parent::__construct('MEDIA_TYPE_INVALID', 'The specified media type cannot be used in stories.', 400, $caller, $previous);
     }
 }

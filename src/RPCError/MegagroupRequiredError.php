@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MegagroupRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MEGAGROUP_REQUIRED', 400, $caller, $previous);
+        parent::__construct('MEGAGROUP_REQUIRED', 'You can only use this method on a supergroup.', 400, $caller, $previous);
     }
 }

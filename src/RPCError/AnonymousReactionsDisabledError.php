@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AnonymousReactionsDisabledError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ANONYMOUS_REACTIONS_DISABLED', 403, $caller, $previous);
+        parent::__construct('ANONYMOUS_REACTIONS_DISABLED', 'Sorry, anonymous administrators cannot leave reactions or participate in polls.', 403, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class DhGAInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('DH_G_A_INVALID', 400, $caller, $previous);
+        parent::__construct('DH_G_A_INVALID', 'g_a invalid.', 400, $caller, $previous);
     }
 }

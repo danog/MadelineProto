@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StoriesTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STORIES_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('STORIES_TOO_MUCH', 'You have hit the maximum active stories limit as specified by the [`story_expiring_limit_*` client configuration parameters](https://core.telegram.org/api/config#story-expiring-limit-default): you should buy a [Premium](/api/premium) subscription, delete an active story, or wait for the oldest story to expire.', 400, $caller, $previous);
     }
 }

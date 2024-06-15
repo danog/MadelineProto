@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UsernameInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERNAME_INVALID', 400, $caller, $previous);
+        parent::__construct('USERNAME_INVALID', 'The provided username is not valid.', 400, $caller, $previous);
     }
 }

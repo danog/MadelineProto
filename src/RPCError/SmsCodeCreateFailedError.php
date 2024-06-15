@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SmsCodeCreateFailedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SMS_CODE_CREATE_FAILED', 400, $caller, $previous);
+        parent::__construct('SMS_CODE_CREATE_FAILED', 'An error occurred while creating the SMS code.', 400, $caller, $previous);
     }
 }

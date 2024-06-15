@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class HideRequesterMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('HIDE_REQUESTER_MISSING', 400, $caller, $previous);
+        parent::__construct('HIDE_REQUESTER_MISSING', 'The join request was missing or was already handled.', 400, $caller, $previous);
     }
 }

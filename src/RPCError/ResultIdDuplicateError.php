@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ResultIdDuplicateError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('RESULT_ID_DUPLICATE', 400, $caller, $previous);
+        parent::__construct('RESULT_ID_DUPLICATE', 'You provided a duplicate result ID.', 400, $caller, $previous);
     }
 }

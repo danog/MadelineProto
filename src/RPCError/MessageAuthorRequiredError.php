@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class MessageAuthorRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('MESSAGE_AUTHOR_REQUIRED', 403, $caller, $previous);
+        parent::__construct('MESSAGE_AUTHOR_REQUIRED', 'Message author required.', 403, $caller, $previous);
     }
 }

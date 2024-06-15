@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserChannelsTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USER_CHANNELS_TOO_MUCH', 403, $caller, $previous);
+        parent::__construct('USER_CHANNELS_TOO_MUCH', 'One of the users you tried to add is already in too many channels/supergroups.', 403, $caller, $previous);
     }
 }

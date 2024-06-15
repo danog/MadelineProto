@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ChatDiscussionUnallowedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_DISCUSSION_UNALLOWED', 400, $caller, $previous);
+        parent::__construct('CHAT_DISCUSSION_UNALLOWED', 'You can\'t enable forum topics in a discussion group linked to a channel.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ExportCardInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('EXPORT_CARD_INVALID', 400, $caller, $previous);
+        parent::__construct('EXPORT_CARD_INVALID', 'Provided card is invalid.', 400, $caller, $previous);
     }
 }

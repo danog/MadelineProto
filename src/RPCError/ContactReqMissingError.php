@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ContactReqMissingError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CONTACT_REQ_MISSING', 400, $caller, $previous);
+        parent::__construct('CONTACT_REQ_MISSING', 'Missing contact request.', 400, $caller, $previous);
     }
 }

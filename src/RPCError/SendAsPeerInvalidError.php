@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class SendAsPeerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SEND_AS_PEER_INVALID', 400, $caller, $previous);
+        parent::__construct('SEND_AS_PEER_INVALID', 'You can\'t send messages as the specified peer.', 400, $caller, $previous);
     }
 }

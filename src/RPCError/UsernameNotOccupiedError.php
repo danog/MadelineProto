@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UsernameNotOccupiedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERNAME_NOT_OCCUPIED', 400, $caller, $previous);
+        parent::__construct('USERNAME_NOT_OCCUPIED', 'The provided username is not occupied.', 400, $caller, $previous);
     }
 }

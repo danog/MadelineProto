@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class GroupcallSsrcDuplicateMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('GROUPCALL_SSRC_DUPLICATE_MUCH', 400, $caller, $previous);
+        parent::__construct('GROUPCALL_SSRC_DUPLICATE_MUCH', 'The app needs to retry joining the group call with a new SSRC value.', 400, $caller, $previous);
     }
 }

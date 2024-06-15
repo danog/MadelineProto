@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EntityMentionUserInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENTITY_MENTION_USER_INVALID', 400, $caller, $previous);
+        parent::__construct('ENTITY_MENTION_USER_INVALID', 'You mentioned an invalid user.', 400, $caller, $previous);
     }
 }

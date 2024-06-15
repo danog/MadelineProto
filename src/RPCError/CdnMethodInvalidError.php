@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CdnMethodInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CDN_METHOD_INVALID', 400, $caller, $previous);
+        parent::__construct('CDN_METHOD_INVALID', 'You can\'t call this method in a CDN DC.', 400, $caller, $previous);
     }
 }

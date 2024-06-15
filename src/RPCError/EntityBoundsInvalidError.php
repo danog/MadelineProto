@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class EntityBoundsInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENTITY_BOUNDS_INVALID', 400, $caller, $previous);
+        parent::__construct('ENTITY_BOUNDS_INVALID', 'A specified [entity offset or length](/api/entities#entity-length) is invalid, see [here &raquo;](/api/entities#entity-length) for info on how to properly compute the entity offset/length.', 400, $caller, $previous);
     }
 }

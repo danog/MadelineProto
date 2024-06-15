@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ReplyToInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('REPLY_TO_INVALID', 400, $caller, $previous);
+        parent::__construct('REPLY_TO_INVALID', 'The specified `reply_to` field is invalid.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class FreshChangeAdminsForbiddenError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FRESH_CHANGE_ADMINS_FORBIDDEN', 406, $caller, $previous);
+        parent::__construct('FRESH_CHANGE_ADMINS_FORBIDDEN', 'You were just elected admin, you can\'t add or modify other admins yet.', 406, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ScheduleStatusPrivateError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SCHEDULE_STATUS_PRIVATE', 400, $caller, $previous);
+        parent::__construct('SCHEDULE_STATUS_PRIVATE', 'Can\'t schedule until user is online, if the user\'s last seen timestamp is hidden by their privacy settings.', 400, $caller, $previous);
     }
 }

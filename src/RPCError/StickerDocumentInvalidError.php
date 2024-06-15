@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerDocumentInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_DOCUMENT_INVALID', 400, $caller, $previous);
+        parent::__construct('STICKER_DOCUMENT_INVALID', 'The specified sticker document is invalid.', 400, $caller, $previous);
     }
 }

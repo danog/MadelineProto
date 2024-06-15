@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class BannedRightsInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BANNED_RIGHTS_INVALID', 406, $caller, $previous);
+        parent::__construct('BANNED_RIGHTS_INVALID', 'You provided some invalid flags in the banned rights.', 406, $caller, $previous);
     }
 }

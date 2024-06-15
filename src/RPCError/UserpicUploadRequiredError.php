@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class UserpicUploadRequiredError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('USERPIC_UPLOAD_REQUIRED', 406, $caller, $previous);
+        parent::__construct('USERPIC_UPLOAD_REQUIRED', 'You must have a profile picture to publish your geolocation.', 406, $caller, $previous);
     }
 }

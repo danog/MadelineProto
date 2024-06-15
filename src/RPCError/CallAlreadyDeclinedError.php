@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class CallAlreadyDeclinedError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CALL_ALREADY_DECLINED', 400, $caller, $previous);
+        parent::__construct('CALL_ALREADY_DECLINED', 'The call was already declined.', 400, $caller, $previous);
     }
 }

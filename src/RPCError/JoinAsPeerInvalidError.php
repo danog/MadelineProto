@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class JoinAsPeerInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('JOIN_AS_PEER_INVALID', 400, $caller, $previous);
+        parent::__construct('JOIN_AS_PEER_INVALID', 'The specified peer cannot be used to join a group call.', 400, $caller, $previous);
     }
 }

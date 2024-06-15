@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class ScheduleTooMuchError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('SCHEDULE_TOO_MUCH', 400, $caller, $previous);
+        parent::__construct('SCHEDULE_TOO_MUCH', 'There are too many scheduled messages.', 400, $caller, $previous);
     }
 }

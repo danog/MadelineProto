@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class PersistentTimestampEmptyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PERSISTENT_TIMESTAMP_EMPTY', 400, $caller, $previous);
+        parent::__construct('PERSISTENT_TIMESTAMP_EMPTY', 'Persistent timestamp empty.', 400, $caller, $previous);
     }
 }

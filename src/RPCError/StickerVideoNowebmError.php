@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class StickerVideoNowebmError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('STICKER_VIDEO_NOWEBM', 400, $caller, $previous);
+        parent::__construct('STICKER_VIDEO_NOWEBM', 'The specified video sticker is not in webm format.', 400, $caller, $previous);
     }
 }

@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class WebdocumentMimeInvalidError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('WEBDOCUMENT_MIME_INVALID', 400, $caller, $previous);
+        parent::__construct('WEBDOCUMENT_MIME_INVALID', 'Invalid webdocument mime type provided.', 400, $caller, $previous);
     }
 }

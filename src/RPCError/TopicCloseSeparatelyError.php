@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class TopicCloseSeparatelyError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('TOPIC_CLOSE_SEPARATELY', 400, $caller, $previous);
+        parent::__construct('TOPIC_CLOSE_SEPARATELY', 'The `close` flag cannot be provided together with any of the other flags.', 400, $caller, $previous);
     }
 }

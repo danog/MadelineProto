@@ -24,8 +24,8 @@ use danog\MadelineProto\RPCErrorException;
  */
 final class AboutTooLongError extends RPCErrorException
 {
-    public function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ABOUT_TOO_LONG', 400, $caller, $previous);
+        parent::__construct('ABOUT_TOO_LONG', 'About string too long.', 400, $caller, $previous);
     }
 }
