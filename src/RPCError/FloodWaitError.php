@@ -32,11 +32,11 @@ final class FloodWaitError extends RPCErrorException
     public readonly int $waitTime;
     public function __construct(string $message, int $code, string $caller, ?Exception $previous = null)
     {
-        parent::__construct($message, $code, $caller, $previous);
-        Assert::true(str_starts_with($this->rpc, 'FLOOD_WAIT_'));
-        $seconds = substr($this->rpc, 11);
+        Assert::true(str_starts_with($message, 'FLOOD_WAIT_'));
+        $seconds = substr($message, 11);
         Assert::numeric($seconds);
         $this->waitTime = (int) $seconds;
+        parent::__construct($message, "A rate limit was encountered, please repeat the method call after $seconds seconds", $code, $caller, $previous);
     }
 
     /**

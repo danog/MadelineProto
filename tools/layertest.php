@@ -6,6 +6,8 @@ use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 
+use function Amp\async;
+
 /*
 Copyright 2016-2020 Daniil Gentili
 (https://daniil.it)
@@ -58,18 +60,24 @@ $methods = [];
 foreach ($new['methods']->by_id as $constructor) {
     $name = $constructor['method'];
     if (!$old['methods']->findByMethod($name)) {
-        if (strtolower($name) === 'account.deleteaccount') {
+        if (strtolower($name) === 'account.deleteaccount' || !str_contains($name, '.')) {
             continue;
         }
-        //readline("$name?");
         [$namespace, $method] = explode('.', $name);
-        try {
-            $bot->{$namespace}->{$method}();
-        } catch (RPCErrorException) {
-        }
-        try {
-            $user->{$namespace}->{$method}();
-        } catch (RPCErrorException) {
-        }
+
+        $methods []= async(static function () use ($namespace, $method, $bot): void {
+            try {
+                $bot->{$namespace}->{$method}();
+            } catch (RPCErrorException) {
+            }
+        });
+        $methods []= async(static function () use ($namespace, $method, $user): void {
+            try {
+                $user->{$namespace}->{$method}();
+            } catch (RPCErrorException) {
+            }
+        });
     }
 }
+
+var_dump(array_map('strval', \Amp\Future\awaitAll($methods)[0]));

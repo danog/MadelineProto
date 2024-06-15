@@ -51,7 +51,7 @@ final class TLSchema extends SettingsAbstract
     /**
      * Whether to enable fuzzing mode (all parameters will be populated with default values).
      */
-    protected bool $fuzz = false;
+    protected bool $fuzzMode = false;
     public function __sleep()
     {
         return array_merge(['wasUpgraded'], parent::__sleep());
@@ -194,7 +194,7 @@ final class TLSchema extends SettingsAbstract
      */
     public function getFuzzMode(): bool
     {
-        return $this->fuzz;
+        return $this->fuzzMode;
     }
 
     /**
@@ -202,7 +202,7 @@ final class TLSchema extends SettingsAbstract
      */
     public function setFuzzMode(bool $fuzz): self
     {
-        $this->fuzz = $fuzz;
+        $this->fuzzMode = $fuzz;
 
         return $this;
     }
