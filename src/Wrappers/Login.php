@@ -33,6 +33,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
+use danog\MadelineProto\RPCError\PasswordHashInvalidError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\Types\LoginQrCode;
@@ -331,12 +332,8 @@ trait Login
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         try {
             $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password], $this->authorized_dc);
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'PASSWORD_HASH_INVALID') {
-                $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password], $this->authorized_dc);
-            } else {
-                throw $e;
-            }
+        } catch (PasswordHashInvalidError) {
+            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password], $this->authorized_dc);
         }
         return $this->processAuthorization($res);
     }

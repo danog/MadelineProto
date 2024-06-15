@@ -27,7 +27,8 @@ use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\RPCError\EncryptionAlreadyAcceptedError;
+use danog\MadelineProto\RPCError\EncryptionAlreadyDeclinedError;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -246,10 +247,7 @@ trait AuthKeyHandler
         }
         try {
             $this->methodCallAsyncRead('messages.discardEncryption', ['chat_id' => $chat, 'delete_history' => $deleteHistory]);
-        } catch (RPCErrorException $e) {
-            if ($e->rpc !== 'ENCRYPTION_ALREADY_DECLINED') {
-                throw $e;
-            }
+        } catch (EncryptionAlreadyAcceptedError|EncryptionAlreadyDeclinedError) {
         }
     }
 }

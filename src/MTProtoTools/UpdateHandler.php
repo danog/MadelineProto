@@ -116,7 +116,9 @@ use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\ResponseException;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCError\MsgIdInvalidError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
@@ -1109,12 +1111,7 @@ trait UpdateHandler
                     if ($this->getSettings()->getDb()->getEnableFullPeerDb()) {
                         $this->peerDatabase->expireFull($id);
                     }
-                } catch (PeerNotInDbException) {
-                } catch (FloodWaitError) {
-                } catch (RPCErrorException $e) {
-                    if ($e->rpc !== 'CHANNEL_PRIVATE' && $e->rpc !== 'MSG_ID_INVALID') {
-                        throw $e;
-                    }
+                } catch (ChannelPrivateError|MsgIdInvalidError|PeerNotInDbException|FloodWaitError) {
                 }
             });
         }

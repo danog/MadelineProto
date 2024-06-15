@@ -47,6 +47,7 @@ use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\RPCError\FileTokenInvalidError;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
@@ -1211,15 +1212,10 @@ trait Files
                     $datacenter = $e->dc;
                 } catch (FloodWaitError $e) {
                     delay(1, cancellation: $cancellation);
-                } catch (RPCErrorException $e) {
-                    switch ($e->rpc) {
-                        case 'FILE_TOKEN_INVALID':
-                            $cdn = false;
-                            $datacenter = $this->authorized_dc;
-                            continue 3;
-                        default:
-                            throw $e;
-                    }
+                } catch (FileTokenInvalidError) {
+                    $cdn = false;
+                    $datacenter = $this->authorized_dc;
+                    continue 2;
                 }
             } while (true);
             $cancellation?->throwIfRequested();

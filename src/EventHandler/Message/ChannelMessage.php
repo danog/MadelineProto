@@ -20,7 +20,7 @@ use AssertionError;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\RPCError\MsgIdInvalidError;
 
 /**
  * Represents an incoming or outgoing channel message.
@@ -54,11 +54,8 @@ final class ChannelMessage extends Message
             $v = $this->getClient()->wrapMessage($r);
             \assert($v instanceof GroupMessage);
             return $v;
-        } catch (RPCErrorException $e) {
-            if ($e->rpc == 'MSG_ID_INVALID') {
-                return null;
-            }
-            throw $e;
+        } catch (MsgIdInvalidError) {
+            return null;
         }
     }
 
