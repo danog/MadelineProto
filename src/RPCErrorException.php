@@ -216,7 +216,7 @@ class RPCErrorException extends \Exception
         ?\Exception $previous = null
     ): self {
         // Start match
-        match ($rpc) {
+        return match ($rpc) {
             'ABOUT_TOO_LONG' => new \danog\MadelineProto\RPCError\AboutTooLongError($caller, $previous),
             'ACCESS_TOKEN_EXPIRED' => new \danog\MadelineProto\RPCError\AccessTokenExpiredError($caller, $previous),
             'ACCESS_TOKEN_INVALID' => new \danog\MadelineProto\RPCError\AccessTokenInvalidError($caller, $previous),

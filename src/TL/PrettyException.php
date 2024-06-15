@@ -58,7 +58,7 @@ trait PrettyException
      * @param string $init  Method name
      * @param array  $trace Async trace
      */
-    public function prettifyTL(string $init, ?array $trace = null): void
+    public function prettifyTL(string $init = '', ?array $trace = null): void
     {
         $this->method = $init;
         $previous_trace = $this->tlTrace;

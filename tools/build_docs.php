@@ -41,6 +41,9 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
+`rm -r src/RPCError/*`;
+`git checkout src/RPCError/FloodWaitError.php`;
+
 $map = [];
 
 $year = date('Y');
@@ -98,7 +101,7 @@ foreach ($errors['result'] as $code => $sub) {
 
 $err = file_get_contents('src/RPCErrorException.php');
 $err = preg_replace_callback('|// Start match.*// End match|sim', static function ($matches) use ($map) {
-    $data = "match (\$rpc) {\n";
+    $data = "return match (\$rpc) {\n";
     foreach ($map as $err => [$human, $code, $class]) {
         $data .= "$err => new $class(\$caller, \$previous),\n";
     }
