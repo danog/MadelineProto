@@ -204,30 +204,21 @@ class RPCErrorException extends \Exception
         $this->localized ??= self::localizeMessage($this->caller, $this->code, $this->message);
         return $this->localized;
     }
-    /**
-     * Set localized error name.
-     */
-    public function setLocalization(string $localization): void
-    {
-        $this->localized = $localization;
-    }
+
     public function __construct(
         /** @var string RPC error */
         public readonly string $rpc,
-        int $code = 0,
-        $caller = '',
+        int $code,
+        string $caller,
         ?Exception $previous = null
     ) {
         parent::__construct($rpc, $code, $previous);
-        if (\is_string($caller)) {
-            $this->prettifyTL($caller);
-            $this->caller = $caller;
-            $additional = [];
-            foreach ($this->getTrace() as $level) {
-                if (isset($level['function']) && $level['function'] === 'methodCall') {
-                    $this->line = $level['line'];
-                    $this->file = $level['file'];
-                }
+        $this->prettifyTL($caller);
+        $this->caller = $caller;
+        foreach ($this->getTrace() as $level) {
+            if (isset($level['function']) && $level['function'] === 'methodCall') {
+                $this->line = $level['line'];
+                $this->file = $level['file'];
             }
         }
         $this->getLocalization();

@@ -28,9 +28,9 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
-use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\TransportError;
 use Error;
 use Revolt\EventLoop;
 
@@ -109,7 +109,7 @@ final class ReadLoop extends Loop
                     $this->connection->reconnect();
                 } else {
                     $this->connection->reconnect();
-                    throw new RPCErrorException((string) $error, $error);
+                    throw new TransportError($error);
                 }
             });
             $this->API->logger("Stopping $this due to $error...", Logger::ERROR);

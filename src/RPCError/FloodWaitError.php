@@ -29,14 +29,14 @@ use function Amp\delay;
  */
 final class FloodWaitError extends RPCErrorException
 {
-    private int $seconds;
-    public function __construct($message = null, $code = 0, $caller = '', ?Exception $previous = null)
+    public readonly int $waitTime;
+    public function __construct(string $message, int $code, string $caller, ?Exception $previous = null)
     {
         parent::__construct($message, $code, $caller, $previous);
         Assert::true(str_starts_with($this->rpc, 'FLOOD_WAIT_'));
         $seconds = substr($this->rpc, 11);
         Assert::numeric($seconds);
-        $this->seconds = (int) $seconds;
+        $this->waitTime = (int) $seconds;
     }
 
     /**
@@ -44,7 +44,7 @@ final class FloodWaitError extends RPCErrorException
      */
     public function getWaitTime(): int
     {
-        return $this->seconds;
+        return $this->waitTime;
     }
 
     /**
@@ -52,6 +52,6 @@ final class FloodWaitError extends RPCErrorException
      */
     public function wait(): void
     {
-        delay($this->seconds);
+        delay($this->waitTime);
     }
 }
