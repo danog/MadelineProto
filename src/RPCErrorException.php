@@ -129,6 +129,7 @@ class RPCErrorException extends \Exception
         'USER_NOT_AVAILABLE' => true,
         'VOLUME_LOC_NOT_FOUND' => true,
         'FILE_WRITE_EMPTY' => true,
+        'Internal_Server_Error' => true,
     ];
 
     /** @internal */
