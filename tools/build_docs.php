@@ -77,6 +77,9 @@ $whitelist = [
     UserIsBlockedError::class => true,
     UserIsBotError::class => true,
     FileTokenInvalidError::class => true,
+    \danog\MadelineProto\RPCError\SessionPasswordNeededError::class => true,
+    \danog\MadelineProto\RPCError\ChannelPrivateError::class => true,
+    \danog\MadelineProto\RPCError\ChatForbiddenError::class => true,
 ];
 
 $whitelistMethods = [
@@ -170,8 +173,6 @@ $err = preg_replace_callback('|// Start match.*// End match|sim', static functio
 file_put_contents('src/RPCErrorException.php', $err);
 
 require 'tools/translator.php';
-
-copy('https://rpc.madelineproto.xyz/v3.json', 'src/v3.json');
 
 Magic::start(light: false);
 Logger::constructorFromSettings(new SettingsLogger);

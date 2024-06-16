@@ -28,6 +28,8 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatForbiddenError;
 use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 

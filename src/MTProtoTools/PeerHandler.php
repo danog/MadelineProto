@@ -29,6 +29,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -91,11 +92,10 @@ trait PeerHandler
             return $this->peerDatabase->isset($this->getIdInternal($id));
         } catch (Exception $e) {
             return false;
+        } catch (ChannelPrivateError) {
+            return true;
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'CHAT_FORBIDDEN') {
-                return true;
-            }
-            if ($e->rpc === 'CHANNEL_PRIVATE') {
                 return true;
             }
             return false;
