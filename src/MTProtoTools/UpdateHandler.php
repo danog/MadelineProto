@@ -119,6 +119,7 @@ use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCError\MsgIdInvalidError;
+use danog\MadelineProto\RPCError\SessionPasswordNeededError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\TL\TL;
@@ -1079,8 +1080,7 @@ trait UpdateHandler
                     );
                 }
                 $this->processAuthorization($authorization['authorization']);
-            } catch (RPCErrorException $e) {
-                if ($e->rpc === 'SESSION_PASSWORD_NEEDED') {
+            } catch (SessionPasswordNeededError) {
                     $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
                     $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
                     if (!isset($this->authorization['hint'])) {
@@ -1090,8 +1090,6 @@ trait UpdateHandler
                     $this->qrLoginDeferred?->cancel();
                     $this->qrLoginDeferred = null;
                     return;
-                }
-                throw $e;
             }
             return;
         }
