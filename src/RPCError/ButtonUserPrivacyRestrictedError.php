@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * The privacy setting of the user specified in a [inputKeyboardButtonUserProfile](/constructor/inputKeyboardButtonUserProfile) button do not allow creating such a button.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class ButtonUserPrivacyRestrictedError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BUTTON_USER_PRIVACY_RESTRICTED', 'The privacy setting of the user specified in a [inputKeyboardButtonUserProfile](/constructor/inputKeyboardButtonUserProfile) button do not allow creating such a button.', 400, $caller, $previous);
+        parent::__construct('BUTTON_USER_PRIVACY_RESTRICTED', 'The privacy setting of the user specified in a [inputKeyboardButtonUserProfile](/constructor/inputKeyboardButtonUserProfile) button do not allow creating such a button.', $code, $caller, $previous);
     }
 }

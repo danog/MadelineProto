@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * You can't send messages in this chat, you were restricted.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class ChatRestrictedError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_RESTRICTED', 'You can\'t send messages in this chat, you were restricted.', 400, $caller, $previous);
+        parent::__construct('CHAT_RESTRICTED', 'You can\'t send messages in this chat, you were restricted.', $code, $caller, $previous);
     }
 }

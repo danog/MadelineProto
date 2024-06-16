@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * Duplicate poll options provided.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class PollOptionDuplicateError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('POLL_OPTION_DUPLICATE', 'Duplicate poll options provided.', 400, $caller, $previous);
+        parent::__construct('POLL_OPTION_DUPLICATE', 'Duplicate poll options provided.', $code, $caller, $previous);
     }
 }

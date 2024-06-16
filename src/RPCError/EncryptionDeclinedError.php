@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * The secret chat was declined.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class EncryptionDeclinedError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENCRYPTION_DECLINED', 'The secret chat was declined.', 400, $caller, $previous);
+        parent::__construct('ENCRYPTION_DECLINED', 'The secret chat was declined.', $code, $caller, $previous);
     }
 }

@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * Please enable bot payments in botfather before calling this method.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class BotPaymentsDisabledError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('BOT_PAYMENTS_DISABLED', 'Please enable bot payments in botfather before calling this method.', 400, $caller, $previous);
+        parent::__construct('BOT_PAYMENTS_DISABLED', 'Please enable bot payments in botfather before calling this method.', $code, $caller, $previous);
     }
 }

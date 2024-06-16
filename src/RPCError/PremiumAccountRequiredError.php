@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * A premium account is required to execute this action.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class PremiumAccountRequiredError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PREMIUM_ACCOUNT_REQUIRED', 'A premium account is required to execute this action.', 403, $caller, $previous);
+        parent::__construct('PREMIUM_ACCOUNT_REQUIRED', 'A premium account is required to execute this action.', $code, $caller, $previous);
     }
 }

@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * Too many pinned dialogs.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class PinnedDialogsTooMuchError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('PINNED_DIALOGS_TOO_MUCH', 'Too many pinned dialogs.', 400, $caller, $previous);
+        parent::__construct('PINNED_DIALOGS_TOO_MUCH', 'Too many pinned dialogs.', $code, $caller, $previous);
     }
 }

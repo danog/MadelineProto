@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * Failure while processing image.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class ImageProcessFailedError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('IMAGE_PROCESS_FAILED', 'Failure while processing image.', 400, $caller, $previous);
+        parent::__construct('IMAGE_PROCESS_FAILED', 'Failure while processing image.', $code, $caller, $previous);
     }
 }

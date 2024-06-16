@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * Secret chat already accepted.
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class EncryptionAlreadyAcceptedError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('ENCRYPTION_ALREADY_ACCEPTED', 'Secret chat already accepted.', 400, $caller, $previous);
+        parent::__construct('ENCRYPTION_ALREADY_ACCEPTED', 'Secret chat already accepted.', $code, $caller, $previous);
     }
 }

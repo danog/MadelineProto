@@ -21,11 +21,15 @@ use danog\MadelineProto\RPCErrorException;
 
 /**
  * You specified too many correct answers in a quiz, quizzes can only have one right answer!
+ *
+ * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+ *
+ * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
 final class QuizCorrectAnswersTooMuchError extends RPCErrorException
 {
-    protected function __construct(string $caller, ?\Exception $previous = null)
+    protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('QUIZ_CORRECT_ANSWERS_TOO_MUCH', 'You specified too many correct answers in a quiz, quizzes can only have one right answer!', 400, $caller, $previous);
+        parent::__construct('QUIZ_CORRECT_ANSWERS_TOO_MUCH', 'You specified too many correct answers in a quiz, quizzes can only have one right answer!', $code, $caller, $previous);
     }
 }

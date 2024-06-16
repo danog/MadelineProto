@@ -19,6 +19,20 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
+use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatWriteForbiddenError;
+use danog\MadelineProto\RPCError\DcIdInvalidError;
+use danog\MadelineProto\RPCError\EncryptionAlreadyAcceptedError;
+use danog\MadelineProto\RPCError\EncryptionAlreadyDeclinedError;
+use danog\MadelineProto\RPCError\FileTokenInvalidError;
+use danog\MadelineProto\RPCError\InputUserDeactivatedError;
+use danog\MadelineProto\RPCError\MsgIdInvalidError;
+use danog\MadelineProto\RPCError\PasswordHashInvalidError;
+use danog\MadelineProto\RPCError\PeerIdInvalidError;
+use danog\MadelineProto\RPCError\UserIsBlockedError;
+use danog\MadelineProto\RPCError\UserIsBotError;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\StrTools;
@@ -46,6 +60,28 @@ require 'vendor/autoload.php';
 
 $map = [];
 
+$whitelist = [
+    EncryptionAlreadyAcceptedError::class => true,
+    EncryptionAlreadyDeclinedError::class => true,
+    CallAlreadyAcceptedError::class => true,
+    CallAlreadyDeclinedError::class => true,
+    PasswordHashInvalidError::class => true,
+    MsgIdInvalidError::class => true,
+    DcIdInvalidError::class => true,
+    ChannelPrivateError::class => true,
+    ChatWriteForbiddenError::class => true,
+    InputUserDeactivatedError::class => true,
+    PeerIdInvalidError::class => true,
+    UserIsBlockedError::class => true,
+    UserIsBotError::class => true,
+    FileTokenInvalidError::class => true,
+];
+
+$whitelistMethods = [
+    'messages.sendMessage',
+    'messages.sendMedia',
+];
+
 $year = date('Y');
 $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
 foreach ($errors['result'] as $code => $sub) {
@@ -53,16 +89,28 @@ foreach ($errors['result'] as $code => $sub) {
         continue;
     }
     $code = var_export($code, true);
-    foreach ($sub as $err => $_) {
+    foreach ($sub as $err => $methods) {
         $camel = ucfirst(StrTools::toCamelCase(strtolower($err))).'Error';
         if (!preg_match('/^\w+$/', $camel)) {
             continue;
         }
+        $class = "danog\\MadelineProto\\RPCError\\$camel";
+        if (array_intersect($methods, $whitelistMethods)
+            && !str_contains($err, 'INVALID')
+            && !str_contains($err, 'TOO_LONG')
+            && !str_contains($err, '_EMPTY')
+        ) {
+            $whitelist[$class] = true;
+        }
+
         $human = $humanOrig = $errors['human_result'][$err];
         $err = var_export($err, true);
         $human = var_export($human, true);
 
-        $map[$err] = [$human, $code, "\\danog\\MadelineProto\\RPCError\\$camel"];
+        $map[$err] = [$human, $code, $class];
+        if (!isset($whitelist[$class])) {
+            continue;
+        }
         $phpCode = <<< PHP
             <?php declare(strict_types=1);
             /**
@@ -87,11 +135,15 @@ foreach ($errors['result'] as $code => $sub) {
 
             /**
              * $humanOrig
+             * 
+             * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+             * 
+             * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
              */
             final class $camel extends RPCErrorException
             {
-                protected function __construct(string \$caller, ?\\Exception \$previous = null) {
-                    parent::__construct($err, $human, $code, \$caller, \$previous);
+                protected function __construct(int \$code, string \$caller, ?\\Exception \$previous = null) {
+                    parent::__construct($err, $human, \$code, \$caller, \$previous);
                 }
             }
             PHP;
@@ -100,10 +152,14 @@ foreach ($errors['result'] as $code => $sub) {
 }
 
 $err = file_get_contents('src/RPCErrorException.php');
-$err = preg_replace_callback('|// Start match.*// End match|sim', static function ($matches) use ($map) {
+$err = preg_replace_callback('|// Start match.*// End match|sim', static function ($matches) use ($map, $whitelist) {
     $data = "return match (\$rpc) {\n";
     foreach ($map as $err => [$human, $code, $class]) {
-        $data .= "$err => new $class(\$caller, \$previous),\n";
+        if (isset($whitelist[$class])) {
+            $data .= "$err => new \\$class(\$code, \$caller, \$previous),\n";
+        } else {
+            $data .= "$err => new self(\$rpc, $human, \$code, \$caller, \$previous),\n";
+        }
     }
     $data .= "default => new self(\$rpc, self::report(\$rpc, \$code, \$caller), \$code, \$caller, \$previous)\n";
     $data .= "};\n";
