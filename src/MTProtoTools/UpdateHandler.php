@@ -1081,15 +1081,15 @@ trait UpdateHandler
                 }
                 $this->processAuthorization($authorization['authorization']);
             } catch (SessionPasswordNeededError) {
-                    $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
-                    if (!isset($this->authorization['hint'])) {
-                        $this->authorization['hint'] = '';
-                    }
-                    $this->authorized = API::WAITING_PASSWORD;
-                    $this->qrLoginDeferred?->cancel();
-                    $this->qrLoginDeferred = null;
-                    return;
+                $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
+                $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
+                if (!isset($this->authorization['hint'])) {
+                    $this->authorization['hint'] = '';
+                }
+                $this->authorized = API::WAITING_PASSWORD;
+                $this->qrLoginDeferred?->cancel();
+                $this->qrLoginDeferred = null;
+                return;
             }
             return;
         }

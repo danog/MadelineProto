@@ -50,7 +50,7 @@ use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\RPCError\FileTokenInvalidError;
 use danog\MadelineProto\RPCError\FloodPremiumWaitError;
 use danog\MadelineProto\RPCError\FloodWaitError;
-use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\RPCError\RequestTokenInvalidError;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\StreamEof;
@@ -1247,16 +1247,10 @@ trait Files
                 $this->getConfig();
                 try {
                     $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $this->authorized_dc));
-                } catch (RPCErrorException $e) {
-                    switch ($e->rpc) {
-                        case 'FILE_TOKEN_INVALID':
-                        case 'REQUEST_TOKEN_INVALID':
-                            $cdn = false;
-                            $datacenter = $this->authorized_dc;
-                            continue 2;
-                        default:
-                            throw $e;
-                    }
+                } catch (FileTokenInvalidError|RequestTokenInvalidError) {
+                    $cdn = false;
+                    $datacenter = $this->authorized_dc;
+                    continue;
                 }
                 continue;
             }

@@ -120,15 +120,15 @@ trait Login
                 }
                 $this->processAuthorization($authorization['authorization']);
             } catch (SessionPasswordNeededError) {
-                    $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                    $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
-                    if (!isset($this->authorization['hint'])) {
-                        $this->authorization['hint'] = '';
-                    }
-                    $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
-                    $this->qrLoginDeferred?->cancel();
-                    $this->qrLoginDeferred = null;
-                    return null;
+                $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
+                $this->authorization = $this->methodCallAsyncRead('account.getPassword', [], $datacenter ?? null);
+                if (!isset($this->authorization['hint'])) {
+                    $this->authorization['hint'] = '';
+                }
+                $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
+                $this->qrLoginDeferred?->cancel();
+                $this->qrLoginDeferred = null;
+                return null;
             }
             return null;
         }
@@ -217,13 +217,13 @@ trait Login
         try {
             $authorization = $this->methodCallAsyncRead('auth.signIn', ['phone_number' => $this->authorization['phone_number'], 'phone_code_hash' => $this->authorization['phone_code_hash'], 'phone_code' => $code]);
         } catch (SessionPasswordNeededError) {
-                $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
-                $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
-                if (!isset($this->authorization['hint'])) {
-                    $this->authorization['hint'] = '';
-                }
-                $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
-                return $this->authorization;
+            $this->logger->logger(Lang::$current_lang['login_2fa_enabled'], Logger::NOTICE);
+            $this->authorization = $this->methodCallAsyncRead('account.getPassword', []);
+            if (!isset($this->authorization['hint'])) {
+                $this->authorization['hint'] = '';
+            }
+            $this->authorized = \danog\MadelineProto\API::WAITING_PASSWORD;
+            return $this->authorization;
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'PHONE_NUMBER_UNOCCUPIED') {
                 $this->logger->logger(Lang::$current_lang['login_need_signup'], Logger::NOTICE);

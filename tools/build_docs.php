@@ -77,6 +77,7 @@ $whitelist = [
     UserIsBlockedError::class => true,
     UserIsBotError::class => true,
     FileTokenInvalidError::class => true,
+    \danog\MadelineProto\RPCError\RequestTokenInvalidError::class => true,
     \danog\MadelineProto\RPCError\SessionPasswordNeededError::class => true,
     \danog\MadelineProto\RPCError\ChannelPrivateError::class => true,
     \danog\MadelineProto\RPCError\ChatForbiddenError::class => true,

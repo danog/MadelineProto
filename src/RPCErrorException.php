@@ -555,7 +555,7 @@ class RPCErrorException extends \Exception
             'REPLY_MESSAGE_ID_INVALID' => new self($rpc, 'The specified reply-to message ID is invalid.', $code, $caller, $previous),
             'REPLY_TO_INVALID' => new self($rpc, 'The specified `reply_to` field is invalid.', $code, $caller, $previous),
             'REPLY_TO_USER_INVALID' => new self($rpc, 'The replied-to user is invalid.', $code, $caller, $previous),
-            'REQUEST_TOKEN_INVALID' => new self($rpc, 'The master DC did not accept the `request_token` from the CDN DC. Continue downloading the file from the master DC using upload.getFile.', $code, $caller, $previous),
+            'REQUEST_TOKEN_INVALID' => new \danog\MadelineProto\RPCError\RequestTokenInvalidError($code, $caller, $previous),
             'RESET_REQUEST_MISSING' => new self($rpc, 'No password reset is in progress.', $code, $caller, $previous),
             'RESULT_ID_DUPLICATE' => new self($rpc, 'You provided a duplicate result ID.', $code, $caller, $previous),
             'RESULT_ID_EMPTY' => new self($rpc, 'Result ID empty.', $code, $caller, $previous),
