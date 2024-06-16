@@ -130,6 +130,7 @@ class RPCErrorException extends \Exception
         'VOLUME_LOC_NOT_FOUND' => true,
         'FILE_WRITE_EMPTY' => true,
         'Internal_Server_Error' => true,
+        'INVITE_HASH_UNSYNC' => true,
     ];
 
     /** @internal */

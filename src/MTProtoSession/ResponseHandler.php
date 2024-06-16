@@ -31,7 +31,9 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCError\FloodPremiumWaitError;
 use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
@@ -451,9 +453,9 @@ trait ResponseHandler
                 }
                 return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 420:
-                $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $seconds = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
-                if (is_numeric($seconds) && $seconds < $limit) {
+                if ($seconds < $limit) {
                     $this->API->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
@@ -466,9 +468,27 @@ trait ResponseHandler
                     return null;
                 }
                 if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
-                    return static fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->constructor);
+                    return static fn () => new FloodWaitError(
+                        $response['error_message'],
+                        $seconds,
+                        $response['error_code'],
+                        $request->constructor
+                    );
                 }
-                // no break
+                if (str_starts_with($response['error_message'], 'FLOOD_PREMIUM_WAIT_')) {
+                    return static fn () => new FloodPremiumWaitError(
+                        $response['error_message'],
+                        $seconds,
+                        $response['error_code'],
+                        $request->constructor
+                    );
+                }
+                return static fn () => new RateLimitError(
+                    $response['error_message'],
+                    $seconds,
+                    $response['error_code'],
+                    $request->constructor
+                );
             default:
                 return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
         }

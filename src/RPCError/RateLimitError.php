@@ -18,9 +18,36 @@
 
 namespace danog\MadelineProto\RPCError;
 
+use Amp\Cancellation;
+use danog\MadelineProto\RPCErrorException;
+use Exception;
+
+use function Amp\delay;
+
 /**
- * Represents a FLOOD_WAIT_ RPC error returned by telegram.
+ * Represents a rate limiting RPC error returned by telegram.
  */
-final class FloodWaitError extends RateLimitError
+class RateLimitError extends RPCErrorException
 {
+    /** @internal */
+    public function __construct(string $message, public readonly int $waitTime, int $code, string $caller, ?Exception $previous = null)
+    {
+        parent::__construct($message, "A rate limit was encountered, please repeat the method call after $waitTime seconds", $code, $caller, $previous);
+    }
+
+    /**
+     * Returns the required waiting period in seconds before repeating the RPC call.
+     */
+    public function getWaitTime(): int
+    {
+        return $this->waitTime;
+    }
+
+    /**
+     * Waits for the required waiting period.
+     */
+    public function wait(?Cancellation $cancellation = null): void
+    {
+        delay($this->waitTime, cancellation: $cancellation);
+    }
 }

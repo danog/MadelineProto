@@ -48,6 +48,7 @@ use danog\MadelineProto\FileRedirect;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\RPCError\FileTokenInvalidError;
+use danog\MadelineProto\RPCError\FloodPremiumWaitError;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
@@ -358,6 +359,12 @@ trait Files
                         }
                         $d->complete();
                         return;
+                    } catch (FloodPremiumWaitError $e) {
+                        $this->logger("Got {$e->rpc} while uploading $part_num: {$datacenter}, retrying...");
+                        $writePromise = async(static function () use ($cancellation, $e, $writeCb): void {
+                            $e->wait($cancellation);
+                            $writeCb();
+                        });
                     } catch (FileRedirect $e) {
                         $datacenter = $e->dc;
                         $this->logger("Got redirect while uploading $part_num: {$datacenter}");
@@ -1210,8 +1217,10 @@ trait Files
                     break;
                 } catch (FileRedirect $e) {
                     $datacenter = $e->dc;
-                } catch (FloodWaitError $e) {
+                } catch (FloodWaitError) {
                     delay(1, cancellation: $cancellation);
+                } catch (FloodPremiumWaitError $e) {
+                    $e->wait($cancellation);
                 } catch (FileTokenInvalidError) {
                     $cdn = false;
                     $datacenter = $this->authorized_dc;

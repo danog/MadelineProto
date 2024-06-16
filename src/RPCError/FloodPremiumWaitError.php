@@ -19,8 +19,8 @@
 namespace danog\MadelineProto\RPCError;
 
 /**
- * Represents a FLOOD_WAIT_ RPC error returned by telegram.
+ * Represents a FLOOD_PREMIUM_WAIT_ RPC error returned by telegram.
  */
-final class FloodWaitError extends RateLimitError
+final class FloodPremiumWaitError extends RateLimitError
 {
 }

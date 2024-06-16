@@ -57,6 +57,8 @@ require 'vendor/autoload.php';
 
 `rm -r src/RPCError/*`;
 `git checkout src/RPCError/FloodWaitError.php`;
+`git checkout src/RPCError/FloodPremiumWaitError.php`;
+`git checkout src/RPCError/RateLimitError.php`;
 
 $map = [];
 
