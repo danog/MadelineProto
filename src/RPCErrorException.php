@@ -131,6 +131,7 @@ class RPCErrorException extends \Exception
         'FILE_WRITE_EMPTY' => true,
         'Internal_Server_Error' => true,
         'INVITE_HASH_UNSYNC' => true,
+        'CHANNEL_ID_GENERATE_FAILED' => true,
     ];
 
     /** @internal */
