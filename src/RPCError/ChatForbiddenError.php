@@ -20,7 +20,7 @@ namespace danog\MadelineProto\RPCError;
 use danog\MadelineProto\RPCErrorException;
 
 /**
- *
+ * This chat is not available to the current user.
  *
  * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
  *
@@ -30,6 +30,6 @@ final class ChatForbiddenError extends RPCErrorException
 {
     protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_FORBIDDEN', '', $code, $caller, $previous);
+        parent::__construct('CHAT_FORBIDDEN', 'This chat is not available to the current user.', $code, $caller, $previous);
     }
 }

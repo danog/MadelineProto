@@ -20,7 +20,7 @@ namespace danog\MadelineProto\RPCError;
 use danog\MadelineProto\RPCErrorException;
 
 /**
- * The specified file token is invalid.
+ * The master DC did not accept the `file_token` (e.g., the token has expired). Continue downloading the file from the master DC using upload.getFile.
  *
  * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
  *
@@ -30,6 +30,6 @@ final class FileTokenInvalidError extends RPCErrorException
 {
     protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('FILE_TOKEN_INVALID', 'The specified file token is invalid.', $code, $caller, $previous);
+        parent::__construct('FILE_TOKEN_INVALID', 'The master DC did not accept the `file_token` (e.g., the token has expired). Continue downloading the file from the master DC using upload.getFile.', $code, $caller, $previous);
     }
 }
