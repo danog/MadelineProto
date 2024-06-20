@@ -19,8 +19,23 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
+use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatWriteForbiddenError;
+use danog\MadelineProto\RPCError\DcIdInvalidError;
+use danog\MadelineProto\RPCError\EncryptionAlreadyAcceptedError;
+use danog\MadelineProto\RPCError\EncryptionAlreadyDeclinedError;
+use danog\MadelineProto\RPCError\FileTokenInvalidError;
+use danog\MadelineProto\RPCError\InputUserDeactivatedError;
+use danog\MadelineProto\RPCError\MsgIdInvalidError;
+use danog\MadelineProto\RPCError\PasswordHashInvalidError;
+use danog\MadelineProto\RPCError\PeerIdInvalidError;
+use danog\MadelineProto\RPCError\UserIsBlockedError;
+use danog\MadelineProto\RPCError\UserIsBotError;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\StrTools;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use danog\PhpDoc\PhpDoc;
@@ -40,9 +55,125 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
-require 'tools/translator.php';
+`rm -r src/RPCError/*`;
+`git checkout src/RPCError/FloodWaitError.php`;
+`git checkout src/RPCError/FloodPremiumWaitError.php`;
+`git checkout src/RPCError/RateLimitError.php`;
 
-copy('https://rpc.madelineproto.xyz/v3.json', 'src/v3.json');
+$map = [];
+
+$whitelist = [
+    EncryptionAlreadyAcceptedError::class => true,
+    EncryptionAlreadyDeclinedError::class => true,
+    CallAlreadyAcceptedError::class => true,
+    CallAlreadyDeclinedError::class => true,
+    PasswordHashInvalidError::class => true,
+    MsgIdInvalidError::class => true,
+    DcIdInvalidError::class => true,
+    ChannelPrivateError::class => true,
+    ChatWriteForbiddenError::class => true,
+    InputUserDeactivatedError::class => true,
+    PeerIdInvalidError::class => true,
+    UserIsBlockedError::class => true,
+    UserIsBotError::class => true,
+    FileTokenInvalidError::class => true,
+    \danog\MadelineProto\RPCError\RequestTokenInvalidError::class => true,
+    \danog\MadelineProto\RPCError\SessionPasswordNeededError::class => true,
+    \danog\MadelineProto\RPCError\ChannelPrivateError::class => true,
+    \danog\MadelineProto\RPCError\ChatForbiddenError::class => true,
+];
+
+$whitelistMethods = [
+    'messages.sendMessage',
+    'messages.sendMedia',
+];
+
+$year = date('Y');
+$errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
+foreach ($errors['result'] as $code => $sub) {
+    if (abs($code) === 500 || $code < 0) {
+        continue;
+    }
+    $code = var_export($code, true);
+    foreach ($sub as $err => $methods) {
+        $camel = ucfirst(StrTools::toCamelCase(strtolower($err))).'Error';
+        if (!preg_match('/^\w+$/', $camel)) {
+            continue;
+        }
+        $class = "danog\\MadelineProto\\RPCError\\$camel";
+        if (array_intersect($methods, $whitelistMethods)
+            && !str_contains($err, 'INVALID')
+            && !str_contains($err, 'TOO_LONG')
+            && !str_contains($err, '_EMPTY')
+        ) {
+            $whitelist[$class] = true;
+        }
+
+        $human = $humanOrig = $errors['human_result'][$err];
+        $err = var_export($err, true);
+        $human = var_export($human, true);
+
+        $map[$err] = [$human, $code, $class];
+        if (!isset($whitelist[$class])) {
+            continue;
+        }
+        $phpCode = <<< PHP
+            <?php declare(strict_types=1);
+            /**
+             * $camel error.
+             *
+             * This file is part of MadelineProto.
+             * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+             * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+             * See the GNU Affero General Public License for more details.
+             * You should have received a copy of the GNU General Public License along with MadelineProto.
+             * If not, see <http://www.gnu.org/licenses/>.
+             *
+             * @author    Daniil Gentili <daniil@daniil.it>
+             * @copyright 2016-$year Daniil Gentili <daniil@daniil.it>
+             * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+             * @link https://docs.madelineproto.xyz MadelineProto documentation
+             */
+
+            namespace danog\MadelineProto\RPCError;
+
+            use danog\MadelineProto\RPCErrorException;
+
+            /**
+             * $humanOrig
+             * 
+             * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
+             * 
+             * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
+             */
+            final class $camel extends RPCErrorException
+            {
+                protected function __construct(int \$code, string \$caller, ?\\Exception \$previous = null) {
+                    parent::__construct($err, $human, \$code, \$caller, \$previous);
+                }
+            }
+            PHP;
+        file_put_contents("src/RPCError/$camel.php", $phpCode);
+    }
+}
+
+$err = file_get_contents('src/RPCErrorException.php');
+$err = preg_replace_callback('|// Start match.*// End match|sim', static function ($matches) use ($map, $whitelist) {
+    $data = "return match (\$rpc) {\n";
+    foreach ($map as $err => [$human, $code, $class]) {
+        if (isset($whitelist[$class])) {
+            $data .= "$err => new \\$class(\$code, \$caller, \$previous),\n";
+        } else {
+            $data .= "$err => new self(\$rpc, $human, \$code, \$caller, \$previous),\n";
+        }
+    }
+    $data .= "default => new self(\$rpc, self::report(\$rpc, \$code, \$caller), \$code, \$caller, \$previous)\n";
+    $data .= "};\n";
+    return "// Start match\n$data\n// End match";
+}, $err);
+file_put_contents('src/RPCErrorException.php', $err);
+
+require 'tools/translator.php';
 
 Magic::start(light: false);
 Logger::constructorFromSettings(new SettingsLogger);

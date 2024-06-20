@@ -29,6 +29,9 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatAdminRequiredError;
+use danog\MadelineProto\RPCError\ChatForbiddenError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
@@ -89,15 +92,9 @@ trait PeerHandler
     {
         try {
             return $this->peerDatabase->isset($this->getIdInternal($id));
-        } catch (Exception $e) {
-            return false;
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'CHAT_FORBIDDEN') {
-                return true;
-            }
-            if ($e->rpc === 'CHANNEL_PRIVATE') {
-                return true;
-            }
+        } catch (ChannelPrivateError|ChatForbiddenError) {
+            return true;
+        } catch (RPCErrorException|Exception) {
             return false;
         }
     }
@@ -753,9 +750,6 @@ trait PeerHandler
                 if (isset($full['full']['exported_invite']['link'])) {
                     $res['invite'] = $full['full']['exported_invite']['link'];
                 }
-                if (isset($full['full']['participants']['participants'])) {
-                    $res['participants'] = $full['full']['participants']['participants'];
-                }
                 break;
         }
         if (isset($res['participants']) && $fullfetch) {
@@ -765,26 +759,11 @@ trait PeerHandler
                 if (isset($participant['inviter_id'])) {
                     $newres['inviter'] = ($this->getPwrChat($participant['inviter_id'], false));
                 }
-                if (isset($participant['promoted_by'])) {
-                    $newres['promoted_by'] = ($this->getPwrChat($participant['promoted_by'], false));
-                }
                 if (isset($participant['kicked_by'])) {
                     $newres['kicked_by'] = ($this->getPwrChat($participant['kicked_by'], false));
                 }
                 if (isset($participant['date'])) {
                     $newres['date'] = $participant['date'];
-                }
-                if (isset($participant['admin_rights'])) {
-                    $newres['admin_rights'] = $participant['admin_rights'];
-                }
-                if (isset($participant['banned_rights'])) {
-                    $newres['banned_rights'] = $participant['banned_rights'];
-                }
-                if (isset($participant['can_edit'])) {
-                    $newres['can_edit'] = $participant['can_edit'];
-                }
-                if (isset($participant['left'])) {
-                    $newres['left'] = $participant['left'];
                 }
                 switch ($participant['_']) {
                     case 'chatParticipant':
@@ -870,12 +849,9 @@ trait PeerHandler
         do {
             try {
                 $gres = $this->methodCallAsyncRead('channels.getParticipants', ['channel' => $channel, 'filter' => ['_' => $filter, 'q' => $q], 'offset' => $offset, 'limit' => $limit, 'hash' => $hash = $this->getParticipantsHash($channel, $filter, $q, $offset, $limit), 'floodWaitLimit' => 86400]);
-            } catch (RPCErrorException $e) {
-                if ($e->rpc === 'CHAT_ADMIN_REQUIRED') {
-                    $this->logger->logger($e->rpc);
-                    return $has_more;
-                }
-                throw $e;
+            } catch (ChatAdminRequiredError) {
+                $this->logger->logger('CHAT_ADMIN_REQUIRED');
+                return $has_more;
             }
             if ($cached = ($gres['_'] === 'channels.channelParticipantsNotModified')) {
                 $gres = $this->fetchParticipantsCache($channel, $filter, $q, $offset, $limit);
@@ -891,28 +867,20 @@ trait PeerHandler
             $promises = [];
             foreach ($gres['participants'] as $participant) {
                 $promises []= async(function () use (&$res, $participant): void {
-                    $newres = [];
+                    $newres = $participant;
+                    unset($newres['user_id'], $newres['peer']);
                     $newres['user'] = ($this->getPwrChat($participant['user_id'] ?? $participant['peer'], false));
                     if (isset($participant['inviter_id'])) {
+                        unset($newres['inviter_id']);
                         $newres['inviter'] = ($this->getPwrChat($participant['inviter_id'], false));
                     }
                     if (isset($participant['kicked_by'])) {
+                        unset($newres['kicked_by']);
                         $newres['kicked_by'] = ($this->getPwrChat($participant['kicked_by'], false));
                     }
                     if (isset($participant['promoted_by'])) {
+                        unset($newres['promoted_by']);
                         $newres['promoted_by'] = ($this->getPwrChat($participant['promoted_by'], false));
-                    }
-                    if (isset($participant['date'])) {
-                        $newres['date'] = $participant['date'];
-                    }
-                    if (isset($participant['rank'])) {
-                        $newres['rank'] = $participant['rank'];
-                    }
-                    if (isset($participant['admin_rights'])) {
-                        $newres['admin_rights'] = $participant['admin_rights'];
-                    }
-                    if (isset($participant['banned_rights'])) {
-                        $newres['banned_rights'] = $participant['banned_rights'];
                     }
                     switch ($participant['_']) {
                         case 'channelParticipantSelf':

@@ -1090,7 +1090,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         foreach ($this->secretChats as $chat) {
             try {
                 $chat->notifyLayer();
-            } catch (RPCErrorException $e) {
+            } catch (RPCErrorException) {
             }
         }
 

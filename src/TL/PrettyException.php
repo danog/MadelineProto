@@ -44,16 +44,6 @@ trait PrettyException
      */
     private bool $updated = false;
     /**
-     * Update TL trace.
-     */
-    public function updateTLTrace(array $trace): void
-    {
-        if (!$this->updated) {
-            $this->updated = true;
-            $this->prettifyTL($this->method, $trace);
-        }
-    }
-    /**
      * Get TL trace.
      */
     public function getTLTrace(): string
@@ -61,16 +51,9 @@ trait PrettyException
         return $this->tlTrace;
     }
     /**
-     * Set TL trace.
-     *
-     * @param string $tlTrace TL trace
-     */
-    public function setTLTrace(string $tlTrace): void
-    {
-        $this->tlTrace = $tlTrace;
-    }
-    /**
      * Generate async trace.
+     *
+     * @internal
      *
      * @param string $init  Method name
      * @param array  $trace Async trace

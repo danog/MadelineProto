@@ -737,6 +737,9 @@ final class TL implements TLInterface
                     case '%DataJSON':
                         $value = null;
                         break;
+                    case '#':
+                        $value = 0;
+                        break;
                     default:
                         if ($this->API->getSettings()->getSchema()->getFuzzMode()) {
                             $value = ['_' => $this->constructors->findByType($type)['predicate']];

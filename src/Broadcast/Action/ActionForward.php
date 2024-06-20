@@ -24,6 +24,12 @@ use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatWriteForbiddenError;
+use danog\MadelineProto\RPCError\InputUserDeactivatedError;
+use danog\MadelineProto\RPCError\PeerIdInvalidError;
+use danog\MadelineProto\RPCError\UserIsBlockedError;
+use danog\MadelineProto\RPCError\UserIsBotError;
 use danog\MadelineProto\RPCErrorException;
 
 /** @internal */
@@ -42,7 +48,7 @@ final class ActionForward implements Action
                     'to_peer' => $peer,
                     'id' => $this->ids,
                     'drop_author' => $this->drop_author,
-                    'floodWaitLimit' => 2*86400,
+                    'floodWaitLimit' => 2 * 86400,
                     'cancellation' => $cancellation,
                 ],
             );
@@ -62,34 +68,14 @@ final class ActionForward implements Action
                             'id' => $id,
                             'unpin' => false,
                             'pm_oneside' => false,
-                            'floodWaitLimit' => 2*86400,
+                            'floodWaitLimit' => 2 * 86400,
                             'cancellation' => $cancellation,
                         ],
                     );
                 } catch (RPCErrorException) {
                 }
             }
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'INPUT_USER_DEACTIVATED') {
-                return;
-            }
-            if ($e->rpc === 'USER_IS_BOT') {
-                return;
-            }
-            if ($e->rpc === 'CHAT_WRITE_FORBIDDEN') {
-                return;
-            }
-            if ($e->rpc === 'CHANNEL_PRIVATE') {
-                return;
-            }
-            if ($e->rpc === 'USER_IS_BLOCKED') {
-                return;
-            }
-            if ($e->rpc === 'PEER_ID_INVALID') {
-                return;
-            }
-            throw $e;
-        } catch (PeerNotInDbException) {
+        } catch (PeerNotInDbException|InputUserDeactivatedError|UserIsBotError|ChatWriteForbiddenError|ChannelPrivateError|UserIsBlockedError|PeerIdInvalidError) {
             return;
         }
     }

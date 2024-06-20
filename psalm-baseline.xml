@@ -4492,8 +4492,6 @@
       <code><![CDATA[$full['full']['exported_invite']['link']]]></code>
       <code><![CDATA[$full['full']['fallback_photo']]]></code>
       <code><![CDATA[$full['full']['participants']]]></code>
-      <code><![CDATA[$full['full']['participants']]]></code>
-      <code><![CDATA[$full['full']['participants']['participants']]]></code>
       <code><![CDATA[$full['full']['participants']['participants']]]></code>
       <code><![CDATA[$full['full']['personal_photo']]]></code>
       <code><![CDATA[$full['full']['profile_photo']]]></code>
@@ -4502,26 +4500,22 @@
       <code><![CDATA[$id['chat_id']]]></code>
       <code><![CDATA[$id['chat_id']]]></code>
       <code><![CDATA[$invite['chat']]]></code>
+      <code><![CDATA[$newres['inviter_id']]]></code>
+      <code><![CDATA[$newres['kicked_by']]]></code>
+      <code><![CDATA[$newres['peer']]]></code>
+      <code><![CDATA[$newres['promoted_by']]]></code>
+      <code><![CDATA[$newres['user_id']]]></code>
       <code><![CDATA[$participant['_']]]></code>
       <code><![CDATA[$participant['_']]]></code>
-      <code><![CDATA[$participant['admin_rights']]]></code>
-      <code><![CDATA[$participant['admin_rights']]]></code>
-      <code><![CDATA[$participant['banned_rights']]]></code>
-      <code><![CDATA[$participant['banned_rights']]]></code>
-      <code><![CDATA[$participant['can_edit']]]></code>
-      <code><![CDATA[$participant['date']]]></code>
       <code><![CDATA[$participant['date']]]></code>
       <code><![CDATA[$participant['inviter_id']]]></code>
       <code><![CDATA[$participant['inviter_id']]]></code>
       <code><![CDATA[$participant['kicked_by']]]></code>
       <code><![CDATA[$participant['kicked_by']]]></code>
-      <code><![CDATA[$participant['left']]]></code>
       <code><![CDATA[$participant['peer']]]></code>
       <code><![CDATA[$participant['peer']]]></code>
       <code><![CDATA[$participant['peer']]]></code>
       <code><![CDATA[$participant['promoted_by']]]></code>
-      <code><![CDATA[$participant['promoted_by']]]></code>
-      <code><![CDATA[$participant['rank']]]></code>
       <code><![CDATA[$participant['user_id']]]></code>
       <code><![CDATA[$participant['user_id']]]></code>
       <code><![CDATA[$participant['user_id']]]></code>
@@ -4534,6 +4528,15 @@
       <code><![CDATA[$this->authorization['user']['id']]]></code>
     </MixedArrayAccess>
     <MixedArrayAssignment>
+      <code><![CDATA[$newres['inviter']]]></code>
+      <code><![CDATA[$newres['kicked_by']]]></code>
+      <code><![CDATA[$newres['promoted_by']]]></code>
+      <code><![CDATA[$newres['role']]]></code>
+      <code><![CDATA[$newres['role']]]></code>
+      <code><![CDATA[$newres['role']]]></code>
+      <code><![CDATA[$newres['role']]]></code>
+      <code><![CDATA[$newres['role']]]></code>
+      <code><![CDATA[$newres['user']]]></code>
       <code><![CDATA[$res['participants'][$key]]]></code>
       <code><![CDATA[$res['participants'][$participant['user_id'] ?? $this->getIdInternal($participant['peer'])]]]></code>
     </MixedArrayAssignment>
@@ -4554,15 +4557,8 @@
       <code><![CDATA[$invite]]></code>
       <code><![CDATA[$key]]></code>
       <code><![CDATA[$last_count]]></code>
-      <code><![CDATA[$newres['admin_rights']]]></code>
-      <code><![CDATA[$newres['admin_rights']]]></code>
-      <code><![CDATA[$newres['banned_rights']]]></code>
-      <code><![CDATA[$newres['banned_rights']]]></code>
-      <code><![CDATA[$newres['can_edit']]]></code>
+      <code><![CDATA[$newres]]></code>
       <code><![CDATA[$newres['date']]]></code>
-      <code><![CDATA[$newres['date']]]></code>
-      <code><![CDATA[$newres['left']]]></code>
-      <code><![CDATA[$newres['rank']]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
@@ -4581,7 +4577,7 @@
       <code><![CDATA[$res['invite']]]></code>
       <code><![CDATA[$res['invite']]]></code>
       <code><![CDATA[$res['participants']]]></code>
-      <code><![CDATA[$res['participants']]]></code>
+      <code><![CDATA[$res['participants'][$participant['user_id'] ?? $this->getIdInternal($participant['peer'])]]]></code>
       <code><![CDATA[$res['personal_photo']]]></code>
       <code><![CDATA[$res['photo']]]></code>
       <code><![CDATA[$res['photo']]]></code>

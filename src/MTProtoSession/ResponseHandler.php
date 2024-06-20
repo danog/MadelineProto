@@ -31,7 +31,9 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCError\FloodPremiumWaitError;
 use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecretPeerNotInDbException;
 use danog\MadelineProto\SecurityException;
@@ -235,7 +237,7 @@ trait ResponseHandler
                     EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
-            $this->handleReject($request, static fn () => new RPCErrorException('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
+            $this->handleReject($request, static fn () => RPCErrorException::make('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
             return;
         }
 
@@ -356,7 +358,7 @@ trait ResponseHandler
                     EventLoop::delay(1.0, fn () => $this->methodRecall($msgId));
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 303:
                 $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 if ($this->API->isTestMode()) {
@@ -400,7 +402,7 @@ trait ResponseHandler
                     }
                     return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 401:
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':
@@ -422,7 +424,7 @@ trait ResponseHandler
                             EventLoop::queue(
                                 $this->handleReject(...),
                                 $request,
-                                static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor)
+                                static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor)
                             );
                             return null;
                         }
@@ -449,11 +451,11 @@ trait ResponseHandler
                         EventLoop::queue($this->methodRecall(...), $request->getMsgId());
                         return null;
                 }
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 420:
-                $seconds = preg_replace('/[^0-9]+/', '', $response['error_message']);
+                $seconds = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
-                if (is_numeric($seconds) && $seconds < $limit) {
+                if ($seconds < $limit) {
                     $this->API->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
                     $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
@@ -466,11 +468,29 @@ trait ResponseHandler
                     return null;
                 }
                 if (str_starts_with($response['error_message'], 'FLOOD_WAIT_')) {
-                    return static fn () => new FloodWaitError($response['error_message'], $response['error_code'], $request->constructor);
+                    return static fn () => new FloodWaitError(
+                        $response['error_message'],
+                        $seconds,
+                        $response['error_code'],
+                        $request->constructor
+                    );
                 }
-                // no break
+                if (str_starts_with($response['error_message'], 'FLOOD_PREMIUM_WAIT_')) {
+                    return static fn () => new FloodPremiumWaitError(
+                        $response['error_message'],
+                        $seconds,
+                        $response['error_code'],
+                        $request->constructor
+                    );
+                }
+                return static fn () => new RateLimitError(
+                    $response['error_message'],
+                    $seconds,
+                    $response['error_code'],
+                    $request->constructor
+                );
             default:
-                return static fn () => new RPCErrorException($response['error_message'], $response['error_code'], $request->constructor);
+                return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
         }
     }
 }

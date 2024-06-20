@@ -18,40 +18,9 @@
 
 namespace danog\MadelineProto\RPCError;
 
-use danog\MadelineProto\RPCErrorException;
-use Exception;
-use Webmozart\Assert\Assert;
-
-use function Amp\delay;
-
 /**
  * Represents a FLOOD_WAIT_ RPC error returned by telegram.
  */
-final class FloodWaitError extends RPCErrorException
+final class FloodWaitError extends RateLimitError
 {
-    private int $seconds;
-    public function __construct($message = null, $code = 0, $caller = '', ?Exception $previous = null)
-    {
-        parent::__construct($message, $code, $caller, $previous);
-        Assert::true(str_starts_with($this->rpc, 'FLOOD_WAIT_'));
-        $seconds = substr($this->rpc, 11);
-        Assert::numeric($seconds);
-        $this->seconds = (int) $seconds;
-    }
-
-    /**
-     * Returns the required waiting period in seconds before repeating the RPC call.
-     */
-    public function getWaitTime(): int
-    {
-        return $this->seconds;
-    }
-
-    /**
-     * Waits for the required waiting period.
-     */
-    public function wait(): void
-    {
-        delay($this->seconds);
-    }
 }
