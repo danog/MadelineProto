@@ -219,6 +219,7 @@ class RPCErrorException extends \Exception
         string $caller,
         ?\Exception $previous = null
     ): self {
+        $msg = self::report($rpc, $code, $caller);
         // Start match
         return match ($rpc) {
             'ADDRESS_INVALID' => new self($rpc, 'The specified geopoint address is invalid.', $code, $caller, $previous),
@@ -778,7 +779,7 @@ class RPCErrorException extends \Exception
             'SESSION_REVOKED' => new self($rpc, 'The session was revoked by the user.', $code, $caller, $previous),
             'USER_DEACTIVATED' => new self($rpc, 'The current account was deleted by the user.', $code, $caller, $previous),
             'USER_DEACTIVATED_BAN' => new self($rpc, 'The current account was deleted and banned by Telegram\'s antispam system.', $code, $caller, $previous),
-            default => new self($rpc, self::report($rpc, $code, $caller), $code, $caller, $previous)
+            default => new self($rpc, $msg, $code, $caller, $previous)
         };
 
         // End match
