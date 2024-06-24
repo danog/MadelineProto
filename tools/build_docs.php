@@ -55,6 +55,8 @@ chdir($d=__DIR__.'/..');
 
 require 'vendor/autoload.php';
 
+copy('https://rpc.madelineproto.xyz/v3.json', 'src/v3.json');
+
 `rm -r src/RPCError/*`;
 `git checkout src/RPCError/FloodWaitError.php`;
 `git checkout src/RPCError/FloodPremiumWaitError.php`;
@@ -167,7 +169,7 @@ $err = preg_replace_callback('|// Start match.*// End match|sim', static functio
             $data .= "$err => new self(\$rpc, $human, \$code, \$caller, \$previous),\n";
         }
     }
-    $data .= "default => new self(\$rpc, self::report(\$rpc, \$code, \$caller), \$code, \$caller, \$previous)\n";
+    $data .= "default => new self(\$rpc, \$msg, \$code, \$caller, \$previous)\n";
     $data .= "};\n";
     return "// Start match\n$data\n// End match";
 }, $err);
