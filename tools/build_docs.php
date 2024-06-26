@@ -84,6 +84,8 @@ $whitelist = [
     \danog\MadelineProto\RPCError\SessionPasswordNeededError::class => true,
     \danog\MadelineProto\RPCError\ChannelInvalidError::class => true,
     \danog\MadelineProto\RPCError\ChatForbiddenError::class => true,
+    \danog\MadelineProto\RPCError\UsernameInvalidError::class => true,
+    \danog\MadelineProto\RPCError\UsernameNotOccupiedError::class => true,
 ];
 
 $whitelistMethods = [

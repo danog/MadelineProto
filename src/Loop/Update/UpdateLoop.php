@@ -31,8 +31,8 @@ use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\ChannelInvalidError;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\ChatForbiddenError;
+use danog\MadelineProto\RPCError\TimeoutError;
 use danog\MadelineProto\RPCError\UserBannedInChannelError;
-use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 
 use function Amp\delay;
@@ -105,12 +105,9 @@ final class UpdateLoop extends Loop
                     $this->API->getChannelStates()->remove($this->channelId);
                     $this->API->logger("Channel private, exiting {$this}");
                     return self::STOP;
-                } catch (RPCErrorException $e) {
-                    if ($e->rpc === '-503') {
-                        delay(1.0);
-                        continue;
-                    }
-                    throw $e;
+                } catch (TimeoutError $e) {
+                    delay(1.0);
+                    continue;
                 } catch (PeerNotInDbException) {
                     $this->feeder->stop();
                     $this->API->getChannelStates()->remove($this->channelId);
@@ -175,10 +172,7 @@ final class UpdateLoop extends Loop
                     try {
                         $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $this->API->authorized_dc);
                         break;
-                    } catch (RPCErrorException $e) {
-                        if ($e->rpc !== '-503') {
-                            throw $e;
-                        }
+                    } catch (TimeoutError) {
                     } catch (TimeoutException) {
                         EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
                         continue;

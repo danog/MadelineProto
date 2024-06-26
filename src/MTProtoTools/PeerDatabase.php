@@ -35,6 +35,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCError\UsernameInvalidError;
+use danog\MadelineProto\RPCError\UsernameNotOccupiedError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
@@ -336,13 +338,7 @@ final class PeerDatabase implements TLCallback
             $result = $this->API->getIdInternal(
                 ($this->API->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
             );
-        } catch (FloodWaitError $e) {
-            throw $e;
-        } catch (RPCErrorException $e) {
-            $this->API->logger('Username resolution failed with error '.$e->getMessage(), Logger::ERROR);
-            if ($e->rpc === 'AUTH_KEY_UNREGISTERED' || $e->rpc === 'USERNAME_INVALID') {
-                throw $e;
-            }
+        } catch (UsernameNotOccupiedError) {
         } finally {
             unset($this->caching_simple_username[$username]);
         }
