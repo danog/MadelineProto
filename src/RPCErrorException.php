@@ -132,6 +132,7 @@ class RPCErrorException extends \Exception
         'Internal_Server_Error' => true,
         'INVITE_HASH_UNSYNC' => true,
         'CHANNEL_ID_GENERATE_FAILED' => true,
+        'Invalid msgs_state_req query' => true,
     ];
 
     /** @internal */
@@ -284,7 +285,7 @@ class RPCErrorException extends \Exception
             'CDN_METHOD_INVALID' => new self($rpc, 'You can\'t call this method in a CDN DC.', $code, $caller, $previous),
             'CHANNEL_FORUM_MISSING' => new self($rpc, 'This supergroup is not a forum.', $code, $caller, $previous),
             'CHANNEL_ID_INVALID' => new self($rpc, 'The specified supergroup ID is invalid.', $code, $caller, $previous),
-            'CHANNEL_INVALID' => new self($rpc, 'The provided channel is invalid.', $code, $caller, $previous),
+            'CHANNEL_INVALID' => new \danog\MadelineProto\RPCError\ChannelInvalidError($code, $caller, $previous),
             'CHANNEL_PARICIPANT_MISSING' => new self($rpc, 'The current user is not in the channel.', $code, $caller, $previous),
             'CHANNEL_PRIVATE' => new \danog\MadelineProto\RPCError\ChannelPrivateError($code, $caller, $previous),
             'CHANNEL_TOO_BIG' => new self($rpc, 'This channel has too many participants (>1000) to be deleted.', $code, $caller, $previous),
@@ -460,6 +461,7 @@ class RPCErrorException extends \Exception
             'MESSAGE_NOT_MODIFIED' => new self($rpc, 'The provided message data is identical to the previous message data, the message wasn\'t modified.', $code, $caller, $previous),
             'MESSAGE_POLL_CLOSED' => new self($rpc, 'Poll closed.', $code, $caller, $previous),
             'MESSAGE_TOO_LONG' => new self($rpc, 'The provided message is too long.', $code, $caller, $previous),
+            'MESSAGE_TOO_OLD' => new self($rpc, 'The message is too old, the requested information is not available.', $code, $caller, $previous),
             'METHOD_INVALID' => new self($rpc, 'The specified method is invalid.', $code, $caller, $previous),
             'MIN_DATE_INVALID' => new self($rpc, 'The specified minimum date is invalid.', $code, $caller, $previous),
             'MSG_ID_INVALID' => new \danog\MadelineProto\RPCError\MsgIdInvalidError($code, $caller, $previous),
@@ -758,6 +760,7 @@ class RPCErrorException extends \Exception
             'USER_DELETED' => new self($rpc, 'You can\'t send this secret message because the other participant deleted their account.', $code, $caller, $previous),
             'USER_PRIVACY_RESTRICTED' => new self($rpc, 'The user\'s privacy settings do not allow you to do this.', $code, $caller, $previous),
             'USER_RESTRICTED' => new self($rpc, 'You\'re spamreported, you can\'t create channels or chats.', $code, $caller, $previous),
+            'YOUR_PRIVACY_RESTRICTED' => new self($rpc, 'You cannot fetch the read date of this message because you have disallowed other users to do so for *your* messages; to fix, allow other users to see *your* exact last online date OR purchase a [Telegram Premium](https://core.telegram.org/api/premium) subscription.', $code, $caller, $previous),
             'CHAT_FORBIDDEN' => new \danog\MadelineProto\RPCError\ChatForbiddenError($code, $caller, $previous),
             'CALL_PROTOCOL_COMPAT_LAYER_INVALID' => new self($rpc, 'The other side of the call does not support any of the VoIP protocols supported by the local client, as specified by the `protocol.layer` and `protocol.library_versions` fields.', $code, $caller, $previous),
             'FILEREF_UPGRADE_NEEDED' => new self($rpc, 'The client has to be updated in order to support [file references](https://core.telegram.org/api/file_reference).', $code, $caller, $previous),

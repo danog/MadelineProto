@@ -28,6 +28,10 @@ use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\PTSException;
+use danog\MadelineProto\RPCError\ChannelInvalidError;
+use danog\MadelineProto\RPCError\ChannelPrivateError;
+use danog\MadelineProto\RPCError\ChatForbiddenError;
+use danog\MadelineProto\RPCError\UserBannedInChannelError;
 use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 
@@ -95,17 +99,16 @@ final class UpdateLoop extends Loop
                 $request_pts = $state->pts();
                 try {
                     $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true, 'floodWaitLimit' => 86400]);
+                } catch (ChannelPrivateError|ChatForbiddenError|ChannelInvalidError|UserBannedInChannelError) {
+                    $this->feeder->stop();
+                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                    $this->API->getChannelStates()->remove($this->channelId);
+                    $this->API->logger("Channel private, exiting {$this}");
+                    return self::STOP;
                 } catch (RPCErrorException $e) {
                     if ($e->rpc === '-503') {
                         delay(1.0);
                         continue;
-                    }
-                    if (\in_array($e->rpc, ['CHANNEL_PRIVATE', 'CHAT_FORBIDDEN', 'CHANNEL_INVALID', 'USER_BANNED_IN_CHANNEL'], true)) {
-                        $this->feeder->stop();
-                        unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
-                        $this->API->getChannelStates()->remove($this->channelId);
-                        $this->API->logger("Channel private, exiting {$this}");
-                        return self::STOP;
                     }
                     throw $e;
                 } catch (PeerNotInDbException) {
