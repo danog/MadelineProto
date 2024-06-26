@@ -173,9 +173,9 @@ final class UpdateLoop extends Loop
                         $difference = $this->API->methodCallAsyncRead('updates.getDifference', ['pts' => $state->pts(), 'date' => $state->date(), 'qts' => $state->qts()], $this->API->authorized_dc);
                         break;
                     } catch (TimeoutError) {
+                        delay(1.0);
                     } catch (TimeoutException) {
                         EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
-                        continue;
                     }
                 } while (true);
                 $this->API->logger('Got '.$difference['_'], Logger::ULTRA_VERBOSE);
