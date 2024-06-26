@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
 use Amp\CancelledException;
+use Revolt\EventLoop;
 
 /**
  * @internal
@@ -37,7 +38,15 @@ final class Cancellation extends Obj implements AmpCancellation
      */
     public function subscribe(\Closure $callback): string
     {
-        return $this->__call('unsubscribe', [$callback]);
+        $id = $this->__call('getId');
+        EventLoop::queue(function () use ($id, $callback): void {
+            try {
+                $this->__call('wait', [$id]);
+            } catch (CancelledException $e) {
+                $callback($e);
+            } catch (\Throwable) {}
+        });
+        return $id;
     }
 
     /**
@@ -47,7 +56,7 @@ final class Cancellation extends Obj implements AmpCancellation
      */
     public function unsubscribe(string $id): void
     {
-        $this->__call('unsubscribe', [$id]);
+        EventLoop::queue($this->__call(...), 'unsubscribe', [$id]);
     }
 
     /**
