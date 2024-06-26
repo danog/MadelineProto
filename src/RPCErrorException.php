@@ -634,6 +634,7 @@ class RPCErrorException extends \Exception
             'THEME_INVALID' => new self($rpc, 'Invalid theme provided.', $code, $caller, $previous),
             'THEME_MIME_INVALID' => new self($rpc, 'The theme\'s MIME type is invalid.', $code, $caller, $previous),
             'THEME_TITLE_INVALID' => new self($rpc, 'The specified theme title is invalid.', $code, $caller, $previous),
+            'TIMEZONE_INVALID' => new self($rpc, '', $code, $caller, $previous),
             'TITLE_INVALID' => new self($rpc, 'The specified stickerpack title is invalid.', $code, $caller, $previous),
             'TMP_PASSWORD_DISABLED' => new self($rpc, 'The temporary password is disabled.', $code, $caller, $previous),
             'TO_LANG_INVALID' => new self($rpc, 'The specified destination language is invalid.', $code, $caller, $previous),
