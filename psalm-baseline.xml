@@ -63,6 +63,7 @@
       <code><![CDATA[$API->serializeSession($this)]]></code>
     </MixedArgument>
     <PossiblyNullReference>
+      <code><![CDATA[getSettings]]></code>
       <code><![CDATA[logger]]></code>
     </PossiblyNullReference>
   </file>
@@ -3062,19 +3063,6 @@
       <code><![CDATA[$difference]]></code>
       <code><![CDATA[$difference]]></code>
       <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
-      <code><![CDATA[$difference]]></code>
     </PossiblyUndefinedVariable>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->feeders[$channelId]?->resume()]]></code>
@@ -3630,7 +3618,6 @@
     </MixedOperand>
     <PossiblyInvalidArgument>
       <code><![CDATA[$response]]></code>
-      <code><![CDATA[hrtime(true) + ($seconds * 1_000_000_000)]]></code>
     </PossiblyInvalidArgument>
     <PossiblyNullArgument>
       <code><![CDATA[$msgId]]></code>
@@ -5386,35 +5373,11 @@
       <code><![CDATA[self::LEVEL_MAP[$level]]]></code>
     </MixedArrayOffset>
   </file>
-  <file src="src/RPCError/FloodWaitError.php">
-    <ArgumentTypeCoercion>
-      <code><![CDATA[$previous]]></code>
-    </ArgumentTypeCoercion>
-    <MissingParamType>
-      <code><![CDATA[$caller]]></code>
-      <code><![CDATA[$code]]></code>
-      <code><![CDATA[$message]]></code>
-    </MissingParamType>
-    <MixedArgument>
-      <code><![CDATA[$code]]></code>
-      <code><![CDATA[$message]]></code>
-    </MixedArgument>
-  </file>
   <file src="src/RPCErrorException.php">
-    <MissingParamType>
-      <code><![CDATA[$caller]]></code>
-      <code><![CDATA[$method]]></code>
-    </MissingParamType>
-    <MixedArgument>
-      <code><![CDATA[$method]]></code>
-    </MixedArgument>
     <MixedArrayAssignment>
       <code><![CDATA[self::$errorMethodMap[$code][$method]]]></code>
       <code><![CDATA[self::$errorMethodMap[$code][$method][$error]]]></code>
     </MixedArrayAssignment>
-    <MixedArrayOffset>
-      <code><![CDATA[self::$errorMethodMap[$code][$method]]]></code>
-    </MixedArrayOffset>
     <MixedAssignment>
       <code><![CDATA[$description]]></code>
       <code><![CDATA[$res]]></code>
