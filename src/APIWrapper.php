@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cancellation;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Ipc\Client;
 
 final class APIWrapper
@@ -72,6 +74,15 @@ final class APIWrapper
     public function getAPI(): Client|MTProto|null
     {
         return $this->API;
+    }
+
+    private ?int $drop = null;
+    /**
+     * @internal
+     */
+    public function getRpcDropCancellation(): Cancellation
+    {
+        return new TimeoutCancellation($this->drop ??= $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
     }
 
     /**

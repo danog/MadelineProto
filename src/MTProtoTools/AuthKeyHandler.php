@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\Cancellation;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
 use phpseclib3\Math\BigInteger;
@@ -30,9 +31,9 @@ trait AuthKeyHandler
     /**
      * Get diffie-hellman configuration.
      */
-    public function getDhConfig(): array
+    public function getDhConfig(?Cancellation $cancellation = null): array
     {
-        $dh_config = $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0]);
+        $dh_config = $this->methodCallAsyncRead('messages.getDhConfig', ['version' => $this->dh_config['version'], 'random_length' => 0, 'cancellation' => $cancellation]);
         if ($dh_config['_'] === 'messages.dhConfigNotModified') {
             $this->logger->logger('DH configuration not modified', Logger::VERBOSE);
             return $this->dh_config;
