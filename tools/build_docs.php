@@ -59,6 +59,7 @@ copy('https://rpc.madelineproto.xyz/v3.json', 'src/v3.json');
 
 `rm -r src/RPCError/*`;
 `git checkout src/RPCError/FloodWaitError.php`;
+`git checkout src/RPCError/TimeoutError.php`;
 `git checkout src/RPCError/FloodPremiumWaitError.php`;
 `git checkout src/RPCError/RateLimitError.php`;
 
@@ -81,7 +82,7 @@ $whitelist = [
     FileTokenInvalidError::class => true,
     \danog\MadelineProto\RPCError\RequestTokenInvalidError::class => true,
     \danog\MadelineProto\RPCError\SessionPasswordNeededError::class => true,
-    \danog\MadelineProto\RPCError\ChannelPrivateError::class => true,
+    \danog\MadelineProto\RPCError\ChannelInvalidError::class => true,
     \danog\MadelineProto\RPCError\ChatForbiddenError::class => true,
 ];
 
@@ -98,6 +99,7 @@ foreach ($errors['result'] as $code => $sub) {
     }
     $code = var_export($code, true);
     foreach ($sub as $err => $methods) {
+        $err = (string) $err;
         $camel = ucfirst(StrTools::toCamelCase(strtolower($err))).'Error';
         if (!preg_match('/^\w+$/', $camel)) {
             continue;
