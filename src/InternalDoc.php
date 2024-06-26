@@ -617,9 +617,9 @@ abstract class InternalDoc
      *
      * @param string $url URL
      */
-    final public function fileGetContents(string $url): string
+    final public function fileGetContents(string $url, ?\Amp\Cancellation $cancellation = null): string
     {
-        return $this->wrapper->getAPI()->fileGetContents($url);
+        return $this->wrapper->getAPI()->fileGetContents($url, $cancellation ?? $this->wrapper->getRpcDropCancellation());
     }
     /**
      * Asynchronously lock a file
