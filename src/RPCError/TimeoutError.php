@@ -18,10 +18,13 @@
 
 namespace danog\MadelineProto\RPCError;
 
+use Amp\TimeoutException;
 use danog\MadelineProto\RPCErrorException;
 
 /**
- * Represents a request timeout RPC error returned by telegram (as opposed to one returned by MadelineProto, which will be an \Amp\TimeoutException).
+ * Represents a request timeout RPC error returned by telegram (as opposed to one returned by MadelineProto, which will be a {@see TimeoutException}).
+ *
+ * @see TimeoutException
  */
 final class TimeoutError extends RPCErrorException
 {
