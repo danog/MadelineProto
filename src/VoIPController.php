@@ -22,6 +22,7 @@ use Amp\ByteStream\BufferedReader;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use danog\Loop\Loop;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -276,7 +277,7 @@ final class VoIPController
     /**
      * Accept incoming call.
      */
-    public function accept(): self
+    public function accept(?Cancellation $cancellation = null): self
     {
         $lock = $this->authMutex->acquire();
         try {
@@ -286,7 +287,7 @@ final class VoIPController
             Assert::eq($this->callState->name, CallState::INCOMING->name);
 
             $this->log(sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
-            $dh_config = $this->API->getDhConfig();
+            $dh_config = $this->API->getDhConfig($cancellation);
             $this->log('Generating b...', Logger::VERBOSE);
             $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
             $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
@@ -302,13 +303,14 @@ final class VoIPController
                     ],
                     'g_b' => $g_b->toBytes(),
                     'protocol' => self::CALL_PROTOCOL,
+                    'cancellation' => $cancellation,
                 ]);
             } catch (CallAlreadyAcceptedError) {
                 $this->log(sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
                 return $this;
             } catch (CallAlreadyDeclinedError) {
                 $this->log(Lang::$current_lang['call_already_declined']);
-                $this->discard(DiscardReason::HANGUP);
+                $this->discard(DiscardReason::HANGUP, cancellation: $cancellation);
                 return $this;
             }
             $this->call['b'] = $b;

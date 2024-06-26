@@ -859,9 +859,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      * @param string $url URL
      */
-    public function fileGetContents(string $url): string
+    public function fileGetContents(string $url, ?Cancellation $cancellation = null): string
     {
-        return $this->getHTTPClient()->request(new Request($url))->getBody()->buffer();
+        return $this->getHTTPClient()->request(new Request($url), $cancellation)->getBody()->buffer($cancellation);
     }
     /**
      * Get main DC ID.

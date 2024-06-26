@@ -493,6 +493,7 @@ final class Blacklist {
             $doc .= $name;
             $doc .= '(';
             $paramList = '';
+            $hasCancellation = false;
             foreach ($method->getParameters() as $param) {
                 if ($type = $param->getType()) {
                     $doc .= $this->typeToStr($type).' ';
@@ -519,7 +520,15 @@ final class Blacklist {
                 if ($param->isVariadic()) {
                     $paramList .= '...';
                 }
-                $paramList .= '$'.$param->getName().', ';
+                $paramList .= '$'.$param->getName();
+                if ($param->getName() === 'cancellation') {
+                    $paramList .= ' ?? $this->wrapper->getRpcDropCancellation()';
+                    $hasCancellation = true;
+                }
+                $paramList .= ', ';
+            }
+            if (!$hasCancellation && !$static) {
+                Logger::log($name.'.'.$param->getName().' has no cancellation!', Logger::WARNING);
             }
             $type = $method->getReturnType();
             $hasReturnValue = $type !== null;

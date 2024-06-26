@@ -22,6 +22,7 @@ namespace danog\MadelineProto\VoIP;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
 use danog\MadelineProto\LocalFile;
@@ -121,9 +122,9 @@ trait AuthKeyHandler
     /**
      * Accept call.
      */
-    public function acceptCall(int $id): void
+    public function acceptCall(int $id, ?Cancellation $cancellation = null): void
     {
-        ($this->calls[$id] ?? null)?->accept();
+        ($this->calls[$id] ?? null)?->accept($cancellation);
     }
 
     /**
