@@ -81,6 +81,31 @@ final class Client extends ClientAbstract
         self::$instances[$session->getSessionDirectoryPath()] = $this;
         EventLoop::queue($this->loopInternal(...));
     }
+
+    /**
+     * Call function.
+     *
+     * @param string|int    $function  Function name
+     * @param array|Wrapper $arguments Arguments
+     */
+    public function __call(string|int $function, array|Wrapper $arguments)
+    {
+        if (\is_array($arguments) && $arguments) {
+            foreach ($arguments as &$arg) {
+                if ($arg instanceof Cancellation) {
+                    break;
+                }
+            }
+            if ($arg instanceof Cancellation) {
+                $wrapper = Wrapper::create($arguments, $this->session, $this->logger);
+                $wrapper->wrap($arg);
+                unset($arg, $arguments);
+                $arguments = $wrapper;
+            }
+        }
+        return parent::__call($function, $arguments);
+    }
+
     /** @internal */
     public function getSession(): SessionPaths
     {

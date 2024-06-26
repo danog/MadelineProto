@@ -28,6 +28,7 @@ use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
 use danog\MadelineProto\Ipc\Wrapper\SeekableReadableStream;
 use danog\MadelineProto\Ipc\Wrapper\SeekableWritableStream;
+use danog\MadelineProto\Ipc\Wrapper\WrappedCancellation;
 use danog\MadelineProto\Ipc\Wrapper\WritableStream;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\SessionPaths;
@@ -108,6 +109,9 @@ final class Wrapper extends ClientAbstract
     public function wrap(mixed &$callback, bool $wrapObjects = true): void
     {
         if (\is_object($callback) && $wrapObjects) {
+            if ($callback instanceof Cancellation) {
+                $callback = new WrappedCancellation($callback);
+            }
             if ($callback instanceof FileCallbackInterface) {
                 $file = $callback->getFile();
                 if ($file instanceof ByteStreamReadableStream) {
@@ -128,7 +132,7 @@ final class Wrapper extends ClientAbstract
                 $class = method_exists($callback, 'seek') ? SeekableWritableStream::class : WritableStream::class;
             } elseif ($callback instanceof FileCallbackInterface) {
                 $class = FileCallback::class;
-            } elseif ($callback instanceof Cancellation) {
+            } elseif ($callback instanceof WrappedCancellation) {
                 $class = WrapperCancellation::class;
             }
             if (!$class) {
