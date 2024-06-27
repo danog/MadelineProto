@@ -48,14 +48,6 @@ trait AckHandler
         return true;
     }
     /**
-     * We have gotten a response for an outgoing message.
-     */
-    public function gotResponseForOutgoingMessage(MTProtoOutgoingMessage $outgoingMessage): void
-    {
-        // The server acknowledges that it received my message
-        unset($this->new_outgoing[$outgoingMessage->getMsgId()]);
-    }
-    /**
      * Acknowledge incoming message ID.
      */
     public function ackIncomingMessage(MTProtoIncomingMessage $message): void
@@ -121,7 +113,7 @@ trait AckHandler
                     || ($message->getSent() + $dropTimeout < hrtime(true))
                 ) {
                     Logger::log('No reply for message: ' . $message, Logger::WARNING);
-                    $this->handleReject($message, static fn () => new TimeoutException('Request timeout'));
+                    $message->reply(static fn () => new TimeoutException('Request timeout'));
                     continue;
                 }
                 if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {

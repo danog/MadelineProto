@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Loop\Connection;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\TimeoutCancellation;
+use Amp\TimeoutException;
 use danog\Loop\Loop;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
@@ -99,7 +100,7 @@ final class CheckLoop extends Loop
                                 case 2:
                                 case 3:
                                     if ($message->constructor === 'msgs_state_req') {
-                                        $this->connection->gotResponseForOutgoingMessage($message);
+                                        $message->reply(static fn () => new TimeoutException("Server did not receive message"));
                                         break;
                                     }
                                     $this->API->logger("Message $message not received by server, resending...", Logger::ERROR);
@@ -115,8 +116,6 @@ final class CheckLoop extends Loop
                                     } elseif ($chr & 32) {
                                         if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
                                             if ($message->isCancellationRequested()) {
-                                                unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
-
                                                 $this->API->logger("Cancelling $message...", Logger::ERROR);
                                             } else {
                                                 $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
