@@ -104,7 +104,7 @@ final class CheckLoop extends Loop
                                         break;
                                     }
                                     $this->API->logger("Message $message not received by server, resending...", Logger::ERROR);
-                                    $this->connection->methodRecall($message_id);
+                                    $this->connection->methodRecall($message);
                                     break;
                                 case 4:
                                     if ($chr & 128) {
@@ -115,12 +115,8 @@ final class CheckLoop extends Loop
                                         $reply[] = $message_id;
                                     } elseif ($chr & 32) {
                                         if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
-                                            if ($message->isCancellationRequested()) {
-                                                $this->API->logger("Cancelling $message...", Logger::ERROR);
-                                            } else {
-                                                $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                                $this->connection->methodRecall($message_id);
-                                            }
+                                            $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
+                                            $this->connection->methodRecall($message);
                                         } else {
                                             $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         }
@@ -146,7 +142,7 @@ final class CheckLoop extends Loop
                     && $message->unencrypted
                 ) {
                     $this->API->logger("Still missing $message on DC {$this->datacenter}, resending", Logger::ERROR);
-                    $this->connection->methodRecall($message->getMsgId());
+                    $this->connection->methodRecall($message);
                 }
             }
         }

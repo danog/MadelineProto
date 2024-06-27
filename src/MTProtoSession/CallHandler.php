@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Logger;
@@ -45,39 +46,52 @@ trait CallHandler
     /**
      * Recall method.
      */
-    public function methodRecall(int $message_id, ?int $datacenter = null): void
+    public function methodRecall(MTProtoOutgoingMessage $request, ?int $forceDatacenter = null, float|Future|null $defer = null): void
     {
-        if ($datacenter === $this->datacenter) {
-            $datacenter = null;
-        }
-        $message = $this->outgoing_messages[$message_id] ?? null;
-        $message_ids = $message instanceof Container
-            ? $message->getIds()
-            : [$message_id];
-        foreach ($message_ids as $message_id) {
-            if (isset($this->outgoing_messages[$message_id])
-                && !$this->outgoing_messages[$message_id]->canGarbageCollect()) {
-                if ($datacenter) {
-                    /** @var MTProtoOutgoingMessage */
-                    $message = $this->outgoing_messages[$message_id];
-                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
-                    $message->setMsgId(null);
-                    $message->setSeqNo(null);
-                    EventLoop::queue(function () use ($datacenter, $message): void {
-                        $this->API->datacenter->waitGetConnection($datacenter)
-                            ->sendMessage($message);
-                    });
-                } else {
-                    /** @var MTProtoOutgoingMessage */
-                    $message = $this->outgoing_messages[$message_id];
-                    if (!$message->hasSeqNo()) {
-                        unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
-                    }
-                    EventLoop::queue($this->sendMessage(...), $message);
-                }
-            } else {
-                $this->API->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
+        $id = $request->getMsgId();
+        unset($this->outgoing_messages[$id], $this->new_outgoing[$id]);
+        if ($request instanceof Container) {
+            foreach ($request->msgs as $msg) {
+                $this->methodRecall($msg, $forceDatacenter, $defer);
             }
+            return;
+        }
+        if ($request->isCancellationRequested()) {
+            return;
+        }
+        if (\is_float($defer)) {
+            $d = new DeferredFuture;
+            $id = EventLoop::delay($defer, $d->complete(...));
+            $request->cancellation?->subscribe(static fn () => EventLoop::cancel($id));
+            $defer = $d;
+            return;
+        }
+        $prev = $request->previousQueuedMessage;
+        if (!$prev->hasReply()) {
+            $prev->getResultPromise()->finally(
+                fn () => $this->methodRecall($request, $this->datacenter, $defer)
+            );
+            return;
+        }
+        if ($defer) {
+            $defer->finally(
+                fn () => $this->methodRecall($request, $this->datacenter)
+            );
+            return;
+        }
+        $datacenter = $forceDatacenter ?? $this->datacenter;
+        if ($forceDatacenter !== null) {
+            /** @var MTProtoOutgoingMessage */
+            $request->setMsgId(null);
+            $request->setSeqNo(null);
+        }
+        if ($datacenter === $this->datacenter) {
+            EventLoop::queue($this->sendMessage(...), $request);
+        } else {
+            EventLoop::queue(function () use ($datacenter, $request): void {
+                $this->API->datacenter->waitGetConnection($datacenter)
+                    ->sendMessage($request);
+            });
         }
     }
     /**

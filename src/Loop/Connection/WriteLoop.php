@@ -286,7 +286,7 @@ final class WriteLoop extends Loop
                 $total_length += $actual_length;
                 $MTmessage['bytes'] = $body_length;
                 $messages[] = $MTmessage;
-                $keys[$k] = $message_id;
+                $keys[$k] = $message;
 
                 $message->setSeqNo($MTmessage['seqno'])
                         ->setMsgId($MTmessage['msg_id']);
@@ -325,10 +325,10 @@ final class WriteLoop extends Loop
             if ($count > 1 || $has_seq) {
                 $this->API->logger("Wrapping in msg_container ({$count} messages of total size {$total_length}) as encrypted message for DC {$this->datacenter}", Logger::ULTRA_VERBOSE);
                 $message_id = $this->connection->msgIdHandler->generateMessageId();
-                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = new Container($this->connection, array_values($keys));
+                $this->connection->pendingOutgoing[$this->connection->pendingOutgoingKey] = $ct = new Container($this->connection, $keys);
                 $this->connection->outgoingCtr?->inc();
                 $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
-                $keys[$this->connection->pendingOutgoingKey++] = $message_id;
+                $keys[$this->connection->pendingOutgoingKey++] = $ct;
                 $message_data = $this->API->getTL()->serializeObject(['type' => ''], ['_' => 'msg_container', 'messages' => $messages], 'container');
                 $message_data_length = \strlen($message_data);
                 $seq_no = $this->connection->generateOutSeqNo(false);
@@ -364,8 +364,7 @@ final class WriteLoop extends Loop
                 $this->connection->ack_queue = \array_slice($this->connection->ack_queue, $ackCount);
             }
 
-            foreach ($keys as $key => $message_id) {
-                $message = $this->connection->pendingOutgoing[$key];
+            foreach ($keys as $key => $message) {
                 unset($this->connection->pendingOutgoing[$key]);
                 $this->connection->outgoing_messages[$message_id] = $message;
                 if ($message->hasPromise()) {

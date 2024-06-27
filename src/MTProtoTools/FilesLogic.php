@@ -240,7 +240,7 @@ trait FilesLogic
         if ($result->shouldServe()) {
             $pipe = new Pipe(1024 * 1024);
             [$start, $end] = $result->getServeRange();
-            EventLoop::queue(function() use($messageMedia, $pipe, $cb, $start, $end, $cancellation) {
+            EventLoop::queue(function () use ($messageMedia, $pipe, $cb, $start, $end, $cancellation): void {
                 try {
                     $this->downloadToStream($messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
                 } catch (\Throwable $e) {

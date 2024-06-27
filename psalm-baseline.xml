@@ -3372,10 +3372,6 @@
       <code><![CDATA[$this->state |= self::STATE_REPLIED]]></code>
       <code><![CDATA[$this->state |= self::STATE_SENT]]></code>
     </PossiblyInvalidPropertyAssignmentValue>
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->connection->new_outgoing]]></code>
-      <code><![CDATA[$this->connection->outgoing_messages]]></code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullOperand>
       <code><![CDATA[$this->sent]]></code>
       <code><![CDATA[$this->sent]]></code>
