@@ -25,6 +25,9 @@ use danog\MadelineProto\Ipc\ClientAbstract;
  */
 final class Cancellation implements AmpCancellation
 {
+    /**
+     * @var array<string, true> $handlers
+     */
     private array $handlers = [];
     private CancellationInner $inner;
     /**
@@ -50,7 +53,9 @@ final class Cancellation implements AmpCancellation
      */
     public function subscribe(\Closure $callback): string
     {
-        return $this->inner->subscribe($callback);
+        $id = $this->inner->subscribe($callback);
+        $this->handlers[$id] = true;
+        return $id;
     }
 
     /**
@@ -60,6 +65,7 @@ final class Cancellation implements AmpCancellation
      */
     public function unsubscribe(string $id): void
     {
+        unset($this->handlers[$id]);
         $this->inner->unsubscribe($id);
     }
 
@@ -83,7 +89,7 @@ final class Cancellation implements AmpCancellation
 
     public function __destruct()
     {
-        foreach ($this->handlers as $handler) {
+        foreach ($this->handlers as $handler => $_) {
             $this->inner->unsubscribe($handler);
         }
     }
