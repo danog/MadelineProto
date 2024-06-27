@@ -170,14 +170,6 @@ trait ResponseHandler
             $this->handleMessages([$message]);
         }
     }
-    /**
-     * @param callable(): \Throwable $data
-     */
-    private function handleReject(MTProtoOutgoingMessage $message, callable $data): void
-    {
-        $this->gotResponseForOutgoingMessage($message);
-        $message->reply($data);
-    }
 
     /**
      * Handle RPC response.
@@ -211,7 +203,7 @@ trait ResponseHandler
                 $exception = static fn (): \Throwable => $e;
             }
             if ($exception) {
-                $this->handleReject($request, $exception);
+                $request->reply($exception);
             }
             return;
         }
@@ -237,7 +229,7 @@ trait ResponseHandler
                     EventLoop::queue($this->methodRecall(...), $requestId);
                     return;
             }
-            $this->handleReject($request, static fn () => RPCErrorException::make('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
+            $request->reply(static fn () => RPCErrorException::make('Received bad_msg_notification: ' . MTProto::BAD_MSG_ERROR_CODES[$response['error_code']], $response['error_code'], $request->constructor));
             return;
         }
 
@@ -275,7 +267,6 @@ trait ResponseHandler
                 }
             }
         }
-        $this->gotResponseForOutgoingMessage($request);
 
         $this->requestResponse?->inc([
             'method' => $request->constructor,
@@ -283,7 +274,7 @@ trait ResponseHandler
             'error_code' => '200',
         ]);
 
-        EventLoop::queue($request->reply(...), $response);
+        $request->reply($response);
     }
     /**
      * @param array{error_message: string, error_code: int} $response
@@ -314,8 +305,8 @@ trait ResponseHandler
             && !$request->shouldRefreshReferences()
         ) {
             $this->API->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
-            $this->gotResponseForOutgoingMessage($request);
             $msgId = $request->getMsgId();
+            unset($this->new_outgoing[$msgId]);
             $request->setRefreshReferences(true);
             $request->setMsgId(null);
             $request->setSeqNo(null);
@@ -334,8 +325,8 @@ trait ResponseHandler
                     )
                 ) {
                     $this->API->logger("Resending $request due to {$response['error_message']}");
-                    $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
+                    unset($this->new_outgoing[$msgId]);
                     $request->setSent(hrtime(true) + (5*60 * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
@@ -386,8 +377,8 @@ trait ResponseHandler
                     )
                 ) {
                     $this->API->logger("Resending $request due to {$response['error_message']}");
-                    $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
+                    unset($this->new_outgoing[$msgId]);
                     $request->setSent(hrtime(true) + (5*60 * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
@@ -420,12 +411,7 @@ trait ResponseHandler
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->authorized !== \danog\MadelineProto\API::LOGGED_IN) {
-                            $this->gotResponseForOutgoingMessage($request);
-                            EventLoop::queue(
-                                $this->handleReject(...),
-                                $request,
-                                static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor)
-                            );
+                            $request->reply(static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor));
                             return null;
                         }
                         $this->session_id = null;
@@ -457,8 +443,8 @@ trait ResponseHandler
                 $limit = $request->floodWaitLimit ?? $this->API->settings->getRPC()->getFloodTimeout();
                 if ($seconds < $limit) {
                     $this->API->logger("Flood, waiting $seconds seconds before repeating async call of $request...", Logger::NOTICE);
-                    $this->gotResponseForOutgoingMessage($request);
                     $msgId = $request->getMsgId();
+                    unset($this->new_outgoing[$msgId]);
                     $request->setSent(hrtime(true) + ($seconds * 1_000_000_000));
                     $request->setMsgId(null);
                     $request->setSeqNo(null);
