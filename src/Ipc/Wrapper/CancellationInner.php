@@ -18,25 +18,13 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
 use Amp\CancelledException;
-use danog\MadelineProto\Ipc\ClientAbstract;
+use Revolt\EventLoop;
 
 /**
  * @internal
  */
-final class Cancellation implements AmpCancellation
+final class CancellationInner extends Obj implements AmpCancellation
 {
-    private array $handlers = [];
-    private CancellationInner $inner;
-    /**
-     * Constructor.
-     *
-     * @param array<string, int> $methods
-     */
-    public function __construct(ClientAbstract $wrapper, array $methods)
-    {
-        $this->inner = new CancellationInner($wrapper, $methods);
-    }
-
     /**
      * Subscribes a new handler to be invoked on a cancellation request.
      *
@@ -50,7 +38,16 @@ final class Cancellation implements AmpCancellation
      */
     public function subscribe(\Closure $callback): string
     {
-        return $this->inner->subscribe($callback);
+        $id = $this->__call('getId');
+        EventLoop::queue(function () use ($id, $callback): void {
+            try {
+                $this->__call('wait', [$id]);
+            } catch (CancelledException $e) {
+                $callback($e);
+            } catch (\Throwable) {
+            }
+        });
+        return $id;
     }
 
     /**
@@ -60,7 +57,7 @@ final class Cancellation implements AmpCancellation
      */
     public function unsubscribe(string $id): void
     {
-        $this->inner->unsubscribe($id);
+        EventLoop::queue($this->__call(...), 'unsubscribe', [$id]);
     }
 
     /**
@@ -68,7 +65,7 @@ final class Cancellation implements AmpCancellation
      */
     public function isRequested(): bool
     {
-        return $this->inner->isRequested();
+        return $this->__call('isRequested');
     }
 
     /**
@@ -78,13 +75,6 @@ final class Cancellation implements AmpCancellation
      */
     public function throwIfRequested(): void
     {
-        $this->inner->throwIfRequested();
-    }
-
-    public function __destruct()
-    {
-        foreach ($this->handlers as $handler) {
-            $this->inner->unsubscribe($handler);
-        }
+        $this->__call('throwIfRequested');
     }
 }
