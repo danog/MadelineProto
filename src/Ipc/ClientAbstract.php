@@ -93,11 +93,8 @@ abstract class ClientAbstract
                 if (!isset($this->requests[$id])) {
                     Logger::log("Got response for non-existing ID $id!");
                 } else {
-                    [, $args, $promise] = $this->requests[$id];
+                    $promise = $this->requests[$id][2];
                     unset($this->requests[$id]);
-                    if ($args instanceof Wrapper) {
-                        $args->disconnect();
-                    }
                     if ($payload instanceof ExitFailure) {
                         $promise->error($payload->getException());
                     } else {
