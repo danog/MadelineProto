@@ -117,7 +117,7 @@ trait ResponseHandler
         }
 
         $this->API->logger('Trying to assign a response of type ' . $response_type . ' to its request...', Logger::VERBOSE);
-        foreach ($this->new_outgoing as $expecting_msg_id => $expecting) {
+        foreach ($this->unencrypted_new_outgoing as $expecting_msg_id => $expecting) {
             if (!$expecting->type) {
                 continue;
             }

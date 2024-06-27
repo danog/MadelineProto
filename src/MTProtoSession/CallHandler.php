@@ -20,11 +20,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\CompositeCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\Exception;
@@ -39,6 +42,7 @@ use function Amp\Future\await;
  *
  *
  * @property DataCenterConnection $shared
+ * @property MTProto $API
  * @internal
  */
 trait CallHandler
@@ -106,6 +110,7 @@ trait CallHandler
         return $readFuture->await();
     }
     private LocalKeyedMutex $abstractionQueueMutex;
+    private ?int $drop = null;
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
@@ -177,6 +182,10 @@ trait CallHandler
         if (!$encrypted && $this->shared->hasTempAuthKey()) {
             $encrypted = true;
         }
+        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
+        $cancellation = $cancellation !== null
+            ? new CompositeCancellation($cancellation, $timeout)
+            : $timeout;
         $message = new MTProtoOutgoingMessage(
             connection: $this,
             body: $args,
@@ -201,7 +210,6 @@ trait CallHandler
             $message->setMsgId($args['madelineMsgId']);
         }
         $this->sendMessage($message);
-        $this->checker->resume();
         return new WrappedFuture($response->getFuture());
     }
     /**
@@ -212,8 +220,15 @@ trait CallHandler
      */
     public function objectCall(string $object, array $args, ?DeferredFuture $promise = null): void
     {
+        $cancellation = $args['cancellation'] ?? null;
+        $cancellation?->throwIfRequested();
+        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
+        $cancellation = $cancellation !== null
+            ? new CompositeCancellation($cancellation, $timeout)
+            : $timeout;
         $this->sendMessage(
             new MTProtoOutgoingMessage(
+                cancellation: $cancellation,
                 connection: $this,
                 body: $args,
                 constructor: $object,

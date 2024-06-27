@@ -73,20 +73,10 @@ final class Connection
      */
     protected ?ReadLoop $reader = null;
     /**
-     * Checker loop.
-     *
-     */
-    protected ?CheckLoop $checker = null;
-    /**
      * Waiter loop.
      *
      */
     protected ?HttpWaitLoop $waiter = null;
-    /**
-     * Ping loop.
-     *
-     */
-    protected ?PingLoop $pinger = null;
     /**
      * Cleanup loop.
      *
@@ -301,26 +291,14 @@ final class Connection
                 $this->httpResCount = 0;
                 $this->writer ??= new WriteLoop($this);
                 $this->reader ??= new ReadLoop($this);
-                $this->checker ??= new CheckLoop($this);
                 $this->cleanup ??= new CleanupLoop($this);
-                $this->waiter ??= new HttpWaitLoop($this);
                 $this->handler ??= new GenericLoop(fn () => $this->handleMessages($this->new_incoming), "Handler loop");
-                if (!isset($this->pinger) && !$ctx->isMedia() && !$ctx->isCDN() && !$this->isHttp()) {
-                    $this->pinger = new PingLoop($this);
-                }
-                foreach ($this->new_outgoing as $message_id => $message) {
-                    if ($message->unencrypted) {
-                        $message->reply(static fn () => new Exception('Restart because we were reconnected'));
-                    }
+                foreach ($this->unencrypted_new_outgoing as $message_id => $message) {
+                    $message->reply(static fn () => new Exception('Restart because we were reconnected'));
                 }
                 Assert::true($this->writer->start(), "Could not start writer stream");
                 Assert::true($this->reader->start(), "Could not start reader stream");
-                Assert::true($this->checker->start(), "Could not start checker stream");
                 Assert::true($this->cleanup->start(), "Could not start cleanup stream");
-                $this->waiter->start();
-                if ($this->pinger) {
-                    Assert::true($this->pinger->start(), "Could not start pinger stream");
-                }
                 $this->handler->start();
 
                 EventLoop::queue($this->shared->initAuthorization(...));
@@ -583,9 +561,7 @@ final class Connection
         $this->pendingOutgoing[$this->pendingOutgoingKey++] = $message;
         $this->outgoingCtr?->inc();
         $this->pendingOutgoingGauge?->set(\count($this->pendingOutgoing));
-        if (isset($this->writer)) {
-            $this->writer->resume();
-        }
+        $this->flush();
         $this->connect();
         $promise->await();
     }
@@ -596,18 +572,6 @@ final class Connection
     {
         if (isset($this->writer)) {
             $this->writer->resume();
-        }
-    }
-    /**
-     * Resume HttpWaiter.
-     */
-    public function pingHttpWaiter(): void
-    {
-        if (isset($this->waiter)) {
-            $this->waiter->resume();
-        }
-        if (isset($this->pinger)) {
-            $this->pinger->resume();
         }
     }
     /**
@@ -660,9 +624,7 @@ final class Connection
 
         $this->reader?->stop();
         $this->writer?->stop();
-        $this->checker?->stop();
         $this->cleanup?->stop();
-        $this->pinger?->stop();
 
         if (!$temporary) {
             $this->shared->signalDisconnect($this->id);

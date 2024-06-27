@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\StreamException;
+use Amp\DeferredFuture;
 use danog\Loop\Loop;
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -42,23 +44,46 @@ final class WriteLoop extends Loop
 {
     private const MAX_COUNT = 1020;
     private const MAX_SIZE = 1 << 15;
+    private const LONG_POLL_TIMEOUT = 30;
+    private const LONG_POLL_TIMEOUT_MS = self::LONG_POLL_TIMEOUT*1000;
     public const MAX_IDS = 8192;
 
-    use Common;
+    use Common {
+        __construct as init;
+    }
+    
+    private int $pingTimeout;
+    private float $timeout;
+    /**
+     * Constructor function.
+     */
+    public function __construct(Connection $connection)
+    {
+        $this->init($connection);
+        $timeout = $this->shared->getSettings()->getPingInterval();
+        $this->pingTimeout = $timeout + 15;
+
+        if ($this->connection->isHttp()) {
+            $this->timeout = (float) max(self::LONG_POLL_TIMEOUT, $timeout);
+        } else {
+            $this->timeout = (float) $timeout;
+        }
+    }
     /**
      * Main loop.
      */
     public function loop(): ?float
     {
         $please_wait = false;
+        $first = true;
         while (true) {
             if ($this->connection->shouldReconnect()) {
                 $this->API->logger("Exiting $this because connection is old");
                 return self::STOP;
             }
-            if (!$this->connection->pendingOutgoing) {
+            if (!$this->connection->pendingOutgoing && !$first) {
                 $this->API->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
-                return self::PAUSE;
+                return $this->timeout;
             }
             if ($please_wait) {
                 $this->API->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
@@ -67,7 +92,7 @@ final class WriteLoop extends Loop
             $this->connection->writing(true);
             try {
                 $please_wait = $this->shared->hasTempAuthKey()
-                    ? $this->encryptedWriteLoop()
+                    ? $this->encryptedWriteLoop($first)
                     : $this->unencryptedWriteLoop();
             } catch (StreamException $e) {
                 if ($this->connection->shouldReconnect()) {
@@ -87,10 +112,17 @@ final class WriteLoop extends Loop
             } finally {
                 $this->connection->writing(false);
             }
+            $first = false;
         }
     }
     public function unencryptedWriteLoop(): bool
     {
+        if ($queue = $this->connection->unencrypted_check_queue) {
+            $this->connection->unencrypted_check_queue = [];
+            foreach ($queue as $msg_id => $_) {
+                $this->connection->methodRecall($msg_id);
+            }
+        }
         while ($this->connection->pendingOutgoing) {
             $skipped_all = true;
             foreach ($this->connection->pendingOutgoing as $k => $message) {
@@ -123,7 +155,7 @@ final class WriteLoop extends Loop
                 $this->connection->pendingOutgoingGauge?->set(\count($this->connection->pendingOutgoing));
                 $message->setMsgId($message_id);
                 $this->connection->outgoing_messages[$message_id] = $message;
-                $this->connection->new_outgoing[$message_id] = $message;
+                $this->connection->unencrypted_new_outgoing[$message_id] = $message;
 
                 $message->sent();
             }
@@ -133,14 +165,95 @@ final class WriteLoop extends Loop
         }
         return false;
     }
-    public function encryptedWriteLoop(): bool
+    public function encryptedWriteLoop(bool $first): bool
     {
         do {
             if (!$this->shared->hasTempAuthKey()) {
                 return false;
             }
-            if ($this->connection->isHttp() && empty($this->connection->pendingOutgoing)) {
+            if (!$first && !$this->connection->pendingOutgoing) {
                 return false;
+            }
+
+            foreach ($this->connection->check_queue as $msg_id => $_) {
+                $deferred = new DeferredFuture();
+                $list = '';
+                // Don't edit this here pls
+                foreach ($message_ids as $message_id) {
+                    if (!isset($this->connection->outgoing_messages[$message_id])) {
+                        continue;
+                    }
+                    $list .= $this->connection->outgoing_messages[$message_id]->constructor.', ';
+                }
+                $this->API->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
+                $this->connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], $deferred);
+                EventLoop::queue(function () use ($deferred, $message_ids): void {
+                    try {
+                        $result = $deferred->getFuture()->await(new TimeoutCancellation($this->timeout));
+                        if (\is_callable($result)) {
+                            throw $result();
+                        }
+                        $reply = [];
+                        foreach (str_split($result['info']) as $key => $chr) {
+                            $message_id = $message_ids[$key];
+                            if (!isset($this->connection->outgoing_messages[$message_id])) {
+                                $this->API->logger("Already got response for and forgot about message ID $message_id");
+                                continue;
+                            }
+                            if (!isset($this->connection->new_outgoing[$message_id])) {
+                                $this->API->logger('Already got response for '.$this->connection->outgoing_messages[$message_id]);
+                                continue;
+                            }
+                            $message = $this->connection->new_outgoing[$message_id];
+                            $chr = \ord($chr);
+                            switch ($chr & 7) {
+                                case 0:
+                                    $this->API->logger("Wrong message status 0 for $message", Logger::FATAL_ERROR);
+                                    break;
+                                case 1:
+                                case 2:
+                                case 3:
+                                    if ($message->constructor === 'msgs_state_req') {
+                                        $this->connection->gotResponseForOutgoingMessage($message);
+                                        break;
+                                    }
+                                    $this->API->logger("Message $message not received by server, resending...", Logger::ERROR);
+                                    $this->connection->methodRecall($message_id);
+                                    break;
+                                case 4:
+                                    if ($chr & 128) {
+                                        $this->API->logger("Message $message received by server and was already sent, requesting reply...", Logger::ERROR);
+                                        $reply[] = $message_id;
+                                    } elseif ($chr & 64) {
+                                        $this->API->logger("Message $message received by server and was already processed, requesting reply...", Logger::ERROR);
+                                        $reply[] = $message_id;
+                                    } elseif ($chr & 32) {
+                                        if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
+                                            if ($message->cancellation?->isRequested()) {
+                                                unset($this->connection->new_outgoing[$message_id], $this->connection->outgoing_messages[$message_id]);
+
+                                                $this->API->logger("Cancelling $message...", Logger::ERROR);
+                                            } else {
+                                                $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
+                                                $this->connection->methodRecall($message_id);
+                                            }
+                                        } else {
+                                            $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
+                                        }
+                                    } else {
+                                        $this->API->logger("Message $message received by server, waiting...", Logger::ERROR);
+                                        $reply[] = $message_id;
+                                    }
+                            }
+                        }
+                        //} catch (CancelledException) {
+                        //$this->API->logger("We did not receive a response for {$this->timeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
+                        //EventLoop::queue($this->connection->reconnect(...));
+                    } catch (\Throwable $e) {
+                        $this->API->logger("Got exception in check loop for DC {$this->datacenter}");
+                        $this->API->logger((string) $e);
+                    }
+                });
             }
 
             ksort($this->connection->pendingOutgoing);

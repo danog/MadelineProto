@@ -63,7 +63,8 @@ final class ReadLoop extends Loop
             }
             EventLoop::queue(function () use ($e): void {
                 if ($e instanceof NothingInTheSocketException
-                    && !$this->connection->hasPendingCalls()
+                    && !$this->connection->unencrypted_new_outgoing
+                    && !$this->connection->new_outgoing
                     && $this->connection->isMedia()
                     && !$this->connection->isWriting()
                     && $this->shared->hasTempAuthKey()
@@ -93,6 +94,9 @@ final class ReadLoop extends Loop
                         foreach ($this->connection->new_outgoing as $message) {
                             $message->resetSent();
                         }
+                        foreach ($this->connection->unencrypted_new_outgoing as $message) {
+                            $message->resetSent();
+                        }
                         $this->shared->reconnect();
                     } else {
                         $this->connection->reconnect();
@@ -116,9 +120,6 @@ final class ReadLoop extends Loop
             return self::STOP;
         }
         $this->connection->httpReceived();
-        if ($this->connection->isHttp()) {
-            $this->connection->pingHttpWaiter();
-        }
         $this->connection->wakeupHandler();
         return self::CONTINUE;
     }

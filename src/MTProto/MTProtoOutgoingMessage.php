@@ -89,6 +89,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     private int $tries = 0;
 
+    private ?string $checkTimer = null;
+
     /**
      * Whether this message is related to a user, as in getting a successful reply means we have auth.
      */
@@ -110,6 +112,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly string $type,
         public readonly bool $isMethod,
         public readonly bool $unencrypted,
+        public readonly ?Cancellation $cancellation,
         public readonly ?string $subtype = null,
         /**
          * Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
@@ -126,20 +129,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly ?int $takeoutId = null,
         public readonly ?string $businessConnectionId = null,
         private ?DeferredFuture $resultDeferred = null,
-        public readonly ?Cancellation $cancellation = null
     ) {
         $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
 
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
         $cancellation?->subscribe(fn (CancelledException $e) => $this->reply(static fn () => throw $e));
-    }
-
-    /**
-     * Whether cancellation is requested.
-     */
-    public function isCancellationRequested(): bool
-    {
-        return $this->cancellation?->isRequested() ?? false;
     }
 
     /**
@@ -164,10 +158,44 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         }
         $this->state |= self::STATE_SENT;
         $this->sent = hrtime(true);
+        $this->checkTimer = EventLoop::delay(
+            $this->connection->API->getSettings()->getConnection()->getTimeout(),
+            $this->check(...)
+        );
         if (isset($this->sendDeferred)) {
             $sendDeferred = $this->sendDeferred;
             $this->sendDeferred = null;
             $sendDeferred->complete();
+        }
+    }
+    private function check(): void
+    {
+        if ($this->state & self::STATE_REPLIED) {
+            return;
+        }
+        $shared = $this->connection->getShared();
+        $settings = $shared->getSettings();
+        $global = $shared->getGenericSettings();
+        $timeout = (float) $settings->getTimeout();
+        $pfs = $global->getAuth()->getPfs();
+        $unencrypted = !$shared->hasTempAuthKey();
+        $notBound = !$shared->isBound();
+        $pfsNotBound = $pfs && $notBound;
+        $this->checkTimer = EventLoop::delay(
+            $timeout,
+            $this->check(...)
+        );
+
+        if ($this->unencrypted === $unencrypted) {
+            if (!$unencrypted && $pfsNotBound && $this->constructor !== 'auth.bindTempAuthKey') {
+                return;
+            }
+            if ($unencrypted) {
+                $this->connection->unencrypted_check_queue[$this->msgId] = true;
+            } else {
+                $this->connection->check_queue[$this->msgId] = true;
+            }
+            $this->connection->flush();
         }
     }
     /**
@@ -184,6 +212,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         }
         if (!($this->state & self::STATE_SENT)) {
             $this->sent();
+        }
+        if ($this->checkTimer !== null) {
+            EventLoop::cancel($this->checkTimer);
+            $this->checkTimer = null;
         }
 
         if ($this->isMethod) {

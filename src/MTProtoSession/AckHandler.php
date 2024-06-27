@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
-use Amp\TimeoutException;
 use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
@@ -57,73 +56,5 @@ trait AckHandler
         $message_id = $message->getMsgId();
         // I let the server know that I received its message
         $this->ack_queue[$message_id] = $message_id;
-    }
-
-    /**
-     * Check if there are some pending calls.
-     */
-    public function hasPendingCalls(): bool
-    {
-        $timeout = (int) ($this->shared->getSettings()->getTimeout() * 1_000_000_000.0);
-        $pfs = $this->shared->getGenericSettings()->getAuth()->getPfs();
-        $unencrypted = !$this->shared->hasTempAuthKey();
-        $notBound = !$this->shared->isBound();
-        $pfsNotBound = $pfs && $notBound;
-        /** @var MTProtoOutgoingMessage */
-        foreach ($this->new_outgoing as $message) {
-            if ($message->wasSent()
-                && $message->getSent() + $timeout < hrtime(true)
-                && $message->unencrypted === $unencrypted
-                && $message->constructor !== 'msgs_state_req') {
-                if (!$unencrypted && $pfsNotBound && $message->constructor !== 'auth.bindTempAuthKey') {
-                    continue;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Get all pending calls (also clear pending state requests).
-     */
-    public function getPendingCalls(): array
-    {
-        $settings = $this->shared->getSettings();
-        $global = $this->shared->getGenericSettings();
-        $dropTimeout = (int) ($global->getRpc()->getRpcDropTimeout() * 1_000_000_000.0);
-        $timeout = (int) ($settings->getTimeout() * 1_000_000_000.0);
-        $pfs = $global->getAuth()->getPfs();
-        $unencrypted = !$this->shared->hasTempAuthKey();
-        $notBound = !$this->shared->isBound();
-        $pfsNotBound = $pfs && $notBound;
-        if ($this->datacenter < 0) {
-            $dropTimeout *= 10;
-        }
-        $result = [];
-        /** @var MTProtoOutgoingMessage $message */
-        foreach ($this->new_outgoing as $message_id => $message) {
-            if ($message->wasSent()
-                && $message->getSent() + $timeout < hrtime(true)
-                && $message->unencrypted === $unencrypted
-            ) {
-                if (!$unencrypted && $pfsNotBound && $message->constructor !== 'auth.bindTempAuthKey') {
-                    continue;
-                }
-                if ($message->constructor === 'msgs_state_req' || $message->constructor === 'ping_delay_disconnect'
-                    || ($message->getSent() + $dropTimeout < hrtime(true))
-                ) {
-                    Logger::log('No reply for message: ' . $message, Logger::WARNING);
-                    $message->reply(static fn () => new TimeoutException('Request timeout'));
-                    continue;
-                }
-                if ($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED) {
-                    $this->API->logger("Already replied to message $message, but still in new_outgoing");
-                    unset($this->new_outgoing[$message_id]);
-                    continue;
-                }
-                $result[] = $message_id;
-            }
-        }
-        return $result;
     }
 }

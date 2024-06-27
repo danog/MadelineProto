@@ -78,6 +78,12 @@ trait Session
      */
     public array $new_outgoing = [];
     /**
+     * New unencrypted outgoing message array.
+     *
+     * @var array<MTProtoOutgoingMessage>
+     */
+    public array $unencrypted_new_outgoing = [];
+    /**
      * Pending outgoing messages.
      *
      * @var array<MTProtoOutgoingMessage>
@@ -104,6 +110,16 @@ trait Session
      *
      */
     public array $ack_queue = [];
+    /**
+     * Check queue.
+     *
+     */
+    public array $check_queue = [];
+    /**
+     * Check queue.
+     *
+     */
+    public array $unencrypted_check_queue = [];
     /**
      * Message ID handler.
      *
@@ -178,6 +194,12 @@ trait Session
             $new_outgoing[$key] = $message;
         }
         $this->new_outgoing = $new_outgoing;
+
+        $unencrypted_new_outgoing = [];
+        foreach ($this->unencrypted_new_outgoing as $key => $message) {
+            $unencrypted_new_outgoing[$key] = $message;
+        }
+        $this->unencrypted_new_outgoing = $unencrypted_new_outgoing;
     }
     /**
      * Create MTProto session if needed.
@@ -227,6 +249,6 @@ trait Session
     public function backupSession(): array
     {
         $pending = array_values($this->pendingOutgoing);
-        return array_merge($pending, $this->new_outgoing);
+        return array_merge($pending, $this->new_outgoing, $this->unencrypted_new_outgoing);
     }
 }
