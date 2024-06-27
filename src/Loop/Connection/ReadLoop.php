@@ -71,7 +71,7 @@ final class ReadLoop extends Loop
                     $this->API->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
                     $this->connection->disconnect(true);
                 } else {
-                    $this->API->logger($e);
+                    $this->API->logger($e, Logger::ERROR);
                     $this->API->logger("Got exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
                 }
