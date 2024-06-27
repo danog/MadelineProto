@@ -266,11 +266,13 @@ final class PeerDatabase implements TLCallback
         }
         $new = self::getUsernames($new);
         $old = $old ? self::getUsernames($old) : [];
-        $diffToRemove = array_diff($old, $new);
-        $diffToAdd = array_diff($new, $old);
-        if (!$diffToAdd && !$diffToRemove) {
-            return;
+        foreach ($old as $key => $username) {
+            if (!isset($this->usernames[$username])) {
+                unset($old[$key]);
+            }
         }
+        $diffToRemove = array_diff($old, $new);
+        $diffToAdd = array_diff($new, $diffToRemove);
         $lock = $this->decacheMutex->acquire();
         try {
             foreach ($diffToRemove as $username) {
@@ -410,6 +412,9 @@ final class PeerDatabase implements TLCallback
                     return;
                 }
             }
+
+            $this->recacheChatUsername($user['id'], $existingChat, $user);
+
             if ($existingChat != $user) {
                 $this->API->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
                 if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
@@ -419,7 +424,7 @@ final class PeerDatabase implements TLCallback
                         $user['access_hash'] = $existingChat['access_hash'];
                     }
                 }
-                $this->recacheChatUsername($user['id'], $existingChat, $user);
+
                 if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                     $user = [
                         '_' => $user['_'],
@@ -544,8 +549,8 @@ final class PeerDatabase implements TLCallback
                     return;
                 }
             }
+            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
             if ($existingChat != $chat) {
-                $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
                 $this->API->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
                 if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
                     $this->API->logger("{$bot_api_id} is min, filling missing fields", Logger::ULTRA_VERBOSE);
