@@ -60,7 +60,7 @@ trait CallHandler
                 if ($datacenter) {
                     /** @var MTProtoOutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
-                    unset($this->new_outgoing[$message_id]);
+                    unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     $message->setMsgId(null);
                     $message->setSeqNo(null);
                     EventLoop::queue(function () use ($datacenter, $message): void {
@@ -71,7 +71,7 @@ trait CallHandler
                     /** @var MTProtoOutgoingMessage */
                     $message = $this->outgoing_messages[$message_id];
                     if (!$message->hasSeqNo()) {
-                        unset($this->new_outgoing[$message_id]);
+                        unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
                     }
                     EventLoop::queue($this->sendMessage(...), $message);
                 }

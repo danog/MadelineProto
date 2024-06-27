@@ -310,10 +310,7 @@ final class Connection
                 }
                 foreach ($this->new_outgoing as $message_id => $message) {
                     if ($message->unencrypted) {
-                        if (!($message->getState() & MTProtoOutgoingMessage::STATE_REPLIED)) {
-                            $message->reply(static fn () => new Exception('Restart because we were reconnected'));
-                        }
-                        unset($this->new_outgoing[$message_id], $this->outgoing_messages[$message_id]);
+                        $message->reply(static fn () => new Exception('Restart because we were reconnected'));
                     }
                 }
                 Assert::true($this->writer->start(), "Could not start writer stream");
