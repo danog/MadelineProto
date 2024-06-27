@@ -522,7 +522,6 @@ final class Blacklist {
                 }
                 $paramList .= '$'.$param->getName();
                 if ($param->getName() === 'cancellation') {
-                    $paramList .= ' ?? $this->wrapper->getRpcDropCancellation()';
                     $hasCancellation = true;
                 }
                 $paramList .= ', ';
