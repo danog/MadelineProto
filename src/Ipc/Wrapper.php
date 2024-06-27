@@ -121,8 +121,7 @@ final class Wrapper extends ClientAbstract
             }
             $ids = [];
             foreach (get_class_methods($callback) as $method) {
-                //$id = $this->id++;
-                $id = $this->id++.'_'.$method;
+                $id = $this->id++;
                 $this->callbacks[$id] = [$callback, $method];
                 $ids[$method] = $id;
             }

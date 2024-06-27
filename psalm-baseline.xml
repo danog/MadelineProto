@@ -2340,6 +2340,7 @@
       <code><![CDATA[$media['media']]]></code>
     </MixedArrayAccess>
     <MixedAssignment>
+      <code><![CDATA[$arg]]></code>
       <code><![CDATA[$callable]]></code>
       <code><![CDATA[$callable]]></code>
       <code><![CDATA[$dir]]></code>
@@ -2510,6 +2511,9 @@
       <code><![CDATA[Wrapper]]></code>
       <code><![CDATA[Wrapper]]></code>
     </PropertyNotSetInConstructor>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$this->callbackIds]]></code>
+    </PropertyTypeCoercion>
     <UnsafeInstantiation>
       <code><![CDATA[new $class($this, $ids)]]></code>
     </UnsafeInstantiation>
@@ -2518,10 +2522,13 @@
       <code><![CDATA[$this->callbackIds[] = &$callback]]></code>
     </UnsupportedReferenceUsage>
   </file>
-  <file src="src/Ipc/Wrapper/Cancellation.php">
+  <file src="src/Ipc/Wrapper/CancellationInner.php">
+    <MixedAssignment>
+      <code><![CDATA[$id]]></code>
+    </MixedAssignment>
     <MixedReturnStatement>
+      <code><![CDATA[$id]]></code>
       <code><![CDATA[$this->__call('isRequested')]]></code>
-      <code><![CDATA[$this->__call('unsubscribe', [$callback])]]></code>
     </MixedReturnStatement>
   </file>
   <file src="src/Ipc/Wrapper/ReadableStream.php">
@@ -2535,6 +2542,14 @@
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$this->__call('isReadable')]]></code>
     </MixedReturnStatement>
+  </file>
+  <file src="src/Ipc/Wrapper/WrappedCancellation.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->handlers[$id]]]></code>
+    </DocblockTypeContradiction>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[$this->handlers[$id]?->complete()]]></code>
+    </RedundantConditionGivenDocblockType>
   </file>
   <file src="src/Ipc/Wrapper/WritableStream.php">
     <MixedReturnStatement>

@@ -56,8 +56,10 @@ final class WrappedCancellation
      */
     public function unsubscribe(string $id): void
     {
-        $this->handlers[$id]?->complete();
-        unset($this->handlers[$id]);
+        if (isset($this->handlers[$id])) {
+            $this->handlers[$id]->complete();
+            unset($this->handlers[$id]);
+        }
     }
 
     /**
