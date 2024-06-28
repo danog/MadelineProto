@@ -17,7 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 /**
- * Represents a reply message that in channel comments.
+ * Represents a reply to one of our messages in a channel comment group that we're not a member of (i.e. received via `@replies`).
  */
 final class CommentReply extends GroupMessage
 {

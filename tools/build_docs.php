@@ -296,7 +296,7 @@ function getSummary(string $phpdoc): string
 }
 
 /** @internal */
-function printTypes(array $types, string $type): string
+function printTypes(array $types, string $type, string $indent = ''): string
 {
     $phpdoc = PhpDoc::fromNamespace();
     $data = '';
@@ -318,12 +318,12 @@ function printTypes(array $types, string $type): string
                 $class .= str_replace(['__construct', '\danog\MadelineProto\EventHandler\Filter\\'], '', $c);
             }
         }
-        $data .= "* [$class &raquo;]($link) - $f\n";
+        $data .= "$indent* [$class &raquo;]($link) - $f\n";
         if ($type !== 'concretefilters') {
             continue;
         }
-        $data .= "  * [Full property list &raquo;]($link#properties)\n";
-        $data .= "  * [Full bound method list &raquo;]($link#method-list)\n";
+        $data .= "$indent  * [Full property list &raquo;]($link#properties)\n";
+        $data .= "$indent  * [Full bound method list &raquo;]($link#method-list)\n";
     }
     return $data;
 }
@@ -441,8 +441,20 @@ foreach ($orderedfiles as $key => $filename) {
                     continue;
                 }
             }
-            if (basename($filename) === 'UPDATES.md' && str_starts_with($url, 'https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler')) {
-                continue;
+            if (basename($filename) === 'UPDATES.md' && str_contains($url, 'Broadcast/Progress')) {
+                $result = ClassFinder::getClassesInNamespace(
+                    \danog\MadelineProto::class,
+                    ClassFinder::RECURSIVE_MODE | ClassFinder::ALLOW_ALL
+                );
+                $result []= ServiceMessage::class;
+                $result = array_filter(
+                    $result,
+                    static fn ($class) => is_subclass_of($class, Update::class)
+                );
+                sort($result);
+                $data = printTypes($result, $match, "  ");
+                $index .= $data;
+                break;
             }
             $index .= "$spaces* [$name]($url)\n";
             if ($name === 'FULL API Documentation with descriptions') {

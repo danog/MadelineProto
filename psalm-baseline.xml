@@ -660,11 +660,17 @@
       <code><![CDATA[$rawMessage['chat_id']]]></code>
       <code><![CDATA[$rawMessage['date']]]></code>
       <code><![CDATA[$rawMessage['from_id']]]></code>
+      <code><![CDATA[$rawMessage['fwd_from']]]></code>
+      <code><![CDATA[$rawMessage['fwd_from']]]></code>
+      <code><![CDATA[$rawMessage['fwd_from']['from_id']]]></code>
+      <code><![CDATA[$rawMessage['fwd_from']['saved_from_msg_id']]]></code>
       <code><![CDATA[$rawMessage['id']]]></code>
       <code><![CDATA[$rawMessage['mentioned']]]></code>
       <code><![CDATA[$rawMessage['out']]]></code>
       <code><![CDATA[$rawMessage['random_id']]]></code>
+      <code><![CDATA[$rawMessage['reply_to']]]></code>
       <code><![CDATA[$rawMessage['reply_to']['_']]]></code>
+      <code><![CDATA[$rawMessage['reply_to']['reply_to_peer_id']]]></code>
       <code><![CDATA[$rawMessage['reply_to_random_id']]]></code>
       <code><![CDATA[$rawMessage['silent']]]></code>
       <code><![CDATA[$rawMessage['ttl']]]></code>
@@ -1503,6 +1509,12 @@
     <PropertyNotSetInConstructor>
       <code><![CDATA[ChannelMessage]]></code>
       <code><![CDATA[ChannelMessage]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/EventHandler/Message/CommentReply.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[CommentReply]]></code>
+      <code><![CDATA[CommentReply]]></code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Message/Entities/MessageEntity.php">
@@ -2542,14 +2554,6 @@
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$this->__call('isReadable')]]></code>
     </MixedReturnStatement>
-  </file>
-  <file src="src/Ipc/Wrapper/WrappedCancellation.php">
-    <DocblockTypeContradiction>
-      <code><![CDATA[$this->handlers[$id]]]></code>
-    </DocblockTypeContradiction>
-    <RedundantConditionGivenDocblockType>
-      <code><![CDATA[$this->handlers[$id]?->complete()]]></code>
-    </RedundantConditionGivenDocblockType>
   </file>
   <file src="src/Ipc/Wrapper/WritableStream.php">
     <MixedReturnStatement>
