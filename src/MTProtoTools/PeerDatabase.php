@@ -432,6 +432,9 @@ final class PeerDatabase implements TLCallback
                 if ($existingChat && ($existingChat['min'] ?? false) && !($user['min'] ?? false)) {
                     $this->API->minDatabase->clearPeer($user['id']);
                 }
+                if ($existingChat && ($existingChat['bot_info_version'] ?? null) !== ($user['bot_info_version'] ?? null)) {
+                    $this->expireFull($user['id']);
+                }
             }
         } finally {
             if (isset($o) && $this->pendingDb[$id] === $o) {
