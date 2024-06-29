@@ -1095,7 +1095,7 @@ trait UpdateHandler
             return;
         }
         if (
-            \in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink'], true)
+            \in_array($update['_'], ['updateChannel', 'updateUser', 'updateUserName', 'updateUserPhone', 'updateUserBlocked', 'updateUserPhoto', 'updateContactRegistered', 'updateContactLink', 'updatePeerBlocked'], true)
             || (
                 $update['_'] === 'updateNewChannelMessage'
                 && isset($update['message']['action']['_'])
