@@ -134,6 +134,7 @@ final class Blacklist {
             'waveform' => 'non-empty-list<int<0, 31>>',
             'int' => 'int',
             'long' => 'int',
+            'int|string' => 'int|string',
             'strlong' => 'int',
             'double' => 'float',
             'float' => 'float',
@@ -306,7 +307,7 @@ final class Blacklist {
             if ($param['name'] === 'hash' && $param['type'] === 'long') {
                 $param['pow'] ??= 'optional';
                 $param['type'] = 'Vector t';
-                $param['subtype'] = 'int';
+                $param['subtype'] = 'int|string';
             }
             if (\in_array($param['type'], ['int', 'long', 'strlong', 'string', 'bytes'], true)) {
                 $param['pow'] ??= 'optional';

@@ -50,9 +50,9 @@ abstract class SettingsAbstract
                 continue;
             }
             $uc = ucfirst($name);
-            if (isset($other->{$name})
+            if ((isset($other->{$name}) || $name === 'metricsBindTo')
                 && (
-                    !isset($defaults[$name])
+                    !array_key_exists($name, $defaults)
                     || (
                         $other->{$name} !== $defaults[$name]  // Isn't equal to the default value
                         || $other->{$name} !== $this->{$name} // Is equal, but current value is not the default one

@@ -1146,9 +1146,13 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updateSavedReactionTag.html" name="messages.updateSavedReactionTag">messages.updateSavedReactionTag</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleDecode" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleEncode" name="rleEncode">null-byte RLE encode: rleEncode</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsRevenueAdsAccountUrl.html" name="payments.getStarsRevenueAdsAccountUrl">payments.getStarsRevenueAdsAccountUrl</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsRevenueStats.html" name="payments.getStarsRevenueStats">payments.getStarsRevenueStats</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsRevenueWithdrawalUrl.html" name="payments.getStarsRevenueWithdrawalUrl">payments.getStarsRevenueWithdrawalUrl</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsStatus.html" name="payments.getStarsStatus">payments.getStarsStatus</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsTopupOptions.html" name="payments.getStarsTopupOptions">payments.getStarsTopupOptions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsTransactions.html" name="payments.getStarsTransactions">payments.getStarsTransactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsTransactionsByID.html" name="payments.getStarsTransactionsByID">payments.getStarsTransactionsByID</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.refundStarsCharge.html" name="payments.refundStarsCharge">payments.refundStarsCharge</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.sendStarsForm.html" name="payments.sendStarsForm">payments.sendStarsForm</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.finishJob.html" name="smsjobs.finishJob">smsjobs.finishJob</a>
@@ -1162,6 +1166,7 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueTransactions.html" name="stats.getBroadcastRevenueTransactions">stats.getBroadcastRevenueTransactions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getBroadcastRevenueWithdrawalUrl.html" name="stats.getBroadcastRevenueWithdrawalUrl">stats.getBroadcastRevenueWithdrawalUrl</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stickers.replaceSticker.html" name="stickers.replaceSticker">stickers.replaceSticker</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.searchPosts.html" name="stories.searchPosts">stories.searchPosts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.togglePinnedToTop.html" name="stories.togglePinnedToTop">stories.togglePinnedToTop</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.getIsPremiumRequiredToContact.html" name="users.getIsPremiumRequiredToContact">users.getIsPremiumRequiredToContact</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.

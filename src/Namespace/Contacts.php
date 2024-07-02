@@ -13,7 +13,7 @@ interface Contacts
      * Get the telegram IDs of all contacts.
      * Returns an array of Telegram user IDs for all contacts (0 if a contact does not have an associated Telegram account or have hidden their account using privacy settings).
      *
-     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int|string>|array<never, never> $hash Array of [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -34,7 +34,7 @@ interface Contacts
     /**
      * Returns the current user's contact list.
      *
-     * @param list<int>|array<never, never> $hash If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned.
+     * @param list<int|string>|array<never, never> $hash Array of If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned. @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -136,7 +136,7 @@ interface Contacts
      * @param bool $channels Most frequently visited channels
      * @param int $offset Offset for [pagination](https://core.telegram.org/api/offsets)
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * @param list<int>|array<never, never> $hash [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation)
+     * @param list<int|string>|array<never, never> $hash Array of [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
