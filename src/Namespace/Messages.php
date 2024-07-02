@@ -143,8 +143,9 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      */
-    public function setTyping(array $action, array|int|string|null $peer = null, int|null $top_msg_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function setTyping(array $action, array|int|string|null $peer = null, int|null $top_msg_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): bool;
 
     /**
      * Sends a message to a chat.
@@ -171,9 +172,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMessage(bool|null $no_webpage = null, bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, string|null $message = '', array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMessage(bool|null $no_webpage = null, bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, string|null $message = '', array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array;
 
     /**
      * Send a media.
@@ -200,9 +202,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMedia(bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, string|null $message = '', array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMedia(bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, string|null $message = '', array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array;
 
     /**
      * Forwards messages by their IDs.
@@ -728,9 +731,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function editMessage(bool|null $no_webpage = null, bool|null $invert_media = null, array|int|string|null $peer = null, int|null $id = 0, string|null $message = null, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, int|null $quick_reply_shortcut_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function editMessage(bool|null $no_webpage = null, bool|null $invert_media = null, array|int|string|null $peer = null, int|null $id = 0, string|null $message = null, \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, array|null $reply_markup = null, array|null $entities = null, \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, int|null $schedule_date = null, int|null $quick_reply_shortcut_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array;
 
     /**
      * Edit an inline bot message.
@@ -1162,9 +1166,10 @@ interface Messages
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      */
-    public function sendMultiMedia(bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array $multi_media = [], int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function sendMultiMedia(bool|null $silent = null, bool|null $background = null, bool|null $clear_draft = null, bool|null $noforwards = null, bool|null $update_stickersets_order = null, bool|null $invert_media = null, array|int|string|null $peer = null, int $reply_to_msg_id = 0, int $top_msg_id = 0, array|null $reply_to = null, array $multi_media = [], int|null $schedule_date = null, array|int|string|null $send_as = null, array|null $quick_reply_shortcut = null, int|null $effect = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array;
 
     /**
      * Upload encrypted file and associate it to a secret chat.
