@@ -565,6 +565,11 @@ final class Connection
                             'invokeWithTakeout',
                             ['takeout_id' => $message->takeoutId, 'query' => $body],
                         );
+                    } elseif ($message->businessConnectionId !== null) {
+                        $body = $this->API->getTL()->serializeMethod(
+                            'invokeWithBusinessConnection',
+                            ['connection_id' => $message->businessConnectionId, 'query' => $body],
+                        );
                     }
                 } else {
                     $body['_'] = $message->constructor;

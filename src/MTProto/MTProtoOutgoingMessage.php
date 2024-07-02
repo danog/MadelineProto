@@ -124,6 +124,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
          */
         public readonly ?int $floodWaitLimit = null,
         public readonly ?int $takeoutId = null,
+        public readonly ?string $businessConnectionId = null,
         private ?DeferredFuture $resultDeferred = null,
         public readonly ?Cancellation $cancellation = null
     ) {

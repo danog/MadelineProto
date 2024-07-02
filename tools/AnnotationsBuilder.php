@@ -388,6 +388,11 @@ final class Blacklist {
             $signature []= "?int \$takeoutId = null";
         }
 
+        if (\in_array($method, ['messages.sendMessage', 'messages.editMessage', 'messages.sendMedia', 'messages.sendMultiMedia', 'messages.setTyping'], true)) {
+            $contents .= "     * @param ?string \$businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.\n";
+            $signature []= "?string \$businessConnectionId = null";
+        }
+
         return [$contents, $signature];
     }
     /**
