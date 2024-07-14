@@ -103,6 +103,10 @@ final class Conversion
         $sqlite = new PDO("sqlite:$session");
         $session = $sqlite->query("SELECT * FROM sessions")->fetchAll(PDO::FETCH_ASSOC)[0];
 
+        if (!isset ($session['test_mode'])) {
+            $session['test_mode'] = false;
+        }
+        
         $settingsFull = new Settings;
         if ($settings) {
             $settingsFull->merge($settings);
