@@ -283,6 +283,12 @@ final class Magic
                         }
                         throw new SignalException('SIGTERM received');
                     }));
+                    EventLoop::unreference(EventLoop::onSignal(SIGQUIT, static function (): void {
+                        if (self::$suspendPeriodicLogging) {
+                            self::togglePeriodicLogging();
+                        }
+                        throw new SignalException('SIGQUIT received');
+                    }));
                 } catch (Throwable $e) {
                 }
             }
