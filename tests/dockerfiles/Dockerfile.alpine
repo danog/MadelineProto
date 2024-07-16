@@ -25,6 +25,8 @@ ADD ./tests/jit.php /jit.php
 
 RUN php /jit.php && rm /jit.php
 
+STOPSIGNAL SIGTERM
+
 WORKDIR /app
 
 CMD ["php", "/app/bot.php"]

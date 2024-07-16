@@ -885,7 +885,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             return $this->getClient()->methodCallAsyncRead(
                 'channels.readHistory',
                 [
-                    'peer' => $this->chatId,
                     'channel' => $this->chatId,
                     'max_id' => $readAll ? 0 : $this->id,
                 ],
@@ -895,7 +894,6 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             'messages.readHistory',
             [
                 'peer' => $this->chatId,
-                'channel' => $this->chatId,
                 'max_id' => $readAll ? 0 : $this->id,
             ],
         );
