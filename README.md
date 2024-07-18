@@ -76,6 +76,7 @@ Some of MadelineProto's core components are also available as separate, standalo
 - [danog/tg-file-decoder](https://github.com/danog/tg-file-decoder) - A library to work with Telegram bot API file IDs.
 - [danog/tg-dialog-id](https://github.com/danog/tg-dialog-id) - A library to work with Telegram bot API dialog IDs. 
 - [danog/loop](https://github.com/danog/loop) - Loop/actor model abstraction for AMPHP.
+- [danog/better-prometheus](https://github.com/danog/better-prometheus) - A better Prometheus library for PHP applications.
 - [danog/ipc](https://github.com/danog/ipc) - Async IPC component for AMPHP.
 - [danog/dns-over-https](https://github.com/danog/dns-over-https) - Async DNS-over-HTTPS resolution for AMPHP. 
 

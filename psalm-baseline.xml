@@ -723,7 +723,6 @@
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
                 'channels.readHistory',
                 [
-                    'peer' => $this->chatId,
                     'channel' => $this->chatId,
                     'max_id' => $readAll ? 0 : $this->id,
                 ],
