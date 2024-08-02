@@ -24,7 +24,7 @@ $logger = new Logger(new SettingsLogger);
 
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
-if ($argc !== 3) {
+if ($argc !== 2) {
     die("Usage: {$argv[0]} layernumber\n");
 }
 /**

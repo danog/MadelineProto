@@ -795,6 +795,7 @@ class RPCErrorException extends \Exception
             'FRESH_RESET_AUTHORISATION_FORBIDDEN' => new self($rpc, 'You can\'t logout other sessions if less than 24 hours have passed since you logged on the current session.', $code, $caller, $previous),
             'PAYMENT_UNSUPPORTED' => new \danog\MadelineProto\RPCError\PaymentUnsupportedError($code, $caller, $previous),
             'PHONE_PASSWORD_FLOOD' => new self($rpc, 'You have tried logging in too many times.', $code, $caller, $previous),
+            'PREMIUM_CURRENTLY_UNAVAILABLE' => new self($rpc, 'You cannot currently purchase a Premium subscription.', $code, $caller, $previous),
             'SEND_CODE_UNAVAILABLE' => new self($rpc, 'Returned when all available options for this type of number were already used (e.g. flash-call, then SMS, then this error might be returned to trigger a second resend).', $code, $caller, $previous),
             'STICKERSET_OWNER_ANONYMOUS' => new self($rpc, 'Provided stickerset can\'t be installed as group stickerset to prevent admin deanonymization.', $code, $caller, $previous),
             'UPDATE_APP_TO_LOGIN' => new self($rpc, 'Please update to the latest version of MadelineProto to login.', $code, $caller, $previous),
