@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /**
- * ChatGuestSendForbiddenError error.
+ * ReplyMessagesTooMuchError error.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -20,16 +20,16 @@ namespace danog\MadelineProto\RPCError;
 use danog\MadelineProto\RPCErrorException;
 
 /**
- * You join the discussion group before commenting, see [here &raquo;](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group) for more info.
+ * Each shortcut can contain a maximum of [appConfig.`quick_reply_messages_limit`](https://core.telegram.org/api/config#quick-reply-messages-limit) messages, the limit was reached.
  *
  * Note: this exception is part of the raw API, and thus is not covered by the backwards-compatibility promise.
  *
  * Always check the changelog when upgrading, and use tools like Psalm to easily upgrade your code.
  */
-final class ChatGuestSendForbiddenError extends RPCErrorException
+final class ReplyMessagesTooMuchError extends RPCErrorException
 {
     protected function __construct(int $code, string $caller, ?\Exception $previous = null)
     {
-        parent::__construct('CHAT_GUEST_SEND_FORBIDDEN', 'You join the discussion group before commenting, see [here &raquo;](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group) for more info.', $code, $caller, $previous);
+        parent::__construct('REPLY_MESSAGES_TOO_MUCH', 'Each shortcut can contain a maximum of [appConfig.`quick_reply_messages_limit`](https://core.telegram.org/api/config#quick-reply-messages-limit) messages, the limit was reached.', $code, $caller, $previous);
     }
 }

@@ -149,4 +149,4 @@ class SecretHandler extends SimpleEventHandler
 $settings = new Settings;
 $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
 
-SecretHandler::startAndLoop('valeriano.madeline', $settings);
+SecretHandler::startAndLoop('secret.madeline', $settings);

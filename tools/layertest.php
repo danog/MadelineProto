@@ -63,6 +63,7 @@ foreach ($layer['methods']->by_id as $constructor) {
         || $name === 'auth.resetAuthorizations'
         || $name === 'auth.dropTempAuthKeys'
         || $name === 'account.resetAuthorization'
+        || $name === 'account.resetPassword'
         || !str_contains($name, '.')) {
         continue;
     }
