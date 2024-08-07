@@ -221,6 +221,9 @@ trait FileServer
     private static array $checkedScripts = [];
     private function checkDownloadScript(string $scriptUrl): void
     {
+        if (!str_starts_with($scriptUrl, 'http://') && !str_starts_with($scriptUrl, 'https://')) {
+            throw new AssertionError("The download script must be an HTTP (preferrably HTTPS) URL!");
+        }
         if (isset(self::$checkedScripts[$scriptUrl])) {
             return;
         }
