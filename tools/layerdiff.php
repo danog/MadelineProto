@@ -114,6 +114,7 @@ foreach (['methods', 'constructors'] as $type) {
 $bot = new \danog\MadelineProto\API('testing.madeline');
 $bot->start();
 
+echo $res."\n\n";
 foreach (explode("\n\n", $res) as $chunk) {
     if (!$chunk || !trim(explode(':', $chunk)[1])) {
         continue;
