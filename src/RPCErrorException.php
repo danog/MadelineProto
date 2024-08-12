@@ -434,6 +434,7 @@ class RPCErrorException extends \Exception
             'IMPORT_TOKEN_INVALID' => new self($rpc, 'The specified token is invalid.', $code, $caller, $previous),
             'INLINE_RESULT_EXPIRED' => new self($rpc, 'The inline query expired.', $code, $caller, $previous),
             'INPUT_CHATLIST_INVALID' => new self($rpc, 'The specified folder is invalid.', $code, $caller, $previous),
+            'INPUT_FILE_INVALID' => new self($rpc, 'The specified [InputFile](https://core.telegram.org/type/InputFile) is invalid.', $code, $caller, $previous),
             'INPUT_FILTER_INVALID' => new self($rpc, 'The specified filter is invalid.', $code, $caller, $previous),
             'INPUT_TEXT_EMPTY' => new self($rpc, 'The specified text is empty.', $code, $caller, $previous),
             'INPUT_TEXT_TOO_LONG' => new self($rpc, 'The specified text is too long.', $code, $caller, $previous),
