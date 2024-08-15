@@ -156,20 +156,30 @@ abstract class Tools extends AsyncTools
         array_walk($input, $cb);
         return $input;
     }
+    private static function uRShift(int $a, int $b): int
+    {
+        if($b == 0) {
+            return $a;
+        }
+        return ($a >> $b) & ~(1<<(8*PHP_INT_SIZE-1)>>($b-1));
+    }
     /**
      * Generate MTProto vector hash.
      *
      * Returns a vector hash.
      *
-     * @param array $longs IDs
+     * @param array<string|int> $longs IDs
      */
     public static function genVectorHash(array $longs): string
     {
         $hash = 0;
         foreach ($longs as $long) {
-            $hash ^= $hash >> 21;
+            if (\is_string($long)) {
+                $long = self::unpackSignedLong(strrev(substr(md5($long, true), 0, 8)));
+            }
+            $hash ^= self::uRShift($hash, 21);
             $hash ^= $hash << 35;
-            $hash ^= $hash >> 4;
+            $hash ^= self::uRShift($hash, 4);
             $hash = $hash + $long;
         }
         return self::packSignedLong($hash);

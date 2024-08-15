@@ -159,7 +159,7 @@ trait Methods
                 if ($param['name'] === 'hash' && ($param['type'] === 'long' || $param['type'] === 'int')) {
                     $param['pow'] = 'hi';
                     $param['type'] = 'Vector t';
-                    $param['subtype'] = 'long';
+                    $param['subtype'] = 'long|string';
                 }
                 $ptype = $param[$type_or_subtype = isset($param['subtype']) ? 'subtype' : 'type'];
                 switch ($ptype) {
