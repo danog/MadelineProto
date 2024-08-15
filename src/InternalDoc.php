@@ -657,7 +657,7 @@ abstract class InternalDoc
      *
      * Returns a vector hash.
      *
-     * @param array $longs IDs
+     * @param array<string|int> $longs IDs
      */
     final public static function genVectorHash(array $longs): string
     {

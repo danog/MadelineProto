@@ -186,7 +186,7 @@ trait Methods
                 if (\in_array($ptype, ['InputEncryptedFile'], true) && !isset($this->settings['td'])) {
                     $human_ptype = 'File path or '.$ptype;
                 }
-                $type_or_bare_type = ctype_upper(Tools::end(explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53'], true) ? 'types' : 'constructors';
+                $type_or_bare_type = ctype_upper(Tools::end(explode('.', $param[$type_or_subtype]))[0]) || \in_array($param[$type_or_subtype], ['!X', 'X', 'bytes', 'true', 'false', 'double', 'string', 'Bool', 'int', 'long', 'int128', 'int256', 'int512', 'int53', 'long|string'], true) ? 'types' : 'constructors';
                 if (isset($this->tdDescriptions['methods'][$method])) {
                     $table .= '|'.self::markdownEscape($param['name']).'|'.(isset($param['subtype']) ? 'Array of ' : '').'['.self::markdownEscape($human_ptype).'](/API_docs/'.$type_or_bare_type.'/'.$ptype.'.md) | '.$this->tdDescriptions['methods'][$method]['params'][$param['name']].' | '.(isset($param['pow']) || $param['type'] === 'int' || $param['type'] === 'string' || $param['type'] === 'double' || ($id = $this->TL->getConstructors()->findByPredicate(lcfirst($param['type']).'Empty')) && $id['type'] === $param['type'] || ($id = $this->TL->getConstructors()->findByPredicate('input'.$param['type'].'Empty')) && $id['type'] === $param['type'] ? 'Optional' : 'Yes').'|';
                 } else {
