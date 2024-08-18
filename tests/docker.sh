@@ -2,7 +2,7 @@
 
 docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
 
-docker buildx create --use --name wp --driver remote tcp://192.168.1.2:1234
+docker buildx create --use --name wp --driver remote tcp://127.0.0.1:1234
 
 has_riscv=0
 if ping -c 1 192.168.69.206; then
