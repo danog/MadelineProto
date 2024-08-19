@@ -110,6 +110,13 @@ trait Session
      */
     public MsgIdHandler $msgIdHandler;
     /**
+     * Last garbage collection timestamp.
+     *
+     * @var float
+     */
+    private float $lastGarbageCollection = 0.0;
+
+    /**
      * Reset MTProto session.
      */
     public function resetSession(string $why): void
@@ -133,16 +140,31 @@ trait Session
             }
         }
     }
+
     /**
      * Cleanup incoming and outgoing messages.
      */
     public function cleanupSession(): void
+    {
+        $now = microtime(true);
+        // Perform garbage collection every 60 seconds
+        if ($now - $this->lastGarbageCollection > 60) {
+            $this->performGarbageCollection();
+            $this->lastGarbageCollection = $now;
+        }
+    }
+
+    /**
+     * Advanced garbage collection algorithm.
+     */
+    private function performGarbageCollection(): void
     {
         $count = 0;
         $incoming = [];
         foreach ($this->incoming_messages as $key => $message) {
             if ($message->canGarbageCollect()) {
                 $count++;
+                unset($this->incoming_messages[$key]);
             } else {
                 $this->API->logger("Can't garbage collect $message in DC {$this->datacenter}, not handled yet!", Logger::VERBOSE);
                 $incoming[$key] = $message;
@@ -150,7 +172,7 @@ trait Session
         }
         $this->incoming_messages = $incoming;
         $total = \count($this->incoming_messages);
-        if ($count+$total) {
+        if ($count + $total) {
             $this->API->logger("Garbage collected $count incoming messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
 
@@ -159,6 +181,7 @@ trait Session
         foreach ($this->outgoing_messages as $key => $message) {
             if ($message->canGarbageCollect()) {
                 $count++;
+                unset($this->outgoing_messages[$key]);
             } else {
                 $ago = (hrtime(true) - $message->getSent()) / 1_000_000_000;
                 if ($ago > 2) {
@@ -169,16 +192,24 @@ trait Session
         }
         $this->outgoing_messages = $outgoing;
         $total = \count($this->outgoing_messages);
-        if ($count+$total) {
+        if ($count + $total) {
             $this->API->logger("Garbage collected $count outgoing messages in DC {$this->datacenter}, $total left", Logger::VERBOSE);
         }
 
         $new_outgoing = [];
         foreach ($this->new_outgoing as $key => $message) {
+            // Add logic to check if messages in $this->new_outgoing can be garbage collected
+            // For example, if a message has been waiting to be sent for too long, it might be considered for garbage collection
             $new_outgoing[$key] = $message;
         }
         $this->new_outgoing = $new_outgoing;
+
+        // Add logic to check if messages in $this->pendingOutgoing can be garbage collected
+        // For example, if a message has been waiting to be confirmed for too long, it might be considered for garbage collection
+
+        gc_collect_cycles();
     }
+
     /**
      * Create MTProto session if needed.
      */
