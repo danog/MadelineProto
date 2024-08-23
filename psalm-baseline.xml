@@ -165,6 +165,13 @@
       <code><![CDATA[$this->broadcasts[$id]]]></code>
       <code><![CDATA[$this->broadcasts[$id]]]></code>
     </DocblockTypeContradiction>
+    <MixedArrayAccess>
+      <code><![CDATA[$message['media']['_']]]></code>
+    </MixedArrayAccess>
+    <MixedAssignment>
+      <code><![CDATA[$message]]></code>
+      <code><![CDATA[$message['media']]]></code>
+    </MixedAssignment>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->broadcasts[$id]?->cancel()]]></code>
       <code><![CDATA[$this->broadcasts[$id]?->getProgress()]]></code>
@@ -1387,6 +1394,7 @@
       <code><![CDATA[$r['reaction']['document_id']]]></code>
       <code><![CDATA[$r['reaction']['emoticon']]]></code>
       <code><![CDATA[$rawMessage['edit_date']]]></code>
+      <code><![CDATA[$rawMessage['edit_hide']]]></code>
       <code><![CDATA[$rawMessage['entities']]]></code>
       <code><![CDATA[$rawMessage['forwards']]]></code>
       <code><![CDATA[$rawMessage['from_scheduled']]]></code>
@@ -1418,6 +1426,7 @@
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$this->editDate]]></code>
+      <code><![CDATA[$this->editHide]]></code>
       <code><![CDATA[$this->forwards]]></code>
       <code><![CDATA[$this->fromScheduled]]></code>
       <code><![CDATA[$this->groupedId]]></code>
@@ -7410,9 +7419,6 @@
     <MissingReturnType>
       <code><![CDATA[getVar]]></code>
     </MissingReturnType>
-    <MixedArgument>
-      <code><![CDATA[$hash]]></code>
-    </MixedArgument>
     <MixedArrayAccess>
       <code><![CDATA[$val['@type']]]></code>
     </MixedArrayAccess>
@@ -7420,11 +7426,6 @@
       <code><![CDATA[$val['_']]]></code>
     </MixedArrayAssignment>
     <MixedAssignment>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$long]]></code>
       <code><![CDATA[$parent]]></code>
       <code><![CDATA[$parent]]></code>
       <code><![CDATA[$val['_']]]></code>
@@ -7433,15 +7434,6 @@
       <code><![CDATA[getAttribute]]></code>
       <code><![CDATA[getAttribute]]></code>
     </MixedMethodCall>
-    <MixedOperand>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash]]></code>
-      <code><![CDATA[$hash >> 21]]></code>
-    </MixedOperand>
     <MixedReturnStatement>
       <code><![CDATA[unpack('d', Magic::$BIG_ENDIAN ? strrev($value) : $value)[1]]]></code>
       <code><![CDATA[unpack('l', Magic::$BIG_ENDIAN ? strrev($value) : $value)[1]]]></code>

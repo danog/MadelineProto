@@ -92,7 +92,7 @@ abstract class Message extends AbstractMessage
      * Indicates if the post has a hidden edit, which is an edit that does not modify the actual message content.
      * Used to signify non-content related updates such as reactions.
      */
-    public readonly ?bool $editHide;
+    public readonly bool $editHide;
 
     /** Inline or reply keyboard. */
     public readonly InlineKeyboard|ReplyKeyboard|null $keyboard;
@@ -153,7 +153,7 @@ abstract class Message extends AbstractMessage
         $this->signature = $rawMessage['post_author'] ?? null;
         $this->groupedId = $rawMessage['grouped_id'] ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
-        $this->editHide = $rawMessage['edit_hide'] ?? null;
+        $this->editHide = $rawMessage['edit_hide'] ?? false;
         $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
 
