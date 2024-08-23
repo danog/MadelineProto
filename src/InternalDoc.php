@@ -250,10 +250,11 @@ abstract class InternalDoc
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
      * @param float|null $delay Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    final public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action, ?\danog\MadelineProto\Broadcast\Filter $filter = null, ?float $delay = null): int
+    final public function broadcastCustom(\danog\MadelineProto\Broadcast\Action $action, ?\danog\MadelineProto\Broadcast\Filter $filter = null, ?float $delay = null, ?\Amp\Cancellation $cancellation = null): int
     {
-        return $this->wrapper->getAPI()->broadcastCustom($action, $filter, $delay);
+        return $this->wrapper->getAPI()->broadcastCustom($action, $filter, $delay, $cancellation);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -272,10 +273,11 @@ abstract class InternalDoc
      * @param bool       $drop_author If true, will forward messages without quoting the original author.
      * @param bool       $pin         Whether to also pin the last sent message.
      * @param float|null $delay       Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    final public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
+    final public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null, ?\Amp\Cancellation $cancellation = null): int
     {
-        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $message_ids, $drop_author, $filter, $pin, $delay);
+        return $this->wrapper->getAPI()->broadcastForwardMessages($from_peer, $message_ids, $drop_author, $filter, $pin, $delay, $cancellation);
     }
     /**
      * Sends a list of messages to all peers (users, chats, channels) of the bot.
@@ -291,13 +293,14 @@ abstract class InternalDoc
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param array      $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool       $pin      Whether to also pin the last sent message.
-     * @param float|null $delay    Number of seconds to wait between each peer.
+     * @param array         $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
+     * @param bool          $pin      Whether to also pin the last sent message.
+     * @param float|null    $delay    Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    final public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
+    final public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null, ?\Amp\Cancellation $cancellation = null): int
     {
-        return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin, $delay);
+        return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin, $delay, $cancellation);
     }
     /**
      * Fork a new green thread and execute the passed function in the background.

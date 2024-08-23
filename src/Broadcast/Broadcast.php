@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Broadcast;
 
+use Amp\Cancellation;
 use danog\MadelineProto\Broadcast\Action\ActionForward;
 use danog\MadelineProto\Broadcast\Action\ActionSend;
 use Webmozart\Assert\Assert;
@@ -50,13 +51,29 @@ trait Broadcast
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param array      $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool       $pin      Whether to also pin the last sent message.
-     * @param float|null $delay    Number of seconds to wait between each peer.
+     * @param array         $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
+     * @param bool          $pin      Whether to also pin the last sent message.
+     * @param float|null    $delay    Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    public function broadcastMessages(array $messages, ?Filter $filter = null, bool $pin = false, ?float $delay = null): int
+    public function broadcastMessages(array $messages, ?Filter $filter = null, bool $pin = false, ?float $delay = null, ?Cancellation $cancellation = null): int
     {
-        return $this->broadcastCustom(new ActionSend($this, $messages, $pin), $filter, $delay);
+        foreach ($messages as &$message) {
+            if (isset($message['media']['_']) &&
+                (
+                    $message['media']['_'] === 'inputMediaUploadedPhoto'
+                    || $message['media']['_'] === 'inputMediaUploadedDocument'
+                    || $message['media']['_'] === 'inputMediaPhotoExternal'
+                    || $message['media']['_'] === 'inputMediaDocumentExternal'
+                )
+            ) {
+                $message['media'] = $this->methodCallAsyncRead(
+                    'messages.uploadMedia',
+                    ['peer' => 'me', 'media' => $message['media'], 'cancellation' => $cancellation]
+                );
+            }
+        } unset($message);
+        return $this->broadcastCustom(new ActionSend($this, $messages, $pin), $filter, $delay, $cancellation);
     }
     /**
      * Forwards a list of messages to all peers (users, chats, channels) of the bot.
@@ -75,10 +92,11 @@ trait Broadcast
      * @param bool       $drop_author If true, will forward messages without quoting the original author.
      * @param bool       $pin         Whether to also pin the last sent message.
      * @param float|null $delay       Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?Filter $filter = null, bool $pin = false, ?float $delay = null): int
+    public function broadcastForwardMessages(mixed $from_peer, array $message_ids, bool $drop_author = false, ?Filter $filter = null, bool $pin = false, ?float $delay = null, ?Cancellation $cancellation = null): int
     {
-        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $message_ids, $drop_author, $pin), $filter, $delay);
+        return $this->broadcastCustom(new ActionForward($this, $this->getID($from_peer), $message_ids, $drop_author, $pin), $filter, $delay, $cancellation);
     }
 
     /**
@@ -95,14 +113,16 @@ trait Broadcast
      *
      * @param Action $action A custom, serializable Action class that will be called once for every peer.
      * @param float|null $delay Number of seconds to wait between each peer.
+     * @param ?Cancellation $cancellation Cancellation. Note: you may also use cancelBroadcast with the returned broadcast ID. Be aware that when running via web with limited execution time, the broadcast will continue correctly after a restart and cancelBroadcast will still be usable, but the cancellation that is passed here will not be usable.
      */
-    public function broadcastCustom(Action $action, ?Filter $filter = null, ?float $delay = null): int
+    public function broadcastCustom(Action $action, ?Filter $filter = null, ?float $delay = null, ?Cancellation $cancellation = null): int
     {
         // Ensure it can be serialized
         Assert::eq(unserialize(serialize($action))::class, $action::class);
 
         $id = $this->broadcastId--;
         $this->broadcasts[$id] = new InternalState($id, $this, $action, $filter ?? Filter::default(), $delay);
+        $cancellation?->subscribe(fn () => $this->cancelBroadcast($id));
         return $id;
     }
     /**
