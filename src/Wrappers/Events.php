@@ -163,6 +163,13 @@ trait Events
         }
         return $this->event_handler_instance;
     }
+    /** @internal */
+    public function getEventHandlerClass(): ?string
+    {
+        return $this->event_handler_instance !== null
+            ? $this->event_handler_instance::class
+            : null;
+    }
     /**
      * Check if an event handler instance is present.
      */
