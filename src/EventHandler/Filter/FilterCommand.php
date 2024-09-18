@@ -39,7 +39,7 @@ final class FilterCommand extends Filter
      */
     public function __construct(private readonly string $command, array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH])
     {
-        Assert::true(preg_match("/^\w+$/", $command) === 1, "An invalid command was specified!");
+        Assert::true(preg_match("/^[\w@]+$/", $command) === 1, "An invalid command was specified!");
         Assert::notEmpty($types, 'No command types were specified!');
         $c = [];
         foreach ($types as $type) {
