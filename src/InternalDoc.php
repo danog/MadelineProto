@@ -291,9 +291,9 @@ abstract class InternalDoc
      * MadelineProto will also periodically emit updateBroadcastProgress updates,
      * containing a Progress object for all broadcasts currently in-progress.
      *
-     * @param array      $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
-     * @param bool       $pin      Whether to also pin the last sent message.
-     * @param float|null $delay    Number of seconds to wait between each peer.
+     * @param array         $messages The messages to send: an array of arrays, containing parameters to pass to messages.sendMessage.
+     * @param bool          $pin      Whether to also pin the last sent message.
+     * @param float|null    $delay    Number of seconds to wait between each peer.
      */
     final public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
     {

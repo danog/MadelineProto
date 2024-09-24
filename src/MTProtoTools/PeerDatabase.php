@@ -190,6 +190,7 @@ final class PeerDatabase implements TLCallback
         } else {
             $this->processUser($id);
         }
+        $this->recacheChatUsername($id, $this->db[$id] ?? null, []);
         unset($this->db[$id]);
     }
 
@@ -315,7 +316,13 @@ final class PeerDatabase implements TLCallback
             }
         }
         $result = $this->usernames[$username];
-        return $result === null ? $result : (int) $result;
+        $id = $result === null ? $result : (int) $result;
+        if (!$this->isset($id)) {
+            $this->API->logger("No peer entry for cached username @$username => {$id}, dropping entry!");
+            unset($this->usernames[$username]);
+            return null;
+        }
+        return $id;
     }
 
     private array $caching_simple_username = [];
@@ -424,7 +431,7 @@ final class PeerDatabase implements TLCallback
                         $user['access_hash'] = $existingChat['access_hash'];
                     }
                 }
-
+                $userUnchanged = $user;
                 if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                     $user = [
                         '_' => $user['_'],
@@ -434,6 +441,7 @@ final class PeerDatabase implements TLCallback
                     ];
                 }
                 $this->db[$user['id']] = $user;
+                $this->recacheChatUsername($user['id'], $existingChat, $userUnchanged);
                 if ($existingChat && ($existingChat['min'] ?? false) && !($user['min'] ?? false)) {
                     $this->API->minDatabase->clearPeer($user['id']);
                 }
@@ -549,7 +557,6 @@ final class PeerDatabase implements TLCallback
                     return;
                 }
             }
-            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
             if ($existingChat != $chat) {
                 $this->API->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
                 if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
@@ -562,6 +569,7 @@ final class PeerDatabase implements TLCallback
                     }
                     $chat = $newchat;
                 }
+                $chatUnchanged = $chat;
                 if (!$this->API->settings->getDb()->getEnablePeerInfoDb()) {
                     $chat = [
                         '_' => $chat['_'],
@@ -571,6 +579,7 @@ final class PeerDatabase implements TLCallback
                     ];
                 }
                 $this->db[$bot_api_id] = $chat;
+                $this->recacheChatUsername($bot_api_id, $existingChat, $chatUnchanged);
                 if ($existingChat && ($existingChat['min'] ?? false) && !($chat['min'] ?? false)) {
                     $this->API->minDatabase->clearPeer($bot_api_id);
                 }

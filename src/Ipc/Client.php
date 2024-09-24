@@ -363,6 +363,9 @@ final class Client extends ClientAbstract
     public function getEventHandler(?string $class = null): ?EventHandlerProxy
     {
         if ($class !== null) {
+            if ($class === $this->getEventHandlerClass()) {
+                return new EventHandlerProxy(null, $this);
+            }
             return $this->getPlugin($class);
         }
         return $this->hasEventHandler() ? new EventHandlerProxy(null, $this) : null;

@@ -58,7 +58,7 @@ abstract class AbstractPoll implements JsonSerializable
     public readonly array $recentVoters;
 
     /** Total number of people that voted in the poll */
-    public readonly int $totalVoters;
+    public readonly ?int $totalVoters;
 
     /** @internal */
     public function __construct(array $rawPoll)
