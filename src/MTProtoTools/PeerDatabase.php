@@ -315,7 +315,7 @@ final class PeerDatabase implements TLCallback
         }
         $result = $this->usernames[$username];
         $id = $result === null ? $result : (int) $result;
-        if (!$this->isset($id)) {
+        if ($id !== null && !$this->isset($id)) {
             $this->API->logger("No peer entry for cached username @$username => {$id}, dropping entry!");
             unset($this->usernames[$username]);
             return null;
