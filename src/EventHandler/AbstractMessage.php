@@ -867,7 +867,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         return $this->getClient()->methodCallAsyncRead(
             'messages.setTyping',
             [
-                'peer' => $this->senderId,
+                'peer' => $this->chatId,
                 'top_msg_id' => $this->topicId,
                 'action' => $action,
             ],
