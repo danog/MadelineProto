@@ -11,7 +11,7 @@
  * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @copyright 2016-2023 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
- * @link https://docs.madelineproto.xyz MadelineProto documentation
+ * @link      https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\EventHandler\Channel;
@@ -23,7 +23,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 
 /**
- * A participant has left, joined, was banned or admined in a [channel or supergroup](https://core.telegram.org/api/channel).
+ * A participant has left, joined, was banned or admin'd in a [channel or supergroup](https://core.telegram.org/api/channel).
  */
 final class ChannelParticipant extends Update
 {
@@ -62,11 +62,11 @@ final class ChannelParticipant extends Update
         $this->inviteLink = isset($rawChannelParticipant['invite'])
             ? ChatInvite::fromRawChatInvite($rawChannelParticipant['invite'])
             : null;
-        // If null, user lefted channel
+        // If null, user wasn't a participant.
         $this->prevParticipant = isset($rawChannelParticipant['prev_participant'])
             ? Participant::fromRawParticipant($rawChannelParticipant['prev_participant'])
             : new Left(['peer' => $this->userId]);
-        // if null, user joind
+        // If null, user has left.
         $this->newParticipant = isset($rawChannelParticipant['new_participant'])
             ? Participant::fromRawParticipant($rawChannelParticipant['new_participant'])
             : new Left(['peer' => $this->userId]);
