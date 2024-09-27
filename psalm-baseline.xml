@@ -749,7 +749,7 @@
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
             'messages.setTyping',
             [
-                'peer' => $this->senderId,
+                'peer' => $this->chatId,
                 'top_msg_id' => $this->topicId,
                 'action' => $action,
             ],
@@ -3337,6 +3337,11 @@
       <code><![CDATA[\is_int($dc_id)]]></code>
       <code><![CDATA[isset($this->datacenter)]]></code>
     </RedundantConditionGivenDocblockType>
+    <UndefinedFunction>
+      <code><![CDATA[memprof_dump_pprof($file)]]></code>
+      <code><![CDATA[memprof_enabled()]]></code>
+      <code><![CDATA[memprof_enabled()]]></code>
+    </UndefinedFunction>
     <UnsupportedReferenceUsage>
       <code><![CDATA[Lang::$current_lang =& Lang::$lang[$this->settings->getAppInfo()->getLangCode()]]]></code>
     </UnsupportedReferenceUsage>
@@ -4391,6 +4396,8 @@
     <MixedArgument>
       <code><![CDATA[$bot_api_id]]></code>
       <code><![CDATA[$bot_api_id]]></code>
+      <code><![CDATA[$bot_api_id]]></code>
+      <code><![CDATA[$bot_api_id]]></code>
       <code><![CDATA[$chat['id']]]></code>
       <code><![CDATA[$chat['id']]]></code>
       <code><![CDATA[$chat['id']]]></code>
@@ -4414,6 +4421,7 @@
       <code><![CDATA[($this->API->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer']]]></code>
     </MixedArrayAccess>
     <MixedArrayOffset>
+      <code><![CDATA[$this->db[$bot_api_id]]]></code>
       <code><![CDATA[$this->db[$bot_api_id]]]></code>
       <code><![CDATA[$this->db[$chat['id']]]]></code>
       <code><![CDATA[$this->db[$chat['id']]]]></code>
@@ -4475,6 +4483,7 @@
       <code><![CDATA[(int) $result]]></code>
     </RedundantCastGivenDocblockType>
     <RedundantConditionGivenDocblockType>
+      <code><![CDATA[$id !== null]]></code>
       <code><![CDATA[$result !== null]]></code>
       <code><![CDATA[$result !== null]]></code>
       <code><![CDATA[(int) $result]]></code>
