@@ -235,7 +235,8 @@ final class Magic
             self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
             // Important, obtain root relative to caller script
             $backtrace = debug_backtrace(0);
-            self::$script_cwd = self::$cwd = \dirname(end($backtrace)['file']);
+            $lastTrace = end($backtrace);
+            self::$script_cwd = self::$cwd = isset($lastTrace['file']) ? \dirname($lastTrace['file']) : getcwd();
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 try {
                     error_reporting(E_ALL);
