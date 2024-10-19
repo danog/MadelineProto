@@ -265,7 +265,7 @@ final class PeerDatabase implements TLCallback
         if (!$this->API->settings->getDb()->getEnableUsernameDb()) {
             return;
         }
-        $new = self::getUsernames($new);
+        $new = $new ? self::getUsernames($new) : [];
         $old = $old ? self::getUsernames($old) : [];
         foreach ($old as $key => $username) {
             if (!isset($this->usernames[$username])) {
