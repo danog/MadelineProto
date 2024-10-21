@@ -64,7 +64,9 @@ trait Reliable
         }
         if ($ok) {
             foreach ($content['msg_ids'] as $msg_id) {
-                $this->methodRecall($msg_id);
+                if (isset($this->outgoing_messages[$msg_id])) {
+                    $this->methodRecall($this->outgoing_messages[$msg_id]);
+                }
             }
         } else {
             $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);

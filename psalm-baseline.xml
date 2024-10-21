@@ -3415,9 +3415,6 @@
     </UnsupportedReferenceUsage>
   </file>
   <file src="src/MTProtoSession/AckHandler.php">
-    <PossiblyNullArrayOffset>
-      <code><![CDATA[$this->new_outgoing]]></code>
-    </PossiblyNullArrayOffset>
     <PossiblyNullOperand>
       <code><![CDATA[$message->getSent()]]></code>
       <code><![CDATA[$message->getSent()]]></code>
@@ -3531,6 +3528,8 @@
       <code><![CDATA[$sub['queueId']]]></code>
     </MixedArrayAssignment>
     <MixedArrayOffset>
+      <code><![CDATA[$this->new_outgoing[$message_id]]]></code>
+      <code><![CDATA[$this->new_outgoing[$message_id]]]></code>
       <code><![CDATA[$this->outgoing_messages[$message_id]]]></code>
       <code><![CDATA[$this->outgoing_messages[$message_id]]]></code>
     </MixedArrayOffset>
@@ -3658,6 +3657,12 @@
       <code><![CDATA[$msgId]]></code>
       <code><![CDATA[$request->getMsgId()]]></code>
     </PossiblyNullArgument>
+    <PossiblyNullArrayOffset>
+      <code><![CDATA[$this->new_outgoing]]></code>
+      <code><![CDATA[$this->new_outgoing]]></code>
+      <code><![CDATA[$this->new_outgoing]]></code>
+      <code><![CDATA[$this->new_outgoing]]></code>
+    </PossiblyNullArrayOffset>
     <RedundantConditionGivenDocblockType>
       <code><![CDATA[$this->API->authorized_dc == $this->datacenter && $this->API->authorized === \danog\MadelineProto\API::LOGGED_IN]]></code>
     </RedundantConditionGivenDocblockType>
@@ -4192,6 +4197,8 @@
     <MixedArgument>
       <code><![CDATA[$end]]></code>
       <code><![CDATA[$end]]></code>
+      <code><![CDATA[$end]]></code>
+      <code><![CDATA[$end]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
@@ -4204,6 +4211,8 @@
       <code><![CDATA[$media['url']->getFile()]]></code>
       <code><![CDATA[$size]]></code>
       <code><![CDATA[$size]]></code>
+      <code><![CDATA[$start]]></code>
+      <code><![CDATA[$start]]></code>
       <code><![CDATA[$start]]></code>
       <code><![CDATA[$start]]></code>
       <code><![CDATA[$stream]]></code>

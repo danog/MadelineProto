@@ -63,7 +63,8 @@ final class ReadLoop extends Loop
             }
             EventLoop::queue(function () use ($e): void {
                 if ($e instanceof NothingInTheSocketException
-                    && !$this->connection->hasPendingCalls()
+                    && !$this->connection->unencrypted_new_outgoing
+                    && !$this->connection->new_outgoing
                     && $this->connection->isMedia()
                     && !$this->connection->isWriting()
                     && $this->shared->hasTempAuthKey()
@@ -71,7 +72,7 @@ final class ReadLoop extends Loop
                     $this->API->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
                     $this->connection->disconnect(true);
                 } else {
-                    $this->API->logger($e);
+                    $this->API->logger($e, Logger::ERROR);
                     $this->API->logger("Got exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
                 }
@@ -91,6 +92,9 @@ final class ReadLoop extends Loop
                         $this->shared->setTempAuthKey(null);
                         $this->shared->resetSession("-404");
                         foreach ($this->connection->new_outgoing as $message) {
+                            $message->resetSent();
+                        }
+                        foreach ($this->connection->unencrypted_new_outgoing as $message) {
                             $message->resetSent();
                         }
                         $this->shared->reconnect();
@@ -116,9 +120,6 @@ final class ReadLoop extends Loop
             return self::STOP;
         }
         $this->connection->httpReceived();
-        if ($this->connection->isHttp()) {
-            $this->connection->pingHttpWaiter();
-        }
         $this->connection->wakeupHandler();
         return self::CONTINUE;
     }

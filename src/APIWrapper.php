@@ -76,13 +76,13 @@ final class APIWrapper
         return $this->API;
     }
 
-    private ?int $drop = null;
+    private ?float $drop = null;
     /**
      * @internal
      */
     public function getRpcDropCancellation(): Cancellation
     {
-        return new TimeoutCancellation($this->drop ??= $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
+        return new TimeoutCancellation($this->drop ??= (float) $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
     }
 
     /**

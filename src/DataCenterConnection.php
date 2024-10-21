@@ -204,9 +204,6 @@ final class DataCenterConnection implements JsonSerializable
             $logger->logger("Done initing auth for DC {$this->datacenter}", Logger::NOTICE);
             EventLoop::queue($lock->release(...));
         }
-        if ($this->hasTempAuthKey()) {
-            $connection->pingHttpWaiter();
-        }
     }
     /**
      * Bind temporary and permanent auth keys.
