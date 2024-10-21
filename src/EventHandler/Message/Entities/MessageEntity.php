@@ -44,7 +44,8 @@ abstract class MessageEntity implements JsonSerializable
             'italic', 'messageEntityItalic' => new Italic($entity['offset'], $entity['length']),
             'url', 'messageEntityUrl' => new Url($entity['offset'], $entity['length']),
             'code', 'messageEntityCode' => new Code($entity['offset'], $entity['length']),
-            'pre', 'messageEntityPre' => new Pre($entity['offset'], $entity['length'], $entity['language']),
+            /** @psalm-suppress MixedArgument */
+            'pre', 'messageEntityPre' => new Pre($entity['offset'], $entity['length'], $entity['language'] ?? ''),
             'text_link', 'messageEntityTextUrl' => new TextUrl($entity['offset'], $entity['length'], $entity['url']),
             'text_mention', 'messageEntityMentionName' => new MentionName($entity['offset'], $entity['length'], $entity['user_id'] ?? $entity['user']['id']),
             'inputMessageEntityMentionName' => new InputMentionName($entity['offset'], $entity['length'], $entity['user_id']),

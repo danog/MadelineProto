@@ -108,6 +108,7 @@ final class Blacklist {
             'waveform' => 'array',
             'int' => 'int',
             'long' => 'int',
+            'long|string' => 'int|string',
             'strlong' => 'int',
             'double' => 'float',
             'float' => 'float',

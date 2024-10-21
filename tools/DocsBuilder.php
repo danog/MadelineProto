@@ -141,7 +141,7 @@ final class DocsBuilder
         file_put_contents('types/'.$this->index, $this->templates['types-index'].$index);
 
         Logger::log('Generating additional types...', Logger::NOTICE);
-        foreach (['waveform', 'string', 'bytes', 'int', 'int53', 'long', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON', '!X'] as $type) {
+        foreach (['waveform', 'string', 'bytes', 'int', 'int53', 'long', 'long|string', 'int128', 'int256', 'int512', 'double', 'Bool', 'DataJSON', '!X'] as $type) {
             file_put_contents("types/$type.md", $this->templates[$type]);
         }
         foreach (['boolFalse', 'boolTrue', 'null', 'photoStrippedSize'] as $constructor) {

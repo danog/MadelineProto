@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.2.1';
+    public const RELEASE = '8.3.4';
     /**
      * We're not logged in.
      *
@@ -220,6 +220,11 @@ final class API extends AbstractAPI
         $this->wrapper->logger('Prompting initial serialization...');
         $this->wrapper->serialize();
         $this->wrapper->logger('Done initial serialization!');
+        $this->destruct();
+        if (!$this->connectToMadelineProto($settings)) {
+            throw new Exception("Could not start IPC server!");
+        }
+
         $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
     }
 
@@ -366,6 +371,23 @@ final class API extends AbstractAPI
             await(self::$destructors);
         }
     }
+
+    private function destruct(int|null $id = null): void
+    {
+        $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');
+        $this->wrapper->getAPI()?->unreference();
+        if (isset($this->wrapper)) {
+            $this->wrapper->logger('Prompting final serialization...');
+            $this->wrapper->serialize();
+            $this->wrapper->logger('Done final serialization!');
+        }
+        if ($this->unlock) {
+            ($this->unlock)();
+        }
+        if ($id !== null) {
+            unset(self::$destructors[$id]);
+        }
+    }
     /**
      * Destruct function.
      *
@@ -374,19 +396,7 @@ final class API extends AbstractAPI
     public function __destruct()
     {
         $id = \count(self::$destructors);
-        self::$destructors[$id] = async(function () use ($id): void {
-            $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');
-            $this->wrapper->getAPI()?->unreference();
-            if (isset($this->wrapper)) {
-                $this->wrapper->logger('Prompting final serialization...');
-                $this->wrapper->serialize();
-                $this->wrapper->logger('Done final serialization!');
-            }
-            if ($this->unlock) {
-                ($this->unlock)();
-            }
-            unset(self::$destructors[$id]);
-        });
+        self::$destructors[$id] = async($this->destruct(...), $id);
     }
 
     /**

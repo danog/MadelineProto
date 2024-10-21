@@ -933,6 +933,7 @@ trait PeerHandler
             }
         }
         sort($ids, SORT_NUMERIC);
+        /** @psalm-suppress MixedArgumentTypeCoercion Typechecks are done inside */
         $gres['hash'] = Tools::genVectorHash($ids);
         $this->channelParticipants[$this->participantsKey($channel, $filter, $q, $offset, $limit)] = $gres;
     }

@@ -83,6 +83,7 @@ trait FilesAbstraction
             self::$client ??= HttpClientBuilder::buildDefault();
             $request = new Request($stream->url);
             $request->setTransferTimeout(INF);
+            $request->setInactivityTimeout(INF);
             $request->setBodySizeLimit(512 * 1024 * 8000);
             $response = self::$client->request(
                 $request,

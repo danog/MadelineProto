@@ -443,6 +443,7 @@ final class TL implements TLInterface
                     return substr($object, 1);
                 }
                 if (\is_array($object) && $type['name'] === 'hash') {
+                    /** @psalm-suppress MixedArgumentTypeCoercion Typechecks are done inside */
                     return Tools::genVectorHash($object);
                 }
                 if (\is_array($object) && \count($object) === 2) {
