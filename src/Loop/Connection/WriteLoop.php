@@ -49,24 +49,24 @@ final class WriteLoop extends Loop
     public const MAX_IDS = 8192;
 
     use Common {
-        __construct as init;
+        __construct as init2;
     }
     
     private int $pingTimeout;
-    private float $timeout;
+    private float $pollTimeout;
     /**
      * Constructor function.
      */
     public function __construct(Connection $connection)
     {
-        $this->init($connection);
+        $this->init2($connection);
         $timeout = $this->shared->getSettings()->getPingInterval();
         $this->pingTimeout = $timeout + 15;
 
         if ($this->connection->isHttp()) {
-            $this->timeout = (float) max(self::LONG_POLL_TIMEOUT, $timeout);
+            $this->pollTimeout = (float) max(self::LONG_POLL_TIMEOUT, $timeout);
         } else {
-            $this->timeout = (float) $timeout;
+            $this->pollTimeout = (float) $timeout;
         }
     }
     /**
@@ -83,7 +83,7 @@ final class WriteLoop extends Loop
             }
             if (!$this->connection->pendingOutgoing && !$first) {
                 $this->API->logger("No messages, pausing in $this...", Logger::ULTRA_VERBOSE);
-                return $this->timeout;
+                return $this->pollTimeout;
             }
             if ($please_wait) {
                 $this->API->logger("Have to wait for handshake, pausing in $this...", Logger::ULTRA_VERBOSE);
@@ -119,8 +119,8 @@ final class WriteLoop extends Loop
     {
         if ($queue = $this->connection->unencrypted_check_queue) {
             $this->connection->unencrypted_check_queue = [];
-            foreach ($queue as $msg_id => $_) {
-                $this->connection->methodRecall($msg_id);
+            foreach ($queue as $msg) {
+                $this->connection->methodRecall($msg);
             }
         }
         while ($this->connection->pendingOutgoing) {
@@ -189,7 +189,7 @@ final class WriteLoop extends Loop
                 $this->connection->objectCall('msgs_state_req', ['msg_ids' => $message_ids], $deferred);
                 EventLoop::queue(function () use ($deferred, $message_ids): void {
                     try {
-                        $result = $deferred->getFuture()->await(new TimeoutCancellation($this->timeout));
+                        $result = $deferred->getFuture()->await(new TimeoutCancellation($this->pollTimeout));
                         if (\is_callable($result)) {
                             throw $result();
                         }
@@ -247,7 +247,7 @@ final class WriteLoop extends Loop
                             }
                         }
                         //} catch (CancelledException) {
-                        //$this->API->logger("We did not receive a response for {$this->timeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
+                        //$this->API->logger("We did not receive a response for {$this->pollTimeout} seconds: reconnecting and exiting check loop on DC {$this->datacenter}");
                         //EventLoop::queue($this->connection->reconnect(...));
                     } catch (\Throwable $e) {
                         $this->API->logger("Got exception in check loop for DC {$this->datacenter}");

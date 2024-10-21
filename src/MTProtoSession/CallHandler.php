@@ -110,7 +110,7 @@ trait CallHandler
         return $readFuture->await();
     }
     private LocalKeyedMutex $abstractionQueueMutex;
-    private ?int $drop = null;
+    private ?float $drop = null;
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
@@ -182,7 +182,7 @@ trait CallHandler
         if (!$encrypted && $this->shared->hasTempAuthKey()) {
             $encrypted = true;
         }
-        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
+        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout());
         $cancellation = $cancellation !== null
             ? new CompositeCancellation($cancellation, $timeout)
             : $timeout;
@@ -222,7 +222,7 @@ trait CallHandler
     {
         $cancellation = $args['cancellation'] ?? null;
         $cancellation?->throwIfRequested();
-        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
+        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout());
         $cancellation = $cancellation !== null
             ? new CompositeCancellation($cancellation, $timeout)
             : $timeout;
