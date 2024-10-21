@@ -644,6 +644,7 @@ abstract class Tools extends AsyncTools
             self::$client ??= HttpClientBuilder::buildDefault();
             $request = new Request($stream->url);
             $request->setTransferTimeout(INF);
+            $request->setInactivityTimeout(INF);
             $stream = self::$client->request(
                 $request,
                 $cancellation

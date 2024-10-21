@@ -208,6 +208,7 @@ trait Files
         }
         $request = new Request($url);
         $request->setTransferTimeout(INF);
+        $request->setInactivityTimeout(INF);
         $request->setBodySizeLimit(512 * 1024 * 8000);
         $response = $this->datacenter->getHTTPClient()->request($request, $cancellation);
         if (($status = $response->getStatus()) !== 200) {
