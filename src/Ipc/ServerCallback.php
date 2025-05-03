@@ -54,6 +54,7 @@ final class ServerCallback extends AbstractServer
      *
      * @param SessionPaths $session Session
      */
+    #[\Override]
     public function setIpcPath(SessionPaths $session): void
     {
         $this->server = new IpcServer($session->getIpcCallbackPath());
@@ -63,6 +64,7 @@ final class ServerCallback extends AbstractServer
      *
      * @param ChannelledSocket $socket Client
      */
+    #[\Override]
     protected function clientLoop(ChannelledSocket $socket): void
     {
         $id = $this->id++;

@@ -57,6 +57,7 @@ final class FilterCommandCaseInsensitive extends Filter
         }
         $this->commandTypes = $types;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof Message && $update->command !== null && mb_strtolower($update->command) === $this->command && \in_array($update->commandType, $this->commandTypes, true);

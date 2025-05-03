@@ -42,6 +42,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = $ctx->getStream($header);
@@ -49,6 +50,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -58,6 +60,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $length += 64;
@@ -73,6 +76,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
@@ -86,6 +90,7 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -93,10 +98,12 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

@@ -51,6 +51,7 @@ final class PingLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     public function loop(): ?float
     {
         if (!$this->shared->hasTempAuthKey()) {

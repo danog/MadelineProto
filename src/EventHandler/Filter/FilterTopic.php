@@ -27,6 +27,7 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterTopic extends Filter
 {
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->topicId !== null) ||

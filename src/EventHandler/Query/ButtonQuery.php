@@ -48,6 +48,7 @@ abstract class ButtonQuery extends CallbackQuery
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

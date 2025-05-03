@@ -19,10 +19,12 @@ final class InputMentionName extends MessageEntity
     ) {
     }
 
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'text_mention', 'offset' => $this->offset, 'length' => $this->length, 'user' => ['id' => $this->userId]];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'inputMessageEntityMentionName', 'offset' => $this->offset, 'length' => $this->length, 'user_id' => $this->userId];

@@ -64,6 +64,7 @@ final class Logger extends SettingsAbstract
         $this->extra = Magic::$script_cwd.'/MadelineProto.log';
     }
 
+    #[\Override]
     public function __sleep()
     {
         return $this->extra instanceof Closure

@@ -28,11 +28,13 @@ use danog\MadelineProto\EventHandler\Update;
 final class FilterFromBot extends Filter
 {
     private readonly EventHandler $API;
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         $this->API = $API;
         return $this;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof AbstractMessage && $this->API->isBot($update->senderId);

@@ -116,6 +116,7 @@ final class TL implements TLInterface
     /**
      * Get secret chat layer version.
      */
+    #[\Override]
     public function getSecretLayer(): int
     {
         return $this->secretLayer;
@@ -123,6 +124,7 @@ final class TL implements TLInterface
     /**
      * Get constructors.
      */
+    #[\Override]
     public function getConstructors(): TLConstructors
     {
         return $this->constructors;
@@ -130,6 +132,7 @@ final class TL implements TLInterface
     /**
      * Get methods.
      */
+    #[\Override]
     public function getMethods(): TLMethods
     {
         return $this->methods;
@@ -137,6 +140,7 @@ final class TL implements TLInterface
     /**
      * Get TL descriptions.
      */
+    #[\Override]
     public function getDescriptions(): array
     {
         return $this->tdDescriptions;
@@ -369,6 +373,7 @@ final class TL implements TLInterface
     /**
      * Get TL namespaces.
      */
+    #[\Override]
     public function getMethodNamespaces(): array
     {
         $res = [];
@@ -381,6 +386,7 @@ final class TL implements TLInterface
     /**
      * Get namespaced methods (method => namespace).
      */
+    #[\Override]
     public function getMethodsNamespaced(): array
     {
         return $this->methods->method_namespace;
@@ -440,6 +446,7 @@ final class TL implements TLInterface
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
      */
+    #[\Override]
     public function serializeObject(array $type, mixed $object, string|int $ctx, int $layer = -1)
     {
         switch ($type['type']) {
@@ -652,6 +659,7 @@ final class TL implements TLInterface
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
      */
+    #[\Override]
     public function serializeMethod(string $method, mixed $arguments)
     {
         $tl = $this->methods->findByMethod($method);
@@ -804,6 +812,7 @@ final class TL implements TLInterface
      * @param resource|string $stream Stream
      * @param array           $type   Type identifier
      */
+    #[\Override]
     public function getLength($stream, array $type = ['type' => '']): int
     {
         if (\is_string($stream)) {
@@ -874,6 +883,7 @@ final class TL implements TLInterface
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
      */
+    #[\Override]
     public function deserialize($stream, array $type)
     {
         if (\is_string($stream)) {

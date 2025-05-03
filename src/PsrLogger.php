@@ -52,6 +52,7 @@ final class PsrLogger extends AbstractLogger
      * @param  array<mixed>             $context
      * @throws InvalidArgumentException
      */
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         $this->logger->logger($message, self::LEVEL_MAP[$level]);

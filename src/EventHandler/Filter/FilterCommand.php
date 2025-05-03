@@ -50,6 +50,7 @@ final class FilterCommand extends Filter
         }
         $this->commandTypes = $types;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof Message && $update->command === $this->command && \in_array($update->commandType, $this->commandTypes, true);

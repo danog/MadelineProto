@@ -23,6 +23,7 @@
             <file name="src/TL/TLParser.php" />
             <file name="src/InternalDoc.php" />
             <file name="src/TL/SecretTLParser.php" />
+            <file name="src/RPCErrorException.php" />
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>

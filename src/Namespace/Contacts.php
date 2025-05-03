@@ -13,7 +13,7 @@ interface Contacts
      * Get the telegram IDs of all contacts.
      * Returns an array of Telegram user IDs for all contacts (0 if a contact does not have an associated Telegram account or have hidden their account using privacy settings).
      *
-     * @param list<int|string>|array<never, never> $hash Array of [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
+     * @param list<int|string>|array<never, never> $hash Array of [Hash used for caching, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -34,7 +34,7 @@ interface Contacts
     /**
      * Returns the current user's contact list.
      *
-     * @param list<int|string>|array<never, never> $hash Array of If there already is a full contact list on the client, a [hash](https://core.telegram.org/api/offsets#hash-generation) of a the list of contact IDs in ascending order may be passed in this parameter. If the contact set was not changed, [(contacts.contactsNotModified)](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contactsNotModified.html) will be returned. @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
+     * @param list<int|string>|array<never, never> $hash Array of [Hash used for caching, for more info click here](https://core.telegram.org/api/offsets#hash-generation).<br>Note that the hash is computed [using the usual algorithm](https://core.telegram.org/api/offsets#hash-generation), passing to the algorithm first the previously returned [contacts.contacts](https://docs.madelineproto.xyz/API_docs/constructors/contacts.contacts.html).`saved_count` field, then max `100000` sorted user IDs from the contact list, including the ID of the currently logged in user if it is saved as a contact. <br>Example: [tdlib implementation](https://github.com/tdlib/td/blob/63c7d0301825b78c30dc7307f1f1466be049eb79/td/telegram/UserManager.cpp#L5754). @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -134,10 +134,10 @@ interface Contacts
      * @param bool $forward_chats Chats to which the users often forwards messages to
      * @param bool $groups Often-opened groups and supergroups
      * @param bool $channels Most frequently visited channels
-     * @param bool $bots_app
+     * @param bool $bots_app Most frequently used [Main Mini Bot Apps](https://core.telegram.org/api/bots/webapps#main-mini-apps).
      * @param int $offset Offset for [pagination](https://core.telegram.org/api/offsets)
      * @param int $limit Maximum number of results to return, [see pagination](https://core.telegram.org/api/offsets)
-     * @param list<int|string>|array<never, never> $hash Array of [Hash for pagination, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
+     * @param list<int|string>|array<never, never> $hash Array of [Hash used for caching, for more info click here](https://core.telegram.org/api/offsets#hash-generation) @see https://docs.madelineproto.xyz/API_docs/types/int|string.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -296,7 +296,9 @@ interface Contacts
     public function setBlocked(bool|null $my_stories_from = null, array $id = [], int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Fetch all users with birthdays that fall within +1/-1 days, relative to the current day: this method should be invoked by clients every 6-8 hours, and if the result is non-empty, it should be used to appropriately update locally cached birthday information in [user](https://docs.madelineproto.xyz/API_docs/constructors/user.html).`birthday`.
      *
+     * [See here »](https://core.telegram.org/api/profile#birthday) for more info.
      *
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -304,4 +306,14 @@ interface Contacts
      * @return array{_: 'contacts.contactBirthdays', contacts: list<array{_: 'contactBirthday', birthday: array{_: 'birthday', day: int, month: int, year?: int}, contact_id: int}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.ContactBirthdays.html
      */
     public function getBirthdays(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     *
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'contacts.sponsoredPeersEmpty'}|array{_: 'contacts.sponsoredPeers', peers: list<array{_: 'sponsoredPeer', peer: array|int|string, random_id: string, sponsor_info?: string, additional_info?: string}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/contacts.SponsoredPeers.html
+     */
+    public function getSponsoredPeers(string|null $q = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

@@ -50,12 +50,14 @@ final class FilterPeer extends Filter
     public function __construct(private readonly string|int $peer)
     {
     }
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         /** @psalm-suppress InaccessibleProperty */
         $this->peerResolved = $API->getId($this->peer);
         return $this;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->chatId === $this->peerResolved) ||

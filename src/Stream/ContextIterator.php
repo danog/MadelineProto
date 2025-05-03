@@ -18,6 +18,7 @@ final class ContextIterator implements IteratorAggregate
     ) {
     }
 
+    #[\Override]
     public function getIterator(): Traversable
     {
         foreach ($this->ctxs as $ctx) {

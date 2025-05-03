@@ -52,6 +52,7 @@ final class LoginQrCode extends IpcCapable implements JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return [

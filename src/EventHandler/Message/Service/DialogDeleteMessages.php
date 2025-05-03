@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Deleted messages.
  */
-class DialogDeleteMessages extends ServiceMessage
+final class DialogDeleteMessages extends ServiceMessage
 {
     public function __construct(
         MTProto $API,

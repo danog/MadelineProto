@@ -37,6 +37,7 @@ enum DiscardReason: string implements JsonSerializable
     case BUSY = 'phoneCallDiscardReasonBusy';
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): string
     {
         return $this->name;

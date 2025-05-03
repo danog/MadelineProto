@@ -937,4 +937,15 @@ abstract class Tools extends AsyncTools
         }
         return self::$canFFmpeg;
     }
+
+    /**
+     * @psalm-pure
+     * @internal
+     * @psalm-taint-escape html
+     * @psalm-taint-escape quotes
+     */
+    public static function taintEscape(string $s): string
+    {
+        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' ? $s : htmlentities($s);
+    }
 }

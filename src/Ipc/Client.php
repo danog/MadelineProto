@@ -88,6 +88,7 @@ final class Client extends ClientAbstract
      * @param string|int    $function  Function name
      * @param array|Wrapper $arguments Arguments
      */
+    #[\Override]
     public function __call(string|int $function, array|Wrapper $arguments)
     {
         if (\is_array($arguments) && $arguments) {
@@ -216,13 +217,13 @@ final class Client extends ClientAbstract
      *
      * @param mixed    $callable  Callable
      * @param integer  $size      File size
-     * @param string   $mime      Mime type
+     * @param ?string   $mime      Mime type
      * @param string   $fileName  File name
      * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
+    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;

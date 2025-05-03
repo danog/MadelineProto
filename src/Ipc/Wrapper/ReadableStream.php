@@ -33,6 +33,7 @@ class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
     use ClosableTrait;
     use ReadableStreamIteratorAggregate;
 
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         return async(function (): ?string {
@@ -59,6 +60,7 @@ class ReadableStream extends Obj implements AmpReadableStream, IteratorAggregate
     /**
      * @return bool A stream may become unreadable if the underlying source is closed or lost.
      */
+    #[\Override]
     public function isReadable(): bool
     {
         return $this->__call('isReadable');

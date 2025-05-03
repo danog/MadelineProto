@@ -7,10 +7,12 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class BankCard extends MessageEntity
 {
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'bank_card', 'offset' => $this->offset, 'length' => $this->length];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityBankCard', 'offset' => $this->offset, 'length' => $this->length];

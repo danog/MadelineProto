@@ -35,6 +35,7 @@ final class HttpWaitLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     protected function loop(): ?float
     {
         if (!$this->connection->isHttp()) {

@@ -45,6 +45,7 @@ final class CleanupLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     protected function loop(): ?float
     {
         $this->connection->msgIdHandler?->cleanup();

@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Info about a Star gifted.
  */
-class DialogStarGift extends ServiceMessage
+final class DialogStarGift extends ServiceMessage
 {
     /** @internal */
     public function __construct(

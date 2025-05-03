@@ -58,6 +58,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
     /**
      * Obtain values for JSON-encoding.
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return ['_' => 'bytes', 'bytes' => base64_encode($this->bytes)];
@@ -68,6 +69,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      * @param integer|null $offset Offset
      * @param string       $value  Char
      */
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new AssertionError("Cannot modify nested bytes!");
@@ -78,6 +80,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      * @param  integer $offset Name
      * @return string
      */
+    #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->bytes[$offset];
@@ -87,6 +90,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      *
      * @param integer $offset Offset
      */
+    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         throw new AssertionError("Cannot modify nested bytes!");
@@ -96,6 +100,7 @@ final class Bytes implements JsonSerializable, ArrayAccess
      *
      * @param integer $offset Offset
      */
+    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->bytes[$offset]);

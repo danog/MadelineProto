@@ -73,6 +73,7 @@ final class FeedLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     public function loop(): ?float
     {
         if (!$this->isLoggedIn()) {

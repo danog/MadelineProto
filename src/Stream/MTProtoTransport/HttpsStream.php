@@ -36,6 +36,7 @@ final class HttpsStream extends HttpStream implements MTProtoBufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         parent::connect($ctx->clone()->secure(true), $header);
@@ -43,10 +44,12 @@ final class HttpsStream extends HttpStream implements MTProtoBufferInterface
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

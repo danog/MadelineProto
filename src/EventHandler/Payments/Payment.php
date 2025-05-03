@@ -23,7 +23,7 @@ use danog\MadelineProto\TL\Types\Bytes;
 /**
  * This object contains information about an incoming pre-checkout query.
  */
-class Payment extends Update
+final class Payment extends Update
 {
     /** Unique query identifier */
     public readonly int $queryId;

@@ -29,10 +29,12 @@ final class MemoryArray extends ArrayObject
     {
         throw new AssertionError("Unreachable");
     }
+    #[\Override]
     public function count(): int
     {
         throw new AssertionError("Unreachable");
     }
+    #[\Override]
     public function getIterator(): \Iterator
     {
         throw new AssertionError("Unreachable");

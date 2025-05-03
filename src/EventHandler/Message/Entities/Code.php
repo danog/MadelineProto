@@ -7,10 +7,12 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Code extends MessageEntity
 {
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'code', 'offset' => $this->offset, 'length' => $this->length];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityCode', 'offset' => $this->offset, 'length' => $this->length];

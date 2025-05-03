@@ -27,6 +27,7 @@ use danog\MadelineProto\VoIP\CallState;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterEnded extends Filter
 {
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof VoIP && $update->getCallState() === CallState::ENDED;

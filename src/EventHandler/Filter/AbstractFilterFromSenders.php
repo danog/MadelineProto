@@ -47,6 +47,7 @@ abstract class AbstractFilterFromSenders extends Filter
     {
         $this->peers = array_unique($idOrUsername);
     }
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         if (\count($this->peers) === 1) {
@@ -60,6 +61,7 @@ abstract class AbstractFilterFromSenders extends Filter
         $this->peersResolved = $res;
         return $this;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof AbstractMessage && \in_array($update->senderId, $this->peersResolved, true) ||

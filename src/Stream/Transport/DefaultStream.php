@@ -64,6 +64,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     {
         throw new AssertionError("No underlying stream!");
     }
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->clone();
@@ -81,6 +82,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      */
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         return $this->stream ? $this->stream->read($cancellation) : null;
@@ -90,6 +92,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function write(string $data): void
     {
         if (!$this->stream) {
@@ -100,6 +103,7 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         try {
@@ -121,11 +125,13 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         Assert::notNull($this->stream);
         return $this->stream;
     }
+    #[\Override]
     public function setExtra($extra): void
     {
         $this->connector = $extra;

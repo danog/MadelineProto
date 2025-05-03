@@ -134,6 +134,7 @@ final class Settings extends SettingsAbstract
      *
      * @param SettingsAbstract $settings Settings
      */
+    #[\Override]
     public function merge(SettingsAbstract $settings): void
     {
         if (!$settings instanceof self) {
@@ -456,6 +457,7 @@ final class Settings extends SettingsAbstract
         return $this;
     }
 
+    #[\Override]
     public function applyChanges(): SettingsAbstract
     {
         foreach (get_object_vars($this) as $setting) {

@@ -71,6 +71,7 @@ final class Mysql extends SqlAbstract
         return $this->optimizeIfWastedGtMb;
     }
 
+    #[\Override]
     public function getOrmSettings(): Settings
     {
         $host = str_replace(['tcp://', 'unix://'], '', $this->getUri());

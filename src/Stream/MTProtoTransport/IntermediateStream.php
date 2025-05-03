@@ -41,6 +41,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = ($ctx->getStream(str_repeat(\chr(238), 4).$header));
@@ -48,6 +49,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -57,6 +59,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $buffer = $this->stream->getWriteBuffer($length + 4, $append);
@@ -69,6 +72,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
@@ -78,6 +82,7 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -85,10 +90,12 @@ final class IntermediateStream implements BufferedStreamInterface, MTProtoBuffer
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

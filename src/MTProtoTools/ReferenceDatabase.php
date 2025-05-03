@@ -147,14 +147,17 @@ final class ReferenceDatabase implements TLCallback
             EventLoop::queue($lock->release(...));
         }
     }
+    #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
     }
+    #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
     }
+    #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return array_merge(
@@ -163,14 +166,17 @@ final class ReferenceDatabase implements TLCallback
             ['document' => [$this->addReference(...), $this->addOrigin(...)]]
         );
     }
+    #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
     }
+    #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
     }
+    #[\Override]
     public function getTypeMismatchCallbacks(): array
     {
         return [];

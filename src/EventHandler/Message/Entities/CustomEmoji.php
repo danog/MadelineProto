@@ -19,10 +19,12 @@ final class CustomEmoji extends MessageEntity
     ) {
     }
 
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'custom_emoji', 'offset' => $this->offset, 'length' => $this->length, 'custom_emoji_id' => $this->documentId];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityCustomEmoji', 'offset' => $this->offset, 'length' => $this->length, 'document_id' => $this->documentId];

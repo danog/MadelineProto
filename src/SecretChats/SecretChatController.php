@@ -728,6 +728,7 @@ final class SecretChatController implements Stringable
         [$seq, $outgoing] = $result;
         return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
     }
+    #[\Override]
     public function __toString(): string
     {
         return "secret chat {$this->id}";

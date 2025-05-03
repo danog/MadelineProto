@@ -43,6 +43,7 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * Stream to use as data source.
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->in_seq_no = -1;
@@ -54,6 +55,7 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -63,6 +65,7 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $this->stream->startWriteHash();
@@ -77,6 +80,7 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->stream->startReadHash();
@@ -94,6 +98,7 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -101,10 +106,12 @@ final class FullStream implements BufferedStreamInterface, MTProtoBufferInterfac
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

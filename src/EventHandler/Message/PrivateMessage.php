@@ -27,6 +27,7 @@ final class PrivateMessage extends AbstractPrivateMessage
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function screenShot(): DialogScreenshotTaken
     {
         $result = $this->getClient()->methodCallAsyncRead(

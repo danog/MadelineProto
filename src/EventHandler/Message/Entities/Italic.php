@@ -7,10 +7,12 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Italic extends MessageEntity
 {
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'italic', 'offset' => $this->offset, 'length' => $this->length];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityItalic', 'offset' => $this->offset, 'length' => $this->length];

@@ -12,8 +12,8 @@ interface Langpack
     /**
      * Get localization pack strings.
      *
-     * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     * @param string $lang_code Language code
+     * @param string $lang_pack Platform identifier (i.e. `android`, `tdesktop`, etc).
+     * @param string $lang_code Either an ISO 639-1 language code or a language pack name obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links).
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -24,8 +24,8 @@ interface Langpack
     /**
      * Get strings from a language pack.
      *
-     * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     * @param string $lang_code Language code
+     * @param string $lang_pack Platform identifier (i.e. `android`, `tdesktop`, etc).
+     * @param string $lang_code Either an ISO 639-1 language code or a language pack name obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links).
      * @param list<string>|array<never, never> $keys Strings to get
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -37,8 +37,8 @@ interface Langpack
     /**
      * Get new strings in language pack.
      *
-     * @param string $lang_pack Language pack
-     * @param string $lang_code Language code
+     * @param string $lang_pack Platform identifier (i.e. `android`, `tdesktop`, etc).
+     * @param string $lang_code Either an ISO 639-1 language code or a language pack name obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links).
      * @param int $from_version Previous localization pack version
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -50,7 +50,7 @@ interface Langpack
     /**
      * Get information about all languages in a localization pack.
      *
-     * @param string $lang_pack Language pack
+     * @param string $lang_pack Platform identifier (i.e. `android`, `tdesktop`, etc).
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -61,8 +61,8 @@ interface Langpack
     /**
      * Get information about a language in a localization pack.
      *
-     * @param string $lang_pack Language pack name, usually obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links)
-     * @param string $lang_code Language code
+     * @param string $lang_pack Platform identifier (i.e. `android`, `tdesktop`, etc).
+     * @param string $lang_code Either an ISO 639-1 language code or a language pack name obtained from a [language pack link](https://core.telegram.org/api/links#language-pack-links).
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

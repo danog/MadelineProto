@@ -2243,7 +2243,7 @@ abstract class InternalDoc
      *
      * @param (callable(int, int, ?Cancellation): string) $callable  Callable (offset, length) => data
      * @param integer                                   $size      File size
-     * @param string                                    $mime      Mime type
+     * @param ?string                                    $mime      Mime type
      * @param string                                    $fileName  File name
      * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
@@ -2251,7 +2251,7 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    final public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
+    final public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
         return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
     }
@@ -2267,7 +2267,7 @@ abstract class InternalDoc
      *
      * @return array InputFile constructor
      */
-    final public function uploadFromStream(mixed $stream, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
+    final public function uploadFromStream(mixed $stream, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
     {
         return $this->wrapper->getAPI()->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
     }

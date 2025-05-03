@@ -18,7 +18,7 @@
     "already_loggedIn": "Cette instance de MadelineProto est déjà connectée!",
     "login_ok": "Connecté avec succès!",
     "apiManualInstructions0": "Connectez-vous à https://my.telegram.org",
-    "apiAutoPrompt1": "Entrez le code de vérification que vous avez reçu dans Telegram: ",
+    "apiAutoPrompt1": "Saisissez le code de vérification que vous avez reçu dans Telegram : ",
     "params_missing": "Paramètre requis manquant",
     "array_invalid": "Vous n'avez pas fourni de tableau valide",
     "not_numeric": "La valeur donnée n'est pas numérique",

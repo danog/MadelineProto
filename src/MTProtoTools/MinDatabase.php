@@ -106,26 +106,32 @@ final class MinDatabase implements TLCallback
             }
         });
     }
+    #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return array_merge(array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
     }
+    #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
     }
+    #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
         return array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
     }
+    #[\Override]
     public function getTypeMismatchCallbacks(): array
     {
         return [];

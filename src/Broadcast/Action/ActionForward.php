@@ -38,6 +38,7 @@ final class ActionForward implements Action
     public function __construct(private readonly MTProto $API, private readonly int $from_peer, private readonly array $ids, private readonly bool $drop_author, private readonly bool $pin)
     {
     }
+    #[\Override]
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void
     {
         try {

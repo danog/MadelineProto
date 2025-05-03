@@ -40,6 +40,7 @@ enum InlineQueryPeerType: string implements JsonSerializable
     case SameBotPM = 'inlineQueryPeerTypeSameBotPM';
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): string
     {
         return $this->name;

@@ -36,6 +36,7 @@ abstract class VoIPLoop extends Loop
     /**
      * Signal that loop has started.
      */
+    #[\Override]
     protected function startedLoop(): void
     {
         $this->instance->log("Entered $this");
@@ -45,6 +46,7 @@ abstract class VoIPLoop extends Loop
     /**
      * Signal that loop has exited.
      */
+    #[\Override]
     protected function exitedLoop(): void
     {
         $this->instance->log("Exited $this");
@@ -56,6 +58,7 @@ abstract class VoIPLoop extends Loop
      *
      * @param float $timeout Pause duration, 0 = forever
      */
+    #[\Override]
     protected function reportPause(float $timeout): void
     {
         if ($timeout) {

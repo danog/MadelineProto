@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * A payment was sent.
  */
-class DialogPaymentSent extends ServiceMessage
+final class DialogPaymentSent extends ServiceMessage
 {
     public function __construct(
         MTProto $API,

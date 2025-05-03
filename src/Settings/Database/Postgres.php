@@ -27,6 +27,7 @@ use danog\AsyncOrm\Settings\PostgresSettings;
  */
 final class Postgres extends SqlAbstract
 {
+    #[\Override]
     public function getOrmSettings(): Settings
     {
         $host = str_replace(['tcp://', 'unix://'], '', $this->getUri());

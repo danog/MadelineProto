@@ -88,6 +88,7 @@ final class DoHWrapper
         ?CookieJar $jar = null
     ) {
         $configProvider = new class implements DnsConfigLoader {
+            #[\Override]
             public function loadConfig(): DnsConfig
             {
                 $loader = stripos(PHP_OS, 'win') === 0 ? new WindowsDnsConfigLoader() : new UnixDnsConfigLoader();

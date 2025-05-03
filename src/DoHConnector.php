@@ -47,6 +47,7 @@ final class DoHConnector implements SocketConnector
     public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)
     {
     }
+    #[\Override]
     public function connect(
         SocketAddress|string $uri,
         ?ConnectContext $context = null,

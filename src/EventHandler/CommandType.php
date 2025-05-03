@@ -25,6 +25,7 @@ enum CommandType: string implements JsonSerializable
     case BANG = '!';
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->value;

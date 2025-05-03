@@ -27,11 +27,11 @@ final class TLSchema extends SettingsAbstract
     /**
      * TL layer version.
      */
-    protected int $layer = 196;
+    protected int $layer = 202;
     /**
      * API schema path.
      */
-    protected string $APISchema = __DIR__ . '/../TL_telegram_v196.tl';
+    protected string $APISchema = __DIR__ . '/../TL_telegram_v202.tl';
     /**
      * MTProto schema path.
      */
@@ -54,6 +54,7 @@ final class TLSchema extends SettingsAbstract
      * Whether to enable fuzzing mode (all parameters will be populated with default values).
      */
     protected bool $fuzzMode = false;
+    #[\Override]
     public function __sleep()
     {
         return array_merge(['wasUpgraded'], parent::__sleep());

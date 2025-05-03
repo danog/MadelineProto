@@ -33,6 +33,7 @@ final class FilterTopicId extends Filter
     ) {
         Assert::greaterThan($topicId, 0);
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->topicId === $this->topicId) ||

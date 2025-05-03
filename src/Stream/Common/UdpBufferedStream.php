@@ -46,6 +46,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->clone();
@@ -59,6 +60,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->close();
@@ -68,6 +70,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): ReadBufferInterface
     {
         if (!$this->stream) {
@@ -102,6 +105,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              *
              * @param integer $length Length
              */
+            #[\Override]
             public function bufferRead(int $length, ?Cancellation $_ = null): string
             {
                 return fread($this->buffer, $length);
@@ -120,6 +124,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): WriteBufferInterface
     {
         return new class($length, $append, $this) implements WriteBufferInterface {
@@ -141,6 +146,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
              *
              * @param string $data Data to write
              */
+            #[\Override]
             public function bufferWrite(string $data): void
             {
                 $this->data .= $data;
@@ -166,6 +172,7 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
             }
         };
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

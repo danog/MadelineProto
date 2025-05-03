@@ -197,6 +197,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
         return $result;
     }
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $v = get_object_vars($this);

@@ -50,6 +50,7 @@ final class CheckLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     protected function loop(): ?float
     {
         if (!$this->connection->new_outgoing) {

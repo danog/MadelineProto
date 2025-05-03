@@ -37,6 +37,7 @@ final class FilterTextCaseInsensitive extends Filter
         $this->content = mb_strtolower($content);
     }
 
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && mb_strtolower($update->message) === $this->content) ||

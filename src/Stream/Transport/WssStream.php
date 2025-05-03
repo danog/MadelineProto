@@ -34,10 +34,12 @@ final class WssStream extends WsStream
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         parent::connect($ctx->clone()->secure(true), $header);
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

@@ -43,6 +43,7 @@ enum Rule: string implements JsonSerializable
     case ABOUT = 'privacyKeyAbout';
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): string
     {
         return $this->name;

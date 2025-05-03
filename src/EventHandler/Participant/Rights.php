@@ -23,6 +23,7 @@ use ReflectionProperty;
 abstract class Rights implements JsonSerializable
 {
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

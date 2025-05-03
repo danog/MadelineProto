@@ -54,6 +54,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->clone();
@@ -148,6 +149,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -157,6 +159,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         return $this->stream->getWriteBuffer($length, $append);
@@ -166,14 +169,17 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         return $this->stream->getReadBuffer($length);
     }
+    #[\Override]
     public function read(?Cancellation $token = null): ?string
     {
         return $this->stream->read($token);
     }
+    #[\Override]
     public function write(string $data): void
     {
         $this->stream->write($data);
@@ -183,6 +189,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      *
      * @param array $extra Proxy data
      */
+    #[\Override]
     public function setExtra($extra): void
     {
         $this->extra = $extra;
@@ -190,6 +197,7 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
@@ -197,10 +205,12 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

@@ -32,6 +32,7 @@ enum IconColor: int implements JsonSerializable
     case RED = 0xfb6f5f;
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): string
     {
         return $this->name;

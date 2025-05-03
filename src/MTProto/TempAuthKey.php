@@ -100,6 +100,7 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     /**
      * Check if we are logged in.
      */
+    #[\Override]
     public function isAuthorized(): bool
     {
         return $this->bound ? $this->bound->isAuthorized() : false;
@@ -109,6 +110,7 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      *
      * @param boolean $authorized Whether we are authorized
      */
+    #[\Override]
     public function authorized(bool $authorized): void
     {
         $this->bound->authorized($authorized);
@@ -132,6 +134,7 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     /**
      * JSON serialization function.
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return ['auth_key' => 'pony'.base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'bound' => $this->isBound(), 'expires' => $this->expires, 'connection_inited' => $this->inited];

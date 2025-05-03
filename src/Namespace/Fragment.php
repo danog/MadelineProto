@@ -10,9 +10,9 @@ namespace danog\MadelineProto\Namespace;
 interface Fragment
 {
     /**
+     * Fetch information about a [fragment collectible, see here »](https://core.telegram.org/api/fragment#fetching-info-about-fragment-collectibles) for more info on the full flow.
      *
-     *
-     * @param array{_: 'inputCollectibleUsername', username?: string}|array{_: 'inputCollectiblePhone', phone?: string} $collectible @see https://docs.madelineproto.xyz/API_docs/types/InputCollectible.html
+     * @param array{_: 'inputCollectibleUsername', username?: string}|array{_: 'inputCollectiblePhone', phone?: string} $collectible Collectible to fetch info about. @see https://docs.madelineproto.xyz/API_docs/types/InputCollectible.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

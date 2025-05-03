@@ -122,6 +122,7 @@ abstract class AbstractPoll implements JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

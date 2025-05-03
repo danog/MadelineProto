@@ -111,7 +111,7 @@ foreach (['methods', 'constructors'] as $type) {
     }
 }
 
-$bot = new \danog\MadelineProto\API('bot.madeline');
+$bot = new \danog\MadelineProto\API('layerdiff.madeline');
 $bot->start();
 
 echo $res."\n\n";

@@ -71,6 +71,7 @@ abstract class MessageEntity implements JsonSerializable
     abstract public function toMTProto(): array;
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

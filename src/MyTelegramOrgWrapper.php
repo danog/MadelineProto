@@ -97,10 +97,12 @@ final class MyTelegramOrgWrapper
                     private readonly Settings $settings
                 ) {
                 }
+                #[\Override]
                 public function getSettings(): Settings
                 {
                     return $this->settings;
                 }
+                #[\Override]
                 public function getLogger(): Logger
                 {
                     return $this->getLogger();

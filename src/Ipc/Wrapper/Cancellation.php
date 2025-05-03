@@ -51,6 +51,7 @@ final class Cancellation implements AmpCancellation
      *
      * @return string Identifier that can be used to cancel the subscription.
      */
+    #[\Override]
     public function subscribe(\Closure $callback): string
     {
         $id = $this->inner->subscribe($callback);
@@ -63,6 +64,7 @@ final class Cancellation implements AmpCancellation
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
      */
+    #[\Override]
     public function unsubscribe(string $id): void
     {
         unset($this->handlers[$id]);
@@ -72,6 +74,7 @@ final class Cancellation implements AmpCancellation
     /**
      * Returns whether cancellation has been requested yet.
      */
+    #[\Override]
     public function isRequested(): bool
     {
         return $this->inner->isRequested();
@@ -82,6 +85,7 @@ final class Cancellation implements AmpCancellation
      *
      * @throws CancelledException
      */
+    #[\Override]
     public function throwIfRequested(): void
     {
         $this->inner->throwIfRequested();

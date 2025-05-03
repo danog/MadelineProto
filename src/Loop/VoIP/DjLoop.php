@@ -127,6 +127,7 @@ final class DjLoop extends VoIPLoop
         $this->packetDeferred?->complete(false);
     }
 
+    #[\Override]
     protected function loop(): ?float
     {
         if ($this->instance->getCallState() === CallState::ENDED) {

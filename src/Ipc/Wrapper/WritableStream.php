@@ -25,15 +25,18 @@ class WritableStream extends Obj implements AmpWritableStream
 {
     use ClosableTrait;
 
+    #[\Override]
     public function write(string $data): void
     {
         $this->__call('write', [$data]);
     }
+    #[\Override]
     public function isWritable(): bool
     {
         return $this->__call('isWritable');
     }
 
+    #[\Override]
     public function end(string $finalData = ""): void
     {
         $this->__call('end', [$finalData]);

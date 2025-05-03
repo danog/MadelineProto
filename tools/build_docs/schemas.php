@@ -10,7 +10,7 @@ use danog\MadelineProto\TL\TL;
  */
 function loadSchemas(): array
 {
-    $stored = trim(file_get_contents(getcwd().'/schemas/last'));
+    $stored = trim(@file_get_contents(getcwd().'/schemas/last'));
     $page = 1;
     $had = [];
     $client = HttpClientBuilder::buildDefault();

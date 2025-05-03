@@ -24,8 +24,9 @@ use danog\MadelineProto\EventHandler\Update;
  * Allow messages that coming from @replies.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class FilterCommentReply extends Filter
+final class FilterCommentReply extends Filter
 {
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof CommentReply;

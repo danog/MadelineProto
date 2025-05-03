@@ -50,6 +50,7 @@ final class ReadLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     protected function loop(): ?float
     {
         try {

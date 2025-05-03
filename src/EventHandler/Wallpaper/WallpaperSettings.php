@@ -63,6 +63,7 @@ final class WallpaperSettings implements JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

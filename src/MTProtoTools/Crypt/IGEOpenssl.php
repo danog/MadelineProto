@@ -35,6 +35,7 @@ final class IGEOpenssl extends IGE
         $this->iv_part_1 = substr($iv, 0, 16);
         $this->iv_part_2 = substr($iv, 16);
     }
+    #[\Override]
     public function encrypt(string $plaintext): string
     {
         $ciphertext = '';
@@ -51,6 +52,7 @@ final class IGEOpenssl extends IGE
 
         return $ciphertext;
     }
+    #[\Override]
     public function decrypt(string $ciphertext): string
     {
         $plaintext = '';

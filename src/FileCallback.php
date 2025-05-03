@@ -50,10 +50,12 @@ final class FileCallback implements FileCallbackInterface
      *
      * @return TT
      */
+    #[\Override]
     public function getFile(): mixed
     {
         return $this->file;
     }
+    #[\Override]
     public function __invoke(float $percent, float $speed, float $time): void
     {
         $callback = $this->callback;

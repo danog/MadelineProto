@@ -25,13 +25,14 @@ use Webmozart\Assert\Assert;
  * Filters based on the content of a button query.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class FilterButtonQueryData extends Filter
+final class FilterButtonQueryData extends Filter
 {
     public function __construct(
         private readonly string $content
     ) {
         Assert::notEmpty($content);
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof ButtonQuery && $update->data === $this->content;

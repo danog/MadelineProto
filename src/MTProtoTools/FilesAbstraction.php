@@ -1148,7 +1148,7 @@ trait FilesAbstraction
         $fileFuture = async(fn () => $this->uploadFromStream(
             new StreamDuplicator($file, $p->getSink()),
             $size,
-            'application/octet-stream',
+            null,
             $fileName ?? '',
             $callback,
             $secret,
@@ -1164,7 +1164,9 @@ trait FilesAbstraction
         unset($p);
 
         $file = $fileFuture->await();
-        return (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+        $mime = (new finfo())->buffer($buff, FILEINFO_MIME_TYPE) ?: 'application/octet-stream';
+        $file['mime_type'] = $mime;
+        return $mime;
     }
     private function extractAudioInfo(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
     {
@@ -1209,7 +1211,7 @@ trait FilesAbstraction
                 $p->getSink()->close();
                 $p->getSource()->close();
 
-                $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+                $mimeType = (new finfo())->buffer($buff, FILEINFO_MIME_TYPE) ?: 'application/octet-stream';
             });
             unset($p);
         }
@@ -1217,7 +1219,7 @@ trait FilesAbstraction
         $fileFuture = async(fn () => $this->uploadFromStream(
             new StreamDuplicator($file, ...$streams),
             $size,
-            'application/octet-stream',
+            null,
             $fileName ?? '',
             $callback,
             $secret,
@@ -1246,6 +1248,7 @@ trait FilesAbstraction
         }
 
         $file = $fileFuture->await();
+        $file['mime_type'] = $mimeType;
     }
 
     private function extractVideoInfo(bool $secret, string $thumbSeek, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation, ?string &$mimeType, array &$attributes, mixed &$thumb): void
@@ -1290,7 +1293,7 @@ trait FilesAbstraction
                 $p->getSink()->close();
                 $p->getSource()->close();
 
-                $mimeType ??= (new finfo())->buffer($buff, FILEINFO_MIME_TYPE);
+                $mimeType = (new finfo())->buffer($buff, FILEINFO_MIME_TYPE) ?: 'application/octet-stream';
             });
             unset($p);
         }
@@ -1298,7 +1301,7 @@ trait FilesAbstraction
         $fileFuture = async(fn () => $this->uploadFromStream(
             new StreamDuplicator($file, ...$streams),
             $size,
-            'application/octet-stream',
+            $mimeType,
             $fileName ?? '',
             $callback,
             $secret,
@@ -1325,5 +1328,6 @@ trait FilesAbstraction
         }
 
         $file = $fileFuture->await();
+        $file['mime_type'] = $mimeType;
     }
 }

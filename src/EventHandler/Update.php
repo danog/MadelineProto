@@ -31,6 +31,7 @@ use ReflectionProperty;
 abstract class Update extends IpcCapable implements JsonSerializable
 {
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

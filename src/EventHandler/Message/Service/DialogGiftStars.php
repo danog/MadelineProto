@@ -22,7 +22,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Info about a gifted Telegram Stars.
  */
-class DialogGiftStars extends ServiceMessage
+final class DialogGiftStars extends ServiceMessage
 {
     /** @internal */
     public function __construct(

@@ -36,6 +36,7 @@ final class FiltersOr extends Filter
         Assert::notEmpty($filters);
         $this->filters = $filters;
     }
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         $final = [];
@@ -58,6 +59,7 @@ final class FiltersOr extends Filter
             default => new self(...$final)
         };
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         foreach ($this->filters as $filter) {

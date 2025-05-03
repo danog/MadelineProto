@@ -27,6 +27,7 @@ final class GeoPoint implements JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $v = get_object_vars($this);

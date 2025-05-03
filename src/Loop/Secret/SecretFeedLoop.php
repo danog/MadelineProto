@@ -65,6 +65,7 @@ final class SecretFeedLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     public function loop(): ?float
     {
         $this->API->logger("Resumed {$this}");

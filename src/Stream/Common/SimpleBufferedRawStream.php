@@ -37,6 +37,7 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
      *
      * @param int $length Amount of data to read
      */
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         $size = fstat($this->memory_stream)['size'];
@@ -59,6 +60,7 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
@@ -66,6 +68,7 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
     /**
      * Get class name.
      */
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

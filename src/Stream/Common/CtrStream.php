@@ -56,6 +56,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->encrypt = new AES('ctr');
@@ -71,6 +72,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -80,6 +82,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $this->write_buffer = $this->stream->getWriteBuffer($length);
@@ -94,6 +97,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         $this->read_buffer = $this->stream->getReadBuffer($length);
@@ -102,6 +106,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * Decrypts read data asynchronously.
      */
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
@@ -111,6 +116,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param string $data Bytes to write.
      */
+    #[\Override]
     public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
@@ -131,6 +137,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      *
      * @param array $data Keys
      */
+    #[\Override]
     public function setExtra($data): void
     {
         $this->extra = $data;
@@ -138,6 +145,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -145,6 +153,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
@@ -157,6 +166,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     {
         return $this->decrypt;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

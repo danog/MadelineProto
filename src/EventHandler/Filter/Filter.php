@@ -135,6 +135,7 @@ abstract class Filter
                         public function __construct(private readonly string $class)
                         {
                         }
+                        #[\Override]
                         public function apply(Update $update): bool
                         {
                             return $update instanceof $this->class;

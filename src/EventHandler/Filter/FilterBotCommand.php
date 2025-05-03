@@ -29,8 +29,9 @@ use Webmozart\Assert\Assert;
  * Allow only messages containing the specified command, optionally postfixed with the bot's username.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class FilterBotCommand extends Filter
+final class FilterBotCommand extends Filter
 {
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         Assert::true($API->isSelfBot(), 'This filter can only be used by bots!');
@@ -44,6 +45,7 @@ class FilterBotCommand extends Filter
     {
     }
 
+    #[\Override]
     public function apply(Update $update): bool
     {
         throw new AssertionError("Unreachable!");

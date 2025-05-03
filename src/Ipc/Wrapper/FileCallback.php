@@ -25,6 +25,7 @@ use danog\MadelineProto\FileCallbackInterface;
  */
 final class FileCallback extends Obj implements FileCallbackInterface
 {
+    #[\Override]
     public function getFile(): mixed
     {
         return $this->__call('getFile');
@@ -36,6 +37,7 @@ final class FileCallback extends Obj implements FileCallbackInterface
      * @param float $speed   Speed in mbps
      * @param float $time    Time
      */
+    #[\Override]
     public function __invoke(float $percent, float $speed, float $time)
     {
         return $this->__call('__invoke', [$percent, $speed, $time]);

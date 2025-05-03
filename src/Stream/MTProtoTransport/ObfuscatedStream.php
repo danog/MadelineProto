@@ -43,6 +43,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if (isset($this->extra['address'])) {
@@ -74,6 +75,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     /**
      * Set extra.
      */
+    #[\Override]
     public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
@@ -86,6 +88,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
         }
         $this->extra = $extra;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

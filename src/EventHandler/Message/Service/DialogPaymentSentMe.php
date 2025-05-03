@@ -25,7 +25,7 @@ use danog\MadelineProto\TL\Types\Bytes;
 /**
  * A user just sent a payment to me (a bot).
  */
-class DialogPaymentSentMe extends ServiceMessage
+final class DialogPaymentSentMe extends ServiceMessage
 {
     public function __construct(
         MTProto $API,

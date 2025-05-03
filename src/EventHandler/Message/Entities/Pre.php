@@ -19,6 +19,7 @@ final class Pre extends MessageEntity
     ) {
     }
 
+    #[\Override]
     public function toBotAPI(): array
     {
         $res = ['type' => 'pre', 'offset' => $this->offset, 'length' => $this->length];
@@ -27,6 +28,7 @@ final class Pre extends MessageEntity
         }
         return $res;
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityPre', 'offset' => $this->offset, 'length' => $this->length, 'language' => $this->language];

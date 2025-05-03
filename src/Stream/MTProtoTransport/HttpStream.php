@@ -59,6 +59,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->ctx = $ctx->clone();
@@ -70,6 +71,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param array $extra Proxy parameters
      */
+    #[\Override]
     public function setExtra($extra): void
     {
         if (isset($extra['user']) && isset($extra['password'])) {
@@ -79,6 +81,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -88,6 +91,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         $headers = 'POST '.$this->uri->getPath()." HTTP/1.1\r\nHost: ".$this->uri->getHost().':'.$this->uri->getPort()."\r\n"."Content-Type: application/x-www-form-urlencoded\r\nConnection: keep-alive\r\nKeep-Alive: timeout=100000, max=10000000\r\nContent-Length: ".$length.$this->header."\r\n\r\n";
@@ -100,6 +104,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): ReadBufferInterface
     {
         $buffer = $this->stream->getReadBuffer($l);
@@ -161,6 +166,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
         }
         return $buffer;
     }
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         return $this->code;
@@ -168,6 +174,7 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -175,10 +182,12 @@ class HttpStream implements MTProtoBufferInterface, BufferedProxyStreamInterface
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

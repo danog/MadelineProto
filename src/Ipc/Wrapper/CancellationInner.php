@@ -36,6 +36,7 @@ final class CancellationInner extends Obj implements AmpCancellation
      *
      * @return string Identifier that can be used to cancel the subscription.
      */
+    #[\Override]
     public function subscribe(\Closure $callback): string
     {
         $id = $this->__call('getId');
@@ -55,6 +56,7 @@ final class CancellationInner extends Obj implements AmpCancellation
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
      */
+    #[\Override]
     public function unsubscribe(string $id): void
     {
         EventLoop::queue($this->__call(...), 'unsubscribe', [$id]);
@@ -63,6 +65,7 @@ final class CancellationInner extends Obj implements AmpCancellation
     /**
      * Returns whether cancellation has been requested yet.
      */
+    #[\Override]
     public function isRequested(): bool
     {
         return $this->__call('isRequested');
@@ -73,6 +76,7 @@ final class CancellationInner extends Obj implements AmpCancellation
      *
      * @throws CancelledException
      */
+    #[\Override]
     public function throwIfRequested(): void
     {
         $this->__call('throwIfRequested');

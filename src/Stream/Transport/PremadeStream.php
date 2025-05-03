@@ -56,6 +56,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if ($header !== '') {
@@ -65,6 +66,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async chunked read.
      */
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         return $this->stream ? $this->stream->read($cancellation) : null;
@@ -74,6 +76,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function write(string $data): void
     {
         if (!$this->stream) {
@@ -86,6 +89,7 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         try {
@@ -103,11 +107,13 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->disconnect();
     }
+    #[\Override]
     public function getSocket(): Socket
     {
         Assert::true($this->stream instanceof Socket);
         return $this->stream;
     }
+    #[\Override]
     public function setExtra(mixed $extra): void
     {
         $this->stream = $extra;

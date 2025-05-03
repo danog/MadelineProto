@@ -38,12 +38,14 @@ use danog\MadelineProto\EventHandler\User\Username;
 final class FilterFromAdmin extends Filter
 {
     private readonly array $adminIds;
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         /** @psalm-suppress InaccessibleProperty */
         $this->adminIds = $API->getAdminIds();
         return $this;
     }
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof AbstractMessage && \in_array($update->senderId, $this->adminIds, true)) ||

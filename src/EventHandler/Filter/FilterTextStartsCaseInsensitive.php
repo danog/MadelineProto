@@ -37,6 +37,7 @@ final class FilterTextStartsCaseInsensitive extends Filter
         $this->content = mb_strtolower($content);
     }
 
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_starts_with(mb_strtolower($update->message), $this->content)) ||

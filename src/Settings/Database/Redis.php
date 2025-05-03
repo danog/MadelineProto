@@ -27,6 +27,7 @@ use danog\AsyncOrm\Settings\RedisSettings;
  */
 final class Redis extends DriverDatabaseAbstract
 {
+    #[\Override]
     public function getOrmSettings(): Settings
     {
         return new RedisSettings(
@@ -51,6 +52,7 @@ final class Redis extends DriverDatabaseAbstract
     /**
      * Get database number.
      */
+    #[\Override]
     public function getDatabase(): int
     {
         return $this->database;
@@ -71,6 +73,7 @@ final class Redis extends DriverDatabaseAbstract
     /**
      * Get database URI.
      */
+    #[\Override]
     public function getUri(): string
     {
         return $this->uri;
@@ -81,6 +84,7 @@ final class Redis extends DriverDatabaseAbstract
      *
      * @param string $uri Database URI.
      */
+    #[\Override]
     public function setUri(string $uri): static
     {
         $this->uri = $uri;

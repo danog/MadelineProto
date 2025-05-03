@@ -54,6 +54,7 @@ final class StreamDuplicator implements ReadableStream, IteratorAggregate
     ) {
         $this->outputs = $outputs;
     }
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         $res = $this->input->read($cancellation);
@@ -78,10 +79,12 @@ final class StreamDuplicator implements ReadableStream, IteratorAggregate
         }
         return $res;
     }
+    #[\Override]
     public function isReadable(): bool
     {
         return $this->input->isReadable();
     }
+    #[\Override]
     public function close(): void
     {
         $this->input->close();
@@ -89,10 +92,12 @@ final class StreamDuplicator implements ReadableStream, IteratorAggregate
             $s->close();
         }
     }
+    #[\Override]
     public function isClosed(): bool
     {
         return $this->input->isClosed();
     }
+    #[\Override]
     public function onClose(Closure $onClose): void
     {
         $this->input->onClose($onClose);

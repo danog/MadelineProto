@@ -96,6 +96,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
     /**
      * Get database name.
      */
+    #[\Override]
     public function getDatabase(): string
     {
         return $this->database;
@@ -136,6 +137,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
     /**
      * Get database URI.
      */
+    #[\Override]
     public function getUri(): string
     {
         return $this->uri;
@@ -146,6 +148,7 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      *
      * @param string $uri Database URI.
      */
+    #[\Override]
     public function setUri(string $uri): static
     {
         $this->uri = $uri;

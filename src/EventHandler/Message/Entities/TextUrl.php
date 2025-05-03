@@ -19,10 +19,12 @@ final class TextUrl extends MessageEntity
     ) {
     }
 
+    #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'text_link', 'offset' => $this->offset, 'length' => $this->length, 'url' => $this->url];
     }
+    #[\Override]
     public function toMTProto(): array
     {
         return ['_' => 'messageEntityTextUrl', 'offset' => $this->offset, 'length' => $this->length, 'url' => $this->url];

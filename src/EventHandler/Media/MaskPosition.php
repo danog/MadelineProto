@@ -27,6 +27,7 @@ enum MaskPosition: int implements JsonSerializable
     case Chin = 3;
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->value;

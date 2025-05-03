@@ -23,7 +23,7 @@ use ReflectionProperty;
 /**
  * Payment identifier.
  */
-class PaymentCharge implements JsonSerializable
+final class PaymentCharge implements JsonSerializable
 {
 
     public function __construct(
@@ -36,6 +36,7 @@ class PaymentCharge implements JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

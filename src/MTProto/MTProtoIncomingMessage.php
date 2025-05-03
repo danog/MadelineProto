@@ -86,6 +86,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * Get my message ID.
      */
+    #[\Override]
     public function getMsgId(): int
     {
         \assert($this->msgId !== null);
@@ -150,6 +151,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * Check if this message can be garbage collected.
      */
+    #[\Override]
     public function canGarbageCollect(): bool
     {
         return (bool) ($this->state & self::STATE_READ);

@@ -167,6 +167,7 @@ abstract class EventHandler extends AbstractAPI
         $API->startAndLoopInternal(static::class);
     }
     /** @internal */
+    #[\Override]
     final protected function reconnectFull(): bool
     {
         return true;

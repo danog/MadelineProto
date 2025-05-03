@@ -25,6 +25,7 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterAllowAll extends Filter
 {
+    #[\Override]
     public function apply(Update $update): bool
     {
         return true;

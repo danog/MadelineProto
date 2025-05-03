@@ -87,6 +87,7 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];

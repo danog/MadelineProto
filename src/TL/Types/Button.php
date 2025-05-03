@@ -98,6 +98,7 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
     /**
      * Serialize button.
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return $this->button;
@@ -108,6 +109,7 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      * @param mixed $name  Offset
      * @param mixed $value Value
      */
+    #[\Override]
     public function offsetSet(mixed $name, mixed $value): void
     {
         if ($name === null) {
@@ -121,6 +123,7 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      *
      * @param mixed $name Field name
      */
+    #[\Override]
     public function offsetGet(mixed $name): mixed
     {
         return $this->button[$name];
@@ -130,6 +133,7 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      *
      * @param mixed $name Offset
      */
+    #[\Override]
     public function offsetUnset(mixed $name): void
     {
         unset($this->button[$name]);
@@ -139,6 +143,7 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      *
      * @param mixed $name Offset
      */
+    #[\Override]
     public function offsetExists(mixed $name): bool
     {
         return isset($this->button[$name]);

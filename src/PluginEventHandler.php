@@ -28,6 +28,7 @@ abstract class PluginEventHandler extends SimpleEventHandler
     /**
      * Plugins can require other plugins ONLY with the getPlugins() method.
      */
+    #[\Override]
     final public static function getPluginPaths(): string|array|null
     {
         return null;

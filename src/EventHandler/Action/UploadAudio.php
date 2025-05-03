@@ -29,6 +29,7 @@ final class UploadAudio extends Action
     ) {
     }
 
+    #[\Override]
     public function toRawAction(): array
     {
         return parent::toRawAction() + [ 'progress' => $this->progress ];

@@ -100,6 +100,7 @@ abstract class AbstractServer extends Loop
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
     }
+    #[\Override]
     public function start(): bool
     {
         return $this instanceof ServerCallback ? parent::start() : $this->callback->start() && parent::start();
@@ -178,6 +179,7 @@ abstract class AbstractServer extends Loop
     /**
      * Shutdown.
      */
+    #[\Override]
     final public function stop(): bool
     {
         $this->server->close();
@@ -195,6 +197,7 @@ abstract class AbstractServer extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     protected function loop(): ?float
     {
         while ($socket = $this->server->accept()) {

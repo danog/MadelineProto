@@ -127,6 +127,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      *
      * @param string $hash Algorithm name
      */
+    #[\Override]
     public function setExtra($hash): void
     {
         $rev = strpos($hash, '_rev');
@@ -142,6 +143,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->write_hash = null;
@@ -155,6 +157,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -164,6 +167,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         //if ($this->read_hash) {
@@ -177,6 +181,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         //if ($this->write_hash) {
@@ -188,6 +193,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * Reads data from the stream.
      */
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string
     {
         if ($this->read_hash === null) {
@@ -217,6 +223,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      *
      * @param string $data Bytes to write.
      */
+    #[\Override]
     public function bufferWrite(string $data): void
     {
         if ($this->write_hash === null) {
@@ -243,6 +250,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -250,10 +258,12 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

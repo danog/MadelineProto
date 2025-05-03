@@ -45,6 +45,7 @@ final class WebRunner extends RunnerAbstract
      *
      * @param string $session Session path
      */
+    #[\Override]
     public static function start(string $session, int $startupId): bool
     {
         if (!isset($_SERVER['SERVER_NAME']) || !$_SERVER['SERVER_NAME']) {

@@ -47,6 +47,7 @@ final class PermAuthKey extends AuthKey
     /**
      * Check if we are logged in.
      */
+    #[\Override]
     public function isAuthorized(): bool
     {
         return $this->authorized;
@@ -56,6 +57,7 @@ final class PermAuthKey extends AuthKey
      *
      * @param boolean $authorized Whether we are authorized
      */
+    #[\Override]
     public function authorized(bool $authorized): void
     {
         $this->authorized = $authorized;
@@ -63,6 +65,7 @@ final class PermAuthKey extends AuthKey
     /**
      * JSON serialization function.
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return ['auth_key' => 'pony'.base64_encode($this->authKey), 'server_salt' => $this->serverSalt, 'authorized' => $this->authorized];

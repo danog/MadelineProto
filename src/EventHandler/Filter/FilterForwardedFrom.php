@@ -33,6 +33,7 @@ final class FilterForwardedFrom extends Filter
     {
     }
 
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         /** @psalm-suppress InaccessibleProperty */
@@ -40,6 +41,7 @@ final class FilterForwardedFrom extends Filter
         return $this;
     }
 
+    #[\Override]
     public function apply(Update $update): bool
     {
         return $update instanceof Message && ($update->fwdInfo?->fromId === $this->peerResolved);

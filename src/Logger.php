@@ -403,6 +403,9 @@ final class Logger
      * @param mixed  $param Message to log
      * @param int    $level Logging level
      * @param string $file  File that originated the message
+     *
+     * @psalm-taint-escape html
+     * @psalm-taint-escape quotes
      */
     public function logger(mixed $param, int $level = self::NOTICE, string $file = ''): void
     {

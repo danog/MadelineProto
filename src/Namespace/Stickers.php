@@ -10,7 +10,7 @@ namespace danog\MadelineProto\Namespace;
 interface Stickers
 {
     /**
-     * Create a stickerset, bots only.
+     * Create a stickerset.
      *
      * @param bool $masks Whether this is a mask stickerset
      * @param bool $emojis Whether this is a [custom emoji](https://core.telegram.org/api/custom-emoji) stickerset.
@@ -29,7 +29,7 @@ interface Stickers
     public function createStickerSet(bool|null $masks = null, bool|null $emojis = null, bool|null $text_color = null, array|int|string|null $user_id = null, string|null $title = '', string|null $short_name = '', array|null $thumb = null, array $stickers = [], string|null $software = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Remove a sticker from the set where it belongs, bots only. The sticker set must have been created by the bot.
+     * Remove a sticker from the set where it belongs. The sticker set must have been created by the current user/bot.
      *
      * @param array $sticker The sticker to remove @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -40,7 +40,7 @@ interface Stickers
     public function removeStickerFromSet(array|null $sticker = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Changes the absolute position of a sticker in the set to which it belongs; for bots only. The sticker set must have been created by the bot.
+     * Changes the absolute position of a sticker in the set to which it belongs. The sticker set must have been created by the current user/bot.
      *
      * @param array $sticker The sticker @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
      * @param int $position The new position of the sticker, zero-based
@@ -52,7 +52,7 @@ interface Stickers
     public function changeStickerPosition(array|null $sticker = null, int|null $position = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Add a sticker to a stickerset, bots only. The sticker set must have been created by the bot.
+     * Add a sticker to a stickerset. The sticker set must have been created by the current user/bot.
      *
      * @param array{_: 'inputStickerSetItem', document?: array, emoji?: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n?: int}, keywords?: string} $sticker The sticker @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSetItem.html
      * @param array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id?: int, access_hash?: int}|array{_: 'inputStickerSetShortName', short_name?: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon?: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}|array{_: 'inputStickerSetEmojiChannelDefaultStatuses'} $stickerset The stickerset @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSet.html
@@ -98,7 +98,7 @@ interface Stickers
     public function suggestShortName(string|null $title = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Update the keywords, emojis or [mask coordinates](https://core.telegram.org/api/stickers#mask-stickers) of a sticker, bots only.
+     * Update the keywords, emojis or [mask coordinates](https://core.telegram.org/api/stickers#mask-stickers) of a sticker.
      *
      * @param array $sticker The sticker @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
      * @param string $emoji If set, updates the emoji list associated to the sticker
@@ -112,7 +112,7 @@ interface Stickers
     public function changeSticker(array|null $sticker = null, string|null $emoji = null, array|null $mask_coords = null, string|null $keywords = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Renames a stickerset, bots only.
+     * Renames a stickerset.
      *
      * @param array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id?: int, access_hash?: int}|array{_: 'inputStickerSetShortName', short_name?: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon?: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}|array{_: 'inputStickerSetEmojiChannelDefaultStatuses'} $stickerset Stickerset to rename @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSet.html
      * @param string $title New stickerset title
@@ -124,7 +124,7 @@ interface Stickers
     public function renameStickerSet(array|null $stickerset = null, string|null $title = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
-     * Deletes a stickerset we created, bots only.
+     * Deletes a stickerset we created.
      *
      * @param array{_: 'inputStickerSetEmpty'}|array{_: 'inputStickerSetID', id?: int, access_hash?: int}|array{_: 'inputStickerSetShortName', short_name?: string}|array{_: 'inputStickerSetAnimatedEmoji'}|array{_: 'inputStickerSetDice', emoticon?: string}|array{_: 'inputStickerSetAnimatedEmojiAnimations'}|array{_: 'inputStickerSetPremiumGifts'}|array{_: 'inputStickerSetEmojiGenericAnimations'}|array{_: 'inputStickerSetEmojiDefaultStatuses'}|array{_: 'inputStickerSetEmojiDefaultTopicIcons'}|array{_: 'inputStickerSetEmojiChannelDefaultStatuses'} $stickerset Stickerset to delete @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSet.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
@@ -134,10 +134,10 @@ interface Stickers
     public function deleteStickerSet(array|null $stickerset = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
+     * Replace a sticker in a [stickerset »](https://core.telegram.org/api/stickers).
      *
-     *
-     * @param array{_: 'inputStickerSetItem', document?: array, emoji?: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n?: int}, keywords?: string} $new_sticker @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSetItem.html
-     * @param array $sticker @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
+     * @param array{_: 'inputStickerSetItem', document?: array, emoji?: string, mask_coords?: array{_: 'maskCoords', x: float, y: float, zoom: float, n?: int}, keywords?: string} $new_sticker New sticker. @see https://docs.madelineproto.xyz/API_docs/types/InputStickerSetItem.html
+     * @param array $sticker Old sticker document. @see https://docs.madelineproto.xyz/API_docs/types/InputDocument.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation

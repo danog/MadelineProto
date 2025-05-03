@@ -75,6 +75,7 @@ final class UpdateLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     public function loop(): ?float
     {
         if (!$this->isLoggedIn()) {

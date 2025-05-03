@@ -65,6 +65,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $uri = $ctx->getStringUri();
@@ -78,6 +79,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         try {
@@ -85,6 +87,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
         } catch (Throwable $e) {
         }
     }
+    #[\Override]
     public function read(?Cancellation $token = null): ?string
     {
         try {
@@ -109,6 +112,7 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function write(string $data): void
     {
         $this->stream->sendBinary($data);
@@ -116,10 +120,12 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         throw new AssertionError("Unreachable!");
     }
+    #[\Override]
     public function setExtra($extra): void
     {
         if ($extra instanceof WebsocketConnector) {

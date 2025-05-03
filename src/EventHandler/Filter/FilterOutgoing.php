@@ -28,6 +28,7 @@ use danog\MadelineProto\VoIP\CallState;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterOutgoing extends Filter
 {
+    #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof AbstractMessage && $update->out)

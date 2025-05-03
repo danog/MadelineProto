@@ -112,6 +112,9 @@ trait BotAPI
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestPhone';
                 } elseif (isset($button['request_location']) && $button['request_location']) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestGeoLocation';
+                } elseif (isset($button['copy_text'])) {
+                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonCopy';
+                    $newrows[$key]['buttons'][$button_key]['copy_text'] = $button['copy_text']['text'];
                 }
                 $button_key++;
             }

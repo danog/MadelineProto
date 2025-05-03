@@ -47,6 +47,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * Connect.
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         if ($header !== '') {
@@ -56,6 +57,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * Async chunked read.
      */
+    #[\Override]
     public function read(?Cancellation $token = null): ?string
     {
         if (!$this->stream) {
@@ -68,6 +70,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function write(string $data): void
     {
         if (!$this->stream) {
@@ -78,6 +81,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         if ($this->stream) {
@@ -89,6 +93,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
@@ -101,6 +106,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         if (\strlen($append)) {
@@ -114,6 +120,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param int $length Amount of data to read
      */
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string
     {
         return $this->stream->read($cancellation, $length);
@@ -123,6 +130,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
@@ -141,6 +149,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * Set file handle.
      */
+    #[\Override]
     public function setExtra($extra): void
     {
         $this->stream = $extra;
@@ -148,6 +157,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         throw new RuntimeException("Can't get underlying RawStreamInterface, is a File handle!");
@@ -155,6 +165,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         throw new RuntimeException("Can't get underlying socket, is a File handle!");
@@ -162,6 +173,7 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     /**
      * Get class name.
      */
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

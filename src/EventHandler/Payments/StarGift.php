@@ -52,6 +52,7 @@ final class StarGift extends IpcCapable implements \JsonSerializable
     }
 
     /** @internal */
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         $v = get_object_vars($this);

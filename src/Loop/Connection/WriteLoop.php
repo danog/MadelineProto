@@ -48,6 +48,7 @@ final class WriteLoop extends Loop
     /**
      * Main loop.
      */
+    #[\Override]
     public function loop(): ?float
     {
         $please_wait = false;

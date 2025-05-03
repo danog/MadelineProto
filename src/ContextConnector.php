@@ -33,6 +33,7 @@ final class ContextConnector implements SocketConnector
     public function __construct(private DoHWrapper $doHWrapper, private LoggerGetter $loggerGetter, private bool $fromDns = false)
     {
     }
+    #[\Override]
     public function connect(SocketAddress|string $uri, ?ConnectContext $context = null, ?Cancellation $cancellation = null): Socket
     {
         $ctx = $context ?? new ConnectContext();

@@ -682,6 +682,7 @@ final class DataCenterConnection implements JsonSerializable
     /**
      * JSON serialize function.
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return $this->linkedDc ? ['linkedDc' => $this->linkedDc, 'tempAuthKey' => $this->tempAuthKey] : ['permAuthKey' => $this->permAuthKey, 'tempAuthKey' => $this->tempAuthKey];

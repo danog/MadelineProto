@@ -30,6 +30,7 @@ final class FilterNot extends Filter
     public function __construct(private readonly Filter $filter)
     {
     }
+    #[\Override]
     public function initialize(EventHandler $API): Filter
     {
         $filter = $this->filter->initialize($API);
@@ -45,6 +46,7 @@ final class FilterNot extends Filter
         return new self($filter);
     }
 
+    #[\Override]
     public function apply(Update $update): bool
     {
         return !$this->filter->apply($update);

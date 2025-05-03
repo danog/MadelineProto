@@ -47,6 +47,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param ConnectionContext $ctx Connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $this->stream = $ctx->getStream($header);
@@ -55,6 +56,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async chunked read.
      */
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         if (!$this->stream) {
@@ -67,6 +69,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function write(string $data): void
     {
         if (!$this->stream) {
@@ -77,6 +80,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         if ($this->memory_stream) {
@@ -93,6 +97,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         if (!$this->stream) {
@@ -117,6 +122,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Total length of data that is going to be piped in the buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         if (\strlen($append)) {
@@ -130,6 +136,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param int $length Amount of data to read
      */
+    #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
         if (!$this->stream) {
@@ -164,6 +171,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      *
      * @param string $data Data to write
      */
+    #[\Override]
     public function bufferWrite(string $data): void
     {
         if ($this->append_after) {
@@ -195,6 +203,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -202,6 +211,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
@@ -209,6 +219,7 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     /**
      * Get class name.
      */
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

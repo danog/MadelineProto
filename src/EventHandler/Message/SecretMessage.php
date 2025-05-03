@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
 /**
  * Represents New encrypted message.
  */
-class SecretMessage extends AbstractPrivateMessage
+final class SecretMessage extends AbstractPrivateMessage
 {
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info, bool $scheduled)
@@ -32,6 +32,7 @@ class SecretMessage extends AbstractPrivateMessage
         parent::__construct($API, $rawMessage, $info, $scheduled);
     }
 
+    #[\Override]
     public function getReply(string $class = SecretMessage::class): ?SecretMessage
     {
         if ($class !== SecretMessage::class) {
@@ -60,6 +61,7 @@ class SecretMessage extends AbstractPrivateMessage
      *
      * @param boolean $revoke Whether to delete the message for all participants of the chat.
      */
+    #[\Override]
     public function delete(bool $revoke = true): void
     {
         if (!$revoke) {
@@ -77,6 +79,7 @@ class SecretMessage extends AbstractPrivateMessage
         );
     }
 
+    #[\Override]
     public function screenShot(): DialogScreenshotTaken
     {
         $result = $this->getClient()->methodCallAsyncRead(

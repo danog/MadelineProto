@@ -353,6 +353,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Check if can garbage collect this message.
      */
+    #[\Override]
     public function canGarbageCollect(): bool
     {
         if ($this->state & self::STATE_REPLIED) {

@@ -215,7 +215,7 @@ trait Files
         if (($status = $response->getStatus()) !== 200) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
-        $mime = trim(explode(';', $response->getHeader('content-type') ?? 'application/octet-stream')[0]);
+        $mime = trim(explode(';', $response->getHeader('content-type') ?? '')[0]) ?: null;
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
         return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
@@ -228,7 +228,7 @@ trait Files
      *
      * @param (callable(int, int, ?Cancellation): string) $callable  Callable (offset, length) => data
      * @param integer                                   $size      File size
-     * @param string                                    $mime      Mime type
+     * @param ?string                                    $mime      Mime type
      * @param string                                    $fileName  File name
      * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
@@ -236,7 +236,7 @@ trait Files
      *
      * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, string $mime = 'application/octet-stream', string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null): array
+    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
         if ($cb === null) {
             $cb = function (float $percent, float $speed, float $time): void {
@@ -405,7 +405,7 @@ trait Files
         }
         $this->logger->logger("Total upload time: {$time}");
         $this->logger->logger("Total upload speed: {$speed} mbps");
-        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $fileName, 'mime_type' => $mime];
+        $constructor = ['_' => $constructor, 'id' => $file_id, 'parts' => $part_total_num, 'name' => $fileName, 'mime_type' => $mime ?? 'application/octet-stream'];
         if ($encrypted === true) {
             $constructor['key_fingerprint'] = $fingerprint;
             $constructor['key'] = $key;

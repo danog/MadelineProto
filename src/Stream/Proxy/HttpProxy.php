@@ -52,6 +52,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
      *
      * @param ConnectionContext $ctx The connection context
      */
+    #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
         $ctx = $ctx->clone();
@@ -133,6 +134,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     /**
      * Async close.
      */
+    #[\Override]
     public function disconnect(): void
     {
         $this->stream->disconnect();
@@ -142,6 +144,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
      *
      * @param int $length Length of data that is going to be written to the write buffer
      */
+    #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
     {
         return $this->stream->getWriteBuffer($length, $append);
@@ -151,14 +154,17 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
      *
      * @param int $length Length of payload, as detected by this layer
      */
+    #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
     {
         return $this->stream->getReadBuffer($length);
     }
+    #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
     {
         return $this->stream->read($cancellation);
     }
+    #[\Override]
     public function write(string $data): void
     {
         $this->stream->write($data);
@@ -173,6 +179,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     /**
      * Sets proxy data.
      */
+    #[\Override]
     public function setExtra($extra): void
     {
         $this->extra = $extra;
@@ -180,6 +187,7 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function getSocket(): Socket
     {
         return $this->stream->getSocket();
@@ -187,10 +195,12 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     /**
      * {@inheritDoc}
      */
+    #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    #[\Override]
     public static function getName(): string
     {
         return self::class;

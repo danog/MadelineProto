@@ -39,6 +39,7 @@ final class EmojiTap extends Action
     ) {
     }
 
+    #[\Override]
     public function toRawAction(): array
     {
         return parent::toRawAction() + [
