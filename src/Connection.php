@@ -444,7 +444,7 @@ final class Connection
                         $arguments['media']['file'] = new ReadableBuffer(buffer($arguments['media']['file'], $arguments['cancellation'] ?? null));
                     }
                 }
-                $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null, true);
+                $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null, !isset($arguments['media']['id']));
             }
         } elseif ($method === 'messages.sendMultiMedia') {
             foreach ($arguments['multi_media'] as &$singleMedia) {
