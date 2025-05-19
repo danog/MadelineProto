@@ -28,5 +28,12 @@
     "mmapErrorPart1": "O número máximo de regiões mapeadas de memória (mmap) foi atingido (%s): aumente a configuração do kernel vm.max_map_count para 262144 a corrigir.",
     "apiChooseManualAutoTip": "Observe que você também pode fornecer o ID/hash da API diretamente no código usando as configurações: %s",
     "apiChooseManualAutoTipWeb": "Observe que você também pode fornecer o ID/hash da API diretamente no código usando as <a target=\"_blank\" href=\"%s\"> configurações</a>.",
-    "mmapErrorPart4": "No Windows e no WSL, aumentar o tamanho do arquivo de paginação pode ajudar; mude para o Linux nativo se o problema persistir."
+    "mmapErrorPart4": "No Windows e no WSL, aumentar o tamanho do arquivo de paginação pode ajudar; mude para o Linux nativo se o problema persistir.",
+    "apiAppInstructionsManual3": "qualquer coisa",
+    "apiAutoWeb": "Insira um número de telefone que <b>já esteja registrado</b> no Telegram para obter o ID da API",
+    "apiAutoPrompt0": "Digite um número de telefone que já esteja registrado no Telegram: ",
+    "apiAutoPrompt1": "Digite o código de verificação recebido pelo Telegram: ",
+    "apiAppWeb": "Insira as informações da API",
+    "apiAppInstructionsAuto0": "Digite o nome do app, pode ser qualquer coisa: ",
+    "loginOptionUser": "Usuário"
 }

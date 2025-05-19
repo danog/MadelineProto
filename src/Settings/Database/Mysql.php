@@ -101,6 +101,9 @@ final class Mysql extends SqlAbstract
                 null => null
             },
             $this->cacheTtl,
+            $this->maxConnections,
+            $this->idleTimeout,
+            $this->optimizeIfWastedGtMb
         );
     }
 }

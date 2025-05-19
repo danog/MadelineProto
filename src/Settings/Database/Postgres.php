@@ -57,6 +57,8 @@ final class Postgres extends SqlAbstract
                 null => null
             },
             $this->cacheTtl,
+            $this->maxConnections,
+            $this->idleTimeout,
         );
     }
 }
