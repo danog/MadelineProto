@@ -16,23 +16,44 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
-use Amp\ByteStream\ReadableStream;
-use Amp\Cancellation;
-use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\TL\Conversion\BotAPIFiles;
-use JsonSerializable;
 
-/**
- * This object represents one size of a photo or a file / sticker thumbnail.
- */
-final class Thumbnail extends AbstractThumbnail
+class SecretChatThumbnail extends AbstractThumbnail
 {
-
-    public function __construct(MTProto $API, array $rawMedia, bool $protected, string $thumbFileName, int $thumbFileSize, array $thumbLocation, string $thumbMimeType, string $thumbFileExt)
+    /** @internal */
+    public function __construct(
+        MTProto       $API,
+        array         $rawMedia,
+        bool          $protected,
+        string        $thumbFileName,
+        int           $thumbFileSize,
+        array         $thumbLocation,
+        string        $thumbMimeType,
+        string        $thumbFileExt,
+        private string $thumbKey,
+        private string $thumbIv,
+        private array $thumbKeyFingerprint
+    )
     {
-        parent::__construct($API, $rawMedia, $protected, $thumbFileName, $thumbFileSize, $thumbLocation, $thumbMimeType, $thumbFileExt);
+        parent::__construct(
+            $API,
+            $rawMedia,
+            $protected,
+            $thumbFileName,
+            $thumbFileSize,
+            $thumbLocation,
+            $thumbMimeType,
+            $thumbFileExt
+        );
     }
 
+    public function getDownloadInfo(): array
+    {
+        $result = parent::getDownloadInfo();
+        $result['key'] = $this->thumbKey;
+        $result['iv'] = $this->thumbIv;
+        $result['key_fingerprint'] = $this->thumbKeyFingerprint;
+        return $result;
+    }
 
 }

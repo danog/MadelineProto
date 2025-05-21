@@ -38,7 +38,6 @@ use danog\MadelineProto\EventHandler\Media\MaskSticker;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
 use danog\MadelineProto\EventHandler\Media\StaticSticker;
-use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\VideoSticker;
 use danog\MadelineProto\EventHandler\Media\Voice;
@@ -754,9 +753,6 @@ trait Files
             $messageMedia = $messageMedia->media;
         }
         if ($messageMedia instanceof Media) {
-            return $messageMedia->getDownloadInfo();
-        }
-        if($messageMedia instanceof Thumbnail) {
             return $messageMedia->getDownloadInfo();
         }
         if (\is_string($messageMedia)) {

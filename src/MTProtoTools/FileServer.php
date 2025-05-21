@@ -26,7 +26,6 @@ use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Media;
-use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Lang;
@@ -99,7 +98,7 @@ trait FileServer
     /**
      * Get download link of media file.
      */
-    public function getDownloadLink(array|string|Message|Media|Thumbnail $media, ?string $scriptUrl = null, ?int $size = null, ?string $name = null, ?string $mime = null): string
+    public function getDownloadLink(array|string|Message|Media $media, ?string $scriptUrl = null, ?int $size = null, ?string $name = null, ?string $mime = null): string
     {
         $scriptUrl ??= $this->getSettings()->getFiles()->getDownloadLink();
         if ($scriptUrl === null) {
