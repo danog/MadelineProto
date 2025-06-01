@@ -16,11 +16,33 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
+use danog\MadelineProto\EventHandler\Attributes\ConstructorAssertion;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
 /**
  * Disallow all users.
  */
-final class DisallowAll extends RuleDestination
+final readonly class DisallowAll extends RuleDestination
 {
+    /**
+     * @internal
+     */
+    public function __construct(array $rawRule)
+    {
+        ConstructorAssertion::assert($rawRule, 'privacyValueDisallowAll');
+    }
+
+    public static function new(): self
+    {
+        return new static(['_' => 'privacyValueDisallowAll']);
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'inputPrivacyValueDisallowAll'];
+    }
 }

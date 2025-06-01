@@ -16,19 +16,39 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
+use danog\MadelineProto\EventHandler\Attributes\ConstructorAssertion;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
+use Webmozart\Assert\Assert;
 
 /**
  * Disallow only certain users.
  */
-final class DisallowUsers extends RuleDestination
+final readonly class DisallowUsers extends RuleDestination
 {
     /** Allowed users */
     public readonly array $users;
 
-    /** @internal */
-    public function __construct(array $rawUsers)
+    /**
+     * @internal
+     */
+    public function __construct(array $rawRule)
     {
-        $this->users = $rawUsers['users'];
+        ConstructorAssertion::assert($rawRule, 'privacyValueDisallowUsers');
+        $this->users = $rawRule['users'];
+    }
+
+    public static function new(array $users): self
+    {
+        Assert::true(\array_is_list($users));
+        return new static(['_' => 'privacyValueDisallowUsers', 'users' => $users]);
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'inputPrivacyValueDisallowUsers', 'users' => $this->users];
     }
 }

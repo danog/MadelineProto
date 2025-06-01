@@ -16,36 +16,92 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy;
 
-use JsonSerializable;
+use danog\MadelineProto\EventHandler\Attributes\HasConstructor;
+use danog\MadelineProto\EventHandler\Type;
 
 /** Represents a privacy rule. */
-enum Rule: string implements JsonSerializable
+enum Rule: string implements Type, HasConstructor
 {
-    /** Whether we can see the last online timestamp of this user */
+    /**
+     * Whether we can see the last online timestamp of this user.
+     */
     case STATUS_TIMESTAMP = 'privacyKeyStatusTimestamp';
-    /** Whether the user can be invited to chats */
+
+    /**
+     * Whether the user can be invited to chats.
+     */
     case CHAT_INVITE = 'privacyKeyChatInvite';
-    /** Whether the user accepts phone calls */
+
+    /**
+     * Whether the user accepts phone calls.
+     */
     case PHONE_CALL = 'privacyKeyPhoneCall';
-    /** Whether P2P connections in phone calls with this user are allowed */
+
+    /**
+     * Whether P2P connections in phone calls with this user are allowed.
+     */
     case PHONE_P2P = 'privacyKeyPhoneP2P';
-    /** Whether messages forwarded from the user will be [anonymously forwarded](https://telegram.org/blog/unsend-privacy-emoji#anonymous-forwarding) */
+
+    /**
+     * Whether messages forwarded from the user will be [anonymously forwarded](https://telegram.org/blog/unsend-privacy-emoji#anonymous-forwarding).
+     */
     case FORWARDS = 'privacyKeyForwards';
-    /** Whether the profile picture of the user is visible */
+
+    /**
+     * Whether the profile picture of the user is visible.
+     */
     case PROFILE_PHOTO = 'privacyKeyProfilePhoto';
-    /** Whether the user allows us to see his phone number */
+
+    /**
+     * Whether the user allows us to see his phone number.
+     */
     case PHONE_NUMBER = 'privacyKeyPhoneNumber';
-    /** Whether this user can be added to our contact list by their phone number */
+
+    /**
+     * Whether this user can be added to our contact list by their phone number.
+     */
     case ADDED_BY_PHONE = 'privacyKeyAddedByPhone';
-    /** Whether the user accepts voice messages */
+
+    /**
+     * Whether the user accepts voice messages.
+     */
     case VOICE_MESSAGES = 'privacyKeyVoiceMessages';
-    /** Whether the user can see our bio. */
+
+    /**
+     * Whether the user can see our bio.
+     */
     case ABOUT = 'privacyKeyAbout';
 
-    /** @internal */
+    /**
+     * Whether the user can see our birthday.
+     */
+    case BIRTHDAY = 'privacyKeyBirthday';
+
+    /**
+     * Whether received [gifts](https://core.telegram.org/api/gifts) will be automatically displayed on our profile.
+     */
+    case STAR_GIFTS_AUTO_SAVE = 'privacyKeyStarGiftsAutoSave';
+
+    /**
+     *
+     */
+    case NO_PAID_MESSAGES = 'privacyKeyNoPaidMessages';
+
+    /**
+     * @internal
+     */
     #[\Override]
     public function jsonSerialize(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'input' . ucfirst($this->value)];
     }
 }

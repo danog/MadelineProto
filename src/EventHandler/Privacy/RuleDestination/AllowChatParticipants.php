@@ -16,19 +16,39 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
+use danog\MadelineProto\EventHandler\Attributes\ConstructorAssertion;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
+use Webmozart\Assert\Assert;
 
 /**
  * Allow all participants of certain chats.
  */
-final class AllowChatParticipants extends RuleDestination
+final readonly class AllowChatParticipants extends RuleDestination
 {
-    /** Allowed chats */
+    /** @var list<int> Allowed chats */
     public readonly array $chats;
 
-    /** @internal */
-    public function __construct(array $rawUsers)
+    /**
+     * @internal
+     */
+    public function __construct(array $rawRule)
     {
-        $this->chats = $rawUsers['chats'];
+        ConstructorAssertion::assert($rawRule, 'privacyValueAllowChatParticipants');
+        $this->chats = $rawRule['chats'];
+    }
+
+    public static function new(array $chats): self
+    {
+        Assert::true(\array_is_list($chats));
+        return new static(['_' => 'privacyValueAllowChatParticipants', 'chats' => $chats]);
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'inputPrivacyValueAllowChatParticipants', 'chats' => $this->chats];
     }
 }

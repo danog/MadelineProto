@@ -16,8 +16,30 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
+use danog\MadelineProto\EventHandler\Attributes\ConstructorAssertion;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
-final class AllowCloseFriends extends RuleDestination
+final readonly class AllowCloseFriends extends RuleDestination
 {
+    /**
+     * @internal
+     */
+    public function __construct(array $rawRule)
+    {
+        ConstructorAssertion::assert($rawRule, 'privacyValueAllowCloseFriends');
+    }
+
+    public static function new(): self
+    {
+        return new static(['_' => 'privacyValueAllowCloseFriends']);
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'inputPrivacyValueAllowCloseFriends'];
+    }
 }

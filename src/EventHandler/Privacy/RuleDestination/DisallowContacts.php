@@ -17,10 +17,32 @@
 namespace danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
+use danog\MadelineProto\EventHandler\Attributes\ConstructorAssertion;
 
 /**
  * Disallow only contacts.
  */
-final class DisallowContacts extends RuleDestination
+final readonly class DisallowContacts extends RuleDestination
 {
+    /**
+     * @internal
+     */
+    public function __construct(array $rawRule)
+    {
+        ConstructorAssertion::assert($rawRule, 'privacyValueDisallowContacts');
+    }
+
+    public static function new(): self
+    {
+        return new static(['_' => 'privacyValueDisallowContacts']);
+    }
+
+    /**
+     * @internal
+     */
+    #[\Override]
+    public function getInputConstructor(): array
+    {
+        return ['_' => 'inputPrivacyValueDisallowContacts'];
+    }
 }
