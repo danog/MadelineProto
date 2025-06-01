@@ -8,34 +8,14 @@
  * You should have received a copy of the GNU General Public License along with MadelineProto.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * @author    Daniil Gentili <daniil@daniil.it>
- * @copyright 2016-2025 Daniil Gentili <daniil@daniil.it>
+ * @author    Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
+ * @copyright 2016-2025 Amir Hossein Jafari <amirhosseinjafari8228@gmail.com>
  * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\Ipc\IpcCapable;
-
-/**
- * Represents a generic update.
- *
- * NOTE: use serialize(), not json_encode() to serialize updates.
- *
- * json_encode() may only be used for logging updates.
- */
-abstract class Update extends IpcCapable implements Type
+interface Type extends \JsonSerializable
 {
-    /** @internal */
-    #[\Override]
-    public function jsonSerialize(): mixed
-    {
-        $res = ['_' => static::class];
-        $refl = new \ReflectionClass($this);
-        foreach ($refl->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
-            $res[$prop->getName()] = $prop->getValue($this);
-        }
-        return $res;
-    }
 }
