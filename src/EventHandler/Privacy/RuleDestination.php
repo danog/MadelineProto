@@ -16,46 +16,53 @@
 
 namespace danog\MadelineProto\EventHandler\Privacy;
 
+use danog\MadelineProto\EventHandler\Attributes\HasConstructor;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowAll;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowBots;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowChatParticipants;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowCloseFriends;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowContacts;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowPremium;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\AllowUsers;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowAll;
+use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowBots;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowChatParticipants;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowContacts;
 use danog\MadelineProto\EventHandler\Privacy\RuleDestination\DisallowUsers;
-use JsonSerializable;
-use ReflectionClass;
-use ReflectionProperty;
+use danog\MadelineProto\EventHandler\Type;
 
 /**
  * To whom does a privacy rule apply?
  */
-abstract class RuleDestination implements JsonSerializable
+abstract readonly class RuleDestination implements Type, HasConstructor
 {
     public static function fromRawRule(array $rawRule): RuleDestination
     {
         return match ($rawRule['_']) {
-            'privacyValueAllowAll' => new AllowAll,
-            'privacyValueDisallowAll' => new DisallowAll,
-            'privacyValueAllowContacts' => new AllowContacts,
-            'privacyValueDisallowContacts' => new DisallowContacts,
-            'privacyValueAllowCloseFriends' => new AllowCloseFriends,
-            'privacyValueAllowUsers' => new AllowUsers($rawRule),
-            'privacyValueDisallowUsers' => new DisallowUsers($rawRule),
-            'privacyValueAllowChatParticipants' => new AllowChatParticipants($rawRule),
+            'privacyValueAllowPremium'             => new AllowPremium($rawRule),
+            'privacyValueAllowAll'                 => new AllowAll($rawRule),
+            'privacyValueDisallowAll'              => new DisallowAll($rawRule),
+            'privacyValueAllowContacts'            => new AllowContacts($rawRule),
+            'privacyValueDisallowContacts'         => new DisallowContacts($rawRule),
+            'privacyValueAllowCloseFriends'        => new AllowCloseFriends($rawRule),
+            'privacyValueAllowBots'                => new AllowBots($rawRule),
+            'privacyValueDisallowBots'             => new DisallowBots($rawRule),
+            'privacyValueAllowUsers'               => new AllowUsers($rawRule),
+            'privacyValueDisallowUsers'            => new DisallowUsers($rawRule),
+            'privacyValueAllowChatParticipants'    => new AllowChatParticipants($rawRule),
             'privacyValueDisallowChatParticipants' => new DisallowChatParticipants($rawRule),
         };
     }
 
-    /** @internal */
+    /**
+     * @internal
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {
         $res = ['_' => static::class];
-        $refl = new ReflectionClass($this);
-        foreach ($refl->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+        $refl = new \ReflectionClass($this);
+        foreach ($refl->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
             $res[$prop->getName()] = $prop->getValue($this);
         }
         return $res;
