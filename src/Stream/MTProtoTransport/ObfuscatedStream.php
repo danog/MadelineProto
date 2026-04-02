@@ -79,12 +79,16 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
+          if (!preg_match('/^[a-f0-9]+$/i', $extra['secret'])) {
+            $extra['secret'] = base64_decode($extra['secret']);
+          } else {
             if (\strlen($extra['secret']) > 17) {
                 $extra['secret'] = hex2bin($extra['secret']);
             }
             if (\strlen($extra['secret']) == 17) {
                 $extra['secret'] = substr($extra['secret'], 1, 16);
             }
+          }
         }
         $this->extra = $extra;
     }
