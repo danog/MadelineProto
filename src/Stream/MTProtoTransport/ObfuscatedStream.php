@@ -78,12 +78,10 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     #[\Override]
     public function setExtra($extra): void
     {
-        if (isset($extra['secret'])) {
-            if (\strlen($extra['secret']) > 17) {
-                $extra['secret'] = hex2bin($extra['secret']);
-            }
-            if (\strlen($extra['secret']) == 17) {
-                $extra['secret'] = substr($extra['secret'], 1, 16);
+        if (isset($extra['secret']) && \is_string($extra['secret'])) {
+            $parsed = MTProxySecretParser::parse($extra['secret']);
+            if ($parsed !== null) {
+                $extra = array_merge($extra, $parsed);
             }
         }
         $this->extra = $extra;

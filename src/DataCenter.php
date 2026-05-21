@@ -32,11 +32,13 @@ use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FakeTlsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream;
 use danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream;
+use danog\MadelineProto\Stream\MTProtoTransport\MTProxySecretParser;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
@@ -248,7 +250,11 @@ final class DataCenter
         $only = $this->API->dcList[$test][$ipv6][$dc_number]['tcpo_only'];
         if ($only || isset($this->API->dcList[$test][$ipv6][$dc_number]['secret'])) {
             $extra = isset($this->API->dcList[$test][$ipv6][$dc_number]['secret']) ? ['secret' => $this->API->dcList[$test][$ipv6][$dc_number]['secret']] : [];
-            $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, $extra], [IntermediatePaddedStream::class, []]];
+            if (isset($extra['secret'])) {
+                $extra = array_merge($extra, MTProxySecretParser::parse($extra['secret']) ?? []);
+            }
+            $stream = isset($extra['domain']) ? FakeTlsStream::class : ObfuscatedStream::class;
+            $combo = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$stream, $extra], [IntermediatePaddedStream::class, []]];
             if ($only) {
                 array_unshift($combos, $combo);
             } else {
@@ -256,16 +262,35 @@ final class DataCenter
             }
         }
         $proxyCombos = [];
-        foreach ($settings->getProxies() as $proxy => $extras) {
+        foreach ($settings->getProxies() as $proxyType => $extras) {
             foreach ($extras as $extra) {
-                if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
+                if (!\is_array($extra)) {
+                    continue;
+                }
+                /** @var array<string, mixed> $extra */
+                $proxy = $proxyType;
+                if (\in_array($proxy, [ObfuscatedStream::class, FakeTlsStream::class], true) && isset($extra['secret']) && \is_string($extra['secret'])) {
+                    $parsed = MTProxySecretParser::parse($extra['secret']);
+                    if ($parsed !== null) {
+                        $extra = array_merge($extra, $parsed);
+                    }
+                    if ($proxy === ObfuscatedStream::class && isset($extra['domain'])) {
+                        $proxy = FakeTlsStream::class;
+                    }
+                }
+                if ($proxy === ObfuscatedStream::class && ($extra['padded'] ?? false)) {
                     $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                }
+                if ($proxy === FakeTlsStream::class) {
+                    $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                    $proxyCombos []= [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                    continue;
                 }
                 foreach ($combos as $orig) {
                     $combo = [];
                     if ($proxy === ObfuscatedStream::class) {
                         $combo = $orig;
-                        if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
+                        if (\in_array($combo[\count($combo) - 2][0], [ObfuscatedStream::class, FakeTlsStream::class], true)) {
                             $combo[\count($combo) - 2][1] = $extra;
                         } else {
                             $mtproto = end($combo);
