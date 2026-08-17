@@ -468,21 +468,12 @@ trait Handler
                 );
                 break;
             case 'updateGroupCallConnection':
-                if ($update['presentation'] ?? false) {
-                    return;
-                }
-                // The connection parameters are not tied to a call ID in the update itself, they
-                // always refer to the call we just joined.
-                foreach ($this->groupCalls as $call) {
-                    if ($call->getCallState() === GroupCallState::JOINING) {
-                        try {
-                            $call->applyConnectionParams((string) $update['params']['data']);
-                        } catch (\Throwable $e) {
-                            $this->logger->logger("Could not apply the connection params of $call: $e", Logger::ERROR);
-                        }
-                        return;
-                    }
-                }
+                // Deliberately ignored: updateGroupCallConnection carries no call ID, so an update
+                // reaching us through the update loop cannot be attributed to a call, and guessing
+                // hands one call's transport parameters (and RTMP keys) to another one whenever two
+                // joins overlap. The very same update is always part of the result of
+                // phone.joinGroupCall, where it is unambiguous, and that is where it is applied,
+                // see GroupCallController::applyJoinUpdates().
                 break;
         }
     }

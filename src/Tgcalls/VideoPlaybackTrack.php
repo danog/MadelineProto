@@ -21,17 +21,19 @@ use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 
 /**
- * An outgoing video track that emits the pre-encoded VP8 frames of a WebM file.
+ * An outgoing video track that emits the pre-encoded frames of a Matroska or WebM file.
  *
  * Nothing is decoded or re-encoded: the frames are packetized straight into RTP by the pure-PHP
- * VP8 payloader, so video works without the FFI extension just like audio does.
+ * payloader of whichever codec the file holds — VP8, VP9 or H.264, the three a Telegram call
+ * carries — so video works without the FFI extension just like audio does. Which one the peer
+ * expects is settled by {@see GroupSdp}, from {@see WebmSource::getVideoCodec()}.
  *
  * As with {@see OpusPlaybackTrack}, {@see self::receiveData()} must never suspend, so frames are
  * released according to their own timestamps rather than by sleeping.
  *
  * @internal
  */
-final class Vp8PlaybackTrack extends MediaStreamTrack
+final class VideoPlaybackTrack extends MediaStreamTrack
 {
     protected MediaKind $kind = MediaKind::Video;
 

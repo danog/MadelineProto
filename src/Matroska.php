@@ -43,6 +43,7 @@ final class Matroska
     private const ID_TRACK_NUMBER = 0xD7;
     private const ID_TRACK_TYPE = 0x83;
     private const ID_CODEC_ID = 0x86;
+    private const ID_CODEC_PRIVATE = 0x63A2;
     private const ID_CLUSTER = 0x1F43B675;
     private const ID_TIMESTAMP = 0xE7;
     private const ID_SIMPLE_BLOCK = 0xA3;
@@ -75,7 +76,7 @@ final class Matroska
     /**
      * Track metadata, keyed by track number.
      *
-     * @var array<int, array{codec: string, type: int}>
+     * @var array<int, array{codec: string, type: int, private: ?string}>
      */
     public array $tracks = [];
 
@@ -176,8 +177,8 @@ final class Matroska
     private function read(): Generator
     {
         $clusterTimestamp = 0;
-        /** @var array{number: ?int, codec: ?string, type: ?int} $pending */
-        $pending = ['number' => null, 'codec' => null, 'type' => null];
+        /** @var array{number: ?int, codec: ?string, type: ?int, private: ?string} $pending */
+        $pending = ['number' => null, 'codec' => null, 'type' => null, 'private' => null];
 
         while (true) {
             $id = $this->readVint(true);
@@ -196,7 +197,7 @@ final class Matroska
 
             if (isset(self::MASTER_ELEMENTS[$elementId])) {
                 if ($elementId === self::ID_TRACK_ENTRY) {
-                    $pending = ['number' => null, 'codec' => null, 'type' => null];
+                    $pending = ['number' => null, 'codec' => null, 'type' => null, 'private' => null];
                 }
                 continue;
             }
@@ -221,6 +222,12 @@ final class Matroska
                     $pending['codec'] = rtrim($this->consume($elementSize), "\0");
                     $this->flushTrack($pending);
                     break;
+                case self::ID_CODEC_PRIVATE:
+                    // Codec setup data, such as the AVCDecoderConfigurationRecord of an H.264
+                    // track: some codecs cannot be decoded at all without it.
+                    $pending['private'] = $this->consume($elementSize);
+                    $this->flushTrack($pending);
+                    break;
                 case self::ID_TIMESTAMP:
                     $clusterTimestamp = self::toInt($this->consume($elementSize));
                     break;
@@ -243,16 +250,23 @@ final class Matroska
     }
 
     /**
-     * Register a track once all three of its interesting fields are known.
+     * Register a track once all three of its mandatory fields are known.
      *
-     * @param array{number: ?int, codec: ?string, type: ?int} $pending
+     * Called again for every field, so a `CodecPrivate` that arrives after the codec ID simply
+     * updates the entry that is already there.
+     *
+     * @param array{number: ?int, codec: ?string, type: ?int, private: ?string} $pending
      */
     private function flushTrack(array $pending): void
     {
         if ($pending['number'] === null || $pending['codec'] === null || $pending['type'] === null) {
             return;
         }
-        $this->tracks[$pending['number']] = ['codec' => $pending['codec'], 'type' => $pending['type']];
+        $this->tracks[$pending['number']] = [
+            'codec' => $pending['codec'],
+            'type' => $pending['type'],
+            'private' => $pending['private'],
+        ];
     }
 
     /**
@@ -301,7 +315,7 @@ final class Matroska
         $payload = substr($block, $offset);
         $frames = $lacing === 0 ? [$payload] : self::unlace($payload, $lacing);
 
-        $track = $this->tracks[$trackNumber] ?? ['codec' => '', 'type' => 0];
+        $track = $this->tracks[$trackNumber] ?? ['codec' => '', 'type' => 0, 'private' => null];
         $timestamp = (int) (($clusterTimestamp + $relative) * $this->timestampScale / 1000000);
 
         $result = [];

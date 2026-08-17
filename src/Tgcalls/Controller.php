@@ -58,7 +58,7 @@ final class Controller
     private ?RTCDataChannel $dataChannel = null;
 
     private MediaStreamTrack $outgoingAudio;
-    private Vp8PlaybackTrack $outgoingVideo;
+    private VideoPlaybackTrack $outgoingVideo;
     private WebmSource $webm;
     private ?OpusRecorder $recorder = null;
 
@@ -114,7 +114,7 @@ final class Controller
         $this->webm = new WebmSource($call);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
         $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
-        $this->outgoingVideo = new Vp8PlaybackTrack($this->webm, $call);
+        $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
         $this->peerConnection->addTransceiver($this->outgoingVideo, SDPDirections::sendrecv);
 
         $this->peerConnection->on('track', function (MediaStreamTrack $track): void {

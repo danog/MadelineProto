@@ -45,12 +45,36 @@ final class OpusPlaybackTrack extends MediaStreamTrack
     /** OPUS always uses a 48kHz clock rate on the wire. */
     public const CLOCK_RATE = 48000;
 
+    /**
+     * The loudness we report for the frames we transmit, in -dBov.
+     *
+     * Every OPUS packet has to carry the `urn:ietf:params:rtp-hdrext:ssrc-audio-level` header
+     * extension of RFC 6464. The Telegram SFU only forwards the participants it believes are
+     * speaking, and it decides that from this extension alone: a stream that never carries one is
+     * treated as permanently silent and is never relayed to anybody, however much RTP it sends.
+     *
+     * The value is a constant rather than a measurement because playback is deliberately a
+     * pass-through — decoding OPUS just to compute a level would drag in a codec library, and
+     * therefore FFI, for every call. A player is in any case continuously "speaking", so a fixed
+     * moderate level describes it accurately.
+     */
+    private const AUDIO_LEVEL_DBOV = -20;
+
     protected MediaKind $kind = MediaKind::Audio;
 
     /** Wall clock time at which the next frame is due. */
     private ?float $nextFrame = null;
     /** RTP timestamp (in 48kHz samples) of the next frame. */
     private int $timestamp = 0;
+
+    /** Wall clock time corresponding to the first WebM frame we released. */
+    private ?float $webmStartedAt = null;
+    /** Source timestamp of the first WebM frame, used to rebase onto our own RTP clock. */
+    private ?int $webmBaseTimestamp = null;
+    /** RTP timestamp the current WebM file was rebased onto. */
+    private int $webmTimestampOffset = 0;
+    /** @var array{data: string, timestamp: int}|null The WebM frame whose presentation time has not arrived yet. */
+    private ?array $webmPending = null;
 
     private bool $muted = true;
 
@@ -76,6 +100,21 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         if ($this->ended || $this->call->isCallEnded()) {
             return null;
         }
+        // Audio coming from a WebM file wins: it has to stay in sync with that file's video.
+        if ($this->webmPending !== null
+            || ($this->webm?->hasAudio() ?? false)
+            || ($this->webmStartedAt !== null && ($this->webm?->isPlaying() ?? false))
+        ) {
+            return $this->receiveWebm();
+        }
+        if ($this->webmStartedAt !== null) {
+            // The file is over: hand the frame grid back to the DJ loop, starting now so that the
+            // first DJ frame is not immediately overdue.
+            $this->webmStartedAt = null;
+            $this->webmBaseTimestamp = null;
+            $this->nextFrame = null;
+        }
+
         $now = microtime(true);
         if ($this->nextFrame === null) {
             $this->nextFrame = $now;
@@ -85,15 +124,6 @@ final class OpusPlaybackTrack extends MediaStreamTrack
             // We fell way behind (the process was suspended, or the call was just resumed):
             // resynchronize instead of bursting out a second of audio.
             $this->nextFrame = $now;
-        }
-
-        // Audio coming from a WebM file wins: it has to stay in sync with that file's video.
-        $fromWebm = $this->webm?->pullAudio();
-        if ($fromWebm !== null) {
-            $this->muted = false;
-            $this->nextFrame += self::FRAME_DURATION;
-            $this->timestamp += self::FRAME_SAMPLES;
-            return new EncodedPacket($fromWebm['data'], $this->timestamp);
         }
 
         $opus = $this->dj->tryPullPacket();
@@ -112,11 +142,52 @@ final class OpusPlaybackTrack extends MediaStreamTrack
             $this->call->log("Unmuting outgoing audio in {$this->call}");
         }
 
-        $packet = new EncodedPacket($opus, $this->timestamp);
+        $packet = new EncodedPacket($opus, $this->timestamp, audioLevel: self::AUDIO_LEVEL_DBOV);
 
         $this->nextFrame += self::FRAME_DURATION;
         $this->timestamp += self::FRAME_SAMPLES;
 
         return $packet;
+    }
+
+    /**
+     * Release the next OPUS frame of the WebM file being played.
+     *
+     * The frames of a file are not on our own 60ms grid (20ms is what most encoders emit), so they
+     * are paced and timestamped by the clock of the file itself, exactly like its video frames.
+     */
+    private function receiveWebm(): ?EncodedPacket
+    {
+        $frame = $this->webmPending ?? $this->webm?->pullAudio();
+        $this->webmPending = null;
+        if ($frame === null) {
+            return null;
+        }
+
+        $now = microtime(true);
+        if ($this->webmStartedAt === null || $this->webmBaseTimestamp === null) {
+            $this->webmStartedAt = $now;
+            $this->webmBaseTimestamp = $frame['timestamp'];
+            // Carry on from the DJ loop's clock, so that the RTP timestamps never rewind.
+            $this->webmTimestampOffset = $this->timestamp;
+        }
+
+        // Release the frame only once its presentation time has arrived.
+        $elapsed = (float) ($frame['timestamp'] - $this->webmBaseTimestamp) / (float) self::CLOCK_RATE;
+        if ($now < $this->webmStartedAt + $elapsed) {
+            $this->webmPending = $frame;
+            return null;
+        }
+
+        if ($this->muted) {
+            $this->muted = false;
+            $this->call->log("Unmuting outgoing audio in {$this->call}");
+        }
+
+        $timestamp = $this->webmTimestampOffset + ($frame['timestamp'] - $this->webmBaseTimestamp);
+        // Where the DJ loop would resume, were the file to end right after this frame.
+        $this->timestamp = $timestamp + self::FRAME_SAMPLES;
+
+        return new EncodedPacket($frame['data'], $timestamp, audioLevel: self::AUDIO_LEVEL_DBOV);
     }
 }

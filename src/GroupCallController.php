@@ -167,13 +167,15 @@ final class GroupCallController implements CallInterface
                 $this->connection = new GroupConnection($this, $this->diskJockey);
                 $params = $this->connection->buildJoinPayload();
                 $this->source = $this->connection->getAudioSource();
+                $this->log("Join payload of $this: ".json_encode($params), Logger::VERBOSE);
 
                 $request = [
                     'call' => $this->inputCall,
                     'join_as' => $joinAs ?? ['_' => 'inputPeerSelf'],
                     'muted' => $muted,
                     'video_stopped' => true,
-                    'params' => ['_' => 'dataJSON', 'data' => $params],
+                    // DataJSON arguments are encoded by the TL serializer, pass the decoded payload.
+                    'params' => $params,
                 ];
                 if ($inviteHash !== null) {
                     $request['invite_hash'] = $inviteHash;
@@ -214,15 +216,19 @@ final class GroupCallController implements CallInterface
     {
         foreach ($updates['updates'] ?? [] as $update) {
             if ($update['_'] === 'updateGroupCallConnection' && !($update['presentation'] ?? false)) {
-                $this->applyConnectionParams((string) $update['params']['data']);
+                $this->applyConnectionParams($update['params']);
             }
         }
     }
 
     /**
+     * Apply the `params` of an
+     * [updateGroupCallConnection](https://core.telegram.org/constructor/updateGroupCallConnection),
+     * already decoded by the TL deserializer.
+     *
      * @internal
      */
-    public function applyConnectionParams(string $params): void
+    public function applyConnectionParams(array $params): void
     {
         if ($this->connectionParamsApplied) {
             // The same updateGroupCallConnection reaches us both in the result of
@@ -230,6 +236,7 @@ final class GroupCallController implements CallInterface
             return;
         }
         $this->connectionParamsApplied = true;
+        $this->log("Join response of $this: ".json_encode($params), Logger::VERBOSE);
         $parsed = GroupSdp::parseJoinResponse($params);
         $this->streamMode = $parsed['stream'];
         $this->rtmpMode = $parsed['rtmp'];
@@ -247,7 +254,7 @@ final class GroupCallController implements CallInterface
         if ($parsed['transport'] === null) {
             throw new Exception('Missing transport parameters in the group call join response!');
         }
-        $this->connection?->setTransport($parsed['transport']);
+        $this->connection?->setTransport($parsed['transport'], $parsed['video']);
     }
 
     /**
@@ -650,11 +657,40 @@ final class GroupCallController implements CallInterface
     }
     public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        $this->connection?->playVideo($file);
+        if ($this->connection === null) {
+            throw new Exception(
+                "Cannot play video in $this: it has no WebRTC connection".
+                ($this->streamMode
+                    ? ', it is in '.($this->rtmpMode ? 'RTMP' : 'stream').' mode, where media is published externally'
+                    : ', it was not joined').'!'
+            );
+        }
+        $this->connection->playVideo($file);
+        $this->setVideoStopped(false);
     }
     public function stopVideo(): void
     {
         $this->connection?->stopVideo();
+        $this->setVideoStopped(true);
+    }
+    /**
+     * Tell the server whether we are currently publishing video, so that the other participants
+     * know they should display our video stream.
+     */
+    private function setVideoStopped(bool $stopped): void
+    {
+        if ($this->callState !== GroupCallState::JOINED) {
+            return;
+        }
+        try {
+            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
+                'call' => $this->inputCall,
+                'participant' => ['_' => 'inputPeerSelf'],
+                'video_stopped' => $stopped,
+            ]);
+        } catch (Throwable $e) {
+            $this->log("Could not change the video state of $this: $e", Logger::WARNING);
+        }
     }
     public function skip(): void
     {

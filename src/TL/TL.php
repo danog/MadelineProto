@@ -671,6 +671,14 @@ final class TL implements TLInterface
         return $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
     }
     /**
+     * Whether a `DataJSON` argument was already passed as a dataJSON constructor, instead of as the
+     * decoded value we would have to encode ourselves.
+     */
+    private static function isDataJSON(mixed $value): bool
+    {
+        return \is_array($value) && ($value['_'] ?? null) === 'dataJSON';
+    }
+    /**
      * Serialize parameters.
      *
      * @param array   $tl    TL object definition
@@ -791,12 +799,14 @@ final class TL implements TLInterface
             } else {
                 $value = $arguments[$name];
             }
-            if (\in_array($type, ['DataJSON', '%DataJSON'], true)) {
+            if (\in_array($type, ['DataJSON', '%DataJSON'], true) && !self::isDataJSON($value)) {
                 $value = ['_' => 'dataJSON', 'data' => json_encode($value)];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'], true)) {
                 array_walk($value, static function (&$arg): void {
-                    $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
+                    if (!self::isDataJSON($arg)) {
+                        $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
+                    }
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {

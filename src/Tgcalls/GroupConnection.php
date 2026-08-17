@@ -58,7 +58,7 @@ final class GroupConnection
 {
     private RTCPeerConnection $peerConnection;
     private OpusPlaybackTrack $outgoingAudio;
-    private Vp8PlaybackTrack $outgoingVideo;
+    private VideoPlaybackTrack $outgoingVideo;
     private WebmSource $webm;
 
     /** Our own outgoing audio SSRC, as an unsigned 32-bit integer. */
@@ -70,6 +70,16 @@ final class GroupConnection
 
     /** Transport parameters returned by the SFU. */
     private ?array $transport = null;
+    /** Video codec table announced by the SFU, if it sent one. */
+    private ?array $video = null;
+    /**
+     * The encoding name our outgoing video m-line is currently pinned to.
+     *
+     * The track passes frames through from the container instead of encoding them, so this has to
+     * follow whatever the file being played holds, and the transport is renegotiated when it
+     * changes. VP8 until a file says otherwise, since that is what the SFU lists first.
+     */
+    private string $outgoingVideoCodec = 'VP8';
 
     /**
      * Remote audio SSRCs currently wired to a transceiver, as `mid => ssrc`.
@@ -105,11 +115,11 @@ final class GroupConnection
         DjLoop $dj,
     ) {
         $this->peerConnection = new RTCPeerConnection(['iceServers' => []]);
-        $this->webm = new WebmSource($call);
+        $this->webm = new WebmSource($call, $this->onVideoCodec(...));
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
         $transceiver = $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendonly);
         $this->audioSsrc = $transceiver->getSender()->getSsrc();
-        $this->outgoingVideo = new Vp8PlaybackTrack($this->webm, $call);
+        $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
         $videoTransceiver = $this->peerConnection->addTransceiver($this->outgoingVideo, SDPDirections::sendonly);
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
@@ -133,10 +143,10 @@ final class GroupConnection
     }
 
     /**
-     * Generate the JSON join payload for
+     * Generate the join payload for
      * [phone.joinGroupCall](https://core.telegram.org/method/phone.joinGroupCall).
      */
-    public function buildJoinPayload(): string
+    public function buildJoinPayload(): array
     {
         $description = $this->peerConnection->createOffer();
         $this->peerConnection->setLocalDescription($description);
@@ -165,11 +175,26 @@ final class GroupConnection
     }
 
     /**
-     * Play a WebM file, transmitting its VP8 video and OPUS audio into the call.
+     * Play a Matroska or WebM file, transmitting its video and OPUS audio into the call.
+     *
+     * Any video codec a group call carries works: see {@see WebmSource::VIDEO_CODECS}.
      */
     public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
     {
         $this->webm->play($file);
+    }
+
+    /**
+     * Re-pin the outgoing video m-line when a newly opened file uses another codec.
+     */
+    private function onVideoCodec(string $codec): void
+    {
+        if ($codec === $this->outgoingVideoCodec) {
+            return;
+        }
+        $this->call->log("Switching the outgoing video of {$this->call} to $codec");
+        $this->outgoingVideoCodec = $codec;
+        $this->renegotiate();
     }
 
     /**
@@ -190,10 +215,14 @@ final class GroupConnection
 
     /**
      * Apply the transport parameters returned by the SFU.
+     *
+     * @param ?array $video The video codec table the SFU announced, as parsed by
+     *                      {@see GroupSdp::parseJoinResponse()}.
      */
-    public function setTransport(array $transport): void
+    public function setTransport(array $transport, ?array $video = null): void
     {
         $this->transport = $transport;
+        $this->video = $video;
         $this->renegotiate();
     }
 
@@ -288,8 +317,14 @@ final class GroupConnection
                 $offer = $this->peerConnection->createOffer();
                 $this->peerConnection->setLocalDescription($offer);
                 // Fix up the mid => ssrc mapping now that mids are final.
-                $this->rebuildSourceMap($offer->getSdp());
-                $answer = GroupSdp::buildAnswer($offer->getSdp(), $this->transport, $this->sources);
+                $this->rebuildSourceMap();
+                $answer = GroupSdp::buildAnswer(
+                    $offer->getSdp(),
+                    $this->transport,
+                    $this->sources,
+                    $this->video,
+                    $this->outgoingVideoCodec,
+                );
                 $this->peerConnection->setRemoteDescription(new RTCSessionDescription($answer, 'answer'));
             } while ($this->renegotiatePending && !$this->closed);
         } catch (Throwable $e) {
@@ -301,23 +336,23 @@ final class GroupConnection
 
     /**
      * Re-key the `mid => ssrc` map against the mids the local stack actually assigned.
+     *
+     * The receive-only transceivers are created by {@see self::setRemoteSources()} in the same
+     * order as {@see self::$orderedSources}, so they line up one by one.
      */
-    private function rebuildSourceMap(string $offer): void
+    private function rebuildSourceMap(): void
     {
-        $ssrcs = $this->orderedSources;
-        $mids = [];
-        foreach (explode("\n", str_replace("\r\n", "\n", $offer)) as $line) {
-            $line = trim($line);
-            if (str_starts_with($line, 'a=mid:')) {
-                $mids[] = substr($line, 6);
-            }
-        }
-        // The first m-line is always our own outgoing audio.
-        array_shift($mids);
         $rebuilt = [];
-        foreach ($mids as $index => $mid) {
-            if (isset($ssrcs[$index])) {
-                $rebuilt[$mid] = $ssrcs[$index];
+        $index = 0;
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            if ($transceiver->getDirection() !== SDPDirections::recvonly) {
+                // Our own outgoing audio and video.
+                continue;
+            }
+            $mid = $transceiver->getMid();
+            $ssrc = $this->orderedSources[$index++] ?? null;
+            if ($mid !== null && $ssrc !== null) {
+                $rebuilt[$mid] = $ssrc;
             }
         }
         $this->sources = $rebuilt;
