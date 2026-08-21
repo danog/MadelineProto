@@ -163,7 +163,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
         $this->incoming = $hello['digest'];
 
         $this->stream->write($hello['data']);
-        $this->readHelloUntilReady();
+        $this->readHelloUntilReady($ctx->getCancellation());
 
         $this->initializeObfuscatedState($ctx, $header);
     }
@@ -229,16 +229,20 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
     #[Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string
     {
-        while (\strlen($this->payloadBuffer) < $length) {
+        $buffer = $this->payloadBuffer;
+        $this->payloadBuffer = '';
+
+        while (\strlen($buffer) < $length) {
             $chunk = $this->read($cancellation);
             if ($chunk === null) {
+                $this->payloadBuffer = $buffer;
                 return null;
             }
-            $this->payloadBuffer .= $chunk;
+            $buffer .= $chunk;
         }
 
-        $result = substr($this->payloadBuffer, 0, $length);
-        $this->payloadBuffer = substr($this->payloadBuffer, $length);
+        $result = substr($buffer, 0, $length);
+        $this->payloadBuffer = substr($buffer, $length);
 
         return $result;
     }
@@ -294,13 +298,6 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
         }
 
         while ($this->payloadBuffer === '') {
-            $chunk = $this->stream->read($cancellation);
-            if ($chunk === null) {
-                return null;
-            }
-
-            $this->incoming .= $chunk;
-
             while (true) {
                 $payload = $this->tryExtractNextPayloadRecord();
                 if ($payload === false) {
@@ -310,8 +307,21 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
                 if ($payload === null) {
                     break;
                 }
-                $this->payloadBuffer .= $this->decryptState->encrypt($payload);
+                if ($payload !== '') {
+                    $this->payloadBuffer .= $this->decryptState->encrypt($payload);
+                }
             }
+
+            if ($this->payloadBuffer !== '') {
+                break;
+            }
+
+            $chunk = $this->stream->read($cancellation);
+            if ($chunk === null) {
+                return null;
+            }
+
+            $this->incoming .= $chunk;
         }
 
         $result = $this->payloadBuffer;
@@ -445,7 +455,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
         $payload = substr($this->incoming, $headerLen, $length);
         $this->incoming = substr($this->incoming, $headerLen + $length);
 
-        return $length === 0 ? null : $payload;
+        return $payload;
     }
 
     private function initializeObfuscatedState(ConnectionContext $ctx, string $header): void
