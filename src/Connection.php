@@ -299,6 +299,7 @@ final class Connection
                 if (!isset($this->pinger) && !$this->shared->auth->isMedia && !$this->shared->auth->isCdn && !$this->isHttp()) {
                     $this->pinger = new PingLoop($this);
                 }
+                $this->pinger?->onSimpleStateChange($this->shared->auth->connectionState->getState());
                 foreach ($this->unencrypted_new_outgoing as $message) {
                     $message->reply(static fn () => new Exception('Restart because we were reconnected'));
                 }
