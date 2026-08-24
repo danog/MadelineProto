@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
+use danog\MadelineProto\Stream\MTProtoTransport\FakeTlsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -273,7 +274,7 @@ final class ConnectionContext
     {
         foreach ($this->nextStreams as $couple) {
             [$streamName, $extra] = $couple;
-            if ($streamName === ObfuscatedStream::class && isset($extra['address'])) {
+            if (\in_array($streamName, [ObfuscatedStream::class, FakeTlsStream::class], true) && isset($extra['address'])) {
                 $extra['_'] = 'inputClientProxy';
                 return $extra;
             }

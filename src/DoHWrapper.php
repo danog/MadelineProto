@@ -42,6 +42,7 @@ use Amp\Websocket\Client\Rfc6455ConnectionFactory;
 use Amp\Websocket\Client\Rfc6455Connector;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
+use danog\MadelineProto\Stream\MTProtoTransport\FakeTlsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
 use danog\MadelineProto\Stream\Transport\WssStream;
@@ -138,7 +139,7 @@ final class DoHWrapper
         if ($this->API->getSettings()->getConnection()->getRetry()) {
             $proxyCombos = [];
             foreach ($this->API->getSettings()->getConnection()->getProxies() as $proxy => $extras) {
-                if ($proxy === ObfuscatedStream::class) {
+                if (\in_array($proxy, [ObfuscatedStream::class, FakeTlsStream::class], true)) {
                     continue;
                 }
                 foreach ($extras as $extra) {
