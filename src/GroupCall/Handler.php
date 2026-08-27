@@ -125,7 +125,10 @@ trait Handler
      */
     public function joinGroupCallById(int $id, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): void
     {
-        ($this->groupCalls[$id] ?? null)?->join($muted, $joinAs, $inviteHash);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->join($muted, $joinAs, $inviteHash);
     }
 
     /**
@@ -201,7 +204,10 @@ trait Handler
      */
     public function leaveGroupCall(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->leave();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->leave();
     }
 
     /**
@@ -209,15 +215,18 @@ trait Handler
      */
     public function discardGroupCall(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->discard();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->discard();
     }
 
     /**
      * Get the state of a group call.
      */
-    public function getGroupCallState(int $id): ?GroupCallState
+    public function getGroupCallState(int $id): GroupCallState
     {
-        return ($this->groupCalls[$id] ?? null)?->getCallState();
+        return ($this->groupCalls[$id] ?? null)?->getCallState() ?? GroupCallState::LEFT;
     }
 
     /**
@@ -227,7 +236,10 @@ trait Handler
      */
     public function getGroupCallParticipants(int $id): array
     {
-        return ($this->groupCalls[$id] ?? null)?->getParticipants() ?? [];
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        return $this->groupCalls[$id]->getParticipants();
     }
 
     /**
@@ -235,7 +247,10 @@ trait Handler
      */
     public function setGroupCallMuted(int $id, bool $muted = true): void
     {
-        ($this->groupCalls[$id] ?? null)?->setMuted($muted);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->setMuted($muted);
     }
 
     /**
@@ -243,7 +258,10 @@ trait Handler
      */
     public function isGroupCallMuted(int $id): bool
     {
-        return ($this->groupCalls[$id] ?? null)?->isMuted() ?? true;
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        return $this->groupCalls[$id]->isMuted();
     }
 
     /**
@@ -298,7 +316,10 @@ trait Handler
      */
     public function groupCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream $file): void
     {
-        ($this->groupCalls[$id] ?? null)?->setOutput($participant, $file);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->setOutput($participant, $file);
     }
 
     /**
@@ -307,7 +328,10 @@ trait Handler
     public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
         self::validateCallAudio($file);
-        ($this->groupCalls[$id] ?? null)?->play($file);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->play($file);
     }
 
     /**
@@ -336,7 +360,10 @@ trait Handler
         foreach ($files as $file) {
             self::validateCallAudio($file);
         }
-        ($this->groupCalls[$id] ?? null)?->playOnHold(...$files);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->playOnHold(...$files);
     }
 
     /**
@@ -368,7 +395,10 @@ trait Handler
      */
     public function groupCallPlayVideo(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        ($this->groupCalls[$id] ?? null)?->playVideo($file);
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->playVideo($file);
     }
 
     /**
@@ -376,7 +406,10 @@ trait Handler
      */
     public function groupCallStopVideo(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->stopVideo();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->stopVideo();
     }
 
     /**
@@ -384,7 +417,10 @@ trait Handler
      */
     public function groupCallSkipPlay(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->skip();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->skip();
     }
 
     /**
@@ -392,7 +428,10 @@ trait Handler
      */
     public function groupCallStopPlay(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->stop();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->stop();
     }
 
     /**
@@ -400,7 +439,10 @@ trait Handler
      */
     public function groupCallPausePlay(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->pause();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->pause();
     }
 
     /**
@@ -408,7 +450,10 @@ trait Handler
      */
     public function groupCallResumePlay(int $id): void
     {
-        ($this->groupCalls[$id] ?? null)?->resume();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->resume();
     }
 
     /**
@@ -416,7 +461,10 @@ trait Handler
      */
     public function isGroupCallPlayPaused(int $id): bool
     {
-        return ($this->groupCalls[$id] ?? null)?->isPaused() ?? false;
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        return $this->groupCalls[$id]->isPaused();
     }
 
     /**
@@ -424,7 +472,10 @@ trait Handler
      */
     public function groupCallGetCurrent(int $id): RemoteUrl|LocalFile|string|null
     {
-        return ($this->groupCalls[$id] ?? null)?->getCurrent();
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        return $this->groupCalls[$id]->getCurrent();
     }
 
     /**
@@ -451,29 +502,23 @@ trait Handler
     {
         switch ($update['_']) {
             case 'updateGroupCall':
-                $id = $update['call']['id'] ?? null;
-                if ($id === null) {
+                $id = $update['call']['id'];
+                if (!isset($this->groupCalls[$id])) {
+                    $this->logger->logger("Ignoring update for unknown group call $id");
                     return;
                 }
-                ($this->groupCalls[$id] ?? null)?->onGroupCallUpdate($update['call']);
+                $this->groupCalls[$id]->onGroupCallUpdate($update['call']);
                 break;
             case 'updateGroupCallParticipants':
-                $id = $update['call']['id'] ?? null;
-                if ($id === null) {
+                $id = $update['call']['id'];
+                if (!isset($this->groupCalls[$id])) {
+                    $this->logger->logger("Ignoring update for unknown group call $id");
                     return;
                 }
-                ($this->groupCalls[$id] ?? null)?->onParticipantsUpdate(
+                $this->groupCalls[$id]->onParticipantsUpdate(
                     $update['participants'],
                     $update['version']
                 );
-                break;
-            case 'updateGroupCallConnection':
-                // Deliberately ignored: updateGroupCallConnection carries no call ID, so an update
-                // reaching us through the update loop cannot be attributed to a call, and guessing
-                // hands one call's transport parameters (and RTMP keys) to another one whenever two
-                // joins overlap. The very same update is always part of the result of
-                // phone.joinGroupCall, where it is unambiguous, and that is where it is applied,
-                // see GroupCallController::applyJoinUpdates().
                 break;
         }
     }
