@@ -20,6 +20,7 @@ namespace danog\MadelineProto;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\GroupCall\Participant;
@@ -210,6 +211,10 @@ final class GroupCallController implements CallInterface
 
     /**
      * Extract the connection parameters out of the updates returned by `phone.joinGroupCall`.
+     *
+     * updateGroupCallConnection carries no call ID and is only ever returned inline by
+     * phone.joinGroupCall, so — unlike the other group call updates — it is applied straight from
+     * the method response instead of being routed through the update loop.
      */
     private function applyJoinUpdates(array $updates): void
     {
@@ -224,14 +229,12 @@ final class GroupCallController implements CallInterface
      * Apply the `params` of an
      * [updateGroupCallConnection](https://core.telegram.org/constructor/updateGroupCallConnection),
      * already decoded by the TL deserializer.
-     *
-     * @internal
      */
-    public function applyConnectionParams(array $params): void
+    private function applyConnectionParams(array $params): void
     {
         if ($this->connectionParamsApplied) {
-            // The same updateGroupCallConnection reaches us both in the result of
-            // phone.joinGroupCall and through the update loop: only the first one matters.
+            // Reset to false at the start of every join(): apply the first updateGroupCallConnection
+            // that reaches us for this join and ignore any redelivery of it.
             return;
         }
         $this->connectionParamsApplied = true;
@@ -319,10 +322,12 @@ final class GroupCallController implements CallInterface
             return;
         }
         if (($call['min'] ?? false) && isset($this->call['version'])) {
-            // A specific set of fields of a min groupCall cannot be applied over the cached one.
+            // A specific set of fields of a min groupCall cannot be applied over the cached one,
+            // see https://core.telegram.org/constructor/groupCall.
             $call = array_merge($this->call, array_diff_key($call, array_flip([
-                'join_muted', 'can_change_join_muted', 'listeners_hidden', 'creator', 'invite_link',
-                'can_change_messages_enabled', 'record_start_date', 'stream_dc_id',
+                'join_muted', 'can_change_join_muted', 'schedule_start_subscribed', 'can_start_video',
+                'creator', 'can_change_messages_enabled', 'unmuted_video_count', 'unmuted_video_limit',
+                'stream_dc_id', 'invite_link', 'default_send_as', 'join_date_asc',
             ])));
         }
         $this->cancelGapRefetch();
@@ -378,7 +383,7 @@ final class GroupCallController implements CallInterface
             }
             return;
         }
-        $parsed = Participant::fromRaw($participant, $peerId);
+        $parsed = Participant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null);
         $this->participants[$peerId] = $parsed;
         if ($parsed->source !== 0) {
             $this->sourceToPeer[$parsed->source] = $peerId;
@@ -614,6 +619,41 @@ final class GroupCallController implements CallInterface
     }
 
     /**
+     * Change the title of the call.
+     */
+    public function setTitle(string $title): void
+    {
+        $this->API->methodCallAsyncRead('phone.editGroupCallTitle', [
+            'call' => $this->inputCall,
+            'title' => $title,
+        ]);
+    }
+
+    /**
+     * Invite users to the call.
+     */
+    public function invite(mixed ...$users): void
+    {
+        $this->API->methodCallAsyncRead('phone.inviteToGroupCall', [
+            'call' => $this->inputCall,
+            'users' => $users,
+        ]);
+    }
+
+    /**
+     * Export an invite link for the call.
+     *
+     * @param bool $canSelfUnmute Whether users joining with this link may speak without asking; admins only.
+     */
+    public function exportInvite(bool $canSelfUnmute = false): string
+    {
+        return $this->API->methodCallAsyncRead('phone.exportGroupCallInvite', [
+            'call' => $this->inputCall,
+            'can_self_unmute' => $canSelfUnmute,
+        ])['link'];
+    }
+
+    /**
      * Our own audio source ID, in the signed form used by the API.
      */
     public function getSource(): int
@@ -652,7 +692,16 @@ final class GroupCallController implements CallInterface
 
     public function play(LocalFile|RemoteUrl|ReadableStream $file): void
     {
+        self::validateCallAudio($file);
         $this->diskJockey->play($file);
+    }
+    /**
+     * Play a file, blocking until it has finished playing if a stream is provided.
+     */
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        $this->play($file);
+        self::awaitStream($file);
     }
     public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
     {
@@ -713,11 +762,42 @@ final class GroupCallController implements CallInterface
     }
     public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
+        foreach ($files as $file) {
+            self::validateCallAudio($file);
+        }
         $this->diskJockey->playOnHold(...$files);
     }
     public function getCurrent(): LocalFile|RemoteUrl|string|null
     {
         return $this->diskJockey->getCurrent();
+    }
+
+    /**
+     * Reject audio that was not encoded as OGG OPUS, unless realtime conversion is available.
+     */
+    private static function validateCallAudio(LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        if (Tools::canConvertOgg()) {
+            return;
+        }
+        if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
+            Ogg::validateOgg($file);
+            return;
+        }
+        throw new \AssertionError('The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!');
+    }
+
+    /**
+     * Block until a played stream has finished; a no-op for files and URLs.
+     */
+    private static function awaitStream(LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        if (!$file instanceof ReadableStream) {
+            return;
+        }
+        $deferred = new DeferredFuture;
+        $file->onClose($deferred->complete(...));
+        $deferred->getFuture()->await();
     }
 
     #[\Override]

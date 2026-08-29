@@ -80,6 +80,8 @@ final class WebmSource
     private bool $stopped = false;
     private bool $reading = false;
     private bool $playing = false;
+    /** Monotonically identifies the current play request, so stale readers cannot resume it. */
+    private int $generation = 0;
 
     /** Highest source timestamp pushed so far, in milliseconds. */
     private int $bufferedUntilMs = 0;
@@ -112,6 +114,7 @@ final class WebmSource
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file): void
     {
+        $generation = ++$this->generation;
         $this->stopped = false;
         $this->finished = false;
         $this->playing = true;
@@ -122,13 +125,19 @@ final class WebmSource
         $this->videoCodec = null;
         $this->framing = null;
 
-        EventLoop::queue(function () use ($file): void {
+        EventLoop::queue(function () use ($file, $generation): void {
+            if ($generation !== $this->generation) {
+                return;
+            }
             $this->reading = true;
             try {
                 $matroska = new Matroska($file);
+                if ($generation !== $this->generation) {
+                    return;
+                }
                 $this->selectTracks($matroska);
                 foreach ($matroska->frames as $frame) {
-                    if ($this->stopped) {
+                    if ($this->stopped || $generation !== $this->generation) {
                         break;
                     }
                     $this->push($frame);
@@ -136,8 +145,10 @@ final class WebmSource
             } catch (Throwable $e) {
                 $this->call->log("Could not play the file in {$this->call}: $e", Logger::ERROR);
             } finally {
-                $this->reading = false;
-                $this->finished = true;
+                if ($generation === $this->generation) {
+                    $this->reading = false;
+                    $this->finished = true;
+                }
             }
         });
     }
@@ -304,6 +315,7 @@ final class WebmSource
      */
     public function stop(): void
     {
+        $this->generation++;
         $this->stopped = true;
         $this->playing = false;
         $this->video = new SplQueue;

@@ -207,7 +207,7 @@ final class Client extends ClientAbstract
                 $wrapper->wrap($param, true);
             }
         }
-        $this->__call('callPlayOnHoldBlocking', $wrapper);
+        $this->__call('callPlayOnHold', $wrapper);
     }
 
     /**
@@ -233,7 +233,7 @@ final class Client extends ClientAbstract
                 $wrapper->wrap($param, true);
             }
         }
-        $this->__call('groupCallPlayOnHoldBlocking', $wrapper);
+        $this->__call('groupCallPlayOnHold', $wrapper);
     }
 
     /**

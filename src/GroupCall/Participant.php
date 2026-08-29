@@ -59,9 +59,14 @@ final class Participant implements JsonSerializable
 
     /**
      * @internal
+     *
+     * @param self|null $cached The previously known state of this participant, if any: when the
+     *                          `min` flag is set, `volume` and `muted_by_you` must be kept from it,
+     *                          see https://core.telegram.org/constructor/groupCallParticipant.
      */
-    public static function fromRaw(array $participant, int $peerId): self
+    public static function fromRaw(array $participant, int $peerId, ?self $cached = null): self
     {
+        $min = $participant['min'];
         return new self(
             $peerId,
             $participant['source'] ?? 0,
@@ -69,11 +74,11 @@ final class Participant implements JsonSerializable
             $participant['active_date'] ?? null,
             $participant['muted'] ?? false,
             $participant['can_self_unmute'] ?? false,
-            $participant['muted_by_you'] ?? false,
+            $min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false),
             $participant['self'] ?? false,
             $participant['just_joined'] ?? false,
             $participant['video_joined'] ?? false,
-            $participant['volume'] ?? 10000,
+            $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
             $participant['about'] ?? null,
             $participant['raise_hand_rating'] ?? null,
         );

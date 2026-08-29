@@ -18,15 +18,12 @@ namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
-use Amp\DeferredFuture;
 use AssertionError;
 use danog\MadelineProto\GroupCall;
 use danog\MadelineProto\GroupCallController;
 use danog\MadelineProto\LocalFile;
-use danog\MadelineProto\Logger;
-use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 
 /**
  * Manages group calls (video chats, livestreams and live stories).
@@ -65,11 +62,27 @@ trait Handler
             $params['schedule_date'] = $scheduleDate;
         }
         $updates = $this->methodCallAsyncRead('phone.createGroupCall', $params);
-        $call = $this->extractGroupCall($updates);
-        if ($call === null) {
+        // The updateGroupCall in the response is dispatched to handleGroupCallUpdate through
+        // saveUpdate, which starts tracking the new call. Look it up (fetching it if that update has
+        // not landed yet) to return its handle.
+        $inputCall = null;
+        foreach ($updates['updates'] ?? [] as $update) {
+            if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
+                $inputCall = [
+                    '_' => 'inputGroupCall',
+                    'id' => $update['call']['id'],
+                    'access_hash' => $update['call']['access_hash'],
+                ];
+                break;
+            }
+        }
+        $controller = $inputCall !== null
+            ? $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))
+            : null;
+        if ($controller === null) {
             throw new AssertionError('The server did not return the created group call!');
         }
-        return $call->public;
+        return $controller->public;
     }
 
     /**
@@ -154,32 +167,6 @@ trait Handler
         // We already have the full call and its first page of participants: no need to refetch.
         $controller->applyGroupCall($result);
         return $controller;
-    }
-
-    /**
-     * Extract and cache the group call contained in an Updates constructor.
-     *
-     * @internal
-     */
-    public function extractGroupCall(array $updates, ?int $peerId = null): ?GroupCallController
-    {
-        foreach ($updates['updates'] ?? [] as $update) {
-            if ($update['_'] !== 'updateGroupCall' || $update['call']['_'] !== 'groupCall') {
-                continue;
-            }
-            $call = $update['call'];
-            if (isset($this->groupCalls[$call['id']])) {
-                return $this->groupCalls[$call['id']];
-            }
-            $controller = new GroupCallController(
-                $this,
-                $call,
-                $peerId ?? (isset($update['peer']) ? $this->getIdInternal($update['peer']) : null)
-            );
-            $this->groupCalls[$call['id']] = $controller;
-            return $controller;
-        }
-        return null;
     }
 
     /** @internal */
@@ -268,14 +255,10 @@ trait Handler
      */
     public function setGroupCallTitle(int $id, string $title): void
     {
-        $call = $this->groupCalls[$id] ?? null;
-        if ($call === null) {
-            return;
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
         }
-        $this->methodCallAsyncRead('phone.editGroupCallTitle', [
-            'call' => $call->getInputCall(),
-            'title' => $title,
-        ]);
+        $this->groupCalls[$id]->setTitle($title);
     }
 
     /**
@@ -283,14 +266,10 @@ trait Handler
      */
     public function inviteToGroupCall(int $id, mixed ...$users): void
     {
-        $call = $this->groupCalls[$id] ?? null;
-        if ($call === null) {
-            return;
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
         }
-        $this->methodCallAsyncRead('phone.inviteToGroupCall', [
-            'call' => $call->getInputCall(),
-            'users' => $users,
-        ]);
+        $this->groupCalls[$id]->invite(...$users);
     }
 
     /**
@@ -300,14 +279,10 @@ trait Handler
      */
     public function exportGroupCallInvite(int $id, bool $canSelfUnmute = false): string
     {
-        $call = $this->groupCalls[$id] ?? null;
-        if ($call === null) {
+        if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        return $this->methodCallAsyncRead('phone.exportGroupCallInvite', [
-            'call' => $call->getInputCall(),
-            'can_self_unmute' => $canSelfUnmute,
-        ])['link'];
+        return $this->groupCalls[$id]->exportInvite($canSelfUnmute);
     }
 
     /**
@@ -326,7 +301,6 @@ trait Handler
      */
     public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        self::validateCallAudio($file);
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
@@ -341,14 +315,9 @@ trait Handler
     public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
     {
         if (!isset($this->groupCalls[$id])) {
-            return;
+            throw new AssertionError('Unknown group call!');
         }
-        $this->groupCallPlay($id, $file);
-        if ($file instanceof ReadableStream) {
-            $deferred = new DeferredFuture;
-            $file->onClose($deferred->complete(...));
-            $deferred->getFuture()->await();
-        }
+        $this->groupCalls[$id]->playBlocking($file);
     }
 
     /**
@@ -356,33 +325,10 @@ trait Handler
      */
     public function groupCallPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        foreach ($files as $file) {
-            self::validateCallAudio($file);
-        }
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
         $this->groupCalls[$id]->playOnHold(...$files);
-    }
-
-    /**
-     * Files to play on hold in a group call, blocking until they have finished playing.
-     *
-     * @internal
-     */
-    public function groupCallPlayOnHoldBlocking(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
-    {
-        if (!isset($this->groupCalls[$id])) {
-            return;
-        }
-        $this->groupCallPlayOnHold($id, ...$files);
-        foreach ($files as $file) {
-            if ($file instanceof ReadableStream) {
-                $deferred = new DeferredFuture;
-                $file->onClose($deferred->complete(...));
-                $deferred->getFuture()->await();
-            }
-        }
     }
 
     /**
@@ -478,21 +424,6 @@ trait Handler
     }
 
     /**
-     * @internal
-     */
-    private static function validateCallAudio(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        if (Tools::canConvertOgg()) {
-            return;
-        }
-        if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
-            Ogg::validateOgg($file);
-            return;
-        }
-        throw new AssertionError('The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!');
-    }
-
-    /**
      * Handle an incoming group call update.
      *
      * @internal
@@ -501,20 +432,35 @@ trait Handler
     {
         switch ($update['_']) {
             case 'updateGroupCall':
-                $id = $update['call']['id'];
+                $call = $update['call'];
+                $id = $call['id'];
                 if (!isset($this->groupCalls[$id])) {
-                    $this->logger->logger("Ignoring update for unknown group call $id");
+                    if ($call['_'] !== 'groupCall') {
+                        // A call we never tracked was just discarded: nothing to do.
+                        return;
+                    }
+                    // Start tracking any group call we become aware of. The controller is built from
+                    // the full groupCall the update carries, so there is nothing to apply over it.
+                    $this->groupCalls[$id] = new GroupCallController(
+                        $this,
+                        $call,
+                        isset($update['peer']) ? $this->getIdInternal($update['peer']) : null
+                    );
                     return;
                 }
-                $this->groupCalls[$id]->onGroupCallUpdate($update['call']);
+                // Deferred: applying an update may refetch the call or renegotiate the WebRTC
+                // session, neither of which should run inline in the update loop. Queueing keeps
+                // them ordered.
+                EventLoop::queue($this->groupCalls[$id]->onGroupCallUpdate(...), $call);
                 break;
             case 'updateGroupCallParticipants':
                 $id = $update['call']['id'];
                 if (!isset($this->groupCalls[$id])) {
-                    $this->logger->logger("Ignoring update for unknown group call $id");
+                    $this->logger->logger("Ignoring participants update for unknown group call $id");
                     return;
                 }
-                $this->groupCalls[$id]->onParticipantsUpdate(
+                EventLoop::queue(
+                    $this->groupCalls[$id]->onParticipantsUpdate(...),
                     $update['participants'],
                     $update['version']
                 );

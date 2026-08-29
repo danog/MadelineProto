@@ -221,6 +221,20 @@ final class TgcallsSignalingTest extends TestCase
         );
     }
 
+    public function testContentsFromOfferCanSelectOutgoingChannels(): void
+    {
+        $offer = str_replace(
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=sendrecv",
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=recvonly",
+            self::OFFER,
+        );
+
+        $contents = V2Sdp::contentsFromOffer($offer, outgoingOnly: true);
+
+        $this->assertCount(1, $contents);
+        $this->assertSame('audio', $contents[0]['type']);
+    }
+
     public function testInitialSetupFromDescription(): void
     {
         $setup = V2Sdp::initialSetupFromDescription(self::OFFER, 'active');
@@ -270,6 +284,69 @@ final class TgcallsSignalingTest extends TestCase
     {
         $this->expectExceptionMessage('ICE credentials');
         V2Sdp::buildRemoteDescription(self::OFFER, ['ufrag' => '', 'pwd' => ''], [], true);
+    }
+
+    /**
+     * Telegram may answer an audio+video offer with audio only. The rejected video m-line must be
+     * retained to preserve its index, but does not need to establish codecs or a transport.
+     */
+    public function testBuildRemoteDescriptionRejectsMissingMedia(): void
+    {
+        $initialSetup = [
+            'ufrag' => 'PEERUF',
+            'pwd' => 'PEERPWD00000000000000000',
+            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
+        ];
+        $contents = [V2Sdp::contentsFromOffer(self::OFFER)[0]];
+
+        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, true);
+        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
+
+        $this->assertStringStartsWith('m=video 0 UDP/TLS/RTP/SAVPF 96', $video);
+        $this->assertStringContainsString('a=inactive', $video);
+        $this->assertStringNotContainsString('a=rtcp-mux', $video);
+        $this->assertStringNotContainsString('a=ice-ufrag:', $video);
+        $this->assertStringNotContainsString('a=fingerprint:', $video);
+        $this->assertStringNotContainsString('a=rtpmap:', $video);
+    }
+
+    public function testBuildRemoteOfferKeepsMissingMediaReusable(): void
+    {
+        $initialSetup = [
+            'ufrag' => 'PEERUF',
+            'pwd' => 'PEERPWD00000000000000000',
+            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
+        ];
+        $contents = [V2Sdp::contentsFromOffer(self::OFFER)[0]];
+
+        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, false);
+        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
+
+        $this->assertStringStartsWith('m=video 9 UDP/TLS/RTP/SAVPF 96', $video);
+        $this->assertStringContainsString('a=inactive', $video);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
+        $this->assertStringContainsString('a=ice-ufrag:PEERUF', $video);
+    }
+
+    public function testBuildRemoteDescriptionMatchesContentsByMediaType(): void
+    {
+        $initialSetup = [
+            'ufrag' => 'PEERUF',
+            'pwd' => 'PEERPWD00000000000000000',
+            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
+        ];
+        $contents = array_reverse(V2Sdp::contentsFromOffer(self::OFFER));
+        $contents[0]['ssrc'] = '88888';
+        $contents[1]['ssrc'] = '99999';
+
+        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, false);
+        $audio = substr($sdp, (int) strpos($sdp, 'm=audio'), (int) strpos($sdp, 'm=video') - (int) strpos($sdp, 'm=audio'));
+        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
+
+        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
+        $this->assertStringContainsString('a=ssrc:99999', $audio);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
+        $this->assertStringContainsString('a=ssrc:88888', $video);
     }
 
     // ------------------------------------------------------------ SCTP-framed signaling

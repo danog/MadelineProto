@@ -440,6 +440,7 @@ final class VoIPController implements CallInterface
         $this->log(sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
         try {
             $this->API->methodCallAsyncRead('phone.discardCall', [
+                'video' => $this->public->video,
                 'peer' => $this->call,
                 'duration' => time() - $this->public->date,
                 'connection_id' => 0,

@@ -27,19 +27,21 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use danog\MadelineProto\VoIPController;
+use Revolt\EventLoop;
+use Throwable;
+use Webrtc\Codecs\Codec;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\ICE\RTCIceCandidate;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
+use Webrtc\RTP\RTCRtpTransceiver;
 use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
+use Webrtc\Webrtc\Enum\SignalingState;
 use Webrtc\Webrtc\RTCPeerConnection;
-use Revolt\EventLoop;
-use Throwable;
-
 
 /**
  * WebRTC engine of a modern one-to-one Telegram call.
@@ -59,6 +61,7 @@ final class Controller
 
     private MediaStreamTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
+    private ?RTCRtpTransceiver $videoTransceiver = null;
     private WebmSource $webm;
     private ?OpusRecorder $recorder = null;
 
@@ -70,10 +73,16 @@ final class Controller
     private MediaState $remoteMediaState;
     /** @var array<string, mixed>|null The peer's InitialSetup, kept until its NegotiateChannels arrives. */
     private ?array $peerInitialSetup = null;
-    /** @var list<array<array-key, mixed>>|null The peer's MediaContent list, kept until its InitialSetup arrives. */
-    private ?array $peerContents = null;
-    /** Whether the InstanceV2Impl handshake already produced a remote description. */
-    private bool $v2Negotiated = false;
+    /** @var list<array<string, mixed>> Structured offers received before InitialSetup. */
+    private array $pendingV2Messages = [];
+    /** Exchange ID of our in-flight structured offer. */
+    private ?string $pendingV2ExchangeId = null;
+    /** Whether our outgoing channels have completed at least one structured negotiation. */
+    private bool $localV2Negotiated = false;
+    private bool $initialSetupSent = false;
+    private bool $renegotiatePending = false;
+    private bool $videoEnabled = false;
+    private ?string $outgoingVideoCodec = null;
     /** The SCTP association carrying signaling, for the versions that use one. */
     private ?SignalingSctpTransport $sctp = null;
     /** Last mute state we told the peer about, so media state updates stay consistent. */
@@ -111,11 +120,14 @@ final class Controller
         $this->peerConnection = new RTCPeerConnection([
             'iceServers' => self::buildIceServers($connections),
         ]);
-        $this->webm = new WebmSource($call);
+        $this->webm = new WebmSource($call, $this->onVideoCodec(...));
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
         $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
         $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
-        $this->peerConnection->addTransceiver($this->outgoingVideo, SDPDirections::sendrecv);
+        if ($this->outgoing && $this->call->public->video) {
+            $this->videoEnabled = true;
+            $this->ensureVideoTransceiver();
+        }
 
         $this->peerConnection->on('track', function (MediaStreamTrack $track): void {
             if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
@@ -133,9 +145,12 @@ final class Controller
         });
 
         if (!$this->version->usesSdp()) {
-            // InstanceV2Impl negotiates media with InitialSetup + NegotiateChannels instead of
-            // shipping an SDP blob: both sides describe themselves straight away.
-            EventLoop::queue($this->sendV2Setup(...));
+            EventLoop::queue(function (): void {
+                $this->sendV2InitialSetup();
+                if ($this->outgoing) {
+                    $this->sendV2Offer();
+                }
+            });
         } elseif ($this->outgoing) {
             // The caller creates the data channel and the initial offer, exactly like tgcalls does.
             $this->dataChannel = $this->peerConnection->createDataChannel(
@@ -222,7 +237,45 @@ final class Controller
     public function stopVideo(): void
     {
         $this->webm->stop();
+        if ($this->videoEnabled) {
+            $this->videoEnabled = false;
+            $this->videoTransceiver?->setDirection(SDPDirections::recvonly);
+            $this->renegotiate();
+        }
         $this->sendMediaState($this->muted, video: false);
+    }
+
+    /**
+     * Pin the video sender to the codec of the opened file and negotiate the channel before its
+     * pre-encoded frames are interpreted by an RTP payloader for another codec.
+     */
+    private function onVideoCodec(string $codec): void
+    {
+        $this->videoEnabled = true;
+        $transceiver = $this->ensureVideoTransceiver();
+        $transceiver->setDirection(SDPDirections::sendrecv);
+        // Keep the first (usually only immediately useful) keyframe queued until the answer has
+        // selected the codec of this file.
+        $this->outgoingVideo->setTransportReady(false);
+        if ($codec !== $this->outgoingVideoCodec) {
+            $capabilities = (new Codec())->getCapabilities('video')->codecs;
+            $preferred = array_values(array_filter(
+                $capabilities,
+                static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0
+                    || strcasecmp($capability->mimeType, 'video/rtx') === 0
+            ));
+            $transceiver->setCodecPreferences($preferred);
+            $this->outgoingVideoCodec = $codec;
+        }
+        $this->renegotiate();
+    }
+
+    private function ensureVideoTransceiver(): RTCRtpTransceiver
+    {
+        return $this->videoTransceiver ??= $this->peerConnection->addTransceiver(
+            $this->outgoingVideo,
+            $this->videoEnabled ? SDPDirections::sendrecv : SDPDirections::recvonly,
+        );
     }
 
     /**
@@ -331,20 +384,18 @@ final class Controller
         }
     }
 
-    /**
-     * Describe ourselves to the peer the way `InstanceV2Impl` expects.
-     */
-    private function sendV2Setup(): void
+    /** Send the transport half of InstanceV2Impl signaling exactly once. */
+    private function sendV2InitialSetup(): void
     {
+        if ($this->initialSetupSent) {
+            return;
+        }
         try {
-            $offer = $this->peerConnection->createOffer();
-            $this->peerConnection->setLocalDescription($offer);
-            $local = $this->peerConnection->getLocalDescription()?->getSdp() ?? $offer->getSdp();
-
-            // tgcalls makes the caller the DTLS client and the callee the server.
+            // Merely creating the offer is enough to allocate ICE and DTLS parameters. The callee
+            // must not set it locally yet, because the caller's channel offer is authoritative.
+            $description = $this->peerConnection->createOffer();
             $setup = $this->outgoing ? 'active' : 'passive';
-            $initialSetup = V2Sdp::initialSetupFromDescription($local, $setup);
-
+            $initialSetup = V2Sdp::initialSetupFromDescription($description->getSdp(), $setup);
             $this->sendSignalingMessage([
                 '@type' => 'InitialSetup',
                 'ufrag' => $initialSetup['ufrag'],
@@ -352,38 +403,122 @@ final class Controller
                 'renomination' => false,
                 'fingerprints' => $initialSetup['fingerprints'],
             ]);
-            $this->sendSignalingMessage([
-                '@type' => 'NegotiateChannels',
-                'exchangeId' => (string) random_int(1, 0x7FFFFFFF),
-                'contents' => V2Sdp::contentsFromOffer($offer->getSdp()),
-            ]);
-            $this->sendLocalCandidates();
+            $this->initialSetupSent = true;
         } catch (Throwable $e) {
-            $this->call->log("Got $e while describing {$this->call} to the peer", Logger::ERROR);
+            $this->call->log("Got $e while sending the initial setup of {$this->call}", Logger::ERROR);
         }
     }
 
-    /**
-     * Apply the peer's description once both halves of it arrived.
-     */
-    private function maybeApplyV2Negotiation(): void
+    /** Offer our currently active outgoing channels using tgcalls' structured dialect. */
+    private function sendV2Offer(): void
     {
-        if ($this->v2Negotiated || $this->peerInitialSetup === null || $this->peerContents === null) {
-            return;
-        }
-        $offer = $this->peerConnection->getLocalDescription()?->getSdp();
-        if ($offer === null) {
+        if ($this->pendingV2ExchangeId !== null
+            || $this->peerConnection->getSignalingState() !== SignalingState::stable
+        ) {
+            $this->renegotiatePending = true;
             return;
         }
         try {
-            $sdp = V2Sdp::buildRemoteDescription($offer, $this->peerInitialSetup, $this->peerContents, true);
+            $this->sendV2InitialSetup();
+            $offer = $this->peerConnection->createOffer();
+            $this->peerConnection->setLocalDescription($offer);
+            $this->pendingV2ExchangeId = (string) random_int(1, 0x7FFFFFFF);
+            $this->renegotiatePending = false;
+            $this->sendSignalingMessage([
+                '@type' => 'NegotiateChannels',
+                'exchangeId' => $this->pendingV2ExchangeId,
+                'contents' => V2Sdp::contentsFromOffer($offer->getSdp(), outgoingOnly: true),
+            ]);
+            $this->sendLocalCandidates();
+        } catch (Throwable $e) {
+            $this->pendingV2ExchangeId = null;
+            $this->call->log("Got $e while offering the media of {$this->call}", Logger::ERROR);
+        }
+    }
+
+    /** Request a new offer/answer exchange, coalescing changes while one is already in flight. */
+    private function renegotiate(): void
+    {
+        if ($this->closed) {
+            return;
+        }
+        $this->renegotiatePending = true;
+        if ($this->version->usesSdp()) {
+            if ($this->peerConnection->getSignalingState() === SignalingState::stable) {
+                $this->renegotiatePending = false;
+                $this->sendLocalDescription();
+            }
+            return;
+        }
+        $this->sendV2Offer();
+    }
+
+    private function flushRenegotiation(): void
+    {
+        if ($this->renegotiatePending && $this->peerConnection->getSignalingState() === SignalingState::stable) {
+            $this->renegotiate();
+        }
+    }
+
+    /** Process one structured offer or answer after InitialSetup has arrived. */
+    private function onV2Negotiation(array $message): void
+    {
+        if ($this->peerInitialSetup === null) {
+            $this->pendingV2Messages[] = $message;
+            return;
+        }
+        $exchangeId = (string) ($message['exchangeId'] ?? '');
+        /** @var list<array<array-key, mixed>> $contents */
+        $contents = array_values((array) ($message['contents'] ?? []));
+
+        if ($this->pendingV2ExchangeId !== null && $exchangeId === $this->pendingV2ExchangeId) {
+            $offer = $this->peerConnection->getLocalDescription()?->getSdp();
+            if ($offer === null) {
+                return;
+            }
+            $sdp = V2Sdp::buildRemoteDescription($offer, $this->peerInitialSetup, $contents, true);
             $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'answer'));
-            $this->v2Negotiated = true;
+            $this->pendingV2ExchangeId = null;
+            $this->localV2Negotiated = true;
+            $this->outgoingVideo->setTransportReady(true);
             $this->hasRemoteDescription = true;
             $this->flushPendingCandidates();
-        } catch (Throwable $e) {
-            $this->call->log("Got $e while applying the peer description of {$this->call}", Logger::ERROR);
+            $this->flushRenegotiation();
+            return;
         }
+
+        if ($this->pendingV2ExchangeId !== null) {
+            // InstanceV2Impl resolves glare in favor of the call initiator.
+            if ($this->outgoing) {
+                return;
+            }
+            $this->peerConnection->setLocalDescription(new RTCSessionDescription('', 'rollback'));
+            $this->pendingV2ExchangeId = null;
+            $this->renegotiatePending = true;
+        }
+
+        if (array_any($contents, static fn (array $content): bool => ($content['type'] ?? null) === 'video')) {
+            $this->ensureVideoTransceiver();
+        }
+        $template = $this->peerConnection->createOffer()->getSdp();
+        $sdp = V2Sdp::buildRemoteDescription($template, $this->peerInitialSetup, $contents, false);
+        $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'offer'));
+        $answer = $this->peerConnection->createAnswer();
+        $this->peerConnection->setLocalDescription($answer);
+        $this->sendSignalingMessage([
+            '@type' => 'NegotiateChannels',
+            'exchangeId' => $exchangeId,
+            // An answer echoes the accepted incoming SSRCs. buildRemoteDescription already
+            // rejected the message if no mutual codec existed, so all remaining contents work.
+            'contents' => $contents,
+        ]);
+        $this->sendLocalCandidates();
+        $this->hasRemoteDescription = true;
+        $this->flushPendingCandidates();
+        if (!$this->localV2Negotiated) {
+            $this->renegotiatePending = true;
+        }
+        $this->flushRenegotiation();
     }
 
     private function sendSignalingMessage(array $message): void
@@ -475,13 +610,17 @@ final class Controller
                 case 'InitialSetup':
                     /** @var array<string, mixed> $message */
                     $this->peerInitialSetup = $message;
-                    $this->maybeApplyV2Negotiation();
+                    if (!$this->outgoing) {
+                        $this->sendV2InitialSetup();
+                    }
+                    $pending = $this->pendingV2Messages;
+                    $this->pendingV2Messages = [];
+                    foreach ($pending as $negotiation) {
+                        $this->onV2Negotiation($negotiation);
+                    }
                     break;
                 case 'NegotiateChannels':
-                    /** @var list<array<array-key, mixed>> $contents */
-                    $contents = array_values((array) ($message['contents'] ?? []));
-                    $this->peerContents = $contents;
-                    $this->maybeApplyV2Negotiation();
+                    $this->onV2Negotiation($message);
                     break;
                 case 'Candidates':
                     // The InstanceV2Impl dialect batches candidates into one message.
@@ -500,11 +639,15 @@ final class Controller
     private function onRemoteDescription(string $type, string $sdp): void
     {
         $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, $type));
+        if ($type === 'answer') {
+            $this->outgoingVideo->setTransportReady(true);
+        }
         $this->hasRemoteDescription = true;
         $this->flushPendingCandidates();
         if ($type === 'offer') {
             $this->sendLocalDescription(true);
         }
+        $this->flushRenegotiation();
     }
 
     /**

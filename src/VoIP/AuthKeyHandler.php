@@ -57,9 +57,10 @@ trait AuthKeyHandler
     /**
      * Request VoIP call.
      *
-     * @param mixed $user User
+     * @param mixed $user  User
+     * @param bool  $video Whether to start a video call.
      */
-    public function requestCall(mixed $user): VoIP
+    public function requestCall(mixed $user, bool $video = false): VoIP
     {
         $user = ($this->getInfo($user));
         if ($user['type'] !== 'user') {
@@ -81,6 +82,7 @@ trait AuthKeyHandler
             $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
             Crypt::checkG($g_a, $dh_config['p']);
             $res = $this->methodCallAsyncRead('phone.requestCall', [
+                'video' => $video,
                 'user_id' => $user,
                 'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
                 'protocol' => VoIPController::CALL_PROTOCOL,
@@ -295,13 +297,6 @@ trait AuthKeyHandler
             return;
         }
         $this->callPlayOnHold($id, ...$files);
-        foreach ($files as $file) {
-            if ($file instanceof ReadableStream) {
-                $deferred = new DeferredFuture;
-                $file->onClose($deferred->complete(...));
-                $deferred->getFuture()->await();
-            }
-        }
     }
 
     /**

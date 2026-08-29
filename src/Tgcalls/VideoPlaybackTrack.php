@@ -66,6 +66,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private ?float $nextDue = null;
 
     private bool $playing = false;
+    /** Whether signaling has selected the codec that the current file contains. */
+    private bool $transportReady = true;
 
     public function __construct(
         private readonly WebmSource $source,
@@ -96,11 +98,23 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         return $this->playing;
     }
 
+    public function setTransportReady(bool $transportReady): void
+    {
+        $this->transportReady = $transportReady;
+        if (!$transportReady) {
+            $this->nextDue = microtime(true) + self::IDLE_POLL;
+        }
+    }
+
     /**
      * Produce the next video frame, if its presentation time has arrived.
      */
     private function produce(): ?EncodedPacket
     {
+        if (!$this->transportReady) {
+            $this->nextDue = microtime(true) + self::IDLE_POLL;
+            return null;
+        }
         $frame = $this->pending ?? $this->source->pullVideo();
         $this->pending = null;
         if ($frame === null) {

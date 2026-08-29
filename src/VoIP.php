@@ -33,6 +33,8 @@ final class VoIP extends Update implements SimpleFilters
     public readonly int $callID;
     /** Whether the call is an outgoing call */
     public readonly bool $outgoing;
+    /** Whether this is a video call. */
+    public bool $video = false;
     /** ID of the other user in the call */
     public readonly int $otherID;
     /** When was the call created */
@@ -60,6 +62,7 @@ final class VoIP extends Update implements SimpleFilters
         $call['_'] = 'inputPhoneCall';
         $this->date = $call['date'];
         $this->callID = $call['id'];
+        $this->video = $call['video'] ?? false;
         if ($call['admin_id'] === $API->getSelf()['id']) {
             $this->outgoing = true;
             $this->otherID = $call['participant_id'];

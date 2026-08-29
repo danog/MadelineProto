@@ -212,6 +212,15 @@ final class GroupCall extends Update
     }
 
     /**
+     * Play a file, blocking until it has finished playing if a stream is provided.
+     */
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file): self
+    {
+        $this->getClient()->groupCallPlayBlocking($this->id, $file);
+        return $this;
+    }
+
+    /**
      * Play file.
      */
     public function then(LocalFile|RemoteUrl|ReadableStream $file): self

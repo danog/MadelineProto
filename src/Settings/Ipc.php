@@ -34,6 +34,9 @@ final class Ipc extends SettingsAbstract
      */
     public function getSlow(): bool
     {
+        // HOTPATCH (testing): always run in full in-process mode so the WebRTC group-call engine
+        // lives in this process instead of an IPC server.
+        return true;
         return Magic::$isIpcWorker || \PHP_OS_FAMILY === 'Windows';
     }
 }

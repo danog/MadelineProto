@@ -1650,11 +1650,12 @@ abstract class InternalDoc
     /**
      * Request VoIP call.
      *
-     * @param mixed $user User
+     * @param mixed $user  User
+     * @param bool  $video Whether to start a video call.
      */
-    final public function requestCall(mixed $user): \danog\MadelineProto\VoIP
+    final public function requestCall(mixed $user, bool $video = false): \danog\MadelineProto\VoIP
     {
-        return $this->wrapper->getAPI()->requestCall($user);
+        return $this->wrapper->getAPI()->requestCall($user, $video);
     }
     /**
      * Request secret chat.
