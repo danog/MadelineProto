@@ -66,7 +66,7 @@ class SecretHandler extends SimpleEventHandler
      * and sends the frames as-is, so neither ffmpeg nor the FFI extension is required.
      */
     #[Handler]
-    public function joinGroupCall(Incoming&Message $update): void
+    public function hjoinGroupCall(Incoming&Message $update): void
     {
         if ($update->message !== '/joinGroupCall') {
             return;

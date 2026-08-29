@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
+use Amp\Pipeline\ConcurrentIterator;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\OggWriter;
 use Webrtc\Codecs\EncodedPacket;
@@ -38,8 +39,6 @@ use function Amp\File\openFile;
  */
 final class OpusRecorder
 {
-    /** How often the frame queue is drained. */
-    private const POLL_INTERVAL = 0.02;
     /** Granule position increment assumed for a frame whose duration we cannot derive. */
     private const DEFAULT_FRAME_SAMPLES = 960;
     /** An OPUS frame can never be longer than 120ms, i.e. 5760 samples at 48kHz. */
@@ -47,7 +46,8 @@ final class OpusRecorder
 
     private OggWriter $writer;
     private ?RemoteStreamTrack $track = null;
-    private ?string $watcher = null;
+    private ?ConcurrentIterator $consumer = null;
+    private bool $draining = false;
     private bool $closed = false;
     /** RTP timestamp of the previously written frame, used to derive granule increments. */
     private ?int $lastTimestamp = null;
@@ -77,18 +77,28 @@ final class OpusRecorder
             return;
         }
         $this->track = $track;
-        $this->watcher ??= EventLoop::repeat(self::POLL_INTERVAL, $this->drain(...));
+        $this->consumer = $track->getConsumer();
+        if (!$this->draining) {
+            $this->draining = true;
+            EventLoop::queue($this->drain(...));
+        }
     }
 
     private function drain(): void
     {
-        if ($this->closed || $this->track === null) {
+        // The track feeds its frames reactively through a concurrency-safe queue, so instead of
+        // polling a `receiveData()` (which no longer exists) we iterate the consumer, which
+        // suspends this single task between frames until one is enqueued or the track is stopped.
+        // A single long-lived foreach — the same shape the RTP sender uses to drain a track — is
+        // deliberate: a repeated timer that re-entered a blocking continue() would leak one parked
+        // fiber per tick, since amphp's ConcurrentIterator hands each waiter a different frame.
+        $consumer = $this->consumer;
+        if ($consumer === null) {
             return;
         }
-        while (true) {
-            $frame = $this->track->receiveData();
-            if ($frame === null) {
-                return;
+        foreach ($consumer as $frame) {
+            if ($this->closed) {
+                break;
             }
             if (!$frame instanceof EncodedPacket) {
                 // The receiver was not put in raw mode: decoded PCM cannot be muxed into OGG OPUS.
@@ -107,6 +117,9 @@ final class OpusRecorder
             $this->lastTimestamp = $timestamp;
             $this->writer->writeChunk($frame->getData(), $granule, false);
         }
+        // The track was stopped and its queue exhausted (or we were closed): close() finalizes.
+        $this->draining = false;
+        $this->consumer = null;
     }
 
     /**
@@ -131,14 +144,11 @@ final class OpusRecorder
             return;
         }
         $this->closed = true;
-        if ($this->watcher !== null) {
-            EventLoop::cancel($this->watcher);
-            $this->watcher = null;
-        }
         try {
             $this->writer->writeChunk('', 0, true);
         } catch (Throwable) {
         }
         $this->track = null;
+        $this->consumer = null;
     }
 }

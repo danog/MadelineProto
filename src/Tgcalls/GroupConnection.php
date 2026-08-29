@@ -26,7 +26,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RemoteUrl;
-use Webrtc\DTLS\RTCDtlsTransport;
+use Webrtc\DTLS\DTLS\RTCDtlsTransport;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;

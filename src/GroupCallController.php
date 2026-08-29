@@ -193,7 +193,6 @@ final class GroupCallController implements CallInterface
             if ($updates === null) {
                 throw new Exception('Could not join the group call, the server kept rejecting our SSRC!');
             }
-            $this->API->handleUpdates($updates);
             $this->applyJoinUpdates($updates);
             $this->callState = GroupCallState::JOINED;
             $this->log("Joined $this!", Logger::NOTICE);

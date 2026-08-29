@@ -1211,7 +1211,6 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateGroupCall'
             || $update['_'] === 'updateGroupCallParticipants'
-            || $update['_'] === 'updateGroupCallConnection'
         ) {
             EventLoop::queue($this->handleGroupCallUpdate(...), $update);
         }

@@ -65,7 +65,6 @@ trait Handler
             $params['schedule_date'] = $scheduleDate;
         }
         $updates = $this->methodCallAsyncRead('phone.createGroupCall', $params);
-        $this->handleUpdates($updates);
         $call = $this->extractGroupCall($updates);
         if ($call === null) {
             throw new AssertionError('The server did not return the created group call!');
@@ -273,10 +272,10 @@ trait Handler
         if ($call === null) {
             return;
         }
-        $this->handleUpdates($this->methodCallAsyncRead('phone.editGroupCallTitle', [
+        $this->methodCallAsyncRead('phone.editGroupCallTitle', [
             'call' => $call->getInputCall(),
             'title' => $title,
-        ]));
+        ]);
     }
 
     /**
@@ -288,10 +287,10 @@ trait Handler
         if ($call === null) {
             return;
         }
-        $this->handleUpdates($this->methodCallAsyncRead('phone.inviteToGroupCall', [
+        $this->methodCallAsyncRead('phone.inviteToGroupCall', [
             'call' => $call->getInputCall(),
             'users' => $users,
-        ]));
+        ]);
     }
 
     /**
