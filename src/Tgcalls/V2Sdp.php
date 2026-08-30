@@ -36,6 +36,67 @@ use danog\MadelineProto\Exception;
  */
 final class V2Sdp
 {
+    /** The `sdes:mid` header extension URI tgcalls uses to route bundled channels. */
+    private const MID_EXTENSION_URI = 'urn:ietf:params:rtp-hdrext:sdes:mid';
+
+    /**
+     * Rewrite each media section's `a=mid` to the SSRC it carries.
+     *
+     * tgcalls' [InstanceV2Impl](https://github.com/TelegramMessenger/tgcalls) identifies every
+     * channel by `contentIdBySsrc()`, i.e. the decimal SSRC string, and uses that as the m-line
+     * `mid` both in the SDP it builds internally and — crucially — as the value it expects in the
+     * `sdes:mid` RTP header extension of incoming packets. It leaves the primary incoming video
+     * SSRC unsignaled and demultiplexes it purely by that MID, so a sender that stamps the plain
+     * m-line index (`0`, `1`, …) instead has all of its video dropped, while audio survives only
+     * because its SSRC happens to be bound. Aligning our mids with the SSRCs makes the MID our
+     * senders write match what the peer routes by, so the video is finally accepted.
+     *
+     * Sections without an SSRC (a rejected m-line, or the data channel) keep their original mid.
+     */
+    public static function useSsrcAsMid(string $sdp): string
+    {
+        // First pass: map each section's current mid to the SSRC it advertises.
+        $ssrcByMid = [];
+        $currentMid = null;
+        foreach (self::lines($sdp) as $line) {
+            if (str_starts_with($line, 'm=')) {
+                $currentMid = null;
+            } elseif (str_starts_with($line, 'a=mid:')) {
+                $currentMid = substr($line, 6);
+            } elseif ($currentMid !== null
+                && !isset($ssrcByMid[$currentMid])
+                && str_starts_with($line, 'a=ssrc:')
+            ) {
+                $ssrc = explode(' ', substr($line, 7))[0];
+                if ($ssrc !== '') {
+                    $ssrcByMid[$currentMid] = $ssrc;
+                }
+            }
+        }
+        if ($ssrcByMid === []) {
+            return $sdp;
+        }
+
+        // Second pass: rewrite the a=mid lines and the BUNDLE group that lists them.
+        $out = [];
+        foreach (self::lines($sdp) as $line) {
+            if (str_starts_with($line, 'a=mid:')) {
+                $mid = substr($line, 6);
+                $out[] = 'a=mid:'.($ssrcByMid[$mid] ?? $mid);
+            } elseif (str_starts_with($line, 'a=group:BUNDLE')) {
+                $mids = array_map(
+                    static fn (string $mid): string => $ssrcByMid[$mid] ?? $mid,
+                    array_filter(explode(' ', substr($line, strlen('a=group:BUNDLE '))))
+                );
+                $out[] = 'a=group:BUNDLE '.implode(' ', $mids);
+            } else {
+                $out[] = $line;
+            }
+        }
+
+        return implode("\r\n", $out)."\r\n";
+    }
+
     /**
      * Describe our local media in the form `NegotiateChannels` expects.
      *
@@ -62,6 +123,7 @@ final class V2Sdp
                     'ssrc' => '0',
                     'payloadTypes' => [],
                     'rtpExtensions' => [],
+                    'ssrcGroups' => [],
                     '_port' => (int) ($parts[1] ?? 0),
                     '_direction' => 'sendrecv',
                 ];
@@ -78,6 +140,26 @@ final class V2Sdp
                 $ssrc = (int) substr($line, 7);
                 // tgcalls transmits SSRCs as unsigned decimal strings.
                 $current['ssrc'] = (string) GroupSdp::toUnsignedSsrc($ssrc);
+                continue;
+            }
+            if (str_starts_with($line, 'a=ssrc-group:')) {
+                // tgcalls' InstanceV2Impl binds the incoming video receive stream from the SSRCs it
+                // finds in the content's ssrcGroups (see IncomingV2VideoChannel); a primary SSRC that
+                // appears in no group is left unsignaled and demultiplexed purely by MID, a path that
+                // silently drops the stream here. Echoing the FID group (primary + RTX) makes the peer
+                // latch our SSRC and route the video by it, exactly like a real tgcalls sender does.
+                $groupParts = array_values(array_filter(explode(' ', substr($line, strlen('a=ssrc-group:')))));
+                $semantics = array_shift($groupParts);
+                $ssrcs = [];
+                foreach ($groupParts as $groupSsrc) {
+                    $ssrcs[] = (string) GroupSdp::toUnsignedSsrc((int) $groupSsrc);
+                }
+                if ($semantics !== null && $semantics !== '' && $ssrcs !== []) {
+                    /** @var list<array{semantics: string, ssrcs: list<string>}> $groups */
+                    $groups = $current['ssrcGroups'];
+                    $groups[] = ['semantics' => $semantics, 'ssrcs' => $ssrcs];
+                    $current['ssrcGroups'] = $groups;
+                }
                 continue;
             }
             if (str_starts_with($line, 'a=rtpmap:')) {
@@ -116,6 +198,10 @@ final class V2Sdp
                 && \in_array($content['_direction'], ['sendrecv', 'sendonly'], true)
             );
             unset($content['_port'], $content['_direction']);
+            // Only carry ssrcGroups when there actually are any, matching tgcalls' own messages.
+            if (($content['ssrcGroups'] ?? []) === []) {
+                unset($content['ssrcGroups']);
+            }
             if ($include) {
                 $result[] = $content;
             }
@@ -257,7 +343,19 @@ final class V2Sdp
             $mappedContents[$mediaIndex] = null;
         }
         $appendRtp = static function (array $content) use (&$result): void {
-            foreach ($content['rtpExtensions'] ?? [] as $extension) {
+            // tgcalls demultiplexes the unsignaled incoming video purely by the sdes:mid RTP
+            // extension, yet its answers never echo that extension back. Re-advertising it here (at
+            // tgcalls' fixed id 1) keeps it in the mutual set so our senders actually stamp the mid;
+            // without it the offer/answer intersection drops it and all video is silently discarded.
+            $extensions = $content['rtpExtensions'] ?? [];
+            $hasMid = array_any(
+                $extensions,
+                static fn (array $extension): bool => ($extension['uri'] ?? '') === self::MID_EXTENSION_URI
+            );
+            if (!$hasMid) {
+                $result[] = 'a=extmap:1 '.self::MID_EXTENSION_URI;
+            }
+            foreach ($extensions as $extension) {
                 $result[] = 'a=extmap:'.$extension['id'].' '.$extension['uri'];
             }
             foreach ($content['payloadTypes'] ?? [] as $payloadType) {

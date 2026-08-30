@@ -421,6 +421,10 @@ final class Controller
         try {
             $this->sendV2InitialSetup();
             $offer = $this->peerConnection->createOffer();
+            // tgcalls routes each channel by an SSRC-derived mid, and demultiplexes the unsignaled
+            // incoming video purely by the sdes:mid RTP extension, so our senders must stamp the
+            // SSRC as the mid rather than the plain m-line index.
+            $offer = new RTCSessionDescription(V2Sdp::useSsrcAsMid($offer->getSdp()), $offer->getType());
             $this->peerConnection->setLocalDescription($offer);
             $this->pendingV2ExchangeId = (string) random_int(1, 0x7FFFFFFF);
             $this->renegotiatePending = false;
