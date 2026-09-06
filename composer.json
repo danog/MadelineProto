@@ -43,6 +43,7 @@
         "amphp/file": "^3.2.0",
         "amphp/mysql": "^3.1.1",
         "amphp/postgres": "^2.2.1",
+        "amphp/process": "^2.1",
         "danog/dns-over-https": "^1.0.1",
         "amphp/http-client-cookies": "^2",
         "danog/tg-file-decoder": "^1.0.2",

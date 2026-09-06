@@ -194,7 +194,11 @@ final class GroupCallController implements CallInterface
             if ($updates === null) {
                 throw new Exception('Could not join the group call, the server kept rejecting our SSRC!');
             }
-            $this->applyJoinUpdates($updates);
+            foreach ($updates['updates'] as $update) {
+                if ($update['_'] === 'updateGroupCallConnection' && !($update['presentation'] ?? false)) {
+                    $this->applyConnectionParams($update['params']);
+                }
+            }
             $this->callState = GroupCallState::JOINED;
             $this->log("Joined $this!", Logger::NOTICE);
             EventLoop::queue($this->refetch(...));
@@ -206,22 +210,6 @@ final class GroupCallController implements CallInterface
             throw $e;
         } finally {
             EventLoop::queue($lock->release(...));
-        }
-    }
-
-    /**
-     * Extract the connection parameters out of the updates returned by `phone.joinGroupCall`.
-     *
-     * updateGroupCallConnection carries no call ID and is only ever returned inline by
-     * phone.joinGroupCall, so — unlike the other group call updates — it is applied straight from
-     * the method response instead of being routed through the update loop.
-     */
-    private function applyJoinUpdates(array $updates): void
-    {
-        foreach ($updates['updates'] ?? [] as $update) {
-            if ($update['_'] === 'updateGroupCallConnection' && !($update['presentation'] ?? false)) {
-                $this->applyConnectionParams($update['params']);
-            }
         }
     }
 

@@ -100,6 +100,12 @@ final class Publisher
         }
     }
 
+    /** @param BaseSubscriber<T> $subscriber */
+    public function unsubscribe(BaseSubscriber $subscriber): void
+    {
+        unset($this->subscribers[$subscriber]);
+    }
+
     /** @param T $state */
     public function publish($state): void
     {
