@@ -43,10 +43,14 @@ trait CallHandler
      */
     public function methodCallAsyncRead(string $method, array $args, ?int $datacenter = null)
     {
+        $pagination = Pagination::apply($method, $args, $this->getTL()->getMethods()->findByMethod($method) ?: null);
         if (isset($args['specialMethodType']) && $args['specialMethodType'] === SpecialMethodType::USER_RELATED) {
             $datacenter = $this->loginState->getState()->authorizedDc;
         }
-        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
+        return Pagination::finalize(
+            $pagination,
+            ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+        );
     }
     /**
      * Call method and make sure it is asynchronously sent.

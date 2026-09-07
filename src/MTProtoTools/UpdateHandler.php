@@ -126,6 +126,7 @@ use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\Mcp\UpdateQueue;
 use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
@@ -1142,6 +1143,16 @@ trait UpdateHandler
     public function saveUpdate(array $update): void
     {
         $this->logger->logger("Saving update of type {$update['_']}", Logger::VERBOSE);
+        $session = $this->getSessionName();
+        if (UpdateQueue::enabled($session)) {
+            EventLoop::queue(function () use ($session, $update): void {
+                try {
+                    UpdateQueue::push($session, $update);
+                } catch (Throwable $e) {
+                    $this->logger->logger("Could not push MCP update: $e", Logger::WARNING);
+                }
+            });
+        }
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
             $this->getConfig();

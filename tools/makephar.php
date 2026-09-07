@@ -56,11 +56,14 @@ if (defined("MADELINE_REAL_ROOT")) {
         } else {
             $arguments = [];
         }
-        if (\count($arguments) >= 2) {
+        if (($arguments[0] ?? null) === "mcp") {
+            \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
+            \define(\MADELINE_WORKER_ARGS::class, $arguments);
+        } elseif (\count($arguments) >= 2) {
             \define(\MADELINE_WORKER_TYPE::class, \array_shift($arguments));
             \define(\MADELINE_WORKER_ARGS::class, $arguments);
         } else {
-            die("MadelineProto loader: you must include this file in another PHP script, see https://docs.madelineproto.xyz for more info.".PHP_EOL);
+            die("MadelineProto loader: you must include this file in another PHP script or run php madeline.phar mcp [session], see https://docs.madelineproto.xyz for more info.".PHP_EOL);
         }
         \define("MADELINE_REAL_ROOT", __DIR__);
         @chdir(\MADELINE_REAL_ROOT);
@@ -73,6 +76,9 @@ $result = require_once "phar://'.$argv[2].'/vendor/autoload.php";
 
 if (\defined("MADELINE_WORKER_TYPE") && \constant("MADELINE_WORKER_TYPE") === "madeline-ipc") {
     require_once "phar://'.$argv[2].'/vendor/danog/madelineproto/src/Ipc/Runner/entry.php";
+}
+if (\defined("MADELINE_WORKER_TYPE") && \constant("MADELINE_WORKER_TYPE") === "mcp") {
+    require_once "phar://'.$argv[2].'/vendor/danog/madelineproto/src/Mcp/entry.php";
 }
 
 return $result;
