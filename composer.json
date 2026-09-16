@@ -55,7 +55,7 @@
         "amphp/redis": "^2.0.4",
         "psr/http-factory": "^1.1.0",
         "psr/log": "^3.0.2",
-        "webmozart/assert": "^1.12.1",
+        "webmozart/assert": "^2",
         "bacon/bacon-qr-code": "^3.1.1",
         "nikic/php-parser": "^5.9.0",
         "revolt/event-loop": "^1.0.9",
