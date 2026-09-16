@@ -17,10 +17,10 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use danog\MadelineProto\Exception;
-use Evenement\EventEmitter;
 use Webrtc\ICE\Enum\IceRole;
 use Webrtc\ICE\Listener\IceTransportDataListener;
 use Webrtc\ICE\Listener\IceTransportDisconnectListener;
+use Webrtc\ICE\Listener\IceTransportStateChangeListener;
 use Webrtc\ICE\RTCIceCandidate;
 use Webrtc\ICE\RTCIceConnectionInterface;
 use Webrtc\ICE\RTCIceGathererInterface;
@@ -36,7 +36,7 @@ use Webrtc\ICE\RTCIceTransportInterface;
  *
  * @internal
  */
-final class SignalingIceRole extends EventEmitter implements RTCIceTransportInterface
+final class SignalingIceRole implements RTCIceTransportInterface
 {
     public function __construct(private readonly IceRole $role)
     {
@@ -101,6 +101,15 @@ final class SignalingIceRole extends EventEmitter implements RTCIceTransportInte
 
     #[\Override]
     public function addDisconnectListener(IceTransportDisconnectListener $listener): void
+    {
+    }
+
+    /**
+     * The signaling association never changes ICE state (it does not run over ICE at all), so
+     * there is nothing to notify: registering a state-change listener is a no-op.
+     */
+    #[\Override]
+    public function addStateChangeListener(IceTransportStateChangeListener $listener): void
     {
     }
 }

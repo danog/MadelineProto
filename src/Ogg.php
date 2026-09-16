@@ -376,14 +376,6 @@ final class Ogg
                 ($this->stream)($headers['number_page_segments']),
             );
 
-            //$serial = $headers['bitstream_serial_number'];
-            /*if ($headers['header_type_flag'] & Ogg::BOS) {
-                $this->emit('ogg:stream:start', [$serial]);
-            } elseif ($headers['header_type_flag'] & Ogg::EOS) {
-                $this->emit('ogg:stream:end', [$serial]);
-            } else {
-                $this->emit('ogg:stream:continue', [$serial]);
-            }*/
             $sizeAccumulated = 0;
             foreach ($segments as $segment_size) {
                 $sizeAccumulated += $segment_size;

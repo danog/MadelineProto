@@ -41,6 +41,8 @@ use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
 use Webrtc\Webrtc\Enum\SignalingState;
+use Webrtc\Webrtc\Listener\PeerConnectionConnectionStateChangeListener;
+use Webrtc\Webrtc\Listener\PeerConnectionTrackListener;
 use Webrtc\Webrtc\RTCPeerConnection;
 
 /**
@@ -53,7 +55,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  *
  * @internal
  */
-final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver
+final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener
 {
     private RTCPeerConnection $peerConnection;
     private EncryptedConnection $encryption;
@@ -116,11 +118,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->ensureVideoTransceiver();
         }
 
-        // The listeners are registered as [object, method] array callables, not closures, so they
-        // are part of the peer connection's serializable state and keep pointing at this restored
-        // controller after a serialize/unserialize cycle (a Closure could not be serialized).
-        $this->peerConnection->on('track', [$this, 'onTrackEvent']);
-        $this->peerConnection->on('connectionstatechange', [$this, 'onConnectionStateChange']);
+        // This object is registered as a typed listener, not a closure, so it is part of the peer
+        // connection's serializable state and keeps pointing at this restored controller after a
+        // serialize/unserialize cycle (a Closure could not be serialized).
+        $this->peerConnection->addTrackListener($this);
+        $this->peerConnection->addConnectionStateChangeListener($this);
 
         if (!$this->version->usesSdp()) {
             EventLoop::queue(function (): void {
@@ -197,9 +199,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     /**
      * Handle a newly negotiated remote track.
      *
-     * @internal Registered as the peer connection's `track` listener.
+     * @internal Registered as the peer connection's track listener.
      */
-    public function onTrackEvent(MediaStreamTrack $track): void
+    #[\Override]
+    public function onPeerConnectionTrack(MediaStreamTrack $track): void
     {
         if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
             $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
@@ -211,9 +214,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     /**
      * React to a change of the WebRTC connection state.
      *
-     * @internal Registered as the peer connection's `connectionstatechange` listener.
+     * @internal Registered as the peer connection's connection-state-change listener.
      */
-    public function onConnectionStateChange(): void
+    #[\Override]
+    public function onPeerConnectionConnectionStateChange(): void
     {
         $state = $this->peerConnection->getConnectionState();
         $this->call->log("WebRTC connection state of {$this->call} is now {$state->name}");
