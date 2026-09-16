@@ -53,7 +53,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  *
  * @internal
  */
-final class Controller
+final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver
 {
     private RTCPeerConnection $peerConnection;
     private EncryptedConnection $encryption;
@@ -97,30 +97,17 @@ final class Controller
         array $connections,
     ) {
         $this->remoteMediaState = new MediaState(true, false, false);
-        $this->encryption = new EncryptedConnection(
-            $authKey,
-            $outgoing,
-            function (int $cause): void {
-                $packet = $this->encryption->prepareForSendingService($cause);
-                if ($packet !== null) {
-                    $this->call->sendSignalingData($packet);
-                }
-            }
-        );
+        $this->encryption = new EncryptedConnection($authKey, $outgoing, $this);
 
         if ($version->usesSctp()) {
             // 11.0.0 and up run the whole signaling channel through an SCTP association.
-            $this->sctp = new SignalingSctpTransport(
-                $outgoing,
-                fn (string $packet) => $this->call->sendSignalingData($packet),
-                fn (string $message) => $this->onSignalingMessageData($message),
-            );
+            $this->sctp = new SignalingSctpTransport($outgoing, $this);
         }
 
         $this->peerConnection = new RTCPeerConnection([
             'iceServers' => self::buildIceServers($connections),
         ]);
-        $this->webm = new WebmSource($call, $this->onVideoCodec(...));
+        $this->webm = new WebmSource($call, $this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
         $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
         $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
@@ -129,20 +116,11 @@ final class Controller
             $this->ensureVideoTransceiver();
         }
 
-        $this->peerConnection->on('track', function (MediaStreamTrack $track): void {
-            if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
-                $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
-                $this->enableRawReceive();
-                $this->recorder?->setTrack($track);
-            }
-        });
-        $this->peerConnection->on('connectionstatechange', function (): void {
-            $state = $this->peerConnection->getConnectionState();
-            $this->call->log("WebRTC connection state of {$this->call} is now {$state->name}");
-            if ($state === ConnectionState::failed) {
-                $this->call->onConnectionFailed();
-            }
-        });
+        // The listeners are registered as [object, method] array callables, not closures, so they
+        // are part of the peer connection's serializable state and keep pointing at this restored
+        // controller after a serialize/unserialize cycle (a Closure could not be serialized).
+        $this->peerConnection->on('track', [$this, 'onTrackEvent']);
+        $this->peerConnection->on('connectionstatechange', [$this, 'onConnectionStateChange']);
 
         if (!$this->version->usesSdp()) {
             EventLoop::queue(function (): void {
@@ -157,6 +135,90 @@ final class Controller
                 new RTCDataChannelParameters('data')
             );
             EventLoop::queue($this->sendLocalDescription(...));
+        }
+    }
+
+    /**
+     * Drop the state that cannot be serialized before the graph is written out.
+     *
+     * The WebRTC engine (peer connection, ICE/DTLS/SCTP transports and their timers), the signaling
+     * reliability layer, the playback tracks and the WebM demuxer all serialize themselves and
+     * resume on the far side. Only the OGG recorder cannot: it wraps an open file/stream handle, so
+     * it is dropped here and re-attached on wakeup from the output the call still remembers.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['recorder']);
+        return $vars;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->recorder = null;
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        // The peer connection and its transports resume on their own; the [object, method] track
+        // and connection-state listeners were restored pointing at this controller, so no handler
+        // needs re-attaching here. Recording, if any, is re-attached by VoIPController on wakeup.
+    }
+
+    /**
+     * Emit a service packet, requested by the reliability layer ({@see EncryptedConnection}).
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onServiceRequest(int $cause): void
+    {
+        $packet = $this->encryption->prepareForSendingService($cause);
+        if ($packet !== null) {
+            $this->call->sendSignalingData($packet);
+        }
+    }
+
+    /**
+     * Put one SCTP packet of the signaling association on the wire.
+     *
+     * @internal Used by {@see SignalingSctpTransport} as its outgoing transport.
+     */
+    #[\Override]
+    public function deliverSignalingPacket(string $packet): void
+    {
+        $this->call->sendSignalingData($packet);
+    }
+
+    /**
+     * Handle a newly negotiated remote track.
+     *
+     * @internal Registered as the peer connection's `track` listener.
+     */
+    public function onTrackEvent(MediaStreamTrack $track): void
+    {
+        if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
+            $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
+            $this->enableRawReceive();
+            $this->recorder?->setTrack($track);
+        }
+    }
+
+    /**
+     * React to a change of the WebRTC connection state.
+     *
+     * @internal Registered as the peer connection's `connectionstatechange` listener.
+     */
+    public function onConnectionStateChange(): void
+    {
+        $state = $this->peerConnection->getConnectionState();
+        $this->call->log("WebRTC connection state of {$this->call} is now {$state->name}");
+        if ($state === ConnectionState::failed) {
+            $this->call->onConnectionFailed();
         }
     }
 
@@ -249,7 +311,8 @@ final class Controller
      * Pin the video sender to the codec of the opened file and negotiate the channel before its
      * pre-encoded frames are interpreted by an RTP payloader for another codec.
      */
-    private function onVideoCodec(string $codec): void
+    #[\Override]
+    public function onVideoCodec(string $codec): void
     {
         $this->videoEnabled = true;
         $transceiver = $this->ensureVideoTransceiver();
@@ -572,8 +635,11 @@ final class Controller
 
     /**
      * Decode and dispatch one decrypted signaling message.
+     *
+     * @internal Public so that {@see SignalingSctpTransport} can deliver reassembled messages.
      */
-    private function onSignalingMessageData(string $message): void
+    #[\Override]
+    public function onSignalingMessageData(string $message): void
     {
         if ($this->sctp !== null) {
             // Messages coming off the association are still encrypted.

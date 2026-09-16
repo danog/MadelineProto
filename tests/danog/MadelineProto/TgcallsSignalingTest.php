@@ -18,7 +18,9 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\Tgcalls\EncryptedConnection;
 use danog\MadelineProto\Tgcalls\GroupSdp;
+use danog\MadelineProto\Tgcalls\SctpSignalingObserver;
 use danog\MadelineProto\Tgcalls\SignalingSctpTransport;
+use danog\MadelineProto\Tgcalls\SignalingServiceObserver;
 use danog\MadelineProto\Tgcalls\V2Sdp;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use PHPUnit\Framework\TestCase;
@@ -145,7 +147,10 @@ final class TgcallsSignalingTest extends TestCase
     private static function pair(): array
     {
         $key = random_bytes(256);
-        $noop = static function (int $cause): void {
+        $noop = new class implements SignalingServiceObserver {
+            public function onServiceRequest(int $cause): void
+            {
+            }
         };
         return [
             new EncryptedConnection($key, true, $noop),
@@ -383,47 +388,51 @@ final class TgcallsSignalingTest extends TestCase
 
     public function testSctpSignalingCarriesMessagesBothWays(): void
     {
-        $aOut = [];
-        $bOut = [];
-        $aGot = [];
-        $bGot = [];
+        $a = self::sctpObserver();
+        $b = self::sctpObserver();
 
-        $caller = new SignalingSctpTransport(
-            true,
-            static function (string $p) use (&$aOut): void {
-                $aOut[] = $p;
-            },
-            static function (string $m) use (&$aGot): void {
-                $aGot[] = $m;
-            }
-        );
-        $callee = new SignalingSctpTransport(
-            false,
-            static function (string $p) use (&$bOut): void {
-                $bOut[] = $p;
-            },
-            static function (string $m) use (&$bGot): void {
-                $bGot[] = $m;
-            }
-        );
+        $caller = new SignalingSctpTransport(true, $a);
+        $callee = new SignalingSctpTransport(false, $b);
 
-        self::pump($caller, $callee, $aOut, $bOut);
+        self::pump($caller, $callee, $a->out, $b->out);
         $this->assertTrue($caller->isEstablished(), 'the caller established the association');
         $this->assertTrue($callee->isEstablished(), 'the callee established the association');
 
         $caller->send('MESSAGE-FROM-CALLER');
-        self::pump($caller, $callee, $aOut, $bOut);
-        $this->assertSame(['MESSAGE-FROM-CALLER'], $bGot);
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertSame(['MESSAGE-FROM-CALLER'], $b->got);
 
         $callee->send('MESSAGE-FROM-CALLEE');
-        self::pump($caller, $callee, $aOut, $bOut);
-        $this->assertSame(['MESSAGE-FROM-CALLEE'], $aGot);
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertSame(['MESSAGE-FROM-CALLEE'], $a->got);
 
         // A message larger than one SCTP packet must be fragmented and reassembled.
         $large = str_repeat('X', 5000);
         $caller->send($large);
-        self::pump($caller, $callee, $aOut, $bOut);
-        $this->assertContains($large, $bGot, 'a fragmented message must arrive intact');
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertContains($large, $b->got, 'a fragmented message must arrive intact');
+    }
+
+    /**
+     * A capturing {@see SctpSignalingObserver} stub: outgoing packets land in `out`, reassembled
+     * incoming messages in `got`.
+     */
+    private static function sctpObserver(): SctpSignalingObserver
+    {
+        return new class implements SctpSignalingObserver {
+            /** @var list<string> */
+            public array $out = [];
+            /** @var list<string> */
+            public array $got = [];
+            public function deliverSignalingPacket(string $packet): void
+            {
+                $this->out[] = $packet;
+            }
+            public function onSignalingMessageData(string $message): void
+            {
+                $this->got[] = $message;
+            }
+        };
     }
 
     /**
@@ -431,36 +440,20 @@ final class TgcallsSignalingTest extends TestCase
      */
     public function testSctpSignalingQueuesUntilEstablished(): void
     {
-        $aOut = [];
-        $bOut = [];
-        $bGot = [];
+        $a = self::sctpObserver();
+        $b = self::sctpObserver();
 
-        $caller = new SignalingSctpTransport(
-            true,
-            static function (string $p) use (&$aOut): void {
-                $aOut[] = $p;
-            },
-            static function (string $m): void {
-            }
-        );
+        $caller = new SignalingSctpTransport(true, $a);
         // Send before anything has been exchanged with the peer.
         $caller->send('EARLY-MESSAGE');
 
-        $callee = new SignalingSctpTransport(
-            false,
-            static function (string $p) use (&$bOut): void {
-                $bOut[] = $p;
-            },
-            static function (string $m) use (&$bGot): void {
-                $bGot[] = $m;
-            }
-        );
+        $callee = new SignalingSctpTransport(false, $b);
 
-        self::pump($caller, $callee, $aOut, $bOut);
+        self::pump($caller, $callee, $a->out, $b->out);
         $caller->send('LATER-MESSAGE');
-        self::pump($caller, $callee, $aOut, $bOut);
+        self::pump($caller, $callee, $a->out, $b->out);
 
-        $this->assertSame(['EARLY-MESSAGE', 'LATER-MESSAGE'], $bGot, 'nothing may be dropped or reordered');
+        $this->assertSame(['EARLY-MESSAGE', 'LATER-MESSAGE'], $b->got, 'nothing may be dropped or reordered');
     }
 
     // ------------------------------------------------------------ SSRC conversion

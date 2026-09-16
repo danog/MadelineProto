@@ -18,7 +18,6 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
-use Closure;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use Revolt\EventLoop;
 
@@ -88,15 +87,35 @@ final class EncryptedConnection
     private bool $resendTimerActive = false;
 
     /**
-     * @param string  $authKey            The 256-byte call auth key.
-     * @param bool    $outgoing           Whether we are the caller.
-     * @param Closure(int): void $requestSendService Invoked with a `SERVICE_CAUSE_*` constant when a service packet must be emitted.
+     * @param string                   $authKey  The 256-byte call auth key.
+     * @param bool                      $outgoing Whether we are the caller.
+     * @param SignalingServiceObserver $owner    Notified via
+     *                             {@see SignalingServiceObserver::onServiceRequest()} with a
+     *                             `SERVICE_CAUSE_*` constant when a service packet must be emitted.
+     *                             A serializable object rather than a `Closure`, so the reliability
+     *                             layer survives the serialize/unserialize cycle intact.
      */
     public function __construct(
         private readonly string $authKey,
         private readonly bool $outgoing,
-        private readonly Closure $requestSendService,
+        private readonly SignalingServiceObserver $owner,
     ) {
+    }
+
+    /**
+     * The reliability layer is plain serializable state, but its ACK and resend timers are
+     * event-loop callbacks that do not survive serialization. Clear the "timer active" flags and,
+     * if anything is still waiting to be acked or resent, arm a fresh service packet so delivery
+     * resumes on the restored connection.
+     */
+    public function __wakeup(): void
+    {
+        $this->sendAcksTimerActive = false;
+        $this->resendTimerActive = false;
+        if ($this->haveAdditionalMessages()) {
+            $this->resendTimerActive = true;
+            $this->scheduleService(self::MAX_DELAY_BEFORE_MESSAGE_RESEND, self::SERVICE_CAUSE_RESEND);
+        }
     }
 
     /**
@@ -316,10 +335,10 @@ final class EncryptedConnection
     private function scheduleService(float $delay, int $cause): void
     {
         if ($delay <= 0.0) {
-            EventLoop::queue($this->requestSendService, $cause);
+            EventLoop::queue($this->owner->onServiceRequest(...), $cause);
             return;
         }
-        EventLoop::delay($delay, fn () => ($this->requestSendService)($cause));
+        EventLoop::delay($delay, fn () => $this->owner->onServiceRequest($cause));
     }
 
     private function haveAdditionalMessages(): bool

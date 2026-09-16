@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\ReadableStream;
-use Closure;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Matroska;
@@ -89,16 +88,29 @@ final class WebmSource
     private int $playbackMs = 0;
 
     /**
-     * @param ?Closure(string): void $onVideoCodec Called with the SDP encoding name of the video
-     *                                             track as soon as a file's track list is known, so
-     *                                             that the transport can be renegotiated for it.
+     * @param ?VideoCodecObserver $onVideoCodec Notified with the SDP encoding name of the video
+     *                                          track as soon as a file's track list is known, so
+     *                                          that the transport can be renegotiated for it. A
+     *                                          serializable object rather than a `Closure`, so it
+     *                                          survives the serialize/unserialize cycle intact.
      */
     public function __construct(
         private readonly CallInterface $call,
-        private readonly ?Closure $onVideoCodec = null,
+        private readonly ?VideoCodecObserver $onVideoCodec = null,
     ) {
         $this->video = new SplQueue;
         $this->audio = new SplQueue;
+    }
+
+    /**
+     * The file demuxer runs as a detached event-loop task that cannot be serialized. After a
+     * serialize/unserialize cycle no reader is running, so mark playback as stopped: the frames that
+     * were already buffered still drain from the queues, and a new file can be started from scratch.
+     */
+    public function __wakeup(): void
+    {
+        $this->reading = false;
+        $this->finished = true;
     }
 
     /**
@@ -176,7 +188,7 @@ final class WebmSource
         if ($this->videoCodec !== null) {
             // The transport has to be renegotiated before the first frame goes out, or the peer
             // would decode it as whatever codec the previous file used.
-            ($this->onVideoCodec ?? static fn (string $codec) => null)($this->videoCodec);
+            $this->onVideoCodec?->onVideoCodec($this->videoCodec);
         }
     }
 

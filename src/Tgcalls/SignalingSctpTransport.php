@@ -18,12 +18,12 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
-use Closure;
 use Webrtc\DataChannel\RTCSctpTransportInterface;
 use Webrtc\ICE\Enum\IceRole;
 use Webrtc\ICE\RTCIceTransportInterface;
 use Webrtc\SCTP\RTCSctpDtlsTransportInterface;
 use Webrtc\SCTP\RTCSctpTransport;
+use Webrtc\SCTP\SignalingSinkInterface;
 use Webrtc\Stats\enum\TLSState;
 
 /**
@@ -41,7 +41,7 @@ use Webrtc\Stats\enum\TLSState;
  *
  * @internal
  */
-final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface
+final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, SignalingSinkInterface
 {
     /** Both ends of the signaling association use this port, as tgcalls does. */
     public const PORT = 5000;
@@ -58,20 +58,35 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface
     private bool $closed = false;
 
     /**
-     * @param bool                    $outgoing  Whether we are the caller, i.e. the side that
-     *                                           initiates the association.
-     * @param Closure(string): void   $emit      Sends one SCTP packet over the signaling channel.
-     * @param Closure(string): void   $onMessage Receives one reassembled signaling message.
+     * @param bool                  $outgoing Whether we are the caller, i.e. the side that
+     *                                        initiates the association.
+     * @param SctpSignalingObserver $owner    Reassembled signaling messages are delivered to
+     *                             {@see SctpSignalingObserver::onSignalingMessageData()} and outgoing
+     *                             SCTP packets to {@see SctpSignalingObserver::deliverSignalingPacket()}.
+     *                             A serializable object rather than `Closure`s, so the association
+     *                             survives the serialize/unserialize cycle intact.
      */
     public function __construct(
         private readonly bool $outgoing,
-        private readonly Closure $emit,
-        private readonly Closure $onMessage,
+        private readonly SctpSignalingObserver $owner,
     ) {
         $this->sctp = new RTCSctpTransport($this, self::PORT);
-        $this->sctp->setSignalingSink($this->onMessage);
+        // The signaling sink is part of the transport's serializable state, so it must be a real
+        // invokable object; this transport is that object (see self::__invoke()).
+        $this->sctp->setSignalingSink($this);
         // The caller drives the association, exactly like tgcalls' SignalingSctpConnection.
         $this->sctp->start(self::PORT);
+    }
+
+    /**
+     * Deliver one reassembled signaling message to the controller, as {@see SignalingSinkInterface}.
+     */
+    #[\Override]
+    public function __invoke(string $data): void
+    {
+        if (!$this->closed) {
+            $this->owner->onSignalingMessageData($data);
+        }
     }
 
     /**
@@ -168,7 +183,7 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface
     public function sendData(string $data): void
     {
         if (!$this->closed) {
-            ($this->emit)($data);
+            $this->owner->deliverSignalingPacket($data);
         }
     }
 }

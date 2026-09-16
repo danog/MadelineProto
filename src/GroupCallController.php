@@ -101,14 +101,15 @@ final class GroupCallController implements CallInterface
     public function __serialize(): array
     {
         $result = get_object_vars($this);
-        unset($result['joinMutex'], $result['connection'], $result['checkWatcher'], $result['gapWatcher']);
+        // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
+        // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
+        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher']);
         return $result;
     }
 
     public function __unserialize(array $data): void
     {
         $this->joinMutex = new LocalMutex;
-        $this->connection = null;
         $this->checkWatcher = null;
         $this->gapWatcher = null;
         foreach ($data as $key => $value) {
@@ -120,16 +121,13 @@ final class GroupCallController implements CallInterface
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
         EventLoop::queue(function (): void {
-            if ($this->callState === GroupCallState::JOINED || $this->callState === GroupCallState::JOINING) {
-                // A WebRTC session cannot survive a restart: rejoin from scratch.
-                $this->log("Rejoining $this after a restart.");
-                $this->callState = GroupCallState::NOT_JOINED;
-                try {
-                    $this->join($this->muted);
-                } catch (Throwable $e) {
-                    $this->log("Could not rejoin $this: $e", Logger::ERROR);
-                }
+            if ($this->callState !== GroupCallState::JOINED && $this->callState !== GroupCallState::JOINING) {
+                return;
             }
+            // The WebRTC connection restored itself and its transport to the SFU resumes on its own;
+            // re-poll the participant list so the set of received sources is brought back in sync.
+            $this->log("Resumed $this after a restart of the process.");
+            EventLoop::queue($this->refetch(...));
         });
     }
 

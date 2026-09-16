@@ -17,13 +17,15 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use danog\MadelineProto\Exception;
+use Evenement\EventEmitter;
 use Webrtc\ICE\Enum\IceRole;
+use Webrtc\ICE\Listener\IceTransportDataListener;
+use Webrtc\ICE\Listener\IceTransportDisconnectListener;
 use Webrtc\ICE\RTCIceCandidate;
 use Webrtc\ICE\RTCIceConnectionInterface;
 use Webrtc\ICE\RTCIceGathererInterface;
 use Webrtc\ICE\RTCIceParameters;
 use Webrtc\ICE\RTCIceTransportInterface;
-use Evenement\EventEmitter;
 
 /**
  * Reports a fixed ICE role to the SCTP stack, which is all it needs from a transport.
@@ -80,6 +82,25 @@ final class SignalingIceRole extends EventEmitter implements RTCIceTransportInte
     }
 
     public function stop(): void
+    {
+    }
+
+    /**
+     * The signaling association carries its own DATA chunks and never sees application data over ICE,
+     * so there is nothing to notify: registering a listener is a no-op.
+     */
+    #[\Override]
+    public function addDataListener(IceTransportDataListener $listener): void
+    {
+    }
+
+    #[\Override]
+    public function removeDataListener(IceTransportDataListener $listener): void
+    {
+    }
+
+    #[\Override]
+    public function addDisconnectListener(IceTransportDisconnectListener $listener): void
     {
     }
 }

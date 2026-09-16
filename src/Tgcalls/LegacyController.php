@@ -78,6 +78,50 @@ final class LegacyController
     }
 
     /**
+     * Drop the state that cannot be serialized before the graph is written out.
+     *
+     * The reflector {@see Endpoint}s serialize themselves (dropping their live sockets, which they
+     * reopen on wakeup). What cannot survive is the OGG recorder's open file handle and the two
+     * event-loop watcher IDs; they are dropped here and re-established on wakeup.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['recorder'], $vars['pendingPing'], $vars['timeoutWatcher']);
+        return $vars;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->recorder = null;
+        $this->pendingPing = null;
+        $this->timeoutWatcher = null;
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        if ($this->closed) {
+            return;
+        }
+        // The read and write loops are detached event-loop tasks that cannot be serialized: redo the
+        // libtgvoip handshake over the reconnecting sockets, which restarts both loops. Recording,
+        // if any, is re-attached by VoIPController::__unserialize().
+        EventLoop::queue(function (): void {
+            if ($this->closed) {
+                return;
+            }
+            unset($this->bestEndpoint);
+            $this->voipState = VoIPState::WAIT_INIT;
+            $this->muted = true;
+            $this->connectToAll();
+        });
+    }
+
+    /**
      * Set the output file or stream for the incoming audio.
      */
     public function setOutput(LocalFile|WritableStream $file): void

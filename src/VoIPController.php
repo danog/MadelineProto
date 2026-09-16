@@ -103,8 +103,10 @@ final class VoIPController implements CallInterface
     public function __serialize(): array
     {
         $result = get_object_vars($this);
-        // The WebRTC connection cannot survive serialization: it is re-established on wakeup.
-        unset($result['authMutex'], $result['tgcallsController'], $result['legacyController']);
+        // The engines (WebRTC and libtgvoip alike) now serialize themselves and resume their
+        // connections on wakeup, so they are kept. Only the mutex, which wraps a live suspension
+        // queue, is dropped and recreated.
+        unset($result['authMutex']);
 
         return $result;
     }
@@ -114,8 +116,6 @@ final class VoIPController implements CallInterface
     public function __unserialize(array $data): void
     {
         $this->authMutex = new LocalMutex;
-        $this->tgcallsController = null;
-        $this->legacyController = null;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -128,10 +128,13 @@ final class VoIPController implements CallInterface
             if ($this->callState !== CallState::RUNNING) {
                 return;
             }
-            // A WebRTC session cannot be resumed after the process restarted: the peer has long
-            // since timed out, so simply tear the call down instead of pretending it is alive.
-            $this->log("Discarding $this because it cannot survive a restart of the WebRTC engine.");
-            $this->discard(DiscardReason::DISCONNECTED);
+            // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own; all
+            // that is left is to re-arm the recorder, whose open output handle could not survive.
+            if ($this->outputFile !== null) {
+                $this->tgcallsController?->setOutput($this->outputFile);
+                $this->legacyController?->setOutput($this->outputFile);
+            }
+            $this->log("Resumed $this after a restart of the process.");
         });
     }
 

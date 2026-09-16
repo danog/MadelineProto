@@ -26,6 +26,8 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RemoteUrl;
+use Revolt\EventLoop;
+use Throwable;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
@@ -34,8 +36,6 @@ use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
 use Webrtc\Webrtc\RTCPeerConnection;
-use Throwable;
-
 
 /**
  * WebRTC engine of a Telegram group call.
@@ -54,7 +54,7 @@ use Throwable;
  *
  * @internal
  */
-final class GroupConnection
+final class GroupConnection implements VideoCodecObserver
 {
     private RTCPeerConnection $peerConnection;
     private OpusPlaybackTrack $outgoingAudio;
@@ -115,7 +115,7 @@ final class GroupConnection
         DjLoop $dj,
     ) {
         $this->peerConnection = new RTCPeerConnection(['iceServers' => []]);
-        $this->webm = new WebmSource($call, $this->onVideoCodec(...));
+        $this->webm = new WebmSource($call, $this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
         $transceiver = $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendonly);
         $this->audioSsrc = $transceiver->getSender()->getSsrc();
@@ -124,14 +124,75 @@ final class GroupConnection
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
 
-        $this->peerConnection->on('track', $this->onTrack(...));
-        $this->peerConnection->on('connectionstatechange', function (): void {
-            $state = $this->peerConnection->getConnectionState();
-            $this->call->log("WebRTC connection state of {$this->call} is now {$state->name}");
-            if ($state === ConnectionState::failed) {
-                $this->call->onConnectionFailed();
+        // The listeners are registered as [object, method] array callables, not closures, so they
+        // are part of the peer connection's serializable state and keep pointing at this restored
+        // connection after a serialize/unserialize cycle (a Closure could not be serialized).
+        $this->peerConnection->on('track', [$this, 'onTrack']);
+        $this->peerConnection->on('connectionstatechange', [$this, 'onConnectionStateChange']);
+    }
+
+    /**
+     * Drop the state that cannot be serialized before the graph is written out.
+     *
+     * The peer connection and its SFU transport serialize themselves and resume on the far side, and
+     * so do the playback tracks and the WebM demuxer. Only the OGG recorders cannot: each wraps an
+     * open file/stream handle. They are dropped here; those writing to a reopenable file are queued
+     * back into {@see self::$pendingOutputs} so wakeup re-attaches them.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        foreach ($this->recorders as $ssrc => $recorder) {
+            if ($recorder->file !== null) {
+                $vars['pendingOutputs'][$ssrc] = $recorder->file;
+            }
+        }
+        $vars['recorders'] = [];
+        return $vars;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->recorders = [];
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        // The peer connection resumed with its remote tracks already in place, so the `track` event
+        // will not fire again for them: re-attach any requested recorder against the live receivers.
+        EventLoop::queue(function (): void {
+            if ($this->closed || $this->pendingOutputs === []) {
+                return;
+            }
+            foreach ($this->peerConnection->getReceivers() as $receiver) {
+                $track = $receiver->getTrack();
+                if (!$track instanceof RemoteStreamTrack) {
+                    continue;
+                }
+                $ssrc = $this->trackSsrc($track);
+                if ($ssrc !== null && isset($this->pendingOutputs[$ssrc])) {
+                    $this->attachRecorder($ssrc, $track);
+                }
             }
         });
+    }
+
+    /**
+     * React to a change of the WebRTC connection state.
+     *
+     * @internal Registered as the peer connection's `connectionstatechange` listener.
+     */
+    public function onConnectionStateChange(): void
+    {
+        $state = $this->peerConnection->getConnectionState();
+        $this->call->log("WebRTC connection state of {$this->call} is now {$state->name}");
+        if ($state === ConnectionState::failed) {
+            $this->call->onConnectionFailed();
+        }
     }
 
     /**
@@ -187,7 +248,8 @@ final class GroupConnection
     /**
      * Re-pin the outgoing video m-line when a newly opened file uses another codec.
      */
-    private function onVideoCodec(string $codec): void
+    #[\Override]
+    public function onVideoCodec(string $codec): void
     {
         if ($codec === $this->outgoingVideoCodec) {
             return;
@@ -358,7 +420,10 @@ final class GroupConnection
         $this->sources = $rebuilt;
     }
 
-    private function onTrack(MediaStreamTrack $track): void
+    /**
+     * @internal Registered as the peer connection's `track` listener.
+     */
+    public function onTrack(MediaStreamTrack $track): void
     {
         if (!$track instanceof RemoteStreamTrack || $track->getKind() !== MediaKind::Audio) {
             return;

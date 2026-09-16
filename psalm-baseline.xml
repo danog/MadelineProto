@@ -7885,6 +7885,7 @@
       <code><![CDATA[$serialized]]></code>
       <code><![CDATA[$serialized]]></code>
       <code><![CDATA[$type]]></code>
+      <code><![CDATA[$value]]></code>
       <code><![CDATA[['sdpString' => $sdp]]]></code>
     </MixedAssignment>
     <MixedMethodCall>

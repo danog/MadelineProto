@@ -92,6 +92,30 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         private readonly ?WebmSource $webm = null,
     ) {
         parent::__construct(MediaKind::Audio);
+        $this->startProducing();
+    }
+
+    /**
+     * Restart the frame producer after a serialize/unserialize cycle.
+     *
+     * The parent restores every field and rebuilds the (non-serializable) frame queue; the detached
+     * producer task is an event-loop callback that cannot be serialized, so it is started afresh
+     * here and picks the stream back up from the restored timestamps.
+     *
+     * @param array<string, mixed> $data
+     */
+    #[\Override]
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->startProducing();
+    }
+
+    /**
+     * Drive the frame producer as a single long-lived, self-pacing event-loop task.
+     */
+    private function startProducing(): void
+    {
         EventLoop::queue(function (): void {
             while (!$this->isEnded() && !$this->call->isCallEnded()) {
                 $packet = $this->produce();
