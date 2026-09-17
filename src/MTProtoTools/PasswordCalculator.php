@@ -24,7 +24,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 
 use const STR_PAD_LEFT;
 

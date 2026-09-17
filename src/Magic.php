@@ -26,7 +26,7 @@ use Amp\File\Driver\EioFilesystemDriver;
 use Amp\File\Driver\UvFilesystemDriver;
 use Amp\SignalException;
 use danog\MadelineProto\TL\Conversion\Extension;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
 

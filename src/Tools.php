@@ -54,7 +54,7 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
-use phpseclib3\Crypt\Random;
+use phpseclib4\Crypt\Random;
 use ReflectionClass;
 use Traversable;
 

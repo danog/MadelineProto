@@ -27,7 +27,7 @@ use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 /**
  * AES CTR stream wrapper.

@@ -30,7 +30,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use danog\PrimeModule;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Throwable;
 
 use const PHP_EOL;

@@ -38,7 +38,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Revolt\EventLoop;
 use Stringable;
 use Webmozart\Assert\Assert;

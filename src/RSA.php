@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use danog\MadelineProto\TL\TL;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 
 use const STR_PAD_LEFT;
 
@@ -55,7 +55,7 @@ final class RSA
      */
     public static function load(TL $TL, string $rsa_key): self
     {
-        $key = \phpseclib3\Crypt\RSA::load($rsa_key);
+        $key = \phpseclib4\Crypt\RSA::load($rsa_key);
         $instance = new self;
         $instance->n = Tools::getVar($key, 'modulus');
         $instance->e = Tools::getVar($key, 'exponent');

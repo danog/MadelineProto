@@ -33,7 +33,7 @@ use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;

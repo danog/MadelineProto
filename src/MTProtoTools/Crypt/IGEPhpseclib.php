@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 /**
  * Phpseclib IGE implementation.

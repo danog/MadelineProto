@@ -24,8 +24,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\SecurityException;
-use phpseclib3\Crypt\AES;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Crypt\AES;
+use phpseclib4\Math\BigInteger;
 
 use const OPENSSL_RAW_DATA;
 use const OPENSSL_ZERO_PADDING;
