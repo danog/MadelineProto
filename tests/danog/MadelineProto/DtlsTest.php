@@ -17,10 +17,10 @@
 namespace danog\MadelineProto\Test;
 
 use PHPUnit\Framework\TestCase;
-use Webrtc\DTLS\RTCCertificate;
-use Webrtc\SSL\DTLS\Engine;
-use Webrtc\SSL\DTLS\Prf;
-use Webrtc\SSL\DTLS\RecordLayer;
+use Webrtc\DTLS\DTLS\RTCCertificate;
+use Webrtc\DTLS\DTLS\Engine;
+use Webrtc\DTLS\DTLS\Prf;
+use Webrtc\DTLS\DTLS\RecordLayer;
 
 /**
  * Tests the pure-PHP DTLS 1.2 implementation used to secure calls.
