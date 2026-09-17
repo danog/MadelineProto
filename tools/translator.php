@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
+/*
 `wget https://weblate.madelineproto.xyz/download/madelineproto/madelineproto/?format=zip -O langs.zip`;
 `unzip -o langs.zip`;
 `mv madelineproto/madelineproto/langs/* langs`;
 `rm -rf madelineproto langs.zip`;
+*/
 
 $template = '<?php
 /**
