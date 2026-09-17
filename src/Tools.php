@@ -203,7 +203,7 @@ abstract class Tools extends AsyncTools
      */
     public static function random(int $length): string
     {
-        return $length === 0 ? '' : Random::string($length);
+        return $length === 0 ? '' : random_bytes($length);
     }
     /**
      * Positive modulo
