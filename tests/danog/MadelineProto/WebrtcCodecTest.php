@@ -16,10 +16,10 @@
 
 namespace danog\MadelineProto\Test;
 
+use PHPUnit\Framework\TestCase;
 use Webrtc\Codecs\Codec;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTPParameter\RTCRtpCodecParameters;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Tests that already-encoded media can be packetized without loading any codec library.

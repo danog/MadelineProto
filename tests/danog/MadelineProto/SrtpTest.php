@@ -16,13 +16,13 @@
 
 namespace danog\MadelineProto\Test;
 
+use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Webrtc\Srtp\Enum\SrtpProfile;
 use Webrtc\Srtp\Enum\SsrcType;
 use Webrtc\Srtp\Exception\SrtpExceptionInterface;
 use Webrtc\Srtp\Policy;
 use Webrtc\Srtp\Session;
-use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 /**
  * Tests the pure-PHP SRTP implementation used by one-to-one and group calls.

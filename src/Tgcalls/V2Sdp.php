@@ -86,7 +86,7 @@ final class V2Sdp
             } elseif (str_starts_with($line, 'a=group:BUNDLE')) {
                 $mids = array_map(
                     static fn (string $mid): string => $ssrcByMid[$mid] ?? $mid,
-                    array_filter(explode(' ', substr($line, strlen('a=group:BUNDLE '))))
+                    array_filter(explode(' ', substr($line, \strlen('a=group:BUNDLE '))))
                 );
                 $out[] = 'a=group:BUNDLE '.implode(' ', $mids);
             } else {
@@ -148,7 +148,7 @@ final class V2Sdp
                 // appears in no group is left unsignaled and demultiplexed purely by MID, a path that
                 // silently drops the stream here. Echoing the FID group (primary + RTX) makes the peer
                 // latch our SSRC and route the video by it, exactly like a real tgcalls sender does.
-                $groupParts = array_values(array_filter(explode(' ', substr($line, strlen('a=ssrc-group:')))));
+                $groupParts = array_values(array_filter(explode(' ', substr($line, \strlen('a=ssrc-group:')))));
                 $semantics = array_shift($groupParts);
                 $ssrcs = [];
                 foreach ($groupParts as $groupSsrc) {

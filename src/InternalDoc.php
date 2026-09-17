@@ -38,6 +38,8 @@ use danog\MadelineProto\EventHandler\Message\Entities\Phone;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
+use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCall;
+use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Pinned;
@@ -98,6 +100,10 @@ abstract class InternalDoc
     public $fragment;
     /** @var \danog\MadelineProto\Namespace\Aicompose $aicompose */
     public $aicompose;
+    /** @var \danog\MadelineProto\Namespace\Communities $communities */
+    public $communities;
+    /** @var \danog\MadelineProto\Namespace\Ephemeral $ephemeral */
+    public $ephemeral;
 
     /**
      * Export APIFactory instance with the specified namespace.
@@ -151,6 +157,10 @@ abstract class InternalDoc
         $this->fragment->setWrapper($this->wrapper);
         $this->aicompose ??= new \danog\MadelineProto\Namespace\AbstractAPI('aicompose');
         $this->aicompose->setWrapper($this->wrapper);
+        $this->communities ??= new \danog\MadelineProto\Namespace\AbstractAPI('communities');
+        $this->communities->setWrapper($this->wrapper);
+        $this->ephemeral ??= new \danog\MadelineProto\Namespace\AbstractAPI('ephemeral');
+        $this->ephemeral->setWrapper($this->wrapper);
     }
     /**
          * Convert MTProto parameters to bot API parameters.
@@ -343,6 +353,17 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
     }
     /**
+     * Play the VP8 video and OPUS audio of a WebM file in a call.
+     *
+     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
+     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
+     * beforehand.
+     */
+    final public function callPlayVideo(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    {
+        $this->wrapper->getAPI()->callPlayVideo($id, $file);
+    }
+    /**
      * Set output file or stream for incoming OPUS audio packets in a call.
      *
      * Will write an OGG OPUS stream to the specified file or stream.
@@ -350,6 +371,13 @@ abstract class InternalDoc
     final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
     {
         $this->wrapper->getAPI()->callSetOutput($id, $file);
+    }
+    /**
+     * Stop transmitting video in a call.
+     */
+    final public function callStopVideo(int $id): void
+    {
+        $this->wrapper->getAPI()->callStopVideo($id);
     }
     /**
      * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
@@ -413,6 +441,21 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
     /**
+     * Create a group call (video chat or livestream) in the specified group or channel.
+     *
+     * Requires the `manage_call` admin right, see
+     * [video chats/livestreams »](https://core.telegram.org/api/group-calls#video-chats-livestreams).
+     *
+     * @param mixed       $peer         The group or channel where the call should be created.
+     * @param string|null $title        Custom title, defaults to the group/channel name.
+     * @param int|null    $scheduleDate If set, creates a scheduled call for the specified UNIX timestamp.
+     * @param bool        $rtmpStream   Whether the call's media is published by an external RTMP application.
+     */
+    final public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): \danog\MadelineProto\GroupCall
+    {
+        return $this->wrapper->getAPI()->createGroupCall($peer, $title, $scheduleDate, $rtmpStream);
+    }
+    /**
      * Discard call.
      *
      * @param int<1, 5> $rating  Call rating in stars
@@ -421,6 +464,13 @@ abstract class InternalDoc
     final public function discardCall(int $id, \danog\MadelineProto\VoIP\DiscardReason $reason = \danog\MadelineProto\VoIP\DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
         $this->wrapper->getAPI()->discardCall($id, $reason, $rating, $comment);
+    }
+    /**
+     * End a group call for all participants.
+     */
+    final public function discardGroupCall(int $id): void
+    {
+        $this->wrapper->getAPI()->discardGroupCall($id);
     }
     /**
      * Discard secret chat.
@@ -578,6 +628,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->exportAuthorization();
     }
     /**
+     * Export an invite link for a group call.
+     *
+     * @param bool $canSelfUnmute Whether users joining with this link may speak without asking; admins only.
+     */
+    final public function exportGroupCallInvite(int $id, bool $canSelfUnmute = false): string
+    {
+        return $this->wrapper->getAPI()->exportGroupCallInvite($id, $canSelfUnmute);
+    }
+    /**
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
@@ -684,6 +743,15 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getAllCalls();
     }
     /**
+     * Get all group calls we're currently tracking, indexed by their ID.
+     *
+     * @return array<int, GroupCall>
+     */
+    final public function getAllGroupCalls(): array
+    {
+        return $this->wrapper->getAPI()->getAllGroupCalls();
+    }
+    /**
      * Get full list of MTProto and API methods.
      */
     final public function getAllMethods(): array
@@ -732,6 +800,13 @@ abstract class InternalDoc
     final public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
     {
         return $this->wrapper->getAPI()->getCallByPeer($userId);
+    }
+    /**
+     * Get the media state of the other party of a call, as reported by their client.
+     */
+    final public function getCallRemoteMediaState(int $id): ?\danog\MadelineProto\VoIP\MediaState
+    {
+        return $this->wrapper->getAPI()->getCallRemoteMediaState($id);
     }
     /**
      * Get call state.
@@ -875,6 +950,37 @@ abstract class InternalDoc
     final public function getFullInfo(mixed $id): array
     {
         return $this->wrapper->getAPI()->getFullInfo($id);
+    }
+    /**
+     * Get the group call (video chat or livestream) currently active in a group or channel.
+     */
+    final public function getGroupCall(mixed $peer): ?\danog\MadelineProto\GroupCall
+    {
+        return $this->wrapper->getAPI()->getGroupCall($peer);
+    }
+    /**
+     * Get a group call from its
+     * [conference deep link »](https://core.telegram.org/api/links#conference-links) slug.
+     */
+    final public function getGroupCallBySlug(string $slug): ?\danog\MadelineProto\GroupCall
+    {
+        return $this->wrapper->getAPI()->getGroupCallBySlug($slug);
+    }
+    /**
+     * Get the participants of a group call, indexed by their bot API peer ID.
+     *
+     * @return array<int, Participant>
+     */
+    final public function getGroupCallParticipants(int $id): array
+    {
+        return $this->wrapper->getAPI()->getGroupCallParticipants($id);
+    }
+    /**
+     * Get the state of a group call.
+     */
+    final public function getGroupCallState(int $id): \danog\MadelineProto\GroupCall\GroupCallState
+    {
+        return $this->wrapper->getAPI()->getGroupCallState($id);
     }
     /**
      * Get async HTTP client.
@@ -1197,6 +1303,80 @@ abstract class InternalDoc
         return \danog\MadelineProto\MTProto::getWebWarnings();
     }
     /**
+     * Get the file that is currently being played in a group call.
+     */
+    final public function groupCallGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
+    {
+        return $this->wrapper->getAPI()->groupCallGetCurrent($id);
+    }
+    /**
+     * Pause playback of the current audio file in a group call.
+     */
+    final public function groupCallPausePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->groupCallPausePlay($id);
+    }
+    /**
+     * Play a file in a group call.
+     */
+    final public function groupCallPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    {
+        $this->wrapper->getAPI()->groupCallPlay($id, $file);
+    }
+    /**
+     * Files to play on hold in a group call.
+     */
+    final public function groupCallPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
+    {
+        $this->wrapper->getAPI()->groupCallPlayOnHold($id, ...$files);
+    }
+    /**
+     * Play the VP8 video and OPUS audio of a WebM file in a group call.
+     *
+     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
+     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
+     * beforehand.
+     */
+    final public function groupCallPlayVideo(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    {
+        $this->wrapper->getAPI()->groupCallPlayVideo($id, $file);
+    }
+    /**
+     * Resume playback of the current audio file in a group call.
+     */
+    final public function groupCallResumePlay(int $id): void
+    {
+        $this->wrapper->getAPI()->groupCallResumePlay($id);
+    }
+    /**
+     * Set the output file or stream for the incoming audio of a group call participant.
+     */
+    final public function groupCallSetOutput(int $id, mixed $participant, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
+    {
+        $this->wrapper->getAPI()->groupCallSetOutput($id, $participant, $file);
+    }
+    /**
+     * Skip to the next file in the playlist of a group call.
+     */
+    final public function groupCallSkipPlay(int $id): void
+    {
+        $this->wrapper->getAPI()->groupCallSkipPlay($id);
+    }
+    /**
+     * Stop playing all files in a group call, clearing the main and the hold playlist.
+     */
+    final public function groupCallStopPlay(int $id): void
+    {
+        $this->wrapper->getAPI()->groupCallStopPlay($id);
+    }
+    /**
+     * Stop transmitting video in a group call.
+     */
+    final public function groupCallStopVideo(int $id): void
+    {
+        $this->wrapper->getAPI()->groupCallStopVideo($id);
+    }
+    /**
      * Check if has admins.
      */
     final public function hasAdmins(): bool
@@ -1286,6 +1466,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->initSelfRestart();
     }
     /**
+     * Invite users to a group call.
+     */
+    final public function inviteToGroupCall(int $id, mixed ...$users): void
+    {
+        $this->wrapper->getAPI()->inviteToGroupCall($id, ...$users);
+    }
+    /**
      * Whether this is altervista.
      */
     final public static function isAltervista(): bool
@@ -1310,12 +1497,33 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isBot($peer);
     }
     /**
+     * Whether our own audio stream is muted in a call.
+     */
+    final public function isCallMuted(int $id): bool
+    {
+        return $this->wrapper->getAPI()->isCallMuted($id);
+    }
+    /**
      * Check if the specified peer is a forum.
      *
      */
     final public function isForum(mixed $peer): bool
     {
         return $this->wrapper->getAPI()->isForum($peer);
+    }
+    /**
+     * Whether our own audio stream is muted in a group call.
+     */
+    final public function isGroupCallMuted(int $id): bool
+    {
+        return $this->wrapper->getAPI()->isGroupCallMuted($id);
+    }
+    /**
+     * Whether the currently playing audio file of a group call is paused.
+     */
+    final public function isGroupCallPlayPaused(int $id): bool
+    {
+        return $this->wrapper->getAPI()->isGroupCallPlayPaused($id);
     }
     /**
      * Whether we're an IPC client instance.
@@ -1367,6 +1575,25 @@ abstract class InternalDoc
     final public function isTestMode(): bool
     {
         return $this->wrapper->getAPI()->isTestMode();
+    }
+    /**
+     * Join the group call currently active in a group or channel.
+     *
+     * @param mixed       $peer       The group or channel whose call should be joined.
+     * @param bool        $muted      Whether to join muted.
+     * @param mixed       $joinAs     Peer to join as, defaults to ourselves.
+     * @param string|null $inviteHash Invite hash from a video chat invite link, if any.
+     */
+    final public function joinGroupCall(mixed $peer, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): \danog\MadelineProto\GroupCall
+    {
+        return $this->wrapper->getAPI()->joinGroupCall($peer, $muted, $joinAs, $inviteHash);
+    }
+    /**
+     * Leave a group call, without ending it for the other participants.
+     */
+    final public function leaveGroupCall(int $id): void
+    {
+        $this->wrapper->getAPI()->leaveGroupCall($id);
     }
     /**
      * Logger.
@@ -2005,6 +2232,27 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->sendVoice($peer, $file, $caption, $parseMode, $callback, $fileName, $ttl, $duration, $waveform, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $forceResend, $cancellation);
     }
     /**
+     * Mute or unmute our own audio stream in a call.
+     */
+    final public function setCallMuted(int $id, bool $muted = true): void
+    {
+        $this->wrapper->getAPI()->setCallMuted($id, $muted);
+    }
+    /**
+     * Mute or unmute our own audio stream in a group call.
+     */
+    final public function setGroupCallMuted(int $id, bool $muted = true): void
+    {
+        $this->wrapper->getAPI()->setGroupCallMuted($id, $muted);
+    }
+    /**
+     * Change the title of a group call.
+     */
+    final public function setGroupCallTitle(int $id, string $title): void
+    {
+        $this->wrapper->getAPI()->setGroupCallTitle($id, $title);
+    }
+    /**
      * Set NOOP update handler, ignoring all updates.
      */
     final public function setNoop(): void
@@ -2593,207 +2841,5 @@ abstract class InternalDoc
     final public function wrapUpdate(array $update): ?\danog\MadelineProto\EventHandler\Update
     {
         return $this->wrapper->getAPI()->wrapUpdate($update);
-    }
-    /**
-     * Create a group call (video chat or livestream) in the specified group or channel.
-     *
-     * Requires the `manage_call` admin right, see
-     * [video chats/livestreams »](https://core.telegram.org/api/group-calls#video-chats-livestreams).
-     *
-     * @param mixed       $peer         The group or channel where the call should be created.
-     * @param string|null $title        Custom title, defaults to the group/channel name.
-     * @param int|null    $scheduleDate If set, creates a scheduled call for the specified UNIX timestamp.
-     * @param bool        $rtmpStream   Whether the call's media is published by an external RTMP application.
-     */
-    final public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): \danog\MadelineProto\GroupCall
-    {
-        return $this->wrapper->getAPI()->createGroupCall($peer, $title, $scheduleDate, $rtmpStream);
-    }
-    /**
-     * End a group call for all participants.
-     */
-    final public function discardGroupCall(int $id): void
-    {
-        $this->wrapper->getAPI()->discardGroupCall($id);
-    }
-    /**
-     * Export an invite link for a group call.
-     *
-     * @param bool $canSelfUnmute Whether users joining with this link may speak without asking; admins only.
-     */
-    final public function exportGroupCallInvite(int $id, bool $canSelfUnmute = false): string
-    {
-        return $this->wrapper->getAPI()->exportGroupCallInvite($id, $canSelfUnmute);
-    }
-    /**
-     * Get all group calls we're currently tracking, indexed by their ID.
-     *
-     * @return array<int, GroupCall>
-     */
-    final public function getAllGroupCalls(): array
-    {
-        return $this->wrapper->getAPI()->getAllGroupCalls();
-    }
-    /**
-     * Get the media state of the other party of a call, as reported by their client.
-     */
-    final public function getCallRemoteMediaState(int $id): ?\danog\MadelineProto\VoIP\MediaState
-    {
-        return $this->wrapper->getAPI()->getCallRemoteMediaState($id);
-    }
-    /**
-     * Get the group call (video chat or livestream) currently active in a group or channel.
-     */
-    final public function getGroupCall(mixed $peer): ?\danog\MadelineProto\GroupCall
-    {
-        return $this->wrapper->getAPI()->getGroupCall($peer);
-    }
-    /**
-     * Get a group call from its
-     * [conference deep link »](https://core.telegram.org/api/links#conference-links) slug.
-     */
-    final public function getGroupCallBySlug(string $slug): ?\danog\MadelineProto\GroupCall
-    {
-        return $this->wrapper->getAPI()->getGroupCallBySlug($slug);
-    }
-    /**
-     * Get the participants of a group call, indexed by their bot API peer ID.
-     *
-     * @return array<int, Participant>
-     */
-    final public function getGroupCallParticipants(int $id): array
-    {
-        return $this->wrapper->getAPI()->getGroupCallParticipants($id);
-    }
-    /**
-     * Get the state of a group call.
-     */
-    final public function getGroupCallState(int $id): ?\danog\MadelineProto\GroupCall\GroupCallState
-    {
-        return $this->wrapper->getAPI()->getGroupCallState($id);
-    }
-    /**
-     * Get the file that is currently being played in a group call.
-     */
-    final public function groupCallGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
-    {
-        return $this->wrapper->getAPI()->groupCallGetCurrent($id);
-    }
-    /**
-     * Pause playback of the current audio file in a group call.
-     */
-    final public function groupCallPausePlay(int $id): void
-    {
-        $this->wrapper->getAPI()->groupCallPausePlay($id);
-    }
-    /**
-     * Play a file in a group call.
-     */
-    final public function groupCallPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
-    {
-        $this->wrapper->getAPI()->groupCallPlay($id, $file);
-    }
-    /**
-     * Files to play on hold in a group call.
-     */
-    final public function groupCallPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
-    {
-        $this->wrapper->getAPI()->groupCallPlayOnHold($id, ...$files);
-    }
-    /**
-     * Resume playback of the current audio file in a group call.
-     */
-    final public function groupCallResumePlay(int $id): void
-    {
-        $this->wrapper->getAPI()->groupCallResumePlay($id);
-    }
-    /**
-     * Set the output file or stream for the incoming audio of a group call participant.
-     */
-    final public function groupCallSetOutput(int $id, mixed $participant, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
-    {
-        $this->wrapper->getAPI()->groupCallSetOutput($id, $participant, $file);
-    }
-    /**
-     * Skip to the next file in the playlist of a group call.
-     */
-    final public function groupCallSkipPlay(int $id): void
-    {
-        $this->wrapper->getAPI()->groupCallSkipPlay($id);
-    }
-    /**
-     * Stop playing all files in a group call, clearing the main and the hold playlist.
-     */
-    final public function groupCallStopPlay(int $id): void
-    {
-        $this->wrapper->getAPI()->groupCallStopPlay($id);
-    }
-    /**
-     * Invite users to a group call.
-     */
-    final public function inviteToGroupCall(int $id, mixed ...$users): void
-    {
-        $this->wrapper->getAPI()->inviteToGroupCall($id, ...$users);
-    }
-    /**
-     * Whether our own audio stream is muted in a call.
-     */
-    final public function isCallMuted(int $id): bool
-    {
-        return $this->wrapper->getAPI()->isCallMuted($id);
-    }
-    /**
-     * Whether our own audio stream is muted in a group call.
-     */
-    final public function isGroupCallMuted(int $id): bool
-    {
-        return $this->wrapper->getAPI()->isGroupCallMuted($id);
-    }
-    /**
-     * Whether the currently playing audio file of a group call is paused.
-     */
-    final public function isGroupCallPlayPaused(int $id): bool
-    {
-        return $this->wrapper->getAPI()->isGroupCallPlayPaused($id);
-    }
-    /**
-     * Join the group call currently active in a group or channel.
-     *
-     * @param mixed       $peer       The group or channel whose call should be joined.
-     * @param bool        $muted      Whether to join muted.
-     * @param mixed       $joinAs     Peer to join as, defaults to ourselves.
-     * @param string|null $inviteHash Invite hash from a video chat invite link, if any.
-     */
-    final public function joinGroupCall(mixed $peer, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): \danog\MadelineProto\GroupCall
-    {
-        return $this->wrapper->getAPI()->joinGroupCall($peer, $muted, $joinAs, $inviteHash);
-    }
-    /**
-     * Leave a group call, without ending it for the other participants.
-     */
-    final public function leaveGroupCall(int $id): void
-    {
-        $this->wrapper->getAPI()->leaveGroupCall($id);
-    }
-    /**
-     * Mute or unmute our own audio stream in a call.
-     */
-    final public function setCallMuted(int $id, bool $muted = true): void
-    {
-        $this->wrapper->getAPI()->setCallMuted($id, $muted);
-    }
-    /**
-     * Mute or unmute our own audio stream in a group call.
-     */
-    final public function setGroupCallMuted(int $id, bool $muted = true): void
-    {
-        $this->wrapper->getAPI()->setGroupCallMuted($id, $muted);
-    }
-    /**
-     * Change the title of a group call.
-     */
-    final public function setGroupCallTitle(int $id, string $title): void
-    {
-        $this->wrapper->getAPI()->setGroupCallTitle($id, $title);
     }
 }

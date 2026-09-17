@@ -39,7 +39,7 @@ interface Account
     /**
      * Edits notification settings from a given user/group, from all users/all groups.
      *
-     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
+     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int}|array{_: 'inputNotifyCommunity', community?: array|int|string} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @param array{_: 'inputPeerNotifySettings', show_previews?: bool, silent?: bool, mute_until?: int, sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}, stories_muted?: bool, stories_hide_sender?: bool, stories_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title?: string, data?: string}|array{_: 'notificationSoundRingtone', id?: int}} $settings Notification settings @see https://docs.madelineproto.xyz/API_docs/types/InputPeerNotifySettings.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -50,7 +50,7 @@ interface Account
     /**
      * Gets current notification settings for a given user/group, from all users/all groups.
      *
-     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
+     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int}|array{_: 'inputNotifyCommunity', community?: array|int|string} $peer Notification source @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -519,7 +519,7 @@ interface Account
      *
      * @param bool $compare_sound If set, chats with non-default sound will be returned
      * @param bool $compare_stories If set, chats with non-default notification settings for stories will be returned
-     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int} $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
+     * @param array{_: 'inputNotifyPeer', peer?: array|int|string}|array{_: 'inputNotifyUsers'}|array{_: 'inputNotifyChats'}|array{_: 'inputNotifyBroadcasts'}|array{_: 'inputNotifyForumTopic', peer?: array|int|string, top_msg_id?: int}|array{_: 'inputNotifyCommunity', community?: array|int|string} $peer If specified, only chats of the specified category will be returned @see https://docs.madelineproto.xyz/API_docs/types/InputNotifyPeer.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
