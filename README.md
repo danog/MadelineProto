@@ -999,6 +999,8 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallPlay" name="groupCallPlay">Play a file in a group call: groupCallPlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callPlay" name="callPlay">Play file in call: callPlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callPlayOnHold" name="callPlayOnHold">Play files on hold in call: callPlayOnHold</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callPlayVideo" name="callPlayVideo">Play the VP8 video and OPUS audio of a WebM file in a call: callPlayVideo</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallPlayVideo" name="groupCallPlayVideo">Play the VP8 video and OPUS audio of a WebM file in a group call: groupCallPlayVideo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#posmod" name="posmod">Positive modulo: posmod</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotCallbackAnswer.html" name="messages.getBotCallbackAnswer">Press an inline callback button and get a callback answer from the bot: messages.getBotCallbackAnswer</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#openBuffered" name="openBuffered">Provide a buffered reader for a file, URL or amp stream: openBuffered</a>
@@ -1189,6 +1191,8 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/contacts.blockFromReplies.html" name="contacts.blockFromReplies">Stop getting notifications about discussion replies of a certain user in @replies: contacts.blockFromReplies</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallStopPlay" name="groupCallStopPlay">Stop playing all files in a group call, clearing the main and the hold playlist: groupCallStopPlay</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.leaveGroupCallPresentation.html" name="phone.leaveGroupCallPresentation">Stop screen sharing in a group call: phone.leaveGroupCallPresentation</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#callStopVideo" name="callStopVideo">Stop transmitting video in a call: callStopVideo</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallStopVideo" name="groupCallStopVideo">Stop transmitting video in a group call: groupCallStopVideo</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#stop" name="stop">Stop update loop: stop</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#stopPlay" name="stopPlay">Stops playing all files in the call, clears the main and the hold playlist: stopPlay</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getCdnConfig" name="getCdnConfig">Store RSA keys for CDN datacenters: getCdnConfig</a>
