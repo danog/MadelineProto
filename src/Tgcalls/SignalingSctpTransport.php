@@ -154,6 +154,7 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
     /**
      * The signaling channel is always usable: the API call underneath it is reliable by itself.
      */
+    #[\Override]
     public function getState(): TLSState
     {
         return $this->closed ? TLSState::CLOSED : TLSState::CONNECTED;
@@ -162,16 +163,19 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
     /**
      * SCTP decides which side is the client from the ICE role, so report the call direction.
      */
+    #[\Override]
     public function getIceTransport(): RTCIceTransportInterface
     {
         return new SignalingIceRole($this->outgoing ? IceRole::Controlling : IceRole::Controlled);
     }
 
+    #[\Override]
     public function setSctpReceiver(?RTCSctpTransportInterface $sctpReceiver = null): void
     {
         $this->sctpReceiver = $sctpReceiver;
     }
 
+    #[\Override]
     public function removeSctpReceiver(RTCSctpTransport $param): void
     {
         $this->sctpReceiver = null;
@@ -180,6 +184,7 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
     /**
      * Put one SCTP packet on the signaling channel.
      */
+    #[\Override]
     public function sendData(string $data): void
     {
         if (!$this->closed) {

@@ -42,45 +42,54 @@ final class SignalingIceRole implements RTCIceTransportInterface
     {
     }
 
+    #[\Override]
     public function getRole(): IceRole
     {
         return $this->role;
     }
 
+    #[\Override]
     public function isRoleSet(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function setRoleSet(bool $roleSet): void
     {
     }
 
+    #[\Override]
     public function send(string $bytes): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    #[\Override]
     public function addRemoteCandidate(RTCIceCandidate $candidate): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    #[\Override]
     public function getIceGatherer(): RTCIceGathererInterface
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    #[\Override]
     public function getIceConnection(): RTCIceConnectionInterface
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    #[\Override]
     public function start(RTCIceParameters $remoteIceParameters): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    #[\Override]
     public function stop(): void
     {
     }
