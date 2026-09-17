@@ -14,6 +14,7 @@ use danog\AsyncOrm\Internal\Containers\CacheContainer;
 use danog\AsyncOrm\Internal\Driver\MysqlArray;
 use danog\AsyncOrm\Internal\Driver\PostgresArray;
 use danog\AsyncOrm\Internal\Driver\RedisArray;
+use phpseclib4\Math\BigInteger;
 
 class_alias(MysqlArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArray');
@@ -24,6 +25,8 @@ class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArrayBytea');
 class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\RedisArray');
 class_alias(CacheContainer::class, '\\danog\\MadelineProto\\Db\\CacheContainer');
+
+class_alias(BigInteger::class, '\\phpseclib3\\Math\\BigInteger');
 
 if ((PHP_MINOR_VERSION === 2 && PHP_VERSION_ID < 80204)
     || PHP_MAJOR_VERSION < 8
