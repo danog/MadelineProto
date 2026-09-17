@@ -133,7 +133,7 @@ final class GroupSdp
                 'name' => 'rtx',
                 'clockrate' => 90000,
                 'channels' => 0,
-                'parameters' => ['apt' => (string) self::VP8_PAYLOAD_TYPE],
+                'parameters' => ['apt' => self::VP8_PAYLOAD_TYPE],
                 'feedback' => [],
             ],
             [
@@ -149,7 +149,7 @@ final class GroupSdp
                 'name' => 'rtx',
                 'clockrate' => 90000,
                 'channels' => 0,
-                'parameters' => ['apt' => (string) self::VP9_PAYLOAD_TYPE],
+                'parameters' => ['apt' => self::VP9_PAYLOAD_TYPE],
                 'feedback' => [],
             ],
             [
@@ -169,7 +169,7 @@ final class GroupSdp
                 'name' => 'rtx',
                 'clockrate' => 90000,
                 'channels' => 0,
-                'parameters' => ['apt' => (string) self::H264_PAYLOAD_TYPE],
+                'parameters' => ['apt' => self::H264_PAYLOAD_TYPE],
                 'feedback' => [],
             ],
         ],
