@@ -437,6 +437,9 @@ final class Blacklist {
             $psalmType = $this->prepareTLPsalmType($data['type'], false);
             $description = $this->prepareTLTypeDescription($data['type'], '');
             $contents .= "     * @return {$psalmType} {$description}\n";
+            // Every API method performs network I/O, so it is impure; declaring it lets Psalm's
+            // taint/security analysis reason about these entry points (psalm.dev/364).
+            $contents .= "     * @psalm-impure\n";
             $contents .= "     */\n";
             $contents .= "    public function {$method}(";
             $contents .= implode(', ', $signature);
@@ -656,7 +659,10 @@ final class Blacklist {
                 fwrite($handle, " */\n\n");
                 fwrite($handle, "namespace {$this->namespace}\\Namespace;\n");
 
-                fwrite($handle, "\ninterface {$namespace}\n{");
+                // A namespace is a stateful service (it wraps the live API), not a value object, so
+                // it is explicitly mutable — this satisfies Psalm's security-analysis requirement
+                // that every interface declare its immutability (psalm.dev/365).
+                fwrite($handle, "\n/** @psalm-mutable */\ninterface {$namespace}\n{");
             }
             foreach ($methods as $contents) {
                 fwrite($handle, $contents);
@@ -673,7 +679,7 @@ final class Blacklist {
         fwrite($handle, " * don't modify it manually.\n");
         fwrite($handle, " */\n\n");
         fwrite($handle, "namespace {$this->namespace}\\EventHandler;\n");
-        fwrite($handle, "/** @internal An internal interface used to avoid type errors when using simple filters. */\n");
+        fwrite($handle, "/**\n * @internal An internal interface used to avoid type errors when using simple filters.\n * @psalm-mutable\n */\n");
         fwrite($handle, "interface SimpleFilters extends ");
         /** @psalm-suppress UndefinedClass */
         fwrite($handle, implode(", ", array_map(static fn ($s) => "\\$s", ClassFinder::getClassesInNamespace(\danog\MadelineProto\EventHandler\SimpleFilter::class, ClassFinder::RECURSIVE_MODE|ClassFinder::ALLOW_INTERFACES))));
