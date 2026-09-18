@@ -27,6 +27,7 @@ namespace danog\MadelineProto\Stream;
  *
  * @template TT
  * @extends ProxyStreamInterface<TT>
+ * @psalm-mutable
  */
 interface BufferedProxyStreamInterface extends BufferedStreamInterface, ProxyStreamInterface
 {

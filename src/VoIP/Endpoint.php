@@ -98,6 +98,9 @@ final class Endpoint
             throw $e;
         }
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __sleep(): array
     {
         $vars = get_object_vars($this);
@@ -106,6 +109,9 @@ final class Endpoint
         return array_keys($vars);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return $this->udp
@@ -123,6 +129,9 @@ final class Endpoint
         }
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private static function unpack_string($stream): string
     {
         $l = \ord(stream_get_contents($stream, 1));

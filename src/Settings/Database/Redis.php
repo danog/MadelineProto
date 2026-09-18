@@ -62,6 +62,8 @@ final class Redis extends DriverDatabaseAbstract
      * Set database number.
      *
      * @param int $database Database number.
+     *
+     * @psalm-external-mutation-free
      */
     public function setDatabase(int $database): self
     {
@@ -83,6 +85,8 @@ final class Redis extends DriverDatabaseAbstract
      * Set database URI.
      *
      * @param string $uri Database URI.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setUri(string $uri): static

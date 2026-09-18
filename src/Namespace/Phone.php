@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Phone
 {
     /**
@@ -16,6 +17,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return mixed Any JSON-encodable data
+     * @psalm-impure
      */
     public function getCallConfig(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): mixed;
 
@@ -27,6 +29,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function receivedCall(array $peer, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -41,6 +44,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function setCallRating(array $peer, bool|null $user_initiative = null, int|null $rating = 0, string|null $comment = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -53,6 +57,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveCallDebug(array $peer, mixed $debug, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -65,6 +70,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function sendSignalingData(array $peer, string|null $data = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -79,6 +85,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function createGroupCall(bool|null $rtmp_stream = null, array|int|string|null $peer = null, string|null $title = null, int|null $schedule_date = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -97,6 +104,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function joinGroupCall(array $call, mixed $params, bool|null $muted = null, bool|null $video_stopped = null, array|int|string|null $join_as = null, string|null $invite_hash = null, string|null $public_key = null, string|null $block = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -109,6 +117,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function leaveGroupCall(array $call, int|null $source = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -121,6 +130,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function inviteToGroupCall(array $call, array $users = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -132,6 +142,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function discardGroupCall(array $call, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -147,6 +158,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleGroupCallSettings(array $call, bool|null $reset_invite_hash = null, bool|null $join_muted = null, bool|null $messages_enabled = null, int|null $send_paid_messages_stars = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -159,6 +171,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCall', call: array{_: 'groupCallDiscarded', id: int, access_hash: int, duration: int}|array{_: 'groupCall', join_muted: bool, can_change_join_muted: bool, join_date_asc: bool, schedule_start_subscribed: bool, can_start_video: bool, record_video_active: bool, rtmp_stream: bool, listeners_hidden: bool, conference: bool, creator: bool, messages_enabled: bool, can_change_messages_enabled: bool, min: bool, id: int, access_hash: int, participants_count: int, title?: string, stream_dc_id?: int, record_start_date?: int, schedule_date?: int, unmuted_video_count?: int, unmuted_video_limit: int, version: int, invite_link?: string, send_paid_messages_stars?: int, default_send_as?: array|int|string}, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date?: int, source: int, volume?: int, about?: string, raise_hand_rating?: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source?: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source?: int}, paid_stars_total?: int}>, participants_next_offset: string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCall.html
+     * @psalm-impure
      */
     public function getGroupCall(array $call, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -174,6 +187,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupParticipants', count: int, participants: list<array{_: 'groupCallParticipant', peer: array|int|string, muted: bool, left: bool, can_self_unmute: bool, just_joined: bool, versioned: bool, min: bool, muted_by_you: bool, volume_by_admin: bool, self: bool, video_joined: bool, date: int, active_date?: int, source: int, volume?: int, about?: string, raise_hand_rating?: int, video?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source?: int}, presentation?: array{_: 'groupCallParticipantVideo', paused: bool, endpoint: string, source_groups: list<array{_: 'groupCallParticipantVideoSourceGroup', semantics: string, sources: list<int>}>, audio_source?: int}, paid_stars_total?: int}>, next_offset: string, chats: list<array|int|string>, users: list<array|int|string>, version: int} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupParticipants.html
+     * @psalm-impure
      */
     public function getGroupParticipants(array $call, array $ids = [], array $sources = [], string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -187,6 +201,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<int> 
+     * @psalm-impure
      */
     public function checkGroupCall(array $call, array $sources = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -202,6 +217,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleGroupCallRecord(array $call, bool|null $start = null, bool|null $video = null, string|null $title = null, bool|null $video_portrait = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -226,6 +242,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editGroupCallParticipant(array $call, array|int|string|null $participant = null, bool|null $muted = null, int|null $volume = null, bool|null $raise_hand = null, bool|null $video_stopped = null, bool|null $video_paused = null, bool|null $presentation_paused = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -238,6 +255,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editGroupCallTitle(array $call, string|null $title = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -249,6 +267,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.joinAsPeers', peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.JoinAsPeers.html
+     * @psalm-impure
      */
     public function getGroupCallJoinAs(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -261,6 +280,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.exportedGroupCallInvite', link: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.ExportedGroupCallInvite.html
+     * @psalm-impure
      */
     public function exportGroupCallInvite(array $call, bool|null $can_self_unmute = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -273,6 +293,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleGroupCallStartSubscription(array $call, bool $subscribed, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -284,6 +305,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function startScheduledGroupCall(array $call, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -296,6 +318,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveDefaultGroupCallJoinAs(array|int|string|null $peer = null, array|int|string|null $join_as = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -308,6 +331,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function joinGroupCallPresentation(array $call, mixed $params, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -319,6 +343,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function leaveGroupCallPresentation(array $call, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -332,6 +357,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCallStreamChannels', channels: list<array{_: 'groupCallStreamChannel', channel: int, scale: int, last_timestamp_ms: int}>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStreamChannels.html
+     * @psalm-impure
      */
     public function getGroupCallStreamChannels(array $call, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -345,6 +371,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCallStreamRtmpUrl', url: string, key: string} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStreamRtmpUrl.html
+     * @psalm-impure
      */
     public function getGroupCallStreamRtmpUrl(bool $revoke, bool|null $live_story = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -357,6 +384,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveCallLog(array $peer, mixed $file, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -373,6 +401,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function createConferenceCall(bool|null $muted = null, bool|null $video_stopped = null, bool|null $join = null, string|null $public_key = null, string|null $block = null, mixed $params = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -390,6 +419,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function deleteConferenceCallParticipants(array $call, bool|null $only_left = null, bool|null $kick = null, array $ids = [], string|null $block = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -402,6 +432,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function sendConferenceCallBroadcast(array $call, string|null $block = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -415,6 +446,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function inviteConferenceCallParticipant(array $call, bool|null $video = null, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -426,6 +458,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function declineConferenceCallInvite(int|null $msg_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -440,6 +473,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function getGroupCallChainBlocks(array $call, int|null $sub_chain_id = 0, int|null $offset = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -454,6 +488,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function sendGroupCallMessage(array $call, array $message, int|null $allow_paid_stars = null, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -466,6 +501,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function sendGroupCallEncryptedMessage(array $call, string|null $encrypted_message = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -479,6 +515,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function deleteGroupCallMessages(array $call, bool|null $report_spam = null, array $messages = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -492,6 +529,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function deleteGroupCallParticipantMessages(array $call, bool|null $report_spam = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -503,6 +541,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'phone.groupCallStars', total_stars: int, top_donors: list<array{_: 'groupCallDonor', top: bool, my: bool, peer_id?: array|int|string, stars: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/phone.GroupCallStars.html
+     * @psalm-impure
      */
     public function getGroupCallStars(array $call, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -515,6 +554,7 @@ interface Phone
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveDefaultSendAs(array $call, array|int|string|null $send_as = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

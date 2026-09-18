@@ -480,6 +480,7 @@ abstract class Message extends AbstractMessage
      * @param int|null   $scheduleDate Scheduled message date for scheduled messages
      * @param bool       $noWebpage    Disable webpage preview
      *
+     * @psalm-mutation-free
      */
     public function replyOrEdit(
         string    $message,

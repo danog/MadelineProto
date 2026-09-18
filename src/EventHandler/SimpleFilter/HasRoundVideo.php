@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only round videos */
+/** @psalm-mutable */
 interface HasRoundVideo
 {
 }

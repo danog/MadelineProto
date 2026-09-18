@@ -74,6 +74,9 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
         $connection->getState()->subscribe($this);
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function onAttach($initState): void
     {
@@ -425,6 +428,8 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
     }
     /**
      * Get loop name.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

@@ -18,7 +18,11 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-pure
+ */
 final class TgcallsTools
 {
     /**
@@ -28,6 +32,8 @@ final class TgcallsTools
      * libopus, libvpx and ffmpeg) is only needed to convert media on the fly. Without it, calls
      * work normally as long as the audio and video that are played back were already converted to
      * the formats Telegram uses, which MadelineProto can also do offline.
+     *
+     * @psalm-pure
      */
     public static function canTranscode(): bool
     {
@@ -36,6 +42,8 @@ final class TgcallsTools
 
     /**
      * Compress a signaling payload, as tgcalls' `gzipData` does.
+     *
+     * @psalm-pure
      */
     public static function gzip(string $data): string
     {
@@ -45,6 +53,8 @@ final class TgcallsTools
 
     /**
      * Transparently decompress a signaling payload, as tgcalls' `isGzip`/`gunzipData` pair does.
+     *
+     * @psalm-pure
      */
     public static function gunzip(string $data): string
     {

@@ -23,9 +23,16 @@ namespace danog\MadelineProto\MTProto;
 use danog\MadelineProto\API;
 use Webmozart\Assert\Assert;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-immutable
+ */
 final class LoginState
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** @var API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT */
         public readonly int $state,
@@ -36,7 +43,11 @@ final class LoginState
         }
     }
 
-    /** @param API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT $state */
+    /**
+     * @param API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT $state
+     *
+     * @psalm-mutation-free
+     */
     public function setState(int $state): self
     {
         if ($state === $this->state) {
@@ -44,7 +55,11 @@ final class LoginState
         }
         return new self($state, $state === API::LOGGED_OUT ? null : $this->authorizedDc);
     }
-    /** @param API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT $state */
+    /**
+     * @param API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT $state
+     *
+     * @psalm-mutation-free
+     */
     public function setStateDc(int $state, ?int $dc): self
     {
         if ($state === $this->state && $dc === $this->authorizedDc) {
@@ -52,6 +67,9 @@ final class LoginState
         }
         return new self($state, $dc);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function setDc(int $dc): self
     {
         $dc = $this->state === API::LOGGED_OUT ? null : $dc;

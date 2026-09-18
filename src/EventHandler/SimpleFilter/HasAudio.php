@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only audio messages */
+/** @psalm-mutable */
 interface HasAudio
 {
 }

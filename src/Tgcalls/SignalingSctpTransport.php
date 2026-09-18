@@ -153,6 +153,8 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
 
     /**
      * The signaling channel is always usable: the API call underneath it is reliable by itself.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getState(): TLSState
@@ -162,6 +164,8 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
 
     /**
      * SCTP decides which side is the client from the ICE role, so report the call direction.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getIceTransport(): RTCIceTransportInterface
@@ -169,12 +173,18 @@ final class SignalingSctpTransport implements RTCSctpDtlsTransportInterface, Sig
         return new SignalingIceRole($this->outgoing ? IceRole::Controlling : IceRole::Controlled);
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function setSctpReceiver(?RTCSctpTransportInterface $sctpReceiver = null): void
     {
         $this->sctpReceiver = $sctpReceiver;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function removeSctpReceiver(RTCSctpTransport $param): void
     {

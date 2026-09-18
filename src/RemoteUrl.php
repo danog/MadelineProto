@@ -18,9 +18,14 @@ namespace danog\MadelineProto;
 
 /**
  * Indicates a remote URL to upload.
+ *
+ * @psalm-immutable
  */
 final class RemoteUrl
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         public readonly string $url
     ) {

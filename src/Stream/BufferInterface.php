@@ -24,6 +24,7 @@ namespace danog\MadelineProto\Stream;
  * Buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface BufferInterface extends ReadBufferInterface, WriteBufferInterface
 {

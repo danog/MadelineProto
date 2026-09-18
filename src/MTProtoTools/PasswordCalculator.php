@@ -145,9 +145,12 @@ final class PasswordCalculator
      *
      * The result will be the SHA256 hash of the salt concatenated with the data concatenated with the salt
      *
-     * @param  string $data Data to hash
-     * @param  string $salt Salt
+     * @param string $data Data to hash
+     * @param string $salt Salt
+     *
      * @return string Hash
+     *
+     * @psalm-pure
      */
     public function hashSha256(string $data, string $salt): string
     {
@@ -156,10 +159,13 @@ final class PasswordCalculator
     /**
      * Hashes the specified password.
      *
-     * @param  string $password    Password
-     * @param  string $client_salt Client salt
-     * @param  string $server_salt Server salt
+     * @param string $password    Password
+     * @param string $client_salt Client salt
+     * @param string $server_salt Server salt
+     *
      * @return string Resulting hash
+     *
+     * @psalm-mutation-free
      */
     public function hashPassword(string $password, string $client_salt, string $server_salt): string
     {

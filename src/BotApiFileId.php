@@ -39,6 +39,8 @@ final class BotApiFileId
      * @param int<1, max> $size      The file size
      * @param string  $fileName  The original file name
      * @param bool    $protected Whether the original file is protected
+     *
+     * @psalm-pure
      */
     public function __construct(
         public readonly string $fileId,

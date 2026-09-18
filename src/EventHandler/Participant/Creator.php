@@ -33,7 +33,11 @@ final class Creator extends Participant
     /** The role (rank) of the group creator in the group: just an arbitrary string, `admin` by default */
     public readonly string $rank;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         array $rawParticipant
     ) {

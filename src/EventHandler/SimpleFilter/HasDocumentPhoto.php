@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only document photos */
+/** @psalm-mutable */
 interface HasDocumentPhoto
 {
 }

@@ -26,6 +26,8 @@ final class Participant implements JsonSerializable
 {
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         /** Bot API ID of the peer that joined the call. */
@@ -63,6 +65,8 @@ final class Participant implements JsonSerializable
      * @param self|null $cached The previously known state of this participant, if any: when the
      *                          `min` flag is set, `volume` and `muted_by_you` must be kept from it,
      *                          see https://core.telegram.org/constructor/groupCallParticipant.
+     *
+     * @psalm-mutation-free
      */
     public static function fromRaw(array $participant, int $peerId, ?self $cached = null): self
     {
@@ -86,6 +90,8 @@ final class Participant implements JsonSerializable
 
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function jsonSerialize(): array

@@ -169,7 +169,11 @@ trait Handler
         return $controller;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
     public function cleanupGroupCall(int $id): void
     {
         unset($this->groupCalls[$id]);
@@ -209,6 +213,8 @@ trait Handler
 
     /**
      * Get the state of a group call.
+     *
+     * @psalm-mutation-free
      */
     public function getGroupCallState(int $id): GroupCallState
     {
@@ -219,6 +225,8 @@ trait Handler
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
      * @return array<int, Participant>
+     *
+     * @psalm-mutation-free
      */
     public function getGroupCallParticipants(int $id): array
     {
@@ -241,6 +249,8 @@ trait Handler
 
     /**
      * Whether our own audio stream is muted in a group call.
+     *
+     * @psalm-mutation-free
      */
     public function isGroupCallMuted(int $id): bool
     {
@@ -332,32 +342,6 @@ trait Handler
     }
 
     /**
-     * Play the VP8 video and OPUS audio of a WebM file in a group call.
-     *
-     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
-     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
-     * beforehand.
-     */
-    public function groupCallPlayVideo(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->playVideo($file);
-    }
-
-    /**
-     * Stop transmitting video in a group call.
-     */
-    public function groupCallStopVideo(int $id): void
-    {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->stopVideo();
-    }
-
-    /**
      * Skip to the next file in the playlist of a group call.
      */
     public function groupCallSkipPlay(int $id): void
@@ -381,6 +365,8 @@ trait Handler
 
     /**
      * Pause playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
     public function groupCallPausePlay(int $id): void
     {
@@ -392,6 +378,8 @@ trait Handler
 
     /**
      * Resume playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
     public function groupCallResumePlay(int $id): void
     {
@@ -403,6 +391,8 @@ trait Handler
 
     /**
      * Whether the currently playing audio file of a group call is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isGroupCallPlayPaused(int $id): bool
     {
@@ -414,6 +404,8 @@ trait Handler
 
     /**
      * Get the file that is currently being played in a group call.
+     *
+     * @psalm-mutation-free
      */
     public function groupCallGetCurrent(int $id): RemoteUrl|LocalFile|string|null
     {

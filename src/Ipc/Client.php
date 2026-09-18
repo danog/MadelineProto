@@ -57,6 +57,8 @@ final class Client extends ClientAbstract
 
     /**
      * Returns an instance of a client by session name.
+     *
+     * @psalm-external-mutation-free
      */
     public static function giveInstanceBySession(string $session): Client|MTProto
     {
@@ -112,7 +114,11 @@ final class Client extends ClientAbstract
     {
         return $this->session;
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function getSessionName(): string
     {
         return $this->session->getSessionDirectoryPath();
@@ -144,12 +150,17 @@ final class Client extends ClientAbstract
     }
     /**
      * Whether we're an IPC client instance.
+     *
+     * @psalm-pure
      */
     public function isIpc(): bool
     {
         return true;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getLogger(): Logger
     {
         return $this->logger;
@@ -383,11 +394,16 @@ final class Client extends ClientAbstract
      * Placeholder.
      *
      * @param mixed ...$params Params
+     *
+     * @psalm-pure
      */
     public function setEventHandler(mixed ...$params): void
     {
         throw new Exception("Can't use ".__FUNCTION__.' in an IPC client instance, please use startAndLoop, instead!');
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getEventHandler(?string $class = null): ?EventHandlerProxy
     {
         if ($class !== null) {
@@ -398,6 +414,9 @@ final class Client extends ClientAbstract
         }
         return $this->hasEventHandler() ? new EventHandlerProxy(null, $this) : null;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getPlugin(string $class): ?EventHandlerProxy
     {
         return $this->hasPlugin($class) ? new EventHandlerProxy($class, $this) : null;

@@ -128,6 +128,8 @@ trait Broadcast
      * Use updateBroadcastProgress updates to get real-time progress status without polling.
      *
      * @param integer $id Broadcast ID
+     *
+     * @psalm-mutation-free
      */
     public function getBroadcastProgress(int $id): ?Progress
     {
@@ -144,7 +146,11 @@ trait Broadcast
         $this->broadcasts[$id]?->cancel();
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
     public function cleanupBroadcast(int $id): void
     {
         unset($this->broadcasts[$id]);

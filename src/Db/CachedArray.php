@@ -15,37 +15,58 @@ final class CachedArray extends DbArray
 {
     private readonly CacheContainer $cache;
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function unset(string|int $key): void
     {
         throw new AssertionError("Unreachable");
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function set(string|int $key, mixed $value): void
     {
         throw new AssertionError("Unreachable");
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function get(string|int $key): mixed
     {
         throw new AssertionError("Unreachable");
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function clear(): void
     {
         throw new AssertionError("Unreachable");
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function count(): int
     {
         throw new AssertionError("Unreachable");
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getIterator(): \Traversable
     {
         throw new AssertionError("Unreachable");
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getInstance(DbArrayBuilder $config, DbArray|null $previous): DbArray
     {

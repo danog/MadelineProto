@@ -18,14 +18,12 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
-use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\GroupCallController;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use danog\MadelineProto\RemoteUrl;
 use Revolt\EventLoop;
 use Throwable;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
@@ -61,7 +59,6 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     private RTCPeerConnection $peerConnection;
     private OpusPlaybackTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
-    private WebmSource $webm;
 
     /** Our own outgoing audio SSRC, as an unsigned 32-bit integer. */
     private int $audioSsrc;
@@ -117,11 +114,11 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         DjLoop $dj,
     ) {
         $this->peerConnection = new RTCPeerConnection(['iceServers' => []]);
-        $this->webm = new WebmSource($call, $this);
-        $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
+        $dj->setVideoCodecObserver($this);
+        $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
         $transceiver = $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendonly);
         $this->audioSsrc = $transceiver->getSender()->getSsrc();
-        $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
+        $this->outgoingVideo = new VideoPlaybackTrack($dj, $call);
         $videoTransceiver = $this->peerConnection->addTransceiver($this->outgoingVideo, SDPDirections::sendonly);
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
@@ -142,6 +139,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * back into {@see self::$pendingOutputs} so wakeup re-attaches them.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
@@ -200,6 +199,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
 
     /**
      * Our own outgoing audio SSRC, in the signed form used by the API.
+     *
+     * @psalm-mutation-free
      */
     public function getAudioSource(): int
     {
@@ -239,21 +240,15 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     }
 
     /**
-     * Play a Matroska or WebM file, transmitting its video and OPUS audio into the call.
+     * Re-pin the outgoing video m-line when a newly opened file uses another codec, and tell the
+     * server we are publishing video so the other participants display our stream.
      *
-     * Any video codec a group call carries works: see {@see WebmSource::VIDEO_CODECS}.
-     */
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        $this->webm->play($file);
-    }
-
-    /**
-     * Re-pin the outgoing video m-line when a newly opened file uses another codec.
+     * Any video codec a group call carries works: see {@see DjLoop::VIDEO_CODECS}.
      */
     #[\Override]
     public function onVideoCodec(string $codec): void
     {
+        $this->call->setVideoStopped(false);
         if ($codec === $this->outgoingVideoCodec) {
             return;
         }
@@ -263,15 +258,18 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     }
 
     /**
-     * Stop transmitting video.
+     * React to the demuxed file's video finishing: tell the server we are no longer publishing.
      */
-    public function stopVideo(): void
+    #[\Override]
+    public function onVideoStopped(): void
     {
-        $this->webm->stop();
+        $this->call->setVideoStopped(true);
     }
 
     /**
      * Whether we are currently transmitting video.
+     *
+     * @psalm-mutation-free
      */
     public function isPlayingVideo(): bool
     {
@@ -353,7 +351,6 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
-            $this->webm->stop();
             $this->peerConnection->close();
         } catch (Throwable $e) {
             $this->call->log("Got $e while closing the WebRTC connection of {$this->call}");
@@ -404,6 +401,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      *
      * The receive-only transceivers are created by {@see self::setRemoteSources()} in the same
      * order as {@see self::$orderedSources}, so they line up one by one.
+     *
+     * @psalm-external-mutation-free
      */
     private function rebuildSourceMap(): void
     {
@@ -460,6 +459,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
 
     /**
      * Resolve the SSRC a remote track belongs to, using the transceiver it was created for.
+     *
+     * @psalm-mutation-free
      */
     private function trackSsrc(RemoteStreamTrack $track): ?int
     {

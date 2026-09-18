@@ -32,6 +32,9 @@ enum ConnectionState
     case ENCRYPTED_NOT_AUTHED;
     case ENCRYPTED;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function isEncrypted(): bool
     {
         return match ($this) {

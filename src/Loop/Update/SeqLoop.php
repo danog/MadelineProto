@@ -70,6 +70,9 @@ final class SeqLoop extends Loop implements SimpleSubscriber
         $this->init($API);
         $API->loginState->subscribe($this);
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['incomingUpdates', 'feeder', 'API', 'state'];
@@ -148,6 +151,8 @@ final class SeqLoop extends Loop implements SimpleSubscriber
     }
     /**
      * @param array<(array|mixed)> $updates
+     *
+     * @psalm-external-mutation-free
      */
     public function feed(array $updates): void
     {
@@ -163,11 +168,16 @@ final class SeqLoop extends Loop implements SimpleSubscriber
     }
     /**
      * @param array<true> $wakeups
+     *
+     * @psalm-external-mutation-free
      */
     public function addPendingWakeups(array $wakeups): void
     {
         $this->pendingWakeups += $wakeups;
     }
+    /**
+     * @psalm-pure
+     */
     public function __toString(): string
     {
         return 'update seq loop';

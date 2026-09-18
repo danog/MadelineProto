@@ -59,6 +59,9 @@ final class InternalState
         $this->cancellation = new DeferredCancellation;
         $this->resume();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
@@ -219,6 +222,9 @@ final class InternalState
         }
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getStatus(): Status
     {
         return match ($this->status) {
@@ -230,6 +236,9 @@ final class InternalState
             StatusInternal::CANCELLED => Status::CANCELLED,
         };
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getProgress(): Progress
     {
         return new Progress(

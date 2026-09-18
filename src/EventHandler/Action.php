@@ -43,7 +43,11 @@ use ReflectionProperty;
  */
 abstract class Action implements JsonSerializable
 {
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-pure
+     */
     public static function fromRawAction(array $rawAction): Action
     {
         return match ($rawAction['_']) {
@@ -72,7 +76,11 @@ abstract class Action implements JsonSerializable
         };
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function toRawAction(): array
     {
         return match (true) {

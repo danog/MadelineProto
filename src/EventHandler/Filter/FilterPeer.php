@@ -47,6 +47,9 @@ use danog\MadelineProto\EventHandler\User\Username;
 final class FilterPeer extends Filter
 {
     private readonly int $peerResolved;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly string|int $peer)
     {
     }
@@ -57,6 +60,9 @@ final class FilterPeer extends Filter
         $this->peerResolved = $API->getId($this->peer);
         return $this;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

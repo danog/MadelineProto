@@ -44,6 +44,9 @@ final class Actor implements Subscriber
         $this->__wakeup();
     }
 
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['queue', 'subscriber'];
@@ -85,6 +88,9 @@ final class Actor implements Subscriber
         }
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __toString(): string
     {

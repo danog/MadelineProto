@@ -30,7 +30,11 @@ final class Phone extends Update
     /** New phone number. */
     public readonly string $number;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawUserPhone)
     {
         parent::__construct($API);

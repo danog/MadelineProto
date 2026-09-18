@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use danog\MadelineProto\Loop\VoIP\DjLoop;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
@@ -29,7 +30,7 @@ use function Amp\delay;
  * Nothing is decoded or re-encoded: the frames are packetized straight into RTP by the pure-PHP
  * payloader of whichever codec the file holds — VP8, VP9 or H.264, the three a Telegram call
  * carries — so video works without the FFI extension just like audio does. Which one the peer
- * expects is settled by {@see GroupSdp}, from {@see WebmSource::getVideoCodec()}.
+ * expects is settled by {@see GroupSdp}, from {@see DjLoop::getVideoCodec()}.
  *
  * As with {@see OpusPlaybackTrack}, a background producer task drains the source and pushes the
  * frames into the track's {@see Queue}, releasing them according to their own timestamps rather
@@ -70,7 +71,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private bool $transportReady = true;
 
     public function __construct(
-        private readonly WebmSource $source,
+        private readonly DjLoop $source,
         private readonly CallInterface $call,
     ) {
         parent::__construct(MediaKind::Video);
@@ -169,7 +170,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         }
 
         // Release the frame only once its presentation time has arrived.
-        $elapsed = (float) ($frame['timestamp'] - $this->baseTimestamp) / (float) WebmSource::VIDEO_CLOCK_RATE;
+        $elapsed = (float) ($frame['timestamp'] - $this->baseTimestamp) / (float) DjLoop::VIDEO_CLOCK_RATE;
         $due = $this->startedAt + $elapsed;
         if ($now < $due) {
             $this->pending = $frame;
@@ -184,12 +185,12 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         if ($this->prevSourceTimestamp !== null) {
             $delta = $frame['timestamp'] - $this->prevSourceTimestamp;
             if ($delta > 0) {
-                $this->frameInterval = $delta / WebmSource::VIDEO_CLOCK_RATE;
+                $this->frameInterval = $delta / DjLoop::VIDEO_CLOCK_RATE;
             }
         }
         $this->prevSourceTimestamp = $frame['timestamp'];
         $this->source->setPlaybackPosition(
-            (int) (($frame['timestamp'] - $this->baseTimestamp) * 1000 / WebmSource::VIDEO_CLOCK_RATE)
+            (int) (($frame['timestamp'] - $this->baseTimestamp) * 1000 / DjLoop::VIDEO_CLOCK_RATE)
         );
         // Pull and hold the next frame right away so its own presentation time paces us.
         $this->nextDue = $now;

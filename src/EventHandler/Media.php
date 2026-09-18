@@ -178,6 +178,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
      *      key?: string,
      *      iv?: string,
      * }
+     *
+     * @psalm-mutation-free
      */
     public function getDownloadInfo(): array
     {
@@ -195,7 +197,11 @@ abstract class Media extends IpcCapable implements JsonSerializable
         }
         return $result;
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {

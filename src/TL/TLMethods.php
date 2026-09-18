@@ -29,6 +29,9 @@ final class TLMethods
     public array $by_id = [];
     public array $by_method = [];
     public array $method_namespace = [];
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['by_id', 'by_method', 'method_namespace'];
@@ -58,6 +61,9 @@ final class TLMethods
         }
         $this->parseParams($json_dict['id'], false, $json_dict['method']);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findById(string $id)
     {
         if (isset($this->by_id[$id])) {
@@ -67,6 +73,9 @@ final class TLMethods
         }
         return false;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findByMethod(string $method_name)
     {
         if (isset($this->by_method[$method_name])) {

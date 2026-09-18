@@ -58,6 +58,8 @@ final class Files extends SettingsAbstract
      * Set allow automatic upload of files from file paths present in constructors?
      *
      * @param bool $allowAutomaticUpload Allow automatic upload of files from file paths present in constructors?
+     *
+     * @psalm-external-mutation-free
      */
     public function setAllowAutomaticUpload(bool $allowAutomaticUpload): self
     {
@@ -78,6 +80,8 @@ final class Files extends SettingsAbstract
      * Set upload parallel chunk count.
      *
      * @param int $uploadParallelChunks Upload parallel chunk count
+     *
+     * @psalm-external-mutation-free
      */
     public function setUploadParallelChunks(int $uploadParallelChunks): self
     {
@@ -98,6 +102,8 @@ final class Files extends SettingsAbstract
      * Set download parallel chunk count.
      *
      * @param int $downloadParallelChunks Download parallel chunk count
+     *
+     * @psalm-external-mutation-free
      */
     public function setDownloadParallelChunks(int $downloadParallelChunks): self
     {
@@ -118,6 +124,8 @@ final class Files extends SettingsAbstract
      * Set whether to report undownloadable media to TSF.
      *
      * @param bool $reportBrokenMedia Whether to report undownloadable media to TSF
+     *
+     * @psalm-external-mutation-free
      */
     public function setReportBrokenMedia(bool $reportBrokenMedia): self
     {
@@ -145,6 +153,7 @@ final class Files extends SettingsAbstract
      *
      * @param ?string $downloadLink Custom download link URL for CLI bots, used by `getDownloadLink`.
      *
+     * @psalm-external-mutation-free
      */
     public function setDownloadLink(?string $downloadLink): self
     {

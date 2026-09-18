@@ -139,6 +139,8 @@ trait Session
     }
     /**
      * Cleanup incoming and outgoing messages.
+     *
+     * @psalm-external-mutation-free
      */
     public function cleanupSession(): void
     {
@@ -201,6 +203,8 @@ trait Session
      * Backup eventual unsent messages before session deletion.
      *
      * @return array<MTProtoOutgoingMessage>
+     *
+     * @psalm-mutation-free
      */
     public function backupSession(): array
     {

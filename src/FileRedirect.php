@@ -32,6 +32,9 @@ use const PHP_EOL;
 final class FileRedirect extends Exception
 {
     use TL\PrettyException;
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return PTSException::class.($this->message !== '' ? ': ' : '').$this->message.PHP_EOL.'TL Trace:'.PHP_EOL.PHP_EOL.$this->getTLTrace().PHP_EOL;

@@ -88,6 +88,8 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      * Stopping the container and then deleting the session folder is 100% OK though.
      *
      * @param ?string $ephemeralFilesystemPrefix The database prefix
+     *
+     * @psalm-external-mutation-free
      */
     public function setEphemeralFilesystemPrefix(?string $ephemeralFilesystemPrefix): static
     {
@@ -147,6 +149,8 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      * Set password.
      *
      * @param string $password Password.
+     *
+     * @psalm-external-mutation-free
      */
     public function setPassword(string $password): static
     {
@@ -158,15 +162,18 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
     /**
      * Get database name/ID.
      *
+     * @psalm-impure
      */
     abstract public function getDatabase(): string|int;
     /**
      * Get database URI.
+     * @psalm-impure
      */
     abstract public function getUri(): string;
 
     /**
      * Set database URI.
+     * @psalm-impure
      */
     abstract public function setUri(string $uri): static;
 
@@ -179,6 +186,8 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      * Which serializer to use by default.
      *
      * If null, the best serializer is chosen.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSerializer(?SerializerType $serializer): static
     {

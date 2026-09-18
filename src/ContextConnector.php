@@ -30,6 +30,9 @@ use Throwable;
 /** @internal */
 final class ContextConnector implements SocketConnector
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private DoHWrapper $doHWrapper, private LoggerGetter $loggerGetter, private bool $fromDns = false)
     {
     }

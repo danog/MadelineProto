@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Chatlists
 {
     /**
@@ -19,6 +20,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'chatlists.exportedChatlistInvite', filter: array{_: 'dialogFilter', title: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>}, contacts: bool, non_contacts: bool, groups: bool, broadcasts: bool, bots: bool, exclude_muted: bool, exclude_read: bool, exclude_archived: bool, title_noanimate: bool, id: int, emoticon?: string, color?: int, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>, exclude_peers: list<array|int|string>}|array{_: 'dialogFilterDefault'}|array{_: 'dialogFilterChatlist', title: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>}, has_my_invites: bool, title_noanimate: bool, id: int, emoticon?: string, color?: int, pinned_peers: list<array|int|string>, include_peers: list<array|int|string>}, invite: array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>}} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ExportedChatlistInvite.html
+     * @psalm-impure
      */
     public function exportChatlistInvite(array $chatlist, string|null $title = '', array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -31,6 +33,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deleteExportedInvite(array $chatlist, string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -45,6 +48,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/ExportedChatlistInvite.html
+     * @psalm-impure
      */
     public function editExportedInvite(array $chatlist, string|null $slug = '', string|null $title = null, array|null $peers = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -56,6 +60,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'chatlists.exportedInvites', invites: list<array{_: 'exportedChatlistInvite', title: string, url: string, peers: list<array|int|string>}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ExportedInvites.html
+     * @psalm-impure
      */
     public function getExportedInvites(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -67,6 +72,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'chatlists.chatlistInviteAlready', filter_id: int, missing_peers: list<array|int|string>, already_peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'chatlists.chatlistInvite', title: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>}, title_noanimate: bool, emoticon?: string, peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ChatlistInvite.html
+     * @psalm-impure
      */
     public function checkChatlistInvite(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -79,6 +85,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function joinChatlistInvite(string|null $slug = '', array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -90,6 +97,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'chatlists.chatlistUpdates', missing_peers: list<array|int|string>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/chatlists.ChatlistUpdates.html
+     * @psalm-impure
      */
     public function getChatlistUpdates(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -102,6 +110,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function joinChatlistUpdates(array $chatlist, array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -113,6 +122,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function hideChatlistUpdates(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -124,6 +134,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array|int|string> Array of  @see https://docs.madelineproto.xyz/API_docs/types/Peer.html
+     * @psalm-impure
      */
     public function getLeaveChatlistSuggestions(array $chatlist, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -136,6 +147,7 @@ interface Chatlists
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function leaveChatlist(array $chatlist, array $peers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

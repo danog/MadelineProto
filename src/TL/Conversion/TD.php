@@ -184,6 +184,8 @@ trait TD
      * Convert TD parameters to tdcli.
      *
      * @param mixed $params Parameters
+     *
+     * @psalm-mutation-free
      */
     public function tdToTdcli(mixed $params): array
     {

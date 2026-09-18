@@ -53,6 +53,8 @@ final class CleanupLoop extends Loop
     }
     /**
      * Loop name.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

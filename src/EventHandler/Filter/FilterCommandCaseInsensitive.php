@@ -40,6 +40,8 @@ final class FilterCommandCaseInsensitive extends Filter
     /**
      * @param string            $command Command
      * @param list<CommandType> $types   Command types, if empty all command types are allowed.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         string $command,
@@ -57,6 +59,9 @@ final class FilterCommandCaseInsensitive extends Filter
         }
         $this->commandTypes = $types;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

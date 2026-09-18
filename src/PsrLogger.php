@@ -41,6 +41,8 @@ final class PsrLogger extends AbstractLogger
     private Logger $logger;
     /**
      * Constructor.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(Logger $logger)
     {

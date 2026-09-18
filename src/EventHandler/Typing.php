@@ -29,7 +29,11 @@ abstract class Typing extends Update
     /** Whether the user is typing, sending a media or doing something else. */
     public readonly Action $action;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API);

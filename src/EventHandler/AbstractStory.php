@@ -30,7 +30,11 @@ abstract class AbstractStory extends Update
     /** Story ID */
     public readonly int $id;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto|Client $API, array $rawStory)
     {
         parent::__construct($API);

@@ -94,6 +94,9 @@ final class DataCenter
         $this->__wakeup();
     }
 
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['API', 'list', 'currentDatacenter'];
@@ -125,23 +128,38 @@ final class DataCenter
         return $this->sockets;
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function isTest(int $dc): bool
     {
         return abs($dc) > 10000;
     }
+    /**
+     * @psalm-pure
+     */
     public static function isMedia(int $dc): bool
     {
         return $dc < 0;
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function getSettings(): \danog\MadelineProto\Settings\Connection
     {
         return $this->API->getSettings()->getConnection();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getHTTPClient(): HttpClient
     {
         return $this->dohWrapper->HTTPClient;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getDNSClient(): DnsResolver
     {
         return $this->dohWrapper->DoHClient;
@@ -153,6 +171,8 @@ final class DataCenter
      * @throws \Error If an invalid option has been passed.
      *
      * @internal
+     *
+     * @psalm-pure
      */
     private static function normalizeBindToOption(?string $bindTo = null): ?string
     {
@@ -414,6 +434,9 @@ final class DataCenter
         }
         return $this->list[$dc];
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function has(int $dc): bool
     {
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';

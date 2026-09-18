@@ -57,6 +57,8 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the file reference database. If disabled, will break file downloads.
      *
      * @param bool $enableFileReferenceDb Whether to enable the file reference database. If disabled, will break file downloads.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnableFileReferenceDb(bool $enableFileReferenceDb): static
     {
@@ -77,6 +79,8 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
      *
      * @param bool $enableMinDb Whether to enable the min database. If disabled, will break sendMessage (and other methods) in certain conditions.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnableMinDb(bool $enableMinDb): static
     {
@@ -97,6 +101,8 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
      *
      * @param bool $enableUsernameDb Whether to enable the username database. If disabled, will break sendMessage (and other methods) with usernames.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnableUsernameDb(bool $enableUsernameDb): static
     {
@@ -117,6 +123,8 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the full peer info database. If disabled, will break getFullInfo.
      *
      * @param bool $enableFullPeerDb Whether to enable the full peer info database. If disabled, will break getFullInfo.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnableFullPeerDb(bool $enableFullPeerDb): static
     {
@@ -137,6 +145,8 @@ abstract class DatabaseAbstract extends SettingsAbstract
      * Set whether to enable the peer info database. If disabled, will break getInfo.
      *
      * @param bool $enablePeerInfoDb Whether to enable the peer info database. If disabled, will break getInfo.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnablePeerInfoDb(bool $enablePeerInfoDb): static
     {
@@ -145,5 +155,6 @@ abstract class DatabaseAbstract extends SettingsAbstract
         return $this;
     }
 
+    /** @psalm-impure */
     abstract public function getOrmSettings(): Settings;
 }

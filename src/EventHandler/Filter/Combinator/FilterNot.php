@@ -27,9 +27,15 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterNot extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly Filter $filter)
     {
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function initialize(EventHandler $API): Filter
     {

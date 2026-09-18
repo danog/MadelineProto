@@ -17,7 +17,11 @@
 
 namespace danog\MadelineProto;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @psalm-pure
+ */
 final class Lang
 {
     public const PERCENTAGES = [

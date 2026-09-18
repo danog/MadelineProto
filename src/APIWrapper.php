@@ -29,11 +29,16 @@ final class APIWrapper
 
     /**
      * API wrapper.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private SessionPaths $session,
     ) {
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setSession(SessionPaths $session): void
     {
         $this->session = $session;
@@ -43,11 +48,17 @@ final class APIWrapper
     {
         return $this->webApiTemplate;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setWebApiTemplate(string $template): void
     {
         $this->webApiTemplate = $template;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         ($this->API->logger ?? Logger::$default)->logger($param, $level, $file);
@@ -60,6 +71,8 @@ final class APIWrapper
 
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -78,6 +91,8 @@ final class APIWrapper
      * Get IPC path.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function getIpcPath(): string
     {

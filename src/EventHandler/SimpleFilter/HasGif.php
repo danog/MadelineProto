@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only GIFs */
+/** @psalm-mutable */
 interface HasGif
 {
 }

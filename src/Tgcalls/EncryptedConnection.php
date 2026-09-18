@@ -94,6 +94,8 @@ final class EncryptedConnection
      *                             `SERVICE_CAUSE_*` constant when a service packet must be emitted.
      *                             A serializable object rather than a `Closure`, so the reliability
      *                             layer survives the serialize/unserialize cycle intact.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private readonly string $authKey,
@@ -341,11 +343,17 @@ final class EncryptedConnection
         EventLoop::delay($delay, fn () => $this->owner->onServiceRequest($cause));
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     private function haveAdditionalMessages(): bool
     {
         return $this->notYetAckedMessages !== [] || $this->acksToSendSeqs !== [];
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function computeNextSeq(bool $requiresAck, bool $singleMessagePacket): ?int
     {
         if ($requiresAck && \count($this->notYetAckedMessages) >= self::NOT_ACKED_MESSAGES_LIMIT) {
@@ -359,6 +367,9 @@ final class EncryptedConnection
             | ($requiresAck ? self::MESSAGE_REQUIRES_ACK_SEQ_BIT : 0);
     }
 
+    /**
+     * @psalm-pure
+     */
     private function enoughSpaceInPacket(string $buffer, int $amount): bool
     {
         return $amount < self::MAX_SIGNALING_PACKET_SIZE
@@ -449,6 +460,9 @@ final class EncryptedConnection
         return !$already;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function sendAckPostponed(int $incomingSeq): void
     {
         if (!\in_array($incomingSeq, $this->acksToSendSeqs, true)) {
@@ -456,6 +470,9 @@ final class EncryptedConnection
         }
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function ackMyMessage(int $seq): void
     {
         foreach ($this->notYetAckedMessages as $k => [$data]) {
@@ -467,11 +484,17 @@ final class EncryptedConnection
         }
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function counterFromSeq(int $seq): int
     {
         return $seq & ~self::SINGLE_MESSAGE_PACKET_SEQ_BIT & ~self::MESSAGE_REQUIRES_ACK_SEQ_BIT;
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function readSeq(string $data, int $offset): int
     {
         /** @var array{1: int} */

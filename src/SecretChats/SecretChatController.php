@@ -150,6 +150,9 @@ final class SecretChatController implements Stringable
         $this->API->loginState->subscribe($this->feedLoop);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
@@ -709,10 +712,16 @@ final class SecretChatController implements Stringable
             yield from $queue;
         }
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function generateSecretInSeqNo(): int
     {
         return $this->remoteLayer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_base : -1;
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function generateSecretOutSeqNo(): int
     {
         return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
@@ -727,6 +736,9 @@ final class SecretChatController implements Stringable
         [$seq, $outgoing] = $result;
         return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __toString(): string
     {

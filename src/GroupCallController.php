@@ -98,6 +98,9 @@ final class GroupCallController implements CallInterface
         $this->joinMutex = new LocalMutex;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $result = get_object_vars($this);
@@ -668,6 +671,9 @@ final class GroupCallController implements CallInterface
         $this->API->logger->logger($message, $level);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function isCallEnded(): bool
     {
@@ -689,29 +695,17 @@ final class GroupCallController implements CallInterface
         $this->play($file);
         self::awaitStream($file);
     }
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        if ($this->connection === null) {
-            throw new Exception(
-                "Cannot play video in $this: it has no WebRTC connection".
-                ($this->streamMode
-                    ? ', it is in '.($this->rtmpMode ? 'RTMP' : 'stream').' mode, where media is published externally'
-                    : ', it was not joined').'!'
-            );
-        }
-        $this->connection->playVideo($file);
-        $this->setVideoStopped(false);
-    }
-    public function stopVideo(): void
-    {
-        $this->connection?->stopVideo();
-        $this->setVideoStopped(true);
-    }
     /**
      * Tell the server whether we are currently publishing video, so that the other participants
      * know they should display our video stream.
+     *
+     * Driven by the {@see \danog\MadelineProto\Loop\VoIP\DjLoop} through the WebRTC engine as the
+     * demuxed file's video starts ({@see GroupConnection::onVideoCodec()}) and stops
+     * ({@see GroupConnection::onVideoStopped()}).
+     *
+     * @internal
      */
-    private function setVideoStopped(bool $stopped): void
+    public function setVideoStopped(bool $stopped): void
     {
         if ($this->callState !== GroupCallState::JOINED) {
             return;
@@ -734,14 +728,23 @@ final class GroupCallController implements CallInterface
     {
         $this->diskJockey->stopPlaying();
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function pause(): void
     {
         $this->diskJockey->pausePlaying();
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function resume(): void
     {
         $this->diskJockey->resumePlaying();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function isPaused(): bool
     {
         return $this->diskJockey->isAudioPaused();
@@ -753,6 +756,9 @@ final class GroupCallController implements CallInterface
         }
         $this->diskJockey->playOnHold(...$files);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getCurrent(): LocalFile|RemoteUrl|string|null
     {
         return $this->diskJockey->getCurrent();
@@ -786,6 +792,9 @@ final class GroupCallController implements CallInterface
         $deferred->getFuture()->await();
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __toString(): string
     {

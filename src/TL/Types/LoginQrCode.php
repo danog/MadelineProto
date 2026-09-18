@@ -40,7 +40,11 @@ use JsonSerializable;
  */
 final class LoginQrCode extends IpcCapable implements JsonSerializable
 {
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         MTProto $API,
         /** @var non-empty-string The [QR code login link](https://core.telegram.org/api/links#qr-code-login-links) */
@@ -51,7 +55,11 @@ final class LoginQrCode extends IpcCapable implements JsonSerializable
         parent::__construct($API);
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {

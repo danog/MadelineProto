@@ -35,7 +35,11 @@ final class MySelf extends Participant
     /** When did I join the channel/supergroup */
     public readonly int $date;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         array $rawParticipant
     ) {

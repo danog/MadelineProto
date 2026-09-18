@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Account
 {
     /**
@@ -22,6 +23,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function registerDevice(bool $app_sandbox, bool|null $no_muted = null, int|null $token_type = 0, string|null $token = '', string|null $secret = '', array $other_uids = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -35,6 +37,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function unregisterDevice(int|null $token_type = 0, string|null $token = '', array $other_uids = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -47,6 +50,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateNotifySettings(array $peer, array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -58,6 +62,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'peerNotifySettings', show_previews?: bool, silent?: bool, mute_until?: int, ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_muted?: bool, stories_hide_sender?: bool, stories_ios_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_android_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, stories_other_sound?: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}} @see https://docs.madelineproto.xyz/API_docs/types/PeerNotifySettings.html
+     * @psalm-impure
      */
     public function getNotifySettings(array $peer, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -68,6 +73,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetNotifySettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -82,6 +88,7 @@ interface Account
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function updateProfile(string|null $first_name = null, string|null $last_name = null, string|null $about = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array|int|string;
 
@@ -93,6 +100,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateStatus(bool $offline, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -104,6 +112,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.wallPapersNotModified'}|array{_: 'account.wallPapers', hash: list<int|string>, wallpapers: list<array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}>} @see https://docs.madelineproto.xyz/API_docs/types/account.WallPapers.html
+     * @psalm-impure
      */
     public function getWallPapers(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -117,6 +126,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reportPeer(array $reason, array|int|string|null $peer = null, string|null $message = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -128,6 +138,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function checkUsername(string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -139,6 +150,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function updateUsername(string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|int|string;
 
@@ -150,6 +162,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}|array{_: 'privacyValueAllowPremium'}|array{_: 'privacyValueAllowBots'}|array{_: 'privacyValueDisallowBots'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @psalm-impure
      */
     public function getPrivacy(array $key, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -162,6 +175,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.privacyRules', rules: list<array{_: 'privacyValueAllowContacts'}|array{_: 'privacyValueAllowAll'}|array{_: 'privacyValueAllowUsers', users: list<int>}|array{_: 'privacyValueDisallowContacts'}|array{_: 'privacyValueDisallowAll'}|array{_: 'privacyValueDisallowUsers', users: list<int>}|array{_: 'privacyValueAllowChatParticipants', chats: list<int>}|array{_: 'privacyValueDisallowChatParticipants', chats: list<int>}|array{_: 'privacyValueAllowCloseFriends'}|array{_: 'privacyValueAllowPremium'}|array{_: 'privacyValueAllowBots'}|array{_: 'privacyValueDisallowBots'}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.PrivacyRules.html
+     * @psalm-impure
      */
     public function setPrivacy(array $key, array $rules = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -176,6 +190,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deleteAccount(string|null $reason = '', string|array|null $password = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -186,6 +201,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'accountDaysTTL', days: int} @see https://docs.madelineproto.xyz/API_docs/types/AccountDaysTTL.html
+     * @psalm-impure
      */
     public function getAccountTTL(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -197,6 +213,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setAccountTTL(array $ttl, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -209,6 +226,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period?: int, reset_pending_date?: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce?: string, play_integrity_project_id?: int, play_integrity_nonce?: string, receipt?: string, push_timeout?: int, length: int}|array{_: 'auth.sentCodeTypeSmsWord', beginning?: string}|array{_: 'auth.sentCodeTypeSmsPhrase', beginning?: string}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout?: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', setup_password_required: bool, otherwise_relogin_days?: int, tmp_sessions?: int, future_auth_token?: string, user: array|int|string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, min_age_confirm?: int}}}|array{_: 'auth.sentCodePaymentRequired', store_product: string, phone_code_hash: string, support_email_address: string, support_email_subject: string, premium_days: int, currency: string, amount: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
+     * @psalm-impure
      */
     public function sendChangePhoneCode(array $settings, string|null $phone_number = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -222,6 +240,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function changePhone(string|null $phone_number = '', string|null $phone_code_hash = '', string|null $phone_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|int|string;
 
@@ -233,6 +252,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateDeviceLocked(int|null $period = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -244,6 +264,7 @@ interface Account
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'account.authorizations', authorization_ttl_days: int, authorizations: list<array{_: 'authorization', current: bool, official_app: bool, password_pending: bool, encrypted_requests_disabled: bool, call_requests_disabled: bool, unconfirmed: bool, hash: list<int|string>, device_model: string, platform: string, system_version: string, api_id: int, app_name: string, app_version: string, date_created: int, date_active: int, ip: string, country: string, region: string}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Authorizations.html
+     * @psalm-impure
      */
     public function getAuthorizations(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
@@ -255,6 +276,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetAuthorization(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -265,6 +287,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.password', new_algo: array{_: 'passwordKdfAlgoUnknown'}|array{_: 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', salt1: string, salt2: string, g: int, p: string}, new_secure_algo: array{_: 'securePasswordKdfAlgoUnknown'}|array{_: 'securePasswordKdfAlgoPBKDF2HMACSHA512iter100000', salt: string}|array{_: 'securePasswordKdfAlgoSHA512', salt: string}, has_recovery: bool, has_secure_values: bool, has_password: bool, current_algo?: array{_: 'passwordKdfAlgoUnknown'}|array{_: 'passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow', salt1: string, salt2: string, g: int, p: string}, srp_B?: string, srp_id?: int, hint?: string, email_unconfirmed_pattern?: string, secure_random: string, pending_reset_date?: int, login_email_pattern?: string} @see https://docs.madelineproto.xyz/API_docs/types/account.Password.html
+     * @psalm-impure
      */
     public function getPassword(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -277,6 +300,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period?: int, reset_pending_date?: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce?: string, play_integrity_project_id?: int, play_integrity_nonce?: string, receipt?: string, push_timeout?: int, length: int}|array{_: 'auth.sentCodeTypeSmsWord', beginning?: string}|array{_: 'auth.sentCodeTypeSmsPhrase', beginning?: string}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout?: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', setup_password_required: bool, otherwise_relogin_days?: int, tmp_sessions?: int, future_auth_token?: string, user: array|int|string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, min_age_confirm?: int}}}|array{_: 'auth.sentCodePaymentRequired', store_product: string, phone_code_hash: string, support_email_address: string, support_email_subject: string, premium_days: int, currency: string, amount: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
+     * @psalm-impure
      */
     public function sendConfirmPhoneCode(array $settings, string|null $hash = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -289,6 +313,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function confirmPhone(string|null $phone_code_hash = '', string|null $phone_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -301,6 +326,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.tmpPassword', tmp_password: string, valid_until: int} @see https://docs.madelineproto.xyz/API_docs/types/account.TmpPassword.html
+     * @psalm-impure
      */
     public function getTmpPassword(string|array $password, int|null $period = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -312,6 +338,7 @@ interface Account
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'account.webAuthorizations', authorizations: list<array{_: 'webAuthorization', hash: list<int|string>, bot_id: int, domain: string, browser: string, platform: string, date_created: int, date_active: int, ip: string, region: string}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.WebAuthorizations.html
+     * @psalm-impure
      */
     public function getWebAuthorizations(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
@@ -323,6 +350,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetWebAuthorization(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -333,6 +361,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetWebAuthorizations(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -343,6 +372,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
+     * @psalm-impure
      */
     public function getAllSecureValues(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -354,6 +384,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
+     * @psalm-impure
      */
     public function getSecureValue(array $types = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -366,6 +397,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string} @see https://docs.madelineproto.xyz/API_docs/types/SecureValue.html
+     * @psalm-impure
      */
     public function saveSecureValue(array $value, int|null $secure_secret_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -377,6 +409,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deleteSecureValue(array $types = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -390,6 +423,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.authorizationForm', required_types: list<array{_: 'secureRequiredType', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, native_names: bool, selfie_required: bool, translation_required: bool}>, values: list<array{_: 'secureValue', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data?: array{_: 'secureData', data: string, data_hash: string, secret: string}, front_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, reverse_side?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, selfie?: array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}, translation?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, files?: list<array{_: 'secureFileEmpty'}|array{_: 'secureFile', id: int, access_hash: int, size: int, dc_id: int, date: int, file_hash: string, secret: string}>, plain_data?: array{_: 'securePlainPhone', phone: string}|array{_: 'securePlainEmail', email: string}, hash: string}>, errors: list<array{_: 'secureValueErrorData', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, data_hash: string, field: string, text: string}|array{_: 'secureValueErrorFrontSide', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorReverseSide', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorSelfie', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorFile', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorFiles', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: list<string>, text: string}|array{_: 'secureValueError', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, hash: string, text: string}|array{_: 'secureValueErrorTranslationFile', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: string, text: string}|array{_: 'secureValueErrorTranslationFiles', type: array{_: 'secureValueTypePersonalDetails'}|array{_: 'secureValueTypePassport'}|array{_: 'secureValueTypeDriverLicense'}|array{_: 'secureValueTypeIdentityCard'}|array{_: 'secureValueTypeInternalPassport'}|array{_: 'secureValueTypeAddress'}|array{_: 'secureValueTypeUtilityBill'}|array{_: 'secureValueTypeBankStatement'}|array{_: 'secureValueTypeRentalAgreement'}|array{_: 'secureValueTypePassportRegistration'}|array{_: 'secureValueTypeTemporaryRegistration'}|array{_: 'secureValueTypePhone'}|array{_: 'secureValueTypeEmail'}, file_hash: list<string>, text: string}>, users: list<array|int|string>, privacy_policy_url?: string} @see https://docs.madelineproto.xyz/API_docs/types/account.AuthorizationForm.html
+     * @psalm-impure
      */
     public function getAuthorizationForm(int|null $bot_id = 0, string|null $scope = '', string|null $public_key = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -405,6 +439,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function acceptAuthorization(array $credentials, int|null $bot_id = 0, string|null $scope = '', string|null $public_key = '', array $value_hashes = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -417,6 +452,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period?: int, reset_pending_date?: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce?: string, play_integrity_project_id?: int, play_integrity_nonce?: string, receipt?: string, push_timeout?: int, length: int}|array{_: 'auth.sentCodeTypeSmsWord', beginning?: string}|array{_: 'auth.sentCodeTypeSmsPhrase', beginning?: string}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout?: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', setup_password_required: bool, otherwise_relogin_days?: int, tmp_sessions?: int, future_auth_token?: string, user: array|int|string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, min_age_confirm?: int}}}|array{_: 'auth.sentCodePaymentRequired', store_product: string, phone_code_hash: string, support_email_address: string, support_email_subject: string, premium_days: int, currency: string, amount: int} @see https://docs.madelineproto.xyz/API_docs/types/auth.SentCode.html
+     * @psalm-impure
      */
     public function sendVerifyPhoneCode(array $settings, string|null $phone_number = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -430,6 +466,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function verifyPhone(string|null $phone_number = '', string|null $phone_code_hash = '', string|null $phone_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -442,6 +479,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.sentEmailCode', email_pattern: string, length: int} @see https://docs.madelineproto.xyz/API_docs/types/account.SentEmailCode.html
+     * @psalm-impure
      */
     public function sendVerifyEmailCode(array $purpose, string|null $email = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -454,6 +492,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.emailVerified', email: string}|array{_: 'account.emailVerifiedLogin', sent_code: array{_: 'auth.sentCode', type: array{_: 'auth.sentCodeTypeApp', length: int}|array{_: 'auth.sentCodeTypeSms', length: int}|array{_: 'auth.sentCodeTypeCall', length: int}|array{_: 'auth.sentCodeTypeFlashCall', pattern: string}|array{_: 'auth.sentCodeTypeMissedCall', prefix: string, length: int}|array{_: 'auth.sentCodeTypeEmailCode', apple_signin_allowed: bool, google_signin_allowed: bool, email_pattern: string, length: int, reset_available_period?: int, reset_pending_date?: int}|array{_: 'auth.sentCodeTypeSetUpEmailRequired', apple_signin_allowed: bool, google_signin_allowed: bool}|array{_: 'auth.sentCodeTypeFragmentSms', url: string, length: int}|array{_: 'auth.sentCodeTypeFirebaseSms', nonce?: string, play_integrity_project_id?: int, play_integrity_nonce?: string, receipt?: string, push_timeout?: int, length: int}|array{_: 'auth.sentCodeTypeSmsWord', beginning?: string}|array{_: 'auth.sentCodeTypeSmsPhrase', beginning?: string}, phone_code_hash: string, next_type?: array{_: 'auth.codeTypeSms'}|array{_: 'auth.codeTypeCall'}|array{_: 'auth.codeTypeFlashCall'}|array{_: 'auth.codeTypeMissedCall'}|array{_: 'auth.codeTypeFragmentSms'}, timeout?: int}|array{_: 'auth.sentCodeSuccess', authorization: array{_: 'auth.authorization', setup_password_required: bool, otherwise_relogin_days?: int, tmp_sessions?: int, future_auth_token?: string, user: array|int|string}|array{_: 'auth.authorizationSignUpRequired', terms_of_service?: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, min_age_confirm?: int}}}|array{_: 'auth.sentCodePaymentRequired', store_product: string, phone_code_hash: string, support_email_address: string, support_email_subject: string, premium_days: int, currency: string, amount: int}, email: string} @see https://docs.madelineproto.xyz/API_docs/types/account.EmailVerified.html
+     * @psalm-impure
      */
     public function verifyEmail(array $purpose, array $verification, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -471,6 +510,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.takeout', id: int} @see https://docs.madelineproto.xyz/API_docs/types/account.Takeout.html
+     * @psalm-impure
      */
     public function initTakeoutSession(bool|null $contacts = null, bool|null $message_users = null, bool|null $message_chats = null, bool|null $message_megagroups = null, bool|null $message_channels = null, bool|null $files = null, int|null $file_max_size = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -482,6 +522,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function finishTakeoutSession(bool|null $success = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -493,6 +534,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function confirmPasswordEmail(string|null $code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -503,6 +545,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resendPasswordEmail(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -513,6 +556,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function cancelPasswordEmail(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -523,6 +567,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function getContactSignUpNotification(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -534,6 +579,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setContactSignUpNotification(bool $silent, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -547,6 +593,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function getNotifyExceptions(bool|null $compare_sound = null, bool|null $compare_stories = null, array|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -558,6 +605,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}} @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
+     * @psalm-impure
      */
     public function getWallPaper(array $wallpaper, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -572,6 +620,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}} @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
+     * @psalm-impure
      */
     public function uploadWallPaper(mixed $file, array $settings, bool|null $for_chat = null, string|null $mime_type = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -585,6 +634,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveWallPaper(array $wallpaper, bool $unsave, array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -597,6 +647,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function installWallPaper(array $wallpaper, array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -607,6 +658,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetWallPapers(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -617,6 +669,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.autoDownloadSettings', low: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}, medium: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}, high: array{_: 'autoDownloadSettings', disabled: bool, video_preload_large: bool, audio_preload_next: bool, phonecalls_less_data: bool, stories_preload: bool, photo_size_max: int, video_size_max: int, file_size_max: int, video_upload_maxbitrate: int, small_queue_active_operations_max: int, large_queue_active_operations_max: int}} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoDownloadSettings.html
+     * @psalm-impure
      */
     public function getAutoDownloadSettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -630,6 +683,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveAutoDownloadSettings(array $settings, bool|null $low = null, bool|null $high = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -644,6 +698,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>} @see https://docs.madelineproto.xyz/API_docs/types/Document.html
+     * @psalm-impure
      */
     public function uploadTheme(mixed $file, mixed $thumb = null, string|null $file_name = '', string|null $mime_type = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -658,6 +713,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>, emoticon?: string, installs_count?: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
+     * @psalm-impure
      */
     public function createTheme(string|null $slug = '', string|null $title = '', array|null $document = null, array|null $settings = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -674,6 +730,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>, emoticon?: string, installs_count?: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
+     * @psalm-impure
      */
     public function updateTheme(array $theme, string|null $format = '', string|null $slug = null, string|null $title = null, array|null $document = null, array|null $settings = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -686,6 +743,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveTheme(array $theme, bool $unsave, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -700,6 +758,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function installTheme(bool|null $dark = null, array|null $theme = null, string|null $format = null, array|null $base_theme = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -712,6 +771,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>, emoticon?: string, installs_count?: int} @see https://docs.madelineproto.xyz/API_docs/types/Theme.html
+     * @psalm-impure
      */
     public function getTheme(array $theme, string|null $format = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -724,6 +784,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int|string>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>, emoticon?: string, installs_count?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
+     * @psalm-impure
      */
     public function getThemes(string|null $format = '', array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -735,6 +796,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setContentSettings(bool|null $sensitive_enabled = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -745,6 +807,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.contentSettings', sensitive_enabled: bool, sensitive_can_change: bool} @see https://docs.madelineproto.xyz/API_docs/types/account.ContentSettings.html
+     * @psalm-impure
      */
     public function getContentSettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -756,6 +819,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/WallPaper.html
+     * @psalm-impure
      */
     public function getMultiWallPapers(array $wallpapers = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -766,6 +830,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool, hide_read_marks: bool, new_noncontact_peers_require_premium: bool, display_gifts_button: bool, noncontact_peers_paid_stars?: int, disallowed_gifts?: array{_: 'disallowedGiftsSettings', disallow_unlimited_stargifts: bool, disallow_limited_stargifts: bool, disallow_unique_stargifts: bool, disallow_premium_gifts: bool, disallow_stargifts_from_channels: bool}} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @psalm-impure
      */
     public function getGlobalPrivacySettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -778,6 +843,7 @@ interface Account
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @param ?string $businessConnectionId Business connection ID, received through an updateBotBusinessConnect update.
      * @return array{_: 'globalPrivacySettings', archive_and_mute_new_noncontact_peers: bool, keep_archived_unmuted: bool, keep_archived_folders: bool, hide_read_marks: bool, new_noncontact_peers_require_premium: bool, display_gifts_button: bool, noncontact_peers_paid_stars?: int, disallowed_gifts?: array{_: 'disallowedGiftsSettings', disallow_unlimited_stargifts: bool, disallow_limited_stargifts: bool, disallow_unique_stargifts: bool, disallow_premium_gifts: bool, disallow_stargifts_from_channels: bool}} @see https://docs.madelineproto.xyz/API_docs/types/GlobalPrivacySettings.html
+     * @psalm-impure
      */
     public function setGlobalPrivacySettings(array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?string $businessConnectionId = null): array;
 
@@ -792,6 +858,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reportProfilePhoto(array $reason, array|int|string|null $peer = null, array|null $photo_id = null, string|null $message = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -802,6 +869,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.resetPasswordFailedWait', retry_date: int}|array{_: 'account.resetPasswordRequestedWait', until_date: int}|array{_: 'account.resetPasswordOk'} @see https://docs.madelineproto.xyz/API_docs/types/account.ResetPasswordResult.html
+     * @psalm-impure
      */
     public function resetPassword(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -812,6 +880,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function declinePasswordReset(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -823,6 +892,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.themesNotModified'}|array{_: 'account.themes', hash: list<int|string>, themes: list<array{_: 'theme', creator: bool, default: bool, for_chat: bool, id: int, access_hash: int, slug: string, title: string, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>, emoticon?: string, installs_count?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Themes.html
+     * @psalm-impure
      */
     public function getChatThemes(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -834,6 +904,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setAuthorizationTTL(int|null $authorization_ttl_days = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -848,6 +919,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function changeAuthorizationSettings(bool|null $confirmed = null, array $hash = [], bool|null $encrypted_requests_disabled = null, bool|null $call_requests_disabled = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -859,6 +931,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.savedRingtonesNotModified'}|array{_: 'account.savedRingtones', hash: list<int|string>, ringtones: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedRingtones.html
+     * @psalm-impure
      */
     public function getSavedRingtones(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -874,6 +947,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.savedRingtone'}|array{_: 'account.savedRingtoneConverted', document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedRingtone.html
+     * @psalm-impure
      */
     public function saveRingtone(bool $unsave, array|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -887,6 +961,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>} @see https://docs.madelineproto.xyz/API_docs/types/Document.html
+     * @psalm-impure
      */
     public function uploadRingtone(mixed $file, string|null $file_name = '', string|null $mime_type = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -898,6 +973,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateEmojiStatus(array|null $emoji_status = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -909,6 +985,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int|string>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int, until?: int}|array{_: 'emojiStatusCollectible', collectible_id: int, document_id: int, title: string, slug: string, pattern_document_id: int, center_color: int, edge_color: int, pattern_color: int, text_color: int, until?: int}|array{_: 'inputEmojiStatusCollectible', collectible_id: int, until?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
+     * @psalm-impure
      */
     public function getDefaultEmojiStatuses(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -920,6 +997,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int|string>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int, until?: int}|array{_: 'emojiStatusCollectible', collectible_id: int, document_id: int, title: string, slug: string, pattern_document_id: int, center_color: int, edge_color: int, pattern_color: int, text_color: int, until?: int}|array{_: 'inputEmojiStatusCollectible', collectible_id: int, until?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
+     * @psalm-impure
      */
     public function getRecentEmojiStatuses(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -930,6 +1008,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function clearRecentEmojiStatuses(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -941,6 +1020,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reorderUsernames(array $order = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -953,6 +1033,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleUsername(bool $active, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -964,6 +1045,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int|string>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
+     * @psalm-impure
      */
     public function getDefaultProfilePhotoEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -975,6 +1057,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int|string>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
+     * @psalm-impure
      */
     public function getDefaultGroupPhotoEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -985,6 +1068,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.autoSaveSettings', users_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size?: int}, chats_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size?: int}, broadcasts_settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size?: int}, exceptions: list<array{_: 'autoSaveException', peer: array|int|string, settings: array{_: 'autoSaveSettings', photos: bool, videos: bool, video_max_size?: int}}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.AutoSaveSettings.html
+     * @psalm-impure
      */
     public function getAutoSaveSettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1000,6 +1084,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveAutoSaveSettings(array $settings, bool|null $users = null, bool|null $chats = null, bool|null $broadcasts = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1010,6 +1095,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deleteAutoSaveExceptions(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1021,6 +1107,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function invalidateSignInCodes(array $codes = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1033,6 +1120,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateColor(bool|null $for_profile = null, array|null $color = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1044,6 +1132,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int|string>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
+     * @psalm-impure
      */
     public function getDefaultBackgroundEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1055,6 +1144,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int|string>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int, until?: int}|array{_: 'emojiStatusCollectible', collectible_id: int, document_id: int, title: string, slug: string, pattern_document_id: int, center_color: int, edge_color: int, pattern_color: int, text_color: int, until?: int}|array{_: 'inputEmojiStatusCollectible', collectible_id: int, until?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
+     * @psalm-impure
      */
     public function getChannelDefaultEmojiStatuses(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1066,6 +1156,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'emojiListNotModified'}|array{_: 'emojiList', hash: list<int|string>, document_id: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/EmojiList.html
+     * @psalm-impure
      */
     public function getChannelRestrictedStatusEmojis(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1082,6 +1173,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBusinessWorkHours(array|null $business_work_hours = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1096,6 +1188,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBusinessLocation(array|null $geo_point = null, string|null $address = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1107,6 +1200,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBusinessGreetingMessage(array|null $message = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1118,6 +1212,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBusinessAwayMessage(array|null $message = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1132,6 +1227,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function updateConnectedBot(array $recipients, bool|null $deleted = null, array|null $rights = null, array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1142,6 +1238,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.connectedBots', connected_bots: list<array{_: 'connectedBot', recipients: array{_: 'businessBotRecipients', existing_chats: bool, new_chats: bool, contacts: bool, non_contacts: bool, exclude_selected: bool, users?: list<int>, exclude_users?: list<int>}, rights: array{_: 'businessBotRights', reply: bool, read_messages: bool, delete_sent_messages: bool, delete_received_messages: bool, edit_name: bool, edit_bio: bool, edit_profile_photo: bool, edit_username: bool, view_gifts: bool, sell_gifts: bool, change_gift_settings: bool, transfer_and_upgrade_gifts: bool, transfer_stars: bool, manage_stories: bool}, bot_id: int, device?: string, date?: int, location?: string}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ConnectedBots.html
+     * @psalm-impure
      */
     public function getConnectedBots(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1156,6 +1253,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function getBotBusinessConnection(string|null $connection_id = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1167,6 +1265,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBusinessIntro(array|null $intro = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1179,6 +1278,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleConnectedBotPaused(bool $paused, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1190,6 +1290,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function disablePeerConnectedBot(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1201,6 +1302,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateBirthday(array|null $birthday = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1212,6 +1314,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int} @see https://docs.madelineproto.xyz/API_docs/types/BusinessChatLink.html
+     * @psalm-impure
      */
     public function createBusinessChatLink(array $link, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1224,6 +1327,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int} @see https://docs.madelineproto.xyz/API_docs/types/BusinessChatLink.html
+     * @psalm-impure
      */
     public function editBusinessChatLink(array $link, string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1235,6 +1339,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deleteBusinessChatLink(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1245,6 +1350,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.businessChatLinks', links: list<array{_: 'businessChatLink', link: string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, title?: string, views: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.BusinessChatLinks.html
+     * @psalm-impure
      */
     public function getBusinessChatLinks(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1256,6 +1362,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.resolvedBusinessChatLinks', peer: array|int|string, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.ResolvedBusinessChatLinks.html
+     * @psalm-impure
      */
     public function resolveBusinessChatLink(string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1269,6 +1376,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updatePersonalChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1282,6 +1390,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleSponsoredMessages(bool $enabled, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1292,6 +1401,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'reactionsNotifySettings', sound: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, show_previews: bool, messages_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, stories_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, poll_votes_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}} @see https://docs.madelineproto.xyz/API_docs/types/ReactionsNotifySettings.html
+     * @psalm-impure
      */
     public function getReactionsNotifySettings(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1303,6 +1413,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'reactionsNotifySettings', sound: array{_: 'notificationSoundDefault'}|array{_: 'notificationSoundNone'}|array{_: 'notificationSoundLocal', title: string, data: string}|array{_: 'notificationSoundRingtone', id: int}, show_previews: bool, messages_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, stories_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}, poll_votes_notify_from?: array{_: 'reactionNotificationsFromContacts'}|array{_: 'reactionNotificationsFromAll'}} @see https://docs.madelineproto.xyz/API_docs/types/ReactionsNotifySettings.html
+     * @psalm-impure
      */
     public function setReactionsNotifySettings(array $settings, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1314,6 +1425,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.emojiStatusesNotModified'}|array{_: 'account.emojiStatuses', hash: list<int|string>, statuses: list<array{_: 'emojiStatusEmpty'}|array{_: 'emojiStatus', document_id: int, until?: int}|array{_: 'emojiStatusCollectible', collectible_id: int, document_id: int, title: string, slug: string, pattern_document_id: int, center_color: int, edge_color: int, pattern_color: int, text_color: int, until?: int}|array{_: 'inputEmojiStatusCollectible', collectible_id: int, until?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.EmojiStatuses.html
+     * @psalm-impure
      */
     public function getCollectibleEmojiStatuses(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1326,6 +1438,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.paidMessagesRevenue', stars_amount: int} @see https://docs.madelineproto.xyz/API_docs/types/account.PaidMessagesRevenue.html
+     * @psalm-impure
      */
     public function getPaidMessagesRevenue(array|int|string|null $parent_peer = null, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1340,6 +1453,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleNoPaidMessagesException(bool|null $refund_charged = null, bool|null $require_payment = null, array|int|string|null $parent_peer = null, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1351,6 +1465,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setMainProfileTab(array $tab, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1364,6 +1479,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveMusic(bool|null $unsave = null, array|null $id = null, array|null $after_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1375,6 +1491,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.savedMusicIdsNotModified'}|array{_: 'account.savedMusicIds', ids: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/account.SavedMusicIds.html
+     * @psalm-impure
      */
     public function getSavedMusicIds(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1388,6 +1505,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.chatThemesNotModified'}|array{_: 'account.chatThemes', hash: list<int|string>, themes: list<array{_: 'chatTheme', emoticon: string}|array{_: 'chatThemeUniqueGift', gift: array{_: 'starGift', limited: bool, sold_out: bool, birthday: bool, require_premium: bool, limited_per_user: bool, peer_color_available: bool, auction: bool, id: int, sticker: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, stars: int, availability_remains?: int, availability_total?: int, availability_resale?: int, convert_stars: int, first_sale_date?: int, last_sale_date?: int, upgrade_stars?: int, resell_min_stars?: int, title?: string, released_by?: array|int|string, per_user_total?: int, per_user_remains?: int, locked_until_date?: int, auction_slug?: string, gifts_per_round?: int, auction_start_date?: int, upgrade_variants?: int, background?: array{_: 'starGiftBackground', center_color: int, edge_color: int, text_color: int}}|array{_: 'starGiftUnique', require_premium: bool, resale_ton_only: bool, theme_available: bool, burned: bool, crafted: bool, id: int, gift_id: int, title: string, slug: string, num: int, owner_id?: array|int|string, owner_name?: string, owner_address?: string, attributes: list<array{_: 'starGiftAttributeModel', rarity: array{_: 'starGiftAttributeRarity', permille: int}|array{_: 'starGiftAttributeRarityUncommon'}|array{_: 'starGiftAttributeRarityRare'}|array{_: 'starGiftAttributeRarityEpic'}|array{_: 'starGiftAttributeRarityLegendary'}, crafted: bool, name: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'starGiftAttributePattern', rarity: array{_: 'starGiftAttributeRarity', permille: int}|array{_: 'starGiftAttributeRarityUncommon'}|array{_: 'starGiftAttributeRarityRare'}|array{_: 'starGiftAttributeRarityEpic'}|array{_: 'starGiftAttributeRarityLegendary'}, name: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'starGiftAttributeBackdrop', rarity: array{_: 'starGiftAttributeRarity', permille: int}|array{_: 'starGiftAttributeRarityUncommon'}|array{_: 'starGiftAttributeRarityRare'}|array{_: 'starGiftAttributeRarityEpic'}|array{_: 'starGiftAttributeRarityLegendary'}, name: string, backdrop_id: int, center_color: int, edge_color: int, pattern_color: int, text_color: int}|array{_: 'starGiftAttributeOriginalDetails', recipient_id: array|int|string, sender_id?: array|int|string, date: int, message?: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: array, length: array}|array{_: 'messageEntityMention', offset: array, length: array}|array{_: 'messageEntityHashtag', offset: array, length: array}|array{_: 'messageEntityBotCommand', offset: array, length: array}|array{_: 'messageEntityUrl', offset: array, length: array}|array{_: 'messageEntityEmail', offset: array, length: array}|array{_: 'messageEntityBold', offset: array, length: array}|array{_: 'messageEntityItalic', offset: array, length: array}|array{_: 'messageEntityCode', offset: array, length: array}|array{_: 'messageEntityPre', offset: array, length: array, language: array}|array{_: 'messageEntityTextUrl', offset: array, length: array, url: array}|array{_: 'messageEntityMentionName', offset: array, length: array, user_id: array}|array{_: 'inputMessageEntityMentionName', offset: array, length: array, user_id: array}|array{_: 'messageEntityPhone', offset: array, length: array}|array{_: 'messageEntityCashtag', offset: array, length: array}|array{_: 'messageEntityUnderline', offset: array, length: array}|array{_: 'messageEntityStrike', offset: array, length: array}|array{_: 'messageEntityBankCard', offset: array, length: array}|array{_: 'messageEntitySpoiler', offset: array, length: array}|array{_: 'messageEntityCustomEmoji', offset: array, length: array, document_id: array}|array{_: 'messageEntityBlockquote', collapsed: array, offset: array, length: array}|array{_: 'messageEntityFormattedDate', relative: array, short_time: array, long_time: array, short_date: array, long_date: array, day_of_week: array, offset: array, length: array, date: array}|array{_: 'messageEntityDiffInsert', offset: array, length: array}|array{_: 'messageEntityDiffReplace', offset: array, length: array, old_text: array}|array{_: 'messageEntityDiffDelete', offset: array, length: array}|array{_: 'messageEntityBlockquote', offset: array, length: array}>}}>, availability_issued: int, availability_total: int, gift_address?: string, resell_amount?: list<array{_: 'starsAmount', amount: int, nanos: int}|array{_: 'starsTonAmount', amount: int}>, released_by?: array|int|string, value_amount?: int, value_currency?: string, value_usd_amount?: int, theme_peer?: array|int|string, peer_color?: array{_: 'peerColor', color?: int, background_emoji_id?: int}|array{_: 'peerColorCollectible', collectible_id: int, gift_emoji_id: int, background_emoji_id: int, accent_color: int, colors: list<int>, dark_accent_color?: int, dark_colors?: list<int>}|array{_: 'inputPeerColorCollectible', collectible_id: int}, host_id?: array|int|string, offer_min_stars?: int, craft_chance_permille?: int}, theme_settings: list<array{_: 'themeSettings', base_theme: array{_: 'baseThemeClassic'}|array{_: 'baseThemeDay'}|array{_: 'baseThemeNight'}|array{_: 'baseThemeTinted'}|array{_: 'baseThemeArctic'}, message_colors_animated: bool, accent_color: int, outbox_accent_color?: int, message_colors?: list<int>, wallpaper?: array{_: 'wallPaper', id: int, creator: bool, default: bool, pattern: bool, dark: bool, access_hash: int, slug: string, document: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}|array{_: 'wallPaperNoFile', id: int, default: bool, dark: bool, settings?: array{_: 'wallPaperSettings', blur: bool, motion: bool, background_color?: int, second_background_color?: int, third_background_color?: int, fourth_background_color?: int, intensity?: int, rotation?: int, emoticon?: string}}}>}>, chats: list<array|int|string>, users: list<array|int|string>, next_offset?: string} @see https://docs.madelineproto.xyz/API_docs/types/account.ChatThemes.html
+     * @psalm-impure
      */
     public function getUniqueGiftChatThemes(string|null $offset = '', int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1398,6 +1516,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.passkeyRegistrationOptions', options: mixed} @see https://docs.madelineproto.xyz/API_docs/types/account.PasskeyRegistrationOptions.html
+     * @psalm-impure
      */
     public function initPasskeyRegistration(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1409,6 +1528,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'passkey', id: string, name: string, date: int, software_emoji_id?: int, last_usage_date?: int} @see https://docs.madelineproto.xyz/API_docs/types/Passkey.html
+     * @psalm-impure
      */
     public function registerPasskey(array $credential, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1419,6 +1539,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.passkeys', passkeys: list<array{_: 'passkey', id: string, name: string, date: int, software_emoji_id?: int, last_usage_date?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/account.Passkeys.html
+     * @psalm-impure
      */
     public function getPasskeys(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1430,6 +1551,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deletePasskey(string|null $id = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1441,6 +1563,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function confirmBotConnection(array|int|string|null $bot_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -1452,6 +1575,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.webBrowserSettingsNotModified'}|array{_: 'account.webBrowserSettings', open_external_browser: bool, display_close_button: bool, external_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, inapp_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, hash: list<int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.WebBrowserSettings.html
+     * @psalm-impure
      */
     public function getWebBrowserSettings(array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1464,6 +1588,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.webBrowserSettingsNotModified'}|array{_: 'account.webBrowserSettings', open_external_browser: bool, display_close_button: bool, external_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, inapp_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, hash: list<int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.WebBrowserSettings.html
+     * @psalm-impure
      */
     public function updateWebBrowserSettings(bool|null $open_external_browser = null, bool|null $display_close_button = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1477,6 +1602,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleWebBrowserSettingsException(bool|null $delete = null, bool|null $open_external_browser = null, string|null $url = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -1487,6 +1613,7 @@ interface Account
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'account.webBrowserSettingsNotModified'}|array{_: 'account.webBrowserSettings', open_external_browser: bool, display_close_button: bool, external_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, inapp_exceptions: list<array{_: 'webDomainException', domain: string, url: string, title: string, favicon?: int}>, hash: list<int|string>} @see https://docs.madelineproto.xyz/API_docs/types/account.WebBrowserSettings.html
+     * @psalm-impure
      */
     public function deleteWebBrowserSettingsExceptions(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

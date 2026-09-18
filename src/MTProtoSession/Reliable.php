@@ -33,6 +33,8 @@ trait Reliable
 {
     /**
      * Called when receiving a new_msg_detailed_info.
+     *
+     * @psalm-mutation-free
      */
     public function onNewMsgDetailedInfo(array $content): void
     {
@@ -44,6 +46,8 @@ trait Reliable
     }
     /**
      * Called when receiving a msg_detailed_info.
+     *
+     * @psalm-mutation-free
      */
     public function onMsgDetailedInfo(array $content): void
     {
@@ -74,6 +78,8 @@ trait Reliable
     }
     /**
      * Called when receiving a msg_resend_ans_req.
+     *
+     * @psalm-mutation-free
      */
     public function onMsgResendAnsReq(array $content, int $current_msg_id): void
     {
@@ -101,6 +107,8 @@ trait Reliable
      *
      * @param array $msg_ids    Message IDs to send info about
      * @param int   $req_msg_id Message ID of msgs_state_req that initiated this
+     *
+     * @psalm-mutation-free
      */
     public function sendMsgsStateInfo(array $msg_ids, int $req_msg_id): void
     {

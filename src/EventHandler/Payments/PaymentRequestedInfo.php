@@ -8,6 +8,9 @@ use ReflectionProperty;
 
 final class PaymentRequestedInfo implements JsonSerializable
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** User’s full name */
         public readonly string $name,

@@ -25,6 +25,9 @@ use Amp\DeferredFuture;
  */
 final class WrappedCancellation
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         private readonly AmpCancellation $cancellation
     ) {
@@ -35,6 +38,9 @@ final class WrappedCancellation
      */
     private array $handlers = [];
     private string $id = 'a';
+    /**
+     * @psalm-mutation-free
+     */
     public function getId(): string
     {
         return $this->id++;

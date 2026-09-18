@@ -61,6 +61,8 @@ final class GroupCall extends Update
      * Constructor.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         MTProto $API,
@@ -76,6 +78,8 @@ final class GroupCall extends Update
 
     /**
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function update(array $call): void
     {
@@ -130,6 +134,8 @@ final class GroupCall extends Update
 
     /**
      * Get the state of the group call.
+     *
+     * @psalm-mutation-free
      */
     public function getCallState(): GroupCallState
     {
@@ -140,6 +146,8 @@ final class GroupCall extends Update
      * Get all known participants, indexed by their bot API peer ID.
      *
      * @return array<int, Participant>
+     *
+     * @psalm-mutation-free
      */
     public function getParticipants(): array
     {
@@ -157,6 +165,8 @@ final class GroupCall extends Update
 
     /**
      * Whether our own audio stream is muted.
+     *
+     * @psalm-mutation-free
      */
     public function isMuted(): bool
     {
@@ -203,7 +213,12 @@ final class GroupCall extends Update
     }
 
     /**
-     * Play file.
+     * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
+     *
+     * A WebM/Matroska file with VP8, VP9 or H.264 video has its video transmitted too; any other
+     * file (or a raw audio stream) is played as audio only. Frames are demuxed in pure PHP and sent
+     * as-is where possible, so no transcoding (and thus no FFI extension) is required for
+     * pre-encoded WebM/OGG-OPUS input.
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file): self
     {
@@ -230,26 +245,6 @@ final class GroupCall extends Update
     }
 
     /**
-     * Play the VP8 video and OPUS audio of a WebM file.
-     */
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): self
-    {
-        $this->getClient()->groupCallPlayVideo($this->id, $file);
-
-        return $this;
-    }
-
-    /**
-     * Stop transmitting video.
-     */
-    public function stopVideo(): self
-    {
-        $this->getClient()->groupCallStopVideo($this->id);
-
-        return $this;
-    }
-
-    /**
      * When called, skips to the next file in the playlist.
      */
     public function skip(): self
@@ -269,6 +264,8 @@ final class GroupCall extends Update
 
     /**
      * Pauses the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function pause(): self
     {
@@ -278,6 +275,8 @@ final class GroupCall extends Update
 
     /**
      * Whether the currently playing file is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isPaused(): bool
     {
@@ -286,6 +285,8 @@ final class GroupCall extends Update
 
     /**
      * Resumes the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function resume(): self
     {
@@ -307,6 +308,8 @@ final class GroupCall extends Update
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream,
      * otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-mutation-free
      */
     public function getCurrent(): RemoteUrl|LocalFile|string|null
     {
@@ -315,6 +318,8 @@ final class GroupCall extends Update
 
     /**
      * Get call representation.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

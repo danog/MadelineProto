@@ -65,6 +65,7 @@ abstract class RunnerAbstract
      * Runner.
      *
      * @param string $session Session path
+     * @psalm-impure
      */
     abstract public static function start(string $session, int $startupId): bool;
 }

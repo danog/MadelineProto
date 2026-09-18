@@ -35,6 +35,9 @@ use danog\MadelineProto\RPCErrorException;
 /** @internal */
 final class ActionSend implements Action
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly MTProto $API, private readonly array $messages, private readonly bool $pin)
     {
     }

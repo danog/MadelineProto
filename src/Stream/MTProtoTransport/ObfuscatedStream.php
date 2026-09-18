@@ -74,6 +74,8 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     }
     /**
      * Set extra.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($extra): void
@@ -88,6 +90,9 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
         }
         $this->extra = $extra;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

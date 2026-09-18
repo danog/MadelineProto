@@ -322,7 +322,7 @@ final class GroupSdp
      * @param ?array{payloadTypes: list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>, extensions: list<array{id: int, uri: string}>} $video
      *                                      The video codec table the SFU announced, if any.
      * @param string $outgoingVideoCodec    Encoding name of the video we transmit, which our own
-     *                                      m-line is pinned to. See {@see WebmSource::VIDEO_CODECS}.
+     *                                      m-line is pinned to. See {@see \danog\MadelineProto\Loop\VoIP\DjLoop::VIDEO_CODECS}.
      */
     public static function buildAnswer(
         string $offer,
@@ -366,7 +366,7 @@ final class GroupSdp
             if ($ssrc === null && $kind === 'video') {
                 // Receiving m-lines advertise everything a group call can carry, but the local
                 // stack picks the first codec of an m-line to send with, and our outgoing video is
-                // demuxed rather than encoded: it can only ever be what {@see WebmSource} yields.
+                // demuxed rather than encoded: it can only ever be what {@see \danog\MadelineProto\Loop\VoIP\DjLoop} yields.
                 $codecs = self::prioritize($codecs, $outgoingVideoCodec);
             }
             $result[] = 'm='.$kind.' 9 UDP/TLS/RTP/SAVPF '
@@ -399,6 +399,8 @@ final class GroupSdp
      * Split an offer into its session-level lines and one descriptor per m-line.
      *
      * @return array{session: list<string>}&array<int, array{string, string, SDPDirections}>
+     *
+     * @psalm-pure
      */
     private static function splitOffer(string $offer): array
     {
@@ -448,6 +450,8 @@ final class GroupSdp
 
     /**
      * Swap the point of view of a direction, to turn our offer into the SFU's answer.
+     *
+     * @psalm-pure
      */
     private static function reverseDirection(SDPDirections $direction): SDPDirections
     {
@@ -473,6 +477,8 @@ final class GroupSdp
      * @param ?array{payloadTypes: list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>, extensions: list<array{id: int, uri: string}>} $video
      *
      * @return list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>
+     *
+     * @psalm-pure
      */
     private static function codecs(string $kind, ?array $video): array
     {
@@ -518,6 +524,8 @@ final class GroupSdp
      * @param list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}> $codecs
      *
      * @return list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>
+     *
+     * @psalm-pure
      */
     private static function prioritize(array $codecs, string $name): array
     {
@@ -550,6 +558,8 @@ final class GroupSdp
      * @param array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>} $codec
      *
      * @return list<string>
+     *
+     * @psalm-pure
      */
     private static function codecLines(array $codec): array
     {
@@ -594,6 +604,8 @@ final class GroupSdp
 
     /**
      * Convert an unsigned 32-bit SSRC to the signed representation used by the API.
+     *
+     * @psalm-pure
      */
     public static function toSignedSsrc(int $ssrc): int
     {
@@ -603,12 +615,17 @@ final class GroupSdp
 
     /**
      * Convert a signed SSRC coming from the API to its unsigned 32-bit representation.
+     *
+     * @psalm-pure
      */
     public static function toUnsignedSsrc(int $ssrc): int
     {
         return $ssrc & 0xFFFFFFFF;
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function formatCandidate(array $candidate): string
     {
         $line = 'a=candidate:'

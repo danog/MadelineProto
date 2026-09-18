@@ -32,6 +32,9 @@ use const PHP_SAPI;
 class Exception extends \Exception
 {
     use TL\PrettyException;
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __toString(): string
     {
         return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();

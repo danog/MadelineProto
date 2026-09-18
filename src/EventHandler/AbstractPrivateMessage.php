@@ -33,6 +33,7 @@ abstract class AbstractPrivateMessage extends Message
     /**
      * Notify the other user in a private chat that a screenshot of the chat was taken.
      *
+     * @psalm-impure
      */
     abstract public function screenShot(): DialogScreenshotTaken;
 }

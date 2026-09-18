@@ -85,6 +85,8 @@ final class LegacyController
      * event-loop watcher IDs; they are dropped here and re-established on wakeup.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
@@ -168,6 +170,9 @@ final class LegacyController
         return $this->voipState;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return (string) $this->call;

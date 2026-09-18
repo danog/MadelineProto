@@ -49,7 +49,11 @@ final class WallpaperSettings implements JsonSerializable
     /** Clockwise rotation angle of the gradient, in degrees; 0-359. Should be always divisible by 45. */
     public readonly int $rotation;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawWallpaperSetting)
     {
         $this->blur = $rawWallpaperSetting['blur'];

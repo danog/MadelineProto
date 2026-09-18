@@ -144,7 +144,11 @@ final class NewAuthKey implements SimpleSubscriber
             );
         }
     }
-    /** @return list{string, string} */
+    /**
+     * @return list{string, string} 
+     *
+     * @psalm-mutation-free
+     */
     public function pfsKdf(string $message_key): array
     {
         return Crypt::oldKdf($message_key, $this->authKey);
@@ -194,6 +198,8 @@ final class NewAuthKey implements SimpleSubscriber
     }
     /**
      * Get server salt.
+     *
+     * @psalm-external-mutation-free
      */
     public function setServerSalt(?string $salt): void
     {

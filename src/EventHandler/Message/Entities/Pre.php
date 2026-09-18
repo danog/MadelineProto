@@ -7,6 +7,9 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Pre extends MessageEntity
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Offset of message entity within message (in UTF-16 code units) */
         public readonly int $offset,
@@ -19,6 +22,9 @@ final class Pre extends MessageEntity
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toBotAPI(): array
     {
@@ -28,6 +34,9 @@ final class Pre extends MessageEntity
         }
         return $res;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toMTProto(): array
     {

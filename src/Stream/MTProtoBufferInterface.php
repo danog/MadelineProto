@@ -24,6 +24,7 @@ namespace danog\MadelineProto\Stream;
  * MTProto buffer interface, for reading transport MTProto header info.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface MTProtoBufferInterface
 {

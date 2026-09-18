@@ -33,6 +33,8 @@ trait LoggerLoop
      * Report pause, can be overriden for logging.
      *
      * @param float $timeout Pause duration, 0 = forever
+     *
+     * @psalm-external-mutation-free
      */
     protected function reportPause(float $timeout): void
     {
@@ -42,6 +44,8 @@ trait LoggerLoop
 
     /**
      * Signal that loop was started.
+     *
+     * @psalm-external-mutation-free
      */
     protected function startedLoop(): void
     {
@@ -49,6 +53,8 @@ trait LoggerLoop
     }
     /**
      * Signal that loop has exited.
+     *
+     * @psalm-external-mutation-free
      */
     protected function exitedLoop(): void
     {

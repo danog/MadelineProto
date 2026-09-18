@@ -33,6 +33,9 @@ trait SeqNoHandler
     public int $session_out_seq_no = 0;
     public int $session_in_seq_no = 0;
     public ?string $session_id = null;
+    /**
+     * @psalm-external-mutation-free
+     */
     public function generateOutSeqNo(bool $contentRelated): int
     {
         $in = $contentRelated ? 1 : 0;
@@ -41,6 +44,9 @@ trait SeqNoHandler
         //$this->API->logger("OUT: $value + $in = ".$this->session_out_seq_no);
         return $value * 2 + $in;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function checkInSeqNo(MTProtoIncomingMessage $message): void
     {
         if ($message->hasSeqNo()) {

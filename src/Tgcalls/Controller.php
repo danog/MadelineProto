@@ -18,12 +18,10 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
-use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use danog\MadelineProto\VoIPController;
@@ -64,8 +62,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private MediaStreamTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
     private ?RTCRtpTransceiver $videoTransceiver = null;
-    private WebmSource $webm;
     private ?OpusRecorder $recorder = null;
+    private ?CallRecorder $callRecorder = null;
 
     /** @var list<RTCIceCandidate> Candidates received before the remote description was applied. */
     private array $pendingCandidates = [];
@@ -109,10 +107,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->peerConnection = new RTCPeerConnection([
             'iceServers' => self::buildIceServers($connections),
         ]);
-        $this->webm = new WebmSource($call, $this);
-        $this->outgoingAudio = new OpusPlaybackTrack($dj, $call, $this->webm);
+        $this->peerConnection->setLogger($this->call->API->logger->getPsrLogger()); // ICEDEBUG
+        $dj->setVideoCodecObserver($this);
+        $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
         $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
-        $this->outgoingVideo = new VideoPlaybackTrack($this->webm, $call);
+        $this->outgoingVideo = new VideoPlaybackTrack($dj, $call);
         if ($this->outgoing && $this->call->public->video) {
             $this->videoEnabled = true;
             $this->ensureVideoTransceiver();
@@ -144,25 +143,31 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * Drop the state that cannot be serialized before the graph is written out.
      *
      * The WebRTC engine (peer connection, ICE/DTLS/SCTP transports and their timers), the signaling
-     * reliability layer, the playback tracks and the WebM demuxer all serialize themselves and
-     * resume on the far side. Only the OGG recorder cannot: it wraps an open file/stream handle, so
-     * it is dropped here and re-attached on wakeup from the output the call still remembers.
+     * reliability layer and the playback tracks all serialize themselves and resume on the far side
+     * (the WebM demuxer they read from lives in the {@see DjLoop}, which the call serializes). Only
+     * the OGG recorder cannot: it wraps an open file/stream handle, so it is dropped here and
+     * re-attached on wakeup from the output the call still remembers.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        unset($vars['recorder']);
+        unset($vars['recorder'], $vars['callRecorder']);
         return $vars;
     }
 
     /**
      * @param array<string, mixed> $data
+     *
+     * @psalm-external-mutation-free
      */
     public function __unserialize(array $data): void
     {
         $this->recorder = null;
+        $this->callRecorder = null;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -204,11 +209,19 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     #[\Override]
     public function onPeerConnectionTrack(MediaStreamTrack $track): void
     {
-        if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
+        if (!$track instanceof RemoteStreamTrack) {
+            return;
+        }
+        if ($track->getKind() === MediaKind::Audio) {
             $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
             $this->enableRawReceive();
             $this->recorder?->setTrack($track);
+        } elseif ($track->getKind() === MediaKind::Video) {
+            $this->call->log("Got incoming video track in {$this->call}", Logger::VERBOSE);
+            $this->enableRawReceive();
         }
+        // The full-call recorder muxes both incoming audio and video into one file.
+        $this->callRecorder?->setTrack($track);
     }
 
     /**
@@ -234,6 +247,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * endpoints are used: they are plain STUN/TURN servers. Legacy `phoneConnection` reflectors
      * speak a Telegram-specific relay protocol and are only used by libtgvoip, which modern calls
      * no longer support.
+     *
+     * @psalm-pure
      */
     private static function buildIceServers(array $connections): array
     {
@@ -272,12 +287,34 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
-     * Set the output file or stream for the incoming audio.
+     * Set the output file or stream for the incoming media.
+     *
+     * A `.mkv`/`.webm` target records both the incoming audio and video, muxed into Matroska in pure
+     * PHP ({@see CallRecorder}); any other target keeps the audio-only behaviour, writing an OGG OPUS
+     * stream ({@see OpusRecorder}). A raw stream, whose extension is unknown, is treated as OGG audio.
      */
     public function setOutput(LocalFile|WritableStream $file): void
     {
         $this->enableRawReceive();
+        $wantsVideo = $file instanceof LocalFile
+            && preg_match('/\.(mkv|webm)$/i', $file->file) === 1;
+
         $this->recorder?->close();
+        $this->recorder = null;
+        $this->callRecorder?->close();
+        $this->callRecorder = null;
+
+        if ($wantsVideo) {
+            $this->callRecorder = new CallRecorder($file);
+            foreach ($this->peerConnection->getReceivers() as $receiver) {
+                $track = $receiver->getTrack();
+                if ($track instanceof RemoteStreamTrack) {
+                    $this->callRecorder->setTrack($track);
+                }
+            }
+            return;
+        }
+
         $this->recorder = new OpusRecorder($file);
         foreach ($this->peerConnection->getReceivers() as $receiver) {
             $track = $receiver->getTrack();
@@ -289,20 +326,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
-     * Play a WebM file, transmitting its VP8 video and OPUS audio.
+     * React to the demuxed file's video finishing: stop transmitting video and tell the peer.
      */
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
+    #[\Override]
+    public function onVideoStopped(): void
     {
-        $this->webm->play($file);
-        $this->sendMediaState($this->muted, video: true);
-    }
-
-    /**
-     * Stop transmitting video.
-     */
-    public function stopVideo(): void
-    {
-        $this->webm->stop();
         if ($this->videoEnabled) {
             $this->videoEnabled = false;
             $this->videoTransceiver?->setDirection(SDPDirections::recvonly);
@@ -312,8 +340,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
-     * Pin the video sender to the codec of the opened file and negotiate the channel before its
-     * pre-encoded frames are interpreted by an RTP payloader for another codec.
+     * Prefer the codec of the opened file for the video sender, while still offering the rest so the
+     * peer's own camera (which it encodes as VP8/VP9/H.264) can be received and recorded.
+     *
+     * The pre-encoded frames of the file are only correct if the peer selects the file's codec; a
+     * peer that cannot decode it will pick another and our outgoing video will not be usable, but the
+     * call and the incoming video keep working — which is what {@see self::record()} needs.
      */
     #[\Override]
     public function onVideoCodec(string $codec): void
@@ -326,15 +358,18 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->outgoingVideo->setTransportReady(false);
         if ($codec !== $this->outgoingVideoCodec) {
             $capabilities = (new Codec())->getCapabilities('video')->codecs;
-            $preferred = array_values(array_filter(
-                $capabilities,
-                static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0
-                    || strcasecmp($capability->mimeType, 'video/rtx') === 0
+            $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
+            // The file's codec first, then every other codec (RTX included), so it is preferred but
+            // the full table is still offered for the receive direction.
+            $preferred = array_values(array_merge(
+                array_filter($capabilities, $isFile),
+                array_filter($capabilities, static fn ($capability): bool => !$isFile($capability)),
             ));
             $transceiver->setCodecPreferences($preferred);
             $this->outgoingVideoCodec = $codec;
         }
         $this->renegotiate();
+        $this->sendMediaState($this->muted, video: true);
     }
 
     private function ensureVideoTransceiver(): RTCRtpTransceiver
@@ -380,10 +415,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->closed = true;
         $this->recorder?->close();
         $this->recorder = null;
+        $this->callRecorder?->close();
+        $this->callRecorder = null;
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
-            $this->webm->stop();
             $this->sctp?->close();
             $this->peerConnection->close();
         } catch (Throwable $e) {

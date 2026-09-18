@@ -32,7 +32,11 @@ trait ChatTrait
     /** Message ID */
     public readonly int $messageId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);

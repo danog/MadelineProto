@@ -73,6 +73,9 @@ final class FeedLoop extends Loop implements SimpleSubscriber
         $this->init($API);
         $API->loginState->subscribe($this);
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['incomingUpdates', 'parsedUpdates', 'updater', 'API', 'state', 'channelId'];
@@ -135,7 +138,10 @@ final class FeedLoop extends Loop implements SimpleSubscriber
                 continue;
             }
             if (isset($update['pts'], $update['pts_count'])) {
-                $logger = function ($msg) use ($update): void {
+                $logger = /**
+                 * @psalm-external-mutation-free
+                 */
+                function ($msg) use ($update): void {
                     $pts_count = $update['pts_count'];
                     $mid = $update['message']['id'] ?? '-';
                     $mypts = $this->state->pts();
@@ -288,6 +294,9 @@ final class FeedLoop extends Loop implements SimpleSubscriber
             $this->parsedUpdates[] = ['_' => $this->channelId === self::GENERIC ? 'updateNewMessage' : 'updateNewChannelMessage', 'message' => $message, 'pts' => -1, 'pts_count' => -1];
         }
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return !$this->channelId ? 'update feed loop generic' : "update feed loop channel {$this->channelId}";

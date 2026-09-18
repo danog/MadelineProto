@@ -39,6 +39,9 @@ final class AsyncWaiter implements Subscriber
         $this->future = new DeferredFuture;
     }
 
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return [];

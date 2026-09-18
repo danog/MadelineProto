@@ -30,6 +30,8 @@ abstract class Obj
      * Constructor.
      *
      * @param array<string, int> $methods
+     *
+     * @psalm-mutation-free
      */
     public function __construct(private ClientAbstract $wrapper, private array $methods)
     {

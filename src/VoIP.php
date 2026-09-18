@@ -53,6 +53,8 @@ final class VoIP extends Update implements SimpleFilters
      * Constructor.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         MTProto $API,
@@ -96,6 +98,8 @@ final class VoIP extends Update implements SimpleFilters
      * Get call emojis (will return null if the call is not inited yet).
      *
      * @return ?list{string, string, string, string}
+     *
+     * @psalm-mutation-free
      */
     public function getVisualization(): ?array
     {
@@ -103,7 +107,12 @@ final class VoIP extends Update implements SimpleFilters
     }
 
     /**
-     * Play file.
+     * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
+     *
+     * A WebM/Matroska file with VP8, VP9 or H.264 video has its video transmitted too; any other
+     * file (or a raw audio stream) is played as audio only. The file is demuxed in pure PHP and its
+     * frames are sent as-is where possible, so no transcoding (and thus no FFI extension) is
+     * required for pre-encoded WebM/OGG-OPUS input.
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file): self
     {
@@ -113,9 +122,12 @@ final class VoIP extends Update implements SimpleFilters
     }
 
     /**
-     * Set output file or stream for incoming OPUS audio packets.
+     * Set the output file or stream for the incoming media.
      *
-     * Will write an OGG OPUS stream to the specified file or stream.
+     * A `.mkv` or `.webm` file records both the incoming audio and video, muxed into a Matroska file
+     * in pure PHP (the peer's frames are stored as-is, so the video track is whatever codec the peer
+     * sends — VP8/VP9/H.264/AV1 — and the audio is OPUS). Any other file or a raw stream keeps the
+     * audio-only behaviour and receives an OGG OPUS stream.
      */
     public function setOutput(LocalFile|WritableStream $file): self
     {
@@ -123,6 +135,7 @@ final class VoIP extends Update implements SimpleFilters
 
         return $this;
     }
+
 
     /**
      * Play file.
@@ -133,26 +146,6 @@ final class VoIP extends Update implements SimpleFilters
 
         return $this;
     }
-    /**
-     * Play the VP8 video and OPUS audio of a WebM file.
-     */
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): self
-    {
-        $this->getClient()->callPlayVideo($this->callID, $file);
-
-        return $this;
-    }
-
-    /**
-     * Stop transmitting video.
-     */
-    public function stopVideo(): self
-    {
-        $this->getClient()->callStopVideo($this->callID);
-
-        return $this;
-    }
-
     /**
      * When called, skips to the next file in the playlist.
      */
@@ -174,6 +167,8 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Pauses the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function pause(): self
     {
@@ -186,6 +181,8 @@ final class VoIP extends Update implements SimpleFilters
      * Whether the currently playing file is paused.
      *
      * @return boolean
+     *
+     * @psalm-mutation-free
      */
     public function isPaused(): bool
     {
@@ -194,6 +191,8 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Resumes the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function resume(): self
     {
@@ -216,6 +215,8 @@ final class VoIP extends Update implements SimpleFilters
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-mutation-free
      */
     public function getCurrent(): RemoteUrl|LocalFile|string|null
     {
@@ -234,6 +235,8 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Whether our own audio stream is muted.
+     *
+     * @psalm-mutation-free
      */
     public function isMuted(): bool
     {
@@ -244,6 +247,8 @@ final class VoIP extends Update implements SimpleFilters
      * Get the media state of the other party, as reported by their client.
      *
      * Will return null if the call is not connected yet.
+     *
+     * @psalm-mutation-free
      */
     public function getRemoteMediaState(): ?MediaState
     {
@@ -252,6 +257,8 @@ final class VoIP extends Update implements SimpleFilters
 
     /**
      * Get call state.
+     *
+     * @psalm-mutation-free
      */
     public function getCallState(): CallState
     {
@@ -259,6 +266,8 @@ final class VoIP extends Update implements SimpleFilters
     }
     /**
      * Get call representation.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

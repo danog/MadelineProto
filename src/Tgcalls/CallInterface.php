@@ -23,16 +23,19 @@ use Stringable;
  * Common interface of one-to-one and group call controllers, used by the shared playback machinery.
  *
  * @internal
+ * @psalm-mutable
  */
 interface CallInterface extends Stringable
 {
     /**
      * Log a message, prefixed by the call description.
+     * @psalm-impure
      */
     public function log(string $message, int $level = Logger::NOTICE): void;
 
     /**
      * Whether the call is over, and all playback loops should exit.
+     * @psalm-impure
      */
     public function isCallEnded(): bool;
 }

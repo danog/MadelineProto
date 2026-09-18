@@ -49,6 +49,8 @@ abstract class AuthKey implements JsonSerializable
      * Constructor function.
      *
      * @param array $old Old auth key array
+     *
+     * @psalm-mutation-free
      */
     public function __construct(array $old = [])
     {
@@ -66,6 +68,8 @@ abstract class AuthKey implements JsonSerializable
      * Set auth key.
      *
      * @param string $authKey Authorization key
+     *
+     * @psalm-external-mutation-free
      */
     public function setAuthKey(string $authKey): void
     {
@@ -74,6 +78,8 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key is present.
+     *
+     * @psalm-mutation-free
      */
     public function hasAuthKey(): bool
     {
@@ -81,6 +87,8 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key.
+     *
+     * @psalm-mutation-free
      */
     public function getAuthKey(): string
     {
@@ -89,6 +97,8 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get auth key ID.
+     *
+     * @psalm-mutation-free
      */
     public function getID(): string
     {
@@ -99,6 +109,8 @@ abstract class AuthKey implements JsonSerializable
      * Set server salt.
      *
      * @param string $salt Server salt
+     *
+     * @psalm-external-mutation-free
      */
     public function setServerSalt(string $salt): void
     {
@@ -106,6 +118,8 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Get server salt.
+     *
+     * @psalm-mutation-free
      */
     public function getServerSalt(): string
     {
@@ -114,6 +128,8 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if has server salt.
+     *
+     * @psalm-mutation-free
      */
     public function hasServerSalt(): bool
     {
@@ -121,12 +137,14 @@ abstract class AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
+     * @psalm-mutation-free
      */
     abstract public function isAuthorized(): bool;
     /**
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
+     * @psalm-mutation-free
      */
     abstract public function authorized(bool $authorized): void;
 }

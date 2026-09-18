@@ -122,6 +122,9 @@ final class DataCenterConnection implements SimpleSubscriber
         $this->auth->setAuthKey($legacy->permAuthKey?->getAuthKey());
     }
 
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['auth', 'API', 'datacenter'];
@@ -143,6 +146,8 @@ final class DataCenterConnection implements SimpleSubscriber
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
+     *
+     * @psalm-external-mutation-free
      */
     public function needReconnect(bool $needsReconnect): void
     {
@@ -155,6 +160,9 @@ final class DataCenterConnection implements SimpleSubscriber
     {
         return $this->needsReconnect;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getCtxs(): ContextIterator
     {
         \assert($this->ctx !== null);
@@ -290,6 +298,8 @@ final class DataCenterConnection implements SimpleSubscriber
     }
     /**
      * Has connection context?
+     *
+     * @psalm-mutation-free
      */
     public function hasCtx(): bool
     {
@@ -340,6 +350,8 @@ final class DataCenterConnection implements SimpleSubscriber
      * Connect to the DC using count more sockets.
      *
      * @param integer $count Number of sockets to open
+     *
+     * @psalm-external-mutation-free
      */
     private function connectMore(int $count): void
     {
@@ -429,6 +441,8 @@ final class DataCenterConnection implements SimpleSubscriber
     }
     /**
      * Get connection for authorization.
+     *
+     * @psalm-mutation-free
      */
     private function getAuthConnection(): Connection
     {
@@ -438,6 +452,8 @@ final class DataCenterConnection implements SimpleSubscriber
      * Check if any connection is available.
      *
      * @param integer $id Connection ID
+     *
+     * @psalm-mutation-free
      */
     public function hasConnection(int $id = -1): bool|int
     {
@@ -457,6 +473,8 @@ final class DataCenterConnection implements SimpleSubscriber
      * Get best socket in round robin.
      *
      * @param integer $id Connection ID, for manual fetching
+     *
+     * @psalm-external-mutation-free
      */
     public function getConnection(int $id = -1): Connection
     {
@@ -501,6 +519,8 @@ final class DataCenterConnection implements SimpleSubscriber
      *
      * @param boolean $reading Whether we're busy reading
      * @param int     $x       Connection ID
+     *
+     * @psalm-external-mutation-free
      */
     public function reading(bool $reading, int $x): void
     {
@@ -514,6 +534,8 @@ final class DataCenterConnection implements SimpleSubscriber
      *
      * @param boolean $writing Whether we're busy writing
      * @param int     $x       Connection ID
+     *
+     * @psalm-external-mutation-free
      */
     public function writing(bool $writing, int $x): void
     {
@@ -522,6 +544,9 @@ final class DataCenterConnection implements SimpleSubscriber
         }
         $this->availableConnections[$x] += $writing ? -$this->decWrite : $this->decWrite;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setCtx(ContextIterator $ctx): void
     {
         $this->ctx = $ctx;
@@ -535,6 +560,8 @@ final class DataCenterConnection implements SimpleSubscriber
     }
     /**
      * Get DC-specific settings.
+     *
+     * @psalm-mutation-free
      */
     public function getSettings(): ConnectionSettings
     {
@@ -542,6 +569,8 @@ final class DataCenterConnection implements SimpleSubscriber
     }
     /**
      * Get global settings.
+     *
+     * @psalm-mutation-free
      */
     public function getGenericSettings(): Settings
     {

@@ -71,6 +71,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -81,6 +83,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -96,6 +100,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
@@ -105,6 +111,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * Decrypts read data asynchronously.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
@@ -115,6 +123,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function bufferWrite(string $data): void
@@ -136,6 +146,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Set obfuscation keys/IVs.
      *
      * @param array $data Keys
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($data): void
@@ -144,6 +156,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -152,20 +166,31 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getEncryptor(): AES
     {
         return $this->encrypt;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getDecryptor(): AES
     {
         return $this->decrypt;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

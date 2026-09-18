@@ -24,16 +24,19 @@ namespace danog\MadelineProto\Reactive;
  * @template T
  *
  * @extends BaseSubscriber<T>
+ * @psalm-mutable
  */
 interface Subscriber extends BaseSubscriber
 {
     /**
      * @param T $initState
+     * @psalm-impure
      */
     public function onAttach($initState): void;
     /**
      * @param T $prevState
      * @param T $state
+     * @psalm-impure
      */
     public function onStateChange($prevState, $state): void;
 }

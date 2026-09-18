@@ -73,9 +73,15 @@ final class MinDatabase implements TLCallback
         $this->v = self::V;
         $this->localMutex = new LocalKeyedMutex;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __destruct()
     {
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['db', 'pendingDb', 'API', 'v'];
@@ -110,36 +116,57 @@ final class MinDatabase implements TLCallback
     {
         $this->db->clear();
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return array_merge(array_fill_keys(self::CATCH_PEERS, [$this->addPeer(...)]), array_fill_keys(self::ORIGINS, [$this->addOrigin(...)]));
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return array_fill_keys(self::ORIGINS, [$this->addOriginContext(...)]);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
         return array_fill_keys(self::SWITCH_CONSTRUCTORS, $this->populateFrom(...));
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getTypeMismatchCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function reset(): void
     {
         if ($this->cache) {
@@ -181,6 +208,9 @@ final class MinDatabase implements TLCallback
         }
         return true;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function addOriginContext(string $type): void
     {
         $this->API->logger("Adding peer origin context for {$type}!", Logger::ULTRA_VERBOSE);
@@ -266,6 +296,9 @@ final class MinDatabase implements TLCallback
     {
         unset($this->db[$id], $this->pendingDb[$id]);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo()
     {
         return ['MinDatabase instance '.spl_object_hash($this)];

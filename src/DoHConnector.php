@@ -44,6 +44,9 @@ use function Amp\Socket\Internal\parseUri;
 /** @internal */
 final class DoHConnector implements SocketConnector
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)
     {
     }

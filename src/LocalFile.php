@@ -18,9 +18,14 @@ namespace danog\MadelineProto;
 
 /**
  * Indicates a local file to upload.
+ *
+ * @psalm-immutable
  */
 final class LocalFile
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         public readonly string $file
     ) {

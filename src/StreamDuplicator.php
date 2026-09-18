@@ -47,6 +47,8 @@ final class StreamDuplicator implements ReadableStream, IteratorAggregate
     /**
      * @param ReadableStream $input Input stream
      * @param WritableStream ...$outputs Secondary output streams, only written to when the primary stream (this one) is read.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private readonly ReadableStream $input,

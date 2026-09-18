@@ -27,6 +27,9 @@ namespace danog\MadelineProto\Reactive;
  */
 final class SimpleSubscriberAdaptor implements Subscriber
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** @var SimpleSubscriber<T> $subscriber */
         public readonly SimpleSubscriber $subscriber

@@ -18,7 +18,11 @@ namespace danog\MadelineProto\EventHandler\Attributes;
 
 use Attribute;
 
-/** Attribute that marks a handler method. */
+/**
+ * Attribute that marks a handler method.
+ *
+ * @psalm-pure
+ */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Handler
 {

@@ -31,6 +31,8 @@ final class Ipc extends SettingsAbstract
 
     /**
      * Get WARNING: this will cause slow startup if enabled.
+     *
+     * @psalm-pure
      */
     public function getSlow(): bool
     {

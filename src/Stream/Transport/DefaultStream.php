@@ -60,6 +60,9 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->stream->setupTls($cancellationToken);
     }
+    /**
+     * @psalm-pure
+     */
     public function getStream(): RawStreamInterface
     {
         throw new AssertionError("No underlying stream!");
@@ -124,6 +127,8 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -131,11 +136,17 @@ class DefaultStream implements RawStreamInterface, ProxyStreamInterface
         Assert::notNull($this->stream);
         return $this->stream;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function setExtra($extra): void
     {
         $this->connector = $extra;
     }
+    /**
+     * @psalm-pure
+     */
     public static function getName(): string
     {
         return self::class;

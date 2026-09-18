@@ -67,6 +67,8 @@ enum SignalingProtocolVersion: string
      * Every version MadelineProto can speak, ordered from most to least preferred.
      *
      * @return non-empty-list<string>
+     *
+     * @psalm-pure
      */
     public static function supported(): array
     {
@@ -75,6 +77,8 @@ enum SignalingProtocolVersion: string
 
     /**
      * Whether MadelineProto implements this version end to end.
+     *
+     * @psalm-pure
      */
     public function isImplemented(): bool
     {
@@ -83,6 +87,8 @@ enum SignalingProtocolVersion: string
 
     /**
      * Whether this version uses the legacy libtgvoip reflector transport instead of WebRTC.
+     *
+     * @psalm-mutation-free
      */
     public function isLegacy(): bool
     {
@@ -93,6 +99,8 @@ enum SignalingProtocolVersion: string
      * Whether media is negotiated with a plain SDP offer/answer.
      *
      * The alternative is the structured `NegotiateChannels` exchange of `InstanceV2Impl`.
+     *
+     * @psalm-mutation-free
      */
     public function usesSdp(): bool
     {
@@ -104,6 +112,8 @@ enum SignalingProtocolVersion: string
      *
      * When false, each message is a single bare encrypted packet, because the channel underneath
      * already guarantees delivery.
+     *
+     * @psalm-mutation-free
      */
     public function usesReliableFraming(): bool
     {
@@ -115,6 +125,8 @@ enum SignalingProtocolVersion: string
 
     /**
      * Whether signaling payloads are gzipped before encryption.
+     *
+     * @psalm-mutation-free
      */
     public function supportsCompression(): bool
     {
@@ -126,6 +138,8 @@ enum SignalingProtocolVersion: string
 
     /**
      * Whether signaling is carried over an SCTP association rather than sent as bare datagrams.
+     *
+     * @psalm-mutation-free
      */
     public function usesSctp(): bool
     {

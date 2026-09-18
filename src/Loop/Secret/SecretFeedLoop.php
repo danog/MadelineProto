@@ -57,6 +57,9 @@ final class SecretFeedLoop extends Loop implements SimpleSubscriber
         $this->init($API);
         $API->loginState->subscribe($this);
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['API', 'secretChat', 'incomingUpdates'];
@@ -115,6 +118,9 @@ final class SecretFeedLoop extends Loop implements SimpleSubscriber
         $this->incomingUpdates []= $update;
         $this->resume();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return "secret chat feed loop {$this->secretChat->id}";

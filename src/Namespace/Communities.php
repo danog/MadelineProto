@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Communities
 {
     /**
@@ -20,6 +21,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function create(bool|null $hidden = null, string|null $title = '', string|null $about = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -35,6 +37,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function togglePeerLink(bool|null $visible = null, bool|null $hidden = null, bool|null $deleted = null, array|int|string|null $community = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -45,6 +48,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
+     * @psalm-impure
      */
     public function getJoinedCommunities(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -57,6 +61,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleCommunityCollapsedInDialogs(bool|null $collapsed = null, array|int|string|null $community = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -70,6 +75,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'communities.peerLinkRequests', total_count: int, requests: list<array{_: 'communityPeerRequest', peer: array|int|string, visible: bool, requested_by: int, date: int}>, next_offset?: string, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/communities.PeerLinkRequests.html
+     * @psalm-impure
      */
     public function getPeerLinkRequests(array|int|string|null $community = null, string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -83,6 +89,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function togglePeerLinkRequestApproval(bool|null $reject = null, array|int|string|null $community = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -95,6 +102,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleAllPeerLinkRequestApproval(bool|null $reject = null, array|int|string|null $community = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -108,6 +116,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleParticipantBanned(bool|null $unban = null, array|int|string|null $community = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -120,6 +129,7 @@ interface Communities
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'communities.participantJoinedChats', creator_chat_ids: list<int>, joined_chat_ids: list<int>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/communities.ParticipantJoinedChats.html
+     * @psalm-impure
      */
     public function getParticipantJoinedChats(array|int|string|null $community = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

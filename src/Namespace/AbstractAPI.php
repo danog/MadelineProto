@@ -28,9 +28,15 @@ use InvalidArgumentException;
 final class AbstractAPI
 {
     private APIWrapper $wrapper;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private string $namespace)
     {
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setWrapper(APIWrapper $wrapper): void
     {
         $this->wrapper = $wrapper;

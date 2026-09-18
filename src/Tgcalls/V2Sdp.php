@@ -213,6 +213,8 @@ final class V2Sdp
      * Parse `payloadType clockRate[/channels]` out of an `a=rtpmap` line.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-pure
      */
     private static function payloadTypeFromRtpmap(string $value): array
     {
@@ -455,6 +457,8 @@ final class V2Sdp
 
     /**
      * @return list<string>
+     *
+     * @psalm-pure
      */
     private static function lines(string $sdp): array
     {
@@ -472,6 +476,8 @@ final class V2Sdp
      * Read the ICE credentials and DTLS fingerprint out of our own local description.
      *
      * @return array{ufrag: string, pwd: string, fingerprints: list<array{hash: string, fingerprint: string, setup: string}>}
+     *
+     * @psalm-pure
      */
     public static function initialSetupFromDescription(string $sdp, string $setup): array
     {

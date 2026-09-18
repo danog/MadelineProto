@@ -26,7 +26,11 @@ abstract class Delete extends Update
     /** @var list<int> List of identifiers of deleted messages */
     public readonly array $ids;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawDelete)
     {
         parent::__construct($API);

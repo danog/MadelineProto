@@ -34,6 +34,9 @@ use Throwable;
  */
 trait BotAPI
 {
+    /**
+     * @psalm-pure
+     */
     private function htmlEntityDecode(string $stuff): string
     {
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));

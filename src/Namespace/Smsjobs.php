@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Smsjobs
 {
     /**
@@ -16,6 +17,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'smsjobs.eligibleToJoin', terms_url: string, monthly_sent_sms: int} @see https://docs.madelineproto.xyz/API_docs/types/smsjobs.EligibilityToJoin.html
+     * @psalm-impure
      */
     public function isEligibleToJoin(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -26,6 +28,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function join(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -36,6 +39,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function leave(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -47,6 +51,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateSettings(bool|null $allow_international = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -57,6 +62,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'smsjobs.status', allow_international: bool, recent_sent: int, recent_since: int, recent_remains: int, total_sent: int, total_since: int, last_gift_slug?: string, terms_url: string} @see https://docs.madelineproto.xyz/API_docs/types/smsjobs.Status.html
+     * @psalm-impure
      */
     public function getStatus(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -68,6 +74,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'smsJob', job_id: string, phone_number: string, text: string} @see https://docs.madelineproto.xyz/API_docs/types/SmsJob.html
+     * @psalm-impure
      */
     public function getSmsJob(string|null $job_id = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -80,6 +87,7 @@ interface Smsjobs
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function finishJob(string|null $job_id = '', string|null $error = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

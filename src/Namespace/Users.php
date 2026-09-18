@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Users
 {
     /**
@@ -20,6 +21,7 @@ interface Users
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setSecureValueErrors(array|int|string|null $id = null, array $errors = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -33,6 +35,7 @@ interface Users
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'requirementToContactEmpty'}|array{_: 'requirementToContactPremium'}|array{_: 'requirementToContactPaidMessages', stars_amount: int}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/RequirementToContact.html
+     * @psalm-impure
      */
     public function getRequirementsToContact(array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -47,6 +50,7 @@ interface Users
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'users.savedMusicNotModified', count: int}|array{_: 'users.savedMusic', count: int, documents: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>} @see https://docs.madelineproto.xyz/API_docs/types/users.SavedMusic.html
+     * @psalm-impure
      */
     public function getSavedMusic(array|int|string|null $id = null, int|null $offset = 0, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -59,6 +63,7 @@ interface Users
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'users.savedMusicNotModified', count: int}|array{_: 'users.savedMusic', count: int, documents: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>} @see https://docs.madelineproto.xyz/API_docs/types/users.SavedMusic.html
+     * @psalm-impure
      */
     public function getSavedMusicByID(array|int|string|null $id = null, array $documents = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -71,6 +76,7 @@ interface Users
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function suggestBirthday(array $birthday, array|int|string|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

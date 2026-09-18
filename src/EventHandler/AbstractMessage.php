@@ -140,6 +140,8 @@ abstract class AbstractMessage extends Update implements SimpleFilters
 
     /**
      * Check if the current message replies to another message.
+     *
+     * @psalm-mutation-free
      */
     public function isReply(): bool
     {

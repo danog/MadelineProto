@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Channels
 {
     /**
@@ -18,6 +19,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function readHistory(array|int|string|null $channel = null, int|null $max_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -30,6 +32,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.affectedMessages', pts: int, pts_count: int} @see https://docs.madelineproto.xyz/API_docs/types/messages.AffectedMessages.html
+     * @psalm-impure
      */
     public function deleteMessages(array|int|string|null $channel = null, array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -43,6 +46,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reportSpam(array|int|string|null $channel = null, array|int|string|null $participant = null, array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -55,6 +59,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.messages', messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate?: array, offset_id_offset?: array, search_flood?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     * @psalm-impure
      */
     public function getMessages(array|int|string|null $channel = null, array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -70,6 +75,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'channels.channelParticipants', count: int, participants: list<array{_: 'channelParticipant', user_id: int, date: int, subscription_until_date?: int, rank?: string}|array{_: 'channelParticipantSelf', via_request: bool, user_id: int, inviter_id: int, date: int, subscription_until_date?: int, rank?: string}|array{_: 'channelParticipantCreator', admin_rights: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool, post_stories: bool, edit_stories: bool, delete_stories: bool, manage_direct_messages: bool, manage_ranks: bool, manage_linked_peers: bool, manage_welcome_messages: bool}, user_id: int, rank?: string}|array{_: 'channelParticipantAdmin', admin_rights: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool, post_stories: bool, edit_stories: bool, delete_stories: bool, manage_direct_messages: bool, manage_ranks: bool, manage_linked_peers: bool, manage_welcome_messages: bool}, can_edit: bool, self: bool, user_id: int, inviter_id?: int, promoted_by: int, date: int, rank?: string}|array{_: 'channelParticipantBanned', peer: array|int|string, banned_rights: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, send_photos: bool, send_videos: bool, send_roundvideos: bool, send_audios: bool, send_voices: bool, send_docs: bool, send_plain: bool, edit_rank: bool, send_reactions: bool, manage_linked_peers: bool, until_date: int}, left: bool, kicked_by: int, date: int, rank?: string}|array{_: 'channelParticipantLeft', peer: array|int|string}>, chats: list<array|int|string>, users: list<array|int|string>}|array{_: 'channels.channelParticipantsNotModified'} @see https://docs.madelineproto.xyz/API_docs/types/channels.ChannelParticipants.html
+     * @psalm-impure
      */
     public function getParticipants(array $filter, array|int|string|null $channel = null, int|null $offset = 0, int|null $limit = 0, array $hash = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -82,6 +88,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'channels.channelParticipant', participant: array{_: 'channelParticipant', user_id: int, date: int, subscription_until_date?: int, rank?: string}|array{_: 'channelParticipantSelf', via_request: bool, user_id: int, inviter_id: int, date: int, subscription_until_date?: int, rank?: string}|array{_: 'channelParticipantCreator', admin_rights: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool, post_stories: bool, edit_stories: bool, delete_stories: bool, manage_direct_messages: bool, manage_ranks: bool, manage_linked_peers: bool, manage_welcome_messages: bool}, user_id: int, rank?: string}|array{_: 'channelParticipantAdmin', admin_rights: array{_: 'chatAdminRights', change_info: bool, post_messages: bool, edit_messages: bool, delete_messages: bool, ban_users: bool, invite_users: bool, pin_messages: bool, add_admins: bool, anonymous: bool, manage_call: bool, other: bool, manage_topics: bool, post_stories: bool, edit_stories: bool, delete_stories: bool, manage_direct_messages: bool, manage_ranks: bool, manage_linked_peers: bool, manage_welcome_messages: bool}, can_edit: bool, self: bool, user_id: int, inviter_id?: int, promoted_by: int, date: int, rank?: string}|array{_: 'channelParticipantBanned', peer: array|int|string, banned_rights: array{_: 'chatBannedRights', view_messages: bool, send_messages: bool, send_media: bool, send_stickers: bool, send_gifs: bool, send_games: bool, send_inline: bool, embed_links: bool, send_polls: bool, change_info: bool, invite_users: bool, pin_messages: bool, manage_topics: bool, send_photos: bool, send_videos: bool, send_roundvideos: bool, send_audios: bool, send_voices: bool, send_docs: bool, send_plain: bool, edit_rank: bool, send_reactions: bool, manage_linked_peers: bool, until_date: int}, left: bool, kicked_by: int, date: int, rank?: string}|array{_: 'channelParticipantLeft', peer: array|int|string}, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/channels.ChannelParticipant.html
+     * @psalm-impure
      */
     public function getParticipant(array|int|string|null $channel = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -101,6 +108,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function createChannel(bool|null $broadcast = null, bool|null $megagroup = null, bool|null $for_import = null, bool|null $forum = null, string|null $title = '', string|null $about = '', array|null $geo_point = null, string|null $address = null, int|null $ttl_period = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -115,6 +123,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editAdmin(array $admin_rights, array|int|string|null $channel = null, array|int|string|null $user_id = null, string|null $rank = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -127,6 +136,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editTitle(array|int|string|null $channel = null, string|null $title = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -139,6 +149,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editPhoto(array|int|string|null $channel = null, array|null $photo = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -151,6 +162,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function checkUsername(array|int|string|null $channel = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -163,6 +175,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateUsername(array|int|string|null $channel = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -174,6 +187,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chatInviteJoinResultOk', updates: array}|array{_: 'messages.chatInviteJoinResultWebView', bot_id: int, query_id: int, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.ChatInviteJoinResult.html
+     * @psalm-impure
      */
     public function joinChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -185,6 +199,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function leaveChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -197,6 +212,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.invitedUsers', updates: array, missing_invitees: list<array{_: 'missingInvitee', premium_would_allow_invite: bool, premium_required_for_pm: bool, user_id: int}>} @see https://docs.madelineproto.xyz/API_docs/types/messages.InvitedUsers.html
+     * @psalm-impure
      */
     public function inviteToChannel(array|int|string|null $channel = null, array $users = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -208,6 +224,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function deleteChannel(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -222,6 +239,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'exportedMessageLink', link: string, html: string} @see https://docs.madelineproto.xyz/API_docs/types/ExportedMessageLink.html
+     * @psalm-impure
      */
     public function exportMessageLink(bool|null $grouped = null, bool|null $thread = null, array|int|string|null $channel = null, int|null $id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -235,6 +253,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleSignatures(bool|null $signatures_enabled = null, bool|null $profiles_enabled = null, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -249,6 +268,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
+     * @psalm-impure
      */
     public function getAdminedPublicChannels(bool|null $by_location = null, bool|null $check_limit = null, bool|null $for_personal = null, bool|null $for_community_peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -262,6 +282,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function editBanned(array $banned_rights, array|int|string|null $channel = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -279,6 +300,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'channels.adminLogResults', events: list<array>, chats: list<array>, users: list<array>} @see https://docs.madelineproto.xyz/API_docs/types/channels.AdminLogResults.html
+     * @psalm-impure
      */
     public function getAdminLog(array|int|string|null $channel = null, string|null $q = '', array|null $events_filter = null, array|null $admins = null, int|null $max_id = 0, int|null $min_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -291,6 +313,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setStickers(array|int|string|null $channel = null, array|null $stickerset = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -303,6 +326,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function readMessageContents(array|int|string|null $channel = null, array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -316,6 +340,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function deleteHistory(bool|null $for_everyone = null, array|int|string|null $channel = null, int|null $max_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -328,6 +353,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function togglePreHistoryHidden(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -340,6 +366,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
+     * @psalm-impure
      */
     public function getLeftChannels(int $takeoutId, int|null $offset = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -353,6 +380,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
+     * @psalm-impure
      */
     public function getGroupsForDiscussion(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -365,6 +393,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setDiscussionGroup(array|int|string|null $broadcast = null, array|int|string|null $group = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -378,6 +407,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function editLocation(array|int|string|null $channel = null, array|null $geo_point = null, string|null $address = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -390,6 +420,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleSlowMode(array|int|string|null $channel = null, int|null $seconds = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -400,6 +431,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.inactiveChats', dates: list<int>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.InactiveChats.html
+     * @psalm-impure
      */
     public function getInactiveChannels(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -411,6 +443,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function convertToGigagroup(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -424,6 +457,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'channels.sendAsPeers', peers: list<array{_: 'sendAsPeer', peer: array|int|string, premium_required: bool}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/channels.SendAsPeers.html
+     * @psalm-impure
      */
     public function getSendAs(bool|null $for_paid_reactions = null, bool|null $for_live_stories = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -436,6 +470,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.affectedHistory', pts: int, pts_count: int, offset: int} @see https://docs.madelineproto.xyz/API_docs/types/messages.AffectedHistory.html
+     * @psalm-impure
      */
     public function deleteParticipantHistory(array|int|string|null $channel = null, array|int|string|null $participant = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -448,6 +483,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleJoinToSend(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -462,6 +498,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleJoinRequest(bool $enabled, bool|null $apply_to_invites = null, array|int|string|null $channel = null, array|int|string|null $guard_bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -474,6 +511,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reorderUsernames(array|int|string|null $channel = null, array $order = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -487,6 +525,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleUsername(bool $active, array|int|string|null $channel = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -498,6 +537,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deactivateAllUsernames(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -511,6 +551,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleForum(bool $enabled, bool $tabs, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -523,6 +564,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleAntiSpam(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -535,6 +577,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reportAntiSpamFalsePositive(array|int|string|null $channel = null, int|null $msg_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -549,6 +592,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleParticipantsHidden(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -563,6 +607,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function updateColor(bool|null $for_profile = null, array|int|string|null $channel = null, int|null $color = null, int|null $background_emoji_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -577,6 +622,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleViewForumAsMessages(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -588,6 +634,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.chats', chats: list<array|int|string>}|array{_: 'messages.chatsSlice', count: int, chats: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/messages.Chats.html
+     * @psalm-impure
      */
     public function getChannelRecommendations(array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -600,6 +647,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function updateEmojiStatus(array|int|string|null $channel = null, array|null $emoji_status = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -612,6 +660,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function setBoostsToUnblockRestrictions(array|int|string|null $channel = null, int|null $boosts = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -624,6 +673,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setEmojiStickers(array|int|string|null $channel = null, array|null $stickerset = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -638,6 +688,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function restrictSponsoredMessages(bool $restricted, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -657,6 +708,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'messages.messages', messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesSlice', inexact: array, count: array, next_rate?: array, offset_id_offset?: array, search_flood?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.channelMessages', inexact: array, pts: array, count: array, offset_id_offset?: array, messages: list<array>, topics: list<array>, chats: list<array>, users: list<array>}|array{_: 'messages.messagesNotModified', count: array} @see https://docs.madelineproto.xyz/API_docs/types/messages.Messages.html
+     * @psalm-impure
      */
     public function searchPosts(string|null $hashtag = null, string|null $query = null, int|null $offset_rate = 0, array|int|string|null $offset_peer = null, int|null $offset_id = 0, int|null $limit = 0, int|null $allow_paid_stars = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -674,6 +726,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function updatePaidMessagesPrice(bool|null $broadcast_messages_allowed = null, array|int|string|null $channel = null, int|null $send_paid_messages_stars = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -686,6 +739,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function toggleAutotranslation(bool $enabled, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -698,6 +752,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function getMessageAuthor(array|int|string|null $channel = null, int|null $id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|int|string;
 
@@ -709,6 +764,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'searchPostsFlood', query_is_free: bool, total_daily: int, remains: int, wait_till?: int, stars_amount: int} @see https://docs.madelineproto.xyz/API_docs/types/SearchPostsFlood.html
+     * @psalm-impure
      */
     public function checkSearchPostsFlood(string|null $query = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -721,6 +777,7 @@ interface Channels
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setMainProfileTab(array $tab, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

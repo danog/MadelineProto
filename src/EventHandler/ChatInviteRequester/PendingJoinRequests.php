@@ -30,7 +30,11 @@ final class PendingJoinRequests extends ChatInviteRequester
     /** @var list<int> IDs of users that have recently requested to join */
     public readonly array $recent;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawChatInviteRequester)
     {
         parent::__construct($API, $rawChatInviteRequester);

@@ -427,6 +427,8 @@ final class Magic
      * Set whether we can use ipv6.
      *
      * @param bool $ipv6 Whether we can use ipv6.
+     *
+     * @psalm-external-mutation-free
      */
     public static function setIpv6(bool $ipv6): void
     {

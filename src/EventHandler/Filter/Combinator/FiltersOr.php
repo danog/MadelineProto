@@ -31,11 +31,17 @@ final class FiltersOr extends Filter
 {
     /** @var array<Filter> */
     private readonly array $filters;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(Filter ...$filters)
     {
         Assert::notEmpty($filters);
         $this->filters = $filters;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function initialize(EventHandler $API): Filter
     {

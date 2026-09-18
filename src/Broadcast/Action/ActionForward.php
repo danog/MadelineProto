@@ -35,6 +35,9 @@ use danog\MadelineProto\RPCErrorException;
 /** @internal */
 final class ActionForward implements Action
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly MTProto $API, private readonly int $from_peer, private readonly array $ids, private readonly bool $drop_author, private readonly bool $pin)
     {
     }

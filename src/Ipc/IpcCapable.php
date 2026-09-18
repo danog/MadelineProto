@@ -22,20 +22,30 @@ use danog\MadelineProto\MTProto;
  * Represents an IPC-capable object.
  *
  * @internal
+ *
+ * @psalm-external-mutation-free
  */
 abstract class IpcCapable
 {
     protected readonly string $session;
     private MTProto|Client|null $API;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     protected function __construct(MTProto|Client $API)
     {
         $this->API = $API;
         $this->session = $API->getSessionName();
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     final public function __sleep()
     {
         $vars = get_object_vars($this);
@@ -43,11 +53,17 @@ abstract class IpcCapable
         return array_keys($vars);
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     final protected function getClient(): MTProto|Client
     {
         return $this->API ??= Client::giveInstanceBySession($this->session);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     final public function __debugInfo()
     {
         $vars = get_object_vars($this);

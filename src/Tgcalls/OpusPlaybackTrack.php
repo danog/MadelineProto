@@ -89,7 +89,6 @@ final class OpusPlaybackTrack extends MediaStreamTrack
     public function __construct(
         private readonly DjLoop $dj,
         private readonly CallInterface $call,
-        private readonly ?WebmSource $webm = null,
     ) {
         parent::__construct(MediaKind::Audio);
         $this->startProducing();
@@ -150,8 +149,8 @@ final class OpusPlaybackTrack extends MediaStreamTrack
     {
         // Audio coming from a WebM file wins: it has to stay in sync with that file's video.
         if ($this->webmPending !== null
-            || ($this->webm?->hasAudio() ?? false)
-            || ($this->webmStartedAt !== null && ($this->webm?->isPlaying() ?? false))
+            || $this->dj->hasWebmAudio()
+            || ($this->webmStartedAt !== null && $this->dj->isWebmPlaying())
         ) {
             return $this->receiveWebm();
         }
@@ -211,7 +210,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
      */
     private function receiveWebm(): ?EncodedPacket
     {
-        $frame = $this->webmPending ?? $this->webm?->pullAudio();
+        $frame = $this->webmPending ?? $this->dj->pullWebmAudio();
         $this->webmPending = null;
         if ($frame === null) {
             // The file's audio queue momentarily ran dry. Once we have measured the file's own

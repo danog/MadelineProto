@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Upload
 {
     /**
@@ -21,6 +22,7 @@ interface Upload
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'upload.webFile', file_type: array{_: 'storage.fileUnknown'}|array{_: 'storage.filePartial'}|array{_: 'storage.fileJpeg'}|array{_: 'storage.fileGif'}|array{_: 'storage.filePng'}|array{_: 'storage.filePdf'}|array{_: 'storage.fileMp3'}|array{_: 'storage.fileMov'}|array{_: 'storage.fileMp4'}|array{_: 'storage.fileWebp'}, size: int, mime_type: string, mtime: int, bytes: string} @see https://docs.madelineproto.xyz/API_docs/types/upload.WebFile.html
+     * @psalm-impure
      */
     public function getWebFile(array $location, int|null $offset = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

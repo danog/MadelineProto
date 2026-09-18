@@ -27,7 +27,11 @@ final class DeleteChannelMessages extends Delete
     /** Channel ID */
     public readonly int $chatId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawDelete)
     {
         parent::__construct($API, $rawDelete);

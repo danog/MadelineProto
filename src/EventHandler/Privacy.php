@@ -31,7 +31,11 @@ final class Privacy extends Update
     /** @var list<RuleDestination> Peers to which the privacy rules apply  */
     public readonly array $appliesTo;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawPrivacy)
     {
         parent::__construct($API);

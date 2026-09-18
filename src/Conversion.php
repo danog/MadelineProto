@@ -125,6 +125,9 @@ final class Conversion
         return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function tdesktop_md5($data)
     {
         $result = '';

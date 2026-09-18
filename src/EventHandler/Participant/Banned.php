@@ -39,7 +39,11 @@ final class Banned extends Participant
     /** Banned [rights](https://core.telegram.org/api/rights) */
     public readonly BannedRights $bannedRights;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawParticipant)
     {
         $this->left = $rawParticipant['left'];

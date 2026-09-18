@@ -55,9 +55,11 @@ trait PeerHandler
      * Set support info.
      *
      * @internal
+     * @internal
      *
      * @param array $support Support info
-     * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function addSupport(array $support): void
     {
@@ -166,6 +168,8 @@ trait PeerHandler
      * @internal
      *
      * @param mixed $id Peer
+     *
+     * @psalm-mutation-free
      */
     public function getIdInternal(mixed $id): ?int
     {
@@ -916,6 +920,8 @@ trait PeerHandler
     }
     /**
      * Key for participatns cache.
+     *
+     * @psalm-pure
      */
     private static function participantsKey(int $channelId, string $filter, string $q, int $offset, int $limit): string
     {

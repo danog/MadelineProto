@@ -99,6 +99,9 @@ final class ReferenceDatabase implements TLCallback
         $this->flushMutex = new LocalKeyedMutex;
         $this->v = self::V;
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['db', 'pendingDb', 'API', 'v'];
@@ -152,16 +155,25 @@ final class ReferenceDatabase implements TLCallback
             EventLoop::queue($lock->release(...));
         }
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
@@ -171,22 +183,34 @@ final class ReferenceDatabase implements TLCallback
             ['document' => [$this->addReference(...), $this->addOrigin(...)]]
         );
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
         return array_fill_keys(array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getTypeMismatchCallbacks(): array
     {
         return [];
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function reset(): void
     {
         if ($this->cache) {
@@ -257,6 +281,9 @@ final class ReferenceDatabase implements TLCallback
         $this->cache[$key][self::serializeLocation($locationType, $location)] = (string) $location['file_reference'];
         return true;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function addOriginContext(string $type): void
     {
         if (!isset(self::CONSTRUCTOR_CONTEXT[$type])) {
@@ -357,6 +384,9 @@ final class ReferenceDatabase implements TLCallback
         }
         $this->API->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function addOriginMethodContext(string $type): void
     {
         if (!isset(self::METHOD_CONTEXT[$type])) {
@@ -452,6 +482,9 @@ final class ReferenceDatabase implements TLCallback
 
         EventLoop::queue($this->flush(...), $location);
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function refreshNextEnable(): void
     {
         Assert::false($this->refresh, 'Cannot enable refresh when it is already enabled');
@@ -572,6 +605,9 @@ final class ReferenceDatabase implements TLCallback
         $this->API->logger("Got file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
         return (string) $res['reference'];
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     private static function serializeLocation(int $locationType, array $location): string
     {
         switch ($locationType) {
@@ -586,6 +622,9 @@ final class ReferenceDatabase implements TLCallback
         }
         throw new Exception('Invalid location type specified!');
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo()
     {
         return ['ReferenceDatabase instance '.spl_object_hash($this)];

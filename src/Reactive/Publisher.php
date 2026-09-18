@@ -34,6 +34,8 @@ final class Publisher
     private bool $wokeup = false;
     /**
      * @param T $state
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private mixed $state

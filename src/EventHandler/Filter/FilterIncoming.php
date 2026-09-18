@@ -28,6 +28,9 @@ use danog\MadelineProto\VoIP\CallState;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterIncoming extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

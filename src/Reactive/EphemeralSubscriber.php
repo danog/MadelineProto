@@ -20,6 +20,7 @@ namespace danog\MadelineProto\Reactive;
 
 /**
  * @internal
+ * @psalm-mutable
  */
 interface EphemeralSubscriber
 {

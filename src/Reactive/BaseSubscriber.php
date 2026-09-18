@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Reactive;
  * @internal
  *
  * @template T
+ * @psalm-mutable
  */
 interface BaseSubscriber
 {

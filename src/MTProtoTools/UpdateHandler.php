@@ -398,7 +398,10 @@ trait UpdateHandler
      * Check message ID.
      *
      * @param array $message Message
+     *
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function checkMsgId(array $message): bool
     {
@@ -431,8 +434,12 @@ trait UpdateHandler
      *
      * @param null|int $channelId Channel ID
      * @param array    $init      Init
+     *
      * @internal
+     *
      * @return UpdatesState|array<UpdatesState>
+     *
+     * @psalm-external-mutation-free
      */
     public function loadChannelState(?int $channelId = null, array $init = []): UpdatesState|array
     {

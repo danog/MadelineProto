@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Bots
 {
     /**
@@ -18,6 +19,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return mixed Any JSON-encodable data
+     * @psalm-impure
      */
     public function sendCustomRequest(mixed $params, string|null $custom_method = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): mixed;
 
@@ -30,6 +32,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function answerWebhookJSONQuery(mixed $data, int|null $query_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -43,6 +46,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotCommands(array $scope, string|null $lang_code = '', array $commands = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -55,6 +59,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function resetBotCommands(array $scope, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -67,6 +72,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'botCommand', ephemeral: bool, command: string, description: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/BotCommand.html
+     * @psalm-impure
      */
     public function getBotCommands(array $scope, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -79,6 +85,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotMenuButton(array $button, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -90,6 +97,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'botMenuButtonDefault'}|array{_: 'botMenuButtonCommands'}|array{_: 'botMenuButton', text: string, url: string} @see https://docs.madelineproto.xyz/API_docs/types/BotMenuButton.html
+     * @psalm-impure
      */
     public function getBotMenuButton(array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -101,6 +109,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotBroadcastDefaultAdminRights(array $admin_rights, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -112,6 +121,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotGroupDefaultAdminRights(array $admin_rights, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -127,6 +137,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotInfo(array|int|string|null $bot = null, string|null $lang_code = '', string|null $name = null, string|null $about = null, string|null $description = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -139,6 +150,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.botInfo', name: string, about: string, description: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.BotInfo.html
+     * @psalm-impure
      */
     public function getBotInfo(array|int|string|null $bot = null, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -151,6 +163,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reorderUsernames(array|int|string|null $bot = null, array $order = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -164,6 +177,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleUsername(bool $active, array|int|string|null $bot = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -175,6 +189,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function canSendMessage(array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -186,6 +201,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
+     * @psalm-impure
      */
     public function allowSendMessage(array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -201,6 +217,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return mixed Any JSON-encodable data
+     * @psalm-impure
      */
     public function invokeWebViewCustomMethod(mixed $params, array|int|string|null $bot = null, string|null $custom_method = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): mixed;
 
@@ -213,6 +230,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.popularAppBots', next_offset?: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/bots.PopularAppBots.html
+     * @psalm-impure
      */
     public function getPopularAppBots(string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -228,6 +246,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'botPreviewMedia', date: int, media: array{_: 'messageMediaEmpty'}|array{_: 'messageMediaPhoto', spoiler: bool, live_photo: bool, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, ttl_seconds?: int, video?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'messageMediaGeo', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}}|array{_: 'messageMediaContact', phone_number: string, first_name: string, last_name: string, vcard: string, user_id: int}|array{_: 'messageMediaUnsupported'}|array{_: 'messageMediaDocument', nopremium: bool, spoiler: bool, video: bool, round: bool, voice: bool, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, alt_documents?: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>, video_cover?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, video_timestamp?: int, ttl_seconds?: int}|array{_: 'messageMediaWebPage', force_large_media: bool, force_small_media: bool, manual: bool, safe: bool, webpage: array{_: 'webPageEmpty', id: array, url?: array}|array{_: 'webPagePending', id: array, url?: array, date: array}|array{_: 'webPage', has_large_media: array, video_cover_photo: array, id: array, url: array, display_url: array, hash: array, type?: array, site_name?: array, title?: array, description?: array, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, embed_url?: array, embed_type?: array, embed_width?: array, embed_height?: array, duration?: array, author?: array, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, cached_page?: array, attributes?: list<array>}|array{_: 'webPageNotModified', cached_page_views?: array}}|array{_: 'messageMediaVenue', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, title: string, address: string, provider: string, venue_id: string, venue_type: string}|array{_: 'messageMediaGame', game: array{_: 'game', id: array, access_hash: array, short_name: array, title: array, description: array, photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}}|array{_: 'messageMediaInvoice', shipping_address_requested: bool, test: bool, title: string, description: string, photo?: array{_: 'webDocument', url: array, access_hash: array, size: array, mime_type: array, attributes: list<array>}|array{_: 'webDocumentNoProxy', url: array, size: array, mime_type: array, attributes: list<array>}, receipt_msg_id?: int, currency: string, total_amount: int, start_param: string, extended_media?: array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}}|array{_: 'messageMediaGeoLive', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, heading?: int, period: int, proximity_notification_radius?: int}|array{_: 'messageMediaDice', value: int, emoticon: string, game_outcome?: array{_: 'messages.emojiGameOutcome', seed: array, stake_ton_amount: array, ton_amount: array}}|array{_: 'messageMediaStory', peer: array|int|string, via_mention: bool, id: int, story?: array{_: 'storyItemDeleted', id: array}|array{_: 'storyItemSkipped', close_friends: array, live: array, id: array, date: array, expire_date: array}}|array{_: 'messageMediaGiveaway', only_new_subscribers: bool, winners_are_visible: bool, channels: list<int>, countries_iso2?: list<string>, prize_description?: string, quantity: int, months?: int, stars?: int, until_date: int}|array{_: 'messageMediaGiveawayResults', only_new_subscribers: bool, refunded: bool, channel_id: int, additional_peers_count?: int, launch_msg_id: int, winners_count: int, unclaimed_count: int, winners: list<int>, months?: int, stars?: int, prize_description?: string, until_date: int}|array{_: 'messageMediaPaidMedia', stars_amount: int, extended_media: list<array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}>}|array{_: 'messageMediaToDo', todo: array{_: 'todoList', title: array, others_can_append: array, others_can_complete: array, list: list<array>}, completions?: list<array{_: 'todoCompletion', completed_by: array, id: array, date: array}>}|array{_: 'messageMediaVideoStream', call: array{_: 'inputGroupCall', id: array, access_hash: array}|array{_: 'inputGroupCallSlug', slug: array}|array{_: 'inputGroupCallInviteMessage', msg_id: array}, rtmp_stream: bool}} @see https://docs.madelineproto.xyz/API_docs/types/BotPreviewMedia.html
+     * @psalm-impure
      */
     public function addPreviewMedia(array|int|string|null $bot = null, string|null $lang_code = '', \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -244,6 +263,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'botPreviewMedia', date: int, media: array{_: 'messageMediaEmpty'}|array{_: 'messageMediaPhoto', spoiler: bool, live_photo: bool, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, ttl_seconds?: int, video?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'messageMediaGeo', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}}|array{_: 'messageMediaContact', phone_number: string, first_name: string, last_name: string, vcard: string, user_id: int}|array{_: 'messageMediaUnsupported'}|array{_: 'messageMediaDocument', nopremium: bool, spoiler: bool, video: bool, round: bool, voice: bool, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, alt_documents?: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>, video_cover?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, video_timestamp?: int, ttl_seconds?: int}|array{_: 'messageMediaWebPage', force_large_media: bool, force_small_media: bool, manual: bool, safe: bool, webpage: array{_: 'webPageEmpty', id: array, url?: array}|array{_: 'webPagePending', id: array, url?: array, date: array}|array{_: 'webPage', has_large_media: array, video_cover_photo: array, id: array, url: array, display_url: array, hash: array, type?: array, site_name?: array, title?: array, description?: array, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, embed_url?: array, embed_type?: array, embed_width?: array, embed_height?: array, duration?: array, author?: array, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, cached_page?: array, attributes?: list<array>}|array{_: 'webPageNotModified', cached_page_views?: array}}|array{_: 'messageMediaVenue', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, title: string, address: string, provider: string, venue_id: string, venue_type: string}|array{_: 'messageMediaGame', game: array{_: 'game', id: array, access_hash: array, short_name: array, title: array, description: array, photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}}|array{_: 'messageMediaInvoice', shipping_address_requested: bool, test: bool, title: string, description: string, photo?: array{_: 'webDocument', url: array, access_hash: array, size: array, mime_type: array, attributes: list<array>}|array{_: 'webDocumentNoProxy', url: array, size: array, mime_type: array, attributes: list<array>}, receipt_msg_id?: int, currency: string, total_amount: int, start_param: string, extended_media?: array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}}|array{_: 'messageMediaGeoLive', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, heading?: int, period: int, proximity_notification_radius?: int}|array{_: 'messageMediaDice', value: int, emoticon: string, game_outcome?: array{_: 'messages.emojiGameOutcome', seed: array, stake_ton_amount: array, ton_amount: array}}|array{_: 'messageMediaStory', peer: array|int|string, via_mention: bool, id: int, story?: array{_: 'storyItemDeleted', id: array}|array{_: 'storyItemSkipped', close_friends: array, live: array, id: array, date: array, expire_date: array}}|array{_: 'messageMediaGiveaway', only_new_subscribers: bool, winners_are_visible: bool, channels: list<int>, countries_iso2?: list<string>, prize_description?: string, quantity: int, months?: int, stars?: int, until_date: int}|array{_: 'messageMediaGiveawayResults', only_new_subscribers: bool, refunded: bool, channel_id: int, additional_peers_count?: int, launch_msg_id: int, winners_count: int, unclaimed_count: int, winners: list<int>, months?: int, stars?: int, prize_description?: string, until_date: int}|array{_: 'messageMediaPaidMedia', stars_amount: int, extended_media: list<array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}>}|array{_: 'messageMediaToDo', todo: array{_: 'todoList', title: array, others_can_append: array, others_can_complete: array, list: list<array>}, completions?: list<array{_: 'todoCompletion', completed_by: array, id: array, date: array}>}|array{_: 'messageMediaVideoStream', call: array{_: 'inputGroupCall', id: array, access_hash: array}|array{_: 'inputGroupCallSlug', slug: array}|array{_: 'inputGroupCallInviteMessage', msg_id: array}, rtmp_stream: bool}} @see https://docs.madelineproto.xyz/API_docs/types/BotPreviewMedia.html
+     * @psalm-impure
      */
     public function editPreviewMedia(array|int|string|null $bot = null, string|null $lang_code = '', \danog\MadelineProto\EventHandler\Media|array|string|null $media = null, \danog\MadelineProto\EventHandler\Media|array|string|null $new_media = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -259,6 +279,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function deletePreviewMedia(array|int|string|null $bot = null, string|null $lang_code = '', array $media = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -274,6 +295,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function reorderPreviewMedias(array|int|string|null $bot = null, string|null $lang_code = '', array $order = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -288,6 +310,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.previewInfo', media: list<array{_: 'botPreviewMedia', date: int, media: array{_: 'messageMediaEmpty'}|array{_: 'messageMediaPhoto', spoiler: bool, live_photo: bool, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, ttl_seconds?: int, video?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'messageMediaGeo', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}}|array{_: 'messageMediaContact', phone_number: string, first_name: string, last_name: string, vcard: string, user_id: int}|array{_: 'messageMediaUnsupported'}|array{_: 'messageMediaDocument', nopremium: bool, spoiler: bool, video: bool, round: bool, voice: bool, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, alt_documents?: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>, video_cover?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, video_timestamp?: int, ttl_seconds?: int}|array{_: 'messageMediaWebPage', force_large_media: bool, force_small_media: bool, manual: bool, safe: bool, webpage: array{_: 'webPageEmpty', id: array, url?: array}|array{_: 'webPagePending', id: array, url?: array, date: array}|array{_: 'webPage', has_large_media: array, video_cover_photo: array, id: array, url: array, display_url: array, hash: array, type?: array, site_name?: array, title?: array, description?: array, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, embed_url?: array, embed_type?: array, embed_width?: array, embed_height?: array, duration?: array, author?: array, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, cached_page?: array, attributes?: list<array>}|array{_: 'webPageNotModified', cached_page_views?: array}}|array{_: 'messageMediaVenue', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, title: string, address: string, provider: string, venue_id: string, venue_type: string}|array{_: 'messageMediaGame', game: array{_: 'game', id: array, access_hash: array, short_name: array, title: array, description: array, photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}}|array{_: 'messageMediaInvoice', shipping_address_requested: bool, test: bool, title: string, description: string, photo?: array{_: 'webDocument', url: array, access_hash: array, size: array, mime_type: array, attributes: list<array>}|array{_: 'webDocumentNoProxy', url: array, size: array, mime_type: array, attributes: list<array>}, receipt_msg_id?: int, currency: string, total_amount: int, start_param: string, extended_media?: array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}}|array{_: 'messageMediaGeoLive', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, heading?: int, period: int, proximity_notification_radius?: int}|array{_: 'messageMediaDice', value: int, emoticon: string, game_outcome?: array{_: 'messages.emojiGameOutcome', seed: array, stake_ton_amount: array, ton_amount: array}}|array{_: 'messageMediaStory', peer: array|int|string, via_mention: bool, id: int, story?: array{_: 'storyItemDeleted', id: array}|array{_: 'storyItemSkipped', close_friends: array, live: array, id: array, date: array, expire_date: array}}|array{_: 'messageMediaGiveaway', only_new_subscribers: bool, winners_are_visible: bool, channels: list<int>, countries_iso2?: list<string>, prize_description?: string, quantity: int, months?: int, stars?: int, until_date: int}|array{_: 'messageMediaGiveawayResults', only_new_subscribers: bool, refunded: bool, channel_id: int, additional_peers_count?: int, launch_msg_id: int, winners_count: int, unclaimed_count: int, winners: list<int>, months?: int, stars?: int, prize_description?: string, until_date: int}|array{_: 'messageMediaPaidMedia', stars_amount: int, extended_media: list<array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}>}|array{_: 'messageMediaToDo', todo: array{_: 'todoList', title: array, others_can_append: array, others_can_complete: array, list: list<array>}, completions?: list<array{_: 'todoCompletion', completed_by: array, id: array, date: array}>}|array{_: 'messageMediaVideoStream', call: array{_: 'inputGroupCall', id: array, access_hash: array}|array{_: 'inputGroupCallSlug', slug: array}|array{_: 'inputGroupCallInviteMessage', msg_id: array}, rtmp_stream: bool}}>, lang_codes: list<string>} @see https://docs.madelineproto.xyz/API_docs/types/bots.PreviewInfo.html
+     * @psalm-impure
      */
     public function getPreviewInfo(array|int|string|null $bot = null, string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -299,6 +322,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'botPreviewMedia', date: int, media: array{_: 'messageMediaEmpty'}|array{_: 'messageMediaPhoto', spoiler: bool, live_photo: bool, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, ttl_seconds?: int, video?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'messageMediaGeo', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}}|array{_: 'messageMediaContact', phone_number: string, first_name: string, last_name: string, vcard: string, user_id: int}|array{_: 'messageMediaUnsupported'}|array{_: 'messageMediaDocument', nopremium: bool, spoiler: bool, video: bool, round: bool, voice: bool, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, alt_documents?: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>, video_cover?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, video_timestamp?: int, ttl_seconds?: int}|array{_: 'messageMediaWebPage', force_large_media: bool, force_small_media: bool, manual: bool, safe: bool, webpage: array{_: 'webPageEmpty', id: array, url?: array}|array{_: 'webPagePending', id: array, url?: array, date: array}|array{_: 'webPage', has_large_media: array, video_cover_photo: array, id: array, url: array, display_url: array, hash: array, type?: array, site_name?: array, title?: array, description?: array, photo?: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, embed_url?: array, embed_type?: array, embed_width?: array, embed_height?: array, duration?: array, author?: array, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, cached_page?: array, attributes?: list<array>}|array{_: 'webPageNotModified', cached_page_views?: array}}|array{_: 'messageMediaVenue', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, title: string, address: string, provider: string, venue_id: string, venue_type: string}|array{_: 'messageMediaGame', game: array{_: 'game', id: array, access_hash: array, short_name: array, title: array, description: array, photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}}|array{_: 'messageMediaInvoice', shipping_address_requested: bool, test: bool, title: string, description: string, photo?: array{_: 'webDocument', url: array, access_hash: array, size: array, mime_type: array, attributes: list<array>}|array{_: 'webDocumentNoProxy', url: array, size: array, mime_type: array, attributes: list<array>}, receipt_msg_id?: int, currency: string, total_amount: int, start_param: string, extended_media?: array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}}|array{_: 'messageMediaGeoLive', geo: array{_: 'geoPointEmpty'}|array{_: 'geoPoint', long: array, lat: array, access_hash: array, accuracy_radius?: array}, heading?: int, period: int, proximity_notification_radius?: int}|array{_: 'messageMediaDice', value: int, emoticon: string, game_outcome?: array{_: 'messages.emojiGameOutcome', seed: array, stake_ton_amount: array, ton_amount: array}}|array{_: 'messageMediaStory', peer: array|int|string, via_mention: bool, id: int, story?: array{_: 'storyItemDeleted', id: array}|array{_: 'storyItemSkipped', close_friends: array, live: array, id: array, date: array, expire_date: array}}|array{_: 'messageMediaGiveaway', only_new_subscribers: bool, winners_are_visible: bool, channels: list<int>, countries_iso2?: list<string>, prize_description?: string, quantity: int, months?: int, stars?: int, until_date: int}|array{_: 'messageMediaGiveawayResults', only_new_subscribers: bool, refunded: bool, channel_id: int, additional_peers_count?: int, launch_msg_id: int, winners_count: int, unclaimed_count: int, winners: list<int>, months?: int, stars?: int, prize_description?: string, until_date: int}|array{_: 'messageMediaPaidMedia', stars_amount: int, extended_media: list<array{_: 'messageExtendedMediaPreview', w?: array, h?: array, thumb?: array, video_duration?: array}>}|array{_: 'messageMediaToDo', todo: array{_: 'todoList', title: array, others_can_append: array, others_can_complete: array, list: list<array>}, completions?: list<array{_: 'todoCompletion', completed_by: array, id: array, date: array}>}|array{_: 'messageMediaVideoStream', call: array{_: 'inputGroupCall', id: array, access_hash: array}|array{_: 'inputGroupCallSlug', slug: array}|array{_: 'inputGroupCallInviteMessage', msg_id: array}, rtmp_stream: bool}}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/BotPreviewMedia.html
+     * @psalm-impure
      */
     public function getPreviewMedias(array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -311,6 +335,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function updateUserEmojiStatus(array|int|string|null $user_id = null, array|null $emoji_status = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -323,6 +348,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function toggleUserEmojiStatusPermission(bool $enabled, array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -336,6 +362,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function checkDownloadFileParams(array|int|string|null $bot = null, string|null $file_name = '', string|null $url = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -346,6 +373,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array|int|string> Array of  @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function getAdminedBots(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -359,6 +387,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'starRefProgram', bot_id: int, commission_permille: int, duration_months?: int, end_date?: int, daily_revenue_per_user?: array{_: 'starsAmount', amount: int, nanos: int}|array{_: 'starsTonAmount', amount: int}} @see https://docs.madelineproto.xyz/API_docs/types/StarRefProgram.html
+     * @psalm-impure
      */
     public function updateStarRefProgram(array|int|string|null $bot = null, int|null $commission_permille = 0, int|null $duration_months = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -373,6 +402,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setCustomVerification(bool|null $enabled = null, array|int|string|null $bot = null, array|int|string|null $peer = null, string|null $custom_description = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -384,6 +414,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'users.users', users: list<array|int|string>}|array{_: 'users.usersSlice', count: int, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/users.Users.html
+     * @psalm-impure
      */
     public function getBotRecommendations(array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -395,6 +426,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function checkUsername(string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -409,6 +441,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array|int|string @see https://docs.madelineproto.xyz/API_docs/types/User.html
+     * @psalm-impure
      */
     public function createBot(bool|null $via_deeplink = null, string|null $name = '', string|null $username = '', array|int|string|null $manager_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array|int|string;
 
@@ -421,6 +454,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.exportedBotToken', token: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.ExportedBotToken.html
+     * @psalm-impure
      */
     public function exportBotToken(bool $revoke, array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -433,6 +467,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.requestedButton', webapp_req_id: string} @see https://docs.madelineproto.xyz/API_docs/types/bots.RequestedButton.html
+     * @psalm-impure
      */
     public function requestWebViewButton(array $button, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -445,6 +480,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/KeyboardButton.html
+     * @psalm-impure
      */
     public function getRequestedWebViewButton(array|int|string|null $bot = null, string|null $webapp_req_id = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -456,6 +492,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'bots.accessSettings', restricted: bool, add_users?: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/bots.AccessSettings.html
+     * @psalm-impure
      */
     public function getAccessSettings(array|int|string|null $bot = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -469,6 +506,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function editAccessSettings(bool|null $restricted = null, array|int|string|null $bot = null, array|null $add_users = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -481,6 +519,7 @@ interface Bots
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setJoinChatResults(array $result, int|null $query_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

@@ -24,6 +24,8 @@ namespace danog\MadelineProto\MTProtoTools;
  * Stores multiple update states.
  *
  * @internal
+ *
+ * @psalm-external-mutation-free
  */
 final class CombinedUpdatesState
 {
@@ -35,6 +37,8 @@ final class CombinedUpdatesState
     private array $states = [];
     /**
      * Constructor function.
+     *
+     * @psalm-mutation-free
      */
     public function __construct()
     {
@@ -43,9 +47,12 @@ final class CombinedUpdatesState
     /**
      * Get or update multiple parameters.
      *
-     * @param  ?int                              $channel Channel to get info about (optional, if not provided returns the entire info array)
-     * @param  array                            $init    Parameters to update
+     * @param ?int                              $channel Channel to get info about (optional, if not provided returns the entire info array)
+     * @param array                            $init    Parameters to update
+     *
      * @return ($channel is null ? array<int, UpdatesState> : UpdatesState)
+     *
+     * @psalm-external-mutation-free
      */
     public function get(?int $channel = null, array $init = []): UpdatesState|array
     {
@@ -61,6 +68,8 @@ final class CombinedUpdatesState
      * Remove update state.
      *
      * @param int $channel Channel whose state should be removed
+     *
+     * @psalm-external-mutation-free
      */
     public function remove(int $channel): void
     {
@@ -72,6 +81,8 @@ final class CombinedUpdatesState
      * Check if update state is present.
      *
      * @param int $channel Channel ID
+     *
+     * @psalm-mutation-free
      */
     public function has(int $channel): bool
     {

@@ -43,6 +43,9 @@ abstract class AbstractFilterFromSenders extends Filter
     private readonly array $peers;
     /** @var list<int> */
     private readonly array $peersResolved;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(string|int ...$idOrUsername)
     {
         $this->peers = array_unique($idOrUsername);
@@ -61,6 +64,9 @@ abstract class AbstractFilterFromSenders extends Filter
         $this->peersResolved = $res;
         return $this;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

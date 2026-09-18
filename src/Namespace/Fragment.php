@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Fragment
 {
     /**
@@ -17,6 +18,7 @@ interface Fragment
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'fragment.collectibleInfo', purchase_date: int, currency: string, amount: int, crypto_currency: string, crypto_amount: int, url: string} @see https://docs.madelineproto.xyz/API_docs/types/fragment.CollectibleInfo.html
+     * @psalm-impure
      */
     public function getCollectibleInfo(array $collectible, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

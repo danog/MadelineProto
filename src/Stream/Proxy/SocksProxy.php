@@ -188,6 +188,8 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
      * Sets proxy data.
      *
      * @param array $extra Proxy data
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($extra): void
@@ -210,6 +212,9 @@ final class SocksProxy implements RawProxyStreamInterface, BufferedProxyStreamIn
     {
         return $this->stream->getSocket();
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

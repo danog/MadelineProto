@@ -30,12 +30,18 @@ final class FilterTextContainsCaseInsensitive extends Filter
 {
     private readonly string $content;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         string $content,
     ) {
         Assert::notEmpty($content);
         $this->content = mb_strtolower($content);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

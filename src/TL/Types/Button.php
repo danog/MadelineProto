@@ -36,6 +36,8 @@ final class Button extends IpcCapable implements JsonSerializable
      * Constructor function.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         MTProto $API,

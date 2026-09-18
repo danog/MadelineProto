@@ -36,15 +36,24 @@ final class MessageHandler
 
     public int $peerVersion = 0;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         public readonly LegacyController $instance,
         public readonly string $callID
     ) {
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getLastSentSeq(): int
     {
         return $this->outSeqNo-1;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     private static function pack_string(string $object): string
     {
         $l = \strlen($object);
@@ -248,6 +257,9 @@ final class MessageHandler
         return true;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function acked(int $seq): bool
     {
         $diff = $this->outSeqNo - $seq;

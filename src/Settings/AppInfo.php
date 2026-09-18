@@ -110,6 +110,8 @@ final class AppInfo extends SettingsAbstract
 
     /**
      * Check if the settings have API ID/hash information.
+     *
+     * @psalm-mutation-free
      */
     public function hasApiInfo(): bool
     {
@@ -117,6 +119,8 @@ final class AppInfo extends SettingsAbstract
     }
     /**
      * Get API ID.
+     *
+     * @psalm-external-mutation-free
      */
     public function getApiId(): int
     {
@@ -130,6 +134,8 @@ final class AppInfo extends SettingsAbstract
      * Set API ID.
      *
      * @param int $apiId API ID.
+     *
+     * @psalm-external-mutation-free
      */
     public function setApiId(int $apiId): self
     {
@@ -139,6 +145,8 @@ final class AppInfo extends SettingsAbstract
 
     /**
      * Get API hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function getApiHash(): string
     {
@@ -152,6 +160,8 @@ final class AppInfo extends SettingsAbstract
      * Set API hash.
      *
      * @param string $apiHash API hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function setApiHash(string $apiHash): self
     {
@@ -172,6 +182,8 @@ final class AppInfo extends SettingsAbstract
      * Set device model.
      *
      * @param string $deviceModel Device model.
+     *
+     * @psalm-external-mutation-free
      */
     public function setDeviceModel(string $deviceModel): self
     {
@@ -192,6 +204,8 @@ final class AppInfo extends SettingsAbstract
      * Set system version.
      *
      * @param string $systemVersion System version.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSystemVersion(string $systemVersion): self
     {
@@ -212,6 +226,8 @@ final class AppInfo extends SettingsAbstract
      * Set app version.
      *
      * @param string $appVersion App version.
+     *
+     * @psalm-external-mutation-free
      */
     public function setAppVersion(string $appVersion): self
     {
@@ -232,6 +248,8 @@ final class AppInfo extends SettingsAbstract
      * Set language code.
      *
      * @param string $langCode Language code.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLangCode(string $langCode): self
     {
@@ -258,6 +276,8 @@ final class AppInfo extends SettingsAbstract
      * Set system language code.
      *
      * @param string $langCode Language code.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSystemLangCode(string $langCode): self
     {
@@ -278,6 +298,8 @@ final class AppInfo extends SettingsAbstract
      * Set language pack.
      *
      * @param string $langPack Language pack.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLangPack(string $langPack): self
     {
@@ -299,6 +321,8 @@ final class AppInfo extends SettingsAbstract
      * Set whether to show a prompt, asking to enter an API ID/API hash if none is provided.
      *
      * @param bool $showPrompt Whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     *
+     * @psalm-external-mutation-free
      */
     public function setShowPrompt(bool $showPrompt): static
     {

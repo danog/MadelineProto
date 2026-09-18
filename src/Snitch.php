@@ -42,6 +42,8 @@ final class Snitch
 
     /**
      * Called before serialization.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {

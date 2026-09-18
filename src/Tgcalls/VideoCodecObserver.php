@@ -19,13 +19,16 @@
 namespace danog\MadelineProto\Tgcalls;
 
 /**
- * Notified when the video codec a {@see WebmSource} is transmitting changes.
+ * Notified when the video codec the {@see \danog\MadelineProto\Loop\VoIP\DjLoop} is transmitting
+ * changes, and when video playback stops.
  *
- * {@see WebmSource} keeps a reference to its observer as part of its serializable state, so this has
- * to be a real, serializable object rather than a `Closure` (which PHP cannot serialize): the WebRTC
- * engines survive a serialize/unserialize cycle, and every callback they hold must survive it too.
+ * The {@see \danog\MadelineProto\Loop\VoIP\DjLoop} keeps a reference to its observer as part of its
+ * serializable state, so this has to be a real, serializable object rather than a `Closure` (which
+ * PHP cannot serialize): the WebRTC engines survive a serialize/unserialize cycle, and every
+ * callback they hold must survive it too.
  *
  * @internal
+ * @psalm-mutable
  */
 interface VideoCodecObserver
 {
@@ -33,6 +36,13 @@ interface VideoCodecObserver
      * Pin the outgoing video m-line to the codec of the file being played.
      *
      * @param string $codec The SDP encoding name (e.g. `VP8`, `H264`) of the video being transmitted.
+     * @psalm-impure
      */
     public function onVideoCodec(string $codec): void;
+
+    /**
+     * React to the demuxed video file finishing: the outgoing video is no longer being transmitted.
+     * @psalm-impure
+     */
+    public function onVideoStopped(): void;
 }

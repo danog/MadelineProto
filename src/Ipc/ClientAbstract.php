@@ -59,6 +59,9 @@ abstract class ClientAbstract
      */
     public Logger $logger;
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function __construct()
     {
     }

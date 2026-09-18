@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Langpack
 {
     /**
@@ -18,6 +19,7 @@ interface Langpack
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value?: string, one_value?: string, two_value?: string, few_value?: string, many_value?: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
+     * @psalm-impure
      */
     public function getLangPack(string|null $lang_pack = '', string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -31,6 +33,7 @@ interface Langpack
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value?: string, one_value?: string, two_value?: string, few_value?: string, many_value?: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackString.html
+     * @psalm-impure
      */
     public function getStrings(string|null $lang_pack = '', string|null $lang_code = '', array $keys = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -44,6 +47,7 @@ interface Langpack
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'langPackDifference', lang_code: string, from_version: int, version: int, strings: list<array{_: 'langPackString', key: string, value: string}|array{_: 'langPackStringPluralized', key: string, zero_value?: string, one_value?: string, two_value?: string, few_value?: string, many_value?: string, other_value: string}|array{_: 'langPackStringDeleted', key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/LangPackDifference.html
+     * @psalm-impure
      */
     public function getDifference(string|null $lang_pack = '', string|null $lang_code = '', int|null $from_version = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -55,6 +59,7 @@ interface Langpack
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code?: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
+     * @psalm-impure
      */
     public function getLanguages(string|null $lang_pack = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -67,6 +72,7 @@ interface Langpack
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'langPackLanguage', official: bool, rtl: bool, beta: bool, name: string, native_name: string, lang_code: string, base_lang_code?: string, plural_code: string, strings_count: int, translated_count: int, translations_url: string} @see https://docs.madelineproto.xyz/API_docs/types/LangPackLanguage.html
+     * @psalm-impure
      */
     public function getLanguage(string|null $lang_pack = '', string|null $lang_code = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

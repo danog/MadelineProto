@@ -26,6 +26,9 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterPrivate extends Filter
 {
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

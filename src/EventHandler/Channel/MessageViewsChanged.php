@@ -33,7 +33,11 @@ final class MessageViewsChanged extends Update
     /** New view counter */
     public readonly int $views;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawMessageViews)
     {
         parent::__construct($API);

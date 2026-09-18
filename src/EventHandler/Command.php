@@ -31,7 +31,11 @@ final class Command implements JsonSerializable
     /** Description of the command. */
     public readonly string $description;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawCommand)
     {
         $this->command = $rawCommand['command'];

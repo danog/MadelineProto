@@ -27,16 +27,19 @@ namespace danog\MadelineProto\Tgcalls;
  * the association survives a serialize/unserialize cycle, and so must both of its callbacks.
  *
  * @internal
+ * @psalm-mutable
  */
 interface SctpSignalingObserver
 {
     /**
      * Put one SCTP packet of the signaling association on the wire.
+     * @psalm-impure
      */
     public function deliverSignalingPacket(string $packet): void;
 
     /**
      * Handle one reassembled signaling message received over the association.
+     * @psalm-impure
      */
     public function onSignalingMessageData(string $message): void;
 }

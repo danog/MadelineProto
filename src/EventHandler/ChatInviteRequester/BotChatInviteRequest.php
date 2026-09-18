@@ -37,7 +37,11 @@ final class BotChatInviteRequest extends ChatInviteRequester
     /** Chat invite link that was used by the user to send the [join request »](https://core.telegram.org/api/invites#join-requests) */
     public readonly ChatInvite $invite;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawChatInviteRequester)
     {
         parent::__construct($API, $rawChatInviteRequester);

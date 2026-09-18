@@ -64,6 +64,8 @@ final class MyTelegramOrgWrapper
     private const MY_TELEGRAM_URL = 'https://my.telegram.org';
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -93,6 +95,9 @@ final class MyTelegramOrgWrapper
             new class($this->settings) implements
                 SettingsGetter,
                 LoggerGetter {
+                /**
+                 * @psalm-mutation-free
+                 */
                 public function __construct(
                     private readonly Settings $settings
                 ) {
@@ -102,6 +107,9 @@ final class MyTelegramOrgWrapper
                 {
                     return $this->settings;
                 }
+                /**
+                 * @psalm-mutation-free
+                 */
                 #[\Override]
                 public function getLogger(): Logger
                 {
@@ -255,6 +263,8 @@ final class MyTelegramOrgWrapper
      * Function for generating curl request headers.
      *
      * @param string $httpType Origin
+     *
+     * @psalm-pure
      */
     private function getHeaders(string $httpType): array
     {

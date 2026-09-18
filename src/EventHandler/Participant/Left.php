@@ -26,7 +26,11 @@ final class Left extends Participant
     /** The peer that left */
     public readonly int $peer;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawParticipant)
     {
         $this->peer = $rawParticipant['peer'];

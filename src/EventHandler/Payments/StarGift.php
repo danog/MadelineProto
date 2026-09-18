@@ -51,7 +51,11 @@ final class StarGift extends IpcCapable implements \JsonSerializable
         parent::__construct($API);
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {

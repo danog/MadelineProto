@@ -25,6 +25,9 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
  */
 final class Memory extends DatabaseAbstract
 {
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getOrmSettings(): Settings
     {

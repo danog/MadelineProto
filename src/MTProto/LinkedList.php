@@ -40,6 +40,9 @@ final class LinkedList
      */
     public WeakMap $check_queue;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct()
     {
         $this->next = $this;
@@ -47,6 +50,9 @@ final class LinkedList
         $this->check_queue = new WeakMap();
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function isEmpty(): bool
     {
         return $this->next === $this;
@@ -59,6 +65,9 @@ final class LinkedList
         $this->next->prev = $message;
         $this->next = $message;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function peek(): ?MTProtoOutgoingMessage
     {
         if ($this->prev === $this) {
@@ -67,6 +76,9 @@ final class LinkedList
         return $this->prev;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo(): array
     {
         if (!isset($this->next)) {

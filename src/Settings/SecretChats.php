@@ -46,6 +46,8 @@ final class SecretChats extends SettingsAbstract
      * Set boolean or array of IDs.
      *
      * @param bool|array<int> $accept Boolean or array of IDs
+     *
+     * @psalm-external-mutation-free
      */
     public function setAccept(bool|array $accept): self
     {
@@ -58,6 +60,8 @@ final class SecretChats extends SettingsAbstract
      * Can we accept this chat.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function canAccept(int $id): bool
     {

@@ -26,6 +26,8 @@ final class MediaState implements JsonSerializable
 {
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         /** Whether the other party muted their microphone. */
@@ -55,6 +57,8 @@ final class MediaState implements JsonSerializable
 
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function jsonSerialize(): array

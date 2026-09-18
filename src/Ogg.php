@@ -140,6 +140,24 @@ final class Ogg
     private int $streamCount;
 
     /**
+     * Total number of bytes read from the underlying source, i.e. the byte offset of the read
+     * cursor. Starts at the resume offset so that {@see self::$pageOffset} is an absolute file offset.
+     */
+    private int $bytesRead = 0;
+
+    /**
+     * Byte offset of the OGG page currently being read.
+     *
+     * This is a page boundary, so re-opening the file here with the `$startOffset` constructor
+     * argument resumes reading exactly this page, which is what makes playback byte-offset
+     * resumable across a serialize/unserialize cycle.
+     */
+    public int $pageOffset = 0;
+
+    /** Whether reading started partway through the file, so the OPUS headers are not present. */
+    private bool $resuming = false;
+
+    /**
      * Pack format.
      */
     private string $packFormat;
@@ -161,9 +179,26 @@ final class Ogg
     /**
      * Constructor.
      */
-    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null)
+    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null, int $startOffset = 0)
     {
-        $this->stream = Tools::openBuffered($stream, $cancellation);
+        // Count every byte read so that the offset of each page is known and playback can resume
+        // from a byte offset. A non-zero start offset means we opened partway through the file,
+        // past the OPUS headers, so streaming starts immediately (see read()).
+        $inner = Tools::openBuffered($stream, $cancellation, $startOffset);
+        $this->bytesRead = $startOffset;
+        $this->resuming = $startOffset > 0;
+        if ($this->resuming) {
+            // The headers were already parsed on the first open; a MadelineProto/converted OGG
+            // OPUS file is a single logical stream, which is all the state opusStateMachine needs.
+            $this->streamCount = 1;
+        }
+        $this->stream = function (int $len) use ($inner): ?string {
+            $data = $inner($len);
+            if ($data !== null) {
+                $this->bytesRead += \strlen($data);
+            }
+            return $data;
+        };
         $pack_format = [
             'stream_structure_version' => 'C',
             'header_type_flag'         => 'C',
@@ -341,12 +376,16 @@ final class Ogg
      */
     private function read(): \Generator
     {
-        $state = self::STATE_READ_HEADER;
+        // When resuming from a byte offset we jump straight to the streaming state: the offset is a
+        // page boundary past the OpusHead/comment headers, which were parsed on the first open.
+        $state = $this->resuming ? self::STATE_STREAMING : self::STATE_READ_HEADER;
         $content = '';
         $granule = 0;
         $ignoredStreams = [];
 
         while (true) {
+            // Record the byte offset of this page before reading it, so a caller can resume here.
+            $this->pageOffset = $this->bytesRead;
             $capture = ($this->stream)(4);
             if ($capture !== self::CAPTURE_PATTERN) {
                 if ($capture === null) {

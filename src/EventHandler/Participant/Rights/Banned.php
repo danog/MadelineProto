@@ -83,7 +83,11 @@ final class Banned extends Rights
     /** Validity of said permissions (it is considered forever any value less then 30 seconds or more then 366 days). */
     public readonly int $untilDate;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         array $rawRights
     ) {

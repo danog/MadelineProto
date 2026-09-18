@@ -40,6 +40,8 @@ final class FileCallback implements FileCallbackInterface
      *
      * @param TT                            $file     File to download/upload
      * @param callable(float, float, float) $callback Callback
+     *
+     * @psalm-mutation-free
      */
     public function __construct(public readonly mixed $file, callable $callback)
     {

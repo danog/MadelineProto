@@ -92,6 +92,9 @@ final class TL implements TLInterface
      * API instance.
      */
     private ?MTProto $API = null;
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return [
@@ -106,6 +109,8 @@ final class TL implements TLInterface
      * Constructor function.
      *
      * @param MTProto $API API instance
+     *
+     * @psalm-mutation-free
      */
     public function __construct(?MTProto $API = null)
     {
@@ -242,6 +247,8 @@ final class TL implements TLInterface
      *      constructors: list<array{id: numeric-string, predicate: string, params: list<array{name: string, type: string}>, type: string, layer?: int}>,
      *      methods: list<array{id: numeric-string, method: string, params: list<array{name: string, type: string}>, type: string, layer?: int}>
      * }
+     *
+     * @psalm-external-mutation-free
      */
     public function toJson(string $filec, ?string $scheme_type = null): array
     {
@@ -372,6 +379,8 @@ final class TL implements TLInterface
     }
     /**
      * Get TL namespaces.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMethodNamespaces(): array
@@ -385,6 +394,8 @@ final class TL implements TLInterface
     }
     /**
      * Get namespaced methods (method => namespace).
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMethodsNamespaced(): array
@@ -429,6 +440,8 @@ final class TL implements TLInterface
      * Deserialize bool.
      *
      * @param string $id Constructor ID
+     *
+     * @psalm-external-mutation-free
      */
     private function deserializeBool(string $id): bool
     {
@@ -673,6 +686,8 @@ final class TL implements TLInterface
     /**
      * Whether a `DataJSON` argument was already passed as a dataJSON constructor, instead of as the
      * decoded value we would have to encode ourselves.
+     *
+     * @psalm-pure
      */
     private static function isDataJSON(mixed $value): bool
     {
@@ -874,6 +889,8 @@ final class TL implements TLInterface
      * Compresses a waveform.
      *
      * @internal Don't use this manually, just pass an array of integers to $attribute['waveform'].
+     *
+     * @psalm-external-mutation-free
      */
     public static function compressWaveform(array $x): string
     {

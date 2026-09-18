@@ -268,6 +268,8 @@ final class ReadLoop extends Loop
     }
     /**
      * Get loop name.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

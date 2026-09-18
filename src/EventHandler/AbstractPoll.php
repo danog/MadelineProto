@@ -89,6 +89,8 @@ abstract class AbstractPoll implements JsonSerializable
 
     /**
      * @return list<PollAnswer>
+     *
+     * @psalm-pure
      */
     private static function getPollAnswers(array $answers, array $result): array
     {

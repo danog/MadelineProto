@@ -40,7 +40,11 @@ abstract class ButtonQuery extends CallbackQuery
      */
     public ?array $matchesAll = null;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);

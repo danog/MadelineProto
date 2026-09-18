@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Photos
 {
     /**
@@ -19,6 +20,7 @@ interface Photos
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @psalm-impure
      */
     public function updateProfilePhoto(bool|null $fallback = null, array|int|string|null $bot = null, array|null $id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -37,6 +39,7 @@ interface Photos
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @psalm-impure
      */
     public function uploadProfilePhoto(bool|null $fallback = null, array|int|string|null $bot = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = null, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -48,6 +51,7 @@ interface Photos
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return list<int> 
+     * @psalm-impure
      */
     public function deletePhotos(array $id = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -63,6 +67,7 @@ interface Photos
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @param ?int $takeoutId Optional takeout ID, generated using account.initTakeoutSession, see [the takeout docs](https://core.telegram.org/api/takeout) for more info.
      * @return array{_: 'photos.photos', photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>}|array{_: 'photos.photosSlice', count: int, photos: list<array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photos.html
+     * @psalm-impure
      */
     public function getUserPhotos(array|int|string|null $user_id = null, int|null $offset = 0, int|null $max_id = 0, int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null, ?int $takeoutId = null): array;
 
@@ -82,6 +87,7 @@ interface Photos
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'photos.photo', photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/photos.Photo.html
+     * @psalm-impure
      */
     public function uploadContactProfilePhoto(bool|null $suggest = null, bool|null $save = null, array|int|string|null $user_id = null, mixed $file = null, mixed $video = null, float|null $video_start_ts = null, array|null $video_emoji_markup = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

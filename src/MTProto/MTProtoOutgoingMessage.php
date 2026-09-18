@@ -153,6 +153,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         });
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __debugInfo(): array
     {
@@ -346,6 +349,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Get message body or empty array.
+     *
+     * @psalm-mutation-free
      */
     public function getBodyOrEmpty(): array
     {
@@ -353,6 +358,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if we have a body.
+     *
+     * @psalm-mutation-free
      */
     public function hasBody(): bool
     {
@@ -368,6 +375,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if we have a serialized body.
+     *
+     * @psalm-mutation-free
      */
     public function hasSerializedBody(): bool
     {
@@ -386,6 +395,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Set serialized body.
      *
      * @param string $serializedBody Serialized body.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSerializedBody(string $serializedBody): self
     {
@@ -417,6 +428,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Check if the message was sent.
+     *
+     * @psalm-mutation-free
      */
     public function wasSent(): bool
     {
@@ -424,6 +437,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if the message has a reply.
+     *
+     * @psalm-mutation-free
      */
     public function hasReply(): bool
     {
@@ -431,6 +446,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * For logging.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {
@@ -453,6 +470,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Wait for message to be sent.
      *
      * @return Future<null>
+     *
+     * @psalm-mutation-free
      */
     public function getSendPromise(): Future
     {
@@ -464,6 +483,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Check if we have a promise.
+     *
+     * @psalm-mutation-free
      */
     public function hasPromise(): bool
     {
@@ -472,6 +493,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Get the promise.
+     *
+     * @psalm-mutation-free
      */
     public function getResultPromise(): Future
     {
@@ -481,6 +504,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Reset sent time to trigger resending.
+     *
+     * @psalm-external-mutation-free
      */
     public function resetSent(): self
     {
@@ -493,6 +518,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Set when was this message sent.
      *
      * @param int $sent When was this message sent.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSent(int $sent): self
     {

@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only messages that reply to one of our messages */
+/** @psalm-mutable */
 interface IsReplyToSelf
 {
 }

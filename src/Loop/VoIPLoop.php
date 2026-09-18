@@ -29,6 +29,9 @@ use danog\MadelineProto\Tgcalls\CallInterface;
  */
 abstract class VoIPLoop extends Loop
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         protected CallInterface $instance,
     ) {
@@ -76,6 +79,7 @@ abstract class VoIPLoop extends Loop
 
     /**
      * Get loop name.
+     * @psalm-mutation-free
      */
     abstract public function __toString(): string;
 }

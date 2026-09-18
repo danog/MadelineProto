@@ -24,6 +24,7 @@ use Amp\Cancellation;
 
 /**
  * Interface that represents a broadcast action.
+ * @psalm-mutable
  */
 interface Action
 {
@@ -33,6 +34,7 @@ interface Action
      * @param integer      $broadcastId  Broadcast ID
      * @param integer      $peer         Broadcast peer
      * @param Cancellation $cancellation Cancellation token
+     * @psalm-impure
      */
     public function act(int $broadcastId, int $peer, Cancellation $cancellation): void;
 }

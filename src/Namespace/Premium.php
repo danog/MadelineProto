@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Premium
 {
     /**
@@ -20,6 +21,7 @@ interface Premium
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id?: int, giveaway_msg_id?: int, date: int, expires: int, used_gift_slug?: string, multiplier?: int, stars?: int}>, next_offset?: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
+     * @psalm-impure
      */
     public function getBoostsList(bool|null $gifts = null, array|int|string|null $peer = null, string|null $offset = '', int|null $limit = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -30,6 +32,7 @@ interface Premium
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date?: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
+     * @psalm-impure
      */
     public function getMyBoosts(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -42,6 +45,7 @@ interface Premium
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'premium.myBoosts', my_boosts: list<array{_: 'myBoost', slot: int, peer?: array|int|string, date: int, expires: int, cooldown_until_date?: int}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.MyBoosts.html
+     * @psalm-impure
      */
     public function applyBoost(array|null $slots = null, array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -53,6 +57,7 @@ interface Premium
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'premium.boostsStatus', my_boost: bool, level: int, current_level_boosts: int, boosts: int, gift_boosts?: int, next_level_boosts?: int, premium_audience?: array{_: 'statsPercentValue', part: float, total: float}, boost_url: string, prepaid_giveaways?: list<array{_: 'prepaidGiveaway', id: int, months: int, quantity: int, date: int}|array{_: 'prepaidStarsGiveaway', id: int, stars: int, quantity: int, boosts: int, date: int}>, my_boost_slots?: list<int>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsStatus.html
+     * @psalm-impure
      */
     public function getBoostsStatus(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -65,6 +70,7 @@ interface Premium
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'premium.boostsList', count: int, boosts: list<array{_: 'boost', gift: bool, giveaway: bool, unclaimed: bool, id: string, user_id?: int, giveaway_msg_id?: int, date: int, expires: int, used_gift_slug?: string, multiplier?: int, stars?: int}>, next_offset?: string, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/premium.BoostsList.html
+     * @psalm-impure
      */
     public function getUserBoosts(array|int|string|null $peer = null, array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

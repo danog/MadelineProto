@@ -20,27 +20,33 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+/** @psalm-mutable */
 interface TLInterface
 {
     /**
      * Get constructors.
+     * @psalm-impure
      */
     public function getConstructors(): TLConstructors;
     /**
      * Get methods.
+     * @psalm-impure
      */
     public function getMethods(): TLMethods;
     /**
      * Get descriptions.
      *
+     * @psalm-impure
      */
     public function getDescriptions(): array;
     /**
      * Get TL namespaces.
+     * @psalm-impure
      */
     public function getMethodNamespaces(): array;
     /**
      * Get namespaced methods (method => namespace).
+     * @psalm-impure
      */
     public function getMethodsNamespaced(): array;
     /**
@@ -50,6 +56,7 @@ interface TLInterface
      * @param mixed   $object Object to serialize
      * @param string  $ctx    Context
      * @param integer $layer  Layer version
+     * @psalm-impure
      */
     public function serializeObject(array $type, mixed $object, string|int $ctx, int $layer = -1);
     /**
@@ -57,6 +64,7 @@ interface TLInterface
      *
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
+     * @psalm-impure
      */
     public function serializeMethod(string $method, mixed $arguments);
     /**
@@ -64,6 +72,7 @@ interface TLInterface
      *
      * @param resource|string $stream Stream
      * @param array           $type   Type identifier
+     * @psalm-impure
      */
     public function getLength($stream, array $type = ['type' => '', 'connection' => null, 'encrypted' => false]): int;
     /**
@@ -71,11 +80,13 @@ interface TLInterface
      *
      * @param string|resource $stream Stream
      * @param array           $type   Type identifier
+     * @psalm-impure
      */
     public function deserialize($stream, array $type);
 
     /**
      * Get secret chat layer version.
+     * @psalm-impure
      */
     public function getSecretLayer(): int;
 }

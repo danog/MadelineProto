@@ -30,11 +30,17 @@ use const OPENSSL_ZERO_PADDING;
  */
 final class IGEOpenssl extends IGE
 {
+    /**
+     * @psalm-mutation-free
+     */
     protected function __construct(private string $key, string $iv)
     {
         $this->iv_part_1 = substr($iv, 0, 16);
         $this->iv_part_2 = substr($iv, 16);
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function encrypt(string $plaintext): string
     {
@@ -52,6 +58,9 @@ final class IGEOpenssl extends IGE
 
         return $ciphertext;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function decrypt(string $ciphertext): string
     {

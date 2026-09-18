@@ -12,6 +12,9 @@ use ReflectionProperty;
  */
 abstract class MessageEntity implements JsonSerializable
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Offset of message entity within message (in UTF-16 code units) */
         public readonly int $offset,
@@ -22,14 +25,20 @@ abstract class MessageEntity implements JsonSerializable
     }
 
     /**
-     * @param  list<array> $entities
+     * @param list<array> $entities
+     *
      * @return list<self>
+     *
+     * @psalm-pure
      */
     public static function fromRawEntities(array $entities): array
     {
         return array_map(self::fromRawEntity(...), $entities);
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function fromRawEntity(array|self $entity): self
     {
         if ($entity instanceof self) {
@@ -63,10 +72,12 @@ abstract class MessageEntity implements JsonSerializable
 
     /**
      * Convert entity to bot API entity.
+     * @psalm-mutation-free
      */
     abstract public function toBotAPI(): array;
     /**
      * Convert entity to MTProto entity.
+     * @psalm-mutation-free
      */
     abstract public function toMTProto(): array;
 

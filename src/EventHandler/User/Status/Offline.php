@@ -27,6 +27,9 @@ final class Offline extends Status
     /** Time the user was last seen online */
     public readonly int $wasOnline;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rowUserStatus)
     {
         parent::__construct($API, $rowUserStatus);

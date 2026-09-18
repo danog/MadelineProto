@@ -32,6 +32,8 @@ final class WrappedFuture
 {
     /**
      * @param Future<T> $f
+     *
+     * @psalm-mutation-free
      */
     public function __construct(private readonly Future $f)
     {

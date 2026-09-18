@@ -27,7 +27,11 @@ final class ChatUserTyping extends Typing
     /** Group ID. */
     public readonly int $chatId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);

@@ -50,7 +50,10 @@ abstract class IGE
         return new IGEPhpseclib($key, $iv);
     }
 
+    /** @psalm-impure */
     abstract protected function __construct(string $key, string $iv);
+    /** @psalm-impure */
     abstract public function encrypt(string $plaintext): string;
+    /** @psalm-impure */
     abstract public function decrypt(string $ciphertext): string;
 }

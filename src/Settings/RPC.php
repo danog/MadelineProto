@@ -54,6 +54,8 @@ final class RPC extends SettingsAbstract
      * Set RPC drop timeout.
      *
      * @param int $rpcDropTimeout RPC timeout
+     *
+     * @psalm-external-mutation-free
      */
     public function setRpcDropTimeout(int $rpcDropTimeout): self
     {
@@ -74,6 +76,8 @@ final class RPC extends SettingsAbstract
      * Set RPC resend timeout.
      *
      * @param int $rpcResendTimeout RPC timeout.
+     *
+     * @psalm-external-mutation-free
      */
     public function setRpcResendTimeout(int $rpcResendTimeout): self
     {
@@ -84,6 +88,8 @@ final class RPC extends SettingsAbstract
 
     /**
      * Get flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously.
+     *
+     * @psalm-mutation-free
      */
     public function getFloodTimeout(): int
     {
@@ -96,6 +102,8 @@ final class RPC extends SettingsAbstract
      * Must be bigger than 5.
      *
      * @param int $floodTimeout Flood timeout: if FLOOD_WAIT_ time is bigger than this, throw exception instead of waiting asynchronously
+     *
+     * @psalm-external-mutation-free
      */
     public function setFloodTimeout(int $floodTimeout): self
     {
@@ -116,6 +124,8 @@ final class RPC extends SettingsAbstract
      * Set encode payload with GZIP if bigger than.
      *
      * @param int $gzipEncodeIfGt Encode payload with GZIP if bigger than
+     *
+     * @psalm-external-mutation-free
      */
     public function setGzipEncodeIfGt(int $gzipEncodeIfGt): self
     {

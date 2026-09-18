@@ -100,6 +100,9 @@ final class VoIPController implements CallInterface
         $this->authMutex = new LocalMutex;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $result = get_object_vars($this);
@@ -411,6 +414,8 @@ final class VoIPController implements CallInterface
 
     /**
      * Get the media state of the other party.
+     *
+     * @psalm-mutation-free
      */
     public function getRemoteMediaState(): ?MediaState
     {
@@ -464,6 +469,9 @@ final class VoIPController implements CallInterface
         $this->API->logger->logger($message, $level);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function isCallEnded(): bool
     {
@@ -508,23 +516,7 @@ final class VoIPController implements CallInterface
     }
 
     /**
-     * Play the VP8 video and OPUS audio of a WebM file.
-     */
-    public function playVideo(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        $this->tgcallsController?->playVideo($file);
-    }
-
-    /**
-     * Stop transmitting video.
-     */
-    public function stopVideo(): void
-    {
-        $this->tgcallsController?->stopVideo();
-    }
-
-    /**
-     * Play file.
+     * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file): void
     {
@@ -547,6 +539,8 @@ final class VoIPController implements CallInterface
     }
     /**
      * Pauses the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function pause(): void
     {
@@ -554,6 +548,8 @@ final class VoIPController implements CallInterface
     }
     /**
      * Resumes the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
     public function resume(): void
     {
@@ -561,6 +557,8 @@ final class VoIPController implements CallInterface
     }
     /**
      * Whether the file we're currently playing is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isPaused(): bool
     {
@@ -576,6 +574,7 @@ final class VoIPController implements CallInterface
     /**
      * Get info about the audio currently being played.
      *
+     * @psalm-mutation-free
      */
     public function getCurrent(): LocalFile|RemoteUrl|string|null
     {
@@ -592,6 +591,8 @@ final class VoIPController implements CallInterface
 
     /**
      * Get call representation.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function __toString(): string

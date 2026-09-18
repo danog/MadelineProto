@@ -689,6 +689,8 @@ trait Files
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
+     *
+     * @psalm-pure
      */
     public static function extractBotAPIFile(array $info): array|null
     {
@@ -1314,6 +1316,9 @@ trait Files
      * @var array<string, array<int, array{limit: int, hash: string}>>
      */
     private array $cdn_hashes = [];
+    /**
+     * @psalm-external-mutation-free
+     */
     private function addCdnHashes(string $file, array $hashes): void
     {
         foreach ($hashes as $hash) {
@@ -1338,6 +1343,9 @@ trait Files
         }
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function clearCdnHashes(string $file): void
     {
         unset($this->cdn_hashes[$file]);

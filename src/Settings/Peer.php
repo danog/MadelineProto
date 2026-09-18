@@ -48,6 +48,8 @@ final class Peer extends SettingsAbstract
      * Set cache time for full peer information (seconds).
      *
      * @param int $fullInfoCacheTime Cache time for full peer information (seconds).
+     *
+     * @psalm-external-mutation-free
      */
     public function setFullInfoCacheTime(int $fullInfoCacheTime): self
     {
@@ -68,6 +70,8 @@ final class Peer extends SettingsAbstract
      * Set should madeline fetch the full member list of every group it meets?
      *
      * @param bool $fullFetch Should madeline fetch the full member list of every group it meets?
+     *
+     * @psalm-external-mutation-free
      */
     public function setFullFetch(bool $fullFetch): self
     {
@@ -88,6 +92,8 @@ final class Peer extends SettingsAbstract
      * Set whether to cache all peers on startup for userbots.
      *
      * @param bool $cacheAllPeersOnStartup Whether to cache all peers on startup for userbots.
+     *
+     * @psalm-external-mutation-free
      */
     public function setCacheAllPeersOnStartup(bool $cacheAllPeersOnStartup): self
     {

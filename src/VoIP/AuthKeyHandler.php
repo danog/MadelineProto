@@ -100,7 +100,11 @@ trait AuthKeyHandler
         return $deferred->getFuture()->await();
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
     public function cleanupCall(int $id): void
     {
         if (isset($this->calls[$id])) {
@@ -115,6 +119,8 @@ trait AuthKeyHandler
      * @internal
      *
      * @return ?list{string, string, string, string}
+     *
+     * @psalm-mutation-free
      */
     public function getCallVisualization(int $id): ?array
     {
@@ -142,6 +148,8 @@ trait AuthKeyHandler
 
     /**
      * Get the phone call with the specified user ID.
+     *
+     * @psalm-mutation-free
      */
     public function getCallByPeer(int $userId): ?VoIP
     {
@@ -160,6 +168,8 @@ trait AuthKeyHandler
 
     /**
      * Get phone call information.
+     *
+     * @psalm-mutation-free
      */
     public function getCall(int $id): ?VoIP
     {
@@ -210,26 +220,6 @@ trait AuthKeyHandler
     }
 
     /**
-     * Play the VP8 video and OPUS audio of a WebM file in a call.
-     *
-     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
-     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
-     * beforehand.
-     */
-    public function callPlayVideo(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        ($this->calls[$id] ?? null)?->playVideo($file);
-    }
-
-    /**
-     * Stop transmitting video in a call.
-     */
-    public function callStopVideo(int $id): void
-    {
-        ($this->calls[$id] ?? null)?->stopVideo();
-    }
-
-    /**
      * When called, skips to the next file in the playlist.
      */
     public function skipPlay(int $id): void
@@ -247,6 +237,8 @@ trait AuthKeyHandler
 
     /**
      * Pauses playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
     public function pausePlay(int $id): void
     {
@@ -255,6 +247,8 @@ trait AuthKeyHandler
 
     /**
      * Resumes playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
     public function resumePlay(int $id): void
     {
@@ -263,6 +257,8 @@ trait AuthKeyHandler
 
     /**
      * Whether the currently playing audio file is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isPlayPaused(int $id): bool
     {
@@ -303,6 +299,8 @@ trait AuthKeyHandler
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-mutation-free
      */
     public function callGetCurrent(int $id): RemoteUrl|LocalFile|string|null
     {
@@ -311,6 +309,8 @@ trait AuthKeyHandler
 
     /**
      * Get call state.
+     *
+     * @psalm-mutation-free
      */
     public function getCallState(int $id): ?CallState
     {
@@ -327,6 +327,8 @@ trait AuthKeyHandler
 
     /**
      * Whether our own audio stream is muted in a call.
+     *
+     * @psalm-mutation-free
      */
     public function isCallMuted(int $id): bool
     {
@@ -335,6 +337,8 @@ trait AuthKeyHandler
 
     /**
      * Get the media state of the other party of a call, as reported by their client.
+     *
+     * @psalm-mutation-free
      */
     public function getCallRemoteMediaState(int $id): ?MediaState
     {

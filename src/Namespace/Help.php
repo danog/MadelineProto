@@ -7,6 +7,7 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Help
 {
     /**
@@ -16,6 +17,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'config', test_mode: bool, default_p2p_contacts: bool, preload_featured_stickers: bool, revoke_pm_inbox: bool, blocked_mode: bool, force_try_ipv6: bool, date: int, expires: int, this_dc: int, dc_options: list<array{_: 'dcOption', ipv6: bool, media_only: bool, tcpo_only: bool, cdn: bool, static: bool, this_port_only: bool, id: int, ip_address: string, port: int, secret?: string}>, dc_txt_domain_name: string, chat_size_max: int, megagroup_size_max: int, forwarded_count_max: int, online_update_period_ms: int, offline_blur_timeout_ms: int, offline_idle_timeout_ms: int, online_cloud_timeout_ms: int, notify_cloud_delay_ms: int, notify_default_delay_ms: int, push_chat_period_ms: int, push_chat_limit: int, edit_time_limit: int, revoke_time_limit: int, revoke_pm_time_limit: int, rating_e_decay: int, stickers_recent_limit: int, channels_read_media_period: int, tmp_sessions?: int, call_receive_timeout_ms: int, call_ring_timeout_ms: int, call_connect_timeout_ms: int, call_packet_timeout_ms: int, me_url_prefix: string, autoupdate_url_prefix?: string, gif_search_username?: string, venue_search_username?: string, img_search_username?: string, static_maps_provider?: string, caption_length_max: int, message_length_max: int, webfile_dc_id: int, suggested_lang_code?: string, lang_pack_version?: int, base_lang_pack_version?: int, reactions_default?: array{_: 'reactionEmpty'}|array{_: 'reactionEmoji', emoticon: string}|array{_: 'reactionCustomEmoji', document_id: int}|array{_: 'reactionPaid'}, autologin_token?: string} @see https://docs.madelineproto.xyz/API_docs/types/Config.html
+     * @psalm-impure
      */
     public function getConfig(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -26,6 +28,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'nearestDc', country: string, this_dc: int, nearest_dc: int} @see https://docs.madelineproto.xyz/API_docs/types/NearestDc.html
+     * @psalm-impure
      */
     public function getNearestDc(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -37,6 +40,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.appUpdate', can_not_skip: bool, id: int, version: string, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, document?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}, url?: string, sticker?: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'help.noAppUpdate'} @see https://docs.madelineproto.xyz/API_docs/types/help.AppUpdate.html
+     * @psalm-impure
      */
     public function getAppUpdate(string|null $source = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -47,6 +51,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.inviteText', message: string} @see https://docs.madelineproto.xyz/API_docs/types/help.InviteText.html
+     * @psalm-impure
      */
     public function getInviteText(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -57,6 +62,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.support', phone_number: string, user: array|int|string} @see https://docs.madelineproto.xyz/API_docs/types/help.Support.html
+     * @psalm-impure
      */
     public function getSupport(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -69,6 +75,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function setBotUpdatesStatus(int|null $pending_updates_count = 0, string|null $message = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -79,6 +86,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'cdnConfig', public_keys: list<array{_: 'cdnPublicKey', dc_id: int, public_key: string}>} @see https://docs.madelineproto.xyz/API_docs/types/CdnConfig.html
+     * @psalm-impure
      */
     public function getCdnConfig(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -93,6 +101,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.recentMeUrls', urls: list<array{_: 'recentMeUrlUnknown', url: string}|array{_: 'recentMeUrlUser', url: string, user_id: int}|array{_: 'recentMeUrlChat', url: string, chat_id: array|int|string}|array{_: 'recentMeUrlChatInvite', chat_invite: array{_: 'chatInviteAlready', chat: array|int|string}|array{_: 'chatInvite', channel: bool, broadcast: bool, public: bool, megagroup: bool, request_needed: bool, verified: bool, scam: bool, fake: bool, can_refulfill_subscription: bool, title: string, about?: string, photo: array{_: 'photoEmpty', id: array}|array{_: 'photo', has_stickers: array, id: array, access_hash: array, file_reference: array, date: array, sizes: list<array>, video_sizes?: list<array>, dc_id: array}, participants_count: int, participants?: list<array|int|string>, color: int, subscription_pricing?: array{_: 'starsSubscriptionPricing', period: int, amount: int}, subscription_form_id?: int, bot_verification?: array{_: 'botVerification', bot_id: int, icon: int, description: string}}|array{_: 'chatInvitePeek', chat: array|int|string, expires: int}, url: string}|array{_: 'recentMeUrlStickerSet', set: array{_: 'stickerSetCovered', set: array{_: 'stickerSet', archived: bool, official: bool, masks: bool, emojis: bool, text_color: bool, channel_emoji_status: bool, creator: bool, installed_date?: int, id: int, access_hash: int, title: string, short_name: string, thumbs?: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, bytes: string}>, thumb_dc_id?: int, thumb_version?: int, thumb_document_id?: int, count: int, hash: int}, cover: array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}}|array{_: 'stickerSetMultiCovered', set: array{_: 'stickerSet', archived: bool, official: bool, masks: bool, emojis: bool, text_color: bool, channel_emoji_status: bool, creator: bool, installed_date?: int, id: int, access_hash: int, title: string, short_name: string, thumbs?: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, bytes: string}>, thumb_dc_id?: int, thumb_version?: int, thumb_document_id?: int, count: int, hash: int}, covers: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>}|array{_: 'stickerSetFullCovered', set: array{_: 'stickerSet', archived: bool, official: bool, masks: bool, emojis: bool, text_color: bool, channel_emoji_status: bool, creator: bool, installed_date?: int, id: int, access_hash: int, title: string, short_name: string, thumbs?: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, bytes: string}>, thumb_dc_id?: int, thumb_version?: int, thumb_document_id?: int, count: int, hash: int}, packs: list<array{_: 'stickerPack', emoticon: string, documents: list<int>}>, keywords: list<array{_: 'stickerKeyword', document_id: int, keyword: list<string>}>, documents: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>}|array{_: 'stickerSetNoCovered', set: array{_: 'stickerSet', archived: bool, official: bool, masks: bool, emojis: bool, text_color: bool, channel_emoji_status: bool, creator: bool, installed_date?: int, id: int, access_hash: int, title: string, short_name: string, thumbs?: list<array{_: 'photoSizeEmpty', type: string}|array{_: 'photoSize', type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', type: string, w: int, h: int, bytes: string}|array{_: 'photoStrippedSize', type: string, bytes: string}|array{_: 'photoSizeProgressive', type: string, w: int, h: int, sizes: list<int>}|array{_: 'photoPathSize', type: string, bytes: string}|array{_: 'photoSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, size: int}|array{_: 'photoCachedSize', location: array{_: 'fileLocationUnavailable', volume_id: array, local_id: array, secret: array}|array{_: 'fileLocation', dc_id: array, volume_id: array, local_id: array, secret: array}, type: string, w: int, h: int, bytes: string}>, thumb_dc_id?: int, thumb_version?: int, thumb_document_id?: int, count: int, hash: int}}, url: string}>, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/help.RecentMeUrls.html
+     * @psalm-impure
      */
     public function getRecentMeUrls(string|null $referer = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -103,6 +112,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.termsOfServiceUpdateEmpty', expires: int}|array{_: 'help.termsOfServiceUpdate', terms_of_service: array{_: 'help.termsOfService', id: mixed, popup: bool, text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, min_age_confirm?: int}, expires: int} @see https://docs.madelineproto.xyz/API_docs/types/help.TermsOfServiceUpdate.html
+     * @psalm-impure
      */
     public function getTermsOfServiceUpdate(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -114,6 +124,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function acceptTermsOfService(mixed $id, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -125,6 +136,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.deepLinkInfoEmpty'}|array{_: 'help.deepLinkInfo', update_app: bool, message: string, entities?: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>} @see https://docs.madelineproto.xyz/API_docs/types/help.DeepLinkInfo.html
+     * @psalm-impure
      */
     public function getDeepLinkInfo(string|null $path = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -136,6 +148,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.appConfigNotModified'}|array{_: 'help.appConfig', config: mixed, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.AppConfig.html
+     * @psalm-impure
      */
     public function getAppConfig(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -147,6 +160,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function saveAppLog(array $events = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -158,6 +172,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.passportConfigNotModified'}|array{_: 'help.passportConfig', countries_langs: mixed, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.PassportConfig.html
+     * @psalm-impure
      */
     public function getPassportConfig(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -168,6 +183,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.supportName', name: string} @see https://docs.madelineproto.xyz/API_docs/types/help.SupportName.html
+     * @psalm-impure
      */
     public function getSupportName(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -179,6 +195,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.userInfoEmpty'}|array{_: 'help.userInfo', message: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, author: string, date: int} @see https://docs.madelineproto.xyz/API_docs/types/help.UserInfo.html
+     * @psalm-impure
      */
     public function getUserInfo(array|int|string|null $user_id = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -193,6 +210,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.userInfoEmpty'}|array{_: 'help.userInfo', message: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, author: string, date: int} @see https://docs.madelineproto.xyz/API_docs/types/help.UserInfo.html
+     * @psalm-impure
      */
     public function editUserInfo(array|int|string|null $user_id = null, string|null $message = '', array $entities = [], \danog\MadelineProto\ParseMode $parse_mode = \danog\MadelineProto\ParseMode::TEXT, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -203,6 +221,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.promoDataEmpty', expires: int}|array{_: 'help.promoData', proxy: bool, expires: int, peer?: array|int|string, psa_type?: string, psa_message?: string, pending_suggestions: list<string>, dismissed_suggestions: list<string>, custom_pending_suggestion?: array{_: 'pendingSuggestion', title: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>}, description: array{_: 'textWithEntities', text: string, entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>}, suggestion: string, url: string}, chats: list<array|int|string>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/help.PromoData.html
+     * @psalm-impure
      */
     public function getPromoData(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -214,6 +233,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function hidePromoData(array|int|string|null $peer = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -226,6 +246,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return bool 
+     * @psalm-impure
      */
     public function dismissSuggestion(array|int|string|null $peer = null, string|null $suggestion = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
@@ -238,6 +259,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.countriesListNotModified'}|array{_: 'help.countriesList', countries: list<array{_: 'help.country', hidden: bool, iso2: string, default_name: string, name?: string, country_codes: list<array{_: 'help.countryCode', country_code: string, prefixes?: list<string>, patterns?: list<string>}>}>, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.CountriesList.html
+     * @psalm-impure
      */
     public function getCountriesList(string|null $lang_code = '', int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -248,6 +270,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.premiumPromo', status_text: string, status_entities: list<array{_: 'messageEntityUnknown', offset: int, length: int}|array{_: 'messageEntityMention', offset: int, length: int}|array{_: 'messageEntityHashtag', offset: int, length: int}|array{_: 'messageEntityBotCommand', offset: int, length: int}|array{_: 'messageEntityUrl', offset: int, length: int}|array{_: 'messageEntityEmail', offset: int, length: int}|array{_: 'messageEntityBold', offset: int, length: int}|array{_: 'messageEntityItalic', offset: int, length: int}|array{_: 'messageEntityCode', offset: int, length: int}|array{_: 'messageEntityPre', offset: int, length: int, language: string}|array{_: 'messageEntityTextUrl', offset: int, length: int, url: string}|array{_: 'messageEntityMentionName', offset: int, length: int, user_id: int}|array{_: 'inputMessageEntityMentionName', offset: int, length: int, user_id: array|int|string}|array{_: 'messageEntityPhone', offset: int, length: int}|array{_: 'messageEntityCashtag', offset: int, length: int}|array{_: 'messageEntityUnderline', offset: int, length: int}|array{_: 'messageEntityStrike', offset: int, length: int}|array{_: 'messageEntityBankCard', offset: int, length: int}|array{_: 'messageEntitySpoiler', offset: int, length: int}|array{_: 'messageEntityCustomEmoji', offset: int, length: int, document_id: int}|array{_: 'messageEntityBlockquote', collapsed: bool, offset: int, length: int}|array{_: 'messageEntityFormattedDate', relative: bool, short_time: bool, long_time: bool, short_date: bool, long_date: bool, day_of_week: bool, offset: int, length: int, date: int}|array{_: 'messageEntityDiffInsert', offset: int, length: int}|array{_: 'messageEntityDiffReplace', offset: int, length: int, old_text: string}|array{_: 'messageEntityDiffDelete', offset: int, length: int}|array{_: 'messageEntityBlockquote', offset: int, length: int}>, video_sections: list<string>, videos: list<array{_: 'documentEmpty', id: array}|array{_: 'document', id: array, access_hash: array, file_reference: array, date: array, mime_type: array, size: array, thumbs?: list<array>, video_thumbs?: list<array>, dc_id: array, attributes: list<array>}>, period_options: list<array{_: 'premiumSubscriptionOption', current: bool, can_purchase_upgrade: bool, transaction?: string, months: int, currency: string, amount: int, bot_url: string, store_product?: string}>, users: list<array|int|string>} @see https://docs.madelineproto.xyz/API_docs/types/help.PremiumPromo.html
+     * @psalm-impure
      */
     public function getPremiumPromo(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -259,6 +282,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.peerColorsNotModified'}|array{_: 'help.peerColors', hash: int, colors: list<array{_: 'help.peerColorOption', hidden: bool, color_id: int, colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, dark_colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, channel_min_level?: int, group_min_level?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/help.PeerColors.html
+     * @psalm-impure
      */
     public function getPeerColors(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -270,6 +294,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.peerColorsNotModified'}|array{_: 'help.peerColors', hash: int, colors: list<array{_: 'help.peerColorOption', hidden: bool, color_id: int, colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, dark_colors?: array{_: 'help.peerColorSet', colors: list<int>}|array{_: 'help.peerColorProfileSet', palette_colors: list<int>, bg_colors: list<int>, story_colors: list<int>}, channel_min_level?: int, group_min_level?: int}>} @see https://docs.madelineproto.xyz/API_docs/types/help.PeerColors.html
+     * @psalm-impure
      */
     public function getPeerProfileColors(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
@@ -281,6 +306,7 @@ interface Help
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'help.timezonesListNotModified'}|array{_: 'help.timezonesList', timezones: list<array{_: 'timezone', id: string, name: string, utc_offset: int}>, hash: int} @see https://docs.madelineproto.xyz/API_docs/types/help.TimezonesList.html
+     * @psalm-impure
      */
     public function getTimezonesList(int|null $hash = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

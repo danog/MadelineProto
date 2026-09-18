@@ -92,8 +92,11 @@ final class Shutdown
     /**
      * Remove a callback from the script shutdown callable list.
      *
-     * @param  null|string|int $id The optional callback ID
+     * @param null|string|int $id The optional callback ID
+     *
      * @return bool            true if the callback was removed correctly, false otherwise
+     *
+     * @psalm-external-mutation-free
      */
     public static function removeCallback(string|int|null $id): bool
     {

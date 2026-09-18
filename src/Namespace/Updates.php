@@ -22,12 +22,14 @@
 
 namespace danog\MadelineProto\Namespace;
 
+/** @psalm-mutable */
 interface Updates
 {
     /**
      * You cannot use this method directly, see https://docs.madelineproto.xyz for more info on handling updates.
      *
      * @return array
+     * @psalm-impure
      */
     public function getState();
 
@@ -41,6 +43,7 @@ interface Updates
      *
      *
      * @return array
+     * @psalm-impure
      */
     public function getDifference(int $pts, int $date, int $qts, int $pts_total_limit = 0);
 
@@ -55,6 +58,7 @@ interface Updates
      *
      *
      * @return array
+     * @psalm-impure
      */
     public function getChannelDifference(array $channel, array $filter, int $pts, int $limit, array $force = []);
 }

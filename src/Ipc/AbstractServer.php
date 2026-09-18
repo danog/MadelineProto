@@ -284,6 +284,8 @@ abstract class AbstractServer extends Loop
     }
     /**
      * Get the name of the loop.
+     *
+     * @psalm-pure
      */
     public function __toString(): string
     {

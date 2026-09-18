@@ -120,6 +120,9 @@ final class Settings extends SettingsAbstract
         $this->ipc = new IPc;
         $this->voip = new VoIP;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __wakeup(): void
     {
         if (!isset($this->voip)) {
@@ -133,6 +136,8 @@ final class Settings extends SettingsAbstract
      * Merge another instance of settings.
      *
      * @param SettingsAbstract $settings Settings
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function merge(SettingsAbstract $settings): void
@@ -209,6 +214,8 @@ final class Settings extends SettingsAbstract
      * Set app information.
      *
      * @param AppInfo $appInfo App information.
+     *
+     * @psalm-external-mutation-free
      */
     public function setAppInfo(AppInfo $appInfo): self
     {
@@ -229,6 +236,8 @@ final class Settings extends SettingsAbstract
      * Set cryptography settings.
      *
      * @param Auth $auth Cryptography settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setAuth(Auth $auth): self
     {
@@ -249,6 +258,8 @@ final class Settings extends SettingsAbstract
      * Set connection settings.
      *
      * @param Connection $connection Connection settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setConnection(Connection $connection): self
     {
@@ -269,6 +280,8 @@ final class Settings extends SettingsAbstract
      * Set file management settings.
      *
      * @param Files $files File management settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setFiles(Files $files): self
     {
@@ -289,6 +302,8 @@ final class Settings extends SettingsAbstract
      * Set metrics settings.
      *
      * @param Metrics $metrics File management settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMetrics(Metrics $metrics): self
     {
@@ -309,6 +324,8 @@ final class Settings extends SettingsAbstract
      * Set logger settings.
      *
      * @param Logger $logger Logger settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLogger(Logger $logger): self
     {
@@ -329,6 +346,8 @@ final class Settings extends SettingsAbstract
      * Set peer database settings.
      *
      * @param Peer $peer Peer database settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setPeer(Peer $peer): self
     {
@@ -349,6 +368,8 @@ final class Settings extends SettingsAbstract
      * Set RPC settings.
      *
      * @param RPC $rpc RPC settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setRpc(RPC $rpc): self
     {
@@ -369,6 +390,8 @@ final class Settings extends SettingsAbstract
      * Set secret chat settings.
      *
      * @param SecretChats $secretChats Secret chat settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSecretChats(SecretChats $secretChats): self
     {
@@ -389,6 +412,8 @@ final class Settings extends SettingsAbstract
      * Set serialization settings.
      *
      * @param Serialization $serialization Serialization settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSerialization(Serialization $serialization): self
     {
@@ -409,6 +434,8 @@ final class Settings extends SettingsAbstract
      * Set TL schema settings.
      *
      * @param TLSchema $schema TL schema settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSchema(TLSchema $schema): self
     {
@@ -429,6 +456,8 @@ final class Settings extends SettingsAbstract
      * Set database settings.
      *
      * @param DatabaseAbstract $db DatabaseAbstract settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setDb(DatabaseAbstract $db): self
     {
@@ -449,6 +478,8 @@ final class Settings extends SettingsAbstract
      * Set IPC server settings.
      *
      * @param Ipc $ipc IPC server settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setIpc(Ipc $ipc): self
     {
@@ -457,6 +488,9 @@ final class Settings extends SettingsAbstract
         return $this;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function applyChanges(): SettingsAbstract
     {
@@ -480,6 +514,8 @@ final class Settings extends SettingsAbstract
      * Set template settings.
      *
      * @param Templates $templates Template settings
+     *
+     * @psalm-external-mutation-free
      */
     public function setTemplates(Templates $templates): self
     {
@@ -500,6 +536,8 @@ final class Settings extends SettingsAbstract
      * Set voIP settings.
      *
      * @param VoIP $voip VoIP settings.
+     *
+     * @psalm-external-mutation-free
      */
     public function setVoip(VoIP $voip): self
     {

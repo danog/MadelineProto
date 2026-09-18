@@ -7,11 +7,17 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Blockquote extends MessageEntity
 {
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'block_quote', 'offset' => $this->offset, 'length' => $this->length];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toMTProto(): array
     {

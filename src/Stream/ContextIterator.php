@@ -12,12 +12,18 @@ use Traversable;
  */
 final class ContextIterator implements IteratorAggregate
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** @var non-empty-list<ConnectionContext> */
         private readonly array $ctxs
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getIterator(): Traversable
     {

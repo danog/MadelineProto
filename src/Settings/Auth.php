@@ -31,6 +31,8 @@ final class Auth extends SettingsAbstract
     /**
      * @deprecated Always true
      * Get whether to use PFS.
+     *
+     * @psalm-pure
      */
     public function getPfs(): bool
     {
@@ -41,7 +43,10 @@ final class Auth extends SettingsAbstract
      * Set whether to use PFS.
      *
      * @deprecated Always true
+     *
      * @param bool $pfs Whether to use PFS
+     *
+     * @psalm-mutation-free
      */
     public function setPfs(bool $pfs): self
     {
@@ -60,6 +65,8 @@ final class Auth extends SettingsAbstract
      * Set max tries for generating auth key.
      *
      * @param int<1, max> $maxAuthTries Max tries for generating auth key
+     *
+     * @psalm-external-mutation-free
      */
     public function setMaxAuthTries(int $maxAuthTries): self
     {

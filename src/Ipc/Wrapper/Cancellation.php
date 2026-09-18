@@ -34,6 +34,8 @@ final class Cancellation implements AmpCancellation
      * Constructor.
      *
      * @param array<string, int> $methods
+     *
+     * @psalm-mutation-free
      */
     public function __construct(ClientAbstract $wrapper, array $methods)
     {

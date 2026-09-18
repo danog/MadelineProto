@@ -71,6 +71,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      *
      * @param array   $content       Content
      * @param boolean $fromContainer Whether this message was in a container
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private readonly Connection $connection,
@@ -92,6 +94,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get my message ID.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMsgId(): int
@@ -112,6 +116,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      * Get log line.
      *
      * @param int $dc DC ID
+     *
+     * @psalm-mutation-free
      */
     public function log(int $dc): string
     {
@@ -123,6 +129,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get message type.
+     *
+     * @psalm-mutation-free
      */
     public function getPredicate(): string
     {
@@ -131,6 +139,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get message type.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {
@@ -162,6 +172,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get ID of message to which this message replies.
+     *
+     * @psalm-mutation-free
      */
     public function getRequestId(): int
     {

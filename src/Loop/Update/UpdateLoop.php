@@ -75,6 +75,9 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
         $this->init($API);
         $API->loginState->subscribe($this);
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['channelId', 'API', 'feeder', 'authorizedDc'];
@@ -253,6 +256,8 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
     }
     /**
      * Get loop name.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

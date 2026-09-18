@@ -44,6 +44,8 @@ final class Metrics extends SettingsAbstract
 
     /**
      * Whether to expose prometheus/memprof metrics with startAndLoop, by providing a ?metrics or ?pprof query string.
+     *
+     * @psalm-external-mutation-free
      */
     public function setReturnMetricsFromStartAndLoop(bool $enable): self
     {
@@ -60,6 +62,8 @@ final class Metrics extends SettingsAbstract
 
     /**
      * Whether to enable additional prometheus stat collection for this session.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnablePrometheusCollection(bool $enable): self
     {
@@ -76,6 +80,8 @@ final class Metrics extends SettingsAbstract
 
     /**
      * Whether to enable memprof memory stat collection for this session.
+     *
+     * @psalm-external-mutation-free
      */
     public function setEnableMemprofCollection(bool $enable): self
     {
@@ -92,6 +98,8 @@ final class Metrics extends SettingsAbstract
 
     /**
      * Whether to expose metrics on the specified endpoint via HTTP.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMetricsBindTo(?SocketAddress $metricsBindTo): self
     {

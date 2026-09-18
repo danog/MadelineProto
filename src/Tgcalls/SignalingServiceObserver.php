@@ -26,6 +26,7 @@ namespace danog\MadelineProto\Tgcalls;
  * the signaling reliability layer survives a serialize/unserialize cycle, and so must its callback.
  *
  * @internal
+ * @psalm-mutable
  */
 interface SignalingServiceObserver
 {
@@ -34,6 +35,7 @@ interface SignalingServiceObserver
      *
      * @param int $cause One of the `EncryptedConnection::SERVICE_CAUSE_*` constants (0 for an
      *                   immediate flush).
+     * @psalm-impure
      */
     public function onServiceRequest(int $cause): void;
 }

@@ -63,7 +63,11 @@ final class Admin extends Rights
     /** If set, allows the admin to create, delete or modify [forum topics »](https://core.telegram.org/api/forum#forum-topics). */
     public readonly bool $manageTopics;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         array $rawRights
     ) {

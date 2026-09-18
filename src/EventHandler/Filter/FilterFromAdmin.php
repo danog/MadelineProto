@@ -45,6 +45,9 @@ final class FilterFromAdmin extends Filter
         $this->adminIds = $API->getAdminIds();
         return $this;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

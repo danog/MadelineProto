@@ -28,6 +28,9 @@ use danog\MadelineProto\EventHandler\Update;
 final class FilterFromBot extends Filter
 {
     private readonly EventHandler $API;
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function initialize(EventHandler $API): Filter
     {

@@ -59,6 +59,8 @@ final class ResponseInfo
      * @param string    $method       HTTP method
      * @param array     $headers      HTTP headers
      * @param array|int $messageMedia Media info
+     *
+     * @psalm-mutation-free
      */
     private function __construct(string $method, array $headers, array|int $messageMedia)
     {
@@ -149,11 +151,16 @@ final class ResponseInfo
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
+     *
+     * @psalm-pure
      */
     public static function parseHeaders(string $method, array $headers, array $messageMedia): self
     {
         return new self($method, $headers, $messageMedia);
     }
+    /**
+     * @psalm-pure
+     */
     public static function error(int $code): self
     {
         return new self('', [], $code);

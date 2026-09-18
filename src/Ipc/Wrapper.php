@@ -95,6 +95,8 @@ final class Wrapper extends ClientAbstract
     }
     /**
      * Serialization function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -149,6 +151,8 @@ final class Wrapper extends ClientAbstract
     }
     /**
      * Get copy of data.
+     *
+     * @psalm-pure
      */
     private static function copy($data)
     {

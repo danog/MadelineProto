@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows messages that weren't edited. */
+/** @psalm-mutable */
 interface IsNotEdited
 {
 }

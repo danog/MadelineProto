@@ -28,6 +28,7 @@ namespace danog\MadelineProto\Stream;
  * @template TT
  *
  * @extends ProxyStreamInterface<TT>
+ * @psalm-mutable
  */
 interface RawProxyStreamInterface extends RawStreamInterface, ProxyStreamInterface
 {

@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only messages with no media */
+/** @psalm-mutable */
 interface HasNoMedia
 {
 }

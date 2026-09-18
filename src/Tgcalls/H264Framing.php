@@ -30,6 +30,8 @@ namespace danog\MadelineProto\Tgcalls;
  * VP8 and VP9 ones do.
  *
  * @internal
+ *
+ * @psalm-immutable
  */
 final class H264Framing
 {
@@ -47,6 +49,8 @@ final class H264Framing
 
     /**
      * @param string|null $codecPrivate The track's `CodecPrivate`, if it declared one.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(?string $codecPrivate)
     {
@@ -73,6 +77,8 @@ final class H264Framing
      *
      * @param string $frame    The frame as the demuxer produced it.
      * @param bool   $keyframe Whether the parameter sets have to be repeated before it.
+     *
+     * @psalm-mutation-free
      */
     public function convert(string $frame, bool $keyframe): string
     {
@@ -99,6 +105,8 @@ final class H264Framing
 
     /**
      * Extract the SPS and PPS of an `AVCDecoderConfigurationRecord`, as an Annex B stream.
+     *
+     * @psalm-pure
      */
     private static function parseParameterSets(string $record): string
     {
@@ -136,6 +144,8 @@ final class H264Framing
 
     /**
      * Read a big endian NAL unit length of `$size` bytes.
+     *
+     * @psalm-pure
      */
     private static function readLength(string $frame, int $offset, int $size): int
     {

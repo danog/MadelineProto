@@ -26,6 +26,7 @@ use Amp\Socket\Socket;
  * Generic stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface StreamInterface
 {
@@ -33,14 +34,17 @@ interface StreamInterface
      * Connect to a server.
      *
      * @param ConnectionContext $ctx The connection context
+     * @psalm-impure
      */
     public function connect(ConnectionContext $ctx, string $header = ''): void;
     /**
      * Disconnect from the server.
+     * @psalm-impure
      */
     public function disconnect(): void;
     /**
      * Get underlying AMPHP socket resource.
+     * @psalm-impure
      */
     public function getSocket(): Socket;
 }

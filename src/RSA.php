@@ -64,12 +64,16 @@ final class RSA
     }
     /**
      * Private constructor.
+     *
+     * @psalm-mutation-free
      */
     private function __construct()
     {
     }
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {

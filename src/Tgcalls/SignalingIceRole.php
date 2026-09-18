@@ -38,6 +38,9 @@ use Webrtc\ICE\RTCIceTransportInterface;
  */
 final class SignalingIceRole implements RTCIceTransportInterface
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly IceRole $role)
     {
     }
@@ -48,47 +51,71 @@ final class SignalingIceRole implements RTCIceTransportInterface
         return $this->role;
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function isRoleSet(): bool
     {
         return true;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function setRoleSet(bool $roleSet): void
     {
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function send(string $bytes): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function addRemoteCandidate(RTCIceCandidate $candidate): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getIceGatherer(): RTCIceGathererInterface
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getIceConnection(): RTCIceConnectionInterface
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function start(RTCIceParameters $remoteIceParameters): void
     {
         throw new Exception('The signaling SCTP association does not run over ICE!');
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function stop(): void
     {
@@ -97,17 +124,25 @@ final class SignalingIceRole implements RTCIceTransportInterface
     /**
      * The signaling association carries its own DATA chunks and never sees application data over ICE,
      * so there is nothing to notify: registering a listener is a no-op.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function addDataListener(IceTransportDataListener $listener): void
     {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function removeDataListener(IceTransportDataListener $listener): void
     {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function addDisconnectListener(IceTransportDisconnectListener $listener): void
     {
@@ -116,6 +151,8 @@ final class SignalingIceRole implements RTCIceTransportInterface
     /**
      * The signaling association never changes ICE state (it does not run over ICE at all), so
      * there is nothing to notify: registering a state-change listener is a no-op.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function addStateChangeListener(IceTransportStateChangeListener $listener): void

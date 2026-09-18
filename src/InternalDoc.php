@@ -353,17 +353,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
     }
     /**
-     * Play the VP8 video and OPUS audio of a WebM file in a call.
-     *
-     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
-     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
-     * beforehand.
-     */
-    final public function callPlayVideo(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
-    {
-        $this->wrapper->getAPI()->callPlayVideo($id, $file);
-    }
-    /**
      * Set output file or stream for incoming OPUS audio packets in a call.
      *
      * Will write an OGG OPUS stream to the specified file or stream.
@@ -371,13 +360,6 @@ abstract class InternalDoc
     final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
     {
         $this->wrapper->getAPI()->callSetOutput($id, $file);
-    }
-    /**
-     * Stop transmitting video in a call.
-     */
-    final public function callStopVideo(int $id): void
-    {
-        $this->wrapper->getAPI()->callStopVideo($id);
     }
     /**
      * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
@@ -1331,17 +1313,6 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->groupCallPlayOnHold($id, ...$files);
     }
     /**
-     * Play the VP8 video and OPUS audio of a WebM file in a group call.
-     *
-     * The file is demuxed in pure PHP and its frames are sent as-is, so no transcoding (and thus
-     * no FFI extension) is involved; convert your media to WebM with VP8 video and OPUS audio
-     * beforehand.
-     */
-    final public function groupCallPlayVideo(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
-    {
-        $this->wrapper->getAPI()->groupCallPlayVideo($id, $file);
-    }
-    /**
      * Resume playback of the current audio file in a group call.
      */
     final public function groupCallResumePlay(int $id): void
@@ -1368,13 +1339,6 @@ abstract class InternalDoc
     final public function groupCallStopPlay(int $id): void
     {
         $this->wrapper->getAPI()->groupCallStopPlay($id);
-    }
-    /**
-     * Stop transmitting video in a group call.
-     */
-    final public function groupCallStopVideo(int $id): void
-    {
-        $this->wrapper->getAPI()->groupCallStopVideo($id);
     }
     /**
      * Check if has admins.

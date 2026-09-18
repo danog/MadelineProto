@@ -67,6 +67,9 @@ abstract class MTProtoMessage
      */
     protected ?int $seqNo = null;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /**
          * Whether constructor is content related.
@@ -75,15 +78,21 @@ abstract class MTProtoMessage
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo(): array
     {
         return [(string) $this, 'objId' => spl_object_id($this)];
     }
 
+    /** @psalm-mutation-free */
     abstract public function __toString(): string;
 
     /**
      * Get my message ID.
+     *
+     * @psalm-mutation-free
      */
     public function getMsgId(): ?int
     {
@@ -92,6 +101,8 @@ abstract class MTProtoMessage
 
     /**
      * Set my message ID.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMsgId(?int $msgId): self
     {
@@ -102,6 +113,8 @@ abstract class MTProtoMessage
 
     /**
      * Check if we have a message ID.
+     *
+     * @psalm-mutation-free
      */
     public function hasMsgId(): bool
     {
@@ -118,6 +131,8 @@ abstract class MTProtoMessage
 
     /**
      * Has sequence number.
+     *
+     * @psalm-mutation-free
      */
     public function hasSeqNo(): bool
     {
@@ -128,6 +143,8 @@ abstract class MTProtoMessage
      * Set sequence number.
      *
      * @param null|int $seqNo Sequence number
+     *
+     * @psalm-external-mutation-free
      */
     public function setSeqNo(?int $seqNo): self
     {

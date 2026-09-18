@@ -54,6 +54,9 @@ final class TLSchema extends SettingsAbstract
      * Whether to enable fuzzing mode (all parameters will be populated with default values).
      */
     protected bool $fuzzMode = false;
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __sleep()
     {
@@ -89,6 +92,8 @@ final class TLSchema extends SettingsAbstract
     }
     /**
      * Signal that scheme was re-parsed.
+     *
+     * @psalm-external-mutation-free
      */
     public function upgrade(): void
     {
@@ -106,6 +111,8 @@ final class TLSchema extends SettingsAbstract
      * Set TL layer version.
      *
      * @param int $layer TL layer version.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLayer(int $layer): self
     {
@@ -126,6 +133,8 @@ final class TLSchema extends SettingsAbstract
      * Set MTProto schema path.
      *
      * @param string $MTProtoSchema MTProto schema path.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMTProtoSchema(string $MTProtoSchema): self
     {
@@ -146,6 +155,8 @@ final class TLSchema extends SettingsAbstract
      * Set API schema path.
      *
      * @param string $APISchema API schema path.
+     *
+     * @psalm-external-mutation-free
      */
     public function setAPISchema(string $APISchema): self
     {
@@ -166,6 +177,8 @@ final class TLSchema extends SettingsAbstract
      * Set secret schema path.
      *
      * @param string $secretSchema Secret schema path.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSecretSchema(string $secretSchema): self
     {
@@ -188,6 +201,8 @@ final class TLSchema extends SettingsAbstract
      * Set the value of other.
      *
      * @param array<string, string> $other
+     *
+     * @psalm-external-mutation-free
      */
     public function setOther(array $other): self
     {
@@ -206,6 +221,8 @@ final class TLSchema extends SettingsAbstract
 
     /**
      * Set the value of the fuzz mode.
+     *
+     * @psalm-external-mutation-free
      */
     public function setFuzzMode(bool $fuzz): self
     {

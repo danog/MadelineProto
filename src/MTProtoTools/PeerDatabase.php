@@ -85,6 +85,9 @@ final class PeerDatabase implements TLCallback
         $this->decacheMutex = new LocalMutex;
         $this->mutex = new LocalKeyedMutex;
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['db', 'fullDb', 'usernames', 'API', 'pendingDb', 'v', 'hasInfo'];
@@ -618,16 +621,25 @@ final class PeerDatabase implements TLCallback
         ];
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
@@ -637,11 +649,17 @@ final class PeerDatabase implements TLCallback
             array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
         );
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
@@ -649,6 +667,8 @@ final class PeerDatabase implements TLCallback
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getTypeMismatchCallbacks(): array
@@ -656,6 +676,9 @@ final class PeerDatabase implements TLCallback
         return [];
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo()
     {
         return ['PeerDatabase instance '.spl_object_hash($this)];

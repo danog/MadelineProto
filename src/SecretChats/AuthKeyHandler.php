@@ -181,6 +181,8 @@ trait AuthKeyHandler
      * Get secret chat.
      *
      * @param array|int $chat Secret chat ID
+     *
+     * @psalm-mutation-free
      */
     public function getSecretChat(array|int $chat): SecretChat
     {
@@ -192,6 +194,8 @@ trait AuthKeyHandler
      * @internal
      *
      * @param array|int $chat Secret chat ID
+     *
+     * @psalm-mutation-free
      */
     public function getSecretChatController(array|int $chat): SecretChatController
     {
@@ -225,6 +229,8 @@ trait AuthKeyHandler
      * Check whether secret chat exists.
      *
      * @param array|int $chat Secret chat ID
+     *
+     * @psalm-mutation-free
      */
     public function hasSecretChat(array|int $chat): bool
     {

@@ -56,7 +56,11 @@ abstract class EventHandler extends AbstractAPI
         LegacyMigrator::saveDbProperties as private privateInternalSaveDbProperties;
     }
 
-    /** @internal Do not use manually. */
+    /**
+     * @internal Do not use manually. 
+     *
+     * @psalm-mutation-free
+     */
     final private function __construct()
     {
         // Dummy code that is NEVER executed, needed to avoid issues during Psalm analysis.
@@ -179,7 +183,11 @@ abstract class EventHandler extends AbstractAPI
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-pure
+     */
     #[\Override]
     final protected function reconnectFull(): bool
     {
@@ -367,6 +375,8 @@ abstract class EventHandler extends AbstractAPI
      * Obtain a PeriodicLoop instance created by the Cron attribute.
      *
      * @param string $name Method name
+     *
+     * @psalm-mutation-free
      */
     final public function getPeriodicLoop(string $name): ?PeriodicLoop
     {
@@ -395,6 +405,8 @@ abstract class EventHandler extends AbstractAPI
      * Get peers where to send error reports.
      *
      * @return string|int|array<string|int>
+     *
+     * @psalm-pure
      */
     public function getReportPeers()
     {
@@ -406,6 +418,8 @@ abstract class EventHandler extends AbstractAPI
      * Plugin filenames end with Plugin.php, and will be included automatically.
      *
      * @return non-empty-string|non-empty-list<non-empty-string>|null
+     *
+     * @psalm-pure
      */
     public static function getPluginPaths(): string|array|null
     {
@@ -415,6 +429,8 @@ abstract class EventHandler extends AbstractAPI
      * Obtain a list of plugin event handlers to use, in addition with those found by getPluginPath.
      *
      * @return array<class-string<EventHandler>>
+     *
+     * @psalm-pure
      */
     public static function getPlugins(): array
     {

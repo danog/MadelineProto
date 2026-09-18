@@ -30,7 +30,11 @@ abstract class CallbackQuery extends Update
     /** Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games. */
     public readonly int $chatInstance;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API);

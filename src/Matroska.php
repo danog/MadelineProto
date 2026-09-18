@@ -83,14 +83,49 @@ final class Matroska
     /** Duration of one timestamp unit, in nanoseconds. */
     private int $timestampScale = 1000000;
 
+    /**
+     * Byte offset of the read cursor: the resume start offset plus every byte consumed since.
+     */
+    private int $bytesConsumed = 0;
+
+    /**
+     * Byte offset of the Cluster element currently being read.
+     *
+     * A Cluster carries its own timestamp and is self-contained, so re-opening the file here with
+     * the `$startOffset` constructor argument (and the track list, which lives once at the start of
+     * the file) resumes reading exactly this cluster — which is what makes playback byte-offset
+     * resumable across a serialize/unserialize cycle.
+     */
+    public int $unitOffset = 0;
+
     /** @var Closure(int): ?string Reads exactly the requested number of bytes, or null at EOF. */
     private Closure $read;
     private string $buffer = '';
     private bool $eof = false;
 
-    public function __construct(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null)
-    {
-        $this->read = Tools::openBuffered($stream, $cancellation);
+    /**
+     * @param int $startOffset Byte offset to resume from; it must be the offset of a Cluster.
+     * @param array<int, array{codec: string, type: int, private: ?string}> $resumeTracks The track
+     *              list from the first open, which is only stored once at the start of the file.
+     * @param int $resumeTimestampScale The timestamp scale from the first open (0 to keep the default).
+     */
+    public function __construct(
+        LocalFile|RemoteUrl|ReadableStream $stream,
+        ?Cancellation $cancellation = null,
+        int $startOffset = 0,
+        array $resumeTracks = [],
+        int $resumeTimestampScale = 0,
+    ) {
+        $this->read = Tools::openBuffered($stream, $cancellation, $startOffset);
+        $this->bytesConsumed = $startOffset;
+        if ($startOffset > 0) {
+            // Resuming inside the segment, past the header: the track list and timestamp scale were
+            // read on the first open and are handed back here, since they are not repeated per cluster.
+            $this->tracks = $resumeTracks;
+            if ($resumeTimestampScale > 0) {
+                $this->timestampScale = $resumeTimestampScale;
+            }
+        }
         $it = $this->read();
         // Prime the generator so that the track list is populated before the caller iterates.
         $it->current();
@@ -98,7 +133,17 @@ final class Matroska
     }
 
     /**
+     * The timestamp scale (nanoseconds per tick) declared by the file, needed to resume it.
+     */
+    public function getTimestampScale(): int
+    {
+        return $this->timestampScale;
+    }
+
+    /**
      * Whether the file declares a track using the given codec.
+     *
+     * @psalm-mutation-free
      */
     public function hasCodec(string $codec): bool
     {
@@ -131,6 +176,7 @@ final class Matroska
         $this->fill($length);
         $data = substr($this->buffer, 0, $length);
         $this->buffer = substr($this->buffer, \strlen($data));
+        $this->bytesConsumed += \strlen($data);
         return $data;
     }
 
@@ -181,6 +227,9 @@ final class Matroska
         $pending = ['number' => null, 'codec' => null, 'type' => null, 'private' => null];
 
         while (true) {
+            // The byte offset of this element, recorded before its ID is read so a Cluster's offset
+            // is the offset a resume can seek back to.
+            $elementStart = $this->bytesConsumed;
             $id = $this->readVint(true);
             if ($id === null) {
                 break;
@@ -191,6 +240,10 @@ final class Matroska
             }
             [$elementId] = $id;
             [$elementSize] = $size;
+
+            if ($elementId === self::ID_CLUSTER) {
+                $this->unitOffset = $elementStart;
+            }
 
             // An "unknown size" master element (all size bits set) is streamed: walk into it.
             $unknownSize = $elementSize === (1 << (7 * $size[1])) - 1;
@@ -256,6 +309,8 @@ final class Matroska
      * updates the entry that is already there.
      *
      * @param array{number: ?int, codec: ?string, type: ?int, private: ?string} $pending
+     *
+     * @psalm-external-mutation-free
      */
     private function flushTrack(array $pending): void
     {
@@ -278,6 +333,7 @@ final class Matroska
             if ($this->buffer !== '') {
                 $take = min($length, \strlen($this->buffer));
                 $this->buffer = substr($this->buffer, $take);
+                $this->bytesConsumed += $take;
                 $length -= $take;
                 continue;
             }
@@ -441,6 +497,8 @@ final class Matroska
 
     /**
      * Decode a big endian unsigned integer of any width.
+     *
+     * @psalm-pure
      */
     private static function toInt(string $data): int
     {
