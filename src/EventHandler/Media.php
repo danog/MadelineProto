@@ -18,8 +18,11 @@ namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use danog\MadelineProto\EventHandler\Media\SecretChatThumbnail;
+use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\TL\Conversion\BotAPIFiles;
 use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
@@ -28,6 +31,7 @@ use JsonSerializable;
  */
 abstract class Media extends IpcCapable implements JsonSerializable
 {
+    use BotAPIFiles;
     /** Media filesize */
     public readonly int $size;
 
@@ -74,8 +78,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** Whether this media originates from a secret chat. */
     public readonly bool $encrypted;
 
-    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
-    public readonly ?Bytes $thumb;
+    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90). */
+    public readonly SecretChatThumbnail|Thumbnail|Bytes $thumb;
     /** Thumbnail height only for secret chats. */
     public readonly ?int $thumbHeight;
     /** Thumbnail width only for secret chats. */
@@ -113,13 +117,43 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
         $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
         $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
-        if ($this->encrypted = isset($rawMedia['iv'])) {
-            $thumb = $rawMedia['thumb'] ?? null;
-            $this->thumb = \is_string($thumb) ? new Bytes($thumb) : $thumb;
-            $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
-            $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
-        } else {
-            $this->thumb = null;
+        if(isset($rawMedia['thumb'])){
+            if(is_string($rawMedia['thumb'])){
+                $this->thumb = new Bytes($rawMedia['thumb']);
+            }
+            elseif ($this->encrypted = isset($rawMedia['iv'])){
+                $thumbInfo = $this->getMediaPreview($rawMedia['thumb']);
+                $this->thumb = new SecretChatThumbnail(
+                    $API,
+                    $rawMedia['thumb'],
+                    false,
+                    $thumbInfo['thumb_file_name'],
+                    $thumbInfo['thumb_file_size'],
+                    $thumbInfo['thumb_location'],
+                    $thumbInfo['thumb_mime_type'],
+                    $thumbInfo['thumb_file_ext'],
+                    $this->key,
+                    $this->iv,
+                    $this->keyFingerprint
+                );
+            }else{
+                $thumbInfo = $this->getMediaPreview($rawMedia['thumb']);
+
+                $this->thumb = new Thumbnail(
+                    $API,
+                    $rawMedia['thumb'],
+                    false,
+                    $thumbInfo['thumb_file_name'],
+                    $thumbInfo['thumb_file_size'],
+                    $thumbInfo['thumb_location'],
+                    $thumbInfo['thumb_mime_type'],
+                    $thumbInfo['thumb_file_ext']
+                );
+            }
+            $this->thumbHeight = $thumbInfo['thumb_height'] ?? null;
+            $this->thumbWidth = $thumbInfo['thumb_width'] ?? null;
+
+        }else{
             $this->thumbHeight = null;
             $this->thumbWidth = null;
         }
@@ -195,6 +229,78 @@ abstract class Media extends IpcCapable implements JsonSerializable
         }
         return $result;
     }
+
+    public function getMediaPreview(array $media): ?array
+    {
+
+        $media = match ($media['_']) {
+            'messageMediaPhoto' => $media['photo'],
+            'messageMediaDocument' => $media['document'],
+            'decryptedMessageMediaDocument' => $media,
+            'messageMediaWebPage' => $media['webpage'],
+        };
+
+        $thumb = null;
+        $thumbInfo = null;
+        switch (true) {
+            case isset($media['sizes']):
+                foreach ($media['sizes'] as $size) {
+                    if ($size['_'] === 'photoSize') {
+                        $thumb = $size;
+                        $thumbInfo = $this->photosizeToBotAPI($thumb, $media, true);
+                    }
+                }
+                break;
+            case isset($media['thumb']['size']):
+                $thumb = $media['thumb'];
+                break;
+            case !empty($media['thumbs']):
+                foreach ($media['thumbs'] as $size) {
+                    if ($size['_'] === 'photoSize') {
+                        $thumb = $size;
+                        $thumbInfo = $this->photosizeToBotAPI($thumb, $media, true);
+                    }
+                }
+                break;
+            case isset($media['photo']['sizes']):
+                foreach ($media['photo']['sizes'] as $size) {
+                    if ($size['_'] === 'photoSize') {
+                        $thumb = $size;
+                        $thumbInfo = $this->photosizeToBotAPI($thumb, $media, true);
+                    }
+                }
+                break;
+            default:
+                return null;
+
+        }
+
+        $info = $this->getClient()->getDownloadInfo($thumb);
+
+        if ($media['_'] === 'webPage') {
+            $media = $media['photo'];
+        }
+
+        //Фикс для LAYER 100+
+        //TODO: Удалить, когда снова станет доступна загрузка photoSize
+        if (isset($info['thumb_size'])) {
+            $infoFull = $this->getClient()->getDownloadInfo($media);
+            $infoFull['InputFileLocation']['thumb_size'] = $info['thumb_size'];
+            return [
+                'thumb_location' => $infoFull['InputFileLocation'],
+                'thumb_file_size' => $thumbInfo['file_size'],
+                'thumb_mime_type' => $thumbInfo['mime_type'] ?? 'image/jpeg',
+                'thumb_file_ext' => '.jpg',
+                'thumb_file_name' => basename($thumbInfo['file_name'], $this->fileExt),
+                'thumb_height' => $thumbInfo['height'] ?? null,
+                'thumb_width' => $thumbInfo['width'] ?? null,
+                'thumb_bot_api_file_id' => $thumbInfo['file_id'] ?? null,
+                'thumb_bot_api_file_unique_id' => $thumbInfo['file_unique_id'] ?? null,
+            ];
+        }
+        return null;
+    }
+
     /** @internal */
     #[\Override]
     public function jsonSerialize(): mixed
