@@ -31,6 +31,7 @@ use Webrtc\Codecs\Codec;
 use Webrtc\RTPParameter\RTCRtpCodecCapability;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
+use Webrtc\DTLS\DTLS\RTCDtlsTransport;
 use Webrtc\ICE\RTCIceCandidate;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
@@ -228,6 +229,51 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->recorder?->resume();
         $this->callRecorder?->resume();
         $this->presentationRecorder?->resume();
+        // A serialize/unserialize cycle can rebind our UDP socket to a different local port, which
+        // strands the ICE candidates the peer already holds. Refresh them from the live socket and
+        // re-signal if anything moved, so connectivity is re-established without a full renegotiation.
+        $this->restartIceIfNeeded();
+    }
+
+    /**
+     * Re-signal our ICE candidates if our local transport address changed across a resume.
+     *
+     * tgcalls V2 bundles every stream over one transport, so only the first transceiver's gatherer
+     * matters. Its host candidates are refreshed in place from the (already reconnected) socket; the
+     * ICE credentials are unchanged, so this is a candidate re-trickle, not a full ICE restart, and
+     * the peer forms fresh candidate pairs for the new port. A no-op when nothing moved.
+     */
+    private function restartIceIfNeeded(): void
+    {
+        $transceivers = $this->peerConnection->getTransceivers();
+        if ($transceivers === []) {
+            return;
+        }
+        $dtls = $transceivers[0]->getDtlsTransport();
+        if (!$dtls instanceof RTCDtlsTransport) {
+            return;
+        }
+        try {
+            $gatherer = $dtls->getIceTransport()->getIceGatherer();
+            if (!$gatherer->refreshLocalCandidates()) {
+                return;
+            }
+            $this->call->log("Local ICE address changed across a resume of {$this->call}; re-signaling candidates", Logger::NOTICE);
+            $batched = [];
+            foreach ($gatherer->getLocalCandidates() as $candidate) {
+                $sdpString = 'candidate:'.$candidate->convert2SDP();
+                if ($this->version->usesSdp()) {
+                    $this->sendSignalingMessage(['@type' => 'candidate', 'sdp' => $sdpString, 'mid' => '0', 'mline' => 0]);
+                } else {
+                    $batched[] = ['sdpString' => $sdpString, 'sdpMLineIndex' => 0];
+                }
+            }
+            if ($batched !== []) {
+                $this->sendSignalingMessage(['@type' => 'Candidates', 'candidates' => $batched]);
+            }
+        } catch (Throwable $e) {
+            $this->call->log("Could not refresh ICE candidates for {$this->call}: $e", Logger::WARNING);
+        }
     }
 
     /**

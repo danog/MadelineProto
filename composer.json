@@ -68,7 +68,7 @@
         "danog/php-rtc-av": "^1.1.9",
         "danog/php-rtc-codecs": "^1.1.15",
         "danog/php-rtc-dtls": "^2.0.13",
-        "danog/php-rtc-ice": "^2.0.10",
+        "danog/php-rtc-ice": "^2.0.11",
         "danog/php-rtc-ntp": "^1.1.11",
         "danog/php-rtc-rtcp": "^1.1.9",
         "danog/php-rtc-rtp": "^2.0.13",
