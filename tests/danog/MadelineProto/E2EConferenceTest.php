@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
+use danog\MadelineProto\Tgcalls\E2E\CallPacket;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
 use danog\MadelineProto\Tgcalls\E2E\Crypto;
 use danog\MadelineProto\Tgcalls\E2E\Verification;
@@ -220,6 +221,48 @@ final class E2EConferenceTest extends TestCase
         $emojisB = Verification::emojis(Verification::emojiHash([$b['nonce'], $a['nonce']], $blockHash));
         $this->assertSame($emojisA, $emojisB);
         $this->assertCount(4, $emojisA);
+    }
+
+    /**
+     * A media packet encrypted by one participant is decrypted and its sender verified by another
+     * that holds the epoch key.
+     */
+    public function testCallPacketRoundTrip(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $epochHash = random_bytes(32);
+        $epochSecret = random_bytes(32);
+        $epochs = [['hash' => $epochHash, 'secret' => $epochSecret]];
+
+        $packet = CallPacket::encrypt(5, 42, 'the media payload', $epochs, $senderSeed, "\x80\x60");
+        $decoded = CallPacket::decrypt($packet, [$epochHash => $epochSecret], $senderPublic);
+
+        $this->assertSame(5, $decoded['channel_id']);
+        $this->assertSame(42, $decoded['seqno']);
+        $this->assertSame('the media payload', $decoded['payload']);
+        $this->assertSame("\x80\x60", $decoded['unencrypted_prefix']);
+    }
+
+    public function testCallPacketRejectsWrongSender(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed] = Crypto::generateKeyPair();
+        [, $otherPublic] = Crypto::generateKeyPair();
+        $epochHash = random_bytes(32);
+        $epochSecret = random_bytes(32);
+        $packet = CallPacket::encrypt(1, 1, 'x', [['hash' => $epochHash, 'secret' => $epochSecret]], $senderSeed);
+        $this->expectException(\RuntimeException::class);
+        CallPacket::decrypt($packet, [$epochHash => $epochSecret], $otherPublic);
+    }
+
+    public function testCallPacketRejectsUnknownEpoch(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $packet = CallPacket::encrypt(1, 1, 'x', [['hash' => random_bytes(32), 'secret' => random_bytes(32)]], $senderSeed);
+        $this->expectException(\RuntimeException::class);
+        CallPacket::decrypt($packet, [random_bytes(32) => random_bytes(32)], $senderPublic);
     }
 
     private function requireCrypto(): void

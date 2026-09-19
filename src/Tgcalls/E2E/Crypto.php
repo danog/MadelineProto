@@ -100,6 +100,17 @@ final class Crypto
      */
     public static function decryptData(string $encrypted, string $secret, string $extra = ''): string
     {
+        return self::decryptDataWithMsgId($encrypted, $secret, $extra)[0];
+    }
+
+    /**
+     * Like {@see self::decryptData()}, but also returns the full 32-byte large message id, which the
+     * media-packet layer needs to verify the sender's signature.
+     *
+     * @return array{0: string, 1: string} `[plaintext, largeMsgId]`
+     */
+    public static function decryptDataWithMsgId(string $encrypted, string $secret, string $extra = ''): array
+    {
         self::assertAvailable();
         if (\strlen($encrypted) < 16 || (\strlen($encrypted) - 16) % 16 !== 0) {
             throw new \RuntimeException('Malformed encrypted data');
@@ -116,15 +127,15 @@ final class Crypto
         if ($padded === false) {
             throw new \RuntimeException('Could not decrypt data');
         }
-        $expected = hash_hmac('sha256', $padded.$extra.pack('V', \strlen($extra)), $hmacKey, true);
-        if (!hash_equals(substr($expected, 0, 16), $msgId)) {
+        $largeMsgId = hash_hmac('sha256', $padded.$extra.pack('V', \strlen($extra)), $hmacKey, true);
+        if (!hash_equals(substr($largeMsgId, 0, 16), $msgId)) {
             throw new \RuntimeException('Message id mismatch decrypting data');
         }
         $padLen = \ord($padded[0]);
         if ($padLen < self::MIN_PADDING || $padLen > \strlen($padded)) {
             throw new \RuntimeException('Invalid padding decrypting data');
         }
-        return substr($padded, $padLen);
+        return [substr($padded, $padLen), $largeMsgId];
     }
 
     /* ------------------------------------------------------------------ *
