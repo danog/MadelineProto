@@ -132,8 +132,10 @@ final class GroupCallController implements CallInterface
                 return;
             }
             // The WebRTC connection restored itself and its transport to the SFU resumes on its own;
-            // re-poll the participant list so the set of received sources is brought back in sync.
+            // now that the whole graph is back, resume the recorders (reopen their files, re-subscribe
+            // to their live tracks) and re-poll the participant list so received sources are in sync.
             $this->log("Resumed $this after a restart of the process.");
+            $this->connection?->resume();
             EventLoop::queue($this->refetch(...));
         });
     }
@@ -391,7 +393,7 @@ final class GroupCallController implements CallInterface
     }
 
     /**
-     * Tell the WebRTC engine which participants we want to receive audio from.
+     * Tell the WebRTC engine which participants we want to receive audio and video from.
      */
     private function syncSources(): void
     {
@@ -401,7 +403,7 @@ final class GroupCallController implements CallInterface
         $sources = [];
         foreach ($this->participants as $participant) {
             if ($participant->source !== 0 && $participant->source !== $this->source) {
-                $sources[] = $participant->source;
+                $sources[] = ['audio' => $participant->source, 'video' => $participant->videoSources];
             }
         }
         $this->connection->setRemoteSources($sources);
@@ -589,14 +591,15 @@ final class GroupCallController implements CallInterface
     }
 
     /**
-     * Record group call audio.
+     * Record group call media.
      *
      * Two modes:
      *  - per participant: `setOutput($participant, $file)` records that one participant's incoming
-     *    audio into the given file or stream.
+     *    audio and (if they transmit a camera) video into the given file or stream.
      *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
-     *    participant into its own `<dir>/<peerId>.ogg` OGG OPUS file, including participants that start
-     *    transmitting later. Our own audio is never recorded.
+     *    participant into its own `<dir>/<peerId>.mkv` Matroska file, including participants that start
+     *    transmitting later. Each file holds the participant's audio and, once they turn a camera on,
+     *    their video. Our own media is never recorded.
      */
     public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
     {
@@ -632,7 +635,7 @@ final class GroupCallController implements CallInterface
     }
 
     /**
-     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.ogg` file,
+     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.mkv` file,
      * once each.
      */
     private function wireFolderOutput(int $peerId, Participant $participant): void
@@ -647,7 +650,7 @@ final class GroupCallController implements CallInterface
             return;
         }
         $this->folderPeers[$peerId] = true;
-        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.ogg'));
+        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.mkv'));
     }
 
     /**

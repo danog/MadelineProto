@@ -50,6 +50,18 @@ final class Participant implements JsonSerializable
         public readonly bool $justJoined,
         /** Whether the participant is transmitting video. */
         public readonly bool $videoJoined,
+        /**
+         * Signed SSRCs of this participant's camera video streams, empty if none.
+         *
+         * @var list<int>
+         */
+        public readonly array $videoSources,
+        /**
+         * Signed SSRCs of this participant's screen-share (presentation) streams, empty if none.
+         *
+         * @var list<int>
+         */
+        public readonly array $presentationSources,
         /** Playback volume, from 1 to 20000 where 10000 is 100%. */
         public readonly int $volume,
         /** Bio of the participant, if any. */
@@ -71,6 +83,14 @@ final class Participant implements JsonSerializable
     public static function fromRaw(array $participant, int $peerId, ?self $cached = null): self
     {
         $min = $participant['min'];
+        // Video/presentation source groups are only carried in full (non-min) updates; a min update
+        // keeps whatever the cached state already had, exactly like volume and muted_by_you.
+        $video = self::videoSources($participant['video'] ?? null);
+        $presentation = self::videoSources($participant['presentation'] ?? null);
+        if ($min && $cached !== null) {
+            $video = \is_array($participant['video'] ?? null) ? $video : $cached->videoSources;
+            $presentation = \is_array($participant['presentation'] ?? null) ? $presentation : $cached->presentationSources;
+        }
         return new self(
             $peerId,
             $participant['source'] ?? 0,
@@ -82,10 +102,41 @@ final class Participant implements JsonSerializable
             $participant['self'] ?? false,
             $participant['just_joined'] ?? false,
             $participant['video_joined'] ?? false,
+            $video,
+            $presentation,
             $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
             $participant['about'] ?? null,
             $participant['raise_hand_rating'] ?? null,
         );
+    }
+
+    /**
+     * Flatten the source SSRCs of a
+     * [groupCallParticipantVideo](https://core.telegram.org/constructor/groupCallParticipantVideo),
+     * taking each source group's primary (first) source and every simulcast layer, deduplicated.
+     * Retransmission (FID) pairs contribute only their main source, since we do not record rtx.
+     *
+     * @param mixed $video The `video` or `presentation` field of a groupCallParticipant, if present.
+     *
+     * @return list<int> Signed SSRCs.
+     *
+     * @psalm-pure
+     */
+    private static function videoSources(mixed $video): array
+    {
+        if (!\is_array($video) || ($video['paused'] ?? false)) {
+            return [];
+        }
+        $sources = [];
+        foreach ($video['source_groups'] ?? [] as $group) {
+            $sim = ($group['semantics'] ?? '') === 'SIM';
+            foreach ($group['sources'] ?? [] as $index => $source) {
+                if ($sim || $index === 0) {
+                    $sources[$source] = true;
+                }
+            }
+        }
+        return array_values(array_keys($sources));
     }
 
     /**

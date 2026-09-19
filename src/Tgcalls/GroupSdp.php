@@ -388,7 +388,7 @@ final class GroupSdp
             $result[] = 'a=end-of-candidates';
             if ($ssrc !== null) {
                 $result[] = 'a=ssrc:'.$ssrc.' cname:tgcalls'.$ssrc;
-                $result[] = 'a=ssrc:'.$ssrc.' label:audio'.$ssrc;
+                $result[] = 'a=ssrc:'.$ssrc.' label:'.$kind.$ssrc;
             }
         }
 
