@@ -790,10 +790,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->peerConnection->setLocalDescription($offer);
             $this->pendingV2ExchangeId = (string) random_int(1, 0x7FFFFFFF);
             $this->renegotiatePending = false;
+            $offerContents = V2Sdp::contentsFromOffer($offer->getSdp(), outgoingOnly: true);
+            $this->call->log('OFFERDEBUG re-offer exch='.$this->pendingV2ExchangeId.' contents='.json_encode(array_map(static fn ($c): string => ($c['type'] ?? '?').'#'.($c['ssrc'] ?? '?'), $offerContents)).' localAudioMlines='.substr_count($offer->getSdp(), 'm=audio').' sendaudio='.(str_contains($offer->getSdp(), 'a=sendrecv') ? '?' : 'n'), Logger::ERROR); // OFFERDEBUG
             $this->sendSignalingMessage([
                 '@type' => 'NegotiateChannels',
                 'exchangeId' => $this->pendingV2ExchangeId,
-                'contents' => V2Sdp::contentsFromOffer($offer->getSdp(), outgoingOnly: true),
+                'contents' => $offerContents,
             ]);
             $this->sendLocalCandidates();
         } catch (Throwable $e) {
@@ -826,6 +828,31 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
     }
 
+    /**
+     * Fill any media type our offer carries but the peer's answer omits, from our own offer, so its
+     * m-line is not marked inactive by {@see V2Sdp::buildRemoteDescription()}. A no-op when the answer
+     * already addresses every offered type.
+     *
+     * @param list<array<array-key, mixed>> $answerContents
+     * @return list<array<array-key, mixed>>
+     */
+    private function completeAnswerContents(string $offer, array $answerContents): array
+    {
+        $haveTypes = [];
+        foreach ($answerContents as $content) {
+            $haveTypes[(string) ($content['type'] ?? '')] = true;
+        }
+        foreach (V2Sdp::contentsFromOffer($offer, outgoingOnly: true) as $offered) {
+            $type = (string) ($offered['type'] ?? '');
+            if (!isset($haveTypes[$type])) {
+                $this->call->log("NEGDEBUG answer omitted $type; carrying it over from our offer to keep it active", Logger::ERROR); // NEGDEBUG
+                $answerContents[] = $offered;
+                $haveTypes[$type] = true;
+            }
+        }
+        return $answerContents;
+    }
+
     /** Process one structured offer or answer after InitialSetup has arrived. */
     private function onV2Negotiation(array $message): void
     {
@@ -854,6 +881,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             if ($offer === null) {
                 return;
             }
+            // A peer answering our re-offer may leave out a media type it is not renegotiating: tweb,
+            // whose VP8 pick triggers our AV1-force re-offer, sometimes answers with video only. A
+            // WebRTC answer must mirror the offer's m-lines, so buildRemoteDescription() would mark the
+            // unanswered (audio) m-line a=inactive and stop our outgoing audio. Carry any media type our
+            // offer has but the answer omits over from our own offer, so that m-line stays active.
+            $contents = $this->completeAnswerContents($offer, $contents);
             $sdp = V2Sdp::buildRemoteDescription($offer, $this->peerInitialSetup, $contents, true);
             $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'answer'));
             $this->pendingV2ExchangeId = null;
