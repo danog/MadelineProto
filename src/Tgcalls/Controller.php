@@ -73,6 +73,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $screencastEnabled = false;
     private ?OpusRecorder $recorder = null;
     private ?CallRecorder $callRecorder = null;
+    /** Records the peer's incoming presentation (screencast) stream, when a separate output was set. */
+    private ?CallRecorder $presentationRecorder = null;
+    /** Whether an incoming (camera) video track has already been routed to the main recorder. */
+    private bool $seenIncomingVideo = false;
 
     /** @var list<RTCIceCandidate> Candidates received before the remote description was applied. */
     private array $pendingCandidates = [];
@@ -183,6 +187,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if ($this->callRecorder?->file === null) {
             unset($vars['callRecorder']);
         }
+        if ($this->presentationRecorder?->file === null) {
+            unset($vars['presentationRecorder']);
+        }
         return $vars;
     }
 
@@ -198,6 +205,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // only — all async resume work happens in resume(), called once the call graph is whole.
         $this->recorder = null;
         $this->callRecorder = null;
+        $this->presentationRecorder = null;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -219,6 +227,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->outgoingScreencast?->resume();
         $this->recorder?->resume();
         $this->callRecorder?->resume();
+        $this->presentationRecorder?->resume();
     }
 
     /**
@@ -265,9 +274,29 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         } elseif ($track->getKind() === MediaKind::Video) {
             $this->call->log("Got incoming video track in {$this->call}", Logger::VERBOSE);
             $this->enableRawReceive();
+            // A second incoming video is the peer's screencast (presentation); if a separate
+            // presentation output was requested, record it there instead of the main file.
+            if ($this->seenIncomingVideo && $this->presentationRecorder !== null) {
+                $this->presentationRecorder->setTrack($track);
+                return;
+            }
+            $this->seenIncomingVideo = true;
         }
-        // The full-call recorder muxes both incoming audio and video into one file.
+        // The full-call recorder muxes the peer's main (audio + camera) media into one file.
         $this->callRecorder?->setTrack($track);
+    }
+
+    /**
+     * Record the peer's incoming presentation (screencast) stream to a separate file/stream, distinct
+     * from the main recording set by {@see self::setOutput()}. A screencast is a second incoming video
+     * content; it is muxed like the main recording. Audio stays on the main recording.
+     */
+    public function setPresentationOutput(LocalFile|WritableStream $file): void
+    {
+        $this->enableRawReceive();
+        $this->presentationRecorder?->close();
+        $this->presentationRecorder = new CallRecorder($file);
+        // A screencast track that arrives after this point is routed here by onPeerConnectionTrack().
     }
 
     /**
@@ -668,6 +697,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->recorder = null;
         $this->callRecorder?->close();
         $this->callRecorder = null;
+        $this->presentationRecorder?->close();
+        $this->presentationRecorder = null;
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();

@@ -24,9 +24,11 @@ use Stringable;
  * group/conference calls.
  *
  * It covers the media surface shared by all call types — the playlist/DJ playback controls and the
- * mute and discard controls — so code can drive any call uniformly. Type-specific operations (a
- * one-to-one call's {@see VoIP::accept()}, a group call's {@see GroupCall::join()} or per-participant
- * recording) live on the concrete classes.
+ * mute and discard controls — so code can drive any call uniformly. Every playlist control takes a
+ * {@see MediaDestination} selecting the stream it acts on: the main camera+mic stream (default) or a
+ * separate presentation (screen-share) stream. Type-specific operations (a one-to-one call's
+ * {@see VoIP::accept()}, a group call's {@see GroupCall::join()} or per-participant recording) live on
+ * the concrete classes.
  */
 interface Call extends Stringable
 {
@@ -36,49 +38,49 @@ interface Call extends Stringable
      * A WebM/Matroska file with VP8, VP9, H.264 or AV1 video has its video transmitted too; any other
      * file (or a raw audio stream) is played as audio only. Frames are demuxed in pure PHP and sent
      * as-is where possible, so no transcoding (and thus no FFI extension) is required for pre-encoded
-     * WebM/OGG-OPUS input.
+     * WebM/OGG-OPUS input. `$dest` selects the camera or the presentation (screencast) stream.
      */
-    public function play(LocalFile|RemoteUrl|ReadableStream $file): static;
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
      * Add a file to the playlist, to be played once the current one finishes.
      */
-    public function then(LocalFile|RemoteUrl|ReadableStream $file): static;
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
-     * Set the files to play, on loop, while the main playlist is empty.
+     * Set the files to play, on loop, while the given stream's main playlist is empty.
      */
-    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): static;
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static;
 
     /**
      * Skip to the next file in the playlist.
      */
-    public function skip(): static;
+    public function skip(MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
      * Stop playing all files, clearing the main and the hold playlist.
      */
-    public function stop(): static;
+    public function stop(MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
      * Pause playback of the current file.
      */
-    public function pause(): static;
+    public function pause(MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
      * Whether playback of the current file is paused.
      */
-    public function isPaused(): bool;
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool;
 
     /**
      * Resume playback of the current file.
      */
-    public function resume(): static;
+    public function resume(MediaDestination $dest = MediaDestination::Camera): static;
 
     /**
      * The file or stream currently being played, if any.
      */
-    public function getCurrent(): RemoteUrl|LocalFile|string|null;
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null;
 
     /**
      * Mute or unmute our own outgoing audio.

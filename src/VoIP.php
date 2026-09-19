@@ -114,9 +114,9 @@ final class VoIP extends Update implements SimpleFilters, Call
      * frames are sent as-is where possible, so no transcoding (and thus no FFI extension) is
      * required for pre-encoded WebM/OGG-OPUS input.
      */
-    public function play(LocalFile|RemoteUrl|ReadableStream $file): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->callPlay($this->callID, $file);
+        $this->getClient()->callPlay($this->callID, $file, $dest);
 
         return $this;
     }
@@ -129,9 +129,9 @@ final class VoIP extends Update implements SimpleFilters, Call
      * sends — VP8/VP9/H.264/AV1 — and the audio is OPUS). Any other file or a raw stream keeps the
      * audio-only behaviour and receives an OGG OPUS stream.
      */
-    public function setOutput(LocalFile|WritableStream $file): self
+    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->callSetOutput($this->callID, $file);
+        $this->getClient()->callSetOutput($this->callID, $file, $dest);
 
         return $this;
     }
@@ -140,63 +140,55 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Play file.
      */
-    public function then(LocalFile|RemoteUrl|ReadableStream $file): self
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->callPlay($this->callID, $file);
+        $this->getClient()->callPlay($this->callID, $file, $dest);
 
         return $this;
     }
     /**
      * When called, skips to the next file in the playlist.
      */
-    public function skip(): self
+    public function skip(MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->skipPlay($this->callID);
+        $this->getClient()->skipPlay($this->callID, $dest);
 
         return $this;
     }
     /**
      * Stops playing all files, clears the main and the hold playlist.
      */
-    public function stop(): self
+    public function stop(MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->stopPlay($this->callID);
+        $this->getClient()->stopPlay($this->callID, $dest);
 
         return $this;
     }
 
     /**
      * Pauses the currently playing file.
-     *
-     * @psalm-external-mutation-free
      */
-    public function pause(): self
+    public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->pausePlay($this->callID);
+        $this->getClient()->pausePlay($this->callID, $dest);
 
         return $this;
     }
 
     /**
      * Whether the currently playing file is paused.
-     *
-     * @return boolean
-     *
-     * @psalm-mutation-free
      */
-    public function isPaused(): bool
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
-        return $this->getClient()->isPlayPaused($this->callID);
+        return $this->getClient()->isPlayPaused($this->callID, $dest);
     }
 
     /**
      * Resumes the currently playing file.
-     *
-     * @psalm-external-mutation-free
      */
-    public function resume(): self
+    public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
-        $this->getClient()->resumePlay($this->callID);
+        $this->getClient()->resumePlay($this->callID, $dest);
 
         return $this;
     }
@@ -204,9 +196,9 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Files to play on hold.
      */
-    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): self
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
-        $this->getClient()->callPlayOnHold($this->callID, ...$files);
+        $this->getClient()->callPlayOnHold($this->callID, $dest, ...$files);
 
         return $this;
     }
@@ -215,12 +207,10 @@ final class VoIP extends Update implements SimpleFilters, Call
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
-     *
-     * @psalm-mutation-free
      */
-    public function getCurrent(): RemoteUrl|LocalFile|string|null
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
-        return $this->getClient()->callGetCurrent($this->callID);
+        return $this->getClient()->callGetCurrent($this->callID, $dest);
     }
 
     /**

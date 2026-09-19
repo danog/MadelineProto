@@ -23,6 +23,7 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
 use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;
@@ -64,6 +65,8 @@ final class VoIPController implements CallInterface
     private ?LegacyController $legacyController = null;
 
     private DjLoop $diskJockey;
+    /** The separate video-only playlist for the presentation (screencast) stream, created on first use. */
+    private ?DjLoop $presentationDj = null;
 
     /** Auth key */
     private ?string $authKey = null;
@@ -353,6 +356,10 @@ final class VoIPController implements CallInterface
         if ($this->outputFile !== null) {
             $this->tgcallsController->setOutput($this->outputFile);
         }
+        // A presentation playlist requested before the engine existed is attached now.
+        if ($this->presentationDj !== null) {
+            $this->tgcallsController->enablePresentation($this->presentationDj);
+        }
     }
 
     /**
@@ -505,11 +512,33 @@ final class VoIPController implements CallInterface
      *
      * Will write an OGG OPUS stream to the specified file or stream.
      */
-    public function setOutput(LocalFile|WritableStream $file): void
+    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
+        if ($dest === MediaDestination::Presentation) {
+            $this->tgcallsController?->setPresentationOutput($file);
+            return;
+        }
         $this->outputFile = $file instanceof LocalFile ? $file : null;
         $this->tgcallsController?->setOutput($file);
         $this->legacyController?->setOutput($file);
+    }
+
+    /**
+     * The playlist engine for a given media stream: the main disk jockey for {@see MediaDestination::Camera},
+     * or a separate video-only one for {@see MediaDestination::Presentation} (the screencast), created and
+     * attached to the WebRTC engine on first use.
+     */
+    private function dj(MediaDestination $dest): DjLoop
+    {
+        if ($dest === MediaDestination::Camera) {
+            return $this->diskJockey;
+        }
+        if ($this->presentationDj === null) {
+            $this->presentationDj = new DjLoop($this, videoOnly: true);
+            Assert::true($this->presentationDj->start());
+            $this->tgcallsController?->enablePresentation($this->presentationDj);
+        }
+        return $this->presentationDj;
     }
 
     /**
@@ -540,67 +569,59 @@ final class VoIPController implements CallInterface
     /**
      * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
      */
-    public function play(LocalFile|RemoteUrl|ReadableStream $file): void
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->diskJockey->play($file);
+        $this->dj($dest)->play($file);
     }
 
     /**
      * When called, skips to the next file in the playlist.
      */
-    public function skip(): void
+    public function skip(MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->diskJockey->skip();
+        $this->dj($dest)->skip();
     }
     /**
      * Stops playing all files, clears the main and the hold playlist.
      */
-    public function stop(): void
+    public function stop(MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->diskJockey->stopPlaying();
+        $this->dj($dest)->stopPlaying();
     }
     /**
      * Pauses the currently playing file.
-     *
-     * @psalm-external-mutation-free
      */
-    public function pause(): void
+    public function pause(MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->diskJockey->pausePlaying();
+        $this->dj($dest)->pausePlaying();
     }
     /**
      * Resumes the currently playing file.
-     *
-     * @psalm-external-mutation-free
      */
-    public function resume(): void
+    public function resume(MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->diskJockey->resumePlaying();
+        $this->dj($dest)->resumePlaying();
     }
     /**
      * Whether the file we're currently playing is paused.
-     *
-     * @psalm-mutation-free
      */
-    public function isPaused(): bool
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
-        return $this->diskJockey->isAudioPaused();
+        return $this->dj($dest)->isAudioPaused();
     }
     /**
      * Files to play on hold.
      */
-    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $this->diskJockey->playOnHold(...$files);
+        $this->dj($dest)->playOnHold(...$files);
     }
     /**
-     * Get info about the audio currently being played.
-     *
-     * @psalm-mutation-free
+     * Get info about the media currently being played.
      */
-    public function getCurrent(): LocalFile|RemoteUrl|string|null
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
-        return $this->diskJockey->getCurrent();
+        return $this->dj($dest)->getCurrent();
     }
 
     /**

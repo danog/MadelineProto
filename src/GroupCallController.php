@@ -735,17 +735,29 @@ final class GroupCallController implements CallInterface
 
     // Playback API, mirroring the one-to-one call API.
 
-    public function play(LocalFile|RemoteUrl|ReadableStream $file): void
+    /**
+     * Group-call presentation (screen-share) is not wired up yet — it needs the separate
+     * presentation connection (phone.joinGroupCallPresentation), which lands with full group video.
+     */
+    private static function requireCamera(MediaDestination $dest): void
     {
+        if ($dest !== MediaDestination::Camera) {
+            throw new \RuntimeException('Group call presentation (screen-share) is not supported yet; it lands with full group video support.');
+        }
+    }
+
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        self::requireCamera($dest);
         self::validateCallAudio($file);
         $this->diskJockey->play($file);
     }
     /**
      * Play a file, blocking until it has finished playing if a stream is provided.
      */
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file): void
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $this->play($file);
+        $this->play($file, $dest);
         self::awaitStream($file);
     }
     /**
@@ -773,47 +785,42 @@ final class GroupCallController implements CallInterface
             $this->log("Could not change the video state of $this: $e", Logger::WARNING);
         }
     }
-    public function skip(): void
+    public function skip(MediaDestination $dest = MediaDestination::Camera): void
     {
+        self::requireCamera($dest);
         $this->diskJockey->skip();
     }
-    public function stop(): void
+    public function stop(MediaDestination $dest = MediaDestination::Camera): void
     {
+        self::requireCamera($dest);
         $this->diskJockey->stopPlaying();
     }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function pause(): void
+    public function pause(MediaDestination $dest = MediaDestination::Camera): void
     {
+        self::requireCamera($dest);
         $this->diskJockey->pausePlaying();
     }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function resume(): void
+    public function resume(MediaDestination $dest = MediaDestination::Camera): void
     {
+        self::requireCamera($dest);
         $this->diskJockey->resumePlaying();
     }
-    /**
-     * @psalm-mutation-free
-     */
-    public function isPaused(): bool
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
+        self::requireCamera($dest);
         return $this->diskJockey->isAudioPaused();
     }
-    public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
+        self::requireCamera($dest);
         foreach ($files as $file) {
             self::validateCallAudio($file);
         }
         $this->diskJockey->playOnHold(...$files);
     }
-    /**
-     * @psalm-mutation-free
-     */
-    public function getCurrent(): LocalFile|RemoteUrl|string|null
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
+        self::requireCamera($dest);
         return $this->diskJockey->getCurrent();
     }
 

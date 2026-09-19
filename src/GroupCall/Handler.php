@@ -22,6 +22,7 @@ use AssertionError;
 use danog\MadelineProto\GroupCall;
 use danog\MadelineProto\GroupCallController;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
 use Revolt\EventLoop;
 
@@ -310,12 +311,12 @@ trait Handler
     /**
      * Play a file in a group call.
      */
-    public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->play($file);
+        $this->groupCalls[$id]->play($file, $dest);
     }
 
     /**
@@ -323,97 +324,89 @@ trait Handler
      *
      * @internal
      */
-    public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->playBlocking($file);
+        $this->groupCalls[$id]->playBlocking($file, $dest);
     }
 
     /**
      * Files to play on hold in a group call.
      */
-    public function groupCallPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function groupCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->playOnHold(...$files);
+        $this->groupCalls[$id]->playOnHold($dest, ...$files);
     }
 
     /**
      * Skip to the next file in the playlist of a group call.
      */
-    public function groupCallSkipPlay(int $id): void
+    public function groupCallSkipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->skip();
+        $this->groupCalls[$id]->skip($dest);
     }
 
     /**
      * Stop playing all files in a group call, clearing the main and the hold playlist.
      */
-    public function groupCallStopPlay(int $id): void
+    public function groupCallStopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->stop();
+        $this->groupCalls[$id]->stop($dest);
     }
 
     /**
      * Pause playback of the current audio file in a group call.
-     *
-     * @psalm-external-mutation-free
      */
-    public function groupCallPausePlay(int $id): void
+    public function groupCallPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->pause();
+        $this->groupCalls[$id]->pause($dest);
     }
 
     /**
      * Resume playback of the current audio file in a group call.
-     *
-     * @psalm-external-mutation-free
      */
-    public function groupCallResumePlay(int $id): void
+    public function groupCallResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->resume();
+        $this->groupCalls[$id]->resume($dest);
     }
 
     /**
      * Whether the currently playing audio file of a group call is paused.
-     *
-     * @psalm-mutation-free
      */
-    public function isGroupCallPlayPaused(int $id): bool
+    public function isGroupCallPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        return $this->groupCalls[$id]->isPaused();
+        return $this->groupCalls[$id]->isPaused($dest);
     }
 
     /**
      * Get the file that is currently being played in a group call.
-     *
-     * @psalm-mutation-free
      */
-    public function groupCallGetCurrent(int $id): RemoteUrl|LocalFile|string|null
+    public function groupCallGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        return $this->groupCalls[$id]->getCurrent();
+        return $this->groupCalls[$id]->getCurrent($dest);
     }
 
     /**

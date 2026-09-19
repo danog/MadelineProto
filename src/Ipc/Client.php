@@ -30,6 +30,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
+use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Wrappers\Start;
@@ -198,9 +199,9 @@ final class Client extends ClientAbstract
     /**
      * Play file in call.
      */
-    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file];
+        $params = [$id, &$file, $dest];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($file, true);
         $this->__call('callPlayBlocking', $wrapper);
@@ -209,9 +210,9 @@ final class Client extends ClientAbstract
     /**
      * Play files on hold in call.
      */
-    public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function callPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $params = [$id, $files];
+        $params = [$id, $dest, $files];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         foreach ($params as &$param) {
             if ($param instanceof ReadableStream) {
@@ -224,9 +225,9 @@ final class Client extends ClientAbstract
     /**
      * Play file in group call.
      */
-    public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file];
+        $params = [$id, &$file, $dest];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($file, true);
         $this->__call('groupCallPlayBlocking', $wrapper);
@@ -235,9 +236,9 @@ final class Client extends ClientAbstract
     /**
      * Play files on hold in group call.
      */
-    public function groupCallPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function groupCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $params = [$id, $files];
+        $params = [$id, $dest, $files];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         foreach ($params as &$param) {
             if ($param instanceof ReadableStream) {
