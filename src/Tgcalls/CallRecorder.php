@@ -63,6 +63,8 @@ final class CallRecorder
 
     /** The peer's advertised video state (from its MediaState): true has video, false none, null unknown. */
     private ?bool $remoteHasVideo = null;
+    /** How many extra segment files were rolled (a track appearing mid-recording forces a new file). */
+    private int $segment = 0;
 
     /** The file being recorded to, or null for a stream (which cannot survive a serialize cycle). */
     public readonly ?LocalFile $file;
@@ -208,10 +210,21 @@ final class CallRecorder
             $ms = (int) (($ts - $this->videoBaseTs) * 1000 / 90000);
 
             if (!$this->writer->hasVideoTrack()) {
-                // Describe the video track from its first frame, then commit the header.
+                // Describe the video track from its first frame.
                 [$codecId, $width, $height, $private] = self::describeVideo($data);
-                $this->writer->setVideoTrack($codecId, $width, $height, $private);
-                $this->begin();
+                if ($this->started) {
+                    // The header was already committed without a video track — a peer turned its
+                    // camera on mid-call. Matroska (like MP4/MOV) fixes its track list at the header,
+                    // so we cannot add one to the open file; roll to a new segment file that declares
+                    // both tracks. A late video for a stream output is simply dropped (can't segment).
+                    if (!$this->rollSegment($codecId, $width, $height, $private)) {
+                        continue;
+                    }
+                } else {
+                    // No header yet: describe the track and commit the header with both tracks.
+                    $this->writer->setVideoTrack($codecId, $width, $height, $private);
+                    $this->begin();
+                }
             }
 
             [$out, $keyframe] = self::transformVideo($this->writer, $data);
@@ -255,6 +268,42 @@ final class CallRecorder
         }
         $this->audioBuffer = [];
         $this->videoBuffer = [];
+    }
+
+    /**
+     * A track appeared after the header was already committed (e.g. the peer turned its camera on).
+     * Matroska fixes its track list in the header, so close the current file and open a new numbered
+     * segment (`basepath.001.mkv`, `basepath.002.mkv`, …) declaring both the audio and video tracks.
+     * The continuous frame timestamps carry over; the new writer rebases them to its own origin.
+     *
+     * @return bool true if a new segment was opened; false for a stream output that cannot be segmented.
+     */
+    private function rollSegment(string $codecId, int $width, int $height, string $private): bool
+    {
+        if ($this->file === null) {
+            return false; // stream output: no seekable file to roll into.
+        }
+        \danog\MadelineProto\Logger::log(
+            "RECDEBUG rollSegment #".($this->segment + 1)." (video track appeared mid-recording)",
+            \danog\MadelineProto\Logger::ERROR
+        ); // RECDEBUG
+        $this->writer->close();
+        $path = self::segmentPath($this->file->file, ++$this->segment);
+        $this->writer = new MatroskaWriter(new LocalFile($path));
+        $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
+        $this->writer->setVideoTrack($codecId, $width, $height, $private);
+        $this->writer->start();
+        return true;
+    }
+
+    /**
+     * Insert a zero-padded segment number before the file extension: `call.mkv` → `call.001.mkv`.
+     */
+    private static function segmentPath(string $path, int $n): string
+    {
+        $suffix = sprintf('.%03d', $n);
+        $dot = strrpos($path, '.');
+        return $dot === false ? $path.$suffix : substr($path, 0, $dot).$suffix.substr($path, $dot);
     }
 
     public function close(): void
