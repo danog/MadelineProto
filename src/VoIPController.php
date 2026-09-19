@@ -105,6 +105,12 @@ final class VoIPController implements CallInterface
      */
     public function __serialize(): array
     {
+        // A call that never finished constructing (e.g. the process was killed mid-setup) must not be
+        // resurrected: persist only an "ended" marker so its half-built subsystems (disk jockey, WebRTC
+        // engine, recorders) are dropped from the graph and cannot start crashing loops on resume.
+        if (!isset($this->public, $this->callState, $this->call)) {
+            return ['callState' => CallState::ENDED];
+        }
         $result = get_object_vars($this);
         // The engines (WebRTC and libtgvoip alike) now serialize themselves and resume their
         // connections on wakeup, so they are kept. Only the mutex, which wraps a live suspension
@@ -121,6 +127,13 @@ final class VoIPController implements CallInterface
         $this->authMutex = new LocalMutex;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
+        }
+        // Defensively drop a call that came back without its essential state (a half-constructed call
+        // that slipped into the session): mark it ended and start nothing, so it can never crash the
+        // resume of the whole session.
+        if (!isset($this->public, $this->call)) {
+            $this->callState = CallState::ENDED;
+            return;
         }
         if (!isset($this->API->logger)) {
             $this->API->setupLogger();
@@ -598,6 +611,6 @@ final class VoIPController implements CallInterface
     #[\Override]
     public function __toString(): string
     {
-        return $this->public->__toString();
+        return isset($this->public) ? $this->public->__toString() : 'ended call';
     }
 }
