@@ -69,6 +69,48 @@ final class OpusRecorder
     }
 
     /**
+     * Drop the (unserializable) OGG writer and live subscription; {@see self::__unserialize()} reopens
+     * the file and continues recording, so an incoming stream survives a serialize/deserialize cycle.
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['writer'], $vars['consumer']);
+        return $vars;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        $this->consumer = null;
+        $this->draining = false;
+        $this->lastTimestamp = null;
+        // Only file-backed recorders are ever serialized (their parent drops stream-backed ones), so
+        // there is always a file to reopen; the guard is purely defensive.
+        if ($this->closed || $this->file === null) {
+            $this->closed = true;
+            return;
+        }
+        // Append a fresh chained Opus stream (its own serial) to the existing recording.
+        $this->writer = new OggWriter(openFile($this->file->file, 'a'), random_int(-(2**31), (2**31) - 1));
+        $this->writer->writeHeader(1, OpusPlaybackTrack::CLOCK_RATE, 'incoming audio stream (resumed)');
+        if ($this->track !== null) {
+            EventLoop::queue(function (): void {
+                if ($this->closed || $this->track === null) {
+                    return;
+                }
+                $this->consumer = $this->track->getConsumer();
+                if (!$this->draining) {
+                    $this->draining = true;
+                    EventLoop::queue($this->drain(...));
+                }
+            });
+        }
+    }
+
+    /**
      * Attach the remote track whose audio should be recorded.
      */
     public function setTrack(RemoteStreamTrack $track): void

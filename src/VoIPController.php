@@ -133,8 +133,9 @@ final class VoIPController implements CallInterface
             }
             // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own; all
             // that is left is to re-arm the recorder, whose open output handle could not survive.
+            // The tgcalls recorder now serializes itself and reopens its file on wakeup; only the
+            // legacy (libtgvoip) engine still needs its output re-armed here.
             if ($this->outputFile !== null) {
-                $this->tgcallsController?->setOutput($this->outputFile);
                 $this->legacyController?->setOutput($this->outputFile);
             }
             $this->log("Resumed $this after a restart of the process.");

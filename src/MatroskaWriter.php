@@ -97,11 +97,53 @@ final class MatroskaWriter
     /** Buffered body of the currently open cluster. */
     private string $clusterBody = '';
 
+    /** The file being written, kept so the writer can reopen it after a serialize/deserialize cycle. */
+    private ?LocalFile $localFile = null;
+
     public function __construct(LocalFile|WritableStream $out)
     {
-        $this->out = $out instanceof LocalFile ? openFile($out->file, 'w') : $out;
+        if ($out instanceof LocalFile) {
+            $this->localFile = $out;
+            $this->out = openFile($out->file, 'w');
+        } else {
+            $this->out = $out;
+        }
         // Only a real file handle can be rewound to back-patch the total Duration on close().
         $this->seekable = $this->out instanceof File;
+    }
+
+    /**
+     * Drop the (unserializable) file handle, flushing any buffered cluster first so nothing is lost.
+     * {@see self::__unserialize()} reopens the file to continue the recording.
+     */
+    public function __serialize(): array
+    {
+        if ($this->headerWritten && !$this->closed) {
+            $this->flushCluster();
+        }
+        $vars = get_object_vars($this);
+        unset($vars['out']);
+        return $vars;
+    }
+
+    /**
+     * Reopen the file in append mode and continue the recording where it left off. The EBML header,
+     * Tracks and Duration placeholder are already on disk, so only new clusters are appended.
+     */
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        // Only file-backed writers are ever serialized (their parent drops stream-backed recorders),
+        // so there is always a file to reopen; the guard is purely defensive.
+        if ($this->closed || $this->localFile === null) {
+            $this->closed = true;
+            return;
+        }
+        $this->out = openFile($this->localFile->file, 'a');
+        // Append mode cannot seek back to patch the Duration, so stop advertising it as seekable.
+        $this->seekable = false;
     }
 
     /**

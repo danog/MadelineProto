@@ -28,6 +28,7 @@ use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webrtc\Codecs\Codec;
+use Webrtc\RTPParameter\RTCRtpCodecCapability;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\ICE\RTCIceCandidate;
@@ -165,9 +166,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      *
      * The WebRTC engine (peer connection, ICE/DTLS/SCTP transports and their timers), the signaling
      * reliability layer and the playback tracks all serialize themselves and resume on the far side
-     * (the WebM demuxer they read from lives in the {@see DjLoop}, which the call serializes). Only
-     * the OGG recorder cannot: it wraps an open file/stream handle, so it is dropped here and
-     * re-attached on wakeup from the output the call still remembers.
+     * (the WebM demuxer they read from lives in the {@see DjLoop}, which the call serializes). A
+     * file-backed recorder likewise serializes itself and reopens its file on wakeup; only a
+     * stream-backed recorder cannot be reopened, so it is dropped here.
      *
      * @return array<string, mixed>
      *
@@ -176,7 +177,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        unset($vars['recorder'], $vars['callRecorder']);
+        if ($this->recorder?->file === null) {
+            unset($vars['recorder']);
+        }
+        if ($this->callRecorder?->file === null) {
+            unset($vars['callRecorder']);
+        }
         return $vars;
     }
 
@@ -187,6 +193,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     public function __unserialize(array $data): void
     {
+        // A stream-backed recorder was dropped in __serialize; a file-backed one is restored below and
+        // resumes itself. Default to none, then apply whatever was serialized.
         $this->recorder = null;
         $this->callRecorder = null;
         foreach ($data as $key => $value) {
@@ -414,21 +422,28 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * order-honouring peers select it), carrying the file's real bitstream parameters, followed by the
      * rest of the table (so the peer's own camera can still be received). VP8 is dropped when asked.
      *
-     * @return list<\Webrtc\RTPParameter\RTCRtpCodecParameters>
+     * @return list<RTCRtpCodecCapability>
      */
     private function orderedVideoCapabilities(string $codec, array $parameters, bool $dropVp8Requested): array
     {
         $capabilities = (new Codec())->getCapabilities('video')->codecs;
         $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
         $isVp8 = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/VP8') === 0;
-        // Advertise the file's real profile/level/tier (derived from its bitstream) for its codec,
-        // so what we offer matches what we actually transmit instead of the generic fallback.
+        // Advertise the file's real profile/level/tier (derived from its bitstream) for its codec, so
+        // what we offer matches what we actually transmit instead of the generic fallback. The
+        // capability objects are readonly, so rebuild the file codec's entry with merged parameters.
         if ($parameters !== []) {
-            foreach ($capabilities as $capability) {
-                if ($isFile($capability)) {
-                    $capability->parameters = array_merge($capability->parameters, $parameters);
-                }
-            }
+            $capabilities = array_map(
+                static fn ($capability) => $isFile($capability)
+                    ? new RTCRtpCodecCapability(
+                        $capability->mimeType,
+                        $capability->clockRate,
+                        $capability->channels,
+                        array_merge($capability->parameters, $parameters),
+                    )
+                    : $capability,
+                $capabilities,
+            );
         }
         $dropVp8 = $dropVp8Requested && strcasecmp($codec, 'VP8') !== 0;
         $others = array_filter(

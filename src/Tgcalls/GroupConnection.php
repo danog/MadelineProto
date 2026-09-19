@@ -147,12 +147,13 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
+        // File-backed recorders serialize themselves and reopen their file on wakeup, so keep them;
+        // a stream-backed recorder cannot be reopened, so drop it.
         foreach ($this->recorders as $ssrc => $recorder) {
-            if ($recorder->file !== null) {
-                $vars['pendingOutputs'][$ssrc] = $recorder->file;
+            if ($recorder->file === null) {
+                unset($vars['recorders'][$ssrc]);
             }
         }
-        $vars['recorders'] = [];
         return $vars;
     }
 
@@ -165,8 +166,9 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        // The peer connection resumed with its remote tracks already in place, so the `track` event
-        // will not fire again for them: re-attach any requested recorder against the live receivers.
+        // Restored (file-backed) recorders reopen their file and re-subscribe to their track on their
+        // own. Any output that was still only *pending* (requested but never attached) is re-attached
+        // here against the live receivers, since the `track` event will not fire again for them.
         EventLoop::queue(function (): void {
             if ($this->closed || $this->pendingOutputs === []) {
                 return;

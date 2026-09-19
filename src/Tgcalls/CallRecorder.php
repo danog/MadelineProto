@@ -61,10 +61,52 @@ final class CallRecorder
     private ?int $videoBaseTs = null;
     private ?int $audioBaseTs = null;
 
+    /** The file being recorded to, or null for a stream (which cannot survive a serialize cycle). */
+    public readonly ?LocalFile $file;
+
     public function __construct(LocalFile|WritableStream $out)
     {
+        $this->file = $out instanceof LocalFile ? $out : null;
         $this->writer = new MatroskaWriter($out);
         $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
+    }
+
+    /**
+     * Drop the live track subscriptions (not serializable); the writer serializes itself and reopens
+     * its file. {@see self::__unserialize()} re-subscribes to the resumed tracks and keeps recording.
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['audioConsumer'], $vars['videoConsumer']);
+        return $vars;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        $this->audioConsumer = null;
+        $this->videoConsumer = null;
+        if ($this->closed) {
+            return;
+        }
+        // The peer connection resumed with its remote tracks in place; re-subscribe and resume
+        // draining into the (reopened, append-mode) writer.
+        EventLoop::queue(function (): void {
+            if ($this->closed) {
+                return;
+            }
+            if ($this->audioTrack !== null) {
+                $this->audioConsumer = $this->audioTrack->getConsumer();
+                EventLoop::queue($this->drainAudio(...));
+            }
+            if ($this->videoTrack !== null) {
+                $this->videoConsumer = $this->videoTrack->getConsumer();
+                EventLoop::queue($this->drainVideo(...));
+            }
+        });
     }
 
     /**
