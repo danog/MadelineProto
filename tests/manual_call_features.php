@@ -175,40 +175,56 @@ switch ($mode) {
             exit(1);
         }
         $out = __DIR__.'/../incoming_1to1.mkv';
-        @unlink($out);
 
-        box('TEST: 1:1 VIDEO CALL — codec params + recording + duration');
+        box('TEST: 1:1 VIDEO CALL — codec params + recording + duration + resume');
         reportDerivedCodec($video);
 
         $API = startApi($session);
-        info("Placing a video call to $arg …");
-        $call = $API->requestCall($arg, video: true);
-        $call->play(new LocalFile($video));
+        $peerId = $API->getId($arg);
+        // The call and its recorder now serialize with the session, so if one is already running
+        // (e.g. this script was Ctrl-C'd earlier) it came back on start() with recording already
+        // resuming — attach to it WITHOUT restarting anything.
+        $existing = $peerId !== null ? $API->getCallByPeer($peerId) : null;
+        $running = $existing !== null && !in_array($existing->getCallState(), [CallState::ENDED], true);
 
-        click("On the OTHER account, ANSWER the incoming call in Telegram, and turn the CAMERA ON.");
-        info('Waiting up to 120s for the call to connect…');
-        waitFor(static fn (): bool => $call->getCallState() !== CallState::REQUESTED, microtime(true) + 120);
-
-        if ($call->getCallState() !== CallState::RUNNING) {
-            info('Call not answered (state: '.$call->getCallState()->name.'). Aborting.');
-            if ($call->getCallState() !== CallState::ENDED) {
-                $call->discard();
+        if ($running) {
+            $call = $existing;
+            info('Found an existing call (state: '.$call->getCallState()->name.') — attaching, not restarting.');
+            info('Its recording resumed into '.$out.' on startup (appended, not truncated).');
+            click("Nothing to do — the call is still up. Press Ctrl-C to detach again (the call keeps running); only hanging up on the OTHER account ends it.");
+        } else {
+            @unlink($out); // a genuinely new recording starts fresh
+            info("Placing a NEW video call to $arg …");
+            $call = $API->requestCall($arg, video: true);
+            $call->play(new LocalFile($video));
+            click("On the OTHER account, ANSWER the incoming call in Telegram, and turn the CAMERA ON.");
+            info('Waiting up to 120s for the call to connect…');
+            waitFor(static fn (): bool => $call->getCallState() !== CallState::REQUESTED, microtime(true) + 120);
+            if ($call->getCallState() !== CallState::RUNNING) {
+                info('Call not answered (state: '.$call->getCallState()->name.'). Leaving it as-is (not discarding).');
+                exit(1);
             }
-            exit(1);
+            info('Connected ✅  Recording the incoming camera+mic into '.$out);
+            click("On the peer, keep the CAMERA on. You should also SEE our video file playing on the peer's screen — check it looks correct (that proves the codec params).");
+            $call->setOutput(new LocalFile($out));
         }
-        info('Connected ✅  Now recording the incoming camera+mic for '.$seconds.'s.');
-        click("On the peer, make sure the CAMERA is on and pointed at something moving. You should also SEE our video file playing on the peer's screen — check it looks correct (that proves the codec params).");
-        $call->setOutput(new LocalFile($out));
 
-        waitFor(static fn (): bool => $call->getCallState() !== CallState::RUNNING, microtime(true) + $seconds, 1.0);
-        if ($call->getCallState() !== CallState::ENDED) {
-            $call->discard();
+        info('Monitoring the call. Ctrl-C to detach WITHOUT ending it; re-run this command to re-attach.');
+        info('To test resume: Ctrl-C now, then re-run — the recording must keep growing, not restart.');
+        // Watch until the PEER ends the call. Never discard from here.
+        $lastReport = 0.0;
+        while ($call->getCallState() !== CallState::ENDED) {
+            if (microtime(true) - $lastReport > 5) {
+                clearstatcache();
+                info('… still running ('.$call->getCallState()->name.'); '.$out.' = '.number_format(is_file($out) ? (int) filesize($out) : 0).' bytes');
+                $lastReport = microtime(true);
+            }
+            Tools::sleep(1.0);
         }
-        Tools::sleep(1.5); // let the recorder flush the final cluster + patch the duration
-
-        box('1:1 RESULT');
+        Tools::sleep(1.5);
+        box('1:1 RESULT (peer hung up)');
         inspect($out);
-        info('Expect: an audio (opus) AND a video stream, and a non-N/A track duration (~'.$seconds.'s).');
+        info('Expect: an audio (opus) AND a video stream. If you Ctrl-C+re-ran, the file kept growing across restarts.');
         break;
 
     case 'group':
@@ -218,28 +234,41 @@ switch ($mode) {
         }
         $dir = __DIR__.'/../group_recordings';
 
-        box('TEST: GROUP CALL — folder recording (one .ogg per participant)');
+        box('TEST: GROUP CALL — folder recording (one .ogg per participant) + resume');
         $API = startApi($session);
-        info("Joining the group call of $arg …");
-        /** @var GroupCall $call */
-        $call = $API->joinGroupCall($arg);
+        // If we are already joined (this script was Ctrl-C'd earlier), the call and its per-participant
+        // recorders came back on start() with recording resuming — attach without rejoining.
+        $existing = $API->getGroupCall($arg);
+        $joined = $existing !== null && $existing->getCallState() === GroupCallState::JOINED;
 
-        click("Open the SAME group call/voice chat on one or more OTHER accounts, JOIN it, and UNMUTE so they transmit audio.");
-        if (is_file($video)) {
-            info('Also playing '.basename($video).' into the call so others hear us.');
-            $call->play(new LocalFile($video));
+        if ($joined) {
+            $call = $existing;
+            info('Already joined — attaching, not rejoining. Per-participant recordings resumed in '.$dir);
+            click("Nothing to do. Ctrl-C to detach (the call keeps running); the recordings keep growing.");
+        } else {
+            /** @var GroupCall $call */
+            $call = $API->joinGroupCall($arg);
+            click("Open the SAME group call on one or more OTHER accounts, JOIN, and UNMUTE so they transmit.");
+            if (is_file($video)) {
+                info('Also playing '.basename($video).' into the call.');
+                $call->play(new LocalFile($video));
+            }
+            info('Recording every transmitting participant into '.$dir.'/<peerId>.ogg');
+            $call->setOutput(new LocalDirectory($dir));
         }
 
-        info('Recording every transmitting participant into '.$dir.'/<peerId>.ogg');
-        $call->setOutput(new LocalDirectory($dir));
+        info('Monitoring. Ctrl-C to detach WITHOUT leaving; re-run to re-attach (recordings resume/append).');
+        $lastReport = 0.0;
+        while ($call->getCallState() === GroupCallState::JOINED) {
+            if (microtime(true) - $lastReport > 5) {
+                $files = glob($dir.'/*.ogg') ?: [];
+                info('… joined; '.count($files).' participant file(s) in '.$dir);
+                $lastReport = microtime(true);
+            }
+            Tools::sleep(1.0);
+        }
 
-        info('Recording for '.$seconds.'s… (keep the other participants talking)');
-        Tools::sleep($seconds);
-
-        $call->leave();
-        Tools::sleep(1.5);
-
-        box('GROUP RESULT');
+        box('GROUP RESULT (left)');
         $files = glob($dir.'/*.ogg') ?: [];
         if ($files === []) {
             info('⚠️  No per-participant files — did anyone else actually transmit audio?');
