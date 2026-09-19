@@ -60,7 +60,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private EncryptedConnection $encryption;
     private ?RTCDataChannel $dataChannel = null;
 
-    private MediaStreamTrack $outgoingAudio;
+    private OpusPlaybackTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
     private ?RTCRtpTransceiver $videoTransceiver = null;
     /** The outgoing presentation (screencast) video, fed by a separate video-only playlist. */
@@ -194,15 +194,31 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     public function __unserialize(array $data): void
     {
         // A stream-backed recorder was dropped in __serialize; a file-backed one is restored below and
-        // resumes itself. Default to none, then apply whatever was serialized.
+        // resumes itself. Default to none, then apply whatever was serialized. Synchronous restore
+        // only — all async resume work happens in resume(), called once the call graph is whole.
         $this->recorder = null;
         $this->callRecorder = null;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        // The peer connection and its transports resume on their own; the [object, method] track
-        // and connection-state listeners were restored pointing at this controller, so no handler
-        // needs re-attaching here. Recording, if any, is re-attached by VoIPController on wakeup.
+    }
+
+    /**
+     * Restart everything that was intentionally left dormant during deserialization, once the whole
+     * call graph is restored: the playback producers and (file-backed) recorders reopen their files,
+     * re-subscribe to the resumed tracks and start their loops. Must run outside __unserialize (it does
+     * async work); {@see \danog\MadelineProto\VoIPController} calls it on wakeup for a running call.
+     */
+    public function resume(): void
+    {
+        if ($this->closed) {
+            return;
+        }
+        $this->outgoingAudio->resume();
+        $this->outgoingVideo->resume();
+        $this->outgoingScreencast?->resume();
+        $this->recorder?->resume();
+        $this->callRecorder?->resume();
     }
 
     /**

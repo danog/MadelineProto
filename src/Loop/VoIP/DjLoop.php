@@ -276,10 +276,25 @@ final class DjLoop extends VoIPLoop
         $this->oggQueue ??= new SplQueue;
         $this->webmAudioQueue ??= new SplQueue;
         $this->videoQueue ??= new SplQueue;
-        // The reader task cannot be serialized; restart it so it resumes the current file (from its
-        // byte offset) or picks up the playlist where it left off.
+        // Sessions serialized before video-only mode existed carry no value for it.
+        $this->videoOnly ??= false;
+        $this->videoParameters ??= [];
+        // Do NOT restart the reader here: its loop reads the call's state, which is only restored once
+        // the whole call graph has finished deserializing. Starting it now could run it
+        // mid-deserialization (if a nested resume suspends the fiber) and dereference not-yet-restored
+        // state. The call's deserializer calls {@see self::resume()} once the graph is whole.
         $this->readerRunning = false;
         $this->generation = 0;
+    }
+
+    /**
+     * Restart the demuxer/reader task after a serialize/unserialize cycle, resuming the current file
+     * (from its byte offset) or the playlist where it left off. Called by the call's deserializer once
+     * the whole call graph is restored; idempotent via the readerRunning guard. (Named to avoid the
+     * base Loop::resume().)
+     */
+    public function resumeReader(): void
+    {
         $this->startReader();
     }
 

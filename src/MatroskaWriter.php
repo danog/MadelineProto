@@ -132,18 +132,28 @@ final class MatroskaWriter
      */
     public function __unserialize(array $data): void
     {
+        // Synchronous state restoration only — NEVER anything async here (opening the file suspends the
+        // fiber, and suspending mid-deserialization lets other objects' resume tasks run before their
+        // dependencies are restored, crashing the whole session resume). The file is reopened later by
+        // {@see self::resume()}. Until then $out stays unset and every write guards on isset($this->out).
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        // Only file-backed writers are ever serialized (their parent drops stream-backed recorders),
-        // so there is always a file to reopen; the guard is purely defensive.
-        if ($this->closed || $this->localFile === null) {
-            $this->closed = true;
+        // Append mode cannot seek back to patch the Duration, so stop advertising it as seekable.
+        $this->seekable = false;
+    }
+
+    /**
+     * Reopen the file in append mode to continue the recording, after the whole graph has been
+     * deserialized. Only file-backed writers are ever serialized (their parent drops stream-backed
+     * recorders), so there is always a file to reopen; the guard is purely defensive.
+     */
+    public function resume(): void
+    {
+        if ($this->closed || $this->localFile === null || isset($this->out)) {
             return;
         }
         $this->out = openFile($this->localFile->file, 'a');
-        // Append mode cannot seek back to patch the Duration, so stop advertising it as seekable.
-        $this->seekable = false;
     }
 
     /**
@@ -256,7 +266,8 @@ final class MatroskaWriter
 
     private function writeBlock(int $trackNumber, string $data, int $timestampMs, bool $keyframe, bool $startsCluster): void
     {
-        if ($this->closed || !$this->headerWritten || $data === '') {
+        // !isset($this->out): a resumed writer is briefly waiting for its deferred reopen; drop until ready.
+        if ($this->closed || !$this->headerWritten || !isset($this->out) || $data === '') {
             return;
         }
         $this->baseMs ??= $timestampMs;
@@ -301,6 +312,10 @@ final class MatroskaWriter
             return;
         }
         $this->closed = true;
+        // A resumed writer may be closed before its deferred reopen ran; there is nothing to flush then.
+        if (!isset($this->out)) {
+            return;
+        }
         if ($this->headerWritten) {
             $this->flushCluster();
             // Back-patch the total Duration now that the last timestamp is known (seekable files only).

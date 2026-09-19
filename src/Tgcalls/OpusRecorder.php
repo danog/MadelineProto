@@ -81,32 +81,35 @@ final class OpusRecorder
 
     public function __unserialize(array $data): void
     {
+        // Synchronous state restoration only — no async work here (see resume()). Until resume() runs,
+        // $writer stays unset and writeChunk/writeOpus/close guard on isset($this->writer).
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
         $this->consumer = null;
         $this->draining = false;
         $this->lastTimestamp = null;
+    }
+
+    /**
+     * Reopen the file and resume recording after the whole call graph has been deserialized: append a
+     * fresh chained Opus stream and re-subscribe to the resumed track. Called by the controller's
+     * resume(); never during unserialize (opening the file suspends the fiber).
+     */
+    public function resume(): void
+    {
         // Only file-backed recorders are ever serialized (their parent drops stream-backed ones), so
         // there is always a file to reopen; the guard is purely defensive.
-        if ($this->closed || $this->file === null) {
-            $this->closed = true;
+        if ($this->closed || $this->file === null || isset($this->writer)) {
             return;
         }
         // Append a fresh chained Opus stream (its own serial) to the existing recording.
         $this->writer = new OggWriter(openFile($this->file->file, 'a'), random_int(-(2**31), (2**31) - 1));
         $this->writer->writeHeader(1, OpusPlaybackTrack::CLOCK_RATE, 'incoming audio stream (resumed)');
-        if ($this->track !== null) {
-            EventLoop::queue(function (): void {
-                if ($this->closed || $this->track === null) {
-                    return;
-                }
-                $this->consumer = $this->track->getConsumer();
-                if (!$this->draining) {
-                    $this->draining = true;
-                    EventLoop::queue($this->drain(...));
-                }
-            });
+        if ($this->track !== null && !$this->draining) {
+            $this->consumer = $this->track->getConsumer();
+            $this->draining = true;
+            EventLoop::queue($this->drain(...));
         }
     }
 
@@ -171,7 +174,7 @@ final class OpusRecorder
      */
     public function writeOpus(string $frame, int $samples = 2880): void
     {
-        if ($this->closed || $frame === '') {
+        if ($this->closed || $frame === '' || !isset($this->writer)) {
             return;
         }
         $this->writer->writeChunk($frame, $samples, false);
@@ -187,7 +190,9 @@ final class OpusRecorder
         }
         $this->closed = true;
         try {
-            $this->writer->writeChunk('', 0, true);
+            if (isset($this->writer)) {
+                $this->writer->writeChunk('', 0, true);
+            }
         } catch (Throwable) {
         }
         $this->track = null;

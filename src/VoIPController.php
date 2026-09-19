@@ -128,10 +128,13 @@ final class VoIPController implements CallInterface
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        // Defensively drop a call that came back without its essential state (a half-constructed call
-        // that slipped into the session): mark it ended and start nothing, so it can never crash the
-        // resume of the whole session.
-        if (!isset($this->public, $this->call)) {
+        // Defensively drop a call that came back without its full essential state (a half-constructed
+        // call that slipped into the session): force it ENDED and start nothing. Because no subsystem
+        // starts async work during deserialization any more (that is all deferred to resume() below),
+        // this is the single point that decides whether a restored call comes back to life at all.
+        if (!isset($this->callState) || !isset($this->public) || !isset($this->call)
+            || $this->callState === CallState::ENDED
+        ) {
             $this->callState = CallState::ENDED;
             return;
         }
@@ -140,14 +143,19 @@ final class VoIPController implements CallInterface
         }
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
+        // Resume everything on the next tick — NEVER here: deserialization must stay synchronous, and
+        // resuming reopens files and starts loops (async). By the time this runs the whole call graph
+        // is restored and callState is known-good, so nothing dereferences half-restored state.
         EventLoop::queue(function (): void {
             if ($this->callState !== CallState::RUNNING) {
                 return;
             }
-            // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own; all
-            // that is left is to re-arm the recorder, whose open output handle could not survive.
-            // The tgcalls recorder now serializes itself and reopens its file on wakeup; only the
-            // legacy (libtgvoip) engine still needs its output re-armed here.
+            // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own. Restart
+            // the demuxer/reader, the playback producers and the (file-backed) recorders, which were all
+            // left dormant during deserialization.
+            $this->diskJockey->resumeReader();
+            $this->tgcallsController?->resume();
+            // The legacy (libtgvoip) engine still re-arms its recorder from the remembered output.
             if ($this->outputFile !== null) {
                 $this->legacyController?->setOutput($this->outputFile);
             }

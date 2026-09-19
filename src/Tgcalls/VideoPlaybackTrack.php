@@ -69,6 +69,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private bool $playing = false;
     /** Whether signaling has selected the codec that the current file contains. */
     private bool $transportReady = true;
+    /** Whether the producer task is running, to keep {@see self::startProducing()} idempotent. */
+    private bool $producing = false;
 
     public function __construct(
         private readonly DjLoop $source,
@@ -79,18 +81,24 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     }
 
     /**
-     * Restart the frame producer after a serialize/unserialize cycle.
-     *
-     * The parent restores every field and rebuilds the (non-serializable) frame queue; the detached
-     * producer task is an event-loop callback that cannot be serialized, so it is started afresh
-     * here and picks the stream back up from the restored timestamps.
-     *
      * @param array<string, mixed> $data
      */
     #[\Override]
     public function __unserialize(array $data): void
     {
+        // Does NOT restart the producer (which reads the call's state, restored only once the whole
+        // call graph has deserialized): starting it here could run it mid-deserialization if a nested
+        // resume suspends the fiber. The call's deserializer calls {@see self::resume()} when ready.
         parent::__unserialize($data);
+        $this->producing = false;
+    }
+
+    /**
+     * Restart the frame producer after a serialize/unserialize cycle. Called by the call's deserializer
+     * once the whole call graph is restored; idempotent.
+     */
+    public function resume(): void
+    {
         $this->startProducing();
     }
 
@@ -99,6 +107,10 @@ final class VideoPlaybackTrack extends MediaStreamTrack
      */
     private function startProducing(): void
     {
+        if ($this->producing) {
+            return;
+        }
+        $this->producing = true;
         EventLoop::queue(function (): void {
             while (!$this->isEnded() && !$this->call->isCallEnded()) {
                 $packet = $this->produce();

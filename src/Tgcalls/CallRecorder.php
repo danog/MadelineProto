@@ -84,29 +84,33 @@ final class CallRecorder
 
     public function __unserialize(array $data): void
     {
+        // Synchronous state restoration only — no async work here (see resume()).
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
         $this->audioConsumer = null;
         $this->videoConsumer = null;
+    }
+
+    /**
+     * Reopen the file and resume recording after the whole call graph has been deserialized: the peer
+     * connection came back with its remote tracks in place, so re-subscribe and resume draining into
+     * the reopened, append-mode writer. Called by the controller's resume(); never during unserialize.
+     */
+    public function resume(): void
+    {
         if ($this->closed) {
             return;
         }
-        // The peer connection resumed with its remote tracks in place; re-subscribe and resume
-        // draining into the (reopened, append-mode) writer.
-        EventLoop::queue(function (): void {
-            if ($this->closed) {
-                return;
-            }
-            if ($this->audioTrack !== null) {
-                $this->audioConsumer = $this->audioTrack->getConsumer();
-                EventLoop::queue($this->drainAudio(...));
-            }
-            if ($this->videoTrack !== null) {
-                $this->videoConsumer = $this->videoTrack->getConsumer();
-                EventLoop::queue($this->drainVideo(...));
-            }
-        });
+        $this->writer->resume();
+        if ($this->audioTrack !== null && $this->audioConsumer === null) {
+            $this->audioConsumer = $this->audioTrack->getConsumer();
+            EventLoop::queue($this->drainAudio(...));
+        }
+        if ($this->videoTrack !== null && $this->videoConsumer === null) {
+            $this->videoConsumer = $this->videoTrack->getConsumer();
+            EventLoop::queue($this->drainVideo(...));
+        }
     }
 
     /**
