@@ -179,7 +179,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     private bool $renegotiatePending = false;
 
     public function __construct(
-        private readonly GroupCallController $call,
+        private readonly GroupConnectionOwner $call,
         DjLoop $dj,
         /**
          * Whether this is the separate screen-share (presentation) connection created by

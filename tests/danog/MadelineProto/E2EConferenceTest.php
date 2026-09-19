@@ -20,8 +20,11 @@ use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
 use danog\MadelineProto\Tgcalls\E2E\CallPacket;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
 use danog\MadelineProto\Tgcalls\E2E\Crypto;
+use danog\MadelineProto\Tgcalls\E2E\E2EKeyProvider;
+use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
 use danog\MadelineProto\Tgcalls\E2E\Verification;
 use PHPUnit\Framework\TestCase;
+use Webrtc\RTP\Enum\MediaKind;
 
 /**
  * Tests the end-to-end encrypted conference-call foundation: the chain block TL codec and the tde2e
@@ -263,6 +266,70 @@ final class E2EConferenceTest extends TestCase
         $packet = CallPacket::encrypt(1, 1, 'x', [['hash' => random_bytes(32), 'secret' => random_bytes(32)]], $senderSeed);
         $this->expectException(\RuntimeException::class);
         CallPacket::decrypt($packet, [random_bytes(32) => random_bytes(32)], $senderPublic);
+    }
+
+    /**
+     * The frame cryptor a sender uses produces frames a receiver's cryptor decrypts and attributes to
+     * the right sender — the full media path through php-rtc's frame-cryptor hook.
+     */
+    public function testFrameCryptorRoundTrip(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $epochHash = random_bytes(32);
+        $epochSecret = random_bytes(32);
+        $ssrc = 123456;
+
+        $sender = new FrameCryptor(self::keyProvider($senderSeed, [['hash' => $epochHash, 'secret' => $epochSecret]], null));
+        $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [['hash' => $epochHash, 'secret' => $epochSecret]], [$ssrc => $senderPublic]));
+
+        $frame = random_bytes(400);
+        $wire = $sender->encryptFrame(MediaKind::Audio, $ssrc, $frame);
+        $this->assertNotSame($frame, $wire);
+        $this->assertSame($frame, $receiver->decryptFrame(MediaKind::Audio, $ssrc, $wire));
+
+        // A video frame on the same SSRC also round-trips (different channel).
+        $videoFrame = random_bytes(1500);
+        $videoWire = $sender->encryptFrame(MediaKind::Video, $ssrc, $videoFrame);
+        $this->assertSame($videoFrame, $receiver->decryptFrame(MediaKind::Video, $ssrc, $videoWire));
+    }
+
+    public function testFrameCryptorRejectsReplay(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $epoch = ['hash' => random_bytes(32), 'secret' => random_bytes(32)];
+        $sender = new FrameCryptor(self::keyProvider($senderSeed, [$epoch], null));
+        $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [$epoch], [7 => $senderPublic]));
+        $wire = $sender->encryptFrame(MediaKind::Audio, 7, 'x');
+        $this->assertSame('x', $receiver->decryptFrame(MediaKind::Audio, 7, $wire));
+        $this->expectException(\RuntimeException::class);
+        $receiver->decryptFrame(MediaKind::Audio, 7, $wire); // same packet again
+    }
+
+    /**
+     * @param list<array{hash: string, secret: string}> $epochs
+     * @param array<int, string>|null                    $ssrcKeys
+     */
+    private static function keyProvider(string $seed, array $epochs, ?array $ssrcKeys): E2EKeyProvider
+    {
+        return new class ($seed, $epochs, $ssrcKeys) implements E2EKeyProvider {
+            public function __construct(private string $seed, private array $epochs, private ?array $ssrcKeys)
+            {
+            }
+            public function activeEpochs(): array
+            {
+                return $this->epochs;
+            }
+            public function selfSeed(): string
+            {
+                return $this->seed;
+            }
+            public function publicKeyForSsrc(int $ssrc): ?string
+            {
+                return $this->ssrcKeys[$ssrc] ?? null;
+            }
+        };
     }
 
     private function requireCrypto(): void
