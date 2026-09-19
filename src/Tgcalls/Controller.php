@@ -75,6 +75,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private ?array $peerInitialSetup = null;
     /** @var list<array<string, mixed>> Structured offers received before InitialSetup. */
     private array $pendingV2Messages = [];
+    /** @var list<array<string, mixed>> Peer offers deferred by glare, answered once our exchange settles. */
+    private array $pendingPeerOffers = [];
+    /** The last peer-offer exchange ID we answered, so a re-sent identical offer is not re-processed. */
+    private ?string $answeredPeerOfferExchangeId = null;
     /** Exchange ID of our in-flight structured offer. */
     private ?string $pendingV2ExchangeId = null;
     /** Whether our outgoing channels have completed at least one structured negotiation. */
@@ -83,6 +87,14 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $renegotiatePending = false;
     private bool $videoEnabled = false;
     private ?string $outgoingVideoCodec = null;
+    /**
+     * Set once, after the peer's answer reveals it selected a codec other than our file's for our
+     * outgoing video, meaning it ignored our preference order (Telegram web hardcodes VP8). We then
+     * re-offer the same video without VP8 to force it onto the file's codec. Clients that honour the
+     * order (tdesktop) select the file codec on the first offer, so this never triggers for them and
+     * they keep seeing the full codec list.
+     */
+    private bool $dropVp8FromOffer = false;
     /** The SCTP association carrying signaling, for the versions that use one. */
     private ?SignalingSctpTransport $sctp = null;
     /** Last mute state we told the peer about, so media state updates stay consistent. */
@@ -107,7 +119,6 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->peerConnection = new RTCPeerConnection([
             'iceServers' => self::buildIceServers($connections),
         ]);
-        $this->peerConnection->setLogger($this->call->API->logger->getPsrLogger()); // ICEDEBUG
         $dj->setVideoCodecObserver($this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
         $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
@@ -212,6 +223,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if (!$track instanceof RemoteStreamTrack) {
             return;
         }
+        $this->call->log('RECDEBUG onPeerConnectionTrack kind='.$track->getKind()->name.' id='.spl_object_id($track).' callRecorder='.($this->callRecorder !== null ? '1' : '0'), Logger::ERROR); // RECDEBUG
         if ($track->getKind() === MediaKind::Audio) {
             $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
             $this->enableRawReceive();
@@ -306,12 +318,16 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
 
         if ($wantsVideo) {
             $this->callRecorder = new CallRecorder($file);
+            $kinds = []; $recv = 0; // RECDEBUG
             foreach ($this->peerConnection->getReceivers() as $receiver) {
+                $recv++; // RECDEBUG
                 $track = $receiver->getTrack();
                 if ($track instanceof RemoteStreamTrack) {
+                    $kinds[] = $track->getKind()->name; // RECDEBUG
                     $this->callRecorder->setTrack($track);
                 }
             }
+            $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
             return;
         }
 
@@ -357,19 +373,133 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // selected the codec of this file.
         $this->outgoingVideo->setTransportReady(false);
         if ($codec !== $this->outgoingVideoCodec) {
-            $capabilities = (new Codec())->getCapabilities('video')->codecs;
-            $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
-            // The file's codec first, then every other codec (RTX included), so it is preferred but
-            // the full table is still offered for the receive direction.
-            $preferred = array_values(array_merge(
-                array_filter($capabilities, $isFile),
-                array_filter($capabilities, static fn ($capability): bool => !$isFile($capability)),
-            ));
-            $transceiver->setCodecPreferences($preferred);
             $this->outgoingVideoCodec = $codec;
+            $this->applyVideoCodecPreferences($transceiver);
         }
         $this->renegotiate();
         $this->sendMediaState($this->muted, video: true);
+    }
+
+    /**
+     * Set the outgoing video codec preferences from {@see self::$outgoingVideoCodec}: the file's
+     * codec first (so order-honouring peers select it), then the rest of the table so the peer's own
+     * camera can still be received. VP8 is dropped once {@see self::$dropVp8FromOffer} is set — see
+     * that property and {@see self::forceFileCodecIfRejected()}.
+     */
+    private function applyVideoCodecPreferences(RTCRtpTransceiver $transceiver): void
+    {
+        $codec = $this->outgoingVideoCodec;
+        if ($codec === null) {
+            return;
+        }
+        $capabilities = (new Codec())->getCapabilities('video')->codecs;
+        $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
+        $isVp8 = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/VP8') === 0;
+        $dropVp8 = $this->dropVp8FromOffer && strcasecmp($codec, 'VP8') !== 0;
+        $others = array_filter(
+            $capabilities,
+            static fn ($capability): bool => !$isFile($capability) && !($dropVp8 && $isVp8($capability)),
+        );
+        $preferred = array_values(array_merge(array_filter($capabilities, $isFile), $others));
+        $transceiver->setCodecPreferences($preferred);
+    }
+
+    /**
+     * After the peer's answer to our offer has been applied, check whether it selected the file's
+     * codec for our outgoing video. A peer that ignores preference order and picks another codec
+     * (Telegram web hardcodes VP8) would decode our pre-encoded frames as garbage, so re-offer the
+     * video once without VP8 to force it onto the file's codec. Order-honouring peers select the file
+     * codec on the first offer and never reach this, keeping the full codec list.
+     */
+    private function forceFileCodecIfRejected(): void
+    {
+        if ($this->dropVp8FromOffer
+            || $this->videoTransceiver === null
+            || $this->outgoingVideoCodec === null
+            || !$this->videoEnabled
+        ) {
+            return;
+        }
+        $selected = $this->negotiatedOutgoingVideoCodec();
+        if ($selected === null || strcasecmp($selected, $this->outgoingVideoCodec) === 0) {
+            return;
+        }
+        $this->call->log(
+            "Peer selected {$selected} for our outgoing {$this->outgoingVideoCodec} video in {$this->call}; "
+            .'re-offering without VP8 to force the file codec',
+            Logger::VERBOSE,
+        );
+        $this->dropVp8FromOffer = true;
+        $this->applyVideoCodecPreferences($this->videoTransceiver);
+        $this->renegotiate();
+    }
+
+    /**
+     * The codec the peer picked to receive our outgoing video, from the applied answer, or null if it
+     * cannot be determined. Matches the answer's media section to our send video by the m-line id our
+     * offer stamped on it (an SSRC, via {@see V2Sdp::useSsrcAsMid()}).
+     */
+    private function negotiatedOutgoingVideoCodec(): ?string
+    {
+        $local = $this->peerConnection->getLocalDescription()?->getSdp();
+        $remote = $this->peerConnection->getRemoteDescription()?->getSdp();
+        if ($local === null || $remote === null) {
+            return null;
+        }
+        $sendMid = self::outgoingVideoMid($local);
+        if ($sendMid === null) {
+            return null;
+        }
+        return self::videoCodecForMid($remote, $sendMid);
+    }
+
+    /** The a=mid of the first send-capable video m-line (port != 0) in an SDP. */
+    private static function outgoingVideoMid(string $sdp): ?string
+    {
+        $mid = null;
+        $isVideo = false;
+        $sending = false;
+        $active = false;
+        foreach (explode("\n", str_replace("\r\n", "\n", $sdp)) as $line) {
+            $line = trim($line);
+            if (str_starts_with($line, 'm=')) {
+                if ($isVideo && $active && $sending && $mid !== null) {
+                    return $mid;
+                }
+                $parts = explode(' ', $line);
+                $isVideo = str_starts_with($line, 'm=video');
+                $active = ($parts[1] ?? '0') !== '0';
+                $sending = false;
+                $mid = null;
+            } elseif ($line === 'a=sendrecv' || $line === 'a=sendonly') {
+                $sending = true;
+            } elseif (str_starts_with($line, 'a=mid:')) {
+                $mid = substr($line, 6);
+            }
+        }
+        return ($isVideo && $active && $sending && $mid !== null) ? $mid : null;
+    }
+
+    /** The first non-RTX codec name of the video m-line with the given a=mid in an SDP. */
+    private static function videoCodecForMid(string $sdp, string $wantMid): ?string
+    {
+        $isVideo = false;
+        $matches = false;
+        foreach (explode("\n", str_replace("\r\n", "\n", $sdp)) as $line) {
+            $line = trim($line);
+            if (str_starts_with($line, 'm=')) {
+                $isVideo = str_starts_with($line, 'm=video');
+                $matches = false;
+            } elseif ($isVideo && str_starts_with($line, 'a=mid:')) {
+                $matches = substr($line, 6) === $wantMid;
+            } elseif ($isVideo && $matches && str_starts_with($line, 'a=rtpmap:')) {
+                $name = explode('/', explode(' ', substr($line, 9))[1] ?? '')[0];
+                if ($name !== '' && strcasecmp($name, 'rtx') !== 0) {
+                    return $name;
+                }
+            }
+        }
+        return null;
     }
 
     private function ensureVideoTransceiver(): RTCRtpTransceiver
@@ -479,7 +609,15 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                     'mline' => $mline,
                 ]);
             } else {
-                $batched[] = ['sdpString' => substr($line, 2)];
+                // Web clients (tdesktop's webrtc.js/tweb) route a trickled candidate to a media
+                // section by its sdpMLineIndex, and drop any candidate they cannot place: their
+                // mid-less fallback only works when a single RTP section is active, so an audio
+                // call connects but a video call (audio+video+data) silently loses every
+                // candidate. We therefore always stamp the m-line index. We deliberately omit
+                // sdpMid: after useSsrcAsMid() our a=mid is an SSRC that does not match the
+                // peer's own mids, which would make a strict client's addIceCandidate() throw.
+                // Native clients ignore these extra JSON fields, so this is safe for them.
+                $batched[] = ['sdpString' => substr($line, 2), 'sdpMLineIndex' => $mline];
             }
         }
         if ($batched !== []) {
@@ -578,6 +716,18 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         /** @var list<array<array-key, mixed>> $contents */
         $contents = array_values((array) ($message['contents'] ?? []));
 
+        // NEGDEBUG
+        $csum = array_map(static function ($c): string {
+            $ssrc = $c['ssrc'] ?? '?';
+            $groups = implode('|', array_map(static fn ($g) => ($g['semantics'] ?? '?').':'.implode('+', $g['ssrcs'] ?? []), $c['ssrcGroups'] ?? []));
+            $pts = implode('/', array_map(static fn ($p) => ($p['name'] ?? '?').':'.($p['id'] ?? '?'), $c['payloadTypes'] ?? []));
+            $exts = implode(',', array_map(static fn ($e) => ($e['id'] ?? '?').'='.substr((string) ($e['uri'] ?? ''), -20), $c['rtpExtensions'] ?? []));
+            return ($c['type'] ?? '?').'#'.$ssrc.' groups['.$groups.'] pts{'.$pts.'} ext['.$exts.']';
+        }, $contents);
+        $t = ($this->pendingV2ExchangeId !== null && $exchangeId === $this->pendingV2ExchangeId) ? 'ANSWER'
+            : ($this->pendingV2ExchangeId !== null ? 'GLARE' : 'PEEROFFER');
+        $this->call->log("NEGDEBUG $t exch=$exchangeId [".implode(',', $csum).']', Logger::ERROR);
+
         if ($this->pendingV2ExchangeId !== null && $exchangeId === $this->pendingV2ExchangeId) {
             $offer = $this->peerConnection->getLocalDescription()?->getSdp();
             if ($offer === null) {
@@ -590,13 +740,32 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->outgoingVideo->setTransportReady(true);
             $this->hasRemoteDescription = true;
             $this->flushPendingCandidates();
+            $this->forceFileCodecIfRejected();
             $this->flushRenegotiation();
+            $this->flushPendingPeerOffers();
+            return;
+        }
+
+        // Beyond this point the message is the peer's own offer (a glare collision or a fresh one),
+        // declaring the peer's outgoing media. If it carries no video we ignore it: the peer's audio
+        // already reaches us via payload-type routing on the sendrecv audio transceiver, and answering
+        // an audio-only offer would renegotiate and — because our template's video m-line has no
+        // matching content in the peer's audio-only offer — inactivate our own outgoing video
+        // (buildRemoteDescription marks unmatched m-lines a=inactive), destabilising the call and
+        // closing the connection (observed with Telegram web, which only ever offers audio). We only
+        // engage when the peer adds video (its camera), which we must negotiate to receive and record.
+        if (!array_any($contents, static fn (array $content): bool => ($content['type'] ?? null) === 'video')) {
             return;
         }
 
         if ($this->pendingV2ExchangeId !== null) {
-            // InstanceV2Impl resolves glare in favor of the call initiator.
+            // InstanceV2Impl resolves glare in favor of the call initiator. As the caller we keep our
+            // in-flight exchange, but must not drop the peer's offer: it declares the peer's own
+            // outgoing media (its mic/camera), which we want to receive and record. Queue it and
+            // answer once our exchange settles — a strict native client (tdesktop) sends nothing until
+            // we answer its media offer.
             if ($this->outgoing) {
+                $this->pendingPeerOffers[] = $message;
                 return;
             }
             $this->peerConnection->setLocalDescription(new RTCSessionDescription('', 'rollback'));
@@ -604,20 +773,48 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->renegotiatePending = true;
         }
 
+        // A peer that has not seen our answer re-sends the same offer; answering it again only churns
+        // the connection, so skip an exchange we already answered.
+        if ($exchangeId !== '' && $exchangeId === $this->answeredPeerOfferExchangeId) {
+            return;
+        }
+        $this->answeredPeerOfferExchangeId = $exchangeId;
+
         if (array_any($contents, static fn (array $content): bool => ($content['type'] ?? null) === 'video')) {
             $this->ensureVideoTransceiver();
         }
+        // The peer advertises codecs we may not support (e.g. Telegram Android offers H265/HEVC).
+        // We echo this offer back as our answer, which is what tells the peer which codec to send; if
+        // we echo a codec our RtpRouter has no receiver for, the peer sends it and every packet is
+        // dropped (routeRtp can't map the payload type), so its video never records. Keep only the
+        // payload types we can actually route/record, so the peer falls back to a mutual codec (H264).
+        $contents = self::filterSupportedPayloadTypes($contents);
         $template = $this->peerConnection->createOffer()->getSdp();
         $sdp = V2Sdp::buildRemoteDescription($template, $this->peerInitialSetup, $contents, false);
+        // NEGDEBUG: video-section rtpmap of the remote description we apply (what the receiver registers)
+        $vlines = [];
+        $inVid = false;
+        foreach (explode("\n", str_replace("\r\n", "\n", $sdp)) as $l) {
+            $l = trim($l);
+            if (str_starts_with($l, 'm=')) { $inVid = str_starts_with($l, 'm=video'); if ($inVid) { $vlines[] = $l; } }
+            elseif ($inVid && (str_starts_with($l, 'a=rtpmap:') || preg_match('/^a=(sendrecv|sendonly|recvonly|inactive)$/', $l))) { $vlines[] = $l; }
+        }
+        $this->call->log('NEGDEBUG built remote video: '.implode(' | ', $vlines), Logger::ERROR);
         $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'offer'));
         $answer = $this->peerConnection->createAnswer();
         $this->peerConnection->setLocalDescription($answer);
         $this->sendSignalingMessage([
             '@type' => 'NegotiateChannels',
             'exchangeId' => $exchangeId,
-            // An answer echoes the accepted incoming SSRCs. buildRemoteDescription already
-            // rejected the message if no mutual codec existed, so all remaining contents work.
-            'contents' => $contents,
+            // The answer must echo the peer's offer verbatim — same exchangeId, SSRCs, ssrcGroups and
+            // payload types — which is how tgcalls activates the peer's outgoing channels (it matches
+            // on SSRC + exchangeId). buildRemoteDescription already rejected the message if no mutual
+            // codec existed. We only have to repair one JSON detail: a payload type's `parameters`
+            // round-trips through PHP's json_decode/encode as an empty array `[]` when it was `{}`, and
+            // tgcalls' strict parser rejects the whole NegotiateChannels ("could not parse
+            // PayloadType") if `parameters` is not a JSON object — so the peer silently drops our
+            // answer and never starts sending its media. Force `parameters` back to an object.
+            'contents' => self::withObjectParameters($contents),
         ]);
         $this->sendLocalCandidates();
         $this->hasRemoteDescription = true;
@@ -626,6 +823,127 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->renegotiatePending = true;
         }
         $this->flushRenegotiation();
+        $this->flushPendingPeerOffers();
+    }
+
+    /**
+     * Answer a peer offer deferred by glare, once our own exchange has settled. One at a time: each
+     * may start a renegotiation, and the next is picked up when that ends.
+     */
+    private function flushPendingPeerOffers(): void
+    {
+        if ($this->pendingPeerOffers === []
+            || $this->pendingV2ExchangeId !== null
+            || $this->renegotiatePending
+            || $this->peerConnection->getSignalingState() !== SignalingState::stable
+        ) {
+            return;
+        }
+        $this->onV2Negotiation(array_shift($this->pendingPeerOffers));
+    }
+
+    /**
+     * Drop from each content the payload types whose codec our php-rtc build cannot handle, keeping
+     * the RTX entries only for codecs that survive. We record incoming media by muxing the raw frames,
+     * but the RtpRouter still only routes payload types negotiated from our codec table; a codec we do
+     * not carry (e.g. Telegram Android's H265/HEVC) would be echoed as accepted, chosen by the peer,
+     * and then dropped packet-by-packet. Filtering the answer makes the peer pick a mutual codec we can
+     * route and record (H264).
+     *
+     * @param list<array<array-key, mixed>> $contents
+     * @return list<array<array-key, mixed>>
+     */
+    private static function filterSupportedPayloadTypes(array $contents): array
+    {
+        $codec = new Codec();
+        /** @var array<string, array<string, true>> $supported */
+        $supported = [];
+        foreach (['audio', 'video'] as $kind) {
+            foreach ($codec->getCapabilities($kind)->codecs as $capability) {
+                $name = strtolower((string) (explode('/', $capability->mimeType)[1] ?? ''));
+                if ($name !== '') {
+                    $supported[$kind][$name] = true;
+                }
+            }
+        }
+        foreach ($contents as &$content) {
+            $kind = ($content['type'] ?? null) === 'video' ? 'video' : 'audio';
+            $names = $supported[$kind] ?? [];
+            $payloadTypes = $content['payloadTypes'] ?? [];
+            if (!is_array($payloadTypes)) {
+                continue;
+            }
+            // Which non-RTX codec ids survive, so a dependent RTX entry can be kept alongside them.
+            $keptIds = [];
+            foreach ($payloadTypes as $payloadType) {
+                $name = strtolower((string) ($payloadType['name'] ?? ''));
+                if ($name !== 'rtx' && $name !== '' && isset($names[$name])) {
+                    $keptIds[(string) ($payloadType['id'] ?? '')] = true;
+                }
+            }
+            $kept = [];
+            foreach ($payloadTypes as $payloadType) {
+                $name = strtolower((string) ($payloadType['name'] ?? ''));
+                if ($name === 'rtx') {
+                    $apt = (string) (((array) ($payloadType['parameters'] ?? []))['apt'] ?? '');
+                    if (isset($keptIds[$apt])) {
+                        $kept[] = $payloadType;
+                    }
+                } elseif ($name !== '' && isset($names[$name])) {
+                    $kept[] = $payloadType;
+                }
+            }
+            $content['payloadTypes'] = $kept;
+            // We don't implement transport-cc (transport-wide congestion control) feedback. Leaving it
+            // in the answer makes modern peers (Telegram Android) drive their uplink congestion control
+            // off transport-cc, receive no such feedback from us, and throttle to the minimum bitrate
+            // ("weak signal", 320x180). Strip the transport-cc feedback type and its RTP extension so
+            // the peer falls back to REMB, which we do send (correctly, once the estimator bug is fixed).
+            foreach ($content['payloadTypes'] as &$payloadType) {
+                if (isset($payloadType['feedbackTypes']) && is_array($payloadType['feedbackTypes'])) {
+                    $payloadType['feedbackTypes'] = array_values(array_filter(
+                        $payloadType['feedbackTypes'],
+                        static fn ($fb): bool => strtolower((string) ($fb['type'] ?? '')) !== 'transport-cc',
+                    ));
+                }
+            }
+            unset($payloadType);
+            if (isset($content['rtpExtensions']) && is_array($content['rtpExtensions'])) {
+                $content['rtpExtensions'] = array_values(array_filter(
+                    $content['rtpExtensions'],
+                    static fn ($e): bool => !str_contains(strtolower((string) ($e['uri'] ?? '')), 'transport-wide-cc'),
+                ));
+            }
+        }
+        unset($content);
+
+        return $contents;
+    }
+
+    /**
+     * Return the tgcalls `contents` with every payload type's `parameters` forced to a JSON object.
+     * An empty `parameters` decodes to a PHP `[]` and would re-encode as a JSON array, which tgcalls'
+     * strict parser rejects (it requires an object), dropping the whole message.
+     *
+     * @param list<array<array-key, mixed>> $contents
+     * @return list<array<array-key, mixed>>
+     */
+    private static function withObjectParameters(array $contents): array
+    {
+        foreach ($contents as &$content) {
+            if (!isset($content['payloadTypes']) || !is_array($content['payloadTypes'])) {
+                continue;
+            }
+            foreach ($content['payloadTypes'] as &$payloadType) {
+                if (is_array($payloadType)) {
+                    $payloadType['parameters'] = (object) ($payloadType['parameters'] ?? []);
+                }
+            }
+            unset($payloadType);
+        }
+        unset($content);
+
+        return $contents;
     }
 
     private function sendSignalingMessage(array $message): void

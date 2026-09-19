@@ -200,6 +200,17 @@ final class DjLoop extends VoIPLoop
     public function setVideoCodecObserver(VideoCodecObserver $observer): void
     {
         $this->videoObserver = $observer;
+        // The reader is started by play() and may open the file and detect its video codec before
+        // the connection — and hence this observer — exists. When that happens the onVideoCodec
+        // announcement in selectTracks() is dropped (the observer was still null), the codec is
+        // never preferred, and the peer decodes our pre-encoded frames as whatever codec sits first
+        // in the default table (VP8). Replay the announcement here so the codec is preferred in the
+        // very first offer. It is queued so it runs after the connection has finished constructing
+        // its transceivers, and before the initial offer it queues itself.
+        if ($this->videoCodec !== null) {
+            $codec = $this->videoCodec;
+            EventLoop::queue(static fn () => $observer->onVideoCodec($codec));
+        }
     }
 
     public function __serialize(): array

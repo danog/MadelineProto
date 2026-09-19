@@ -18,9 +18,9 @@ namespace danog\MadelineProto\Test;
 
 use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\Tgcalls\CallInterface;
 use danog\MadelineProto\Tgcalls\GroupSdp;
-use danog\MadelineProto\Tgcalls\WebmSource;
 use PHPUnit\Framework\TestCase;
 use Revolt\EventLoop;
 use Webrtc\Codecs\Codec;
@@ -106,12 +106,12 @@ final class GroupVideoCodecTest extends TestCase
      */
     private static function play(string $file): array
     {
-        $source = new WebmSource(self::call());
-        $source->play(new ReadableBuffer($file));
-        // play() defers the demuxer onto the event loop, so let it run to completion.
+        $dj = new DjLoop(self::call());
+        $dj->play(new ReadableBuffer($file));
+        // play() defers the streaming reader onto the event loop, so let it run to completion.
         EventLoop::run();
 
-        return [$source->getVideoCodec(), $source->pullVideo()];
+        return [$dj->getVideoCodec(), $dj->pullVideo()];
     }
 
     /**

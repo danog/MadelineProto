@@ -17,6 +17,8 @@
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\WritableStream;
+use Amp\File\File;
+use Amp\File\Whence;
 
 use function Amp\File\openFile;
 
@@ -41,6 +43,7 @@ final class MatroskaWriter
     private const ID_SEGMENT = "\x18\x53\x80\x67";
     private const ID_INFO = "\x15\x49\xA9\x66";
     private const ID_TIMESTAMP_SCALE = "\x2A\xD7\xB1";
+    private const ID_DURATION = "\x44\x89";
     private const ID_MUXING_APP = "\x4D\x80";
     private const ID_WRITING_APP = "\x57\x41";
     private const ID_TRACKS = "\x16\x54\xAE\x6B";
@@ -72,6 +75,8 @@ final class MatroskaWriter
     private const MAX_CLUSTER_MS = 30000;
 
     private WritableStream $out;
+    /** Whether {@see self::$out} is a seekable file we can back-patch the Duration into on close(). */
+    private bool $seekable;
 
     /** @var array{codecId: string, width: int, height: int, private: string}|null */
     private ?array $video = null;
@@ -83,6 +88,10 @@ final class MatroskaWriter
 
     /** Wall value (ms) the whole file is rebased onto: the first frame's timestamp. */
     private ?int $baseMs = null;
+    /** Byte offset of the 8-byte Duration value to patch on close(), or null when not seekable. */
+    private ?int $durationOffset = null;
+    /** Highest file-relative block timestamp (ms) seen, written as the Duration on close(). */
+    private ?int $maxTimestampMs = null;
     /** Timestamp (ms, file-relative) of the currently open cluster, or null if none is open. */
     private ?int $clusterBaseMs = null;
     /** Buffered body of the currently open cluster. */
@@ -91,6 +100,8 @@ final class MatroskaWriter
     public function __construct(LocalFile|WritableStream $out)
     {
         $this->out = $out instanceof LocalFile ? openFile($out->file, 'w') : $out;
+        // Only a real file handle can be rewound to back-patch the total Duration on close().
+        $this->seekable = $this->out instanceof File;
     }
 
     /**
@@ -135,11 +146,16 @@ final class MatroskaWriter
             .self::uintElement("\x42\x85", 2)             // DocTypeReadVersion
         );
 
-        $info = self::element(self::ID_INFO,
-            self::uintElement(self::ID_TIMESTAMP_SCALE, self::TIMESTAMP_SCALE_NS)
+        $infoBody = self::uintElement(self::ID_TIMESTAMP_SCALE, self::TIMESTAMP_SCALE_NS)
             .self::stringElement(self::ID_MUXING_APP, 'MadelineProto')
-            .self::stringElement(self::ID_WRITING_APP, 'MadelineProto')
-        );
+            .self::stringElement(self::ID_WRITING_APP, 'MadelineProto');
+        // On a seekable output, reserve a Duration element (a 64-bit float, in TimestampScale units,
+        // i.e. milliseconds) as the LAST element of Info, so its value is the last 8 bytes of $info;
+        // close() rewinds to it and writes the real duration. Non-seekable streams stay Duration-less.
+        if ($this->seekable) {
+            $infoBody .= self::ID_DURATION.self::ebmlSize(8).pack('E', 0.0);
+        }
+        $info = self::element(self::ID_INFO, $infoBody);
 
         $tracks = '';
         if ($this->video !== null) {
@@ -172,7 +188,12 @@ final class MatroskaWriter
         }
 
         // The segment uses the "unknown size" length so it can be streamed; players read to EOF.
-        $this->out->write($ebml.self::ID_SEGMENT."\x01\xFF\xFF\xFF\xFF\xFF\xFF\xFF".$info.self::element(self::ID_TRACKS, $tracks));
+        $header = $ebml.self::ID_SEGMENT."\x01\xFF\xFF\xFF\xFF\xFF\xFF\xFF";
+        if ($this->seekable) {
+            // The reserved Duration value is the last 8 bytes of $info, which follows $header.
+            $this->durationOffset = \strlen($header) + \strlen($info) - 8;
+        }
+        $this->out->write($header.$info.self::element(self::ID_TRACKS, $tracks));
     }
 
     /**
@@ -198,6 +219,7 @@ final class MatroskaWriter
         }
         $this->baseMs ??= $timestampMs;
         $relativeToFile = max(0, $timestampMs - $this->baseMs);
+        $this->maxTimestampMs = max($this->maxTimestampMs ?? 0, $relativeToFile);
 
         // Start a new cluster on a video keyframe, or when the block would fall outside the open
         // cluster's signed-16-bit relative range.
@@ -239,6 +261,13 @@ final class MatroskaWriter
         $this->closed = true;
         if ($this->headerWritten) {
             $this->flushCluster();
+            // Back-patch the total Duration now that the last timestamp is known (seekable files only).
+            if ($this->seekable && $this->durationOffset !== null && $this->maxTimestampMs !== null) {
+                \assert($this->out instanceof File);
+                $this->out->seek($this->durationOffset);
+                $this->out->write(pack('E', (float) $this->maxTimestampMs));
+                $this->out->seek(0, Whence::End);
+            }
         }
         $this->out->end();
     }

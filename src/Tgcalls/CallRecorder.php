@@ -75,6 +75,7 @@ final class CallRecorder
         if ($this->closed) {
             return;
         }
+        \danog\MadelineProto\Logger::log('RECDEBUG CallRecorder::setTrack kind='.$track->getKind()->name, \danog\MadelineProto\Logger::ERROR); // RECDEBUG
         if ($track->getKind() === MediaKind::Video) {
             if ($this->videoTrack === $track) {
                 return;
@@ -98,10 +99,12 @@ final class CallRecorder
         if ($consumer === null) {
             return;
         }
+        $n = 0; // RECDEBUG
         foreach ($consumer as $frame) {
             if ($this->closed) {
                 return;
             }
+            if (++$n % 100 === 1) { \danog\MadelineProto\Logger::log("RECDEBUG drainAudio n=$n", \danog\MadelineProto\Logger::ERROR); } // RECDEBUG
             $ts = $frame->getTimestamp();
             $this->audioBaseTs ??= $ts;
             $ms = (int) (($ts - $this->audioBaseTs) * 1000 / 48000);
@@ -124,10 +127,12 @@ final class CallRecorder
         if ($consumer === null) {
             return;
         }
+        $n = 0; // RECDEBUG
         foreach ($consumer as $frame) {
             if ($this->closed) {
                 return;
             }
+            if (++$n % 60 === 1) { \danog\MadelineProto\Logger::log("RECDEBUG drainVideo n=$n", \danog\MadelineProto\Logger::ERROR); } // RECDEBUG
             $data = $frame->getData();
             if ($data === '') {
                 continue;
