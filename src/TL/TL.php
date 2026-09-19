@@ -703,7 +703,10 @@ final class TL implements TLInterface
     private function serializeParams(array $tl, array|Button $arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
-        $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
+        $arguments = $arguments instanceof Button ? $arguments->jsonSerialize() : $arguments;
+        // The bot-API argument conversion is only relevant to the full API; a schema-only TL instance
+        // (e.g. the E2E conference block codec) has no API and serializes already-MTProto arguments.
+        $arguments = $this->API?->botAPIToMTProto($arguments) ?? $arguments;
         foreach ($tl['flags'] as [
             'flag' => $flag,
             'name' => $name,
