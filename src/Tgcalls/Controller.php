@@ -415,6 +415,13 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->outgoingVideoParameters,
             $this->dropVp8FromOffer,
         ));
+        // Advertise the file's real profile/level/tier on the wire (not just reorder): the fmtp
+        // parameters derived from the bitstream are merged onto the offered codec by php-rtc.
+        $transceiver->setCodecParameterOverrides(
+            $this->outgoingVideoParameters === []
+                ? []
+                : ['video/'.$this->outgoingVideoCodec => $this->outgoingVideoParameters],
+        );
     }
 
     /**
@@ -429,22 +436,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $capabilities = (new Codec())->getCapabilities('video')->codecs;
         $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
         $isVp8 = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/VP8') === 0;
-        // Advertise the file's real profile/level/tier (derived from its bitstream) for its codec, so
-        // what we offer matches what we actually transmit instead of the generic fallback. The
-        // capability objects are readonly, so rebuild the file codec's entry with merged parameters.
-        if ($parameters !== []) {
-            $capabilities = array_map(
-                static fn ($capability) => $isFile($capability)
-                    ? new RTCRtpCodecCapability(
-                        $capability->mimeType,
-                        $capability->clockRate,
-                        $capability->channels,
-                        array_merge($capability->parameters, $parameters),
-                    )
-                    : $capability,
-                $capabilities,
-            );
-        }
+        // NB: RTCRtpTransceiver::setCodecPreferences() only accepts capability objects that match the
+        // registered table by value, so this method just reorders; the file's real fmtp parameters are
+        // applied separately via RTCRtpTransceiver::setCodecParameterOverrides() (see the callers).
         $dropVp8 = $dropVp8Requested && strcasecmp($codec, 'VP8') !== 0;
         $others = array_filter(
             $capabilities,
@@ -486,6 +480,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->outgoingScreencastCodec = $codec;
             $this->outgoingScreencastParameters = $parameters;
             $transceiver->setCodecPreferences($this->orderedVideoCapabilities($codec, $parameters, false));
+            $transceiver->setCodecParameterOverrides($parameters === [] ? [] : ['video/'.$codec => $parameters]);
         }
         $this->renegotiate();
         $this->sendMediaState($this->muted);
