@@ -202,11 +202,16 @@ final class GroupCall extends Update
     }
 
     /**
-     * Set the output file or stream for the incoming audio of a specific participant.
+     * Record group call audio, writing an OGG OPUS stream.
      *
-     * Will write an OGG OPUS stream to the specified file or stream.
+     * Call it either way:
+     *  - `setOutput($participant, $file)` records that one participant's incoming audio to the file
+     *    or stream.
+     *  - `setOutput(new LocalDirectory($dir))` records *every* transmitting participant, each into its
+     *    own `<dir>/<peerId>.ogg` file (participants that start transmitting later are picked up too);
+     *    our own audio is never recorded.
      */
-    public function setOutput(mixed $participant, LocalFile|WritableStream $file): self
+    public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
     {
         $this->getClient()->groupCallSetOutput($this->id, $participant, $file);
         return $this;

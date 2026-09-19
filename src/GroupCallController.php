@@ -75,6 +75,10 @@ final class GroupCallController implements CallInterface
 
     /** Output files/streams requested per participant peer ID. */
     private array $pendingOutputs = [];
+    /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
+    private ?string $outputDir = null;
+    /** @var array<int, true> Peer IDs already wired to a per-participant file in folder mode. */
+    private array $folderPeers = [];
 
     public readonly GroupCall $public;
 
@@ -381,6 +385,8 @@ final class GroupCallController implements CallInterface
                 unset($this->pendingOutputs[$peerId]);
                 $this->connection?->setOutput($parsed->source, $file);
             }
+            // Folder mode: start recording a participant that has just begun transmitting.
+            $this->wireFolderOutput($peerId, $parsed);
         }
     }
 
@@ -583,18 +589,65 @@ final class GroupCallController implements CallInterface
     }
 
     /**
-     * Record the audio of a specific participant to a file or stream.
+     * Record group call audio.
+     *
+     * Two modes:
+     *  - per participant: `setOutput($participant, $file)` records that one participant's incoming
+     *    audio into the given file or stream.
+     *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
+     *    participant into its own `<dir>/<peerId>.ogg` OGG OPUS file, including participants that start
+     *    transmitting later. Our own audio is never recorded.
      */
-    public function setOutput(mixed $participant, LocalFile|WritableStream $file): self
+    public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
     {
-        $peerId = $this->API->getId($participant);
+        if ($participant instanceof LocalDirectory) {
+            $dir = $participant->dir;
+            if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException("Could not create the recording directory $dir");
+            }
+            $this->outputDir = $dir;
+            foreach ($this->participants as $peerId => $known) {
+                $this->wireFolderOutput($peerId, $known);
+            }
+            return $this;
+        }
+        if ($file === null) {
+            throw new \InvalidArgumentException('setOutput() requires a file/stream to record a participant into, or a LocalDirectory to record every participant.');
+        }
+        $this->wireOutput($this->API->getId($participant), $file);
+        return $this;
+    }
+
+    /**
+     * Route one participant's output to the connection now, or defer it until their source is known.
+     */
+    private function wireOutput(int $peerId, LocalFile|WritableStream $file): void
+    {
         $known = $this->participants[$peerId] ?? null;
         if ($known !== null && $known->source !== 0 && $this->connection !== null) {
             $this->connection->setOutput($known->source, $file);
-            return $this;
+            return;
         }
         $this->pendingOutputs[$peerId] = $file;
-        return $this;
+    }
+
+    /**
+     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.ogg` file,
+     * once each.
+     */
+    private function wireFolderOutput(int $peerId, Participant $participant): void
+    {
+        if ($this->outputDir === null
+            || $participant->source === 0
+            || $participant->self
+            || $participant->source === $this->source
+            || isset($this->folderPeers[$peerId])
+            || isset($this->pendingOutputs[$peerId]) // an explicit per-participant output takes precedence
+        ) {
+            return;
+        }
+        $this->folderPeers[$peerId] = true;
+        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.ogg'));
     }
 
     /**

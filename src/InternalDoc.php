@@ -1320,9 +1320,10 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->groupCallResumePlay($id);
     }
     /**
-     * Set the output file or stream for the incoming audio of a group call participant.
+     * Record group call audio: one participant to a file/stream, or every transmitting participant
+     * into its own file under a directory when `$file` is null and `$participant` is a LocalFile dir.
      */
-    final public function groupCallSetOutput(int $id, mixed $participant, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
+    final public function groupCallSetOutput(int $id, mixed $participant, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream|null $file = null): void
     {
         $this->wrapper->getAPI()->groupCallSetOutput($id, $participant, $file);
     }

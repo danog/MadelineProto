@@ -296,9 +296,10 @@ trait Handler
     }
 
     /**
-     * Set the output file or stream for the incoming audio of a group call participant.
+     * Record group call audio: one participant to a file/stream, or every transmitting participant
+     * into its own file under a directory when `$file` is null and `$participant` is a LocalFile dir.
      */
-    public function groupCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream $file): void
+    public function groupCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream|null $file = null): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
