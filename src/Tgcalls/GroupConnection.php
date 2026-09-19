@@ -104,6 +104,13 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $videoOwner = [];
     /**
+     * Which participant (by unsigned audio SSRC) each remote screen-share SSRC belongs to, so an
+     * incoming presentation track is routed to that participant's separate presentation recorder.
+     *
+     * @var array<int, int>
+     */
+    private array $presentationOwner = [];
+    /**
      * Whether a participant (by unsigned audio SSRC) is expected to send camera video, so its
      * recorder holds the header for the video track instead of committing an audio-only one.
      *
@@ -118,12 +125,25 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $recorders = [];
     /**
+     * Recorders for incoming screen-share, indexed by the participant's unsigned audio SSRC (a
+     * screen-share is a separate video stream, so it gets its own file).
+     *
+     * @var array<int, CallRecorder>
+     */
+    private array $presentationRecorders = [];
+    /**
      * Output files/streams requested before the corresponding participant's track showed up, indexed
      * by the participant's unsigned audio SSRC.
      *
      * @var array<int, LocalFile|WritableStream>
      */
     private array $pendingOutputs = [];
+    /**
+     * Screen-share output files/streams requested per participant, indexed by unsigned audio SSRC.
+     *
+     * @var array<int, LocalFile|WritableStream>
+     */
+    private array $pendingPresentationOutputs = [];
 
     private bool $closed = false;
     private bool $renegotiating = false;
@@ -154,9 +174,9 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * Drop the state that cannot be serialized before the graph is written out.
      *
      * The peer connection and its SFU transport serialize themselves and resume on the far side, and
-     * so do the playback tracks and the WebM demuxer. Only the OGG recorders cannot: each wraps an
-     * open file/stream handle. They are dropped here; those writing to a reopenable file are queued
-     * back into {@see self::$pendingOutputs} so wakeup re-attaches them.
+     * so do the playback tracks and the WebM demuxer. Only the recorders cannot: each wraps an open
+     * file/stream handle. A file-backed one serializes itself and reopens its file on wakeup, so it is
+     * kept; a stream-backed one cannot be reopened, so it is dropped.
      *
      * @return array<string, mixed>
      *
@@ -165,11 +185,14 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        // File-backed recorders serialize themselves and reopen their file on wakeup, so keep them;
-        // a stream-backed recorder cannot be reopened, so drop it.
         foreach ($this->recorders as $ssrc => $recorder) {
             if ($recorder->file === null) {
                 unset($vars['recorders'][$ssrc]);
+            }
+        }
+        foreach ($this->presentationRecorders as $ssrc => $recorder) {
+            if ($recorder->file === null) {
+                unset($vars['presentationRecorders'][$ssrc]);
             }
         }
         return $vars;
@@ -181,6 +204,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __unserialize(array $data): void
     {
         $this->recorders = [];
+        $this->presentationRecorders = [];
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -202,7 +226,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         foreach ($this->recorders as $recorder) {
             $recorder->resume();
         }
-        if ($this->pendingOutputs === []) {
+        foreach ($this->presentationRecorders as $recorder) {
+            $recorder->resume();
+        }
+        if ($this->pendingOutputs === [] && $this->pendingPresentationOutputs === []) {
             return;
         }
         foreach ($this->peerConnection->getReceivers() as $receiver) {
@@ -333,7 +360,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * transceiver of the matching kind is created for every new SSRC; the SFU forwards that
      * participant's media on it, demultiplexed by SSRC.
      *
-     * @param list<array{audio: int, video: list<int>}> $participants Signed SSRCs per participant.
+     * @param list<array{audio: int, video: list<int>, presentation?: list<int>}> $participants
+     *        Signed SSRCs per participant.
      */
     public function setRemoteSources(array $participants): void
     {
@@ -361,12 +389,15 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 }
                 $videoSsrcs[] = $unsigned;
                 $this->videoOwner[$unsigned] = $audio;
-                if (!isset($known[$unsigned])) {
-                    $this->peerConnection->addTransceiver(MediaKind::Video, SDPDirections::recvonly);
-                    $this->orderedSources[] = $unsigned;
-                    $known[$unsigned] = true;
-                    $added = true;
+                $added = $this->wireReceiver($unsigned, $known) || $added;
+            }
+            foreach ($participant['presentation'] ?? [] as $presentation) {
+                $unsigned = GroupSdp::toUnsignedSsrc($presentation);
+                if ($unsigned === 0 || $unsigned === $this->videoSsrc) {
+                    continue;
                 }
+                $this->presentationOwner[$unsigned] = $audio;
+                $added = $this->wireReceiver($unsigned, $known) || $added;
             }
             $this->participantHasVideo[$audio] = $videoSsrcs !== [];
             // A participant already recording gets told whether to expect video, so an audio-only
@@ -377,6 +408,24 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         if ($added) {
             $this->renegotiate();
         }
+    }
+
+    /**
+     * Add a receive-only video transceiver for a remote video SSRC if we do not already have one.
+     *
+     * @param array<int, mixed> $known SSRCs already wired, updated in place.
+     *
+     * @return bool Whether a transceiver was added (so a renegotiation is needed).
+     */
+    private function wireReceiver(int $ssrc, array &$known): bool
+    {
+        if (isset($known[$ssrc])) {
+            return false;
+        }
+        $this->peerConnection->addTransceiver(MediaKind::Video, SDPDirections::recvonly);
+        $this->orderedSources[] = $ssrc;
+        $known[$ssrc] = true;
+        return true;
     }
 
     /**
@@ -409,6 +458,29 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
     }
 
+    /**
+     * Record a specific participant's incoming screen-share (presentation) into its own file.
+     *
+     * @param int $source The participant's signed audio SSRC.
+     */
+    public function setPresentationOutput(int $source, LocalFile|WritableStream $file): void
+    {
+        $ssrc = GroupSdp::toUnsignedSsrc($source);
+        ($this->presentationRecorders[$ssrc] ?? null)?->close();
+        unset($this->presentationRecorders[$ssrc]);
+        $this->pendingPresentationOutputs[$ssrc] = $file;
+        foreach ($this->peerConnection->getReceivers() as $receiver) {
+            $track = $receiver->getTrack();
+            if (!$track instanceof RemoteStreamTrack || $track->getKind() !== MediaKind::Video) {
+                continue;
+            }
+            $trackSsrc = $this->trackSsrc($track);
+            if ($trackSsrc !== null && ($this->presentationOwner[$trackSsrc] ?? null) === $ssrc) {
+                $this->attachTrack($track, $trackSsrc);
+            }
+        }
+    }
+
     public function close(): void
     {
         if ($this->closed) {
@@ -418,7 +490,11 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         foreach ($this->recorders as $recorder) {
             $recorder->close();
         }
+        foreach ($this->presentationRecorders as $recorder) {
+            $recorder->close();
+        }
         $this->recorders = [];
+        $this->presentationRecorders = [];
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
@@ -527,12 +603,16 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private function attachTrack(RemoteStreamTrack $track, int $ssrc): void
     {
+        if ($track->getKind() === MediaKind::Video && isset($this->presentationOwner[$ssrc])) {
+            // A screen-share is a separate stream, recorded to its own file.
+            $this->ensurePresentationRecorder($this->presentationOwner[$ssrc])?->setTrack($track);
+            return;
+        }
         $owner = $track->getKind() === MediaKind::Video ? ($this->videoOwner[$ssrc] ?? null) : $ssrc;
         if ($owner === null) {
             return;
         }
-        $recorder = $this->ensureRecorder($owner);
-        $recorder?->setTrack($track);
+        $this->ensureRecorder($owner)?->setTrack($track);
     }
 
     /**
@@ -554,6 +634,25 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         // Only hold the header for a video track if this participant is known to be transmitting one.
         $recorder->setRemoteHasVideo($this->participantHasVideo[$audioSsrc] ?? false);
         $this->recorders[$audioSsrc] = $recorder;
+        return $recorder;
+    }
+
+    /**
+     * Return the screen-share recorder for a participant (by unsigned audio SSRC), creating it from
+     * the pending presentation output the first time the participant's screen-share track arrives.
+     */
+    private function ensurePresentationRecorder(int $audioSsrc): ?CallRecorder
+    {
+        if (isset($this->presentationRecorders[$audioSsrc])) {
+            return $this->presentationRecorders[$audioSsrc];
+        }
+        $file = $this->pendingPresentationOutputs[$audioSsrc] ?? null;
+        if ($file === null) {
+            return null;
+        }
+        unset($this->pendingPresentationOutputs[$audioSsrc]);
+        $recorder = new CallRecorder($file);
+        $this->presentationRecorders[$audioSsrc] = $recorder;
         return $recorder;
     }
 

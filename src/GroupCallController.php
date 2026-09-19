@@ -75,10 +75,14 @@ final class GroupCallController implements CallInterface
 
     /** Output files/streams requested per participant peer ID. */
     private array $pendingOutputs = [];
+    /** Presentation (screen-share) output files/streams requested per participant peer ID. */
+    private array $pendingPresentationOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
     /** @var array<int, true> Peer IDs already wired to a per-participant file in folder mode. */
     private array $folderPeers = [];
+    /** @var array<int, true> Peer IDs already wired to a presentation file in folder mode. */
+    private array $folderPresentationPeers = [];
 
     public readonly GroupCall $public;
 
@@ -387,8 +391,14 @@ final class GroupCallController implements CallInterface
                 unset($this->pendingOutputs[$peerId]);
                 $this->connection?->setOutput($parsed->source, $file);
             }
+            if (isset($this->pendingPresentationOutputs[$peerId])) {
+                $file = $this->pendingPresentationOutputs[$peerId];
+                unset($this->pendingPresentationOutputs[$peerId]);
+                $this->connection?->setPresentationOutput($parsed->source, $file);
+            }
             // Folder mode: start recording a participant that has just begun transmitting.
             $this->wireFolderOutput($peerId, $parsed);
+            $this->wireFolderPresentationOutput($peerId, $parsed);
         }
     }
 
@@ -403,7 +413,11 @@ final class GroupCallController implements CallInterface
         $sources = [];
         foreach ($this->participants as $participant) {
             if ($participant->source !== 0 && $participant->source !== $this->source) {
-                $sources[] = ['audio' => $participant->source, 'video' => $participant->videoSources];
+                $sources[] = [
+                    'audio' => $participant->source,
+                    'video' => $participant->videoSources,
+                    'presentation' => $participant->presentationSources,
+                ];
             }
         }
         $this->connection->setRemoteSources($sources);
@@ -611,6 +625,7 @@ final class GroupCallController implements CallInterface
             $this->outputDir = $dir;
             foreach ($this->participants as $peerId => $known) {
                 $this->wireFolderOutput($peerId, $known);
+                $this->wireFolderPresentationOutput($peerId, $known);
             }
             return $this;
         }
@@ -651,6 +666,31 @@ final class GroupCallController implements CallInterface
         }
         $this->folderPeers[$peerId] = true;
         $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.mkv'));
+    }
+
+    /**
+     * In folder mode, give a participant that is screen-sharing its own `<dir>/<peerId>.presentation.mkv`
+     * file, once each. Called whenever a participant's presentation state changes.
+     */
+    private function wireFolderPresentationOutput(int $peerId, Participant $participant): void
+    {
+        if ($this->outputDir === null
+            || $participant->source === 0
+            || $participant->self
+            || $participant->source === $this->source
+            || $participant->presentationSources === []
+            || isset($this->folderPresentationPeers[$peerId])
+            || isset($this->pendingPresentationOutputs[$peerId]) // an explicit output takes precedence
+        ) {
+            return;
+        }
+        $this->folderPresentationPeers[$peerId] = true;
+        $file = new LocalFile($this->outputDir.'/'.$peerId.'.presentation.mkv');
+        if ($this->connection !== null) {
+            $this->connection->setPresentationOutput($participant->source, $file);
+        } else {
+            $this->pendingPresentationOutputs[$peerId] = $file;
+        }
     }
 
     /**
