@@ -26,6 +26,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use Revolt\EventLoop;
 use Throwable;
+use Webrtc\RTP\Crypto\FrameCryptorInterface;
+use Webrtc\RTP\RTCRtpTransceiver;
 use Webrtc\DataChannel\Enum\State;
 use Webrtc\DataChannel\Listener\DataChannelMessageListener;
 use Webrtc\DataChannel\Listener\DataChannelOpenListener;
@@ -169,6 +171,9 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $wantedEndpoints = [];
 
+    /** End-to-end frame cryptor for an encrypted conference; null for an ordinary (SFU-trusted) call. */
+    private ?FrameCryptorInterface $frameCryptor = null;
+
     private bool $closed = false;
     private bool $renegotiating = false;
     private bool $renegotiatePending = false;
@@ -204,6 +209,28 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         // serialize/unserialize cycle (a Closure could not be serialized).
         $this->peerConnection->addTrackListener($this);
         $this->peerConnection->addConnectionStateChangeListener($this);
+    }
+
+    /**
+     * Enable end-to-end frame encryption on this connection (for an encrypted conference): every
+     * outgoing frame is encrypted and every incoming frame decrypted by the cryptor. Applies to all
+     * current transceivers and to any created afterwards. Pass null to disable.
+     */
+    public function setFrameCryptor(?FrameCryptorInterface $frameCryptor): void
+    {
+        $this->frameCryptor = $frameCryptor;
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            $this->applyCryptor($transceiver);
+        }
+    }
+
+    /**
+     * Install the current frame cryptor (if any) on a transceiver's sender and receiver.
+     */
+    private function applyCryptor(RTCRtpTransceiver $transceiver): void
+    {
+        $transceiver->getSender()->setFrameCryptor($this->frameCryptor);
+        $transceiver->getReceiver()->setFrameCryptor($this->frameCryptor);
     }
 
     /**
@@ -427,7 +454,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 continue;
             }
             if (!isset($known[$audio])) {
-                $this->peerConnection->addTransceiver(MediaKind::Audio, SDPDirections::recvonly);
+                $this->applyCryptor($this->peerConnection->addTransceiver(MediaKind::Audio, SDPDirections::recvonly));
                 $this->orderedSources[] = $audio;
                 $known[$audio] = true;
                 $added = true;
@@ -537,7 +564,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         if (isset($known[$ssrc])) {
             return false;
         }
-        $this->peerConnection->addTransceiver(MediaKind::Video, SDPDirections::recvonly);
+        $this->applyCryptor($this->peerConnection->addTransceiver(MediaKind::Video, SDPDirections::recvonly));
         $this->orderedSources[] = $ssrc;
         $known[$ssrc] = true;
         return true;
