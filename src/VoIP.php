@@ -27,7 +27,7 @@ use danog\MadelineProto\VoIP\MediaState;
 /**
  * This update represents a VoIP Telegram call.
  */
-final class VoIP extends Update implements SimpleFilters
+final class VoIP extends Update implements SimpleFilters, Call
 {
     /** Phone call ID */
     public readonly int $callID;

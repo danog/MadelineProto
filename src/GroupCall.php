@@ -27,7 +27,7 @@ use danog\MadelineProto\GroupCall\Participant;
  *
  * See https://core.telegram.org/api/group-calls for more info.
  */
-final class GroupCall extends Update
+final class GroupCall extends Update implements Call
 {
     /** Group call ID. */
     public readonly int $id;
