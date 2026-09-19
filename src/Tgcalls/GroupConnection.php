@@ -26,6 +26,11 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use Revolt\EventLoop;
 use Throwable;
+use Webrtc\DataChannel\Enum\State;
+use Webrtc\DataChannel\Listener\DataChannelMessageListener;
+use Webrtc\DataChannel\Listener\DataChannelOpenListener;
+use Webrtc\DataChannel\RTCDataChannel;
+use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
@@ -54,8 +59,13 @@ use Webrtc\Webrtc\RTCPeerConnection;
  *
  * @internal
  */
-final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener
+final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, DataChannelOpenListener, DataChannelMessageListener
 {
+    /** Colibri video-quality tiers, in pixels of height: thumbnail, medium and full. */
+    private const HEIGHT_THUMBNAIL = 180;
+    private const HEIGHT_MEDIUM = 360;
+    private const HEIGHT_FULL = 720;
+
     private RTCPeerConnection $peerConnection;
     private OpusPlaybackTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
@@ -145,6 +155,20 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $pendingPresentationOutputs = [];
 
+    /**
+     * The colibri data channel: the client sends {@see ReceiverVideoConstraints} on it to tell the
+     * SFU which participants' video to forward, and receives quality hints on it.
+     */
+    private RTCDataChannel $dataChannel;
+    private bool $dataChannelOpen = false;
+    /**
+     * The SFU endpoints whose video we want forwarded, `endpoint => desired maximum height`. The SFU
+     * forwards a participant's video only once we subscribe to their endpoint here.
+     *
+     * @var array<string, int>
+     */
+    private array $wantedEndpoints = [];
+
     private bool $closed = false;
     private bool $renegotiating = false;
     private bool $renegotiatePending = false;
@@ -162,6 +186,12 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         $videoTransceiver = $this->peerConnection->addTransceiver($this->outgoingVideo, SDPDirections::sendonly);
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
+
+        // The colibri data channel over which we subscribe to other participants' video. tgcalls
+        // creates it up front so it is bundled into the first offer/answer with the media.
+        $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true));
+        $this->dataChannel->addOpenListener($this);
+        $this->dataChannel->addMessageListener($this);
 
         // This object is registered as a typed listener, not a closure, so it is part of the peer
         // connection's serializable state and keeps pointing at this restored connection after a
@@ -229,6 +259,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         foreach ($this->presentationRecorders as $recorder) {
             $recorder->resume();
         }
+        // Re-subscribe to remote video: the SCTP channel came back, so resend the constraints in case
+        // it did not fire its open event again (it may already be open, or reopen shortly).
+        $this->dataChannelOpen = $this->dataChannel->getReadyState() === State::Open;
+        $this->sendReceiverConstraints();
         if ($this->pendingOutputs === [] && $this->pendingPresentationOutputs === []) {
             return;
         }
@@ -360,8 +394,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * transceiver of the matching kind is created for every new SSRC; the SFU forwards that
      * participant's media on it, demultiplexed by SSRC.
      *
-     * @param list<array{audio: int, video: list<int>, presentation?: list<int>}> $participants
-     *        Signed SSRCs per participant.
+     * @param list<array{audio: int, video: list<int>, presentation?: list<int>, videoEndpoint?: ?string, presentationEndpoint?: ?string}> $participants
+     *        Signed SSRCs and SFU endpoints per participant.
      */
     public function setRemoteSources(array $participants): void
     {
@@ -370,6 +404,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
         $known = array_flip($this->orderedSources);
         $added = false;
+        $endpoints = [];
         foreach ($participants as $participant) {
             $audio = GroupSdp::toUnsignedSsrc($participant['audio']);
             if ($audio === 0 || $audio === $this->audioSsrc) {
@@ -399,6 +434,14 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 $this->presentationOwner[$unsigned] = $audio;
                 $added = $this->wireReceiver($unsigned, $known) || $added;
             }
+            // Collect the endpoints to subscribe to over the colibri data channel: the SFU forwards
+            // a stream only for endpoints we ask for. We record at full quality.
+            if ($videoSsrcs !== [] && ($participant['videoEndpoint'] ?? null) !== null) {
+                $endpoints[$participant['videoEndpoint']] = self::HEIGHT_FULL;
+            }
+            if (($participant['presentation'] ?? []) !== [] && ($participant['presentationEndpoint'] ?? null) !== null) {
+                $endpoints[$participant['presentationEndpoint']] = self::HEIGHT_FULL;
+            }
             $this->participantHasVideo[$audio] = $videoSsrcs !== [];
             // A participant already recording gets told whether to expect video, so an audio-only
             // header is not held back for one that never turns a camera on.
@@ -408,6 +451,62 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         if ($added) {
             $this->renegotiate();
         }
+        if ($endpoints !== $this->wantedEndpoints) {
+            $this->wantedEndpoints = $endpoints;
+            $this->sendReceiverConstraints();
+        }
+    }
+
+    /**
+     * Tell the SFU which participants' video to forward, over the colibri data channel. Full-quality
+     * endpoints must also be listed as "on stage". Buffered until the channel opens.
+     */
+    private function sendReceiverConstraints(): void
+    {
+        if (!$this->dataChannelOpen || $this->closed) {
+            return;
+        }
+        $constraints = [];
+        $onStage = [];
+        foreach ($this->wantedEndpoints as $endpoint => $height) {
+            $constraints[$endpoint] = ['minHeight' => 0, 'maxHeight' => $height];
+            if ($height >= self::HEIGHT_FULL) {
+                $onStage[] = $endpoint;
+            }
+        }
+        $message = [
+            'colibriClass' => 'ReceiverVideoConstraints',
+            'constraints' => (object) $constraints,
+            'onStageEndpoints' => $onStage,
+            'defaultConstraints' => ['maxHeight' => 0],
+        ];
+        try {
+            $this->dataChannel->send(json_encode($message, JSON_THROW_ON_ERROR));
+        } catch (Throwable $e) {
+            $this->call->log("Could not send video constraints on {$this->call}: $e", Logger::WARNING);
+        }
+    }
+
+    /**
+     * @internal The colibri data channel opened: flush any pending video subscription.
+     */
+    #[\Override]
+    public function onDataChannelOpen(): void
+    {
+        $this->dataChannelOpen = true;
+        $this->call->log("Colibri data channel of {$this->call} is open", Logger::VERBOSE);
+        $this->sendReceiverConstraints();
+    }
+
+    /**
+     * @internal The SFU sends encoder hints (SenderVideoConstraints) and diagnostics (DebugMessage)
+     * on the data channel. We transmit a demuxed file rather than a live encoder, so there is nothing
+     * to cap; the messages are logged for diagnostics only.
+     */
+    #[\Override]
+    public function onDataChannelMessage(string $data): void
+    {
+        $this->call->log("Colibri message on {$this->call}: $data", Logger::VERBOSE);
     }
 
     /**

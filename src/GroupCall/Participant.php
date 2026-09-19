@@ -62,6 +62,10 @@ final class Participant implements JsonSerializable
          * @var list<int>
          */
         public readonly array $presentationSources,
+        /** The SFU endpoint id of this participant's camera stream, needed to subscribe to it. */
+        public readonly ?string $videoEndpoint,
+        /** The SFU endpoint id of this participant's screen-share stream, needed to subscribe to it. */
+        public readonly ?string $presentationEndpoint,
         /** Playback volume, from 1 to 20000 where 10000 is 100%. */
         public readonly int $volume,
         /** Bio of the participant, if any. */
@@ -87,9 +91,17 @@ final class Participant implements JsonSerializable
         // keeps whatever the cached state already had, exactly like volume and muted_by_you.
         $video = self::videoSources($participant['video'] ?? null);
         $presentation = self::videoSources($participant['presentation'] ?? null);
+        $videoEndpoint = self::endpoint($participant['video'] ?? null);
+        $presentationEndpoint = self::endpoint($participant['presentation'] ?? null);
         if ($min && $cached !== null) {
-            $video = \is_array($participant['video'] ?? null) ? $video : $cached->videoSources;
-            $presentation = \is_array($participant['presentation'] ?? null) ? $presentation : $cached->presentationSources;
+            if (!\is_array($participant['video'] ?? null)) {
+                $video = $cached->videoSources;
+                $videoEndpoint = $cached->videoEndpoint;
+            }
+            if (!\is_array($participant['presentation'] ?? null)) {
+                $presentation = $cached->presentationSources;
+                $presentationEndpoint = $cached->presentationEndpoint;
+            }
         }
         return new self(
             $peerId,
@@ -104,6 +116,8 @@ final class Participant implements JsonSerializable
             $participant['video_joined'] ?? false,
             $video,
             $presentation,
+            $videoEndpoint,
+            $presentationEndpoint,
             $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
             $participant['about'] ?? null,
             $participant['raise_hand_rating'] ?? null,
@@ -137,6 +151,21 @@ final class Participant implements JsonSerializable
             }
         }
         return array_values(array_keys($sources));
+    }
+
+    /**
+     * The `endpoint` of a groupCallParticipantVideo, the key used to subscribe to that stream over
+     * the colibri data channel.
+     *
+     * @psalm-pure
+     */
+    private static function endpoint(mixed $video): ?string
+    {
+        if (!\is_array($video)) {
+            return null;
+        }
+        $endpoint = $video['endpoint'] ?? null;
+        return \is_string($endpoint) && $endpoint !== '' ? $endpoint : null;
     }
 
     /**

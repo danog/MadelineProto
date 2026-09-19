@@ -360,6 +360,21 @@ final class GroupSdp
                 continue;
             }
             [$kind, $mid, $direction] = $section;
+            if ($kind === 'application') {
+                // The SCTP data channel that carries colibri video-quality control. It is bundled on
+                // the same transport as the media, so it reuses the SFU's ICE/DTLS parameters.
+                $result[] = 'm=application 9 UDP/DTLS/SCTP webrtc-datachannel';
+                $result[] = 'c=IN IP4 0.0.0.0';
+                $result[] = 'a=mid:'.$mid;
+                $result[] = 'a=sctp-port:5000';
+                $result[] = 'a=ice-ufrag:'.$ufrag;
+                $result[] = 'a=ice-pwd:'.$pwd;
+                $result = array_merge($result, $fingerprints);
+                $result[] = 'a=setup:'.$setup;
+                $result = array_merge($result, $candidates);
+                $result[] = 'a=end-of-candidates';
+                continue;
+            }
             // The SFU sends the m-lines we mapped to a participant, and receives our own ones.
             $ssrc = $sources[$mid] ?? null;
             $codecs = self::codecs($kind, $video);

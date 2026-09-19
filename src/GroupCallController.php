@@ -417,6 +417,8 @@ final class GroupCallController implements CallInterface
                     'audio' => $participant->source,
                     'video' => $participant->videoSources,
                     'presentation' => $participant->presentationSources,
+                    'videoEndpoint' => $participant->videoEndpoint,
+                    'presentationEndpoint' => $participant->presentationEndpoint,
                 ];
             }
         }
