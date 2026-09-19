@@ -1220,6 +1220,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                     break;
                 case 'MediaState':
                     $this->remoteMediaState = MediaState::fromSignaling($message);
+                    // Let the recorder commit its header without waiting once the peer's real video
+                    // state is known: its camera counts for the main recording, its screencast for the
+                    // separate presentation recording.
+                    $this->callRecorder?->setRemoteHasVideo($this->remoteMediaState->video);
+                    $this->presentationRecorder?->setRemoteHasVideo($this->remoteMediaState->screencast);
                     break;
                 case 'InitialSetup':
                     /** @var array<string, mixed> $message */

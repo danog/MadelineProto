@@ -61,6 +61,9 @@ final class CallRecorder
     private ?int $videoBaseTs = null;
     private ?int $audioBaseTs = null;
 
+    /** The peer's advertised video state (from its MediaState): true has video, false none, null unknown. */
+    private ?bool $remoteHasVideo = null;
+
     /** The file being recorded to, or null for a stream (which cannot survive a serialize cycle). */
     public readonly ?LocalFile $file;
 
@@ -139,6 +142,19 @@ final class CallRecorder
         }
     }
 
+    /**
+     * Tell the recorder whether the peer is transmitting video, from its MediaState. When it is not,
+     * and audio is already buffered, the audio-only header is committed immediately rather than after
+     * the grace period — replacing the blind wait with a deterministic signal.
+     */
+    public function setRemoteHasVideo(bool $hasVideo): void
+    {
+        $this->remoteHasVideo = $hasVideo;
+        if (!$hasVideo && !$this->started && !$this->closed && $this->audioBuffer !== []) {
+            $this->begin();
+        }
+    }
+
     private function drainAudio(): void
     {
         $consumer = $this->audioConsumer;
@@ -159,8 +175,12 @@ final class CallRecorder
                 $this->writer->writeAudio($frame->getData(), $ms);
             } else {
                 $this->audioBuffer[] = ['data' => $frame->getData(), 'ms' => $ms];
-                // If no video showed up, commit an audio-only file after a short grace period.
-                if (microtime(true) - $this->firstAudioAt > self::VIDEO_WAIT) {
+                // Commit the header as soon as we KNOW the peer is not sending video (from its
+                // MediaState), instead of blindly waiting; the timed grace period is only a backstop
+                // for a peer that never announces its media state.
+                if ($this->remoteHasVideo === false
+                    || microtime(true) - $this->firstAudioAt > self::VIDEO_WAIT
+                ) {
                     $this->begin();
                 }
             }
