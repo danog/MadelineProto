@@ -55,6 +55,10 @@ final class GroupCallController implements CallInterface
 
     private ?GroupConnection $connection = null;
     private DjLoop $diskJockey;
+    /** The separate screen-share connection (phone.joinGroupCallPresentation), while sharing a screen. */
+    private ?GroupConnection $presentationConnection = null;
+    /** The video-only disk jockey feeding the screen-share connection, if any. */
+    private ?DjLoop $presentationDj = null;
     private LocalMutex $joinMutex;
 
     /** @var array<int, Participant> Participants indexed by their bot API peer ID. */
@@ -131,6 +135,9 @@ final class GroupCallController implements CallInterface
         }
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
+        if ($this->presentationDj !== null) {
+            Assert::true($this->presentationDj->start());
+        }
         EventLoop::queue(function (): void {
             if ($this->callState !== GroupCallState::JOINED && $this->callState !== GroupCallState::JOINING) {
                 return;
@@ -140,6 +147,7 @@ final class GroupCallController implements CallInterface
             // to their live tracks) and re-poll the participant list so received sources are in sync.
             $this->log("Resumed $this after a restart of the process.");
             $this->connection?->resume();
+            $this->presentationConnection?->resume();
             EventLoop::queue($this->refetch(...));
         });
     }
@@ -555,6 +563,10 @@ final class GroupCallController implements CallInterface
         $this->stopChecking();
         $this->cancelGapRefetch();
         $this->diskJockey->discard();
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
+        $this->presentationConnection?->close();
+        $this->presentationConnection = null;
         $this->connection?->close();
         $this->connection = null;
         $this->API->cleanupGroupCall($this->public->id);
@@ -781,21 +793,116 @@ final class GroupCallController implements CallInterface
     // Playback API, mirroring the one-to-one call API.
 
     /**
-     * Group-call presentation (screen-share) is not wired up yet — it needs the separate
-     * presentation connection (phone.joinGroupCallPresentation), which lands with full group video.
+     * The disk jockey feeding a given destination: the main one for the camera, and the video-only
+     * screen-share one for the presentation (joining the separate presentation connection on first
+     * use). Screen-share is video-only, so it does not require OGG OPUS audio.
      */
-    private static function requireCamera(MediaDestination $dest): void
+    private function dj(MediaDestination $dest): DjLoop
     {
-        if ($dest !== MediaDestination::Camera) {
-            throw new \RuntimeException('Group call presentation (screen-share) is not supported yet; it lands with full group video support.');
+        if ($dest === MediaDestination::Camera) {
+            return $this->diskJockey;
+        }
+        $this->enablePresentation();
+        \assert($this->presentationDj !== null);
+        return $this->presentationDj;
+    }
+
+    /**
+     * The disk jockey feeding a destination, without starting a screen-share that is not running:
+     * returns null for the presentation when no screen is being shared. For control/query methods.
+     */
+    private function djOrNull(MediaDestination $dest): ?DjLoop
+    {
+        return $dest === MediaDestination::Camera ? $this->diskJockey : $this->presentationDj;
+    }
+
+    /**
+     * Start the separate screen-share connection (phone.joinGroupCallPresentation) if it is not up
+     * yet. The screen-share is a fully separate WebRTC connection with its own SSRC and transport;
+     * see https://core.telegram.org/api/group-calls.
+     */
+    public function enablePresentation(): void
+    {
+        if ($this->presentationConnection !== null) {
+            return;
+        }
+        if ($this->callState !== GroupCallState::JOINED) {
+            throw new \RuntimeException('Cannot share a screen before joining the group call.');
+        }
+        $this->presentationDj ??= new DjLoop($this, videoOnly: true);
+        Assert::true($this->presentationDj->start());
+        $connection = new GroupConnection($this, $this->presentationDj, screencast: true);
+        $params = $connection->buildJoinPayload();
+        $this->presentationConnection = $connection;
+        $this->log("Joining the presentation of $this...", Logger::VERBOSE);
+        try {
+            $updates = $this->API->methodCallAsyncRead('phone.joinGroupCallPresentation', [
+                'call' => $this->inputCall,
+                'params' => $params,
+            ]);
+        } catch (Throwable $e) {
+            $this->presentationConnection = null;
+            $connection->close();
+            throw $e;
+        }
+        foreach ($updates['updates'] as $update) {
+            if ($update['_'] === 'updateGroupCallConnection' && ($update['presentation'] ?? false)) {
+                $parsed = GroupSdp::parseJoinResponse($update['params']);
+                if ($parsed['transport'] !== null) {
+                    $connection->setTransport($parsed['transport'], $parsed['video']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Stop sharing the screen: tear down the presentation connection and tell the server.
+     */
+    public function disablePresentation(): void
+    {
+        if ($this->presentationConnection === null) {
+            return;
+        }
+        $this->presentationConnection->close();
+        $this->presentationConnection = null;
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
+        if ($this->callState === GroupCallState::JOINED) {
+            try {
+                $this->API->methodCallAsyncRead('phone.leaveGroupCallPresentation', ['call' => $this->inputCall]);
+            } catch (Throwable $e) {
+                $this->log("Could not leave the presentation of $this: $e", Logger::WARNING);
+            }
+        }
+    }
+
+    /**
+     * Tell the server whether our screen-share is paused.
+     *
+     * @internal Driven by the screen-share {@see GroupConnection} as its file's video starts and stops.
+     */
+    public function setPresentationPaused(bool $paused): void
+    {
+        if ($this->callState !== GroupCallState::JOINED) {
+            return;
+        }
+        try {
+            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
+                'call' => $this->inputCall,
+                'participant' => ['_' => 'inputPeerSelf'],
+                'presentation_paused' => $paused,
+            ]);
+        } catch (Throwable $e) {
+            $this->log("Could not change the presentation state of $this: $e", Logger::WARNING);
         }
     }
 
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        self::requireCamera($dest);
-        self::validateCallAudio($file);
-        $this->diskJockey->play($file);
+        if ($dest === MediaDestination::Camera) {
+            self::validateCallAudio($file);
+        }
+        $this->dj($dest)->play($file);
     }
     /**
      * Play a file, blocking until it has finished playing if a stream is provided.
@@ -832,41 +939,40 @@ final class GroupCallController implements CallInterface
     }
     public function skip(MediaDestination $dest = MediaDestination::Camera): void
     {
-        self::requireCamera($dest);
-        $this->diskJockey->skip();
+        $this->djOrNull($dest)?->skip();
     }
     public function stop(MediaDestination $dest = MediaDestination::Camera): void
     {
-        self::requireCamera($dest);
+        if ($dest === MediaDestination::Presentation) {
+            $this->disablePresentation();
+            return;
+        }
         $this->diskJockey->stopPlaying();
     }
     public function pause(MediaDestination $dest = MediaDestination::Camera): void
     {
-        self::requireCamera($dest);
-        $this->diskJockey->pausePlaying();
+        $this->djOrNull($dest)?->pausePlaying();
     }
     public function resume(MediaDestination $dest = MediaDestination::Camera): void
     {
-        self::requireCamera($dest);
-        $this->diskJockey->resumePlaying();
+        $this->djOrNull($dest)?->resumePlaying();
     }
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
-        self::requireCamera($dest);
-        return $this->diskJockey->isAudioPaused();
+        return $this->djOrNull($dest)?->isAudioPaused() ?? false;
     }
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        self::requireCamera($dest);
-        foreach ($files as $file) {
-            self::validateCallAudio($file);
+        if ($dest === MediaDestination::Camera) {
+            foreach ($files as $file) {
+                self::validateCallAudio($file);
+            }
         }
-        $this->diskJockey->playOnHold(...$files);
+        $this->dj($dest)->playOnHold(...$files);
     }
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
-        self::requireCamera($dest);
-        return $this->diskJockey->getCurrent();
+        return $this->djOrNull($dest)?->getCurrent();
     }
 
     /**

@@ -176,6 +176,12 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __construct(
         private readonly GroupCallController $call,
         DjLoop $dj,
+        /**
+         * Whether this is the separate screen-share (presentation) connection created by
+         * phone.joinGroupCallPresentation, rather than the main camera/audio one. It transmits only,
+         * never receives, and its video-state changes toggle the presentation, not the camera.
+         */
+        private readonly bool $screencast = false,
     ) {
         $this->peerConnection = new RTCPeerConnection(['iceServers' => []]);
         $dj->setVideoCodecObserver($this);
@@ -344,7 +350,13 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     #[\Override]
     public function onVideoCodec(string $codec, array $parameters = []): void
     {
-        $this->call->setVideoStopped(false);
+        // The camera connection tells the server it is publishing video; the screencast connection's
+        // publishing state is set by joining the presentation, and only its paused flag toggles here.
+        if ($this->screencast) {
+            $this->call->setPresentationPaused(false);
+        } else {
+            $this->call->setVideoStopped(false);
+        }
         if ($codec === $this->outgoingVideoCodec && $parameters === $this->outgoingVideoParameters) {
             return;
         }
@@ -360,7 +372,11 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     #[\Override]
     public function onVideoStopped(): void
     {
-        $this->call->setVideoStopped(true);
+        if ($this->screencast) {
+            $this->call->setPresentationPaused(true);
+        } else {
+            $this->call->setVideoStopped(true);
+        }
     }
 
     /**
