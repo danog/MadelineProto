@@ -185,7 +185,11 @@ final class DjLoop extends VoIPLoop
     private int $generation = 0;
     private ?DeferredCancellation $readerCancel = null;
 
-    public function __construct(CallInterface $instance)
+    /**
+     * @param bool $videoOnly When true, the audio of played files is dropped and only their video is
+     *                        queued — used for a presentation/screencast stream, which carries no audio.
+     */
+    public function __construct(CallInterface $instance, private bool $videoOnly = false)
     {
         parent::__construct($instance);
         $this->oggQueue = new SplQueue;
@@ -258,6 +262,7 @@ final class DjLoop extends VoIPLoop
             'videoCodec' => $this->videoCodec,
             'videoParameters' => $this->videoParameters,
             'videoProfileFromFrame' => $this->videoProfileFromFrame,
+            'videoOnly' => $this->videoOnly,
             'framing' => $this->framing,
             'webmVideoAnnounced' => $this->webmVideoAnnounced,
         ];
@@ -765,6 +770,10 @@ final class DjLoop extends VoIPLoop
         $timestampMs = $frame['timestamp'];
         $this->bufferedUntilMs = max($this->bufferedUntilMs, $timestampMs);
         if (isset(self::AUDIO_CODECS[$frame['codec']])) {
+            // A presentation/screencast stream transmits video only; drop its audio.
+            if ($this->videoOnly) {
+                return false;
+            }
             $this->webmAudioQueue->enqueue([
                 'data' => $frame['data'],
                 'timestamp' => (int) ($timestampMs * self::AUDIO_CLOCK_RATE / 1000),

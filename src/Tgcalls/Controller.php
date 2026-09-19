@@ -62,6 +62,14 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private MediaStreamTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
     private ?RTCRtpTransceiver $videoTransceiver = null;
+    /** The outgoing presentation (screencast) video, fed by a separate video-only playlist. */
+    private ?VideoPlaybackTrack $outgoingScreencast = null;
+    private ?RTCRtpTransceiver $screencastTransceiver = null;
+    private ?ScreencastCodecObserver $screencastObserver = null;
+    private ?string $outgoingScreencastCodec = null;
+    /** SDP fmtp parameters of the outgoing screencast file, derived from its bitstream. */
+    private array $outgoingScreencastParameters = [];
+    private bool $screencastEnabled = false;
     private ?OpusRecorder $recorder = null;
     private ?CallRecorder $callRecorder = null;
 
@@ -391,29 +399,104 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     private function applyVideoCodecPreferences(RTCRtpTransceiver $transceiver): void
     {
-        $codec = $this->outgoingVideoCodec;
-        if ($codec === null) {
+        if ($this->outgoingVideoCodec === null) {
             return;
         }
+        $transceiver->setCodecPreferences($this->orderedVideoCapabilities(
+            $this->outgoingVideoCodec,
+            $this->outgoingVideoParameters,
+            $this->dropVp8FromOffer,
+        ));
+    }
+
+    /**
+     * Build the ordered video codec capability list to advertise: the given codec first (so
+     * order-honouring peers select it), carrying the file's real bitstream parameters, followed by the
+     * rest of the table (so the peer's own camera can still be received). VP8 is dropped when asked.
+     *
+     * @return list<\Webrtc\RTPParameter\RTCRtpCodecParameters>
+     */
+    private function orderedVideoCapabilities(string $codec, array $parameters, bool $dropVp8Requested): array
+    {
         $capabilities = (new Codec())->getCapabilities('video')->codecs;
         $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
         $isVp8 = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/VP8') === 0;
         // Advertise the file's real profile/level/tier (derived from its bitstream) for its codec,
         // so what we offer matches what we actually transmit instead of the generic fallback.
-        if ($this->outgoingVideoParameters !== []) {
+        if ($parameters !== []) {
             foreach ($capabilities as $capability) {
                 if ($isFile($capability)) {
-                    $capability->parameters = array_merge($capability->parameters, $this->outgoingVideoParameters);
+                    $capability->parameters = array_merge($capability->parameters, $parameters);
                 }
             }
         }
-        $dropVp8 = $this->dropVp8FromOffer && strcasecmp($codec, 'VP8') !== 0;
+        $dropVp8 = $dropVp8Requested && strcasecmp($codec, 'VP8') !== 0;
         $others = array_filter(
             $capabilities,
             static fn ($capability): bool => !$isFile($capability) && !($dropVp8 && $isVp8($capability)),
         );
-        $preferred = array_values(array_merge(array_filter($capabilities, $isFile), $others));
-        $transceiver->setCodecPreferences($preferred);
+        return array_values(array_merge(array_filter($capabilities, $isFile), $others));
+    }
+
+    /**
+     * Attach the presentation (screencast) playlist as a separate outgoing video stream, created once
+     * on the first presentation playback. The screencast is a second `video` content with its own SSRC
+     * (tgcalls has no distinct screencast content type); the peer is told it is a screencast purely via
+     * the {@see MediaState} `screencastState` field.
+     */
+    public function enablePresentation(DjLoop $presentationDj): void
+    {
+        if ($this->outgoingScreencast !== null) {
+            return;
+        }
+        $this->outgoingScreencast = new VideoPlaybackTrack($presentationDj, $this->call);
+        $this->screencastObserver = new ScreencastCodecObserver($this);
+        $presentationDj->setVideoCodecObserver($this->screencastObserver);
+    }
+
+    /**
+     * Notified (via {@see ScreencastCodecObserver}) of the codec of the presentation file being played:
+     * bring up the screencast video content and announce it as active.
+     */
+    public function onScreencastCodec(string $codec, array $parameters = []): void
+    {
+        if ($this->outgoingScreencast === null) {
+            return;
+        }
+        $this->screencastEnabled = true;
+        $transceiver = $this->ensureScreencastTransceiver();
+        $transceiver->setDirection(SDPDirections::sendonly);
+        $this->outgoingScreencast->setTransportReady(false);
+        if ($codec !== $this->outgoingScreencastCodec || $parameters !== $this->outgoingScreencastParameters) {
+            $this->outgoingScreencastCodec = $codec;
+            $this->outgoingScreencastParameters = $parameters;
+            $transceiver->setCodecPreferences($this->orderedVideoCapabilities($codec, $parameters, false));
+        }
+        $this->renegotiate();
+        $this->sendMediaState($this->muted);
+    }
+
+    /**
+     * Notified that the presentation playlist finished: stop advertising the screencast.
+     */
+    public function onScreencastStopped(): void
+    {
+        if (!$this->screencastEnabled) {
+            return;
+        }
+        $this->screencastEnabled = false;
+        $this->screencastTransceiver?->setDirection(SDPDirections::inactive);
+        $this->outgoingScreencast?->setTransportReady(true);
+        $this->renegotiate();
+        $this->sendMediaState($this->muted);
+    }
+
+    private function ensureScreencastTransceiver(): RTCRtpTransceiver
+    {
+        return $this->screencastTransceiver ??= $this->peerConnection->addTransceiver(
+            $this->outgoingScreencast,
+            SDPDirections::sendonly,
+        );
     }
 
     /**
@@ -541,7 +624,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             'muted' => $muted,
             'videoState' => $video || $this->outgoingVideo->isPlaying() ? 'active' : 'inactive',
             'videoRotation' => 0,
-            'screencastState' => 'inactive',
+            'screencastState' => $this->screencastEnabled || ($this->outgoingScreencast?->isPlaying() ?? false) ? 'active' : 'inactive',
             'isBatteryLow' => $batteryLow,
         ]);
     }
@@ -750,6 +833,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->pendingV2ExchangeId = null;
             $this->localV2Negotiated = true;
             $this->outgoingVideo->setTransportReady(true);
+            $this->outgoingScreencast?->setTransportReady(true);
             $this->hasRemoteDescription = true;
             $this->flushPendingCandidates();
             $this->forceFileCodecIfRejected();
@@ -1081,6 +1165,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, $type));
         if ($type === 'answer') {
             $this->outgoingVideo->setTransportReady(true);
+            $this->outgoingScreencast?->setTransportReady(true);
         }
         $this->hasRemoteDescription = true;
         $this->flushPendingCandidates();
