@@ -14,8 +14,10 @@ true#3fedd339 = True;
 
 vector#1cb5c415 {t:Type} # [ t ] = Vector t;
 
-e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
-e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:int64 chain_height:int32 chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
+// int64/int32 in TDLib's e2e_api.tl are wire-identical to long/int; these constructors have explicit
+// ids, so using MadelineProto's native scalar types keeps the bytes and the id unchanged.
+e2e.chain.groupBroadcastNonceCommit#d1512ae7 signature:int512 user_id:long chain_height:int chain_hash:int256 nonce_hash:int256 = e2e.chain.GroupBroadcast;
+e2e.chain.groupBroadcastNonceReveal#83f4f9d8 signature:int512 user_id:long chain_height:int chain_hash:int256 nonce:int256 = e2e.chain.GroupBroadcast;
 
 e2e.chain.groupParticipant user_id:long public_key:int256 flags:# add_users:flags.0?true remove_users:flags.1?true version:int = e2e.chain.GroupParticipant;
 e2e.chain.groupState participants:vector<e2e.chain.GroupParticipant> external_permissions:int = e2e.chain.GroupState;
