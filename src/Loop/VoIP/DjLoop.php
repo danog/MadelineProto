@@ -41,6 +41,7 @@ use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
+use Webrtc\Codecs\Codec;
 
 /**
  * The single disc jockey of a call: it plays a playlist of files, streaming both their audio and
@@ -167,6 +168,10 @@ final class DjLoop extends VoIPLoop
 
     private ?VideoCodecObserver $videoObserver = null;
     private ?string $videoCodec = null;
+    /** SDP fmtp parameters (profile/level/etc.) of the current video file, derived from its bitstream. */
+    private array $videoParameters = [];
+    /** Whether {@see self::$videoParameters} is still a tentative value awaiting the first keyframe. */
+    private bool $videoProfileFromFrame = false;
     private ?H264Framing $framing = null;
     /** Whether a video codec was announced and still owes the observer a stop notification. */
     private bool $webmVideoAnnounced = false;
@@ -209,7 +214,8 @@ final class DjLoop extends VoIPLoop
         // its transceivers, and before the initial offer it queues itself.
         if ($this->videoCodec !== null) {
             $codec = $this->videoCodec;
-            EventLoop::queue(static fn () => $observer->onVideoCodec($codec));
+            $parameters = $this->videoParameters;
+            EventLoop::queue(static fn () => $observer->onVideoCodec($codec, $parameters));
         }
     }
 
@@ -250,6 +256,8 @@ final class DjLoop extends VoIPLoop
             'playbackMs' => $this->playbackMs,
             'videoObserver' => $this->videoObserver,
             'videoCodec' => $this->videoCodec,
+            'videoParameters' => $this->videoParameters,
+            'videoProfileFromFrame' => $this->videoProfileFromFrame,
             'framing' => $this->framing,
             'webmVideoAnnounced' => $this->webmVideoAnnounced,
         ];
@@ -491,6 +499,16 @@ final class DjLoop extends VoIPLoop
     public function getVideoCodec(): ?string
     {
         return $this->videoCodec;
+    }
+
+    /**
+     * The SDP fmtp parameters (profile/level/tier/…) of the current video, derived from its bitstream.
+     *
+     * @return array<string, string>
+     */
+    public function getVideoParameters(): array
+    {
+        return $this->videoParameters;
     }
 
     /* ==================================================================== *
@@ -756,6 +774,16 @@ final class DjLoop extends VoIPLoop
         if ($this->videoCodec === null || (self::VIDEO_CODECS[$frame['codec']] ?? null) !== $this->videoCodec) {
             return false;
         }
+        // Confirm the VP9 profile from the first real keyframe (no configuration record was stored);
+        // re-announce only if it differs from the tentative profile 0 advertised in selectTracks().
+        if ($this->videoProfileFromFrame && $frame['keyframe']) {
+            $this->videoProfileFromFrame = false;
+            $parameters = Codec::fmtpFromBitstream('video/'.$this->videoCodec, '', $frame['data']);
+            if ($parameters !== [] && $parameters !== $this->videoParameters) {
+                $this->videoParameters = $parameters;
+                $this->videoObserver?->onVideoCodec($this->videoCodec, $parameters);
+            }
+        }
         $this->videoQueue->enqueue([
             'data' => $this->framing?->convert($frame['data'], $frame['keyframe']) ?? $frame['data'],
             'timestamp' => (int) ($timestampMs * self::VIDEO_CLOCK_RATE / 1000),
@@ -850,14 +878,25 @@ final class DjLoop extends VoIPLoop
     private function selectTracks(Matroska $matroska): void
     {
         $this->videoCodec = null;
+        $this->videoParameters = [];
+        $this->videoProfileFromFrame = false;
         $this->framing = null;
         foreach ($matroska->tracks as $track) {
             if ($this->videoCodec !== null || !isset(self::VIDEO_CODECS[$track['codec']])) {
                 continue;
             }
             $this->videoCodec = self::VIDEO_CODECS[$track['codec']];
+            $private = $track['private'] ?? '';
             if ($this->videoCodec === 'H264') {
-                $this->framing = new H264Framing($track['private']);
+                $this->framing = new H264Framing($private);
+            }
+            // Advertise the file's real profile/level/tier instead of the generic fallback.
+            $this->videoParameters = Codec::fmtpFromBitstream('video/'.$this->videoCodec, $private);
+            // VP9 in WebM usually carries no configuration record; its profile is in every frame.
+            // Advertise the common profile 0 for now and confirm it from the first keyframe.
+            if ($this->videoParameters === [] && $this->videoCodec === 'VP9') {
+                $this->videoParameters = ['profile-id' => '0'];
+                $this->videoProfileFromFrame = true;
             }
         }
         $this->warnAboutDroppedTracks($matroska, Matroska::TRACK_TYPE_VIDEO, self::VIDEO_CODECS);
@@ -866,7 +905,7 @@ final class DjLoop extends VoIPLoop
             // The transport has to be renegotiated before the first frame goes out, or the peer
             // would decode it as whatever codec the previous file used.
             $this->webmVideoAnnounced = true;
-            $this->videoObserver?->onVideoCodec($this->videoCodec);
+            $this->videoObserver?->onVideoCodec($this->videoCodec, $this->videoParameters);
         }
     }
 

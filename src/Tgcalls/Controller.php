@@ -87,6 +87,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $renegotiatePending = false;
     private bool $videoEnabled = false;
     private ?string $outgoingVideoCodec = null;
+    /** SDP fmtp parameters of the outgoing video file, derived from its bitstream (profile/level/…). */
+    private array $outgoingVideoParameters = [];
     /**
      * Set once, after the peer's answer reveals it selected a codec other than our file's for our
      * outgoing video, meaning it ignored our preference order (Telegram web hardcodes VP8). We then
@@ -364,7 +366,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * call and the incoming video keep working — which is what {@see self::record()} needs.
      */
     #[\Override]
-    public function onVideoCodec(string $codec): void
+    public function onVideoCodec(string $codec, array $parameters = []): void
     {
         $this->videoEnabled = true;
         $transceiver = $this->ensureVideoTransceiver();
@@ -372,8 +374,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // Keep the first (usually only immediately useful) keyframe queued until the answer has
         // selected the codec of this file.
         $this->outgoingVideo->setTransportReady(false);
-        if ($codec !== $this->outgoingVideoCodec) {
+        if ($codec !== $this->outgoingVideoCodec || $parameters !== $this->outgoingVideoParameters) {
             $this->outgoingVideoCodec = $codec;
+            $this->outgoingVideoParameters = $parameters;
             $this->applyVideoCodecPreferences($transceiver);
         }
         $this->renegotiate();
@@ -395,6 +398,15 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $capabilities = (new Codec())->getCapabilities('video')->codecs;
         $isFile = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/'.$codec) === 0;
         $isVp8 = static fn ($capability): bool => strcasecmp($capability->mimeType, 'video/VP8') === 0;
+        // Advertise the file's real profile/level/tier (derived from its bitstream) for its codec,
+        // so what we offer matches what we actually transmit instead of the generic fallback.
+        if ($this->outgoingVideoParameters !== []) {
+            foreach ($capabilities as $capability) {
+                if ($isFile($capability)) {
+                    $capability->parameters = array_merge($capability->parameters, $this->outgoingVideoParameters);
+                }
+            }
+        }
         $dropVp8 = $this->dropVp8FromOffer && strcasecmp($codec, 'VP8') !== 0;
         $others = array_filter(
             $capabilities,

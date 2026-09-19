@@ -36,9 +36,11 @@ interface VideoCodecObserver
      * Pin the outgoing video m-line to the codec of the file being played.
      *
      * @param string $codec The SDP encoding name (e.g. `VP8`, `H264`) of the video being transmitted.
+     * @param array<string, string> $parameters The SDP fmtp parameters (profile/level/tier/…) derived
+     *                                           from the file's bitstream, to advertise for this codec.
      * @psalm-impure
      */
-    public function onVideoCodec(string $codec): void;
+    public function onVideoCodec(string $codec, array $parameters = []): void;
 
     /**
      * React to the demuxed video file finishing: the outgoing video is no longer being transmitted.

@@ -79,6 +79,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * changes. VP8 until a file says otherwise, since that is what the SFU lists first.
      */
     private string $outgoingVideoCodec = 'VP8';
+    /** SDP fmtp parameters of the outgoing video file, derived from its bitstream (profile/level/…). */
+    private array $outgoingVideoParameters = [];
 
     /**
      * Remote audio SSRCs currently wired to a transceiver, as `mid => ssrc`.
@@ -246,14 +248,15 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * Any video codec a group call carries works: see {@see DjLoop::VIDEO_CODECS}.
      */
     #[\Override]
-    public function onVideoCodec(string $codec): void
+    public function onVideoCodec(string $codec, array $parameters = []): void
     {
         $this->call->setVideoStopped(false);
-        if ($codec === $this->outgoingVideoCodec) {
+        if ($codec === $this->outgoingVideoCodec && $parameters === $this->outgoingVideoParameters) {
             return;
         }
         $this->call->log("Switching the outgoing video of {$this->call} to $codec");
         $this->outgoingVideoCodec = $codec;
+        $this->outgoingVideoParameters = $parameters;
         $this->renegotiate();
     }
 

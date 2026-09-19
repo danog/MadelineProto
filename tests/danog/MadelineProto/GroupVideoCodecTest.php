@@ -106,12 +106,22 @@ final class GroupVideoCodecTest extends TestCase
      */
     private static function play(string $file): array
     {
+        $dj = self::playDj($file);
+
+        return [$dj->getVideoCodec(), $dj->pullVideo()];
+    }
+
+    /**
+     * Play a file to completion and return the source itself, for inspecting its negotiated state.
+     */
+    private static function playDj(string $file): DjLoop
+    {
         $dj = new DjLoop(self::call());
         $dj->play(new ReadableBuffer($file));
         // play() defers the streaming reader onto the event loop, so let it run to completion.
         EventLoop::run();
 
-        return [$dj->getVideoCodec(), $dj->pullVideo()];
+        return $dj;
     }
 
     /**
@@ -201,6 +211,28 @@ final class GroupVideoCodecTest extends TestCase
             'm=video 9 UDP/TLS/RTP/SAVPF 100 101 102 103 104 105',
             $mLines[1]
         );
+    }
+
+    /**
+     * The fmtp parameters advertised for our outgoing video must be read from the file's bitstream
+     * (its configuration record, or a keyframe for VP9), not hardcoded.
+     */
+    public function testItAdvertisesTheFilesRealCodecParameters(): void
+    {
+        // AV1 av1C: seq_profile 0, seq_level_idx 8 (level 4.0), seq_tier 0.
+        $dj = self::playDj(self::buildFile('V_AV1', "\x81\x08\x0c\x00"));
+        $this->assertSame('AV1', $dj->getVideoCodec());
+        $this->assertSame(['profile' => '0', 'level-idx' => '8', 'tier' => '0'], $dj->getVideoParameters());
+
+        // H264 avcC bytes 1-3 (profile/compat/level) form the SDP profile-level-id.
+        $dj = self::playDj(self::buildFile('V_MPEG4/ISO/AVC', "\x01\x4D\x40\x1F\xFF\xE0\x00", pack('N', 5)."\x65abcd"));
+        $this->assertSame('H264', $dj->getVideoCodec());
+        $this->assertSame('4d401f', $dj->getVideoParameters()['profile-level-id']);
+
+        // VP9 without a configuration record advertises the common profile 0.
+        $dj = self::playDj(self::buildFile('V_VP9'));
+        $this->assertSame('VP9', $dj->getVideoCodec());
+        $this->assertSame(['profile-id' => '0'], $dj->getVideoParameters());
     }
 
     /**
