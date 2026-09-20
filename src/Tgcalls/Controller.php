@@ -417,38 +417,24 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     public function setOutput(LocalFile|WritableStream $file): void
     {
         $this->enableRawReceive();
-        $wantsVideo = $file instanceof LocalFile
-            && preg_match('/\.(mkv|webm)$/i', $file->file) === 1;
 
         $this->recorder?->close();
         $this->recorder = null;
         $this->callRecorder?->close();
         $this->callRecorder = null;
 
-        if ($wantsVideo) {
-            $this->callRecorder = new CallRecorder($file);
-            $kinds = [];
-            $recv = 0; // RECDEBUG
-            foreach ($this->peerConnection->getReceivers() as $receiver) {
-                $recv++; // RECDEBUG
-                $track = $receiver->getTrack();
-                if ($track instanceof RemoteStreamTrack) {
-                    $kinds[] = $track->getKind()->name; // RECDEBUG
-                    $this->callRecorder->setTrack($track);
-                }
-            }
-            $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
-            return;
-        }
-
-        $this->recorder = new OpusRecorder($file);
+        $this->callRecorder = new CallRecorder($file);
+        $kinds = [];
+        $recv = 0; // RECDEBUG
         foreach ($this->peerConnection->getReceivers() as $receiver) {
+            $recv++; // RECDEBUG
             $track = $receiver->getTrack();
-            if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
-                $this->recorder->setTrack($track);
-                break;
+            if ($track instanceof RemoteStreamTrack) {
+                $kinds[] = $track->getKind()->name; // RECDEBUG
+                $this->callRecorder->setTrack($track);
             }
         }
+        $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
     }
 
     /**
