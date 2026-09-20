@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Tgcalls\E2E;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Call;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaDestination;
@@ -44,7 +45,7 @@ use Throwable;
  * and {@see \danog\MadelineProto\MTProto::joinConferenceCall()}; it implements the common
  * {@see Call} media interface plus conference-specific controls (verification, encrypted messages).
  */
-final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
+final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyProvider
 {
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
     private const SUBCHAIN_STATE = 0;
@@ -170,6 +171,18 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     public function getInputCall(): array
     {
         return $this->inputCall ?? throw new \RuntimeException('The conference call does not exist yet.');
+    }
+
+    /** Whether we are currently in the conference (joined and not left/forbidden). */
+    public function isJoined(): bool
+    {
+        return $this->joined;
+    }
+
+    /** Whether a screen-share is currently being transmitted. */
+    public function isSharingScreen(): bool
+    {
+        return $this->presentationConnection !== null;
     }
 
     /* ------------------------------------------------------------------ *
@@ -681,9 +694,11 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     }
 
     /**
-     * Leave the conference: stop the backstop poll and stop receiving its updates.
+     * Leave the conference, keeping it running for the other participants: stop the backstop poll and
+     * stop receiving its updates.
      */
-    public function leave(): void
+    #[\Override]
+    public function leave(): self
     {
         $this->joined = false;
         if ($this->pollWatcher !== null) {
@@ -695,7 +710,7 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
         $this->presentationDj?->discard();
         $this->presentationDj = null;
         if ($this->inputCall === null) {
-            return;
+            return $this;
         }
         $this->API->unregisterConferenceCall($this->inputCall['id']);
         $source = $this->connection?->getAudioSource() ?? 0;
@@ -706,6 +721,19 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
         } catch (Throwable $e) {
             $this->log("Could not leave $this: $e", Logger::WARNING);
         }
+        return $this;
+    }
+
+    /**
+     * The participants currently in the conference, keyed by user id, each with their Ed25519
+     * `public_key` and `permissions` bits from the shared-state chain.
+     *
+     * @return array<int, array{public_key: string, permissions: int}>
+     */
+    #[\Override]
+    public function getParticipants(): array
+    {
+        return $this->chain->getParticipants();
     }
 
     /* ------------------------------------------------------------------ *
