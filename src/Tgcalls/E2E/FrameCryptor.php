@@ -30,10 +30,6 @@ use Webrtc\RTP\Enum\MediaKind;
  */
 final class FrameCryptor implements FrameCryptorInterface
 {
-    /** Per-media-kind channel ids (0 is reserved for in-call encrypted messages). */
-    private const CHANNEL_AUDIO = 1;
-    private const CHANNEL_VIDEO = 2;
-
     /** Outgoing sequence number per channel, unique and monotonically increasing. */
     private array $seqno = [];
     /**
@@ -44,8 +40,16 @@ final class FrameCryptor implements FrameCryptorInterface
     private array $seen = [];
     private const REPLAY_WINDOW = 1024;
 
-    public function __construct(private readonly E2EKeyProvider $keys)
-    {
+    /**
+     * @param int $audioChannel Channel id for outgoing audio (0 is reserved for in-call messages).
+     * @param int $videoChannel Channel id for outgoing video; a screen-share connection uses a
+     *                          distinct one from the camera so their sequence numbers never collide.
+     */
+    public function __construct(
+        private readonly E2EKeyProvider $keys,
+        private readonly int $audioChannel = 1,
+        private readonly int $videoChannel = 2,
+    ) {
     }
 
     #[\Override]
@@ -56,7 +60,7 @@ final class FrameCryptor implements FrameCryptorInterface
             // No key yet (chain not established): send in the clear rather than drop media.
             return $frame;
         }
-        $channel = self::channel($kind);
+        $channel = $this->channel($kind);
         $seqno = ($this->seqno[$channel] ?? 0) + 1;
         $this->seqno[$channel] = $seqno;
         return CallPacket::encrypt($channel, $seqno, $frame, $epochs, $this->keys->selfSeed());
@@ -78,9 +82,9 @@ final class FrameCryptor implements FrameCryptorInterface
         return $decoded['payload'];
     }
 
-    private static function channel(MediaKind $kind): int
+    private function channel(MediaKind $kind): int
     {
-        return $kind === MediaKind::Video ? self::CHANNEL_VIDEO : self::CHANNEL_AUDIO;
+        return $kind === MediaKind::Video ? $this->videoChannel : $this->audioChannel;
     }
 
     /**

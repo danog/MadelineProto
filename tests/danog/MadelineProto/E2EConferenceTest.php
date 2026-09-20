@@ -339,6 +339,28 @@ final class E2EConferenceTest extends TestCase
         $this->assertSame($videoFrame, $receiver->decryptFrame(MediaKind::Video, $ssrc, $videoWire));
     }
 
+    /**
+     * The camera and screen-share connections use distinct video channels, so the same sender's
+     * frames on each are accepted by a receiver without a replay false-positive even at equal seqnos.
+     */
+    public function testFrameCryptorChannelSeparation(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $epoch = ['hash' => random_bytes(32), 'secret' => random_bytes(32)];
+        $provider = self::keyProvider($senderSeed, [$epoch], [9 => $senderPublic]);
+
+        $camera = new FrameCryptor($provider); // video channel 2 (default)
+        $screen = new FrameCryptor($provider, audioChannel: 4, videoChannel: 3);
+        $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [$epoch], [9 => $senderPublic]));
+
+        // Both start at seqno 1, but on different channels — the receiver accepts both.
+        $cameraFrame = $receiver->decryptFrame(MediaKind::Video, 9, $camera->encryptFrame(MediaKind::Video, 9, 'cam'));
+        $screenFrame = $receiver->decryptFrame(MediaKind::Video, 9, $screen->encryptFrame(MediaKind::Video, 9, 'screen'));
+        $this->assertSame('cam', $cameraFrame);
+        $this->assertSame('screen', $screenFrame);
+    }
+
     public function testFrameCryptorRejectsReplay(): void
     {
         $this->requireCrypto();

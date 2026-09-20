@@ -61,6 +61,12 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     private ?GroupConnection $connection = null;
     private DjLoop $diskJockey;
     private FrameCryptor $frameCryptor;
+    /** The separate screen-share connection (phone.joinGroupCallPresentation), while sharing a screen. */
+    private ?GroupConnection $presentationConnection = null;
+    /** The video-only disk jockey feeding the screen-share connection, if any. */
+    private ?DjLoop $presentationDj = null;
+    /** Frame cryptor for the screen-share, on its own channel so its seqnos don't collide with camera. */
+    private ?FrameCryptor $presentationCryptor = null;
 
     /**
      * Active media epochs, `blockHash => ['hash' => string, 'secret' => string]`, oldest first.
@@ -124,6 +130,7 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
         }
         $this->pollWatcher = null;
         $this->diskJockey->start();
+        $this->presentationDj?->start();
         // Bring the rest of the graph back once it is whole, from a single queued task.
         EventLoop::queue($this->resumeAfterRestart(...));
     }
@@ -139,6 +146,7 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
             return;
         }
         $this->connection?->resume();
+        $this->presentationConnection?->resume();
         $this->API->registerConferenceCall($this->inputCall['id'], $this);
         $this->startPolling();
         $this->syncChain(self::SUBCHAIN_STATE);
@@ -234,20 +242,21 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     public function join(bool $muted = false): void
     {
         $this->syncChain(self::SUBCHAIN_STATE);
-        $selfAdd = $this->buildSelfAddBlock();
         $this->connection = new GroupConnection($this, $this->diskJockey);
         $this->connection->setFrameCryptor($this->frameCryptor);
         $params = $this->connection->buildJoinPayload();
 
-        $updates = $this->API->methodCallAsyncRead('phone.joinGroupCall', [
+        // If another member's block took our height while we were building, rebuild the self-add
+        // block on the new head and re-join; the connection/join-payload are reused.
+        $updates = $this->submitWithChainRetry(fn (): array => $this->API->methodCallAsyncRead('phone.joinGroupCall', [
             'muted' => $muted,
             'video_stopped' => true,
             'call' => $this->inputCall,
             'join_as' => ['_' => 'inputPeerSelf'],
             'public_key' => $this->chain->getSelfPublicKey(),
-            'block' => $selfAdd['serialized'],
+            'block' => $this->buildSelfAddBlock()['serialized'],
             'params' => $params,
-        ]);
+        ]));
         $this->consumeUpdates($updates);
         $this->joined = true;
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
@@ -292,33 +301,91 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     public function removeParticipant(int ...$userIds): void
     {
         $remove = array_flip($userIds);
-        $participants = [];
-        $recipients = [];
-        foreach ($this->chain->getParticipants() as $userId => $info) {
-            if (isset($remove[$userId])) {
-                continue;
+        $updates = $this->submitWithChainRetry(function () use ($remove, $userIds): array {
+            // Built from the current chain state each attempt, so a retry rekeys on the fresh head.
+            $participants = [];
+            $recipients = [];
+            foreach ($this->chain->getParticipants() as $userId => $info) {
+                if (isset($remove[$userId])) {
+                    continue;
+                }
+                $participants[] = [$userId, $info['public_key'], $info['permissions']];
+                $recipients[] = [$userId, $info['public_key']];
             }
-            $participants[] = [$userId, $info['public_key'], $info['permissions']];
-            $recipients[] = [$userId, $info['public_key']];
-        }
-        if ($recipients === []) {
-            throw new \RuntimeException('Cannot remove every participant from the conference.');
-        }
-        $raw = random_bytes(32);
-        $block = $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), [
-            $this->chain->groupStateChange($participants),
-            ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->chain->buildSharedKey($raw, $recipients)],
-            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
-        ]);
-        $updates = $this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
-            'kick' => true,
-            'call' => $this->getInputCall(),
-            'ids' => $userIds,
-            'block' => $block['serialized'],
-        ]);
+            if ($recipients === []) {
+                throw new \RuntimeException('Cannot remove every participant from the conference.');
+            }
+            $raw = random_bytes(32);
+            $block = $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), [
+                $this->chain->groupStateChange($participants),
+                ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->chain->buildSharedKey($raw, $recipients)],
+                ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
+            ]);
+            return $this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
+                'kick' => true,
+                'call' => $this->getInputCall(),
+                'ids' => $userIds,
+                'block' => $block['serialized'],
+            ]);
+        });
         $this->consumeUpdates($updates);
         // Apply our own accepted block (and anything concurrent) in server order.
         $this->syncChain(self::SUBCHAIN_STATE);
+    }
+
+    /**
+     * How many times a chain-mutating block is rebuilt on the latest head before giving up.
+     */
+    private const MAX_CHAIN_RETRIES = 5;
+
+    /**
+     * Submit a chain-mutating RPC, rebuilding its block on the latest chain head when the server
+     * rejects it as stale (`CONF_WRITE_CHAIN_INVALID`) — a concurrent block took our height — and
+     * treating `GROUPCALL_FORBIDDEN` as a reset. `$attempt` must build its block from the *current*
+     * chain state and return the RPC's Updates, so a retry naturally rebuilds on the fresh head.
+     *
+     * @param callable(): array $attempt
+     *
+     * @return array The RPC's Updates.
+     */
+    private function submitWithChainRetry(callable $attempt): array
+    {
+        for ($i = 0; $i < self::MAX_CHAIN_RETRIES; $i++) {
+            try {
+                return $attempt();
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'CONF_WRITE_CHAIN_INVALID') {
+                    $this->log("Block rejected as stale on $this; refetching the chain and rebuilding", Logger::WARNING);
+                    $this->syncChain(self::SUBCHAIN_STATE);
+                    continue;
+                }
+                if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
+                    $this->handleForbidden();
+                }
+                throw $e;
+            }
+        }
+        throw new \RuntimeException("The conference chain kept rejecting our block as invalid ($this)");
+    }
+
+    /**
+     * We were forbidden from the call (removed, or the chain reset): stop participating so we neither
+     * poll nor apply further blocks. The caller decides whether to rejoin.
+     */
+    private function handleForbidden(): void
+    {
+        $this->log("Forbidden from $this; resetting conference state", Logger::WARNING);
+        $this->joined = false;
+        if ($this->pollWatcher !== null) {
+            EventLoop::cancel($this->pollWatcher);
+            $this->pollWatcher = null;
+        }
+        if ($this->inputCall !== null) {
+            $this->API->unregisterConferenceCall($this->inputCall['id']);
+        }
+        $this->chainOffset = [0, 0];
+        $this->connection?->close();
+        $this->connection = null;
     }
 
     /* ------------------------------------------------------------------ *
@@ -339,6 +406,10 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
                     'limit' => 50,
                 ]);
             } catch (RPCErrorException $e) {
+                if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
+                    $this->handleForbidden();
+                    return;
+                }
                 $this->log("Could not fetch chain $subChainId of $this: $e", Logger::WARNING);
                 return;
             }
@@ -414,56 +485,132 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     }
 
     /* ------------------------------------------------------------------ *
+     *  Screen-share: a second, end-to-end encrypted connection.
+     * ------------------------------------------------------------------ */
+
+    /**
+     * Start sharing a screen: a second WebRTC connection (phone.joinGroupCallPresentation) whose
+     * video is end-to-end encrypted with the same conference keys, on its own packet channel so its
+     * sequence numbers never collide with the camera's. Idempotent.
+     */
+    public function enablePresentation(): void
+    {
+        if ($this->presentationConnection !== null) {
+            return;
+        }
+        if (!$this->joined) {
+            throw new \RuntimeException('Cannot share a screen before joining the conference.');
+        }
+        $this->presentationDj ??= new DjLoop($this, videoOnly: true);
+        $this->presentationDj->start();
+        // Distinct channels (screen video = 3) so replay windows don't clash with the camera (video = 2).
+        $this->presentationCryptor ??= new FrameCryptor($this, audioChannel: 4, videoChannel: 3);
+        $connection = new GroupConnection($this, $this->presentationDj, screencast: true);
+        $connection->setFrameCryptor($this->presentationCryptor);
+        $params = $connection->buildJoinPayload();
+        $this->presentationConnection = $connection;
+        try {
+            $updates = $this->API->methodCallAsyncRead('phone.joinGroupCallPresentation', [
+                'call' => $this->getInputCall(),
+                'params' => $params,
+            ]);
+        } catch (Throwable $e) {
+            $this->presentationConnection = null;
+            $connection->close();
+            throw $e;
+        }
+        foreach ($updates['updates'] ?? [] as $update) {
+            if ($update['_'] === 'updateGroupCallConnection' && ($update['presentation'] ?? false)) {
+                $parsed = GroupSdp::parseJoinResponse($update['params']);
+                if ($parsed['transport'] !== null) {
+                    $connection->setTransport($parsed['transport'], $parsed['video']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Stop sharing the screen: tear down the presentation connection and tell the server.
+     */
+    public function disablePresentation(): void
+    {
+        if ($this->presentationConnection === null) {
+            return;
+        }
+        $this->presentationConnection->close();
+        $this->presentationConnection = null;
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
+        if ($this->joined) {
+            try {
+                $this->API->methodCallAsyncRead('phone.leaveGroupCallPresentation', ['call' => $this->getInputCall()]);
+            } catch (Throwable $e) {
+                $this->log("Could not leave the presentation of $this: $e", Logger::WARNING);
+            }
+        }
+    }
+
+    /**
+     * The disk jockey feeding a destination, starting the screen-share on first use of Presentation.
+     */
+    private function dj(MediaDestination $dest): DjLoop
+    {
+        if ($dest === MediaDestination::Camera) {
+            return $this->diskJockey;
+        }
+        $this->enablePresentation();
+        \assert($this->presentationDj !== null);
+        return $this->presentationDj;
+    }
+
+    /** The disk jockey for a destination without starting a screen-share that is not running. */
+    private function djOrNull(MediaDestination $dest): ?DjLoop
+    {
+        return $dest === MediaDestination::Camera ? $this->diskJockey : $this->presentationDj;
+    }
+
+    /* ------------------------------------------------------------------ *
      *  Media playback — the common {@see Call} interface. Every frame is end-to-end
-     *  encrypted before it reaches the SFU. Screen-share (Presentation) is not wired yet.
+     *  encrypted (camera and screen-share alike) before it reaches the SFU.
      * ------------------------------------------------------------------ */
 
     private bool $muted = false;
 
-    /** Conference screen-share would need a second connection; reject it until that lands. */
-    private static function requireCamera(MediaDestination $dest): void
-    {
-        if ($dest !== MediaDestination::Camera) {
-            throw new \RuntimeException('Screen-share is not yet supported in end-to-end conference calls.');
-        }
-    }
-
     #[\Override]
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->play($file);
+        $this->dj($dest)->play($file);
         return $this;
     }
 
     #[\Override]
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->play($file);
+        $this->dj($dest)->play($file);
         return $this;
     }
 
     #[\Override]
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->playOnHold(...$files);
+        $this->dj($dest)->playOnHold(...$files);
         return $this;
     }
 
     #[\Override]
     public function skip(MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->skip();
+        $this->djOrNull($dest)?->skip();
         return $this;
     }
 
     #[\Override]
     public function stop(MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
+        if ($dest === MediaDestination::Presentation) {
+            $this->disablePresentation();
+            return $this;
+        }
         $this->diskJockey->stopPlaying();
         return $this;
     }
@@ -471,31 +618,27 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     #[\Override]
     public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->pausePlaying();
+        $this->djOrNull($dest)?->pausePlaying();
         return $this;
     }
 
     #[\Override]
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
-        self::requireCamera($dest);
-        return $this->diskJockey->isAudioPaused();
+        return $this->djOrNull($dest)?->isAudioPaused() ?? false;
     }
 
     #[\Override]
     public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
-        self::requireCamera($dest);
-        $this->diskJockey->resumePlaying();
+        $this->djOrNull($dest)?->resumePlaying();
         return $this;
     }
 
     #[\Override]
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
-        self::requireCamera($dest);
-        return $this->diskJockey->getCurrent();
+        return $this->djOrNull($dest)?->getCurrent();
     }
 
     #[\Override]
@@ -547,6 +690,10 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
             EventLoop::cancel($this->pollWatcher);
             $this->pollWatcher = null;
         }
+        $this->presentationConnection?->close();
+        $this->presentationConnection = null;
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
         if ($this->inputCall === null) {
             return;
         }
@@ -777,7 +924,18 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
     #[\Override]
     public function setPresentationPaused(bool $paused): void
     {
-        // Screen-share in a conference would be a second connection; not wired yet.
+        if (!$this->joined || $this->inputCall === null) {
+            return;
+        }
+        try {
+            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
+                'call' => $this->inputCall,
+                'participant' => ['_' => 'inputPeerSelf'],
+                'presentation_paused' => $paused,
+            ]);
+        } catch (Throwable $e) {
+            $this->log("Could not change the presentation state of $this: $e", Logger::WARNING);
+        }
     }
 
     #[\Override]
