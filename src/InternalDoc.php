@@ -209,6 +209,8 @@ abstract class InternalDoc
      * Create array.
      *
      * @param mixed ...$params Params
+     *
+     * @psalm-pure
      */
     final public static function arr(mixed ...$params): array
     {
@@ -218,6 +220,8 @@ abstract class InternalDoc
      * base64URL decode.
      *
      * @param string $data Data to decode
+     *
+     * @psalm-pure
      */
     final public static function base64urlDecode(string $data): string
     {
@@ -227,6 +231,8 @@ abstract class InternalDoc
      * Base64URL encode.
      *
      * @param string $data Data to encode
+     *
+     * @psalm-pure
      */
     final public static function base64urlEncode(string $data): string
     {
@@ -333,33 +339,35 @@ abstract class InternalDoc
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-mutation-free
      */
-    final public function callGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
+    final public function callGetCurrent(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
     {
-        return $this->wrapper->getAPI()->callGetCurrent($id);
+        return $this->wrapper->getAPI()->callGetCurrent($id, $dest);
     }
     /**
      * Play file in call.
      */
-    final public function callPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    final public function callPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->callPlay($id, $file);
+        $this->wrapper->getAPI()->callPlay($id, $file, $dest);
     }
     /**
      * Play files on hold in call.
      */
-    final public function callPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
+    final public function callPlayOnHold(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
     {
-        $this->wrapper->getAPI()->callPlayOnHold($id, ...$files);
+        $this->wrapper->getAPI()->callPlayOnHold($id, $dest, ...$files);
     }
     /**
      * Set output file or stream for incoming OPUS audio packets in a call.
      *
      * Will write an OGG OPUS stream to the specified file or stream.
      */
-    final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file): void
+    final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->callSetOutput($id, $file);
+        $this->wrapper->getAPI()->callSetOutput($id, $file, $dest);
     }
     /**
      * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
@@ -423,6 +431,19 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->completeSignup($first_name, $last_name);
     }
     /**
+     * Create and join a new end-to-end encrypted conference call, with ourselves as the only
+     * participant. Others join it with {@see self::joinConferenceCall()} using the returned call id.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param bool $muted Whether to join muted.
+     */
+    final public function createConferenceCall(bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->createConferenceCall($muted);
+    }
+    /**
      * Create a group call (video chat or livestream) in the specified group or channel.
      *
      * Requires the `manage_call` admin right, see
@@ -436,38 +457,6 @@ abstract class InternalDoc
     final public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): \danog\MadelineProto\GroupCall
     {
         return $this->wrapper->getAPI()->createGroupCall($peer, $title, $scheduleDate, $rtmpStream);
-    }
-    /**
-     * Create and join a new end-to-end encrypted conference call, with ourselves as the only participant.
-     *
-     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
-     *
-     * @param bool $muted Whether to join muted.
-     */
-    final public function createConferenceCall(bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
-    {
-        return $this->wrapper->getAPI()->createConferenceCall($muted);
-    }
-    /**
-     * Join an existing end-to-end encrypted conference call.
-     *
-     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
-     *
-     * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
-     * @param bool  $muted Whether to join muted.
-     */
-    final public function joinConferenceCall(array $call, bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
-    {
-        return $this->wrapper->getAPI()->joinConferenceCall($call, $muted);
-    }
-    /**
-     * Get a live end-to-end encrypted conference call this session is in, by its call id.
-     */
-    final public function getConferenceCall(int $id): ?\danog\MadelineProto\Tgcalls\E2E\ConferenceCall
-    {
-        return $this->wrapper->getAPI()->getConferenceCall($id);
     }
     /**
      * Discard call.
@@ -615,8 +604,12 @@ abstract class InternalDoc
      * Get final element of array.
      *
      * @template T
-     * @param  array<T> $what Array
+     *
+     * @param array<T> $what Array
+     *
      * @return T
+     *
+     * @psalm-pure
      */
     final public static function end(array $what): mixed
     {
@@ -654,6 +647,8 @@ abstract class InternalDoc
      * Extract file info from bot API message.
      *
      * @param array $info Bot API message object
+     *
+     * @psalm-pure
      */
     final public static function extractBotAPIFile(array $info): ?array
     {
@@ -735,6 +730,8 @@ abstract class InternalDoc
      * Returns a vector hash.
      *
      * @param array<string|int> $longs IDs
+     *
+     * @psalm-external-mutation-free
      */
     final public static function genVectorHash(array $longs): string
     {
@@ -776,6 +773,8 @@ abstract class InternalDoc
      * Get authorization info.
      *
      * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN|API::LOGGED_OUT
+     *
+     * @psalm-mutation-free
      */
     final public function getAuthorization(): int
     {
@@ -789,6 +788,8 @@ abstract class InternalDoc
      * Use updateBroadcastProgress updates to get real-time progress status without polling.
      *
      * @param integer $id Broadcast ID
+     *
+     * @psalm-mutation-free
      */
     final public function getBroadcastProgress(int $id): ?\danog\MadelineProto\Broadcast\Progress
     {
@@ -803,6 +804,8 @@ abstract class InternalDoc
     }
     /**
      * Get phone call information.
+     *
+     * @psalm-mutation-free
      */
     final public function getCall(int $id): ?\danog\MadelineProto\VoIP
     {
@@ -810,6 +813,8 @@ abstract class InternalDoc
     }
     /**
      * Get the phone call with the specified user ID.
+     *
+     * @psalm-mutation-free
      */
     final public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
     {
@@ -817,6 +822,8 @@ abstract class InternalDoc
     }
     /**
      * Get the media state of the other party of a call, as reported by their client.
+     *
+     * @psalm-mutation-free
      */
     final public function getCallRemoteMediaState(int $id): ?\danog\MadelineProto\VoIP\MediaState
     {
@@ -824,6 +831,8 @@ abstract class InternalDoc
     }
     /**
      * Get call state.
+     *
+     * @psalm-mutation-free
      */
     final public function getCallState(int $id): ?\danog\MadelineProto\VoIP\CallState
     {
@@ -837,6 +846,15 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->getCdnConfig();
     }
     /**
+     * Get a live end-to-end encrypted conference call this session is in, by its call id.
+     *
+     * @psalm-mutation-free
+     */
+    final public function getConferenceCall(int $id): ?\danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->getConferenceCall($id);
+    }
+    /**
      * Get cached (or eventually re-fetch) server-side config.
      *
      * @param array $config Current config
@@ -848,6 +866,8 @@ abstract class InternalDoc
     }
     /**
      * Get async DNS client.
+     *
+     * @psalm-mutation-free
      */
     final public function getDNSClient(): \Amp\Dns\DnsResolver
     {
@@ -911,6 +931,8 @@ abstract class InternalDoc
      * @param class-string<T>|null $class
      *
      * @return T|EventHandlerProxy|__PHP_Incomplete_Class|null
+     *
+     * @psalm-mutation-free
      */
     final public function getEventHandler(?string $class = null): \danog\MadelineProto\EventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|\__PHP_Incomplete_Class|null
     {
@@ -921,6 +943,8 @@ abstract class InternalDoc
      *
      * @param mixed  $location File location
      * @param string $default  Default extension
+     *
+     * @psalm-pure
      */
     final public static function getExtensionFromLocation(mixed $location, string $default): string
     {
@@ -930,6 +954,8 @@ abstract class InternalDoc
      * Get extension from mime type.
      *
      * @param string $mime MIME type
+     *
+     * @psalm-external-mutation-free
      */
     final public static function getExtensionFromMime(string $mime): string
     {
@@ -984,6 +1010,8 @@ abstract class InternalDoc
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
      * @return array<int, Participant>
+     *
+     * @psalm-mutation-free
      */
     final public function getGroupCallParticipants(int $id): array
     {
@@ -991,6 +1019,8 @@ abstract class InternalDoc
     }
     /**
      * Get the state of a group call.
+     *
+     * @psalm-mutation-free
      */
     final public function getGroupCallState(int $id): \danog\MadelineProto\GroupCall\GroupCallState
     {
@@ -998,6 +1028,8 @@ abstract class InternalDoc
     }
     /**
      * Get async HTTP client.
+     *
+     * @psalm-mutation-free
      */
     final public function getHTTPClient(): \Amp\Http\Client\HttpClient
     {
@@ -1005,6 +1037,8 @@ abstract class InternalDoc
     }
     /**
      * Get current password hint.
+     *
+     * @psalm-mutation-free
      */
     final public function getHint(): string
     {
@@ -1073,6 +1107,8 @@ abstract class InternalDoc
     }
     /**
      * Get TL namespaces.
+     *
+     * @psalm-mutation-free
      */
     final public function getMethodNamespaces(): array
     {
@@ -1080,6 +1116,8 @@ abstract class InternalDoc
     }
     /**
      * Get namespaced methods (method => namespace).
+     *
+     * @psalm-mutation-free
      */
     final public function getMethodsNamespaced(): array
     {
@@ -1099,6 +1137,8 @@ abstract class InternalDoc
      *
      * @param string $extension File extension
      * @param string $default   Default mime type
+     *
+     * @psalm-pure
      */
     final public static function getMimeFromExtension(string $extension, string $default): string
     {
@@ -1119,8 +1159,10 @@ abstract class InternalDoc
      * @template T as EventHandler
      *
      * @param class-string<T> $class
-     *
+
      * return T|null
+     *
+     * @psalm-mutation-free
      */
     final public function getPlugin(string $class): \danog\MadelineProto\PluginEventHandler|\danog\MadelineProto\Ipc\EventHandlerProxy|null
     {
@@ -1132,6 +1174,8 @@ abstract class InternalDoc
      * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
+     *
+     * @psalm-external-mutation-free
      */
     final public function getPromCounter(string $namespace, string $name, string $help, array $labels = [
     ]): ?\danog\BetterPrometheus\BetterCounter
@@ -1144,6 +1188,8 @@ abstract class InternalDoc
      * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
+     *
+     * @psalm-external-mutation-free
      */
     final public function getPromGauge(string $namespace, string $name, string $help, array $labels = [
     ]): ?\danog\BetterPrometheus\BetterGauge
@@ -1157,6 +1203,8 @@ abstract class InternalDoc
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $buckets
+     *
+     * @psalm-external-mutation-free
      */
     final public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [
     ], ?array $buckets = null): ?\danog\BetterPrometheus\BetterHistogram
@@ -1170,6 +1218,8 @@ abstract class InternalDoc
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $quantiles
+     *
+     * @psalm-external-mutation-free
      */
     final public function getPromSummary(string $namespace, string $name, string $help, array $labels = [
     ], int $maxAgeSeconds = 600, ?array $quantiles = null): ?\danog\BetterPrometheus\BetterSummary
@@ -1185,6 +1235,8 @@ abstract class InternalDoc
     }
     /**
      * Get PSR logger.
+     *
+     * @psalm-mutation-free
      */
     final public function getPsrLogger(): \Psr\Log\LoggerInterface
     {
@@ -1204,6 +1256,8 @@ abstract class InternalDoc
      * Get secret chat.
      *
      * @param array|int $chat Secret chat ID
+     *
+     * @psalm-mutation-free
      */
     final public function getSecretChat(array|int $chat): \danog\MadelineProto\SecretChats\SecretChat
     {
@@ -1223,6 +1277,8 @@ abstract class InternalDoc
      * Get info about the logged-in user, cached.
      *
      * Use fullGetSelf to bypass the cache.
+     *
+     * @psalm-mutation-free
      */
     final public function getSelf(): array|false
     {
@@ -1230,6 +1286,8 @@ abstract class InternalDoc
     }
     /**
      * Returns the session name.
+     *
+     * @psalm-mutation-free
      */
     final public function getSessionName(): string
     {
@@ -1318,38 +1376,44 @@ abstract class InternalDoc
     }
     /**
      * Get the file that is currently being played in a group call.
+     *
+     * @psalm-mutation-free
      */
-    final public function groupCallGetCurrent(int $id): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
+    final public function groupCallGetCurrent(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
     {
-        return $this->wrapper->getAPI()->groupCallGetCurrent($id);
+        return $this->wrapper->getAPI()->groupCallGetCurrent($id, $dest);
     }
     /**
      * Pause playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
-    final public function groupCallPausePlay(int $id): void
+    final public function groupCallPausePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->groupCallPausePlay($id);
+        $this->wrapper->getAPI()->groupCallPausePlay($id, $dest);
     }
     /**
      * Play a file in a group call.
      */
-    final public function groupCallPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file): void
+    final public function groupCallPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->groupCallPlay($id, $file);
+        $this->wrapper->getAPI()->groupCallPlay($id, $file, $dest);
     }
     /**
      * Files to play on hold in a group call.
      */
-    final public function groupCallPlayOnHold(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
+    final public function groupCallPlayOnHold(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
     {
-        $this->wrapper->getAPI()->groupCallPlayOnHold($id, ...$files);
+        $this->wrapper->getAPI()->groupCallPlayOnHold($id, $dest, ...$files);
     }
     /**
      * Resume playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
-    final public function groupCallResumePlay(int $id): void
+    final public function groupCallResumePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->groupCallResumePlay($id);
+        $this->wrapper->getAPI()->groupCallResumePlay($id, $dest);
     }
     /**
      * Record group call audio: one participant to a file/stream, or every transmitting participant
@@ -1362,19 +1426,21 @@ abstract class InternalDoc
     /**
      * Skip to the next file in the playlist of a group call.
      */
-    final public function groupCallSkipPlay(int $id): void
+    final public function groupCallSkipPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->groupCallSkipPlay($id);
+        $this->wrapper->getAPI()->groupCallSkipPlay($id, $dest);
     }
     /**
      * Stop playing all files in a group call, clearing the main and the hold playlist.
      */
-    final public function groupCallStopPlay(int $id): void
+    final public function groupCallStopPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->groupCallStopPlay($id);
+        $this->wrapper->getAPI()->groupCallStopPlay($id, $dest);
     }
     /**
      * Check if has admins.
+     *
+     * @psalm-mutation-free
      */
     final public function hasAdmins(): bool
     {
@@ -1382,6 +1448,8 @@ abstract class InternalDoc
     }
     /**
      * Check if an event handler instance is present.
+     *
+     * @psalm-mutation-free
      */
     final public function hasEventHandler(): bool
     {
@@ -1391,6 +1459,8 @@ abstract class InternalDoc
      * Check if a certain event handler plugin is installed.
      *
      * @param class-string<EventHandler> $class
+     *
+     * @psalm-mutation-free
      */
     final public function hasPlugin(string $class): bool
     {
@@ -1398,6 +1468,8 @@ abstract class InternalDoc
     }
     /**
      * Check if has report peers.
+     *
+     * @psalm-mutation-free
      */
     final public function hasReportPeers(): bool
     {
@@ -1407,6 +1479,8 @@ abstract class InternalDoc
      * Check whether secret chat exists.
      *
      * @param array|int $chat Secret chat ID
+     *
+     * @psalm-mutation-free
      */
     final public function hasSecretChat(array|int $chat): bool
     {
@@ -1416,6 +1490,8 @@ abstract class InternalDoc
      * Escape string for MadelineProto's HTML entity converter.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     final public static function htmlEscape(string $what): string
     {
@@ -1450,6 +1526,8 @@ abstract class InternalDoc
      * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
+     *
+     * @psalm-pure
      */
     final public static function inflateStripped(string $stripped): string
     {
@@ -1471,6 +1549,8 @@ abstract class InternalDoc
     }
     /**
      * Whether this is altervista.
+     *
+     * @psalm-external-mutation-free
      */
     final public static function isAltervista(): bool
     {
@@ -1480,6 +1560,8 @@ abstract class InternalDoc
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
      * @param mixed $var Value to check
+     *
+     * @psalm-pure
      */
     final public static function isArrayOrAlike(mixed $var): bool
     {
@@ -1495,6 +1577,8 @@ abstract class InternalDoc
     }
     /**
      * Whether our own audio stream is muted in a call.
+     *
+     * @psalm-mutation-free
      */
     final public function isCallMuted(int $id): bool
     {
@@ -1510,6 +1594,8 @@ abstract class InternalDoc
     }
     /**
      * Whether our own audio stream is muted in a group call.
+     *
+     * @psalm-mutation-free
      */
     final public function isGroupCallMuted(int $id): bool
     {
@@ -1517,13 +1603,17 @@ abstract class InternalDoc
     }
     /**
      * Whether the currently playing audio file of a group call is paused.
+     *
+     * @psalm-mutation-free
      */
-    final public function isGroupCallPlayPaused(int $id): bool
+    final public function isGroupCallPlayPaused(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): bool
     {
-        return $this->wrapper->getAPI()->isGroupCallPlayPaused($id);
+        return $this->wrapper->getAPI()->isGroupCallPlayPaused($id, $dest);
     }
     /**
      * Whether we're an IPC client instance.
+     *
+     * @psalm-pure
      */
     final public function isIpc(): bool
     {
@@ -1531,6 +1621,8 @@ abstract class InternalDoc
     }
     /**
      * Whether we're an IPC server process (as opposed to an event handler).
+     *
+     * @psalm-external-mutation-free
      */
     final public function isIpcWorker(): bool
     {
@@ -1538,13 +1630,17 @@ abstract class InternalDoc
     }
     /**
      * Whether the currently playing audio file is paused.
+     *
+     * @psalm-mutation-free
      */
-    final public function isPlayPaused(int $id): bool
+    final public function isPlayPaused(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): bool
     {
-        return $this->wrapper->getAPI()->isPlayPaused($id);
+        return $this->wrapper->getAPI()->isPlayPaused($id, $dest);
     }
     /**
      * Returns whether the current user is a premium user, cached.
+     *
+     * @psalm-mutation-free
      */
     final public function isPremium(): bool
     {
@@ -1552,6 +1648,8 @@ abstract class InternalDoc
     }
     /**
      * Returns whether the current user is a bot.
+     *
+     * @psalm-mutation-free
      */
     final public function isSelfBot(): bool
     {
@@ -1559,6 +1657,8 @@ abstract class InternalDoc
     }
     /**
      * Returns whether the current user is a user.
+     *
+     * @psalm-mutation-free
      */
     final public function isSelfUser(): bool
     {
@@ -1568,10 +1668,25 @@ abstract class InternalDoc
      * Whether we're currently connected to the test DCs.
      *
      * @return boolean
+     *
+     * @psalm-mutation-free
      */
     final public function isTestMode(): bool
     {
         return $this->wrapper->getAPI()->isTestMode();
+    }
+    /**
+     * Join an existing end-to-end encrypted conference call.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
+     * @param bool  $muted Whether to join muted.
+     */
+    final public function joinConferenceCall(array $call, bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->joinConferenceCall($call, $muted);
     }
     /**
      * Join the group call currently active in a group or channel.
@@ -1598,6 +1713,8 @@ abstract class InternalDoc
      * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
+     *
+     * @psalm-external-mutation-free
      */
     final public function logger(mixed $param, int $level = \danog\MadelineProto\Logger::NOTICE, string $file = ''): void
     {
@@ -1614,6 +1731,8 @@ abstract class InternalDoc
      * Escape string for markdown code section.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     final public static function markdownCodeEscape(string $what): string
     {
@@ -1623,6 +1742,8 @@ abstract class InternalDoc
      * Escape string for markdown codeblock.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     final public static function markdownCodeblockEscape(string $what): string
     {
@@ -1632,6 +1753,8 @@ abstract class InternalDoc
      * Escape string for markdown.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     final public static function markdownEscape(string $what): string
     {
@@ -1647,6 +1770,8 @@ abstract class InternalDoc
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
      * @return TextEntities Object containing message and entities
+     *
+     * @psalm-mutation-free
      */
     final public static function markdownToMessageEntities(string $markdown): \danog\MadelineProto\TextEntities
     {
@@ -1656,6 +1781,8 @@ abstract class InternalDoc
      * Escape string for URL.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     final public static function markdownUrlEscape(string $what): string
     {
@@ -1664,9 +1791,12 @@ abstract class InternalDoc
     /**
      * Telegram UTF-8 multibyte split.
      *
-     * @param  string        $text   Text
-     * @param  integer       $length Length
+     * @param string        $text   Text
+     * @param integer       $length Length
+     *
      * @return array<string>
+     *
+     * @psalm-pure
      */
     final public static function mbStrSplit(string $text, int $length): array
     {
@@ -1676,6 +1806,8 @@ abstract class InternalDoc
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
+     *
+     * @psalm-pure
      */
     final public static function mbStrlen(string $text): int
     {
@@ -1687,19 +1819,25 @@ abstract class InternalDoc
      * @param string   $text   Text to substring
      * @param integer  $offset Offset
      * @param null|int $length Length
+     *
+     * @psalm-pure
      */
     final public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
     }
     /**
-     * Provide a buffered reader for a file, URL or amp stream.
+     * Provide a buffered reader for a file, URL or amp stream, optionally starting at a byte offset.
+     *
+     * The `$offset` makes a demuxer resumable across a serialize/unserialize cycle: a `LocalFile` is
+     * seeked and a `RemoteUrl` is fetched with a `Range` request. A raw {@see ReadableStream} cannot
+     * be seeked, so a non-zero offset on one is rejected.
      *
      * @return Closure(int): ?string
      */
-    final public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null): \Closure
+    final public static function openBuffered(\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $stream, ?\Amp\Cancellation $cancellation = null, int $offset = 0): \Closure
     {
-        return \danog\MadelineProto\Tools::openBuffered($stream, $cancellation);
+        return \danog\MadelineProto\Tools::openBuffered($stream, $cancellation, $offset);
     }
     /**
      * Opens a file in append-only mode.
@@ -1714,6 +1852,8 @@ abstract class InternalDoc
      * Convert double to binary version.
      *
      * @param float $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     final public static function packDouble(float $value): string
     {
@@ -1723,6 +1863,8 @@ abstract class InternalDoc
      * Convert integer to base256 signed int.
      *
      * @param integer $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     final public static function packSignedInt(int $value): string
     {
@@ -1732,6 +1874,8 @@ abstract class InternalDoc
      * Convert integer to base256 long.
      *
      * @param int $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     final public static function packSignedLong(int $value): string
     {
@@ -1741,6 +1885,8 @@ abstract class InternalDoc
      * Convert value to unsigned base256 int.
      *
      * @param int $value Value
+     *
+     * @psalm-external-mutation-free
      */
     final public static function packUnsignedInt(int $value): string
     {
@@ -1748,10 +1894,12 @@ abstract class InternalDoc
     }
     /**
      * Pauses playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
-    final public function pausePlay(int $id): void
+    final public function pausePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->pausePlay($id);
+        $this->wrapper->getAPI()->pausePlay($id, $dest);
     }
     /**
      * Check if peer is present in internal peer database.
@@ -1778,6 +1926,8 @@ abstract class InternalDoc
      *
      * @param int $a A
      * @param int $b B
+     *
+     * @psalm-pure
      */
     final public static function posmod(int $a, int $b): int
     {
@@ -1785,6 +1935,8 @@ abstract class InternalDoc
     }
     /**
      * Internal endpoint used by the download server.
+     *
+     * @psalm-external-mutation-free
      */
     final public static function processDownloadServerPing(string $path, string $payload): void
     {
@@ -1906,10 +2058,12 @@ abstract class InternalDoc
     }
     /**
      * Resumes playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
-    final public function resumePlay(int $id): void
+    final public function resumePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->resumePlay($id);
+        $this->wrapper->getAPI()->resumePlay($id, $dest);
     }
     /**
      * Rethrow exception into event loop.
@@ -1922,6 +2076,8 @@ abstract class InternalDoc
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
+     *
+     * @psalm-pure
      */
     final public static function rleDecode(string $string): string
     {
@@ -1931,6 +2087,8 @@ abstract class InternalDoc
      * null-byte RLE encode.
      *
      * @param string $string Data to encode
+     *
+     * @psalm-pure
      */
     final public static function rleEncode(string $string): string
     {
@@ -2277,9 +2435,9 @@ abstract class InternalDoc
     /**
      * When called, skips to the next file in the playlist.
      */
-    final public function skipPlay(int $id): void
+    final public function skipPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->skipPlay($id);
+        $this->wrapper->getAPI()->skipPlay($id, $dest);
     }
     /**
      * Asynchronously sleep.
@@ -2307,9 +2465,9 @@ abstract class InternalDoc
     /**
      * Stops playing all files in the call, clears the main and the hold playlist.
      */
-    final public function stopPlay(int $id): void
+    final public function stopPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
-        $this->wrapper->getAPI()->stopPlay($id);
+        $this->wrapper->getAPI()->stopPlay($id, $dest);
     }
     /**
      * Converts a string into an async amphp stream.
@@ -2342,6 +2500,8 @@ abstract class InternalDoc
      * Convert TD parameters to tdcli.
      *
      * @param mixed $params Parameters
+     *
+     * @psalm-mutation-free
      */
     final public function tdToTdcli(mixed $params): array
     {
@@ -2370,6 +2530,8 @@ abstract class InternalDoc
      * Convert to camelCase.
      *
      * @param string $input String
+     *
+     * @psalm-pure
      */
     final public static function toCamelCase(string $input): string
     {
@@ -2388,6 +2550,8 @@ abstract class InternalDoc
      * Unpack binary double.
      *
      * @param string $value Value to unpack
+     *
+     * @psalm-external-mutation-free
      */
     final public static function unpackDouble(string $value): float
     {
@@ -2407,6 +2571,8 @@ abstract class InternalDoc
      * Unpack base256 signed int.
      *
      * @param string $value base256 int
+     *
+     * @psalm-external-mutation-free
      */
     final public static function unpackSignedInt(string $value): int
     {
@@ -2416,6 +2582,8 @@ abstract class InternalDoc
      * Unpack base256 signed long.
      *
      * @param string $value base256 long
+     *
+     * @psalm-external-mutation-free
      */
     final public static function unpackSignedLong(string $value): int
     {
@@ -2425,6 +2593,8 @@ abstract class InternalDoc
      * Unpack base256 signed long to string.
      *
      * @param string|int|array $value base256 long
+     *
+     * @psalm-external-mutation-free
      */
     final public static function unpackSignedLongString(array|string|int $value): string
     {

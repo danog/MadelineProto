@@ -1,9 +1,6 @@
 <?php
 namespace danog\MadelineProto\Namespace;
 
-/**
- * @psalm-pure
- */
 final class Blacklist {
     public const BLACKLIST = array (
   '__messages.getHistory' => 'Please use the [event handler](https://docs.madelineproto.xyz/docs/UPDATES.html)',
