@@ -208,7 +208,7 @@ $mode    = $argv[1] ?? 'help';
 
 switch ($mode) {
     case 'check':
-        $video = $argv[2] ?? (__DIR__.'/../av1.webm');
+        $video = $argv[2] ?? (__DIR__.'/../new.webm');
         box('OFFLINE SELF-CHECK (no Telegram needed)');
         $impl = static fn (string $class, string $iface): string => (new ReflectionClass($class))->implementsInterface($iface) ? 'yes ✅' : 'NO ❌';
         info('VoIP implements Call:                '.$impl(VoIP::class, Call::class).' (1:1, not multi-party)');
@@ -225,7 +225,7 @@ switch ($mode) {
     case '1to1':
         $arg     = $argv[2] ?? null;
         $media   = $argv[3] ?? null;
-        $file    = $argv[4] ?? (__DIR__.'/../av1.webm');
+        $file    = $argv[4] ?? (__DIR__.'/../new.webm');
         $session = $argv[5] ?? 'fuzz_user.madeline';
         if ($arg === null || $media === null) {
             fwrite(STDERR, "Usage: php tests/manual_call_features.php 1to1 <user> <audio|video|screencast> [file] [session]\n");
@@ -305,7 +305,7 @@ switch ($mode) {
     case 'group':
         $arg     = $argv[2] ?? null;
         $media   = $argv[3] ?? null;
-        $file    = $argv[4] ?? (__DIR__.'/../av1.webm');
+        $file    = $argv[4] ?? (__DIR__.'/../new.webm');
         $session = $argv[5] ?? 'fuzz_user.madeline';
         if ($arg === null || $media === null) {
             fwrite(STDERR, "Usage: php tests/manual_call_features.php group <chat> <audio|video|screencast> [file] [session]\n");
@@ -363,7 +363,7 @@ switch ($mode) {
 
     case 'conference':
         $media   = $argv[2] ?? null;
-        $file    = $argv[3] ?? (__DIR__.'/../av1.webm');
+        $file    = $argv[3] ?? (__DIR__.'/../new.webm');
         $session = $argv[4] ?? 'fuzz_user.madeline';
         if ($media === null) {
             fwrite(STDERR, "Usage: php tests/manual_call_features.php conference <audio|video|screencast> [file] [session]\n");
@@ -391,7 +391,7 @@ switch ($mode) {
         $id      = $argv[2] ?? null;
         $hash    = $argv[3] ?? null;
         $media   = $argv[4] ?? null;
-        $file    = $argv[5] ?? (__DIR__.'/../av1.webm');
+        $file    = $argv[5] ?? (__DIR__.'/../new.webm');
         $session = $argv[6] ?? 'fuzz_user.madeline';
         if ($id === null || $hash === null || $media === null) {
             fwrite(STDERR, "Usage: php tests/manual_call_features.php conference-join <id> <access_hash> <audio|video|screencast> [file] [session]\n");
@@ -431,7 +431,7 @@ switch ($mode) {
         prints verification emojis + sends an encrypted in-call message. Ctrl-C detaches without
         ending the call; re-run the same command to re-attach.
 
-        Defaults: file=av1.webm, session=fuzz_user.madeline.
+        Defaults: file=new.webm, session=fuzz_user.madeline.
 
         TXT);
         break;
