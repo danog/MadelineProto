@@ -20,6 +20,7 @@ use Amp\ByteStream\WritableStream;
 use Amp\Pipeline\ConcurrentIterator;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MatroskaWriter;
+use danog\MadelineProto\RecordingFormat;
 use Revolt\EventLoop;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
@@ -69,10 +70,10 @@ final class CallRecorder
     /** The file being recorded to, or null for a stream (which cannot survive a serialize cycle). */
     public readonly ?LocalFile $file;
 
-    public function __construct(LocalFile|WritableStream $out)
+    public function __construct(LocalFile|WritableStream $out, RecordingFormat $format = RecordingFormat::Mkv)
     {
         $this->file = $out instanceof LocalFile ? $out : null;
-        $this->writer = new MatroskaWriter($out);
+        $this->writer = new MatroskaWriter($out, $format->docType());
         $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
     }
 

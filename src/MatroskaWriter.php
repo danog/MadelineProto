@@ -100,7 +100,11 @@ final class MatroskaWriter
     /** The file being written, kept so the writer can reopen it after a serialize/deserialize cycle. */
     private ?LocalFile $localFile = null;
 
-    public function __construct(LocalFile|WritableStream $out)
+    /**
+     * @param string $docType The EBML DocType to declare in the header (`matroska` for `.mkv`, `webm`
+     *                        for `.webm`); both are Matroska containers, differing only in this string.
+     */
+    public function __construct(LocalFile|WritableStream $out, private readonly string $docType = 'matroska')
     {
         if ($out instanceof LocalFile) {
             $this->localFile = $out;
@@ -203,7 +207,7 @@ final class MatroskaWriter
             .self::uintElement("\x42\xF7", 1)             // EBMLReadVersion
             .self::uintElement("\x42\xF2", 4)             // EBMLMaxIDLength
             .self::uintElement("\x42\xF3", 8)             // EBMLMaxSizeLength
-            .self::stringElement("\x42\x82", 'matroska')  // DocType
+            .self::stringElement("\x42\x82", $this->docType) // DocType
             .self::uintElement("\x42\x87", 4)             // DocTypeVersion
             .self::uintElement("\x42\x85", 2)             // DocTypeReadVersion
         );

@@ -19,7 +19,7 @@ namespace danog\MadelineProto;
 /**
  * Indicates a local directory to write output into.
  *
- * Used with {@see GroupCall::setOutput()} to record every transmitting participant of a group call
+ * Used with {@see EventHandler\Calls\GroupCall::setOutput()} to record every transmitting participant of a group call
  * into its own file inside the directory.
  *
  * @psalm-immutable

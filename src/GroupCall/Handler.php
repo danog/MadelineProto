@@ -19,12 +19,11 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
-use danog\MadelineProto\GroupCall;
-use danog\MadelineProto\GroupCallController;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
+use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
 
 /**

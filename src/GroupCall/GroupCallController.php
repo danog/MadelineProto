@@ -16,18 +16,27 @@
 
 // IMPORTANT NOTE: Please keep the above copyright notice intact if copying or rewriting this file in another language.
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
-use danog\MadelineProto\GroupCall\GroupCallState;
-use danog\MadelineProto\GroupCall\Participant;
+use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\LocalDirectory;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Ogg;
+use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\CallInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupSdp;
+use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;

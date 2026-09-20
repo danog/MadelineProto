@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIP\CallState;
 
 /**
@@ -33,6 +33,6 @@ final class FilterEnded extends Filter
     #[\Override]
     public function apply(Update $update): bool
     {
-        return $update instanceof VoIP && $update->getCallState() === CallState::ENDED;
+        return $update instanceof PrivateCall && $update->getCallState() === CallState::ENDED;
     }
 }

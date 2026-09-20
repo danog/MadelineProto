@@ -286,7 +286,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * reopen their file and re-subscribe to their live track; any output that was still only *pending*
      * when the process stopped is re-attached against the live receivers, since the `track` event will
      * not fire again for them. Must run only once the peer connection has been fully restored, so it
-     * is driven from {@see \danog\MadelineProto\GroupCallController}'s resume path, never during
+     * is driven from {@see \danog\MadelineProto\GroupCall\GroupCallController}'s resume path, never during
      * unserialize (reopening a file suspends the fiber).
      */
     public function resume(): void

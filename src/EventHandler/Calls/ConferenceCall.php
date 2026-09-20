@@ -14,10 +14,10 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Tgcalls\E2E;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 use Amp\ByteStream\ReadableStream;
-use danog\MadelineProto\Call;
+use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -26,6 +26,13 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
+use danog\MadelineProto\Tgcalls\E2E\CallPacket;
+use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
+use danog\MadelineProto\Tgcalls\E2E\Crypto;
+use danog\MadelineProto\Tgcalls\E2E\E2EKeyProvider;
+use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
+use danog\MadelineProto\Tgcalls\E2E\Verification;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use danog\MadelineProto\Tgcalls\GroupSdp;

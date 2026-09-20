@@ -14,13 +14,18 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\GroupCall\Participant;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MultiCall;
+use danog\MadelineProto\RemoteUrl;
 
 /**
  * This update represents a Telegram group call (a video chat, a livestream or a live story).

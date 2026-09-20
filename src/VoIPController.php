@@ -22,6 +22,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
@@ -70,13 +71,15 @@ final class VoIPController implements CallInterface
     /** Auth key */
     private ?string $authKey = null;
 
-    public readonly VoIP $public;
+    public readonly PrivateCall $public;
     /** @var ?list{string, string, string, string} */
     private ?array $visualization = null;
 
     private LocalMutex $authMutex;
 
     private ?LocalFile $outputFile = null;
+
+    private ?RecordingFormat $outputFormat = null;
 
     private bool $muted = false;
 
@@ -89,7 +92,7 @@ final class VoIPController implements CallInterface
         public readonly MTProto $API,
         array $call
     ) {
-        $this->public = new VoIP($API, $call);
+        $this->public = new PrivateCall($API, $call);
         $call['_'] = 'inputPhoneCall';
         $this->diskJockey = new DjLoop($this);
         Assert::true($this->diskJockey->start());
@@ -353,7 +356,7 @@ final class VoIPController implements CallInterface
             $call['connections'] ?? [],
         );
         if ($this->outputFile !== null) {
-            $this->tgcallsController->setOutput($this->outputFile);
+            $this->tgcallsController->setOutput($this->outputFile, $this->outputFormat);
         }
         // A presentation playlist requested before the engine existed is attached now.
         if ($this->presentationDj !== null) {
@@ -507,18 +510,22 @@ final class VoIPController implements CallInterface
     }
 
     /**
-     * Set output file or stream for incoming OPUS audio packets.
+     * Set the output file or stream for the incoming media.
      *
-     * Will write an OGG OPUS stream to the specified file or stream.
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
+     * audio and video, muxed into a Matroska file in pure PHP; {@see RecordingFormat::Opus} keeps the
+     * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
+     * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
      */
-    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
     {
         if ($dest === MediaDestination::Presentation) {
             $this->tgcallsController?->setPresentationOutput($file);
             return;
         }
         $this->outputFile = $file instanceof LocalFile ? $file : null;
-        $this->tgcallsController?->setOutput($file);
+        $this->outputFormat = $format;
+        $this->tgcallsController?->setOutput($file, $format);
         $this->legacyController?->setOutput($file);
     }
 

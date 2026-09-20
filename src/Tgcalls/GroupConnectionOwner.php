@@ -20,7 +20,7 @@ use Stringable;
 
 /**
  * The call a {@see GroupConnection} belongs to: the small surface the WebRTC engine calls back into,
- * implemented by both the ordinary group call ({@see \danog\MadelineProto\GroupCallController}) and
+ * implemented by both the ordinary group call ({@see \danog\MadelineProto\GroupCall\GroupCallController}) and
  * the end-to-end encrypted conference call, so the same engine drives either.
  *
  * @internal

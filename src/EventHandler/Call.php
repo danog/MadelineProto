@@ -14,20 +14,23 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\RemoteUrl;
 use Stringable;
 
 /**
- * Common interface implemented by every call type: one-to-one {@see VoIP} calls and {@see GroupCall}
+ * Common interface implemented by every call type: one-to-one {@see Calls\PrivateCall} calls and {@see Calls\GroupCall}
  * group/conference calls.
  *
  * It covers the media surface shared by all call types — the playlist/DJ playback controls and the
  * mute and discard controls — so code can drive any call uniformly. Every playlist control takes a
  * {@see MediaDestination} selecting the stream it acts on: the main camera+mic stream (default) or a
  * separate presentation (screen-share) stream. Type-specific operations (a one-to-one call's
- * {@see VoIP::accept()}, a group call's {@see GroupCall::join()} or per-participant recording) live on
+ * {@see Calls\PrivateCall::accept()}, a group call's {@see Calls\GroupCall::join()} or per-participant recording) live on
  * the concrete classes.
  */
 interface Call extends Stringable

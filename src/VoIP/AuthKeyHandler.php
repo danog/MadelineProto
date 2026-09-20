@@ -25,15 +25,16 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Ogg;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIPController;
 use phpseclib4\Math\BigInteger;
 use Throwable;
@@ -61,7 +62,7 @@ trait AuthKeyHandler
      * @param mixed $user  User
      * @param bool  $video Whether to start a video call.
      */
-    public function requestCall(mixed $user, bool $video = false): VoIP
+    public function requestCall(mixed $user, bool $video = false): PrivateCall
     {
         $user = ($this->getInfo($user));
         if ($user['type'] !== 'user') {
@@ -152,7 +153,7 @@ trait AuthKeyHandler
      *
      * @psalm-mutation-free
      */
-    public function getCallByPeer(int $userId): ?VoIP
+    public function getCallByPeer(int $userId): ?PrivateCall
     {
         return ($this->callsByPeer[$userId] ?? null)?->public;
     }
@@ -160,11 +161,11 @@ trait AuthKeyHandler
     /**
      * Get all pending and running calls, indexed by user ID.
      *
-     * @return array<int, VoIP>
+     * @return array<int, PrivateCall>
      */
     public function getAllCalls(): array
     {
-        return array_map(static fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+        return array_map(static fn (VoIPController $v): PrivateCall => $v->public, $this->callsByPeer);
     }
 
     /**
@@ -172,7 +173,7 @@ trait AuthKeyHandler
      *
      * @psalm-mutation-free
      */
-    public function getCall(int $id): ?VoIP
+    public function getCall(int $id): ?PrivateCall
     {
         return ($this->calls[$id] ?? null)?->public;
     }
@@ -186,13 +187,16 @@ trait AuthKeyHandler
     }
 
     /**
-     * Set output file or stream for incoming OPUS audio packets in a call.
+     * Set the output file or stream for the incoming media of a call.
      *
-     * Will write an OGG OPUS stream to the specified file or stream.
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
+     * audio and video, muxed into a Matroska file in pure PHP; {@see RecordingFormat::Opus} keeps the
+     * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
+     * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
      */
-    public function callSetOutput(int $id, LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    public function callSetOutput(int $id, LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
     {
-        ($this->calls[$id] ?? null)?->setOutput($file, $dest);
+        ($this->calls[$id] ?? null)?->setOutput($file, $dest, $format);
     }
 
     /**

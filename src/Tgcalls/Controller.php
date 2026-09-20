@@ -22,6 +22,7 @@ use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use danog\MadelineProto\VoIPController;
@@ -410,12 +411,17 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     /**
      * Set the output file or stream for the incoming media.
      *
-     * A `.mkv`/`.webm` target records both the incoming audio and video, muxed into Matroska in pure
-     * PHP ({@see CallRecorder}); any other target keeps the audio-only behaviour, writing an OGG OPUS
-     * stream ({@see OpusRecorder}). A raw stream, whose extension is unknown, is treated as OGG audio.
+     * {@see RecordingFormat::Webm} and {@see RecordingFormat::Mkv} record both the incoming audio and
+     * video, muxed into Matroska in pure PHP ({@see CallRecorder}); {@see RecordingFormat::Opus} keeps
+     * the audio-only behaviour, writing an OGG OPUS stream ({@see OpusRecorder}).
+     *
+     * When `$format` is null it is autodetected from the extension of `$file` — but only if a
+     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
      */
-    public function setOutput(LocalFile|WritableStream $file): void
+    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
+        $format ??= $file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Opus;
+
         $this->enableRawReceive();
 
         $this->recorder?->close();
@@ -423,18 +429,30 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->callRecorder?->close();
         $this->callRecorder = null;
 
-        $this->callRecorder = new CallRecorder($file);
-        $kinds = [];
-        $recv = 0; // RECDEBUG
+        if ($format->isMatroska()) {
+            $this->callRecorder = new CallRecorder($file, $format);
+            $kinds = [];
+            $recv = 0; // RECDEBUG
+            foreach ($this->peerConnection->getReceivers() as $receiver) {
+                $recv++; // RECDEBUG
+                $track = $receiver->getTrack();
+                if ($track instanceof RemoteStreamTrack) {
+                    $kinds[] = $track->getKind()->name; // RECDEBUG
+                    $this->callRecorder->setTrack($track);
+                }
+            }
+            $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
+            return;
+        }
+
+        $this->recorder = new OpusRecorder($file);
         foreach ($this->peerConnection->getReceivers() as $receiver) {
-            $recv++; // RECDEBUG
             $track = $receiver->getTrack();
-            if ($track instanceof RemoteStreamTrack) {
-                $kinds[] = $track->getKind()->name; // RECDEBUG
-                $this->callRecorder->setTrack($track);
+            if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
+                $this->recorder->setTrack($track);
+                break;
             }
         }
-        $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
     }
 
     /**

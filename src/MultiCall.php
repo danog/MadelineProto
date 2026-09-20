@@ -16,14 +16,16 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\EventHandler\Call;
+
 /**
- * Common interface for the multi-party call types — {@see GroupCall} (video chats, livestreams) and
- * {@see \danog\MadelineProto\Tgcalls\E2E\ConferenceCall} (end-to-end encrypted conference calls) — on
+ * Common interface for the multi-party call types — {@see EventHandler\Calls\GroupCall} (video chats, livestreams) and
+ * {@see \danog\MadelineProto\EventHandler\Calls\ConferenceCall} (end-to-end encrypted conference calls) — on
  * top of the media surface every call shares ({@see Call}).
  *
- * It covers what a call with more than two participants adds over a one-to-one {@see VoIP} call:
+ * It covers what a call with more than two participants adds over a one-to-one {@see EventHandler\Calls\PrivateCall} call:
  * leaving without ending it for everyone else, and enumerating who is in it. Type-specific operations
- * (a group call's {@see GroupCall::invite()} / per-participant recording, a conference's
+ * (a group call's {@see EventHandler\Calls\GroupCall::invite()} / per-participant recording, a conference's
  * verification emojis / encrypted messages / participant removal) live on the concrete classes.
  */
 interface MultiCall extends Call

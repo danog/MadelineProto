@@ -14,20 +14,28 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\MediaState;
 
 /**
- * This update represents a VoIP Telegram call.
+ * This update represents a private (one-to-one) VoIP Telegram call.
+ *
+ * The old name {@see \danog\MadelineProto\VoIP} is kept as an alias for backwards compatibility.
  */
-final class VoIP extends Update implements SimpleFilters, Call
+final class PrivateCall extends Update implements SimpleFilters, Call
 {
     /** Phone call ID */
     public readonly int $callID;
@@ -126,14 +134,17 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Set the output file or stream for the incoming media.
      *
-     * A `.mkv` or `.webm` file records both the incoming audio and video, muxed into a Matroska file
-     * in pure PHP (the peer's frames are stored as-is, so the video track is whatever codec the peer
-     * sends — VP8/VP9/H.264/AV1 — and the audio is OPUS). Any other file or a raw stream keeps the
-     * audio-only behaviour and receives an OGG OPUS stream.
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
+     * audio and video, muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so
+     * the video track is whatever codec the peer sends — VP8/VP9/H.264/AV1 — and the audio is OPUS).
+     * {@see RecordingFormat::Opus} keeps the audio-only behaviour and receives an OGG OPUS stream.
+     *
+     * When `$format` is null it is autodetected from the extension of `$file`, but only if a
+     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
      */
-    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
     {
-        $this->getClient()->callSetOutput($this->callID, $file, $dest);
+        $this->getClient()->callSetOutput($this->callID, $file, $dest, $format);
 
         return $this;
     }
