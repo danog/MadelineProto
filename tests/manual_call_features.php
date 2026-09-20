@@ -335,9 +335,13 @@ switch ($mode) {
             $call->setOutput(new LocalDirectory($dir));
         }
 
+        // A freshly re-attached call may still be JOINING; wait until it is actually JOINED.
+        info('Waiting for the call to be fully joined…');
+        waitFor(static fn (): bool => $call->getCallState() !== GroupCallState::JOINING, microtime(true) + 30);
+
         info('Monitoring. Ctrl-C detaches WITHOUT leaving; re-run to re-attach (recordings resume/append).');
         $lastReport = 0.0;
-        while ($call->getCallState() === GroupCallState::JOINED) {
+        while (in_array($call->getCallState(), [GroupCallState::JOINED, GroupCallState::JOINING], true)) {
             if (microtime(true) - $lastReport > 5) {
                 $files = array_merge(glob($dir.'/*.mkv') ?: [], glob($dir.'/*.presentation.mkv') ?: []);
                 info('… joined; '.count($files).' participant file(s) in '.$dir);

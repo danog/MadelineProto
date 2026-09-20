@@ -161,7 +161,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * The colibri data channel: the client sends {@see ReceiverVideoConstraints} on it to tell the
      * SFU which participants' video to forward, and receives quality hints on it.
      */
-    private RTCDataChannel $dataChannel;
+    private ?RTCDataChannel $dataChannel = null;
     private bool $dataChannelOpen = false;
     /**
      * The SFU endpoints whose video we want forwarded, `endpoint => desired maximum height`. The SFU
@@ -198,11 +198,19 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
 
-        // The colibri data channel over which we subscribe to other participants' video. tgcalls
-        // creates it up front so it is bundled into the first offer/answer with the media.
-        $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true));
-        $this->dataChannel->addOpenListener($this);
-        $this->dataChannel->addMessageListener($this);
+        // The colibri data channel over which we'd subscribe to other participants' video is OFF by
+        // default (opt in with MP_GROUP_DATACHANNEL=1). php-rtc's createDataChannel() builds the SCTP
+        // over a SEPARATE DtlsTransport+IceTransport instead of bundling it onto the media transport;
+        // against the single bundled transport the Telegram SFU offers, that second ICE transport can
+        // never connect, so RTCPeerConnection::updateConnectionState() (which aggregates every ICE/DTLS
+        // transport) is pinned at "connecting" and media never starts flowing. tgcalls runs the group
+        // data channel as its own SCTP association, not an SDP-bundled m-line; until we do the same,
+        // enabling it breaks all group media. See GroupNetworkManager.cpp (Android tgcalls).
+        if (getenv('MP_GROUP_DATACHANNEL') === '1') {
+            $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true));
+            $this->dataChannel->addOpenListener($this);
+            $this->dataChannel->addMessageListener($this);
+        }
 
         // This object is registered as a typed listener, not a closure, so it is part of the peer
         // connection's serializable state and keeps pointing at this restored connection after a
@@ -294,7 +302,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
         // Re-subscribe to remote video: the SCTP channel came back, so resend the constraints in case
         // it did not fire its open event again (it may already be open, or reopen shortly).
-        $this->dataChannelOpen = $this->dataChannel->getReadyState() === State::Open;
+        $this->dataChannelOpen = $this->dataChannel?->getReadyState() === State::Open;
         $this->sendReceiverConstraints();
         if ($this->pendingOutputs === [] && $this->pendingPresentationOutputs === []) {
             return;
@@ -524,7 +532,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             'defaultConstraints' => ['maxHeight' => 0],
         ];
         try {
-            $this->dataChannel->send(json_encode($message, JSON_THROW_ON_ERROR));
+            $this->dataChannel?->send(json_encode($message, JSON_THROW_ON_ERROR));
         } catch (Throwable $e) {
             $this->call->log("Could not send video constraints on {$this->call}: $e", Logger::WARNING);
         }
