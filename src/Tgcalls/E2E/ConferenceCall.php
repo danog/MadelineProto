@@ -201,9 +201,6 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
      */
     public function create(bool $muted = false): void
     {
-        if (!Crypto::available()) {
-            throw new \RuntimeException('End-to-end encrypted conference calls require the sodium and openssl extensions.');
-        }
         $genesis = $this->chain->buildGenesis();
         $this->connection = new GroupConnection($this, $this->diskJockey);
         $this->connection->setFrameCryptor($this->frameCryptor);
@@ -236,9 +233,6 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
      */
     public function join(bool $muted = false): void
     {
-        if (!Crypto::available()) {
-            throw new \RuntimeException('End-to-end encrypted conference calls require the sodium and openssl extensions.');
-        }
         $this->syncChain(self::SUBCHAIN_STATE);
         $selfAdd = $this->buildSelfAddBlock();
         $this->connection = new GroupConnection($this, $this->diskJockey);

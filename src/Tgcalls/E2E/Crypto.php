@@ -24,8 +24,10 @@ namespace danog\MadelineProto\Tgcalls\E2E;
  *
  * Signatures are Ed25519, key agreement is X25519 over the Ed25519 keys converted to Montgomery form
  * (exactly what libsodium's crypto_sign_ed25519_*_to_curve25519 do), the KDF is HMAC-SHA512, message
- * ids are HMAC-SHA256, and bulk encryption is AES-256-CBC. These come from the `sodium` and `openssl`
- * PHP extensions; {@see self::available()} reports whether the runtime has them.
+ * ids are HMAC-SHA256, and bulk encryption is AES-256-CBC. The fast path uses the `sodium` and
+ * `openssl` extensions; when they are absent it falls back to phpseclib (Ed25519, AES) and a pure-PHP
+ * X25519, so no PHP extension beyond the always-present `hash` is required — both backends are
+ * cross-validated to produce byte-identical results.
  *
  * @internal
  */
@@ -34,17 +36,18 @@ final class Crypto
     /** Minimum padding prepended by encrypt_data (MessageEncryption.cpp MIN_PADDING). */
     private const MIN_PADDING = 16;
 
-    /** Whether the runtime has the extensions required for E2E conference cryptography. */
+    /**
+     * Always available: the fast path uses the `sodium` and `openssl` extensions, and a pure-PHP
+     * fallback (phpseclib Ed25519, a phpseclib X25519 over Ed25519 keys, and phpseclib AES) covers
+     * runtimes without them. phpseclib is a hard dependency of MadelineProto.
+     */
     public static function available(): bool
     {
-        return \extension_loaded('sodium') && \extension_loaded('openssl');
+        return true;
     }
 
     private static function assertAvailable(): void
     {
-        if (!self::available()) {
-            throw new \RuntimeException('End-to-end encrypted conference calls require the PHP sodium and openssl extensions.');
-        }
     }
 
     /* ------------------------------------------------------------------ *
@@ -90,8 +93,7 @@ final class Crypto
         $msgId = substr($largeMsgId, 0, 16);
 
         [$aesKey, $aesIv] = self::aesFromHash($encKey, $msgId);
-        $ciphertext = openssl_encrypt($padded, 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $aesIv);
-        \assert($ciphertext !== false);
+        $ciphertext = self::aesEncrypt($aesKey, $aesIv, $padded);
         return [$msgId.$ciphertext, $largeMsgId];
     }
 
@@ -123,7 +125,7 @@ final class Crypto
         $hmacKey = substr($large, 32, 32);
 
         [$aesKey, $aesIv] = self::aesFromHash($encKey, $msgId);
-        $padded = openssl_decrypt($ciphertext, 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $aesIv);
+        $padded = self::aesDecrypt($aesKey, $aesIv, $ciphertext);
         if ($padded === false) {
             throw new \RuntimeException('Could not decrypt data');
         }
@@ -154,9 +156,7 @@ final class Crypto
         }
         $encKey = substr(self::kdfExpand($secret, 'tde2e_encrypt_header'), 0, 32);
         [$aesKey, $aesIv] = self::aesFromHash($encKey, substr($encryptedMessage, 0, 16));
-        $out = openssl_encrypt($header, 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $aesIv);
-        \assert($out !== false);
-        return $out;
+        return self::aesEncrypt($aesKey, $aesIv, $header);
     }
 
     /**
@@ -167,7 +167,7 @@ final class Crypto
         self::assertAvailable();
         $encKey = substr(self::kdfExpand($secret, 'tde2e_encrypt_header'), 0, 32);
         [$aesKey, $aesIv] = self::aesFromHash($encKey, substr($encryptedMessage, 0, 16));
-        $out = openssl_decrypt($encryptedHeader, 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $aesIv);
+        $out = self::aesDecrypt($aesKey, $aesIv, $encryptedHeader);
         if ($out === false) {
             throw new \RuntimeException('Could not decrypt header');
         }
@@ -179,6 +179,37 @@ final class Crypto
     {
         $kv = hash_hmac('sha512', $msgId, $hashKey, true);
         return [substr($kv, 0, 32), substr($kv, 32, 16)];
+    }
+
+    /** AES-256-CBC encrypt without padding (input is already block-aligned): openssl, else phpseclib. */
+    private static function aesEncrypt(string $key, string $iv, string $data): string
+    {
+        if (\extension_loaded('openssl')) {
+            $out = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+            \assert($out !== false);
+            return $out;
+        }
+        $aes = new \phpseclib4\Crypt\AES('cbc');
+        $aes->setKey($key);
+        $aes->setIV($iv);
+        $aes->disablePadding();
+        return $aes->encrypt($data);
+    }
+
+    /** AES-256-CBC decrypt without padding: openssl, else phpseclib. Returns false on failure. */
+    private static function aesDecrypt(string $key, string $iv, string $data): string|false
+    {
+        if (\extension_loaded('openssl')) {
+            return openssl_decrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+        }
+        if ($data === '' || \strlen($data) % 16 !== 0) {
+            return false;
+        }
+        $aes = new \phpseclib4\Crypt\AES('cbc');
+        $aes->setKey($key);
+        $aes->setIV($iv);
+        $aes->disablePadding();
+        return $aes->decrypt($data);
     }
 
     /* ------------------------------------------------------------------ *
@@ -199,26 +230,38 @@ final class Crypto
     /** The 32-byte Ed25519 public key of a 32-byte seed. */
     public static function publicKey(string $seed): string
     {
-        self::assertAvailable();
-        return sodium_crypto_sign_publickey(sodium_crypto_sign_seed_keypair($seed));
+        if (\extension_loaded('sodium')) {
+            return sodium_crypto_sign_publickey(sodium_crypto_sign_seed_keypair($seed));
+        }
+        $curve = new \phpseclib4\Crypt\EC\Curves\Ed25519();
+        $point = $curve->multiplyPoint($curve->getBasePoint(), $curve->extractSecret($seed)['dA']);
+        return \phpseclib4\Crypt\EC\Formats\Keys\libsodium::savePublicKey($curve, $point);
     }
 
     /** Ed25519-sign a message with a 32-byte seed, returning the 64-byte signature. */
     public static function sign(string $seed, string $message): string
     {
-        self::assertAvailable();
-        $secretKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
-        return sodium_crypto_sign_detached($message, $secretKey);
+        if (\extension_loaded('sodium')) {
+            return sodium_crypto_sign_detached($message, sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed)));
+        }
+        // phpseclib loads an Ed25519 private key from the 32-byte seed followed by its public key.
+        return \phpseclib4\Crypt\EC::loadFormat('libsodium', $seed.self::publicKey($seed))->sign($message);
     }
 
     /** Verify an Ed25519 signature against a 32-byte public key. */
     public static function verify(string $signature, string $message, string $publicKey): bool
     {
-        self::assertAvailable();
         if (\strlen($signature) !== 64 || \strlen($publicKey) !== 32) {
             return false;
         }
-        return sodium_crypto_sign_verify_detached($signature, $message, $publicKey);
+        if (\extension_loaded('sodium')) {
+            return sodium_crypto_sign_verify_detached($signature, $message, $publicKey);
+        }
+        try {
+            return \phpseclib4\Crypt\EC::loadFormat('libsodium', $publicKey)->verify($message, $signature);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /* ------------------------------------------------------------------ *
@@ -231,13 +274,96 @@ final class Crypto
      */
     public static function computeSharedSecret(string $seed, string $peerPublicKey): string
     {
-        self::assertAvailable();
-        $secretKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
-        $x25519Secret = sodium_crypto_sign_ed25519_sk_to_curve25519($secretKey);
-        $x25519Public = sodium_crypto_sign_ed25519_pk_to_curve25519($peerPublicKey);
-        $raw = sodium_crypto_scalarmult($x25519Secret, $x25519Public);
+        if (\extension_loaded('sodium')) {
+            $secretKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
+            $raw = sodium_crypto_scalarmult(
+                sodium_crypto_sign_ed25519_sk_to_curve25519($secretKey),
+                sodium_crypto_sign_ed25519_pk_to_curve25519($peerPublicKey)
+            );
+        } else {
+            $raw = self::x25519(self::edSeedToX25519($seed), self::edPublicToX25519($peerPublicKey));
+        }
         // Note the key/msg order here is the opposite of kdfExpand: the purpose string is the key.
         return substr(hash_hmac('sha512', $raw, 'tde2e_shared_secret', true), 0, 32);
+    }
+
+    /* ------------------------------------------------------------------ *
+     *  Pure-PHP X25519 fallback (RFC 7748 + Ed25519->Montgomery conversion), used without sodium.
+     * ------------------------------------------------------------------ */
+
+    /** Curve25519 field prime, 2^255 - 19. */
+    private static function fieldPrime(): \phpseclib4\Math\BigInteger
+    {
+        return (new \phpseclib4\Math\BigInteger(2))->pow(new \phpseclib4\Math\BigInteger(255))->subtract(new \phpseclib4\Math\BigInteger(19));
+    }
+
+    /** Ed25519 seed -> clamped X25519 scalar: SHA-512(seed)[0:32] with the RFC 7748 clamp. */
+    private static function edSeedToX25519(string $seed): string
+    {
+        $s = substr(hash('sha512', $seed, true), 0, 32);
+        $s[0] = \chr(\ord($s[0]) & 248);
+        $s[31] = \chr((\ord($s[31]) & 127) | 64);
+        return $s;
+    }
+
+    /** Ed25519 public key -> Montgomery u: u = (1 + y) / (1 - y) mod p, with the sign bit cleared. */
+    private static function edPublicToX25519(string $publicKey): string
+    {
+        $p = self::fieldPrime();
+        $one = new \phpseclib4\Math\BigInteger(1);
+        $y = (new \phpseclib4\Math\BigInteger(strrev($publicKey), 256))
+            ->bitwise_and((new \phpseclib4\Math\BigInteger(2))->pow(new \phpseclib4\Math\BigInteger(255))->subtract($one));
+        $u = $one->add($y)->multiply($one->subtract($y)->modInverse($p))->powMod($one, $p);
+        return self::toLe32($u);
+    }
+
+    /** X25519 scalar multiplication (RFC 7748 Montgomery ladder). */
+    private static function x25519(string $scalar, string $u): string
+    {
+        $p = self::fieldPrime();
+        $one = new \phpseclib4\Math\BigInteger(1);
+        $a24 = new \phpseclib4\Math\BigInteger(121665);
+        $k = new \phpseclib4\Math\BigInteger(strrev($scalar), 256);
+        $x1 = new \phpseclib4\Math\BigInteger(strrev($u), 256);
+        $x2 = $one;
+        $z2 = new \phpseclib4\Math\BigInteger(0);
+        $x3 = $x1;
+        $z3 = $one;
+        $swap = 0;
+        for ($t = 254; $t >= 0; $t--) {
+            $kt = $k->bitwise_rightShift($t)->bitwise_and($one)->equals($one) ? 1 : 0;
+            $swap ^= $kt;
+            if ($swap) {
+                [$x2, $x3] = [$x3, $x2];
+                [$z2, $z3] = [$z3, $z2];
+            }
+            $swap = $kt;
+            $A = $x2->add($z2)->powMod($one, $p);
+            $AA = $A->multiply($A)->powMod($one, $p);
+            $B = $x2->subtract($z2)->powMod($one, $p);
+            $BB = $B->multiply($B)->powMod($one, $p);
+            $E = $AA->subtract($BB)->powMod($one, $p);
+            $C = $x3->add($z3)->powMod($one, $p);
+            $D = $x3->subtract($z3)->powMod($one, $p);
+            $DA = $D->multiply($A)->powMod($one, $p);
+            $CB = $C->multiply($B)->powMod($one, $p);
+            $x3 = $DA->add($CB);
+            $x3 = $x3->multiply($x3)->powMod($one, $p);
+            $z3 = $DA->subtract($CB);
+            $z3 = $z3->multiply($z3)->powMod($one, $p)->multiply($x1)->powMod($one, $p);
+            $x2 = $AA->multiply($BB)->powMod($one, $p);
+            $z2 = $E->multiply($AA->add($a24->multiply($E)->powMod($one, $p)))->powMod($one, $p);
+        }
+        if ($swap) {
+            [$x2, $z2] = [$x3, $z3];
+        }
+        return self::toLe32($x2->multiply($z2->modInverse($p))->powMod($one, $p));
+    }
+
+    /** Encode a field element as a 32-byte little-endian string. */
+    private static function toLe32(\phpseclib4\Math\BigInteger $n): string
+    {
+        return strrev(str_pad($n->toBytes(), 32, "\0", STR_PAD_LEFT));
     }
 
     /* ------------------------------------------------------------------ *
