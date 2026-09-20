@@ -180,17 +180,26 @@ final class ConferenceChain
      * server has already validated it; we recover state and, when a shared key targets us, decrypt it.
      *
      * @param string $serialized The block bytes exactly as the server returned them (server id).
+     *
+     * @return bool Whether the block was the next one and was applied (false = duplicate/out of order).
      */
-    public function applyServerBlock(string $serialized): void
+    public function applyServerBlock(string $serialized): bool
     {
         $block = $this->codec->deserialize($serialized);
+        // Apply strictly in order and exactly once: the same block may reach us from both the push
+        // update and the polling backstop. A block that is not the next one is ignored (the server
+        // enforces the ordering, so this is not an error, just a duplicate/out-of-order delivery).
+        if ((int) $block['height'] !== $this->height + 1) {
+            return false;
+        }
         // Hash the block in its canonical (local-id) form, as tde2e does.
         $canonical = $this->codec->serialize($block);
         foreach ($block['changes'] ?? [] as $change) {
             $this->applyChange($change);
         }
-        $this->height = $block['height'];
+        $this->height = (int) $block['height'];
         $this->lastBlockHash = $this->codec->blockHash($canonical);
+        return true;
     }
 
     /**

@@ -438,6 +438,38 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->createGroupCall($peer, $title, $scheduleDate, $rtmpStream);
     }
     /**
+     * Create and join a new end-to-end encrypted conference call, with ourselves as the only participant.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param bool $muted Whether to join muted.
+     */
+    final public function createConferenceCall(bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->createConferenceCall($muted);
+    }
+    /**
+     * Join an existing end-to-end encrypted conference call.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
+     * @param bool  $muted Whether to join muted.
+     */
+    final public function joinConferenceCall(array $call, bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->joinConferenceCall($call, $muted);
+    }
+    /**
+     * Get a live end-to-end encrypted conference call this session is in, by its call id.
+     */
+    final public function getConferenceCall(int $id): ?\danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->getConferenceCall($id);
+    }
+    /**
      * Discard call.
      *
      * @param int<1, 5> $rating  Call rating in stars

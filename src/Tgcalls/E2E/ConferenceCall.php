@@ -16,9 +16,14 @@
 
 namespace danog\MadelineProto\Tgcalls\E2E;
 
+use Amp\ByteStream\ReadableStream;
+use danog\MadelineProto\Call;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
@@ -35,9 +40,11 @@ use Throwable;
  * end-to-end encrypted by a {@see FrameCryptor} — the SFU only ever forwards ciphertext. It is both
  * the connection's owner and the cryptor's key provider.
  *
- * @internal
+ * This is the public object returned by {@see \danog\MadelineProto\MTProto::createConferenceCall()}
+ * and {@see \danog\MadelineProto\MTProto::joinConferenceCall()}; it implements the common
+ * {@see Call} media interface plus conference-specific controls (verification, encrypted messages).
  */
-final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
+final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
 {
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
     private const SUBCHAIN_STATE = 0;
@@ -45,7 +52,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     /** How many recent epochs to keep so media from just before a rekey still decrypts. */
     private const MAX_EPOCHS = 15;
 
-    private array $inputCall;
+    /** The inputGroupCall of this conference, set once it exists (after create/join). */
+    private ?array $inputCall = null;
     private int $selfId;
     /** Our Ed25519 signing seed: signs both chain blocks and media/message packets. */
     private string $selfSeed;
@@ -74,16 +82,12 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     private ?string $ownNonce = null;
 
     private bool $joined = false;
+    /** Event-loop id of the backstop chain poll, so it can be cancelled on leave. */
+    private ?string $pollWatcher = null;
 
     public function __construct(
         public readonly MTProto $API,
-        array $call,
     ) {
-        $this->inputCall = [
-            '_' => 'inputGroupCall',
-            'id' => $call['id'],
-            'access_hash' => $call['access_hash'],
-        ];
         $self = $this->API->getSelf();
         if ($self === false) {
             throw new \RuntimeException('Cannot start a conference call without being logged in.');
@@ -94,6 +98,24 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         $this->frameCryptor = new FrameCryptor($this);
         $this->diskJockey = new DjLoop($this);
         $this->diskJockey->start();
+    }
+
+    /** Point this controller at an existing conference (its groupCall), before joining it. */
+    public function setCall(array $call): void
+    {
+        $this->inputCall = [
+            '_' => 'inputGroupCall',
+            'id' => $call['id'],
+            'access_hash' => $call['access_hash'],
+        ];
+    }
+
+    /**
+     * @return array The inputGroupCall, once the conference exists.
+     */
+    public function getInputCall(): array
+    {
+        return $this->inputCall ?? throw new \RuntimeException('The conference call does not exist yet.');
     }
 
     /* ------------------------------------------------------------------ *
@@ -150,12 +172,14 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
             'block' => $genesis['serialized'],
             'params' => $params,
         ]);
+        $this->extractCall($updates);
         // Our genesis block is authoritative once the server accepted it.
         $this->chain->applyServerBlock($genesis['serialized']);
         $this->refreshEpoch();
         $this->chainOffset = [$this->chain->getHeight() + 1, 0];
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         $this->startPolling();
         $this->log("Created and joined E2E conference $this", Logger::NOTICE);
     }
@@ -186,6 +210,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         ]);
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         // Re-sync so our own accepted block (and any concurrent ones) are applied in server order.
         $this->syncChain(self::SUBCHAIN_STATE);
         $this->startPolling();
@@ -264,10 +289,13 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     {
         try {
             if ($subChainId === self::SUBCHAIN_STATE) {
-                $this->chain->applyServerBlock($serialized);
-                $this->refreshEpoch();
-                $this->refreshVerification();
-                $this->chainOffset[self::SUBCHAIN_STATE] = $this->chain->getHeight() + 1;
+                // Idempotent + ordered: the same block may arrive from both the push update and the
+                // polling backstop; only a newly applied block advances the epoch and offset.
+                if ($this->chain->applyServerBlock($serialized)) {
+                    $this->refreshEpoch();
+                    $this->refreshVerification();
+                    $this->chainOffset[self::SUBCHAIN_STATE] = $this->chain->getHeight() + 1;
+                }
             } else {
                 $this->applyBroadcast($serialized);
                 $this->chainOffset[self::SUBCHAIN_VERIFICATION]++;
@@ -295,14 +323,164 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
 
     private function startPolling(): void
     {
-        // Poll both subchains periodically as a backstop to the push updates.
-        EventLoop::repeat(5.0, function (): void {
+        // The primary delivery path is the push updates (updateGroupCallChainBlocks /
+        // updateGroupCallEncryptedMessage) routed here by the update dispatcher; this timer is only a
+        // backstop that catches anything missed while the update seq was gapped or the process slept.
+        $this->pollWatcher = EventLoop::repeat(5.0, function (): void {
             if (!$this->joined) {
                 return;
             }
             $this->syncChain(self::SUBCHAIN_STATE);
             $this->syncChain(self::SUBCHAIN_VERIFICATION);
         });
+    }
+
+    /* ------------------------------------------------------------------ *
+     *  Media playback — the common {@see Call} interface. Every frame is end-to-end
+     *  encrypted before it reaches the SFU. Screen-share (Presentation) is not wired yet.
+     * ------------------------------------------------------------------ */
+
+    private bool $muted = false;
+
+    /** Conference screen-share would need a second connection; reject it until that lands. */
+    private static function requireCamera(MediaDestination $dest): void
+    {
+        if ($dest !== MediaDestination::Camera) {
+            throw new \RuntimeException('Screen-share is not yet supported in end-to-end conference calls.');
+        }
+    }
+
+    #[\Override]
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->play($file);
+        return $this;
+    }
+
+    #[\Override]
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->play($file);
+        return $this;
+    }
+
+    #[\Override]
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->playOnHold(...$files);
+        return $this;
+    }
+
+    #[\Override]
+    public function skip(MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->skip();
+        return $this;
+    }
+
+    #[\Override]
+    public function stop(MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->stopPlaying();
+        return $this;
+    }
+
+    #[\Override]
+    public function pause(MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->pausePlaying();
+        return $this;
+    }
+
+    #[\Override]
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
+    {
+        self::requireCamera($dest);
+        return $this->diskJockey->isAudioPaused();
+    }
+
+    #[\Override]
+    public function resume(MediaDestination $dest = MediaDestination::Camera): self
+    {
+        self::requireCamera($dest);
+        $this->diskJockey->resumePlaying();
+        return $this;
+    }
+
+    #[\Override]
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
+    {
+        self::requireCamera($dest);
+        return $this->diskJockey->getCurrent();
+    }
+
+    #[\Override]
+    public function setMuted(bool $muted = true): self
+    {
+        $this->muted = $muted;
+        if ($muted) {
+            $this->diskJockey->pausePlaying();
+        } else {
+            $this->diskJockey->resumePlaying();
+        }
+        if ($this->joined && $this->inputCall !== null) {
+            try {
+                $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
+                    'call' => $this->inputCall,
+                    'participant' => ['_' => 'inputPeerSelf'],
+                    'muted' => $muted,
+                ]);
+            } catch (Throwable $e) {
+                $this->log("Could not change the mute state of $this: $e", Logger::WARNING);
+            }
+        }
+        return $this;
+    }
+
+    #[\Override]
+    public function isMuted(): bool
+    {
+        return $this->muted;
+    }
+
+    /**
+     * Discard (leave) the conference call.
+     */
+    #[\Override]
+    public function discard(): self
+    {
+        $this->leave();
+        return $this;
+    }
+
+    /**
+     * Leave the conference: stop the backstop poll and stop receiving its updates.
+     */
+    public function leave(): void
+    {
+        $this->joined = false;
+        if ($this->pollWatcher !== null) {
+            EventLoop::cancel($this->pollWatcher);
+            $this->pollWatcher = null;
+        }
+        if ($this->inputCall === null) {
+            return;
+        }
+        $this->API->unregisterConferenceCall($this->inputCall['id']);
+        $source = $this->connection?->getAudioSource() ?? 0;
+        $this->connection?->close();
+        $this->connection = null;
+        try {
+            $this->API->methodCallAsyncRead('phone.leaveGroupCall', ['call' => $this->inputCall, 'source' => $source]);
+        } catch (Throwable $e) {
+            $this->log("Could not leave $this: $e", Logger::WARNING);
+        }
     }
 
     /* ------------------------------------------------------------------ *
@@ -434,6 +612,19 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         $this->connection?->setRemoteSources($sources);
     }
 
+    /**
+     * Set our inputGroupCall from the groupCall an update carries (the create/join response).
+     */
+    private function extractCall(array $updates): void
+    {
+        foreach ($updates['updates'] ?? [] as $update) {
+            if ($update['_'] === 'updateGroupCall' && ($update['call']['_'] ?? '') === 'groupCall') {
+                $this->setCall($update['call']);
+                return;
+            }
+        }
+    }
+
     private function consumeUpdates(array $updates): void
     {
         foreach ($updates['updates'] ?? [] as $update) {
@@ -514,6 +705,6 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     #[\Override]
     public function __toString(): string
     {
-        return "E2E conference {$this->inputCall['id']}";
+        return 'E2E conference '.($this->inputCall['id'] ?? '(new)');
     }
 }

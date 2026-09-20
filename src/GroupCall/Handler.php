@@ -24,6 +24,7 @@ use danog\MadelineProto\GroupCallController;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
 
 /**
@@ -37,6 +38,27 @@ trait Handler
 {
     /** @var array<int, GroupCallController> */
     private array $groupCalls = [];
+    /** @var array<int, ConferenceCall> End-to-end encrypted conference calls, by call id. */
+    private array $conferenceCalls = [];
+
+    /**
+     * Register a live end-to-end encrypted conference so its chain-block and encrypted-message
+     * updates are routed to it.
+     *
+     * @internal
+     */
+    public function registerConferenceCall(int $id, ConferenceCall $call): void
+    {
+        $this->conferenceCalls[$id] = $call;
+    }
+
+    /**
+     * @internal
+     */
+    public function unregisterConferenceCall(int $id): void
+    {
+        unset($this->conferenceCalls[$id]);
+    }
 
     /**
      * Create a group call (video chat or livestream) in the specified group or channel.
@@ -84,6 +106,47 @@ trait Handler
             throw new AssertionError('The server did not return the created group call!');
         }
         return $controller->public;
+    }
+
+    /**
+     * Create and join a new end-to-end encrypted conference call, with ourselves as the only
+     * participant. Others join it with {@see self::joinConferenceCall()} using the returned call id.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param bool $muted Whether to join muted.
+     */
+    public function createConferenceCall(bool $muted = false): ConferenceCall
+    {
+        $conference = new ConferenceCall($this);
+        $conference->create($muted);
+        return $conference;
+    }
+
+    /**
+     * Join an existing end-to-end encrypted conference call.
+     *
+     * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
+     * Requires the `sodium` and `openssl` PHP extensions.
+     *
+     * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
+     * @param bool  $muted Whether to join muted.
+     */
+    public function joinConferenceCall(array $call, bool $muted = false): ConferenceCall
+    {
+        $conference = new ConferenceCall($this);
+        $conference->setCall($call);
+        $conference->join($muted);
+        return $conference;
+    }
+
+    /**
+     * Get a live end-to-end encrypted conference call this session is in, by its call id.
+     */
+    public function getConferenceCall(int $id): ?ConferenceCall
+    {
+        return $this->conferenceCalls[$id] ?? null;
     }
 
     /**
@@ -449,6 +512,29 @@ trait Handler
                     $this->groupCalls[$id]->onParticipantsUpdate(...),
                     $update['participants'],
                     $update['version']
+                );
+                break;
+            case 'updateGroupCallChainBlocks':
+                $id = $update['call']['id'];
+                if (!isset($this->conferenceCalls[$id])) {
+                    return;
+                }
+                EventLoop::queue(
+                    $this->conferenceCalls[$id]->onChainBlocks(...),
+                    $update['sub_chain_id'],
+                    array_map('strval', $update['blocks']),
+                    $update['next_offset']
+                );
+                break;
+            case 'updateGroupCallEncryptedMessage':
+                $id = $update['call']['id'];
+                if (!isset($this->conferenceCalls[$id])) {
+                    return;
+                }
+                EventLoop::queue(
+                    $this->conferenceCalls[$id]->onEncryptedMessage(...),
+                    $this->getIdInternal($update['from_id']) ?? 0,
+                    (string) $update['encrypted_message']
                 );
                 break;
         }

@@ -1218,11 +1218,14 @@ trait UpdateHandler
         }
         if ($update['_'] === 'updateGroupCall'
             || $update['_'] === 'updateGroupCallParticipants'
+            || $update['_'] === 'updateGroupCallChainBlocks'
+            || $update['_'] === 'updateGroupCallEncryptedMessage'
         ) {
             // Group call updates must be applied synchronously and in order, exclusively from here:
             // never invoke the controller's handlers directly, or a version gap could be filled out
             // of sequence. updateGroupCallConnection is not handled here: it carries no call ID and
             // is only ever returned by phone.joinGroupCall, so it is extracted from that response.
+            // The chain-block and encrypted-message updates drive end-to-end conference calls.
             $this->handleGroupCallUpdate($update);
         }
         if ($update['_'] === 'updatePhoneCall') {
