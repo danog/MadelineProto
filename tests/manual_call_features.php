@@ -15,38 +15,51 @@
  */
 
 /*
- * Manual, INTERACTIVE test harness for the call features landed so far. It is NOT a PHPUnit test
+ * Manual, INTERACTIVE test harness for every call feature landed so far. It is NOT a PHPUnit test
  * (it needs live Telegram peers), which is why it lives in tests/ without the `Test.php` suffix and
  * is never picked up by the automated suite.
  *
- * It exercises the features that are callable through the public API today:
- *   1. codec fmtp derived from the played file's bitstream (1:1 video call)
- *   2. incoming 1:1 recording as a Matroska file, WITH the new total-duration element
- *   3. group-call folder recording: one .ogg per transmitting participant
- *   4. the common Call interface (offline self-check)
+ * It covers the full matrix of call type × media mode:
  *
- * NOT yet covered (not wired to the public API yet): 1:1 / group presentation (screencast).
+ *                | audio-only        | audio + video (camera) | screencast (presentation)
+ *   -------------+-------------------+------------------------+---------------------------
+ *   1:1          | 1to1 <user> audio | 1to1 <user> video      | 1to1 <user> screencast
+ *   group        | group <chat> audio| group <chat> video     | group <chat> screencast
+ *   conference   | conference audio  | conference video       | conference screencast
+ *              (E2E, end-to-end encrypted — the SFU only ever sees ciphertext)
+ *
+ * For 1:1 and group calls the incoming media is also recorded (Matroska), as a check of the receive
+ * path; for conference calls it prints the verification emojis and sends an encrypted in-call message.
+ * Every call persists with the session: Ctrl-C DETACHES without ending the call; re-running the same
+ * command re-attaches to the running call (recordings resume/append). Only the OTHER party ends it.
  *
  * Usage:
- *   php tests/manual_call_features.php check   [video-file]
- *   php tests/manual_call_features.php 1to1    <user>  [video-file] [seconds] [session]
- *   php tests/manual_call_features.php group   <chat>  [video-file] [seconds] [session]
+ *   php tests/manual_call_features.php check                 [video-file]
+ *   php tests/manual_call_features.php 1to1  <user> <mode>   [file] [session]
+ *   php tests/manual_call_features.php group <chat> <mode>   [file] [session]
+ *   php tests/manual_call_features.php conference   <mode>   [file] [session]
+ *   php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
  *
- * `check` runs fully offline (no Telegram, no login). `1to1` and `group` place/join a real call and
- * print, step by step, exactly what to click in your Telegram client.
+ * <mode> is one of: audio | video | screencast
  *
- * `ffprobe` is used ONLY to inspect the resulting files for verification — never to record; all
- * recording and muxing is pure PHP.
+ * `check` runs fully offline (no Telegram, no login). The others place/join a real call and print,
+ * step by step, exactly what to click in your Telegram client. `ffprobe` is used ONLY to inspect
+ * result files for verification — never to record; all recording and muxing is pure PHP.
  */
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\Call;
 use danog\MadelineProto\GroupCall;
+use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Matroska;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
+use danog\MadelineProto\Tgcalls\E2E\Crypto;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIP\CallState;
@@ -76,6 +89,22 @@ function info(string $what): void
     fwrite(STDERR, "  •  $what\n");
 }
 
+/**
+ * Resolve a media mode to what it means for a call: whether it needs a video call/transport, which
+ * stream it plays on, and a human description.
+ *
+ * @return array{video: bool, dest: MediaDestination, desc: string, needsVideoFile: bool}
+ */
+function modeInfo(string $mode): array
+{
+    return match ($mode) {
+        'audio' => ['video' => false, 'dest' => MediaDestination::Camera, 'desc' => 'audio-only', 'needsVideoFile' => false],
+        'video' => ['video' => true, 'dest' => MediaDestination::Camera, 'desc' => 'audio + camera video', 'needsVideoFile' => true],
+        'screencast' => ['video' => true, 'dest' => MediaDestination::Presentation, 'desc' => 'screen-share (presentation)', 'needsVideoFile' => true],
+        default => throw new \InvalidArgumentException("Unknown media mode '$mode' (expected: audio | video | screencast)"),
+    };
+}
+
 /** Print the video codec + the fmtp parameters we derive from a file's bitstream (proves feature #1). */
 function reportDerivedCodec(string $file): void
 {
@@ -89,7 +118,6 @@ function reportDerivedCodec(string $file): void
         info("Could not demux $file for inspection: {$e->getMessage()}");
         return;
     }
-    $firstKeyframe = null;
     foreach ($m->tracks as $track) {
         if (($track['type'] ?? 0) !== Matroska::TRACK_TYPE_VIDEO || !isset(VIDEO_CODECS[$track['codec']])) {
             continue;
@@ -97,7 +125,6 @@ function reportDerivedCodec(string $file): void
         $name = VIDEO_CODECS[$track['codec']];
         $params = Codec::fmtpFromBitstream('video/'.$name, $track['private'] ?? '');
         if ($params === [] && $name === 'VP9') {
-            // VP9 with no configuration record: read the profile from the first keyframe.
             foreach ($m->frames as $fr) {
                 if ($fr['type'] === Matroska::TRACK_TYPE_VIDEO && $fr['keyframe']) {
                     $params = Codec::fmtpFromBitstream('video/VP9', '', $fr['data']);
@@ -148,75 +175,118 @@ function waitFor(callable $isDone, float $deadline, float $step = 0.5): void
     }
 }
 
+/** Play the file into the right stream for the mode, warning if it lacks video when one is needed. */
+function transmit(Call $call, array $m, string $file): void
+{
+    if ($m['needsVideoFile'] && !hasVideoTrack($file)) {
+        info('⚠️  '.basename($file).' has no video track — '.$m['desc'].' needs one. Pass a WebM/MKV with video.');
+    }
+    info('Transmitting '.basename($file).' as '.$m['desc'].'.');
+    $call->play(new LocalFile($file), $m['dest']);
+}
+
+/** Whether a file has a transmittable video track (best-effort demux). */
+function hasVideoTrack(string $file): bool
+{
+    if (!is_file($file)) {
+        return false;
+    }
+    try {
+        $m = new Matroska(new LocalFile($file), null);
+    } catch (\Throwable) {
+        return false;
+    }
+    foreach ($m->tracks as $track) {
+        if (($track['type'] ?? 0) === Matroska::TRACK_TYPE_VIDEO && isset(VIDEO_CODECS[$track['codec']])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 $mode    = $argv[1] ?? 'help';
-$arg     = $argv[2] ?? null;
-$video   = $argv[3] ?? (__DIR__.'/../av1.webm');
-$seconds = (int) ($argv[4] ?? 25);
-$session = $argv[5] ?? 'fuzz_user.madeline';
 
 switch ($mode) {
     case 'check':
+        $video = $argv[2] ?? (__DIR__.'/../av1.webm');
         box('OFFLINE SELF-CHECK (no Telegram needed)');
-        info('VoIP implements Call:      '.((new ReflectionClass(VoIP::class))->implementsInterface(Call::class) ? 'yes ✅' : 'NO ❌'));
-        info('GroupCall implements Call: '.((new ReflectionClass(GroupCall::class))->implementsInterface(Call::class) ? 'yes ✅' : 'NO ❌'));
+        $impl = static fn (string $class, string $iface): string => (new ReflectionClass($class))->implementsInterface($iface) ? 'yes ✅' : 'NO ❌';
+        info('VoIP implements Call:                '.$impl(VoIP::class, Call::class).' (1:1, not multi-party)');
+        info('GroupCall implements Call+MultiCall: '.$impl(GroupCall::class, Call::class).' / '.$impl(GroupCall::class, MultiCall::class));
+        info('ConferenceCall Call+MultiCall:       '.$impl(ConferenceCall::class, Call::class).' / '.$impl(ConferenceCall::class, MultiCall::class));
+        info('VoIP is NOT MultiCall (1:1):         '.((new ReflectionClass(VoIP::class))->implementsInterface(MultiCall::class) ? 'NO ❌ (should not be)' : 'correct ✅'));
+        info('E2E crypto available:           '.(Crypto::available() ? 'yes ✅ ('.(extension_loaded('sodium') ? 'sodium' : 'phpseclib fallback').')' : 'NO ❌'));
         fwrite(STDERR, "\n");
         info('Codec parameter derivation (feature #1):');
-        reportDerivedCodec($argv[2] ?? $video);
+        reportDerivedCodec($video);
         box('SELF-CHECK DONE — nothing to click.');
         break;
 
     case '1to1':
-        if ($arg === null) {
-            fwrite(STDERR, "Usage: php tests/manual_call_features.php 1to1 <user> [video] [seconds] [session]\n");
+        $arg     = $argv[2] ?? null;
+        $media   = $argv[3] ?? null;
+        $file    = $argv[4] ?? (__DIR__.'/../av1.webm');
+        $session = $argv[5] ?? 'fuzz_user.madeline';
+        if ($arg === null || $media === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php 1to1 <user> <audio|video|screencast> [file] [session]\n");
             exit(2);
         }
-        if (!is_file($video)) {
-            fwrite(STDERR, "Video file $video does not exist.\n");
-            exit(1);
-        }
-        $out = __DIR__.'/../incoming_1to1.mkv';
+        $m = modeInfo($media);
+        $out = __DIR__.'/../incoming_1to1_'.$media.'.mkv';
 
-        box('TEST: 1:1 VIDEO CALL — codec params + recording + duration + resume');
-        reportDerivedCodec($video);
+        box("TEST: 1:1 CALL — $m[desc]");
+        if ($m['needsVideoFile']) {
+            reportDerivedCodec($file);
+        }
 
         $API = startApi($session);
         $peerId = $API->getId($arg);
-        // The call and its recorder now serialize with the session, so if one is already running
-        // (e.g. this script was Ctrl-C'd earlier) it came back on start() with recording already
-        // resuming — attach to it WITHOUT restarting anything.
         $existing = $peerId !== null ? $API->getCallByPeer($peerId) : null;
-        $running = $existing !== null && !in_array($existing->getCallState(), [CallState::ENDED], true);
+        $running = $existing !== null && $existing->getCallState() !== CallState::ENDED;
 
         if ($running) {
             $call = $existing;
             info('Found an existing call (state: '.$call->getCallState()->name.') — attaching, not restarting.');
-            info('Its recording resumed into '.$out.' on startup (appended, not truncated).');
-            click("Nothing to do — the call is still up. Press Ctrl-C to detach again (the call keeps running); only hanging up on the OTHER account ends it.");
+            click('Nothing to do — the call is still up. Ctrl-C detaches (call keeps running); the OTHER account hangs up to end it.');
         } else {
-            @unlink($out); // a genuinely new recording starts fresh
-            info("Placing a NEW video call to $arg …");
-            $call = $API->requestCall($arg, video: true);
-            $call->play(new LocalFile($video));
-            click("On the OTHER account, ANSWER the incoming call in Telegram, and turn the CAMERA ON.");
+            if (is_file($out)) {
+                unlink($out);
+            }
+            info("Placing a NEW ".($m['video'] ? 'video' : 'audio')." call to $arg …");
+            $call = $API->requestCall($arg, video: $m['video']);
+            transmit($call, $m, $file);
+            $ask = match ($media) {
+                'audio' => 'ANSWER the call and UNMUTE your mic. You should HEAR our audio file playing.',
+                'video' => 'ANSWER the call and turn your CAMERA ON. You should SEE our video file playing.',
+                'screencast' => 'ANSWER the call. You should SEE our screen-share (the video file) as a shared screen.',
+            };
+            click("On the OTHER account, $ask");
             info('Waiting up to 120s for the call to connect…');
             waitFor(static fn (): bool => $call->getCallState() !== CallState::REQUESTED, microtime(true) + 120);
             if ($call->getCallState() !== CallState::RUNNING) {
                 info('Call not answered (state: '.$call->getCallState()->name.'). Leaving it as-is (not discarding).');
                 exit(1);
             }
-            info('Connected ✅  Recording the incoming camera+mic into '.$out);
-            click("On the peer, keep the CAMERA on. You should also SEE our video file playing on the peer's screen — check it looks correct (that proves the codec params).");
+            info('Connected ✅');
+            info('Recording the incoming camera/mic into '.$out);
             $call->setOutput(new LocalFile($out));
+            if ($media === 'screencast') {
+                $presOut = __DIR__.'/../incoming_1to1_screencast.presentation.mkv';
+                info('Also recording any incoming screen-share into '.$presOut);
+                $call->setOutput(new LocalFile($presOut), MediaDestination::Presentation);
+            }
+            $emojis = $call->getVisualization();
+            if ($emojis !== null) {
+                info('Call verification emojis (compare with the peer): '.implode(' ', $emojis));
+            }
         }
 
-        info('Monitoring the call. Ctrl-C to detach WITHOUT ending it; re-run this command to re-attach.');
-        info('To test resume: Ctrl-C now, then re-run — the recording must keep growing, not restart.');
-        // Watch until the PEER ends the call. Never discard from here.
+        info('Monitoring. Ctrl-C detaches WITHOUT ending it; re-run to re-attach (recording appends).');
         $lastReport = 0.0;
         while ($call->getCallState() !== CallState::ENDED) {
             if (microtime(true) - $lastReport > 5) {
                 clearstatcache();
-                info('… still running ('.$call->getCallState()->name.'); '.$out.' = '.number_format(is_file($out) ? (int) filesize($out) : 0).' bytes');
+                info('… running ('.$call->getCallState()->name.'); '.basename($out).' = '.number_format(is_file($out) ? (int) filesize($out) : 0).' bytes');
                 $lastReport = microtime(true);
             }
             Tools::sleep(1.0);
@@ -224,44 +294,52 @@ switch ($mode) {
         Tools::sleep(1.5);
         box('1:1 RESULT (peer hung up)');
         inspect($out);
-        info('Expect: an audio (opus) AND a video stream. If you Ctrl-C+re-ran, the file kept growing across restarts.');
+        $expect = match ($media) {
+            'audio' => 'Expect an audio (opus) stream only.',
+            'video' => 'Expect an audio (opus) AND a video stream.',
+            'screencast' => 'Expect audio; a screen-share we sent is verified on the peer, incoming screen-share (if any) in the .presentation.mkv.',
+        };
+        info($expect.' If you Ctrl-C+re-ran, the file kept growing across restarts.');
         break;
 
     case 'group':
-        if ($arg === null) {
-            fwrite(STDERR, "Usage: php tests/manual_call_features.php group <chat> [video] [seconds] [session]\n");
+        $arg     = $argv[2] ?? null;
+        $media   = $argv[3] ?? null;
+        $file    = $argv[4] ?? (__DIR__.'/../av1.webm');
+        $session = $argv[5] ?? 'fuzz_user.madeline';
+        if ($arg === null || $media === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php group <chat> <audio|video|screencast> [file] [session]\n");
             exit(2);
         }
-        $dir = __DIR__.'/../group_recordings';
+        $m = modeInfo($media);
+        $dir = __DIR__.'/../group_recordings_'.$media;
 
-        box('TEST: GROUP CALL — folder recording (one .ogg per participant) + resume');
+        box("TEST: GROUP CALL — $m[desc] + folder recording (one .mkv per participant)");
+        if ($m['needsVideoFile']) {
+            reportDerivedCodec($file);
+        }
         $API = startApi($session);
-        // If we are already joined (this script was Ctrl-C'd earlier), the call and its per-participant
-        // recorders came back on start() with recording resuming — attach without rejoining.
         $existing = $API->getGroupCall($arg);
         $joined = $existing !== null && $existing->getCallState() === GroupCallState::JOINED;
 
         if ($joined) {
             $call = $existing;
             info('Already joined — attaching, not rejoining. Per-participant recordings resumed in '.$dir);
-            click("Nothing to do. Ctrl-C to detach (the call keeps running); the recordings keep growing.");
+            click('Nothing to do. Ctrl-C detaches (call keeps running); recordings keep growing.');
         } else {
             /** @var GroupCall $call */
             $call = $API->joinGroupCall($arg);
-            click("Open the SAME group call on one or more OTHER accounts, JOIN, and UNMUTE so they transmit.");
-            if (is_file($video)) {
-                info('Also playing '.basename($video).' into the call.');
-                $call->play(new LocalFile($video));
-            }
-            info('Recording every transmitting participant into '.$dir.'/<peerId>.ogg');
+            click('Open the SAME group call on one or more OTHER accounts, JOIN, and transmit ('.$m['desc'].').');
+            transmit($call, $m, $file);
+            info('Recording every transmitting participant into '.$dir.'/<peerId>.mkv');
             $call->setOutput(new LocalDirectory($dir));
         }
 
-        info('Monitoring. Ctrl-C to detach WITHOUT leaving; re-run to re-attach (recordings resume/append).');
+        info('Monitoring. Ctrl-C detaches WITHOUT leaving; re-run to re-attach (recordings resume/append).');
         $lastReport = 0.0;
         while ($call->getCallState() === GroupCallState::JOINED) {
             if (microtime(true) - $lastReport > 5) {
-                $files = glob($dir.'/*.ogg') ?: [];
+                $files = array_merge(glob($dir.'/*.mkv') ?: [], glob($dir.'/*.presentation.mkv') ?: []);
                 info('… joined; '.count($files).' participant file(s) in '.$dir);
                 $lastReport = microtime(true);
             }
@@ -269,33 +347,129 @@ switch ($mode) {
         }
 
         box('GROUP RESULT (left)');
-        $files = glob($dir.'/*.ogg') ?: [];
+        $files = glob($dir.'/*.mkv') ?: [];
         if ($files === []) {
-            info('⚠️  No per-participant files — did anyone else actually transmit audio?');
+            info('⚠️  No per-participant files — did anyone else actually transmit?');
         }
         foreach ($files as $f) {
             info(basename($f).' — '.number_format((int) filesize($f)).' bytes');
         }
-        info('Expect one .ogg per participant who transmitted (excluding ourselves).');
+        info('Expect one .mkv per participant who transmitted (excluding ourselves); a screen-sharer also gets a <id>.presentation.mkv.');
+        break;
+
+    case 'conference':
+        $media   = $argv[2] ?? null;
+        $file    = $argv[3] ?? (__DIR__.'/../av1.webm');
+        $session = $argv[4] ?? 'fuzz_user.madeline';
+        if ($media === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php conference <audio|video|screencast> [file] [session]\n");
+            exit(2);
+        }
+        $m = modeInfo($media);
+
+        box("TEST: E2E CONFERENCE CALL (creator) — $m[desc]");
+        info('End-to-end encrypted: the server/SFU only ever sees ciphertext. Crypto backend: '.(extension_loaded('sodium') ? 'sodium' : 'phpseclib fallback'));
+        if ($m['needsVideoFile']) {
+            reportDerivedCodec($file);
+        }
+        $API = startApi($session);
+        info('Creating a new end-to-end encrypted conference call…');
+        $call = $API->createConferenceCall();
+        $ic = $call->getInputCall();
+        transmit($call, $m, $file);
+        box('SHARE THESE WITH THE OTHER ACCOUNT TO JOIN');
+        info('Run on the OTHER account:');
+        info("  php tests/manual_call_features.php conference-join {$ic['id']} {$ic['access_hash']} $media [file] [other-session]");
+        runConference($call, $media);
+        break;
+
+    case 'conference-join':
+        $id      = $argv[2] ?? null;
+        $hash    = $argv[3] ?? null;
+        $media   = $argv[4] ?? null;
+        $file    = $argv[5] ?? (__DIR__.'/../av1.webm');
+        $session = $argv[6] ?? 'fuzz_user.madeline';
+        if ($id === null || $hash === null || $media === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php conference-join <id> <access_hash> <audio|video|screencast> [file] [session]\n");
+            exit(2);
+        }
+        $m = modeInfo($media);
+
+        box("TEST: E2E CONFERENCE CALL (joiner) — $m[desc]");
+        $API = startApi($session);
+        $existing = $API->getConferenceCall((int) $id);
+        if ($existing !== null && $existing->isJoined()) {
+            $call = $existing;
+            info('Already in this conference — attaching, not rejoining.');
+        } else {
+            info('Joining the end-to-end encrypted conference…');
+            $call = $API->joinConferenceCall(['_' => 'inputGroupCall', 'id' => (int) $id, 'access_hash' => (int) $hash]);
+            transmit($call, $m, $file);
+        }
+        runConference($call, $media);
         break;
 
     default:
         fwrite(STDERR, <<<TXT
-        MadelineProto call-features manual test.
+        MadelineProto call-features manual test — full matrix (call type × media mode).
 
           php tests/manual_call_features.php check [video-file]
-              Offline checks: Call interface + codec-param derivation. No Telegram.
+              Offline checks: Call interfaces + E2E crypto + codec-param derivation. No Telegram.
 
-          php tests/manual_call_features.php 1to1 <user> [video] [seconds] [session]
-              Place a 1:1 video call, record the incoming camera+mic to incoming_1to1.mkv,
-              and verify streams + duration. You answer the call on the other account.
+          php tests/manual_call_features.php 1to1  <user> <mode> [file] [session]
+          php tests/manual_call_features.php group <chat> <mode> [file] [session]
+          php tests/manual_call_features.php conference      <mode> [file] [session]
+          php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
 
-          php tests/manual_call_features.php group <chat> [video] [seconds] [session]
-              Join a group call, record every participant into group_recordings/<id>.ogg.
-              Other accounts join+unmute.
+          <mode> = audio | video | screencast
 
-        Defaults: video=av1.webm, seconds=25, session=fuzz_user.madeline.
+        1:1 and group record the incoming media (Matroska); conference is end-to-end encrypted and
+        prints verification emojis + sends an encrypted in-call message. Ctrl-C detaches without
+        ending the call; re-run the same command to re-attach.
+
+        Defaults: file=av1.webm, session=fuzz_user.madeline.
 
         TXT);
         break;
+}
+
+/**
+ * Drive a conference call after it is up: transmit, compute + print the verification emojis, send an
+ * encrypted in-call message, and monitor until Ctrl-C (which detaches without leaving).
+ */
+function runConference(ConferenceCall $call, string $media): void
+{
+    $ask = match ($media) {
+        'audio' => 'you HEAR our audio',
+        'video' => 'you SEE our camera video',
+        'screencast' => 'you SEE our shared screen',
+    };
+    click("On the OTHER account, JOIN the conference and confirm $ask, then compare the verification emojis below.");
+
+    info('Starting verification (commit/reveal on subchain 1)…');
+    $call->startVerification();
+    info('Waiting up to 30s for every participant to reveal their nonce…');
+    waitFor(static fn (): bool => $call->getEmojis() !== null, microtime(true) + 30);
+    $emojis = $call->getEmojis();
+    info('Verification emojis (MUST match on every participant): '.($emojis !== null ? implode(' ', $emojis) : '(not enough participants revealed yet)'));
+
+    try {
+        $call->sendMessage('MadelineProto E2E conference test message '.date('H:i:s'));
+        info('Sent an end-to-end encrypted in-call message ✅');
+    } catch (\Throwable $e) {
+        info('Could not send an encrypted message yet: '.$e->getMessage());
+    }
+
+    info('Monitoring. Ctrl-C detaches WITHOUT leaving; re-run to re-attach.'.($call->isSharingScreen() ? ' (screen-share active)' : ''));
+    $lastReport = 0.0;
+    while ($call->isJoined()) {
+        if (microtime(true) - $lastReport > 5) {
+            $emojis = $call->getEmojis();
+            info('… in conference; emojis: '.($emojis !== null ? implode(' ', $emojis) : 'pending'));
+            $lastReport = microtime(true);
+        }
+        Tools::sleep(1.0);
+    }
+    box('CONFERENCE ENDED');
+    info('Expect: the peer saw/heard the '.$media.' stream (all E2E-encrypted) and the emojis matched.');
 }
