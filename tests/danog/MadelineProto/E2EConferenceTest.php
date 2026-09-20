@@ -206,6 +206,51 @@ final class E2EConferenceTest extends TestCase
         $this->assertArrayHasKey(2, $bob->getParticipants());
     }
 
+    /**
+     * Removing a participant drops them from the group state and rekeys: the remaining members share
+     * a new key that the removed member's chain never receives.
+     */
+    public function testParticipantRemovalRekeys(): void
+    {
+        $this->requireCrypto();
+        [$seedA] = Crypto::generateKeyPair();
+        [$seedB] = Crypto::generateKeyPair();
+        [$seedC] = Crypto::generateKeyPair();
+        $alice = new ConferenceChain(1, $seedA);
+        $bob = new ConferenceChain(2, $seedB);
+        $carol = new ConferenceChain(3, $seedC);
+        $keys = [1 => $alice->getSelfPublicKey(), 2 => $bob->getSelfPublicKey(), 3 => $carol->getSelfPublicKey()];
+
+        // Block 0: all three, keyed for all three.
+        $raw0 = random_bytes(32);
+        $block0 = $alice->buildBlock(0, str_repeat("\0", 32), [
+            $alice->groupStateChange([[1, $keys[1], 3], [2, $keys[2], 0], [3, $keys[3], 0]]),
+            ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $alice->buildSharedKey($raw0, [[1, $keys[1]], [2, $keys[2]], [3, $keys[3]]])],
+            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
+        ]);
+        foreach ([$alice, $bob, $carol] as $chain) {
+            $chain->applyServerBlock($block0['serialized']);
+        }
+        $this->assertCount(3, $carol->getParticipants());
+
+        // Block 1: remove Carol, rekey for Alice + Bob only.
+        $raw1 = random_bytes(32);
+        $block1 = $alice->buildBlock(1, $alice->getLastBlockHash(), [
+            $alice->groupStateChange([[1, $keys[1], 3], [2, $keys[2], 0]]),
+            ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $alice->buildSharedKey($raw1, [[1, $keys[1]], [2, $keys[2]]])],
+            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
+        ]);
+        $alice->applyServerBlock($block1['serialized']);
+        $bob->applyServerBlock($block1['serialized']);
+        $carol->applyServerBlock($block1['serialized']);
+
+        $this->assertCount(2, $alice->getParticipants());
+        $this->assertArrayNotHasKey(3, $alice->getParticipants());
+        $this->assertSame($alice->getGroupKey(), $bob->getGroupKey(), 'remaining members share the new key');
+        // Carol applied the block (public state) but is not a recipient, so she has no group key.
+        $this->assertNull($carol->getGroupKey());
+    }
+
     public function testEmojiVerificationConverges(): void
     {
         $this->requireCrypto();

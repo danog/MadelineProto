@@ -100,6 +100,52 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
         $this->diskJockey->start();
     }
 
+    /**
+     * Keep everything serializable across a restart: the WebRTC connection, chain, epochs, keys and
+     * disk jockey all serialize themselves; only the event-loop poll id cannot and is recreated.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['pollWatcher']);
+        return $vars;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        // Synchronous restoration only — no async work here (that goes in resume()).
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+        $this->pollWatcher = null;
+        $this->diskJockey->start();
+        // Bring the rest of the graph back once it is whole, from a single queued task.
+        EventLoop::queue($this->resumeAfterRestart(...));
+    }
+
+    /**
+     * Resume the conference after the process restarted: reopen the media connection, re-register for
+     * push updates, restart the backstop poll and catch up on any blocks missed while stopped. Named
+     * to avoid clashing with the {@see Call} playback {@see self::resume()}.
+     */
+    public function resumeAfterRestart(): void
+    {
+        if (!$this->joined || $this->inputCall === null) {
+            return;
+        }
+        $this->connection?->resume();
+        $this->API->registerConferenceCall($this->inputCall['id'], $this);
+        $this->startPolling();
+        $this->syncChain(self::SUBCHAIN_STATE);
+        $this->syncChain(self::SUBCHAIN_VERIFICATION);
+        $this->log("Resumed E2E conference $this after a restart", Logger::NOTICE);
+    }
+
     /** Point this controller at an existing conference (its groupCall), before joining it. */
     public function setCall(array $call): void
     {
@@ -241,6 +287,44 @@ final class ConferenceCall implements Call, GroupConnectionOwner, E2EKeyProvider
             ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
         ];
         return $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), $changes);
+    }
+
+    /**
+     * Remove participants from the conference: build a block dropping them and rekeying for the
+     * remaining members, then submit it with phone.deleteConferenceCallParticipants. Requires the
+     * `remove_users` permission. The removed members can no longer decrypt media once the new epoch
+     * takes over.
+     */
+    public function removeParticipant(int ...$userIds): void
+    {
+        $remove = array_flip($userIds);
+        $participants = [];
+        $recipients = [];
+        foreach ($this->chain->getParticipants() as $userId => $info) {
+            if (isset($remove[$userId])) {
+                continue;
+            }
+            $participants[] = [$userId, $info['public_key'], $info['permissions']];
+            $recipients[] = [$userId, $info['public_key']];
+        }
+        if ($recipients === []) {
+            throw new \RuntimeException('Cannot remove every participant from the conference.');
+        }
+        $raw = random_bytes(32);
+        $block = $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), [
+            $this->chain->groupStateChange($participants),
+            ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->chain->buildSharedKey($raw, $recipients)],
+            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
+        ]);
+        $updates = $this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
+            'kick' => true,
+            'call' => $this->getInputCall(),
+            'ids' => $userIds,
+            'block' => $block['serialized'],
+        ]);
+        $this->consumeUpdates($updates);
+        // Apply our own accepted block (and anything concurrent) in server order.
+        $this->syncChain(self::SUBCHAIN_STATE);
     }
 
     /* ------------------------------------------------------------------ *
