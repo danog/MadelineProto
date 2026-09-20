@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * PWRTelegram settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Pwr extends SettingsAbstract
 {

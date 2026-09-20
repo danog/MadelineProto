@@ -458,6 +458,7 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
      *
      * @internal
      */
+    #[\Override]
     public function onConnectionFailed(): void
     {
         if ($this->callState !== GroupCallState::JOINED || $this->checkWatcher !== null) {
@@ -507,6 +508,7 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
      *
      * @internal
      */
+    #[\Override]
     public function onIncomingSource(int $source): void
     {
         $this->log("Audio of source $source is now flowing in $this", Logger::VERBOSE);
@@ -633,7 +635,7 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
     {
         if ($participant instanceof LocalDirectory) {
             $dir = $participant->dir;
-            if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
                 throw new \RuntimeException("Could not create the recording directory $dir");
             }
             $this->outputDir = $dir;
@@ -810,6 +812,8 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
     /**
      * The disk jockey feeding a destination, without starting a screen-share that is not running:
      * returns null for the presentation when no screen is being shared. For control/query methods.
+     *
+     * @psalm-mutation-free
      */
     private function djOrNull(MediaDestination $dest): ?DjLoop
     {
@@ -881,6 +885,7 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
      *
      * @internal Driven by the screen-share {@see GroupConnection} as its file's video starts and stops.
      */
+    #[\Override]
     public function setPresentationPaused(bool $paused): void
     {
         if ($this->callState !== GroupCallState::JOINED) {
@@ -922,6 +927,7 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
      *
      * @internal
      */
+    #[\Override]
     public function setVideoStopped(bool $stopped): void
     {
         if ($this->callState !== GroupCallState::JOINED) {
@@ -949,14 +955,23 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
         }
         $this->diskJockey->stopPlaying();
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function pause(MediaDestination $dest = MediaDestination::Camera): void
     {
         $this->djOrNull($dest)?->pausePlaying();
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function resume(MediaDestination $dest = MediaDestination::Camera): void
     {
         $this->djOrNull($dest)?->resumePlaying();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
         return $this->djOrNull($dest)?->isAudioPaused() ?? false;
@@ -970,6 +985,9 @@ final class GroupCallController implements CallInterface, \danog\MadelineProto\T
         }
         $this->dj($dest)->playOnHold(...$files);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
         return $this->djOrNull($dest)?->getCurrent();

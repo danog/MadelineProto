@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * RPC settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class RPC extends SettingsAbstract
 {

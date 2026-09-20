@@ -79,6 +79,8 @@ final class CallRecorder
     /**
      * Drop the live track subscriptions (not serializable); the writer serializes itself and reopens
      * its file. {@see self::__unserialize()} re-subscribes to the resumed tracks and keeps recording.
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
@@ -87,6 +89,9 @@ final class CallRecorder
         return $vars;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __unserialize(array $data): void
     {
         // Synchronous state restoration only — no async work here (see resume()).
@@ -168,7 +173,9 @@ final class CallRecorder
             if ($this->closed) {
                 return;
             }
-            if (++$n % 100 === 1) { \danog\MadelineProto\Logger::log("RECDEBUG drainAudio n=$n", \danog\MadelineProto\Logger::ERROR); } // RECDEBUG
+            if (++$n % 100 === 1) {
+                \danog\MadelineProto\Logger::log("RECDEBUG drainAudio n=$n", \danog\MadelineProto\Logger::ERROR);
+            } // RECDEBUG
             $ts = $frame->getTimestamp();
             $this->audioBaseTs ??= $ts;
             $ms = (int) (($ts - $this->audioBaseTs) * 1000 / 48000);
@@ -200,7 +207,9 @@ final class CallRecorder
             if ($this->closed) {
                 return;
             }
-            if (++$n % 60 === 1) { \danog\MadelineProto\Logger::log("RECDEBUG drainVideo n=$n", \danog\MadelineProto\Logger::ERROR); } // RECDEBUG
+            if (++$n % 60 === 1) {
+                \danog\MadelineProto\Logger::log("RECDEBUG drainVideo n=$n", \danog\MadelineProto\Logger::ERROR);
+            } // RECDEBUG
             $data = $frame->getData();
             if ($data === '') {
                 continue;
@@ -298,6 +307,8 @@ final class CallRecorder
 
     /**
      * Insert a zero-padded segment number before the file extension: `call.mkv` → `call.001.mkv`.
+     *
+     * @psalm-pure
      */
     private static function segmentPath(string $path, int $n): string
     {
@@ -329,6 +340,8 @@ final class CallRecorder
      * Identify the video codec of a frame and its picture size and codec-private data.
      *
      * @return array{string, int, int, string} [Matroska CodecID, width, height, CodecPrivate]
+     *
+     * @psalm-mutation-free
      */
     private static function describeVideo(string $frame): array
     {
@@ -364,6 +377,8 @@ final class CallRecorder
      * Prepare a frame for muxing and report whether it is a keyframe.
      *
      * @return array{string, bool} [frame bytes to store, is keyframe]
+     *
+     * @psalm-mutation-free
      */
     private static function transformVideo(MatroskaWriter $writer, string $frame): array
     {
@@ -393,7 +408,11 @@ final class CallRecorder
 
     /* ---- H.264 ---- */
 
-    /** @return list<string> NAL units (without start codes). */
+    /**
+     * @return list<string> NAL units (without start codes).
+     *
+     * @psalm-pure
+     */
     private static function h264Nals(string $frame): array
     {
         $nals = [];
@@ -425,6 +444,8 @@ final class CallRecorder
 
     /**
      * @return array{int, int, string} [width, height, AVCDecoderConfigurationRecord]
+     *
+     * @psalm-mutation-free
      */
     private static function h264Config(string $frame): array
     {
@@ -453,6 +474,8 @@ final class CallRecorder
 
     /**
      * @return array{string, bool} [AVCC length-prefixed frame, keyframe]
+     *
+     * @psalm-pure
      */
     private static function h264ToAvcc(string $frame): array
     {
@@ -478,6 +501,8 @@ final class CallRecorder
      * Parse width/height out of an H.264 SPS via Exp-Golomb decoding.
      *
      * @return array{int, int}
+     *
+     * @psalm-mutation-free
      */
     private static function h264SpsSize(string $sps): array
     {
@@ -487,7 +512,7 @@ final class CallRecorder
         $br->bits(8); // constraint flags + reserved
         $br->bits(8); // level_idc
         $br->ue();    // seq_parameter_set_id
-        if (in_array($profileIdc, [100, 110, 122, 244, 44, 83, 86, 118, 128, 138, 139, 134, 135], true)) {
+        if (\in_array($profileIdc, [100, 110, 122, 244, 44, 83, 86, 118, 128, 138, 139, 134, 135], true)) {
             $chroma = $br->ue();
             if ($chroma === 3) {
                 $br->bits(1); // separate_colour_plane_flag
@@ -547,6 +572,9 @@ final class CallRecorder
         return [max(1, $width), max(1, $height)];
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function stripEmulationPrevention(string $data): string
     {
         // Remove 0x03 in 0x00 0x00 0x03 sequences (RBSP anti-emulation).
@@ -555,7 +583,11 @@ final class CallRecorder
 
     /* ---- VP9 ---- */
 
-    /** @return array{int, int} */
+    /**
+     * @return array{int, int}
+     *
+     * @psalm-mutation-free
+     */
     private static function vp9Size(string $frame): array
     {
         $br = new BitReader($frame);
@@ -582,6 +614,9 @@ final class CallRecorder
         return [$width, $height];
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     private static function vp9IsKeyframe(string $frame): bool
     {
         $br = new BitReader($frame);
@@ -598,6 +633,9 @@ final class CallRecorder
 
     /* ---- AV1 ---- */
 
+    /**
+     * @psalm-pure
+     */
     private static function av1HasSequenceHeader(string $tu): bool
     {
         $o = 0;
@@ -627,7 +665,11 @@ final class CallRecorder
         return false;
     }
 
-    /** @return array{int, int} */
+    /**
+     * @return array{int, int}
+     *
+     * @psalm-pure
+     */
     private static function av1Size(string $tu): array
     {
         // Parsing the sequence header for the exact size is involved; a sensible default keeps the
@@ -637,6 +679,9 @@ final class CallRecorder
 
     /* ---- OPUS ---- */
 
+    /**
+     * @psalm-pure
+     */
     private static function opusHead(int $channels, int $sampleRate): string
     {
         return 'OpusHead'.pack('CCvVvC', 1, $channels, 312, $sampleRate, 0, 0);

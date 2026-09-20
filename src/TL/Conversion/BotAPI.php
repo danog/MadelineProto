@@ -388,6 +388,8 @@ trait BotAPI
     }
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public static function MTProtoEntityToBotAPI(array $data): array
     {

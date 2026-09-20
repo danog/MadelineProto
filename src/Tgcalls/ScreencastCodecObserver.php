@@ -31,6 +31,9 @@ namespace danog\MadelineProto\Tgcalls;
  */
 final class ScreencastCodecObserver implements VideoCodecObserver
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly Controller $controller)
     {
     }

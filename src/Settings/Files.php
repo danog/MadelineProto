@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * File management settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Files extends SettingsAbstract
 {

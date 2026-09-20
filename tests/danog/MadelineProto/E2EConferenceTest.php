@@ -380,7 +380,7 @@ final class E2EConferenceTest extends TestCase
      */
     private static function keyProvider(string $seed, array $epochs, ?array $ssrcKeys): E2EKeyProvider
     {
-        return new class ($seed, $epochs, $ssrcKeys) implements E2EKeyProvider {
+        return new class($seed, $epochs, $ssrcKeys) implements E2EKeyProvider {
             public function __construct(private string $seed, private array $epochs, private ?array $ssrcKeys)
             {
             }

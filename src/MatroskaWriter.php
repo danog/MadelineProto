@@ -129,6 +129,8 @@ final class MatroskaWriter
     /**
      * Reopen the file in append mode and continue the recording where it left off. The EBML header,
      * Tracks and Duration placeholder are already on disk, so only new clusters are appended.
+     *
+     * @psalm-external-mutation-free
      */
     public function __unserialize(array $data): void
     {
@@ -159,6 +161,8 @@ final class MatroskaWriter
     /**
      * Declare the video track. `$codecPrivate` is empty for VP8/VP9 and the codec configuration
      * record for H.264/AV1.
+     *
+     * @psalm-external-mutation-free
      */
     public function setVideoTrack(string $codecId, int $width, int $height, string $codecPrivate = ''): void
     {
@@ -167,12 +171,17 @@ final class MatroskaWriter
 
     /**
      * Declare the audio track (OPUS, 48kHz, with its OpusHead as the codec private data).
+     *
+     * @psalm-external-mutation-free
      */
     public function setAudioTrack(string $codecId, int $rate, int $channels, string $codecPrivate = ''): void
     {
         $this->audio = ['codecId' => $codecId, 'rate' => $rate, 'channels' => max(1, $channels), 'private' => $codecPrivate];
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function hasVideoTrack(): bool
     {
         return $this->video !== null;
@@ -188,7 +197,8 @@ final class MatroskaWriter
         }
         $this->headerWritten = true;
 
-        $ebml = self::element(self::ID_EBML,
+        $ebml = self::element(
+            self::ID_EBML,
             self::uintElement("\x42\x86", 1)              // EBMLVersion
             .self::uintElement("\x42\xF7", 1)             // EBMLReadVersion
             .self::uintElement("\x42\xF2", 4)             // EBMLMaxIDLength
@@ -215,7 +225,8 @@ final class MatroskaWriter
                 .self::uintElement(self::ID_TRACK_UID, self::VIDEO_TRACK_NUMBER)
                 .self::uintElement(self::ID_TRACK_TYPE, self::TRACK_VIDEO)
                 .self::stringElement(self::ID_CODEC_ID, $this->video['codecId'])
-                .self::element(self::ID_VIDEO,
+                .self::element(
+                    self::ID_VIDEO,
                     self::uintElement(self::ID_PIXEL_WIDTH, $this->video['width'])
                     .self::uintElement(self::ID_PIXEL_HEIGHT, $this->video['height'])
                 );
@@ -229,7 +240,8 @@ final class MatroskaWriter
                 .self::uintElement(self::ID_TRACK_UID, self::AUDIO_TRACK_NUMBER)
                 .self::uintElement(self::ID_TRACK_TYPE, self::TRACK_AUDIO)
                 .self::stringElement(self::ID_CODEC_ID, $this->audio['codecId'])
-                .self::element(self::ID_AUDIO,
+                .self::element(
+                    self::ID_AUDIO,
                     self::floatElement(self::ID_SAMPLING_FREQUENCY, (float) $this->audio['rate'])
                     .self::uintElement(self::ID_CHANNELS, $this->audio['channels'])
                 );
@@ -333,13 +345,21 @@ final class MatroskaWriter
      *  EBML encoding helpers.
      * ----------------------------------------------------------------- */
 
-    /** An element: id + size + payload. */
+    /**
+     * An element: id + size + payload.
+     *
+     * @psalm-pure
+     */
     private static function element(string $id, string $payload): string
     {
         return $id.self::ebmlSize(\strlen($payload)).$payload;
     }
 
-    /** Encode a size as an EBML variable-length integer with its length descriptor. */
+    /**
+     * Encode a size as an EBML variable-length integer with its length descriptor.
+     *
+     * @psalm-pure
+     */
     private static function ebmlSize(int $size): string
     {
         for ($len = 1; $len <= 8; $len++) {
@@ -351,7 +371,11 @@ final class MatroskaWriter
         return self::intToBytes($marker | $size, $len);
     }
 
-    /** Encode an unsigned integer as an EBML vint (used for the SimpleBlock track number). */
+    /**
+     * Encode an unsigned integer as an EBML vint (used for the SimpleBlock track number).
+     *
+     * @psalm-pure
+     */
     private static function vint(int $value): string
     {
         for ($len = 1; $len <= 8; $len++) {
@@ -363,6 +387,9 @@ final class MatroskaWriter
         return self::intToBytes($marker | $value, $len);
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function uintElement(string $id, int $value): string
     {
         $bytes = $value === 0 ? "\x00" : '';
@@ -374,16 +401,25 @@ final class MatroskaWriter
         return self::element($id, $bytes);
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function stringElement(string $id, string $value): string
     {
         return self::element($id, $value);
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function floatElement(string $id, float $value): string
     {
         return self::element($id, pack('E', $value)); // 64-bit big-endian IEEE 754
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function intToBytes(int $value, int $len): string
     {
         $bytes = '';

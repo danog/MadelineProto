@@ -71,6 +71,8 @@ final class OpusRecorder
     /**
      * Drop the (unserializable) OGG writer and live subscription; {@see self::__unserialize()} reopens
      * the file and continues recording, so an incoming stream survives a serialize/deserialize cycle.
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
@@ -79,6 +81,9 @@ final class OpusRecorder
         return $vars;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __unserialize(array $data): void
     {
         // Synchronous state restoration only — no async work here (see resume()). Until resume() runs,

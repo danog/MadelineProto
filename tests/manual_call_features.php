@@ -415,25 +415,25 @@ switch ($mode) {
 
     default:
         fwrite(STDERR, <<<TXT
-        MadelineProto call-features manual test — full matrix (call type × media mode).
+            MadelineProto call-features manual test — full matrix (call type × media mode).
 
-          php tests/manual_call_features.php check [video-file]
-              Offline checks: Call interfaces + E2E crypto + codec-param derivation. No Telegram.
+              php tests/manual_call_features.php check [video-file]
+                  Offline checks: Call interfaces + E2E crypto + codec-param derivation. No Telegram.
 
-          php tests/manual_call_features.php 1to1  <user> <mode> [file] [session]
-          php tests/manual_call_features.php group <chat> <mode> [file] [session]
-          php tests/manual_call_features.php conference      <mode> [file] [session]
-          php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
+              php tests/manual_call_features.php 1to1  <user> <mode> [file] [session]
+              php tests/manual_call_features.php group <chat> <mode> [file] [session]
+              php tests/manual_call_features.php conference      <mode> [file] [session]
+              php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
 
-          <mode> = audio | video | screencast
+              <mode> = audio | video | screencast
 
-        1:1 and group record the incoming media (Matroska); conference is end-to-end encrypted and
-        prints verification emojis + sends an encrypted in-call message. Ctrl-C detaches without
-        ending the call; re-run the same command to re-attach.
+            1:1 and group record the incoming media (Matroska); conference is end-to-end encrypted and
+            prints verification emojis + sends an encrypted in-call message. Ctrl-C detaches without
+            ending the call; re-run the same command to re-attach.
 
-        Defaults: file=new.webm, session=fuzz_user.madeline.
+            Defaults: file=new.webm, session=fuzz_user.madeline.
 
-        TXT);
+            TXT);
         break;
 }
 

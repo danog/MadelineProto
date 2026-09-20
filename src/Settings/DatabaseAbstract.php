@@ -21,6 +21,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Base class for storage backends.
+ *
+ * @psalm-external-mutation-free
  */
 abstract class DatabaseAbstract extends SettingsAbstract
 {

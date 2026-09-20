@@ -117,6 +117,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * Leave the group call, without ending it for the other participants.
      */
+    #[\Override]
     public function leave(): self
     {
         $this->getClient()->leaveGroupCall($this->id);
@@ -126,6 +127,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * End the group call for all participants.
      */
+    #[\Override]
     public function discard(): self
     {
         $this->getClient()->discardGroupCall($this->id);
@@ -149,6 +151,7 @@ final class GroupCall extends Update implements MultiCall
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function getParticipants(): array
     {
         return $this->getClient()->getGroupCallParticipants($this->id);
@@ -157,6 +160,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * Mute or unmute our own audio stream.
      */
+    #[\Override]
     public function setMuted(bool $muted = true): self
     {
         $this->getClient()->setGroupCallMuted($this->id, $muted);
@@ -168,6 +172,7 @@ final class GroupCall extends Update implements MultiCall
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function isMuted(): bool
     {
         return $this->getClient()->isGroupCallMuted($this->id);
@@ -225,6 +230,7 @@ final class GroupCall extends Update implements MultiCall
      * as-is where possible, so no transcoding (and thus no FFI extension) is required for
      * pre-encoded WebM/OGG-OPUS input.
      */
+    #[\Override]
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallPlay($this->id, $file, $dest);
@@ -243,6 +249,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * Play file.
      */
+    #[\Override]
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallPlay($this->id, $file, $dest);
@@ -252,6 +259,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * When called, skips to the next file in the playlist.
      */
+    #[\Override]
     public function skip(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallSkipPlay($this->id, $dest);
@@ -261,6 +269,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * Stops playing all files, clears the main and the hold playlist.
      */
+    #[\Override]
     public function stop(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallStopPlay($this->id, $dest);
@@ -269,7 +278,10 @@ final class GroupCall extends Update implements MultiCall
 
     /**
      * Pauses the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallPausePlay($this->id, $dest);
@@ -278,7 +290,10 @@ final class GroupCall extends Update implements MultiCall
 
     /**
      * Whether the currently playing file is paused.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
         return $this->getClient()->isGroupCallPlayPaused($this->id, $dest);
@@ -286,7 +301,10 @@ final class GroupCall extends Update implements MultiCall
 
     /**
      * Resumes the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->groupCallResumePlay($this->id, $dest);
@@ -296,6 +314,7 @@ final class GroupCall extends Update implements MultiCall
     /**
      * Files to play on hold.
      */
+    #[\Override]
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
         $this->getClient()->groupCallPlayOnHold($this->id, $dest, ...$files);
@@ -307,7 +326,10 @@ final class GroupCall extends Update implements MultiCall
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream,
      * otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
         return $this->getClient()->groupCallGetCurrent($this->id, $dest);

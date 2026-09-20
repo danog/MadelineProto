@@ -46,6 +46,8 @@ trait Handler
      * updates are routed to it.
      *
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function registerConferenceCall(int $id, ConferenceCall $call): void
     {
@@ -54,6 +56,8 @@ trait Handler
 
     /**
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function unregisterConferenceCall(int $id): void
     {
@@ -143,6 +147,8 @@ trait Handler
 
     /**
      * Get a live end-to-end encrypted conference call this session is in, by its call id.
+     *
+     * @psalm-mutation-free
      */
     public function getConferenceCall(int $id): ?ConferenceCall
     {
@@ -430,6 +436,8 @@ trait Handler
 
     /**
      * Pause playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
     public function groupCallPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -441,6 +449,8 @@ trait Handler
 
     /**
      * Resume playback of the current audio file in a group call.
+     *
+     * @psalm-external-mutation-free
      */
     public function groupCallResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -452,6 +462,8 @@ trait Handler
 
     /**
      * Whether the currently playing audio file of a group call is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isGroupCallPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
     {
@@ -463,6 +475,8 @@ trait Handler
 
     /**
      * Get the file that is currently being played in a group call.
+     *
+     * @psalm-mutation-free
      */
     public function groupCallGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {

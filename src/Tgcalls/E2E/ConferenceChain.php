@@ -84,6 +84,8 @@ final class ConferenceChain
     /**
      * The group shared key actually used to encrypt media, derived from the raw key and the current
      * block hash (protocol version >= 1), or null if no shared key is set.
+     *
+     * @psalm-mutation-free
      */
     public function getGroupKey(): ?string
     {
@@ -287,6 +289,8 @@ final class ConferenceChain
      * @param list<array{0: int, 1: string, 2: int}> $participants `[user_id, public_key, permissions]`.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-mutation-free
      */
     public function groupStateChange(array $participants, int $externalPermissions = 0): array
     {
@@ -306,6 +310,8 @@ final class ConferenceChain
 
     /**
      * @return array<string, mixed> An e2e.chain.groupParticipant.
+     *
+     * @psalm-pure
      */
     private function participantChange(int $userId, string $publicKey, int $permissions): array
     {

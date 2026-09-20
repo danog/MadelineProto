@@ -40,12 +40,17 @@ final class Crypto
      * Always available: the fast path uses the `sodium` and `openssl` extensions, and a pure-PHP
      * fallback (phpseclib Ed25519, a phpseclib X25519 over Ed25519 keys, and phpseclib AES) covers
      * runtimes without them. phpseclib is a hard dependency of MadelineProto.
+     *
+     * @psalm-pure
      */
     public static function available(): bool
     {
         return true;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     private static function assertAvailable(): void
     {
     }
@@ -57,6 +62,8 @@ final class Crypto
     /**
      * The tde2e key-derivation function: `HMAC-SHA512(key = secret, msg = info)`, 64 bytes
      * (MessageEncryption.cpp `kdf_expand`). The purpose string is the *message*, the secret the key.
+     *
+     * @psalm-pure
      */
     public static function kdfExpand(string $secret, string $info): string
     {
@@ -174,7 +181,11 @@ final class Crypto
         return $out;
     }
 
-    /** AES-256-CBC (key, iv) from `HMAC-SHA512(hashKey, msgId)[0:48]`. */
+    /**
+     * AES-256-CBC (key, iv) from `HMAC-SHA512(hashKey, msgId)[0:48]`.
+     *
+     * @psalm-pure
+     */
     private static function aesFromHash(string $hashKey, string $msgId): array
     {
         $kv = hash_hmac('sha512', $msgId, $hashKey, true);
@@ -297,7 +308,11 @@ final class Crypto
         return (new \phpseclib4\Math\BigInteger(2))->pow(new \phpseclib4\Math\BigInteger(255))->subtract(new \phpseclib4\Math\BigInteger(19));
     }
 
-    /** Ed25519 seed -> clamped X25519 scalar: SHA-512(seed)[0:32] with the RFC 7748 clamp. */
+    /**
+     * Ed25519 seed -> clamped X25519 scalar: SHA-512(seed)[0:32] with the RFC 7748 clamp.
+     *
+     * @psalm-pure
+     */
     private static function edSeedToX25519(string $seed): string
     {
         $s = substr(hash('sha512', $seed, true), 0, 32);
@@ -370,7 +385,11 @@ final class Crypto
      *  Hashing helpers.
      * ------------------------------------------------------------------ */
 
-    /** SHA-256, raw bytes. */
+    /**
+     * SHA-256, raw bytes.
+     *
+     * @psalm-pure
+     */
     public static function sha256(string $data): string
     {
         return hash('sha256', $data, true);
@@ -379,6 +398,8 @@ final class Crypto
     /**
      * Derive the actual group encryption key from the raw shared key for protocol version >= 1:
      * `HMAC-SHA512(key = raw, msg = blockHash)[0:32]` (Call.cpp update_group_shared_key).
+     *
+     * @psalm-pure
      */
     public static function deriveGroupKey(string $rawSharedKey, string $blockHash): string
     {

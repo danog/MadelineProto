@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Serialization settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Serialization extends SettingsAbstract
 {

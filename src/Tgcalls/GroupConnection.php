@@ -20,23 +20,21 @@ namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\GroupCallController;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use Revolt\EventLoop;
 use Throwable;
-use Webrtc\RTP\Crypto\FrameCryptorInterface;
-use Webrtc\RTP\RTCRtpTransceiver;
 use Webrtc\DataChannel\Enum\State;
 use Webrtc\DataChannel\Listener\DataChannelMessageListener;
 use Webrtc\DataChannel\Listener\DataChannelOpenListener;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
+use Webrtc\RTP\Crypto\FrameCryptorInterface;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
+use Webrtc\RTP\RTCRtpTransceiver;
 use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
@@ -271,6 +269,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
 
     /**
      * @param array<string, mixed> $data
+     *
+     * @psalm-external-mutation-free
      */
     public function __unserialize(array $data): void
     {

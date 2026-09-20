@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * VoIP settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class VoIP extends SettingsAbstract
 {

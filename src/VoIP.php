@@ -88,6 +88,7 @@ final class VoIP extends Update implements SimpleFilters, Call
      * @param int<1, 5> $rating  Call rating in stars
      * @param string    $comment Additional comment on call quality.
      */
+    #[\Override]
     public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
     {
         $this->getClient()->discardCall($this->callID, $reason, $rating, $comment);
@@ -114,6 +115,7 @@ final class VoIP extends Update implements SimpleFilters, Call
      * frames are sent as-is where possible, so no transcoding (and thus no FFI extension) is
      * required for pre-encoded WebM/OGG-OPUS input.
      */
+    #[\Override]
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->callPlay($this->callID, $file, $dest);
@@ -136,10 +138,10 @@ final class VoIP extends Update implements SimpleFilters, Call
         return $this;
     }
 
-
     /**
      * Play file.
      */
+    #[\Override]
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->callPlay($this->callID, $file, $dest);
@@ -149,6 +151,7 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * When called, skips to the next file in the playlist.
      */
+    #[\Override]
     public function skip(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->skipPlay($this->callID, $dest);
@@ -158,6 +161,7 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Stops playing all files, clears the main and the hold playlist.
      */
+    #[\Override]
     public function stop(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->stopPlay($this->callID, $dest);
@@ -167,7 +171,10 @@ final class VoIP extends Update implements SimpleFilters, Call
 
     /**
      * Pauses the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->pausePlay($this->callID, $dest);
@@ -177,7 +184,10 @@ final class VoIP extends Update implements SimpleFilters, Call
 
     /**
      * Whether the currently playing file is paused.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
         return $this->getClient()->isPlayPaused($this->callID, $dest);
@@ -185,7 +195,10 @@ final class VoIP extends Update implements SimpleFilters, Call
 
     /**
      * Resumes the currently playing file.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->getClient()->resumePlay($this->callID, $dest);
@@ -196,6 +209,7 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Files to play on hold.
      */
+    #[\Override]
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
         $this->getClient()->callPlayOnHold($this->callID, $dest, ...$files);
@@ -207,7 +221,10 @@ final class VoIP extends Update implements SimpleFilters, Call
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-external-mutation-free
      */
+    #[\Override]
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
         return $this->getClient()->callGetCurrent($this->callID, $dest);
@@ -216,6 +233,7 @@ final class VoIP extends Update implements SimpleFilters, Call
     /**
      * Mute or unmute our own audio stream.
      */
+    #[\Override]
     public function setMuted(bool $muted = true): self
     {
         $this->getClient()->setCallMuted($this->callID, $muted);
@@ -228,6 +246,7 @@ final class VoIP extends Update implements SimpleFilters, Call
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function isMuted(): bool
     {
         return $this->getClient()->isCallMuted($this->callID);

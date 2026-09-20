@@ -263,7 +263,7 @@ final class Connection
         return $this->chosenCtx->isHttp();
     }
     /**
-     * @return Publisher<ConnectionState> 
+     * @return Publisher<ConnectionState>
      *
      * @psalm-mutation-free
      */

@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Secret chat settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class SecretChats extends SettingsAbstract
 {

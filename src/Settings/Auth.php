@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Cryptography settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Auth extends SettingsAbstract
 {

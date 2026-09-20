@@ -19,11 +19,11 @@ namespace danog\MadelineProto\Tgcalls\E2E;
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\Call;
 use danog\MadelineProto\LocalFile;
-use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\GroupConnection;
@@ -112,6 +112,8 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * disk jockey all serialize themselves; only the event-loop poll id cannot and is recreated.
      *
      * @return array<string, mixed>
+     *
+     * @psalm-mutation-free
      */
     public function __serialize(): array
     {
@@ -155,7 +157,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         $this->log("Resumed E2E conference $this after a restart", Logger::NOTICE);
     }
 
-    /** Point this controller at an existing conference (its groupCall), before joining it. */
+    /**
+     * Point this controller at an existing conference (its groupCall), before joining it.
+     *
+     * @psalm-external-mutation-free
+     */
     public function setCall(array $call): void
     {
         $this->inputCall = [
@@ -167,6 +173,8 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
 
     /**
      * @return array The inputGroupCall, once the conference exists.
+     *
+     * @psalm-mutation-free
      */
     public function getInputCall(): array
     {
@@ -179,7 +187,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this->joined;
     }
 
-    /** Whether a screen-share is currently being transmitted. */
+    /**
+     * Whether a screen-share is currently being transmitted.
+     *
+     * @psalm-mutation-free
+     */
     public function isSharingScreen(): bool
     {
         return $this->presentationConnection !== null;
@@ -189,6 +201,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      *  E2EKeyProvider — the live keys the frame cryptor uses.
      * ------------------------------------------------------------------ */
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function activeEpochs(): array
     {
@@ -202,6 +217,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this->selfSeed;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function publicKeyForSsrc(int $ssrc): ?string
     {
@@ -469,6 +487,8 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
 
     /**
      * Snapshot the current group key as a media epoch, keeping the most recent ones.
+     *
+     * @psalm-external-mutation-free
      */
     private function refreshEpoch(): void
     {
@@ -576,7 +596,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this->presentationDj;
     }
 
-    /** The disk jockey for a destination without starting a screen-share that is not running. */
+    /**
+     * The disk jockey for a destination without starting a screen-share that is not running.
+     *
+     * @psalm-mutation-free
+     */
     private function djOrNull(MediaDestination $dest): ?DjLoop
     {
         return $dest === MediaDestination::Camera ? $this->diskJockey : $this->presentationDj;
@@ -628,6 +652,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
@@ -635,12 +662,18 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
         return $this->djOrNull($dest)?->isAudioPaused() ?? false;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
@@ -648,6 +681,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
@@ -729,6 +765,8 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * `public_key` and `permissions` bits from the shared-state chain.
      *
      * @return array<int, array{public_key: string, permissions: int}>
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getParticipants(): array
@@ -766,7 +804,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         }
     }
 
-    /** Drop verification state when the chain (and thus the block hash) changes. */
+    /**
+     * Drop verification state when the chain (and thus the block hash) changes.
+     *
+     * @psalm-external-mutation-free
+     */
     private function refreshVerification(): void
     {
         $this->verificationNonces = [];
@@ -808,6 +850,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
 
     private int $messageSeqno = 0;
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function nextMessageSeqno(): int
     {
         return ++$this->messageSeqno;
@@ -920,6 +965,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         $this->API->logger->logger($message, $level);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function onIncomingSource(int $source): void
     {
@@ -966,6 +1014,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         }
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __toString(): string
     {

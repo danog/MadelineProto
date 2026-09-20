@@ -145,7 +145,7 @@ final class NewAuthKey implements SimpleSubscriber
         }
     }
     /**
-     * @return list{string, string} 
+     * @return list{string, string}
      *
      * @psalm-mutation-free
      */

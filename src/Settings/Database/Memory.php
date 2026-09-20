@@ -22,6 +22,8 @@ use danog\MadelineProto\Settings\DatabaseAbstract;
 
 /**
  * Memory backend settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Memory extends DatabaseAbstract
 {

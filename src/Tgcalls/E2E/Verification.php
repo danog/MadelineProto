@@ -80,6 +80,8 @@ final class Verification
 
     /**
      * Whether a revealed nonce matches a previously committed hash.
+     *
+     * @psalm-pure
      */
     public static function checkReveal(string $committedHash, string $revealedNonce): bool
     {
@@ -91,6 +93,8 @@ final class Verification
      * byte strings, concatenated, and used as the HMAC-SHA512 key over the last block hash.
      *
      * @param list<string> $nonces Every participant's revealed 32-byte nonce.
+     *
+     * @psalm-pure
      */
     public static function emojiHash(array $nonces, string $lastBlockHash): string
     {

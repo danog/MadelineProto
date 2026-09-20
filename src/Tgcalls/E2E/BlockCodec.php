@@ -102,6 +102,8 @@ final class BlockCodec
     /**
      * The SHA-256 hash of a serialized block, used as its identity and as `prev_block_hash` of the
      * next block.
+     *
+     * @psalm-pure
      */
     public function blockHash(string $serializedBlock): string
     {
@@ -122,6 +124,8 @@ final class BlockCodec
 
     /**
      * The boxed `e2e.chain.Type` a predicate belongs to, for {@see TL::serializeObject()}.
+     *
+     * @psalm-pure
      */
     private static function typeOf(string $predicate): string
     {

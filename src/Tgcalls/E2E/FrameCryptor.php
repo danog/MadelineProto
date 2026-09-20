@@ -44,6 +44,8 @@ final class FrameCryptor implements FrameCryptorInterface
      * @param int $audioChannel Channel id for outgoing audio (0 is reserved for in-call messages).
      * @param int $videoChannel Channel id for outgoing video; a screen-share connection uses a
      *                          distinct one from the camera so their sequence numbers never collide.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private readonly E2EKeyProvider $keys,
@@ -82,6 +84,9 @@ final class FrameCryptor implements FrameCryptorInterface
         return $decoded['payload'];
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     private function channel(MediaKind $kind): int
     {
         return $kind === MediaKind::Video ? $this->videoChannel : $this->audioChannel;
@@ -89,6 +94,8 @@ final class FrameCryptor implements FrameCryptorInterface
 
     /**
      * Reject a replayed or too-old sequence number for a (sender, channel), and remember it.
+     *
+     * @psalm-external-mutation-free
      */
     private function checkReplay(string $senderHex, int $channel, int $seqno): void
     {

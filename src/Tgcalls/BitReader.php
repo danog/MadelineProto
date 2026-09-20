@@ -22,12 +22,17 @@ namespace danog\MadelineProto\Tgcalls;
  * video track. Pure PHP, no dependencies.
  *
  * @internal
+ *
+ * @psalm-external-mutation-free
  */
 final class BitReader
 {
     private int $bitPos = 0;
     private int $length;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly string $data)
     {
         $this->length = \strlen($data) * 8;
@@ -35,6 +40,8 @@ final class BitReader
 
     /**
      * Read `$count` bits (0-32) as an unsigned integer.
+     *
+     * @psalm-mutation-free
      */
     public function bits(int $count): int
     {
@@ -45,6 +52,9 @@ final class BitReader
         return $value;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     private function bit(): int
     {
         if ($this->bitPos >= $this->length) {
@@ -58,6 +68,8 @@ final class BitReader
 
     /**
      * Read an unsigned Exp-Golomb coded value (ue(v)).
+     *
+     * @psalm-mutation-free
      */
     public function ue(): int
     {
@@ -73,6 +85,8 @@ final class BitReader
 
     /**
      * Read a signed Exp-Golomb coded value (se(v)).
+     *
+     * @psalm-mutation-free
      */
     public function se(): int
     {

@@ -23,7 +23,6 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
 use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;

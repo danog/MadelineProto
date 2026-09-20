@@ -21,6 +21,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Metric settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Metrics extends SettingsAbstract
 {

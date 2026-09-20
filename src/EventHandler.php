@@ -57,7 +57,7 @@ abstract class EventHandler extends AbstractAPI
     }
 
     /**
-     * @internal Do not use manually. 
+     * @internal Do not use manually.
      *
      * @psalm-mutation-free
      */

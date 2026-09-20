@@ -28,7 +28,6 @@ use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webrtc\Codecs\Codec;
-use Webrtc\RTPParameter\RTCRtpCodecCapability;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
@@ -37,6 +36,7 @@ use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
 use Webrtc\RTP\RTCRtpTransceiver;
+use Webrtc\RTPParameter\RTCRtpCodecCapability;
 use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
@@ -427,7 +427,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
 
         if ($wantsVideo) {
             $this->callRecorder = new CallRecorder($file);
-            $kinds = []; $recv = 0; // RECDEBUG
+            $kinds = [];
+            $recv = 0; // RECDEBUG
             foreach ($this->peerConnection->getReceivers() as $receiver) {
                 $recv++; // RECDEBUG
                 $track = $receiver->getTrack();
@@ -649,7 +650,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         return self::videoCodecForMid($remote, $sendMid);
     }
 
-    /** The a=mid of the first send-capable video m-line (port != 0) in an SDP. */
+    /**
+     * The a=mid of the first send-capable video m-line (port != 0) in an SDP.
+     *
+     * @psalm-pure
+     */
     private static function outgoingVideoMid(string $sdp): ?string
     {
         $mid = null;
@@ -676,7 +681,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         return ($isVideo && $active && $sending && $mid !== null) ? $mid : null;
     }
 
-    /** The first non-RTX codec name of the video m-line with the given a=mid in an SDP. */
+    /**
+     * The first non-RTX codec name of the video m-line with the given a=mid in an SDP.
+     *
+     * @psalm-pure
+     */
     private static function videoCodecForMid(string $sdp, string $wantMid): ?string
     {
         $isVideo = false;
@@ -1028,8 +1037,14 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $inVid = false;
         foreach (explode("\n", str_replace("\r\n", "\n", $sdp)) as $l) {
             $l = trim($l);
-            if (str_starts_with($l, 'm=')) { $inVid = str_starts_with($l, 'm=video'); if ($inVid) { $vlines[] = $l; } }
-            elseif ($inVid && (str_starts_with($l, 'a=rtpmap:') || preg_match('/^a=(sendrecv|sendonly|recvonly|inactive)$/', $l))) { $vlines[] = $l; }
+            if (str_starts_with($l, 'm=')) {
+                $inVid = str_starts_with($l, 'm=video');
+                if ($inVid) {
+                    $vlines[] = $l;
+                }
+            } elseif ($inVid && (str_starts_with($l, 'a=rtpmap:') || preg_match('/^a=(sendrecv|sendonly|recvonly|inactive)$/', $l))) {
+                $vlines[] = $l;
+            }
         }
         $this->call->log('NEGDEBUG built remote video: '.implode(' | ', $vlines), Logger::ERROR);
         $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'offer'));
@@ -1102,7 +1117,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $kind = ($content['type'] ?? null) === 'video' ? 'video' : 'audio';
             $names = $supported[$kind] ?? [];
             $payloadTypes = $content['payloadTypes'] ?? [];
-            if (!is_array($payloadTypes)) {
+            if (!\is_array($payloadTypes)) {
                 continue;
             }
             // Which non-RTX codec ids survive, so a dependent RTX entry can be kept alongside them.
@@ -1132,7 +1147,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             // ("weak signal", 320x180). Strip the transport-cc feedback type and its RTP extension so
             // the peer falls back to REMB, which we do send (correctly, once the estimator bug is fixed).
             foreach ($content['payloadTypes'] as &$payloadType) {
-                if (isset($payloadType['feedbackTypes']) && is_array($payloadType['feedbackTypes'])) {
+                if (isset($payloadType['feedbackTypes']) && \is_array($payloadType['feedbackTypes'])) {
                     $payloadType['feedbackTypes'] = array_values(array_filter(
                         $payloadType['feedbackTypes'],
                         static fn ($fb): bool => strtolower((string) ($fb['type'] ?? '')) !== 'transport-cc',
@@ -1140,7 +1155,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                 }
             }
             unset($payloadType);
-            if (isset($content['rtpExtensions']) && is_array($content['rtpExtensions'])) {
+            if (isset($content['rtpExtensions']) && \is_array($content['rtpExtensions'])) {
                 $content['rtpExtensions'] = array_values(array_filter(
                     $content['rtpExtensions'],
                     static fn ($e): bool => !str_contains(strtolower((string) ($e['uri'] ?? '')), 'transport-wide-cc'),
@@ -1163,11 +1178,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private static function withObjectParameters(array $contents): array
     {
         foreach ($contents as &$content) {
-            if (!isset($content['payloadTypes']) || !is_array($content['payloadTypes'])) {
+            if (!isset($content['payloadTypes']) || !\is_array($content['payloadTypes'])) {
                 continue;
             }
             foreach ($content['payloadTypes'] as &$payloadType) {
-                if (is_array($payloadType)) {
+                if (\is_array($payloadType)) {
                     $payloadType['parameters'] = (object) ($payloadType['parameters'] ?? []);
                 }
             }

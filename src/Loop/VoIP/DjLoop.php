@@ -291,7 +291,7 @@ final class DjLoop extends VoIPLoop
      * Restart the demuxer/reader task after a serialize/unserialize cycle, resuming the current file
      * (from its byte offset) or the playlist where it left off. Called by the call's deserializer once
      * the whole call graph is restored; idempotent via the readerRunning guard. (Named to avoid the
-     * base Loop::resume().)
+     * base Loop::resume().).
      */
     public function resumeReader(): void
     {
@@ -959,7 +959,7 @@ final class DjLoop extends VoIPLoop
     }
 
     /**
-     * @psalm-mutation-free
+     * @psalm-pure
      */
     private function describe(LocalFile|RemoteUrl|ReadableStream $file): string
     {

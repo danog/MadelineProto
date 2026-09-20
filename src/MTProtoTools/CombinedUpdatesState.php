@@ -69,7 +69,7 @@ final class CombinedUpdatesState
      *
      * @param int $channel Channel whose state should be removed
      *
-     * @psalm-external-mutation-free
+     * @psalm-mutation-free
      */
     public function remove(int $channel): void
     {

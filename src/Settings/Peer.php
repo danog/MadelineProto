@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Peer database settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Peer extends SettingsAbstract
 {

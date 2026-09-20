@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Web and CLI template settings for login.
+ *
+ * @psalm-external-mutation-free
  */
 final class Templates extends SettingsAbstract
 {
