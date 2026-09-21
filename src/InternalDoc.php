@@ -22,6 +22,7 @@ use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Action\Cancel;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Keyboard;
@@ -770,9 +771,9 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getAllCalls();
     }
     /**
-     * Get all group calls we're currently tracking, indexed by their ID.
+     * Get all group calls (video chats, livestreams and live stories) we're currently tracking, indexed by their ID.
      *
-     * @return array<int, GroupCall>
+     * @return array<int, AbstractGroupCall>
      */
     final public function getAllGroupCalls(): array
     {
@@ -2568,7 +2569,7 @@ abstract class InternalDoc
         [
             '_' => 'inputPrivacyValueAllowAll',
         ],
-    ], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): \danog\MadelineProto\EventHandler\Calls\GroupCall
+    ], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): \danog\MadelineProto\EventHandler\Calls\LiveStory
     {
         return $this->wrapper->getAPI()->startLive($peer, $caption, $parseMode, $privacyRules, $pinned, $noForwards, $rtmpStream, $messagesEnabled, $sendPaidMessagesStars);
     }

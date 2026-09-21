@@ -20,7 +20,6 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\GroupCall\GroupCallStars;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -281,28 +280,6 @@ final class ConferenceCall extends Update implements MultiCall
     }
 
     /**
-     * End-to-end encrypted conference messages are only ever shown as an overlay and cannot be deleted.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function deleteMessages(array $ids, bool $reportSpam = false): self
-    {
-        throw new \LogicException('End-to-end encrypted conference messages cannot be deleted.');
-    }
-
-    /**
-     * End-to-end encrypted conference messages are only ever shown as an overlay and cannot be deleted.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function deleteParticipantMessages(mixed $participant, bool $reportSpam = false): self
-    {
-        throw new \LogicException('End-to-end encrypted conference messages cannot be deleted.');
-    }
-
-    /**
      * Enable or disable in-call messages.
      */
     #[\Override]
@@ -335,17 +312,6 @@ final class ConferenceCall extends Update implements MultiCall
     }
 
     /**
-     * A conference has no admins to ask for permission to speak: raising a hand is not available.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function raiseHand(bool $raised = true): self
-    {
-        throw new \LogicException('Raising a hand is only available in video chats and livestreams.');
-    }
-
-    /**
      * Pause or resume our own video stream, telling the other participants to keep showing the last
      * frame rather than hiding it.
      */
@@ -374,95 +340,6 @@ final class ConferenceCall extends Update implements MultiCall
     {
         $this->getClient()->toggleConferenceCallSettings($this->id, resetInviteHash: true);
         return $this;
-    }
-
-    /**
-     * Paid messages are a live story feature, not available in conference calls.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function setPaidMessagesStars(?int $stars): self
-    {
-        throw new \LogicException('Paid messages are only available in live stories.');
-    }
-
-    /**
-     * Server-side recording is only available in video chats and livestreams: the server never sees
-     * a conference's media in the clear. Record it locally with {@see self::setOutput()} instead.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function startRecording(?string $title = null, bool $video = false, bool $portrait = false): self
-    {
-        throw new \LogicException('End-to-end encrypted conference calls cannot be recorded server-side, use setOutput() to record them locally.');
-    }
-
-    /**
-     * Server-side recording is only available in video chats and livestreams.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function stopRecording(): self
-    {
-        throw new \LogicException('End-to-end encrypted conference calls cannot be recorded server-side.');
-    }
-
-    /**
-     * Conference calls cannot be scheduled.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function startScheduled(): self
-    {
-        throw new \LogicException('Conference calls cannot be scheduled.');
-    }
-
-    /**
-     * Conference calls cannot be scheduled.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function setStartSubscription(bool $subscribed): self
-    {
-        throw new \LogicException('Conference calls cannot be scheduled.');
-    }
-
-    /**
-     * Donations are a live story feature, not available in conference calls.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function donate(int $stars): self
-    {
-        throw new \LogicException('Donations are only available in live stories.');
-    }
-
-    /**
-     * Donations are a live story feature, not available in conference calls.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function getStars(): GroupCallStars
-    {
-        throw new \LogicException('Donations are only available in live stories.');
-    }
-
-    /**
-     * Conference messages are always sent as ourselves.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function setDefaultSendAs(mixed $peer): self
-    {
-        throw new \LogicException('Conference messages are always sent as ourselves.');
     }
 
     /**

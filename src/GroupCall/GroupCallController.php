@@ -23,7 +23,9 @@ use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use danog\DialogId\DialogId;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -106,7 +108,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     /** @var array<int, true> Peer IDs already wired to a presentation file in folder mode. */
     private array $folderPresentationPeers = [];
 
-    public readonly GroupCall $public;
+    public readonly AbstractGroupCall $public;
 
     /**
      * @internal
@@ -123,7 +125,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             'id' => $call['id'],
             'access_hash' => $call['access_hash'],
         ];
-        $this->public = new GroupCall($API, $call, $peerId, $liveStory);
+        $this->public = $liveStory ? new LiveStory($API, $call, $peerId) : new GroupCall($API, $call, $peerId);
         $this->diskJockey = new DjLoop($this);
         Assert::true($this->diskJockey->start());
         $this->joinMutex = new LocalMutex;
@@ -383,6 +385,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
      */
     public function applyGroupCall(array $result): void
     {
+        \assert(\is_array($result['call']));
         $this->call = $result['call'];
         $this->public->update($result['call']);
         if ($result['call']['_'] === 'groupCallDiscarded') {
@@ -775,11 +778,12 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             if ($participant !== null) {
                 throw new \InvalidArgumentException('In stream mode the call is a single mixed stream: record it without specifying a participant.');
             }
-            if ($file instanceof LocalDirectory) {
-                $file = new LocalFile($file->dir.'/stream.ogg');
-            }
             $this->streamReceiver ??= new StreamReceiver($this);
-            $this->streamReceiver->setOutput($file, $format);
+            if ($file instanceof LocalDirectory) {
+                $this->streamReceiver->setOutputDirectory($file->dir, $format);
+            } else {
+                $this->streamReceiver->setOutput($file, $format);
+            }
             return $this;
         }
         if ($file instanceof LocalDirectory) {

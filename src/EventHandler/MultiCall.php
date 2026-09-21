@@ -16,19 +16,19 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use danog\MadelineProto\GroupCall\GroupCallStars;
 use danog\MadelineProto\ParseMode;
 
 /**
- * Common interface for the multi-party call types — {@see Calls\GroupCall} (video chats, livestreams) and
- * {@see Calls\ConferenceCall} (end-to-end encrypted conference calls) — on
- * top of the surface every call shares ({@see Call}).
+ * Common interface for the multi-party call types — {@see Calls\GroupCall} (video chats, livestreams),
+ * {@see Calls\LiveStory} (live stories) and {@see Calls\ConferenceCall} (end-to-end encrypted conference
+ * calls) — on top of the surface every call shares ({@see Call}).
  *
  * It covers what a call with more than two participants adds over a one-to-one {@see Calls\PrivateCall} call:
  * leaving without ending it for everyone else, managing who is in it (inviting, invite links, removing
- * participants), its title, and messaging its participants. Where the two call types back an operation
- * with different Telegram features (a video chat's group vs. a conference's end-to-end encrypted in-call
- * messages, for instance), the concrete class documents it.
+ * participants), its title and settings, and messaging its participants. What only some call types
+ * offer (server-side recording, scheduling, raising a hand, moderating messages, donations) lives on the
+ * concrete classes: {@see Calls\AbstractGroupCall} for everything a video chat and a live story share,
+ * {@see Calls\GroupCall} and {@see Calls\LiveStory} for their own.
  */
 interface MultiCall extends Call
 {
@@ -80,7 +80,7 @@ interface MultiCall extends Call
      *
      * @param string         $message   The text; markup in `$parseMode` is converted to entities.
      * @param ParseMode|null $parseMode Whether to parse HTML or Markdown markup in the text.
-     * @param int|null       $paidStars Live stories only: Telegram Stars to donate with the message (at least the story's minimum, see {@see self::setPaidMessagesStars()}).
+     * @param int|null       $paidStars Live stories only: Telegram Stars to donate with the message (at least the story's minimum, see {@see Calls\LiveStory::setPaidMessagesStars()}).
      * @param mixed          $sendAs    Live stories only: the peer to send the message as.
      *
      * @psalm-impure
@@ -97,25 +97,6 @@ interface MultiCall extends Call
      * @psalm-impure
      */
     public function sendReaction(string $emoji, ?int $customEmojiId = null): static;
-
-    /**
-     * Delete in-call messages: our own, or anyone's if we are an admin.
-     *
-     * @param list<int> $ids        IDs of the messages to delete.
-     * @param bool      $reportSpam Also report them as spam (admins only).
-     *
-     * @psalm-impure
-     */
-    public function deleteMessages(array $ids, bool $reportSpam = false): static;
-
-    /**
-     * Delete every in-call message of a participant (admins only).
-     *
-     * @param bool $reportSpam Also report them as spam.
-     *
-     * @psalm-impure
-     */
-    public function deleteParticipantMessages(mixed $participant, bool $reportSpam = false): static;
 
     /**
      * Enable or disable in-call messages (admins only).
@@ -142,14 +123,6 @@ interface MultiCall extends Call
     public function setParticipantVolume(mixed $participant, int $volume): static;
 
     /**
-     * Raise or lower our hand, asking the admins to let us speak when muted by them (video chats and
-     * livestreams only).
-     *
-     * @psalm-impure
-     */
-    public function raiseHand(bool $raised = true): static;
-
-    /**
      * Pause or resume our own video stream, telling the other participants to keep showing the last
      * frame rather than hiding it.
      *
@@ -170,68 +143,6 @@ interface MultiCall extends Call
      * @psalm-impure
      */
     public function resetInviteHash(): static;
-
-    /**
-     * Live stories only: the minimum Telegram Stars donation required to comment, or null to let
-     * everyone comment for free.
-     *
-     * @psalm-impure
-     */
-    public function setPaidMessagesStars(?int $stars): static;
-
-    /**
-     * Start a server-side recording of the call (admins only), which is sent to the admin's Saved
-     * Messages once stopped.
-     *
-     * @param string|null $title    Title of the recording.
-     * @param bool        $video    Whether to record video as well as audio.
-     * @param bool        $portrait Whether the video is recorded in portrait (true) or landscape (false) orientation.
-     *
-     * @psalm-impure
-     */
-    public function startRecording(?string $title = null, bool $video = false, bool $portrait = false): static;
-
-    /**
-     * Stop the server-side recording of the call (admins only).
-     *
-     * @psalm-impure
-     */
-    public function stopRecording(): static;
-
-    /**
-     * Start a scheduled call now, before (or after) its scheduled date (admins only).
-     *
-     * @psalm-impure
-     */
-    public function startScheduled(): static;
-
-    /**
-     * Subscribe to (or unsubscribe from) a notification when a scheduled call starts.
-     *
-     * @psalm-impure
-     */
-    public function setStartSubscription(bool $subscribed): static;
-
-    /**
-     * Live stories only: donate Telegram Stars to the streamer, without a message.
-     *
-     * @psalm-impure
-     */
-    public function donate(int $stars): static;
-
-    /**
-     * Live stories only: the Telegram Stars donated so far and the top donors.
-     *
-     * @psalm-impure
-     */
-    public function getStars(): GroupCallStars;
-
-    /**
-     * Live stories only: the peer we send in-call messages as by default.
-     *
-     * @psalm-impure
-     */
-    public function setDefaultSendAs(mixed $peer): static;
 
     /**
      * Whether the server switched us to [stream mode »](https://core.telegram.org/api/group-calls#stream-mode):

@@ -37,11 +37,13 @@ use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall as GroupCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCallMessage;
 use danog\MadelineProto\EventHandler\Calls\GroupCallMessagesDeleted;
 use danog\MadelineProto\EventHandler\Calls\GroupCallParticipants;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
 use danog\MadelineProto\EventHandler\Channel\MessageForwards;
 use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
@@ -531,7 +533,7 @@ trait UpdateHandler
      * The handle of the call an updateGroupCall is about: the one we track, or else a fresh one built
      * from the groupCall the update carries (a conference handle for a conference).
      */
-    private function wrapGroupCall(array $update): GroupCallUpdate|ConferenceCallUpdate
+    private function wrapGroupCall(array $update): AbstractGroupCall|ConferenceCallUpdate
     {
         $call = $update['call'];
         $id = $call['id'];
@@ -544,12 +546,10 @@ trait UpdateHandler
         if ($call['conference'] ?? false) {
             return new ConferenceCallUpdate($this, $call);
         }
-        return new GroupCallUpdate(
-            $this,
-            $call,
-            isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
-            (bool) ($update['live_story'] ?? false),
-        );
+        $peerId = isset($update['peer']) ? $this->getIdInternal($update['peer']) : null;
+        return ($update['live_story'] ?? false)
+            ? new LiveStory($this, $call, $peerId)
+            : new GroupCallUpdate($this, $call, $peerId);
     }
 
     /**

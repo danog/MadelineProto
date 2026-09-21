@@ -19,8 +19,10 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
@@ -114,6 +116,7 @@ trait Handler
         if ($controller === null) {
             throw new AssertionError('The server did not return the created group call!');
         }
+        \assert($controller->public instanceof GroupCall);
         return $controller->public;
     }
 
@@ -559,7 +562,8 @@ trait Handler
         if ($inputCall === null) {
             return null;
         }
-        return $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))?->public;
+        $call = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))?->public;
+        return $call instanceof GroupCall ? $call : null;
     }
 
     /**
@@ -568,7 +572,8 @@ trait Handler
      */
     public function getGroupCallBySlug(string $slug): ?GroupCall
     {
-        return $this->getGroupCallByInput(['_' => 'inputGroupCallSlug', 'slug' => $slug])?->public;
+        $call = $this->getGroupCallByInput(['_' => 'inputGroupCallSlug', 'slug' => $slug])?->public;
+        return $call instanceof GroupCall ? $call : null;
     }
 
     /**
@@ -591,6 +596,7 @@ trait Handler
             throw new AssertionError('Could not fetch the group call!');
         }
         $controller->join($muted, $joinAs, $inviteHash);
+        \assert($controller->public instanceof GroupCall);
         return $controller->public;
     }
 
@@ -644,13 +650,13 @@ trait Handler
     }
 
     /**
-     * Get all group calls we're currently tracking, indexed by their ID.
+     * Get all group calls (video chats, livestreams and live stories) we're currently tracking, indexed by their ID.
      *
-     * @return array<int, GroupCall>
+     * @return array<int, AbstractGroupCall>
      */
     public function getAllGroupCalls(): array
     {
-        return array_map(static fn (GroupCallController $c): GroupCall => $c->public, $this->groupCalls);
+        return array_map(static fn (GroupCallController $c): AbstractGroupCall => $c->public, $this->groupCalls);
     }
 
     /**
@@ -1031,7 +1037,7 @@ trait Handler
      * @param bool|null                 $messagesEnabled       Whether viewers may comment with in-call messages.
      * @param int|null                  $sendPaidMessagesStars The minimum Telegram Stars donation required to comment, if any.
      */
-    public function startLive(mixed $peer, ?string $caption = null, ?ParseMode $parseMode = null, array $privacyRules = [['_' => 'inputPrivacyValueAllowAll']], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): GroupCall
+    public function startLive(mixed $peer, ?string $caption = null, ?ParseMode $parseMode = null, array $privacyRules = [['_' => 'inputPrivacyValueAllowAll']], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): LiveStory
     {
         $params = [
             'peer' => $peer,
@@ -1064,7 +1070,7 @@ trait Handler
             if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
                 $inputCall = ['_' => 'inputGroupCall', 'id' => $update['call']['id'], 'access_hash' => $update['call']['access_hash']];
                 $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer), liveStory: true);
-                if ($controller !== null) {
+                if ($controller !== null && $controller->public instanceof LiveStory) {
                     return $controller->public;
                 }
             }
