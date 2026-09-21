@@ -122,12 +122,24 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $presentationOwner = [];
     /**
-     * Whether a participant (by unsigned audio SSRC) is expected to send camera video, so its
-     * recorder holds the header for the video track instead of committing an audio-only one.
+     * What each participant currently sends (mic, camera, screen share), by unsigned audio SSRC, as
+     * the participant list reports it.
      *
-     * @var array<int, bool>
+     * @var array<int, array{audio: bool, video: bool, presentation: bool}>
      */
-    private array $participantHasVideo = [];
+    private array $participantStreams = [];
+
+    /**
+     * Pass a participant's current streams (mic, camera, screen share) to its recorder, if any.
+     */
+    private function tellRecorderExpectedStreams(int $audioSsrc): void
+    {
+        $streams = $this->participantStreams[$audioSsrc] ?? null;
+        if ($streams === null) {
+            return;
+        }
+        ($this->recorders[$audioSsrc] ?? null)?->setExpected($streams['audio'], $streams['video'], $streams['presentation']);
+    }
     /**
      * Recorders for incoming media, indexed by the participant's unsigned audio SSRC. Each muxes the
      * participant's audio and (once it arrives) camera video into one Matroska file.
@@ -136,13 +148,6 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $recorders = [];
     /**
-     * Recorders for incoming screen-share, indexed by the participant's unsigned audio SSRC (a
-     * screen-share is a separate video stream, so it gets its own file).
-     *
-     * @var array<int, CallRecorder>
-     */
-    private array $presentationRecorders = [];
-    /**
      * Output files/streams requested before the corresponding participant's track showed up, indexed
      * by the participant's unsigned audio SSRC.
      *
@@ -150,23 +155,11 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $pendingOutputs = [];
     /**
-     * Screen-share output files/streams requested per participant, indexed by unsigned audio SSRC.
-     *
-     * @var array<int, LocalFile|WritableStream>
-     */
-    private array $pendingPresentationOutputs = [];
-    /**
      * Matroska DocType of the recordings requested per participant, indexed by unsigned audio SSRC.
      *
      * @var array<int, RecordingFormat>
      */
     private array $formats = [];
-    /**
-     * Matroska DocType of the screen-share recordings requested per participant, indexed by unsigned audio SSRC.
-     *
-     * @var array<int, RecordingFormat>
-     */
-    private array $presentationFormats = [];
 
     /**
      * The colibri data channel: the client sends {@see ReceiverVideoConstraints} on it to tell the
@@ -209,16 +202,15 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         $this->videoSsrc = $videoTransceiver->getSender()->getSsrc();
         $this->videoRtxSsrc = $videoTransceiver->getSender()->getRtxSsrc();
 
-        // The colibri data channel over which we'd subscribe to other participants' video is OFF by
-        // default (opt in with MP_GROUP_DATACHANNEL=1). php-rtc's createDataChannel() builds the SCTP
-        // over a SEPARATE DtlsTransport+IceTransport instead of bundling it onto the media transport;
-        // against the single bundled transport the Telegram SFU offers, that second ICE transport can
-        // never connect, so RTCPeerConnection::updateConnectionState() (which aggregates every ICE/DTLS
-        // transport) is pinned at "connecting" and media never starts flowing. tgcalls runs the group
-        // data channel as its own SCTP association, not an SDP-bundled m-line; until we do the same,
-        // enabling it breaks all group media. See GroupNetworkManager.cpp (Android tgcalls).
-        if (getenv('MP_GROUP_DATACHANNEL') === '1') {
-            $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true));
+        // The colibri data channel, over which we subscribe to other participants' video (the SFU
+        // forwards a camera or screen-share stream only for endpoints we ask for). tgcalls runs it
+        // as an SCTP association straight over the media DTLS transport, with no SDP section: the
+        // client always initiates it (although it is the ICE-controlled side) and opens the channel
+        // as stream 0 — see GroupNetworkManager.cpp and SctpDataChannelProviderInterfaceImpl.cpp.
+        // A screen-share-only connection subscribes to nothing, so it needs no channel.
+        if (!$this->screencast) {
+            $this->peerConnection->createInbandSctp(client: true);
+            $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true, id: 0));
             $this->dataChannel->addOpenListener($this);
             $this->dataChannel->addMessageListener($this);
         }
@@ -272,11 +264,6 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 unset($vars['recorders'][$ssrc]);
             }
         }
-        foreach ($this->presentationRecorders as $ssrc => $recorder) {
-            if ($recorder->file === null) {
-                unset($vars['presentationRecorders'][$ssrc]);
-            }
-        }
         return $vars;
     }
 
@@ -288,7 +275,6 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __unserialize(array $data): void
     {
         $this->recorders = [];
-        $this->presentationRecorders = [];
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -310,14 +296,11 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         foreach ($this->recorders as $recorder) {
             $recorder->resume();
         }
-        foreach ($this->presentationRecorders as $recorder) {
-            $recorder->resume();
-        }
         // Re-subscribe to remote video: the SCTP channel came back, so resend the constraints in case
         // it did not fire its open event again (it may already be open, or reopen shortly).
         $this->dataChannelOpen = $this->dataChannel?->getReadyState() === State::Open;
         $this->sendReceiverConstraints();
-        if ($this->pendingOutputs === [] && $this->pendingPresentationOutputs === []) {
+        if ($this->pendingOutputs === []) {
             return;
         }
         foreach ($this->peerConnection->getReceivers() as $receiver) {
@@ -458,7 +441,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * transceiver of the matching kind is created for every new SSRC; the SFU forwards that
      * participant's media on it, demultiplexed by SSRC.
      *
-     * @param list<array{audio: int, video: list<int>, presentation?: list<int>, videoEndpoint?: ?string, presentationEndpoint?: ?string}> $participants
+     * @param list<array{audio: int, muted?: bool, video: list<int>, presentation?: list<int>, videoEndpoint?: ?string, presentationEndpoint?: ?string}> $participants
      *        Signed SSRCs and SFU endpoints per participant.
      */
     public function setRemoteSources(array $participants): void
@@ -506,10 +489,14 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             if (($participant['presentation'] ?? []) !== [] && ($participant['presentationEndpoint'] ?? null) !== null) {
                 $endpoints[$participant['presentationEndpoint']] = self::HEIGHT_FULL;
             }
-            $this->participantHasVideo[$audio] = $videoSsrcs !== [];
-            // A participant already recording gets told whether to expect video, so an audio-only
-            // header is not held back for one that never turns a camera on.
-            ($this->recorders[$audio] ?? null)?->setRemoteHasVideo($videoSsrcs !== []);
+            // What the participant is sending shapes the segments of its recording: a stream turned
+            // off ends the current segment, one turned on is waited for (see CallRecorder).
+            $this->participantStreams[$audio] = [
+                'audio' => !(bool) ($participant['muted'] ?? false),
+                'video' => $videoSsrcs !== [],
+                'presentation' => ($participant['presentation'] ?? []) !== [],
+            ];
+            $this->tellRecorderExpectedStreams($audio);
         }
         // The SFU never removes m-lines, so we only ever add; nothing to do if none were missing.
         if ($added) {
@@ -616,33 +603,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             if ($trackSsrc === null) {
                 continue;
             }
-            $owner = $track->getKind() === MediaKind::Video ? ($this->videoOwner[$trackSsrc] ?? null) : $trackSsrc;
+            $owner = $track->getKind() === MediaKind::Video
+                ? ($this->videoOwner[$trackSsrc] ?? $this->presentationOwner[$trackSsrc] ?? null)
+                : $trackSsrc;
             if ($owner === $ssrc) {
-                $this->attachTrack($track, $trackSsrc);
-            }
-        }
-    }
-
-    /**
-     * Record a specific participant's incoming screen-share (presentation) into its own file.
-     *
-     * @param int             $source The participant's signed audio SSRC.
-     * @param RecordingFormat $format The Matroska DocType to write.
-     */
-    public function setPresentationOutput(int $source, LocalFile|WritableStream $file, RecordingFormat $format = RecordingFormat::Mkv): void
-    {
-        $ssrc = GroupSdp::toUnsignedSsrc($source);
-        ($this->presentationRecorders[$ssrc] ?? null)?->close();
-        unset($this->presentationRecorders[$ssrc]);
-        $this->pendingPresentationOutputs[$ssrc] = $file;
-        $this->presentationFormats[$ssrc] = $format;
-        foreach ($this->peerConnection->getReceivers() as $receiver) {
-            $track = $receiver->getTrack();
-            if (!$track instanceof RemoteStreamTrack || $track->getKind() !== MediaKind::Video) {
-                continue;
-            }
-            $trackSsrc = $this->trackSsrc($track);
-            if ($trackSsrc !== null && ($this->presentationOwner[$trackSsrc] ?? null) === $ssrc) {
                 $this->attachTrack($track, $trackSsrc);
             }
         }
@@ -655,13 +619,14 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
         $this->closed = true;
         foreach ($this->recorders as $recorder) {
-            $recorder->close();
-        }
-        foreach ($this->presentationRecorders as $recorder) {
-            $recorder->close();
+            try {
+                $recorder->close();
+            } catch (Throwable $e) {
+                // A recorder that cannot finish its file must not take the whole call down with it.
+                $this->call->log("Could not close a recording of {$this->call}: $e", Logger::WARNING);
+            }
         }
         $this->recorders = [];
-        $this->presentationRecorders = [];
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
@@ -766,20 +731,20 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     /**
      * Route a live remote track into its participant's recorder, creating the recorder on demand if
      * an output was requested for that participant. Audio identifies the participant directly; video
-     * is mapped back through {@see self::$videoOwner}.
+     * is mapped back through {@see self::$videoOwner} (camera) or {@see self::$presentationOwner}
+     * (screen share), which are the recording's two video slots.
      */
     private function attachTrack(RemoteStreamTrack $track, int $ssrc): void
     {
         if ($track->getKind() === MediaKind::Video && isset($this->presentationOwner[$ssrc])) {
-            // A screen-share is a separate stream, recorded to its own file.
-            $this->ensurePresentationRecorder($this->presentationOwner[$ssrc])?->setTrack($track);
+            $this->ensureRecorder($this->presentationOwner[$ssrc])?->setTrack($track, CallRecorder::SLOT_PRESENTATION);
             return;
         }
         $owner = $track->getKind() === MediaKind::Video ? ($this->videoOwner[$ssrc] ?? null) : $ssrc;
         if ($owner === null) {
             return;
         }
-        $this->ensureRecorder($owner)?->setTrack($track);
+        $this->ensureRecorder($owner)?->setTrack($track, CallRecorder::SLOT_VIDEO);
     }
 
     /**
@@ -798,28 +763,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
         unset($this->pendingOutputs[$audioSsrc]);
         $recorder = new CallRecorder($file, $this->formats[$audioSsrc] ?? RecordingFormat::Mkv);
-        // Only hold the header for a video track if this participant is known to be transmitting one.
-        $recorder->setRemoteHasVideo($this->participantHasVideo[$audioSsrc] ?? false);
         $this->recorders[$audioSsrc] = $recorder;
-        return $recorder;
-    }
-
-    /**
-     * Return the screen-share recorder for a participant (by unsigned audio SSRC), creating it from
-     * the pending presentation output the first time the participant's screen-share track arrives.
-     */
-    private function ensurePresentationRecorder(int $audioSsrc): ?CallRecorder
-    {
-        if (isset($this->presentationRecorders[$audioSsrc])) {
-            return $this->presentationRecorders[$audioSsrc];
-        }
-        $file = $this->pendingPresentationOutputs[$audioSsrc] ?? null;
-        if ($file === null) {
-            return null;
-        }
-        unset($this->pendingPresentationOutputs[$audioSsrc]);
-        $recorder = new CallRecorder($file, $this->presentationFormats[$audioSsrc] ?? RecordingFormat::Mkv);
-        $this->presentationRecorders[$audioSsrc] = $recorder;
+        $this->tellRecorderExpectedStreams($audioSsrc);
         return $recorder;
     }
 

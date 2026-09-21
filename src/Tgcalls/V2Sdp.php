@@ -28,9 +28,14 @@ use danog\MadelineProto\Exception;
  * DTLS fingerprint, and `NegotiateChannels` carries one `MediaContent` per stream, describing its
  * SSRC, payload types and header extensions.
  *
- * Since MadelineProto drives a standard peer connection, this reads those messages out of the local
- * SDP offer and synthesizes the matching remote description from the peer's, exactly like
- * {@see GroupSdp} does for the group call SFU.
+ * tgcalls' model (see its `ContentNegotiationContext`) is one-directional per channel: every party
+ * offers only its *outgoing* channels, each identified by its SSRC and carrying that party's own
+ * payload type numbers, and the other party answers by echoing them. A call therefore has separate
+ * send and receive channels, never a shared bidirectional one. MadelineProto drives a standard peer
+ * connection, so it mirrors this with one send-only m-line per outgoing channel and one receive-only
+ * m-line per channel of the peer: this class reads our offers out of the local SDP and synthesizes
+ * the remote description that expresses the peer's state, exactly like {@see GroupSdp} does for the
+ * group call SFU.
  *
  * @internal
  */
@@ -40,40 +45,47 @@ final class V2Sdp
     private const MID_EXTENSION_URI = 'urn:ietf:params:rtp-hdrext:sdes:mid';
 
     /**
-     * Rewrite each media section's `a=mid` to the SSRC it carries.
+     * Rewrite each media section's `a=mid` to the SSRC it carries, or to an explicitly given value.
      *
      * tgcalls' [InstanceV2Impl](https://github.com/TelegramMessenger/tgcalls) identifies every
      * channel by `contentIdBySsrc()`, i.e. the decimal SSRC string, and uses that as the m-line
      * `mid` both in the SDP it builds internally and — crucially — as the value it expects in the
-     * `sdes:mid` RTP header extension of incoming packets. It leaves the primary incoming video
-     * SSRC unsignaled and demultiplexes it purely by that MID, so a sender that stamps the plain
-     * m-line index (`0`, `1`, …) instead has all of its video dropped, while audio survives only
-     * because its SSRC happens to be bound. Aligning our mids with the SSRCs makes the MID our
-     * senders write match what the peer routes by, so the video is finally accepted.
+     * `sdes:mid` RTP header extension of incoming packets. Aligning our mids with the SSRCs makes
+     * the MID our senders write match what the peer routes by.
      *
      * Sections without an SSRC (a rejected m-line, or the data channel) keep their original mid.
+     *
+     * @param array<int, string> $midByIndex Explicit mids for given m-line indexes, taking precedence
+     *                                       over the SSRC rule: used for the receive-only m-lines,
+     *                                       whose mid is the *peer's* SSRC (their only SSRC line is
+     *                                       the unused local sender's).
      */
-    public static function useSsrcAsMid(string $sdp): string
+    public static function useSsrcAsMid(string $sdp, array $midByIndex = []): string
     {
-        // First pass: map each section's current mid to the SSRC it advertises.
-        $ssrcByMid = [];
+        // First pass: map each section's current mid to the mid it should have.
+        $newMidByMid = [];
         $currentMid = null;
+        $index = -1;
         foreach (self::lines($sdp) as $line) {
             if (str_starts_with($line, 'm=')) {
                 $currentMid = null;
+                $index++;
             } elseif (str_starts_with($line, 'a=mid:')) {
                 $currentMid = substr($line, 6);
+                if (isset($midByIndex[$index])) {
+                    $newMidByMid[$currentMid] = $midByIndex[$index];
+                }
             } elseif ($currentMid !== null
-                && !isset($ssrcByMid[$currentMid])
+                && !isset($newMidByMid[$currentMid])
                 && str_starts_with($line, 'a=ssrc:')
             ) {
                 $ssrc = explode(' ', substr($line, 7))[0];
                 if ($ssrc !== '') {
-                    $ssrcByMid[$currentMid] = $ssrc;
+                    $newMidByMid[$currentMid] = $ssrc;
                 }
             }
         }
-        if ($ssrcByMid === []) {
+        if ($newMidByMid === []) {
             return $sdp;
         }
 
@@ -82,11 +94,13 @@ final class V2Sdp
         foreach (self::lines($sdp) as $line) {
             if (str_starts_with($line, 'a=mid:')) {
                 $mid = substr($line, 6);
-                $out[] = 'a=mid:'.($ssrcByMid[$mid] ?? $mid);
+                $out[] = 'a=mid:'.($newMidByMid[$mid] ?? $mid);
             } elseif (str_starts_with($line, 'a=group:BUNDLE')) {
+                // NB: a plain array_filter() would drop the mid "0" (a falsy string) and unbundle
+                // the first m-line, so the filter must only remove empty strings.
                 $mids = array_map(
-                    static fn (string $mid): string => $ssrcByMid[$mid] ?? $mid,
-                    array_filter(explode(' ', substr($line, \strlen('a=group:BUNDLE '))))
+                    static fn (string $mid): string => $newMidByMid[$mid] ?? $mid,
+                    array_filter(explode(' ', substr($line, \strlen('a=group:BUNDLE '))), static fn (string $mid): bool => $mid !== '')
                 );
                 $out[] = 'a=group:BUNDLE '.implode(' ', $mids);
             } else {
@@ -106,12 +120,41 @@ final class V2Sdp
      */
     public static function contentsFromOffer(string $offer, bool $outgoingOnly = false): array
     {
+        $result = [];
+        foreach (self::sections($offer) as $section) {
+            $include = !$outgoingOnly || self::isSending($section);
+            $content = self::contentOfSection($section);
+            if ($include) {
+                $result[] = $content;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * The mid of every m-line of an SDP, in order (null where a section has none).
+     *
+     * @return list<?string>
+     */
+    public static function mids(string $sdp): array
+    {
+        return array_map(static fn (array $section): ?string => \is_string($section['_mid']) ? $section['_mid'] : null, self::sections($sdp));
+    }
+
+    /**
+     * Parse every media section of an SDP into a `MediaContent` plus the m-line's own attributes.
+     *
+     * @return list<array<string, mixed>> Contents carrying the extra `_port`, `_direction` and `_mid`
+     *                                    keys, which {@see self::contentOfSection()} strips.
+     */
+    private static function sections(string $sdp): array
+    {
         /** @var list<array<string, mixed>> $contents */
         $contents = [];
         /** @var array<string, mixed>|null $current */
         $current = null;
 
-        foreach (self::lines($offer) as $line) {
+        foreach (self::lines($sdp) as $line) {
             if (str_starts_with($line, 'm=')) {
                 if ($current !== null) {
                     $contents[] = $current;
@@ -126,6 +169,7 @@ final class V2Sdp
                     'ssrcGroups' => [],
                     '_port' => (int) ($parts[1] ?? 0),
                     '_direction' => 'sendrecv',
+                    '_mid' => null,
                 ];
                 continue;
             }
@@ -134,6 +178,10 @@ final class V2Sdp
             }
             if (\in_array($line, ['a=sendrecv', 'a=sendonly', 'a=recvonly', 'a=inactive'], true)) {
                 $current['_direction'] = substr($line, 2);
+                continue;
+            }
+            if (str_starts_with($line, 'a=mid:')) {
+                $current['_mid'] = substr($line, 6);
                 continue;
             }
             if (str_starts_with($line, 'a=ssrc:') && $current['ssrc'] === '0') {
@@ -148,7 +196,7 @@ final class V2Sdp
                 // appears in no group is left unsignaled and demultiplexed purely by MID, a path that
                 // silently drops the stream here. Echoing the FID group (primary + RTX) makes the peer
                 // latch our SSRC and route the video by it, exactly like a real tgcalls sender does.
-                $groupParts = array_values(array_filter(explode(' ', substr($line, \strlen('a=ssrc-group:')))));
+                $groupParts = array_values(array_filter(explode(' ', substr($line, \strlen('a=ssrc-group:'))), static fn (string $part): bool => $part !== ''));
                 $semantics = array_shift($groupParts);
                 $ssrcs = [];
                 foreach ($groupParts as $groupSsrc) {
@@ -190,23 +238,37 @@ final class V2Sdp
         if ($current !== null) {
             $contents[] = $current;
         }
+        return $contents;
+    }
 
-        $result = [];
-        foreach ($contents as $content) {
-            $include = !$outgoingOnly || (
-                $content['_port'] !== 0
-                && \in_array($content['_direction'], ['sendrecv', 'sendonly'], true)
-            );
-            unset($content['_port'], $content['_direction']);
-            // Only carry ssrcGroups when there actually are any, matching tgcalls' own messages.
-            if (($content['ssrcGroups'] ?? []) === []) {
-                unset($content['ssrcGroups']);
-            }
-            if ($include) {
-                $result[] = $content;
-            }
+    /**
+     * Whether a parsed section is one we transmit on.
+     *
+     * @param array<string, mixed> $section
+     *
+     * @psalm-pure
+     */
+    private static function isSending(array $section): bool
+    {
+        return $section['_port'] !== 0 && \in_array($section['_direction'], ['sendrecv', 'sendonly'], true);
+    }
+
+    /**
+     * The `MediaContent` of a parsed section, without the section-level bookkeeping.
+     *
+     * @param array<string, mixed> $section
+     * @return array<string, mixed>
+     *
+     * @psalm-pure
+     */
+    private static function contentOfSection(array $section): array
+    {
+        unset($section['_port'], $section['_direction'], $section['_mid']);
+        // Only carry ssrcGroups when there actually are any, matching tgcalls' own messages.
+        if (($section['ssrcGroups'] ?? []) === []) {
+            unset($section['ssrcGroups']);
         }
-        return $result;
+        return $section;
     }
 
     /**
@@ -284,17 +346,32 @@ final class V2Sdp
     }
 
     /**
-     * Synthesize the remote description out of the peer's `InitialSetup` and `NegotiateChannels`.
+     * Synthesize the remote description that expresses the whole negotiated state of the call.
+     *
+     * Every m-line of our own offer (the template) is described from the peer's point of view:
+     *
+     *  - an m-line that carries one of the *peer's* channels (`$recvContents`) is `a=sendonly`
+     *    (the peer sends), with the peer's own SSRC and payload types;
+     *  - an m-line we transmit on is `a=recvonly` (the peer receives), with the payload types the
+     *    peer accepted for it (`$sendContents`), or with our own if it has not answered yet;
+     *  - anything else is inactive: rejected (port 0) in an answer, kept reusable in an offer.
+     *
+     * The two directions never share an m-line, so each keeps its own payload type numbering —
+     * the peer sends with its numbers and expects ours on what we send, just like tgcalls.
      *
      * @param string               $offer        Our own local offer, used as the m-line template.
      * @param array<string, mixed> $initialSetup The peer's `InitialSetup` message.
-     * @param list<array>          $contents     The peer's `MediaContent` list.
+     * @param array<string, array> $sendContents The peer's answer for our outgoing channels, keyed by
+     *                                           our SSRC (decimal string).
+     * @param array<string, array> $recvContents The peer's outgoing channels, keyed by the mid of the
+     *                                           receive-only m-line that carries each of them.
      * @param bool                 $answer       Whether the result is an answer to our offer.
      */
     public static function buildRemoteDescription(
         string $offer,
         array $initialSetup,
-        array $contents,
+        array $sendContents,
+        array $recvContents,
         bool $answer
     ): string {
         $ufrag = (string) ($initialSetup['ufrag'] ?? '');
@@ -317,142 +394,146 @@ final class V2Sdp
             $setup = 'active';
         }
 
+        // Session-level lines are copied verbatim (they include the BUNDLE group).
         $result = [];
-        $index = 0;
-        $inMedia = false;
-        $pending = [];
-        $offeredContents = self::contentsFromOffer($offer);
-        $mappedContents = [];
-        $usedContents = [];
-        foreach ($offeredContents as $mediaIndex => $offeredContent) {
-            $offeredSsrc = (string) ($offeredContent['ssrc'] ?? '0');
-            if ($offeredSsrc !== '0') {
-                foreach ($contents as $contentIndex => $content) {
-                    if (!isset($usedContents[$contentIndex]) && (string) ($content['ssrc'] ?? '0') === $offeredSsrc) {
-                        $mappedContents[$mediaIndex] = $content;
-                        $usedContents[$contentIndex] = true;
-                        continue 2;
-                    }
-                }
+        foreach (self::lines($offer) as $line) {
+            if (str_starts_with($line, 'm=')) {
+                break;
             }
-            foreach ($contents as $contentIndex => $content) {
-                if (!isset($usedContents[$contentIndex]) && ($content['type'] ?? null) === ($offeredContent['type'] ?? null)) {
-                    $mappedContents[$mediaIndex] = $content;
-                    $usedContents[$contentIndex] = true;
-                    continue 2;
-                }
-            }
-            $mappedContents[$mediaIndex] = null;
+            $result[] = $line;
         }
-        $appendRtp = static function (array $content) use (&$result): void {
-            // tgcalls demultiplexes the unsignaled incoming video purely by the sdes:mid RTP
-            // extension, yet its answers never echo that extension back. Re-advertising it here (at
-            // tgcalls' fixed id 1) keeps it in the mutual set so our senders actually stamp the mid;
-            // without it the offer/answer intersection drops it and all video is silently discarded.
-            $extensions = $content['rtpExtensions'] ?? [];
-            $hasMid = array_any(
-                $extensions,
-                static fn (array $extension): bool => ($extension['uri'] ?? '') === self::MID_EXTENSION_URI
-            );
-            if (!$hasMid) {
-                $result[] = 'a=extmap:1 '.self::MID_EXTENSION_URI;
+
+        foreach (self::sections($offer) as $section) {
+            $kind = $section['type'] === 'video' ? 'video' : 'audio';
+            /** @var ?string $mid */
+            $mid = $section['_mid'];
+            /** @var ?array<string, mixed> $recv */
+            $recv = $mid !== null ? ($recvContents[$mid] ?? null) : null;
+            if ($recv !== null) {
+                $content = $recv;
+                $direction = 'sendonly';
+            } elseif (self::isSending($section)) {
+                /** @var array<string, mixed> $content */
+                $content = $sendContents[(string) $section['ssrc']] ?? self::contentOfSection($section);
+                $direction = 'recvonly';
+            } else {
+                $content = self::contentOfSection($section);
+                $direction = 'inactive';
             }
-            foreach ($extensions as $extension) {
-                $result[] = 'a=extmap:'.$extension['id'].' '.$extension['uri'];
-            }
+
+            $formats = [];
             foreach ($content['payloadTypes'] ?? [] as $payloadType) {
-                $line = 'a=rtpmap:'.$payloadType['id'].' '.$payloadType['name'].'/'.$payloadType['clockrate'];
-                if (($payloadType['channels'] ?? 0) > 1) {
-                    $line .= '/'.$payloadType['channels'];
-                }
-                $result[] = $line;
-                foreach ($payloadType['feedbackTypes'] ?? [] as $feedback) {
-                    $result[] = trim('a=rtcp-fb:'.$payloadType['id'].' '.$feedback['type'].' '.($feedback['subtype'] ?? ''));
-                }
-                $parameters = (array) ($payloadType['parameters'] ?? []);
-                if ($parameters !== []) {
-                    $pairs = [];
-                    foreach ($parameters as $key => $value) {
-                        $pairs[] = $key.'='.$value;
-                    }
-                    $result[] = 'a=fmtp:'.$payloadType['id'].' '.implode(';', $pairs);
-                }
+                $formats[] = (string) $payloadType['id'];
             }
-        };
+            $formatList = $formats === [] ? '0' : implode(' ', $formats);
 
-        $flush = static function () use (&$result, &$pending, &$index, $answer, $offeredContents, $mappedContents, $appendRtp, $fingerprints, $ufrag, $pwd, $setup): void {
-            if ($pending === []) {
-                return;
-            }
-            $content = $mappedContents[$index] ?? null;
-            $offeredContent = $offeredContents[$index] ?? null;
-            $index++;
-            $result = array_merge($result, $pending);
-            $pending = [];
-
-            if ($content === null) {
-                // Answers reject an unaccepted m-line. A renegotiation offer instead keeps an
+            if ($direction === 'inactive' && $answer) {
+                // Answers reject an unaccepted m-line; a renegotiation offer instead keeps an
                 // inactive, reusable section, matching tgcalls' persistent channel ordering.
-                $result[] = 'a=inactive';
-                if (!$answer && $offeredContent !== null) {
-                    $result[] = 'a=rtcp-mux';
-                    $result[] = 'a=rtcp:9 IN IP4 0.0.0.0';
-                    $appendRtp($offeredContent);
-                    $result[] = 'a=ice-ufrag:'.$ufrag;
-                    $result[] = 'a=ice-pwd:'.$pwd;
-                    $result = array_merge($result, $fingerprints);
-                    $result[] = 'a=setup:'.$setup;
+                $result[] = 'm='.$kind.' 0 UDP/TLS/RTP/SAVPF '.$formatList;
+                $result[] = 'c=IN IP4 0.0.0.0';
+                if ($mid !== null) {
+                    $result[] = 'a=mid:'.$mid;
                 }
-                return;
+                $result[] = 'a=inactive';
+                continue;
             }
 
-            $result[] = 'a=sendrecv';
+            $result[] = 'm='.$kind.' 9 UDP/TLS/RTP/SAVPF '.$formatList;
+            $result[] = 'c=IN IP4 0.0.0.0';
+            if ($mid !== null) {
+                $result[] = 'a=mid:'.$mid;
+            }
+            $result[] = 'a='.$direction;
             $result[] = 'a=rtcp-mux';
             $result[] = 'a=rtcp:9 IN IP4 0.0.0.0';
-            $appendRtp($content);
+            self::appendRtp($result, $content);
             $result[] = 'a=ice-ufrag:'.$ufrag;
             $result[] = 'a=ice-pwd:'.$pwd;
             $result = array_merge($result, $fingerprints);
             $result[] = 'a=setup:'.$setup;
-            $ssrc = (int) ($content['ssrc'] ?? 0);
-            if ($ssrc !== 0) {
-                $result[] = 'a=ssrc:'.$ssrc.' cname:tgcalls'.$ssrc;
-            }
-        };
-
-        foreach (self::lines($offer) as $line) {
-            if (str_starts_with($line, 'm=')) {
-                $flush();
-                $inMedia = true;
-                $content = $mappedContents[$index] ?? null;
-                $formats = [];
-                foreach ($content['payloadTypes'] ?? [] as $payloadType) {
-                    $formats[] = (string) $payloadType['id'];
-                }
-                $kind = explode(' ', substr($line, 2))[0];
-                if ($content === null && $answer) {
-                    $parts = explode(' ', $line);
-                    $parts[1] = '0';
-                    $pending[] = implode(' ', $parts);
-                } elseif ($content === null) {
-                    $pending[] = $line;
-                } else {
-                    $pending[] = 'm='.$kind.' 9 UDP/TLS/RTP/SAVPF '.($formats === [] ? '0' : implode(' ', $formats));
-                }
-                $pending[] = 'c=IN IP4 0.0.0.0';
-                continue;
-            }
-            if (!$inMedia) {
-                $result[] = $line;
-                continue;
-            }
-            if (str_starts_with($line, 'a=mid:')) {
-                $pending[] = $line;
+            if ($direction === 'sendonly') {
+                self::appendSsrcs($result, $content);
             }
         }
-        $flush();
 
         return implode("\r\n", $result)."\r\n";
+    }
+
+    /**
+     * Append the payload type and header extension lines of a content.
+     *
+     * @param list<string>         $result
+     * @param array<string, mixed> $content
+     */
+    private static function appendRtp(array &$result, array $content): void
+    {
+        // tgcalls demultiplexes the unsignaled incoming video purely by the sdes:mid RTP
+        // extension, yet its answers never echo that extension back. Re-advertising it here (at
+        // tgcalls' fixed id 1) keeps it in the mutual set so our senders actually stamp the mid;
+        // without it the offer/answer intersection drops it and all video is silently discarded.
+        $extensions = $content['rtpExtensions'] ?? [];
+        $hasMid = array_any(
+            $extensions,
+            static fn (array $extension): bool => ($extension['uri'] ?? '') === self::MID_EXTENSION_URI
+        );
+        if (!$hasMid) {
+            $result[] = 'a=extmap:1 '.self::MID_EXTENSION_URI;
+        }
+        foreach ($extensions as $extension) {
+            $result[] = 'a=extmap:'.$extension['id'].' '.$extension['uri'];
+        }
+        foreach ($content['payloadTypes'] ?? [] as $payloadType) {
+            $line = 'a=rtpmap:'.$payloadType['id'].' '.$payloadType['name'].'/'.$payloadType['clockrate'];
+            if (($payloadType['channels'] ?? 0) > 1) {
+                $line .= '/'.$payloadType['channels'];
+            }
+            $result[] = $line;
+            foreach ($payloadType['feedbackTypes'] ?? [] as $feedback) {
+                $result[] = trim('a=rtcp-fb:'.$payloadType['id'].' '.$feedback['type'].' '.($feedback['subtype'] ?? ''));
+            }
+            $parameters = (array) ($payloadType['parameters'] ?? []);
+            if ($parameters !== []) {
+                $pairs = [];
+                foreach ($parameters as $key => $value) {
+                    $pairs[] = $key.'='.$value;
+                }
+                $result[] = 'a=fmtp:'.$payloadType['id'].' '.implode(';', $pairs);
+            }
+        }
+    }
+
+    /**
+     * Append the SSRC lines of a channel the peer sends: its primary SSRC first, then the SSRC
+     * groups (FID: primary + retransmission) so the RTX stream is bound to it too.
+     *
+     * @param list<string>         $result
+     * @param array<string, mixed> $content
+     */
+    private static function appendSsrcs(array &$result, array $content): void
+    {
+        $primary = (int) ($content['ssrc'] ?? 0);
+        if ($primary === 0) {
+            return;
+        }
+        $ssrcs = [$primary];
+        /** @var list<array{semantics: string, ssrcs: list<string>}> $groups */
+        $groups = (array) ($content['ssrcGroups'] ?? []);
+        foreach ($groups as $group) {
+            $groupSsrcs = array_map(intval(...), $group['ssrcs']);
+            if ($groupSsrcs === []) {
+                continue;
+            }
+            $result[] = 'a=ssrc-group:'.$group['semantics'].' '.implode(' ', $groupSsrcs);
+            foreach ($groupSsrcs as $ssrc) {
+                if (!\in_array($ssrc, $ssrcs, true)) {
+                    $ssrcs[] = $ssrc;
+                }
+            }
+        }
+        foreach ($ssrcs as $ssrc) {
+            $result[] = 'a=ssrc:'.$ssrc.' cname:tgcalls'.$primary;
+        }
     }
 
     /**

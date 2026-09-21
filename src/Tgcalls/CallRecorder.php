@@ -19,74 +19,137 @@ namespace danog\MadelineProto\Tgcalls;
 use Amp\ByteStream\WritableStream;
 use Amp\Pipeline\ConcurrentIterator;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MatroskaWriter;
 use danog\MadelineProto\RecordingFormat;
 use Revolt\EventLoop;
+use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
 
 /**
- * Records the incoming audio and video of a call into a Matroska (.mkv) file, in pure PHP.
+ * Records the incoming media of one party of a call into Matroska (.mkv) files, in pure PHP.
  *
- * Both receivers run in raw mode, so the already-encoded OPUS audio and video frames that arrive
+ * The receivers run in raw mode, so the already-encoded OPUS audio and video frames that arrive
  * over RTP are muxed straight into the file by {@see MatroskaWriter} without any decoding, ffmpeg,
  * CLI tool or FFI. The video codec, keyframe flags and picture size are recovered from the frames
  * themselves (see {@see self::describeVideo()}), since RTP does not carry them.
  *
- * The file header lists whatever tracks exist, so a call answered without a camera produces a valid
- * audio-only file. The header is written once the video track has been described from its first
- * frame, or, if no video has arrived, shortly after audio starts.
+ * A party has up to three streams — its microphone ({@see self::SLOT_AUDIO}), its camera
+ * ({@see self::SLOT_VIDEO}) and its screen share ({@see self::SLOT_PRESENTATION}) — and can turn each
+ * on and off at any time, in any combination. Matroska fixes the track list in the file header, so
+ * the recording is a *sequence of segments*: whenever the set of flowing streams changes (a stream
+ * starts or stops, or a video stream comes back with another codec or picture size), the current
+ * file is closed and a new one is opened, whose tracks are exactly the streams flowing from then on.
+ * Segment files are named `<stem>.<n>_<streams>.mkv` (or `.webm`): `n` counts from 0 and `streams`
+ * lists what the file holds — `audio`, `video` (the camera) and `screen`, joined by commas — so
+ * `call.mkv` yields `call.0_audio.mkv`, `call.1_audio,video.mkv`, … and a stem ending in `/` (a
+ * directory) yields `dir/0_audio.mkv`, …. A stream output cannot be rolled over, so it keeps its
+ * initial tracks and drops what does not fit.
+ *
+ * Which streams to expect is told by whoever routes the media (from the peer's media state, or a
+ * group call participant's flags, see {@see self::setExpected()}); the header of a segment is
+ * committed once every expected stream has been seen, or after a short grace period.
  *
  * @internal
  */
 final class CallRecorder
 {
-    /** Grace period (seconds) to wait for a first video frame before committing an audio-only file. */
-    private const VIDEO_WAIT = 2.0;
+    public const SLOT_AUDIO = 'audio';
+    public const SLOT_VIDEO = MatroskaWriter::SLOT_VIDEO;
+    public const SLOT_PRESENTATION = MatroskaWriter::SLOT_PRESENTATION;
+    private const VIDEO_SLOTS = [self::SLOT_VIDEO, self::SLOT_PRESENTATION];
+    private const SLOTS = [self::SLOT_AUDIO, self::SLOT_VIDEO, self::SLOT_PRESENTATION];
 
-    private MatroskaWriter $writer;
-    private bool $started = false;
+    /** Grace period (seconds) to wait for an expected stream before committing a segment without it. */
+    private const GRACE = 2.0;
+
+    private ?MatroskaWriter $writer = null;
     private bool $closed = false;
-    private ?float $firstAudioAt = null;
+    /** Whether the current segment's header has been written. */
+    private bool $started = false;
+    /** How many segments were rolled so far (0: still on the base file). */
+    private int $segment = 0;
+    /** Wall clock of the first frame buffered for the segment being opened, for the grace period. */
+    private ?float $waitingSince = null;
 
     private ?RemoteStreamTrack $audioTrack = null;
-    private ?RemoteStreamTrack $videoTrack = null;
+    /** @var array<string, RemoteStreamTrack> Video tracks drained by the recorder itself, by slot. */
+    private array $videoTracks = [];
     private ?ConcurrentIterator $audioConsumer = null;
-    private ?ConcurrentIterator $videoConsumer = null;
+    /** @var array<string, ConcurrentIterator> */
+    private array $videoConsumers = [];
 
-    /** @var list<array{data: string, ms: int}> Audio buffered until the header is written. */
-    private array $audioBuffer = [];
-    /** @var list<array{data: string, ms: int, keyframe: bool}> Video buffered until the header is written. */
-    private array $videoBuffer = [];
+    /**
+     * Which streams the party is currently sending, as far as signaling tells: true expected, false
+     * not, null unknown. A stream that stops is dropped from the next segment right away; one that
+     * starts joins it once its first (key)frame arrives.
+     *
+     * @var array<string, ?bool>
+     */
+    private array $expected = [self::SLOT_AUDIO => null, self::SLOT_VIDEO => null, self::SLOT_PRESENTATION => null];
+    /**
+     * The video tracks described so far, by slot: what a segment opened now would declare.
+     *
+     * @var array<string, array{codecId: string, width: int, height: int, private: string}>
+     */
+    private array $described = [];
+    /** @var array<string, int> The source (track) each slot's frames currently come from. */
+    private array $sources = [];
+    /** @var array<string, ?int> The first RTP timestamp of each slot's current source. */
+    private array $baseTs = [];
+    /** @var array<string, int> Offset (ms) placing each slot's current source on the recording's clock. */
+    private array $offsetMs = [];
+    /** @var array<string, int> The last timestamp (ms) written per slot. */
+    private array $lastMs = [];
+    /** @var array<string, list<array{data: string, ms: int, keyframe: bool}>> Frames buffered until the header is written. */
+    private array $buffers = [];
+    /** Whether the set of flowing streams changed and the next frame must go to a new segment. */
+    private bool $rollPending = false;
+    /** Whether the stream output was already told that it cannot follow a stream change. */
+    private bool $warnedUnrollable = false;
 
-    private ?int $videoBaseTs = null;
-    private ?int $audioBaseTs = null;
-
-    /** The peer's advertised video state (from its MediaState): true has video, false none, null unknown. */
-    private ?bool $remoteHasVideo = null;
-    /** How many extra segment files were rolled (a track appearing mid-recording forces a new file). */
-    private int $segment = 0;
-
-    /** The file being recorded to, or null for a stream (which cannot survive a serialize cycle). */
+    /** The file the recording was requested to, or null for a stream (which cannot survive a serialize cycle). */
     public readonly ?LocalFile $file;
+    /** The segment file stem: the requested file without its extension, or a directory with its trailing `/`. */
+    private string $stem = '';
+    private WritableStream|LocalFile $out;
+    private RecordingFormat $format;
 
+    /**
+     * @param LocalFile|WritableStream $out The file to record to (`name.mkv` gives `name.<n>_<streams>.mkv`
+     *                                      segments; a path ending in `/` gives `<n>_<streams>.mkv` files in
+     *                                      that directory), or a stream.
+     */
     public function __construct(LocalFile|WritableStream $out, RecordingFormat $format = RecordingFormat::Mkv)
     {
         $this->file = $out instanceof LocalFile ? $out : null;
-        $this->writer = new MatroskaWriter($out, $format->docType());
-        $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
+        $this->out = $out;
+        $this->format = $format;
+        if ($out instanceof LocalFile) {
+            $path = $out->file;
+            if (str_ends_with($path, '/')) {
+                $this->stem = $path;
+            } else {
+                $dot = strrpos(basename($path), '.');
+                $this->stem = $dot === false ? $path : substr($path, 0, \strlen($path) - \strlen(basename($path)) + $dot);
+            }
+        }
     }
 
     /**
      * Drop the live track subscriptions (not serializable); the writer serializes itself and reopens
-     * its file. {@see self::__unserialize()} re-subscribes to the resumed tracks and keeps recording.
+     * its file. {@see self::resume()} re-subscribes to the resumed tracks and keeps recording.
      *
      * @psalm-mutation-free
      */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        unset($vars['audioConsumer'], $vars['videoConsumer']);
+        unset($vars['audioConsumer'], $vars['videoConsumers']);
+        if ($this->file === null) {
+            unset($vars['out']);
+        }
         return $vars;
     }
 
@@ -100,7 +163,10 @@ final class CallRecorder
             $this->{$key} = $value;
         }
         $this->audioConsumer = null;
-        $this->videoConsumer = null;
+        $this->videoConsumers = [];
+        if (!isset($this->out) && $this->file !== null) {
+            $this->out = $this->file;
+        }
     }
 
     /**
@@ -113,209 +179,466 @@ final class CallRecorder
         if ($this->closed) {
             return;
         }
-        $this->writer->resume();
+        $this->writer?->resume();
         if ($this->audioTrack !== null && $this->audioConsumer === null) {
             $this->audioConsumer = $this->audioTrack->getConsumer();
             EventLoop::queue($this->drainAudio(...));
         }
-        if ($this->videoTrack !== null && $this->videoConsumer === null) {
-            $this->videoConsumer = $this->videoTrack->getConsumer();
-            EventLoop::queue($this->drainVideo(...));
+        foreach ($this->videoTracks as $slot => $track) {
+            if (!isset($this->videoConsumers[$slot])) {
+                $this->videoConsumers[$slot] = $track->getConsumer();
+                EventLoop::queue(fn () => $this->drainVideo($slot));
+            }
         }
     }
 
     /**
-     * Attach an incoming track. Audio and video are handled as they arrive.
+     * Attach an incoming track, whose frames are then drained by the recorder itself. Video may
+     * alternatively be pushed frame by frame (see {@see self::pushVideoFrame()}) by whoever routes
+     * the incoming video between slots and recorders.
+     *
+     * @param string $slot For a video track, whether it is the camera or the screen share.
      */
-    public function setTrack(RemoteStreamTrack $track): void
+    public function setTrack(RemoteStreamTrack $track, string $slot = self::SLOT_VIDEO): void
     {
         if ($this->closed) {
             return;
         }
-        \danog\MadelineProto\Logger::log('RECDEBUG CallRecorder::setTrack kind='.$track->getKind()->name, \danog\MadelineProto\Logger::ERROR); // RECDEBUG
-        if ($track->getKind() === MediaKind::Video) {
-            if ($this->videoTrack === $track) {
-                return;
-            }
-            $this->videoTrack = $track;
-            $this->videoConsumer = $track->getConsumer();
-            EventLoop::queue($this->drainVideo(...));
-        } else {
+        if ($track->getKind() === MediaKind::Audio) {
             if ($this->audioTrack === $track) {
                 return;
             }
             $this->audioTrack = $track;
             $this->audioConsumer = $track->getConsumer();
             EventLoop::queue($this->drainAudio(...));
+            return;
+        }
+        \assert(\in_array($slot, self::VIDEO_SLOTS, true));
+        if (($this->videoTracks[$slot] ?? null) === $track) {
+            return;
+        }
+        $this->videoTracks[$slot] = $track;
+        $this->videoConsumers[$slot] = $track->getConsumer();
+        EventLoop::queue(fn () => $this->drainVideo($slot));
+    }
+
+    /**
+     * A stable identifier of a track, to tell its frames apart from those of another one.
+     *
+     * @psalm-pure
+     */
+    public static function sourceOf(RemoteStreamTrack $track): int
+    {
+        return crc32($track->getId());
+    }
+
+    /**
+     * Tell the recorder which streams the party is sending, as signaling reports it (null leaves a
+     * stream's expectation unchanged). A stream reported off is dropped from the next segment at
+     * once; one reported on is waited for before a segment is committed.
+     */
+    public function setExpected(?bool $audio = null, ?bool $video = null, ?bool $presentation = null): void
+    {
+        if ($this->closed) {
+            return;
+        }
+        $changed = false;
+        foreach ([self::SLOT_AUDIO => $audio, self::SLOT_VIDEO => $video, self::SLOT_PRESENTATION => $presentation] as $slot => $value) {
+            if ($value === null || $this->expected[$slot] === $value) {
+                continue;
+            }
+            $this->expected[$slot] = $value;
+            $changed = true;
+            if (!$value && $slot !== self::SLOT_AUDIO) {
+                // The stream is gone; when it comes back it is a new track, to be described afresh.
+                unset($this->described[$slot], $this->sources[$slot], $this->baseTs[$slot], $this->buffers[$slot]);
+            } elseif (!$value) {
+                unset($this->buffers[$slot]);
+            }
+        }
+        if (!$changed) {
+            return;
+        }
+        if ($this->started) {
+            // Something stopped or started: re-evaluate the segment as soon as the state is stable.
+            $this->rollPending = true;
+            $this->waitingSince = microtime(true);
+            $this->maybeRoll();
+        } else {
+            $this->maybeBegin();
         }
     }
 
     /**
-     * Tell the recorder whether the peer is transmitting video, from its MediaState. When it is not,
-     * and audio is already buffered, the audio-only header is committed immediately rather than after
-     * the grace period — replacing the blind wait with a deterministic signal.
+     * Compatibility shim: whether the party is transmitting camera video.
      */
     public function setRemoteHasVideo(bool $hasVideo): void
     {
-        $this->remoteHasVideo = $hasVideo;
-        if (!$hasVideo && !$this->started && !$this->closed && $this->audioBuffer !== []) {
-            $this->begin();
-        }
+        $this->setExpected(video: $hasVideo);
     }
 
     private function drainAudio(): void
     {
         $consumer = $this->audioConsumer;
-        if ($consumer === null) {
+        $track = $this->audioTrack;
+        if ($consumer === null || $track === null) {
             return;
         }
-        $n = 0; // RECDEBUG
+        $source = self::sourceOf($track);
         foreach ($consumer as $frame) {
             if ($this->closed) {
                 return;
             }
-            if (++$n % 100 === 1) {
-                \danog\MadelineProto\Logger::log("RECDEBUG drainAudio n=$n", \danog\MadelineProto\Logger::ERROR);
-            } // RECDEBUG
-            $ts = $frame->getTimestamp();
-            $this->audioBaseTs ??= $ts;
-            $ms = (int) (($ts - $this->audioBaseTs) * 1000 / 48000);
-            $this->firstAudioAt ??= microtime(true);
-            if ($this->started) {
-                $this->writer->writeAudio($frame->getData(), $ms);
-            } else {
-                $this->audioBuffer[] = ['data' => $frame->getData(), 'ms' => $ms];
-                // Commit the header as soon as we KNOW the peer is not sending video (from its
-                // MediaState), instead of blindly waiting; the timed grace period is only a backstop
-                // for a peer that never announces its media state.
-                if ($this->remoteHasVideo === false
-                    || microtime(true) - $this->firstAudioAt > self::VIDEO_WAIT
-                ) {
-                    $this->begin();
-                }
+            if ($frame instanceof EncodedPacket) {
+                $this->pushAudioFrame($frame->getData(), $frame->getTimestamp(), $source);
             }
         }
     }
 
-    private function drainVideo(): void
+    private function drainVideo(string $slot): void
     {
-        $consumer = $this->videoConsumer;
-        if ($consumer === null) {
+        $consumer = $this->videoConsumers[$slot] ?? null;
+        $track = $this->videoTracks[$slot] ?? null;
+        if ($consumer === null || $track === null) {
             return;
         }
-        $n = 0; // RECDEBUG
+        $source = self::sourceOf($track);
         foreach ($consumer as $frame) {
-            if ($this->closed) {
+            if ($this->closed || ($this->videoTracks[$slot] ?? null) !== $track) {
                 return;
             }
-            if (++$n % 60 === 1) {
-                \danog\MadelineProto\Logger::log("RECDEBUG drainVideo n=$n", \danog\MadelineProto\Logger::ERROR);
-            } // RECDEBUG
-            $data = $frame->getData();
-            if ($data === '') {
-                continue;
-            }
-            $ts = $frame->getTimestamp();
-            $this->videoBaseTs ??= $ts;
-            $ms = (int) (($ts - $this->videoBaseTs) * 1000 / 90000);
-
-            if (!$this->writer->hasVideoTrack()) {
-                // Describe the video track from its first frame.
-                [$codecId, $width, $height, $private] = self::describeVideo($data);
-                if ($this->started) {
-                    // The header was already committed without a video track — a peer turned its
-                    // camera on mid-call. Matroska (like MP4/MOV) fixes its track list at the header,
-                    // so we cannot add one to the open file; roll to a new segment file that declares
-                    // both tracks. A late video for a stream output is simply dropped (can't segment).
-                    if (!$this->rollSegment($codecId, $width, $height, $private)) {
-                        continue;
-                    }
-                } else {
-                    // No header yet: describe the track and commit the header with both tracks.
-                    $this->writer->setVideoTrack($codecId, $width, $height, $private);
-                    $this->begin();
-                }
-            }
-
-            [$out, $keyframe] = self::transformVideo($this->writer, $data);
-            if ($out === '') {
-                continue;
-            }
-            if ($this->started) {
-                $this->writer->writeVideo($out, $ms, $keyframe);
-            } else {
-                $this->videoBuffer[] = ['data' => $out, 'ms' => $ms, 'keyframe' => $keyframe];
+            if ($frame instanceof EncodedPacket) {
+                $this->pushVideoFrame($frame->getData(), $frame->getTimestamp(), $source, $slot);
             }
         }
     }
 
     /**
-     * Write the header and flush everything buffered so far, ordered by timestamp.
+     * Record one incoming OPUS frame.
+     *
+     * @param int $rtpTimestamp The frame's RTP timestamp (48 kHz clock).
+     * @param int $source       Identifies the track the frame belongs to.
      */
-    private function begin(): void
+    public function pushAudioFrame(string $data, int $rtpTimestamp, int $source = 0): void
+    {
+        if ($this->closed || $data === '') {
+            return;
+        }
+        $ms = $this->placeOnClock(self::SLOT_AUDIO, $source, $rtpTimestamp, 48000);
+        $this->handleFrame(self::SLOT_AUDIO, $data, $ms, true);
+    }
+
+    /**
+     * Record one incoming video frame (still encoded, as it came off RTP).
+     *
+     * @param int    $rtpTimestamp The frame's RTP timestamp (90 kHz clock).
+     * @param int    $source       Identifies the track the frame belongs to; a new source is placed on
+     *                             the recording's clock where it currently is.
+     * @param string $slot         Whether this is the camera or the screen share.
+     */
+    public function pushVideoFrame(string $data, int $rtpTimestamp, int $source = 0, string $slot = self::SLOT_VIDEO): void
+    {
+        if ($this->closed || $data === '') {
+            return;
+        }
+        \assert(\in_array($slot, self::VIDEO_SLOTS, true));
+        if ($this->expected[$slot] === false) {
+            return; // Signaling says this stream is off: a straggler.
+        }
+        $newSource = ($this->sources[$slot] ?? null) !== $source;
+        $ms = $this->placeOnClock($slot, $source, $rtpTimestamp, 90000);
+
+        [$out, $keyframe] = self::transformVideo($data, $newSource ? null : ($this->described[$slot]['codecId'] ?? null));
+        if ($out === '') {
+            return;
+        }
+        if (!isset($this->described[$slot]) || $newSource) {
+            // Describe the track from its first keyframe: only a keyframe carries the picture size
+            // (and the parameter sets), and a decoder can only start on one anyway. A new source
+            // (the peer's camera turned off and on again, a screen share) is described afresh, and
+            // its frames before that keyframe are useless.
+            if (!$keyframe) {
+                unset($this->sources[$slot]);
+                return;
+            }
+            [$codecId, $width, $height, $private] = self::describeVideo($data);
+            $description = ['codecId' => $codecId, 'width' => $width, 'height' => $height, 'private' => $private];
+            Logger::log("Incoming $slot track $source recorded as $codecId {$width}x{$height}", Logger::VERBOSE);
+            if ($description !== ($this->described[$slot] ?? null)) {
+                $this->described[$slot] = $description;
+                [$out, $keyframe] = self::transformVideo($data, $codecId);
+                if ($this->started && $this->writer?->getVideoTrack($slot) !== $description) {
+                    // Another codec or size than the open segment declares: it needs a new segment.
+                    $this->rollPending = true;
+                }
+            }
+        }
+        $this->sources[$slot] = $source;
+        $this->handleFrame($slot, $out, $ms, $keyframe);
+    }
+
+    /**
+     * Map a frame's RTP timestamp onto the recording's continuous millisecond clock.
+     */
+    private function placeOnClock(string $slot, int $source, int $rtpTimestamp, int $clockRate): int
+    {
+        if (($this->sources[$slot] ?? null) !== $source || !isset($this->baseTs[$slot])) {
+            // A new source starts where the recording currently is, not at its own random RTP time.
+            $this->baseTs[$slot] = $rtpTimestamp;
+            $this->offsetMs[$slot] = $this->positionMs();
+            $this->sources[$slot] = $source;
+        }
+        $ms = $this->offsetMs[$slot] + (int) ((($rtpTimestamp - $this->baseTs[$slot]) & 0xFFFFFFFF) * 1000 / $clockRate);
+        $this->lastMs[$slot] = $ms;
+        return $ms;
+    }
+
+    /**
+     * How far the recording has got, in milliseconds: the latest timestamp of any flowing stream.
+     */
+    private function positionMs(): int
+    {
+        return $this->lastMs === [] ? 0 : max($this->lastMs);
+    }
+
+    /**
+     * Write a frame of a slot into the current segment, opening or rolling segments as needed.
+     */
+    private function handleFrame(string $slot, string $data, int $ms, bool $keyframe): void
+    {
+        if ($this->expected[$slot] === false) {
+            // Signaling says this stream is off: a straggler, or a stream that came back before
+            // its state did — either way it is not part of any segment until the state says so.
+            return;
+        }
+        if ($this->started) {
+            if ($this->rollPending) {
+                $this->maybeRoll();
+            }
+            if ($this->writer !== null && $this->inSegment($slot)) {
+                $this->write($slot, $data, $ms, $keyframe);
+                return;
+            }
+            if (!$this->rollPending) {
+                // The segment lacks this stream: it just (re)appeared, so a new segment is due —
+                // unless the output is a stream, which cannot roll.
+                $this->rollPending = true;
+                $this->waitingSince = microtime(true);
+                $this->maybeRoll();
+                if ($this->started && $this->writer !== null && $this->inSegment($slot)) {
+                    $this->write($slot, $data, $ms, $keyframe);
+                    return;
+                }
+            }
+            // Keep it for the segment about to open.
+            $this->buffers[$slot][] = ['data' => $data, 'ms' => $ms, 'keyframe' => $keyframe];
+            return;
+        }
+        $this->buffers[$slot][] = ['data' => $data, 'ms' => $ms, 'keyframe' => $keyframe];
+        $this->waitingSince ??= microtime(true);
+        $this->maybeBegin();
+    }
+
+    /**
+     * Whether the current segment declares a track for a slot.
+     */
+    private function inSegment(string $slot): bool
+    {
+        if ($this->writer === null) {
+            return false;
+        }
+        return $slot === self::SLOT_AUDIO ? $this->writer->hasAudioTrack() : $this->writer->hasVideoTrack($slot);
+    }
+
+    private function write(string $slot, string $data, int $ms, bool $keyframe): void
+    {
+        \assert($this->writer !== null);
+        if ($slot === self::SLOT_AUDIO) {
+            $this->writer->writeAudio($data, $ms);
+        } else {
+            $this->writer->writeVideo($data, $ms, $keyframe, $slot);
+        }
+    }
+
+    /**
+     * The streams a segment opened now would carry: the ones not reported off, that have delivered
+     * something (audio) or been described (video).
+     *
+     * @return list<string>
+     */
+    private function flowingSlots(): array
+    {
+        $slots = [];
+        foreach (self::SLOTS as $slot) {
+            if ($this->expected[$slot] === false) {
+                continue;
+            }
+            $seen = $slot === self::SLOT_AUDIO ? (isset($this->sources[$slot]) || ($this->buffers[$slot] ?? []) !== []) : isset($this->described[$slot]);
+            if ($seen) {
+                $slots[] = $slot;
+            }
+        }
+        return $slots;
+    }
+
+    /**
+     * Whether some stream reported on has not delivered its first (key)frame yet.
+     */
+    private function awaitingExpected(): bool
+    {
+        foreach (self::SLOTS as $slot) {
+            if ($this->expected[$slot] !== true) {
+                continue;
+            }
+            $seen = $slot === self::SLOT_AUDIO ? (isset($this->sources[$slot]) || ($this->buffers[$slot] ?? []) !== []) : isset($this->described[$slot]);
+            if (!$seen) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function graceExpired(): bool
+    {
+        return $this->waitingSince !== null && microtime(true) - $this->waitingSince > self::GRACE;
+    }
+
+    /**
+     * Commit the header of the first segment once every expected stream is in, or the grace period
+     * for the missing ones has passed.
+     */
+    private function maybeBegin(): void
     {
         if ($this->started || $this->closed) {
             return;
         }
+        if ($this->awaitingExpected() && !$this->graceExpired()) {
+            return;
+        }
+        $slots = $this->flowingSlots();
+        if ($slots === []) {
+            return;
+        }
+        $this->openSegment($slots);
+    }
+
+    /**
+     * Move to a new segment if the flowing streams no longer match the open one — once every stream
+     * that was reported on has arrived, or the grace period for it has passed, so that a stream
+     * swapped for another (the camera for a screen share) yields one new segment, not two.
+     */
+    private function maybeRoll(): void
+    {
+        if (!$this->started || $this->closed || $this->writer === null) {
+            return;
+        }
+        if ($this->awaitingExpected() && !$this->graceExpired()) {
+            return;
+        }
+        $wanted = $this->flowingSlots();
+        $current = [];
+        foreach (self::SLOTS as $slot) {
+            if ($this->inSegment($slot)) {
+                $current[] = $slot;
+            }
+        }
+        $same = $wanted === $current;
+        foreach (self::VIDEO_SLOTS as $slot) {
+            if ($same && isset($this->described[$slot]) && \in_array($slot, $wanted, true)
+                && $this->writer->getVideoTrack($slot) !== $this->described[$slot]
+            ) {
+                $same = false;
+            }
+        }
+        $this->rollPending = false;
+        if ($same) {
+            return;
+        }
+        if ($this->file === null) {
+            if (!$this->warnedUnrollable) {
+                $this->warnedUnrollable = true;
+                Logger::log('The streams of a recording changed, but a stream output cannot be rolled over to a new file: keeping its initial tracks', Logger::WARNING);
+            }
+            return;
+        }
+        if ($wanted === []) {
+            // Everything stopped: close the segment; the next one opens when something arrives.
+            $this->writer->close();
+            $this->writer = null;
+            $this->started = false;
+            $this->waitingSince = null;
+            return;
+        }
+        $this->openSegment($wanted);
+    }
+
+    /**
+     * Open a segment declaring the given slots, and flush what was buffered for them.
+     *
+     * @param list<string> $slots
+     */
+    private function openSegment(array $slots): void
+    {
+        if ($this->writer !== null) {
+            $this->writer->close();
+            $this->writer = null;
+        }
+        $out = $this->out;
+        if ($this->file !== null) {
+            $out = new LocalFile($this->segmentPath($slots));
+            $this->segment++;
+        }
         $this->started = true;
+        $this->waitingSince = null;
+        $this->rollPending = false;
+        $this->writer = new MatroskaWriter($out, $this->format->docType());
+        if (\in_array(self::SLOT_AUDIO, $slots, true)) {
+            $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
+        }
+        foreach (self::VIDEO_SLOTS as $slot) {
+            if (\in_array($slot, $slots, true) && isset($this->described[$slot])) {
+                $d = $this->described[$slot];
+                $this->writer->setVideoTrack($d['codecId'], $d['width'], $d['height'], $d['private'], $slot);
+            }
+        }
+        Logger::log('Recording '.($out instanceof LocalFile ? $out->file : 'stream').' with '.implode('+', $slots), Logger::VERBOSE);
         $this->writer->start();
 
-        // Merge the two buffers in timestamp order so the first cluster is well formed.
+        // Merge the buffers in timestamp order so the first cluster is well formed; buffered frames
+        // of a stream not in this segment are dropped (it is gone, or waits for the next segment).
         $merged = [];
-        foreach ($this->videoBuffer as $f) {
-            $merged[] = ['kind' => 'v', 'ms' => $f['ms'], 'data' => $f['data'], 'keyframe' => $f['keyframe']];
-        }
-        foreach ($this->audioBuffer as $f) {
-            $merged[] = ['kind' => 'a', 'ms' => $f['ms'], 'data' => $f['data'], 'keyframe' => true];
+        foreach ($this->buffers as $slot => $frames) {
+            if (!\in_array($slot, $slots, true)) {
+                continue;
+            }
+            foreach ($frames as $f) {
+                $merged[] = ['slot' => $slot, 'ms' => $f['ms'], 'data' => $f['data'], 'keyframe' => $f['keyframe']];
+            }
         }
         usort($merged, static fn ($a, $b) => $a['ms'] <=> $b['ms']);
         foreach ($merged as $f) {
-            if ($f['kind'] === 'v') {
-                $this->writer->writeVideo($f['data'], $f['ms'], $f['keyframe']);
-            } else {
-                $this->writer->writeAudio($f['data'], $f['ms']);
+            $this->write($f['slot'], $f['data'], $f['ms'], $f['keyframe']);
+        }
+        $this->buffers = [];
+    }
+
+    /**
+     * The path of the next segment: `<stem>.<n>_<streams>.<ext>`, or `<stem><n>_<streams>.<ext>`
+     * for a directory stem.
+     *
+     * @param list<string> $slots
+     */
+    private function segmentPath(array $slots): string
+    {
+        $names = [];
+        foreach (self::SLOTS as $slot) {
+            if (\in_array($slot, $slots, true)) {
+                $names[] = $slot === self::SLOT_PRESENTATION ? 'screen' : $slot;
             }
         }
-        $this->audioBuffer = [];
-        $this->videoBuffer = [];
-    }
-
-    /**
-     * A track appeared after the header was already committed (e.g. the peer turned its camera on).
-     * Matroska fixes its track list in the header, so close the current file and open a new numbered
-     * segment (`basepath.001.mkv`, `basepath.002.mkv`, …) declaring both the audio and video tracks.
-     * The continuous frame timestamps carry over; the new writer rebases them to its own origin.
-     *
-     * @return bool true if a new segment was opened; false for a stream output that cannot be segmented.
-     */
-    private function rollSegment(string $codecId, int $width, int $height, string $private): bool
-    {
-        if ($this->file === null) {
-            return false; // stream output: no seekable file to roll into.
-        }
-        \danog\MadelineProto\Logger::log(
-            "RECDEBUG rollSegment #".($this->segment + 1)." (video track appeared mid-recording)",
-            \danog\MadelineProto\Logger::ERROR
-        ); // RECDEBUG
-        $this->writer->close();
-        $path = self::segmentPath($this->file->file, ++$this->segment);
-        $this->writer = new MatroskaWriter(new LocalFile($path));
-        $this->writer->setAudioTrack('A_OPUS', 48000, 2, self::opusHead(2, 48000));
-        $this->writer->setVideoTrack($codecId, $width, $height, $private);
-        $this->writer->start();
-        return true;
-    }
-
-    /**
-     * Insert a zero-padded segment number before the file extension: `call.mkv` → `call.001.mkv`.
-     *
-     * @psalm-pure
-     */
-    private static function segmentPath(string $path, int $n): string
-    {
-        $suffix = sprintf('.%03d', $n);
-        $dot = strrpos($path, '.');
-        return $dot === false ? $path.$suffix : substr($path, 0, $dot).$suffix.substr($path, $dot);
+        $separator = str_ends_with($this->stem, '/') ? '' : '.';
+        $extension = $this->format === RecordingFormat::Webm ? 'webm' : 'mkv';
+        return $this->stem.$separator.$this->segment.'_'.implode(',', $names).'.'.$extension;
     }
 
     public function close(): void
@@ -323,14 +646,11 @@ final class CallRecorder
         if ($this->closed) {
             return;
         }
-        // Nothing arrived at all: still emit an audio-only header so the file is valid.
-        if (!$this->started) {
-            $this->begin();
-        }
         $this->closed = true;
         $this->audioTrack = null;
-        $this->videoTrack = null;
-        $this->writer->close();
+        $this->videoTracks = [];
+        $this->writer?->close();
+        $this->writer = null;
     }
 
     /* ----------------------------------------------------------------- *
@@ -338,7 +658,7 @@ final class CallRecorder
      * ----------------------------------------------------------------- */
 
     /**
-     * Identify the video codec of a frame and its picture size and codec-private data.
+     * Identify the video codec of a keyframe and its picture size and codec-private data.
      *
      * @return array{string, int, int, string} [Matroska CodecID, width, height, CodecPrivate]
      *
@@ -346,24 +666,29 @@ final class CallRecorder
      */
     private static function describeVideo(string $frame): array
     {
-        // H.264 Annex-B always begins with a start code.
+        // H.264 and H.265 Annex-B always begin with a start code; the parameter sets tell them apart.
         if (str_starts_with($frame, "\x00\x00\x00\x01") || str_starts_with($frame, "\x00\x00\x01")) {
+            if (HevcBitstream::isHevc($frame)) {
+                [$w, $h, $hvcc] = HevcBitstream::describe($frame);
+                return ['V_MPEGH/ISO/HEVC', $w, $h, $hvcc];
+            }
             [$w, $h, $avcc] = self::h264Config($frame);
             return ['V_MPEG4/ISO/AVC', $w, $h, $avcc];
         }
         $first = \ord($frame[0]);
-        // AV1: an OBU header has the forbidden bit clear and a small type; a temporal unit usually
-        // starts with a temporal delimiter (type 2) or sequence header (type 1).
-        $obuType = ($first >> 3) & 0x0F;
-        if (($first & 0x80) === 0 && ($obuType === 1 || $obuType === 2 || $obuType === 6)) {
-            [$w, $h] = self::av1Size($frame);
-            return ['V_AV1', $w, $h, ''];
-        }
-        // VP8 keyframe carries the 0x9d 0x01 0x2a start code and the dimensions.
+        // VP8 keyframe carries the 0x9d 0x01 0x2a start code and the dimensions (checked before
+        // AV1: the first byte of a VP8 keyframe can look like an AV1 OBU header).
         if (\strlen($frame) > 9 && substr($frame, 3, 3) === "\x9d\x01\x2a") {
             $w = (\ord($frame[6]) | (\ord($frame[7]) << 8)) & 0x3FFF;
             $h = (\ord($frame[8]) | (\ord($frame[9]) << 8)) & 0x3FFF;
             return ['V_VP8', $w, $h, ''];
+        }
+        // AV1: an OBU header has the forbidden bit clear and a small type; a temporal unit usually
+        // starts with a temporal delimiter (type 2) or sequence header (type 1).
+        $obuType = ($first >> 3) & 0x0F;
+        if (($first & 0x80) === 0 && ($obuType === 1 || $obuType === 2 || $obuType === 6)) {
+            [$w, $h, $av1c] = Av1Bitstream::describe($frame);
+            return ['V_AV1', $w, $h, $av1c];
         }
         // VP9: the uncompressed header begins with the frame marker 0b10.
         if (($first >> 6) === 0x02) {
@@ -377,27 +702,42 @@ final class CallRecorder
     /**
      * Prepare a frame for muxing and report whether it is a keyframe.
      *
+     * @param ?string $codecId The Matroska codec of the track, when already known.
      * @return array{string, bool} [frame bytes to store, is keyframe]
      *
      * @psalm-mutation-free
      */
-    private static function transformVideo(MatroskaWriter $writer, string $frame): array
+    private static function transformVideo(string $frame, ?string $codecId): array
     {
         $first = \ord($frame[0]);
+        // Once the track is described, its codec is known; the bitstream sniffing below is only
+        // needed for the first keyframe (an inter frame of one codec can look like another's).
+        switch ($codecId) {
+            case 'V_MPEGH/ISO/HEVC':
+                return [HevcBitstream::toLengthPrefixed($frame), HevcBitstream::isKeyframe($frame)];
+            case 'V_MPEG4/ISO/AVC':
+                return self::h264ToAvcc($frame);
+            case 'V_AV1':
+                return [$frame, Av1Bitstream::isKeyframe($frame)];
+            case 'V_VP9':
+                return [$frame, self::vp9IsKeyframe($frame)];
+            case 'V_VP8':
+                return [$frame, ($first & 0x01) === 0];
+        }
         if (str_starts_with($frame, "\x00\x00\x00\x01") || str_starts_with($frame, "\x00\x00\x01")) {
+            if (HevcBitstream::isHevc($frame)) {
+                return [HevcBitstream::toLengthPrefixed($frame), HevcBitstream::isKeyframe($frame)];
+            }
             return self::h264ToAvcc($frame); // [avcc bytes, keyframe]
         }
         // VP8 keyframe = low bit of the first byte clear.
         if (\strlen($frame) > 9 && substr($frame, 3, 3) === "\x9d\x01\x2a") {
             return [$frame, true];
         }
-        if (($first & 0x01) === 0 && ($first >> 6) !== 0x02) {
-            // Heuristic VP8 P/keyframe bit when not obviously VP9/AV1.
-        }
         // AV1: a temporal unit that carries a sequence header (type 1) starts a new sequence.
         $obuType = ($first >> 3) & 0x0F;
-        if (($first & 0x80) === 0 && ($obuType === 1 || $obuType === 2)) {
-            return [$frame, self::av1HasSequenceHeader($frame)];
+        if (($first & 0x80) === 0 && ($obuType === 1 || $obuType === 2 || $obuType === 6)) {
+            return [$frame, Av1Bitstream::isKeyframe($frame)];
         }
         // VP9 keyframe: frame_type bit is 0 (parsed in vp9IsKeyframe).
         if (($first >> 6) === 0x02) {
@@ -630,52 +970,6 @@ final class CallRecorder
             return false; // show_existing_frame
         }
         return $br->bits(1) === 0; // frame_type 0 = key
-    }
-
-    /* ---- AV1 ---- */
-
-    /**
-     * @psalm-pure
-     */
-    private static function av1HasSequenceHeader(string $tu): bool
-    {
-        $o = 0;
-        $n = \strlen($tu);
-        while ($o < $n) {
-            $h = \ord($tu[$o]);
-            $type = ($h >> 3) & 0x0F;
-            $ext = ($h >> 2) & 1;
-            $hasSize = ($h >> 1) & 1;
-            $p = $o + 1 + $ext;
-            if ($hasSize) {
-                $size = 0;
-                $shift = 0;
-                do {
-                    $b = \ord($tu[$p++]);
-                    $size |= ($b & 0x7F) << $shift;
-                    $shift += 7;
-                } while ($b & 0x80);
-            } else {
-                $size = $n - $p;
-            }
-            if ($type === 1) {
-                return true;
-            }
-            $o = $p + $size;
-        }
-        return false;
-    }
-
-    /**
-     * @return array{int, int}
-     *
-     * @psalm-pure
-     */
-    private static function av1Size(string $tu): array
-    {
-        // Parsing the sequence header for the exact size is involved; a sensible default keeps the
-        // file valid, and incoming AV1 is not something current Telegram clients actually send.
-        return [1280, 720];
     }
 
     /* ---- OPUS ---- */

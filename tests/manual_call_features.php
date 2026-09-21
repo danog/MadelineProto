@@ -45,6 +45,8 @@
  * `check` runs fully offline (no Telegram, no login). The others place/join a real call and print,
  * step by step, exactly what to click in your Telegram client. `ffprobe` is used ONLY to inspect
  * result files for verification — never to record; all recording and muxing is pure PHP.
+ *
+ * Set CALL_TEST_LOG=<file> to get a verbose MadelineProto log of the call in that file.
  */
 
 use danog\MadelineProto\API;
@@ -70,7 +72,7 @@ require __DIR__.'/../vendor/autoload.php';
 /** Map a Matroska track codec ID to the SDP name our codec table uses. */
 const VIDEO_CODECS = [
     'V_VP8' => 'VP8', 'V_VP9' => 'VP9',
-    'V_MPEG4/ISO/AVC' => 'H264', 'V_AV1' => 'AV1',
+    'V_MPEG4/ISO/AVC' => 'H264', 'V_MPEGH/ISO/HEVC' => 'H265', 'V_AV1' => 'AV1',
 ];
 
 function box(string $title): void
@@ -139,29 +141,46 @@ function reportDerivedCodec(string $file): void
     info('No transmittable video track found in '.$file);
 }
 
-/** Inspect a recording with ffprobe (verification only). */
-function inspect(string $path): void
+/** The segment files of a recording requested as `$base` (`name.mkv` → `name.<n>_<streams>.mkv`). */
+function segments(string $base): array
+{
+    $files = glob(substr($base, 0, -4).'.*_*.mkv') ?: [];
+    natsort($files);
+    return array_values($files);
+}
+
+/** Inspect a recording (every segment) with ffprobe (verification only). */
+function inspect(string $base): void
 {
     clearstatcache();
-    $size = is_file($path) ? filesize($path) : 0;
-    info('File: '.$path.' ('.number_format((int) $size).' bytes)');
-    if ($size < 1024) {
-        info('⚠️  File is suspiciously small — the peer may not have transmitted media.');
-    }
-    if (!shell_exec('command -v ffprobe')) {
-        info('(install ffprobe to auto-verify streams & duration)');
+    $files = segments($base);
+    if ($files === []) {
+        info('⚠️  No segment files — the peer may not have transmitted media.');
         return;
     }
-    $streams = shell_exec('ffprobe -v error -show_entries stream=codec_type,codec_name -of csv=p=0 '.escapeshellarg($path).' 2>&1');
-    info('Streams: '.trim((string) $streams ?: 'none'));
-    $dur = shell_exec('ffprobe -v error -show_entries stream=duration -of csv=p=0 '.escapeshellarg($path).' 2>&1');
-    info('Track duration(s): '.trim((string) $dur ?: 'N/A'));
+    foreach ($files as $path) {
+        $size = filesize($path);
+        info('File: '.basename($path).' ('.number_format((int) $size).' bytes)');
+        if (!shell_exec('command -v ffprobe')) {
+            info('(install ffprobe to auto-verify streams & duration)');
+            continue;
+        }
+        $streams = shell_exec('ffprobe -v error -show_entries stream=codec_type,codec_name -of csv=p=0 '.escapeshellarg($path).' 2>&1');
+        info('   streams: '.str_replace("\n", ' ', trim((string) $streams ?: 'none')));
+        $dur = shell_exec('ffprobe -v error -show_entries format=duration -of csv=p=0 '.escapeshellarg($path).' 2>&1');
+        info('   duration: '.trim((string) $dur ?: 'N/A'));
+    }
 }
 
 function startApi(string $session): API
 {
     $settings = new Settings;
     $settings->getLogger()->setLevel(Logger::LEVEL_ERROR);
+    // CALL_TEST_LOG=<file> writes a verbose MadelineProto log there instead, for debugging a call.
+    $logFile = getenv('CALL_TEST_LOG');
+    if (is_string($logFile) && $logFile !== '') {
+        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra($logFile)->setLevel(Logger::LEVEL_VERBOSE);
+    }
     $API = new API($session, $settings);
     $API->start();
     return $API;
@@ -250,16 +269,24 @@ switch ($mode) {
             info('Found an existing call (state: '.$call->getCallState()->name.') — attaching, not restarting.');
             click('Nothing to do — the call is still up. Ctrl-C detaches (call keeps running); the OTHER account hangs up to end it.');
         } else {
-            if (is_file($out)) {
-                unlink($out);
+            foreach (segments($out) as $old) {
+                unlink($old);
             }
             info("Placing a NEW ".($m['video'] ? 'video' : 'audio')." call to $arg …");
             $call = $API->requestCall($arg, video: $m['video']);
             transmit($call, $m, $file);
+            if ($media === 'screencast') {
+                // A screencast is video only (like Telegram's own screen sharing, the audio of a 1:1
+                // call is the mic stream): play the file on the main stream too, for its audio. Its
+                // video is not transmitted as camera while the screencast is up: as in tgcalls, a
+                // screencast replaces the camera, since the peer has a single incoming video.
+                info('Also playing '.basename($file).' on the main stream, so that its audio is heard.');
+                $call->play(new LocalFile($file), MediaDestination::Camera);
+            }
             $ask = match ($media) {
                 'audio' => 'ANSWER the call and UNMUTE your mic. You should HEAR our audio file playing.',
                 'video' => 'ANSWER the call and turn your CAMERA ON. You should SEE our video file playing.',
-                'screencast' => 'ANSWER the call. You should SEE our screen-share (the video file) as a shared screen.',
+                'screencast' => 'ANSWER the call and turn your CAMERA ON. You should SEE our screen-share (the video file) as a shared screen and HEAR its audio.',
             };
             click("On the OTHER account, $ask");
             info('Waiting up to 120s for the call to connect…');
@@ -271,11 +298,7 @@ switch ($mode) {
             info('Connected ✅');
             info('Recording the incoming camera/mic into '.$out);
             $call->setOutput(new LocalFile($out));
-            if ($media === 'screencast') {
-                $presOut = __DIR__.'/../incoming_1to1_screencast.presentation.mkv';
-                info('Also recording any incoming screen-share into '.$presOut);
-                $call->setOutput(new LocalFile($presOut), dest: MediaDestination::Presentation);
-            }
+            info('Every stream the peer sends (mic, camera, screen share) is recorded as '.basename($out, '.mkv').'.<n>_<streams>.mkv, a new file each time the peer turns one on or off.');
             $emojis = $call->getVisualization();
             if ($emojis !== null) {
                 info('Call verification emojis (compare with the peer): '.implode(' ', $emojis));
@@ -287,7 +310,9 @@ switch ($mode) {
         while ($call->getCallState() !== CallState::ENDED) {
             if (microtime(true) - $lastReport > 5) {
                 clearstatcache();
-                info('… running ('.$call->getCallState()->name.'); '.basename($out).' = '.number_format(is_file($out) ? (int) filesize($out) : 0).' bytes');
+                $files = segments($out);
+                $last = $files === [] ? null : end($files);
+                info('… running ('.$call->getCallState()->name.'); '.count($files).' segment(s)'.($last !== null ? ', latest '.basename($last).' = '.number_format((int) filesize($last)).' bytes' : ''));
                 $lastReport = microtime(true);
             }
             Tools::sleep(1.0);
@@ -296,11 +321,11 @@ switch ($mode) {
         box('1:1 RESULT (peer hung up)');
         inspect($out);
         $expect = match ($media) {
-            'audio' => 'Expect an audio (opus) stream only.',
-            'video' => 'Expect an audio (opus) AND a video stream.',
-            'screencast' => 'Expect audio; a screen-share we sent is verified on the peer, incoming screen-share (if any) in the .presentation.mkv.',
+            'audio' => 'Expect audio-only segments, plus audio+video ones for whenever you turned the camera on.',
+            'video' => 'Expect audio+video segments (and audio-only ones for whenever the camera was off).',
+            'screencast' => 'Expect one segment per combination of what you sent: e.g. 0_audio,video, then 1_audio,screen while you shared the screen, and so on.',
         };
-        info($expect.' If you Ctrl-C+re-ran, the file kept growing across restarts.');
+        info($expect.' If you Ctrl-C+re-ran, the recording continued across restarts.');
         break;
 
     case 'group':
@@ -344,8 +369,8 @@ switch ($mode) {
         $lastReport = 0.0;
         while (in_array($call->getCallState(), [GroupCallState::JOINED, GroupCallState::JOINING], true)) {
             if (microtime(true) - $lastReport > 5) {
-                $files = array_merge(glob($dir.'/*.mkv') ?: [], glob($dir.'/*.presentation.mkv') ?: []);
-                info('… joined; '.count($files).' participant file(s) in '.$dir);
+                $files = glob($dir.'/*.mkv') ?: [];
+                info('… joined; '.count($files).' segment file(s) in '.$dir);
                 $lastReport = microtime(true);
             }
             Tools::sleep(1.0);
@@ -359,7 +384,7 @@ switch ($mode) {
         foreach ($files as $f) {
             info(basename($f).' — '.number_format((int) filesize($f)).' bytes');
         }
-        info('Expect one .mkv per participant who transmitted (excluding ourselves); a screen-sharer also gets a <id>.presentation.mkv.');
+        info('Expect <id>.<n>_<streams>.mkv files per participant who transmitted (excluding ourselves), one per change of what they sent.');
         break;
 
     case 'conference':

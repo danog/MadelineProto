@@ -35,6 +35,8 @@ namespace danog\MadelineProto\Tgcalls;
  */
 final class H264Framing
 {
+    // Also serves H.265: the two share the length-prefixed sample layout, only the configuration
+    // record that carries the parameter sets differs (avcC vs hvcC).
     /** The four byte Annex B start code, used for every NAL unit we emit. */
     private const START_CODE = "\x00\x00\x00\x01";
 
@@ -52,16 +54,56 @@ final class H264Framing
      *
      * @psalm-mutation-free
      */
-    public function __construct(?string $codecPrivate)
+    /**
+     * @param bool $hevc Whether the record is an HEVCDecoderConfigurationRecord (`hvcC`) rather
+     *                   than an AVCDecoderConfigurationRecord (`avcC`); both start with version 1.
+     */
+    public function __construct(?string $codecPrivate, bool $hevc = false)
     {
-        if ($codecPrivate === null || \strlen($codecPrivate) < 7 || $codecPrivate[0] !== "\x01") {
-            // No AVCDecoderConfigurationRecord: the muxer stored a raw Annex B stream, which some
-            // tools do even though the specification asks for the length prefixed form.
+        if ($codecPrivate === null || \strlen($codecPrivate) < ($hevc ? 23 : 7) || $codecPrivate[0] !== "\x01") {
+            // No configuration record: the muxer stored a raw Annex B stream, which some tools do
+            // even though the specification asks for the length prefixed form.
             return;
         }
         $this->lengthPrefixed = true;
+        if ($hevc) {
+            $this->lengthSize = (\ord($codecPrivate[21]) & 0x03) + 1;
+            $this->parameterSets = self::parseHevcParameterSets($codecPrivate);
+            return;
+        }
         $this->lengthSize = (\ord($codecPrivate[4]) & 0x03) + 1;
         $this->parameterSets = self::parseParameterSets($codecPrivate);
+    }
+
+    /**
+     * The VPS/SPS/PPS (and any other) NAL unit arrays of an `hvcC` record, as an Annex B prefix.
+     *
+     * @psalm-pure
+     */
+    private static function parseHevcParameterSets(string $record): string
+    {
+        $result = '';
+        $length = \strlen($record);
+        $offset = 22;
+        $arrays = \ord($record[$offset++]);
+        for ($a = 0; $a < $arrays && $offset + 3 <= $length; $a++) {
+            $offset++; // array_completeness + NAL_unit_type
+            $count = unpack('n', substr($record, $offset, 2))[1];
+            $offset += 2;
+            for ($i = 0; $i < $count; $i++) {
+                if ($offset + 2 > $length) {
+                    return $result;
+                }
+                $size = unpack('n', substr($record, $offset, 2))[1];
+                $offset += 2;
+                if ($size === 0 || $offset + $size > $length) {
+                    return $result;
+                }
+                $result .= self::START_CODE.substr($record, $offset, $size);
+                $offset += $size;
+            }
+        }
+        return $result;
     }
 
     /**

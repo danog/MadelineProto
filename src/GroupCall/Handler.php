@@ -452,14 +452,14 @@ trait Handler
     }
 
     /**
-     * Record conference call media: one participant's camera or screen-share to a file/stream, or every
-     * transmitting participant into its own file under a LocalDirectory.
+     * Record conference call media: one participant's audio, camera and screen-share to a file/stream,
+     * or every transmitting participant into its own file under a LocalDirectory.
      *
      * @internal
      */
-    public function conferenceCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
+    public function conferenceCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): void
     {
-        $this->getConferenceCallController($id)->setOutput($file, $participant, $dest, $format);
+        $this->getConferenceCallController($id)->setOutput($file, $participant, $format);
     }
 
     /**
@@ -1079,15 +1079,15 @@ trait Handler
     }
 
     /**
-     * Record group call media: one participant's camera or screen-share to a file/stream, or every
-     * transmitting participant into its own file under a LocalDirectory.
+     * Record group call media: one participant's audio, camera and screen-share to a file/stream, or
+     * every transmitting participant into its own file under a LocalDirectory.
      */
-    public function groupCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
+    public function groupCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->setOutput($file, $participant, $dest, $format);
+        $this->groupCalls[$id]->setOutput($file, $participant, $format);
     }
 
     /**

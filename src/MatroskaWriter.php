@@ -67,6 +67,12 @@ final class MatroskaWriter
     private const TRACK_AUDIO = 2;
     private const VIDEO_TRACK_NUMBER = 1;
     private const AUDIO_TRACK_NUMBER = 2;
+    private const PRESENTATION_TRACK_NUMBER = 3;
+    /** The camera video slot. */
+    public const SLOT_VIDEO = 'video';
+    /** The screen-share video slot: a second, independent video track. */
+    public const SLOT_PRESENTATION = 'presentation';
+    private const VIDEO_SLOTS = [self::SLOT_VIDEO => self::VIDEO_TRACK_NUMBER, self::SLOT_PRESENTATION => self::PRESENTATION_TRACK_NUMBER];
 
     /** One timestamp tick is a millisecond (TimestampScale = 1e6 ns). */
     private const TIMESTAMP_SCALE_NS = 1000000;
@@ -78,8 +84,8 @@ final class MatroskaWriter
     /** Whether {@see self::$out} is a seekable file we can back-patch the Duration into on close(). */
     private bool $seekable;
 
-    /** @var array{codecId: string, width: int, height: int, private: string}|null */
-    private ?array $video = null;
+    /** @var array<string, array{codecId: string, width: int, height: int, private: string}> Video tracks by slot. */
+    private array $video = [];
     /** @var array{codecId: string, rate: int, channels: int, private: string}|null */
     private ?array $audio = null;
 
@@ -168,9 +174,14 @@ final class MatroskaWriter
      *
      * @psalm-external-mutation-free
      */
-    public function setVideoTrack(string $codecId, int $width, int $height, string $codecPrivate = ''): void
+    /**
+     * Declare a video track: the camera ({@see self::SLOT_VIDEO}) or a screen share
+     * ({@see self::SLOT_PRESENTATION}), which may both be present at once.
+     */
+    public function setVideoTrack(string $codecId, int $width, int $height, string $codecPrivate = '', string $slot = self::SLOT_VIDEO): void
     {
-        $this->video = ['codecId' => $codecId, 'width' => max(1, $width), 'height' => max(1, $height), 'private' => $codecPrivate];
+        \assert(isset(self::VIDEO_SLOTS[$slot]));
+        $this->video[$slot] = ['codecId' => $codecId, 'width' => max(1, $width), 'height' => max(1, $height), 'private' => $codecPrivate];
     }
 
     /**
@@ -186,9 +197,36 @@ final class MatroskaWriter
     /**
      * @psalm-mutation-free
      */
-    public function hasVideoTrack(): bool
+    public function hasVideoTrack(string $slot = self::SLOT_VIDEO): bool
     {
-        return $this->video !== null;
+        return isset($this->video[$slot]);
+    }
+
+    public function hasAudioTrack(): bool
+    {
+        return $this->audio !== null;
+    }
+
+    /**
+     * The declared video track of a slot, or null.
+     *
+     * @return array{codecId: string, width: int, height: int, private: string}|null
+     *
+     * @psalm-mutation-free
+     */
+    public function getVideoTrack(string $slot = self::SLOT_VIDEO): ?array
+    {
+        return $this->video[$slot] ?? null;
+    }
+
+    /**
+     * Whether a video track is H.265 (the frames arrive as Annex B like H.264, but are stored differently).
+     *
+     * @psalm-mutation-free
+     */
+    public function isHevc(string $slot = self::SLOT_VIDEO): bool
+    {
+        return ($this->video[$slot]['codecId'] ?? null) === 'V_MPEGH/ISO/HEVC';
     }
 
     /**
@@ -224,18 +262,22 @@ final class MatroskaWriter
         $info = self::element(self::ID_INFO, $infoBody);
 
         $tracks = '';
-        if ($this->video !== null) {
-            $entry = self::uintElement(self::ID_TRACK_NUMBER, self::VIDEO_TRACK_NUMBER)
-                .self::uintElement(self::ID_TRACK_UID, self::VIDEO_TRACK_NUMBER)
+        foreach (self::VIDEO_SLOTS as $slot => $number) {
+            $video = $this->video[$slot] ?? null;
+            if ($video === null) {
+                continue;
+            }
+            $entry = self::uintElement(self::ID_TRACK_NUMBER, $number)
+                .self::uintElement(self::ID_TRACK_UID, $number)
                 .self::uintElement(self::ID_TRACK_TYPE, self::TRACK_VIDEO)
-                .self::stringElement(self::ID_CODEC_ID, $this->video['codecId'])
+                .self::stringElement(self::ID_CODEC_ID, $video['codecId'])
                 .self::element(
                     self::ID_VIDEO,
-                    self::uintElement(self::ID_PIXEL_WIDTH, $this->video['width'])
-                    .self::uintElement(self::ID_PIXEL_HEIGHT, $this->video['height'])
+                    self::uintElement(self::ID_PIXEL_WIDTH, $video['width'])
+                    .self::uintElement(self::ID_PIXEL_HEIGHT, $video['height'])
                 );
-            if ($this->video['private'] !== '') {
-                $entry .= self::element(self::ID_CODEC_PRIVATE, $this->video['private']);
+            if ($video['private'] !== '') {
+                $entry .= self::element(self::ID_CODEC_PRIVATE, $video['private']);
             }
             $tracks .= self::element(self::ID_TRACK_ENTRY, $entry);
         }
@@ -267,9 +309,12 @@ final class MatroskaWriter
     /**
      * Append one encoded video frame.
      */
-    public function writeVideo(string $data, int $timestampMs, bool $keyframe): void
+    public function writeVideo(string $data, int $timestampMs, bool $keyframe, string $slot = self::SLOT_VIDEO): void
     {
-        $this->writeBlock(self::VIDEO_TRACK_NUMBER, $data, $timestampMs, $keyframe, $keyframe);
+        if (!isset($this->video[$slot])) {
+            return;
+        }
+        $this->writeBlock(self::VIDEO_SLOTS[$slot], $data, $timestampMs, $keyframe, $keyframe);
     }
 
     /**
@@ -277,6 +322,9 @@ final class MatroskaWriter
      */
     public function writeAudio(string $data, int $timestampMs): void
     {
+        if ($this->audio === null) {
+            return;
+        }
         $this->writeBlock(self::AUDIO_TRACK_NUMBER, $data, $timestampMs, true, false);
     }
 
@@ -293,7 +341,7 @@ final class MatroskaWriter
         // Start a new cluster on a video keyframe, or when the block would fall outside the open
         // cluster's signed-16-bit relative range.
         if ($this->clusterBaseMs === null
-            || ($startsCluster && $trackNumber === self::VIDEO_TRACK_NUMBER)
+            || ($startsCluster && $trackNumber !== self::AUDIO_TRACK_NUMBER)
             || $relativeToFile - $this->clusterBaseMs > self::MAX_CLUSTER_MS
         ) {
             $this->flushCluster();

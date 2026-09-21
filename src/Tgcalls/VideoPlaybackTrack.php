@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
@@ -69,12 +70,28 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private bool $playing = false;
     /** Whether signaling has selected the codec that the current file contains. */
     private bool $transportReady = true;
+    /**
+     * Whether the frames are consumed at their pace but discarded instead of transmitted: set while
+     * a screencast replaces the camera video, so the camera playlist keeps advancing (its audio is
+     * still transmitted) without queueing frames nobody sends.
+     */
+    private bool $suppressed = false;
+    /**
+     * Whether to hold non-keyframes until the next keyframe: after the transport was (re)negotiated
+     * the peer sets up a fresh decoder, which can only start on a keyframe.
+     */
+    private bool $needKeyframe = false;
     /** Whether the producer task is running, to keep {@see self::startProducing()} idempotent. */
     private bool $producing = false;
+
+    /** Frames released so far, for the diagnostics log. */
+    private int $released = 0;
 
     public function __construct(
         private readonly DjLoop $source,
         private readonly CallControllerInterface $call,
+        /** What this track carries, for the logs: the camera or the screencast. */
+        private readonly string $label = 'camera',
     ) {
         parent::__construct(MediaKind::Video);
         $this->startProducing();
@@ -137,10 +154,27 @@ final class VideoPlaybackTrack extends MediaStreamTrack
 
     public function setTransportReady(bool $transportReady): void
     {
+        if (!$transportReady && $this->transportReady) {
+            $this->needKeyframe = true;
+        }
         $this->transportReady = $transportReady;
         if (!$transportReady) {
             $this->nextDue = microtime(true) + self::IDLE_POLL;
         }
+    }
+
+    /**
+     * Discard (true) or transmit (false) the frames; see {@see self::$suppressed}. Transmission
+     * resumes on a keyframe.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setSuppressed(bool $suppressed): void
+    {
+        if ($this->suppressed && !$suppressed) {
+            $this->needKeyframe = true;
+        }
+        $this->suppressed = $suppressed;
     }
 
     /**
@@ -206,6 +240,19 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         );
         // Pull and hold the next frame right away so its own presentation time paces us.
         $this->nextDue = $now;
+
+        if ($this->suppressed) {
+            return null;
+        }
+        if ($this->needKeyframe) {
+            if (!$frame['keyframe']) {
+                return null;
+            }
+            $this->needKeyframe = false;
+        }
+        if ($this->released++ % 250 === 0) {
+            $this->call->log("Releasing {$this->label} frame {$this->released} (".($frame['keyframe'] ? 'key' : 'inter').") in {$this->call}", Logger::VERBOSE);
+        }
 
         return new EncodedPacket($frame['data'], $timestamp, $frame['keyframe']);
     }

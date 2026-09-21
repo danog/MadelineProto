@@ -202,29 +202,32 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     /**
      * Record the incoming media of the call.
      *
-     * A {@see LocalFile} or {@see WritableStream} records the other party's camera+audio (or, with
-     * {@see MediaDestination::Presentation}, their screencast) into it; a {@see LocalDirectory} records
-     * them into `<dir>/<userId>.mkv` instead. `$participant` may only be the other party, and is
-     * therefore optional.
+     * A {@see LocalFile} `name.mkv` records everything the other party sends — their audio, camera and
+     * screencast, each on or off at any time — as `name.0_<streams>.mkv`, `name.1_<streams>.mkv`, …,
+     * one file per combination of streams flowing (see {@see Call::setOutput()}); a
+     * {@see LocalDirectory} records the same as `<dir>/0_<streams>.mkv`, `<dir>/1_<streams>.mkv`, …. A
+     * {@see WritableStream} gets a single file that cannot roll over. `$participant` may only be the
+     * other party, and is therefore optional.
      *
-     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
-     * audio and video, muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so
-     * the video track is whatever codec the peer sends — VP8/VP9/H.264/AV1 — and the audio is OPUS).
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records the incoming audio
+     * and video, muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so the
+     * video tracks are whatever codec the peer sends — VP8/VP9/H.264/H.265/AV1 — and the audio is OPUS).
      * {@see RecordingFormat::Opus} keeps the audio-only behaviour and receives an OGG OPUS stream.
      *
      * When `$format` is null it is autodetected from the extension of `$file`, but only if a
      * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
     {
         if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
             throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
         }
         if ($file instanceof LocalDirectory) {
-            $file = new LocalFile($file->dir.'/'.$this->otherID.($dest === MediaDestination::Presentation ? '.presentation' : '').'.mkv');
+            $file = new LocalFile(rtrim($file->dir, '/').'/');
+            $format ??= RecordingFormat::Mkv;
         }
-        $this->getClient()->callSetOutput($this->callID, $file, $dest, $format);
+        $this->getClient()->callSetOutput($this->callID, $file, $format);
 
         return $this;
     }

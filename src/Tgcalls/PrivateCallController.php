@@ -364,10 +364,12 @@ final class PrivateCallController implements CallControllerInterface
         if ($this->outputFile !== null) {
             $this->tgcallsController->setOutput($this->outputFile, $this->outputFormat);
         }
-        // A presentation playlist requested before the engine existed is attached now.
+        // A presentation playlist requested before the engine existed is attached now, before the
+        // first offer goes out, so that the screencast is in it from the start.
         if ($this->presentationDj !== null) {
             $this->tgcallsController->enablePresentation($this->presentationDj);
         }
+        $this->tgcallsController->start();
     }
 
     /**
@@ -523,12 +525,8 @@ final class PrivateCallController implements CallControllerInterface
      * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
      * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
      */
-    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
+    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
-        if ($dest === MediaDestination::Presentation) {
-            $this->tgcallsController?->setPresentationOutput($file);
-            return;
-        }
         $this->outputFile = $file instanceof LocalFile ? $file : null;
         $this->outputFormat = $format;
         $this->tgcallsController?->setOutput($file, $format);

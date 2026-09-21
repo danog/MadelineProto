@@ -99,14 +99,11 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
 
     /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Output files/streams (and their format) requested per participant peer ID. */
     private array $pendingOutputs = [];
-    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Presentation (screen-share) output files/streams (and their format) requested per participant peer ID. */
-    private array $pendingPresentationOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
+    private RecordingFormat $outputFormat = RecordingFormat::Mkv;
     /** @var array<int, true> Peer IDs already wired to a per-participant file in folder mode. */
     private array $folderPeers = [];
-    /** @var array<int, true> Peer IDs already wired to a presentation file in folder mode. */
-    private array $folderPresentationPeers = [];
 
     public readonly AbstractGroupCall $public;
 
@@ -503,14 +500,8 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                 unset($this->pendingOutputs[$peerId]);
                 $this->connection?->setOutput($parsed->source, $file, $format);
             }
-            if (isset($this->pendingPresentationOutputs[$peerId])) {
-                [$file, $format] = $this->pendingPresentationOutputs[$peerId];
-                unset($this->pendingPresentationOutputs[$peerId]);
-                $this->connection?->setPresentationOutput($parsed->source, $file, $format);
-            }
             // Folder mode: start recording a participant that has just begun transmitting.
             $this->wireFolderOutput($peerId, $parsed);
-            $this->wireFolderPresentationOutput($peerId, $parsed);
         }
     }
 
@@ -527,6 +518,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             if ($participant->source !== 0 && $participant->source !== $this->source) {
                 $sources[] = [
                     'audio' => $participant->source,
+                    'muted' => $participant->muted,
                     'video' => $participant->videoSources,
                     'presentation' => $participant->presentationSources,
                     'videoEndpoint' => $participant->videoEndpoint,
@@ -759,19 +751,16 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     /**
      * Record group call media, muxed into Matroska files.
      *
-     * Two modes:
-     *  - per participant: `setOutput($file, $participant)` records that one participant's incoming
-     *    audio and (if they transmit a camera) video into the given file or stream, or their
-     *    screen-share with `$dest` set to {@see MediaDestination::Presentation}.
-     *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
-     *    participant into its own `<dir>/<peerId>.mkv` Matroska file, including participants that start
-     *    transmitting later, plus a `<dir>/<peerId>.presentation.mkv` for anyone screen-sharing. Each
-     *    file holds the participant's audio and, once they turn a camera on, their video. Our own media
-     *    is never recorded.
+     * Only a {@see LocalDirectory} is accepted (except in stream mode, a single mixed stream): every
+     * *transmitting* participant — or only the given `$participant` — is recorded as
+     * `<dir>/<peerId>.<n>_<streams>.mkv` files, one per combination of the audio, camera video and
+     * screen share they send, which they can turn on and off at any time (see
+     * {@see \danog\MadelineProto\EventHandler\Call::setOutput()}). Participants that start
+     * transmitting later are picked up too; our own media is never recorded.
      *
      * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
     {
         if ($this->streamMode) {
             // A single mixed stream, downloaded in chunks: there are no per-participant sources.
@@ -786,27 +775,26 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             }
             return $this;
         }
-        if ($file instanceof LocalDirectory) {
-            $dir = $file->dir;
-            if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
-                throw new \RuntimeException("Could not create the recording directory $dir");
-            }
-            $this->outputDir = $dir;
-            foreach ($this->participants as $peerId => $known) {
-                $this->wireFolderOutput($peerId, $known);
-                $this->wireFolderPresentationOutput($peerId, $known);
-            }
+        if (!$file instanceof LocalDirectory) {
+            throw new \InvalidArgumentException('A group call is recorded into a LocalDirectory, one numbered file series per participant; a single file cannot hold them.');
+        }
+        $dir = rtrim($file->dir, '/');
+        if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
+            throw new \RuntimeException("Could not create the recording directory $dir");
+        }
+        $format ??= RecordingFormat::Mkv;
+        if (!$format->isMatroska()) {
+            throw new \InvalidArgumentException('Multi-party call recordings are always Matroska: use RecordingFormat::Mkv or RecordingFormat::Webm.');
+        }
+        if ($participant !== null) {
+            $peerId = $this->API->getId($participant);
+            $this->wireOutput($peerId, new LocalFile("$dir/$peerId"), $format);
             return $this;
         }
-        if ($participant === null) {
-            throw new \InvalidArgumentException('setOutput() requires the participant to record into the file/stream, or a LocalDirectory to record every participant.');
-        }
-        $format = RecordingFormat::matroskaFor($file, $format);
-        $peerId = $this->API->getId($participant);
-        if ($dest === MediaDestination::Presentation) {
-            $this->wirePresentationOutput($peerId, $file, $format);
-        } else {
-            $this->wireOutput($peerId, $file, $format);
+        $this->outputDir = $dir;
+        $this->outputFormat = $format;
+        foreach ($this->participants as $peerId => $known) {
+            $this->wireFolderOutput($peerId, $known);
         }
         return $this;
     }
@@ -825,22 +813,8 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     /**
-     * Route one participant's screen-share output to the connection now, or defer it until their
-     * source is known.
-     */
-    private function wirePresentationOutput(int $peerId, LocalFile|WritableStream $file, RecordingFormat $format): void
-    {
-        $known = $this->participants[$peerId] ?? null;
-        if ($known !== null && $known->source !== 0 && $this->connection !== null) {
-            $this->connection->setPresentationOutput($known->source, $file, $format);
-            return;
-        }
-        $this->pendingPresentationOutputs[$peerId] = [$file, $format];
-    }
-
-    /**
-     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.mkv` file,
-     * once each.
+     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.<n>_<streams>.mkv`
+     * file series, once each.
      */
     private function wireFolderOutput(int $peerId, Participant $participant): void
     {
@@ -854,27 +828,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             return;
         }
         $this->folderPeers[$peerId] = true;
-        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.mkv'), RecordingFormat::Mkv);
-    }
-
-    /**
-     * In folder mode, give a participant that is screen-sharing its own `<dir>/<peerId>.presentation.mkv`
-     * file, once each. Called whenever a participant's presentation state changes.
-     */
-    private function wireFolderPresentationOutput(int $peerId, Participant $participant): void
-    {
-        if ($this->outputDir === null
-            || $participant->source === 0
-            || $participant->self
-            || $participant->source === $this->source
-            || $participant->presentationSources === []
-            || isset($this->folderPresentationPeers[$peerId])
-            || isset($this->pendingPresentationOutputs[$peerId]) // an explicit output takes precedence
-        ) {
-            return;
-        }
-        $this->folderPresentationPeers[$peerId] = true;
-        $this->wirePresentationOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.presentation.mkv'), RecordingFormat::Mkv);
+        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId), $this->outputFormat);
     }
 
     /**

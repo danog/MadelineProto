@@ -232,23 +232,32 @@ interface Call extends Stringable
     /**
      * Record the incoming media of the call.
      *
-     * `$file` is where to record to:
-     *  - a {@see LocalFile} or {@see WritableStream} records one participant: the other party of a
-     *    one-to-one call, or the multi-party call participant given as `$participant` (a user id,
-     *    username or peer). `$dest` selects whether their camera+audio or their screen-share is
-     *    recorded;
-     *  - a {@see LocalDirectory} records every participant that transmits something (including ones
-     *    that start later) into its own `<dir>/<peerId>.mkv` file, plus a `<dir>/<peerId>.presentation.mkv`
-     *    for anyone screen-sharing; `$participant` and `$dest` are ignored. Our own media is never recorded.
+     * A recording holds *everything* a participant sends: their microphone audio, their camera video
+     * and their screen share (a second video track), whichever of them are on. A participant may turn
+     * any of these on or off at any time, in any combination; since a Matroska file's track list is
+     * fixed in its header, every such change closes the current file and continues in a new one, so
+     * a recording is a numbered series of files, each named after the streams it holds: `<stem>.0_audio.mkv`,
+     * `<stem>.1_audio,video.mkv`, `<stem>.2_audio,video,screen.mkv`, … (`audio`, `video` and `screen`,
+     * joined by commas, in that order).
      *
-     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target muxes the participant's audio
-     * and video into a Matroska file in pure PHP: the frames are stored as-is, so the video track is
-     * whatever codec the peer sends (VP8/VP9/H.264/AV1) and the audio is OPUS. {@see RecordingFormat::Opus}
-     * writes an audio-only OGG OPUS stream, and is supported by one-to-one calls only. When `$format` is
-     * null it is autodetected from the extension of `$file` if a {@see LocalFile} was passed; a raw stream,
+     * `$file` is where to record to:
+     *  - in a one-to-one call, a {@see LocalFile} `name.mkv` records the other party as `name.<n>_<streams>.mkv`,
+     *    and a {@see LocalDirectory} as `<dir>/<n>_<streams>.mkv`;
+     *  - in a multi-party call only a {@see LocalDirectory} is accepted (stream-mode livestreams aside):
+     *    every participant that transmits something (including ones that start later) is recorded as
+     *    `<dir>/<peerId>.<n>_<streams>.mkv`, or only the one given as `$participant` (a user id, username
+     *    or peer) if any. Our own media is never recorded;
+     *  - a {@see WritableStream} (one-to-one calls only) gets a single file that cannot roll over, so it
+     *    keeps its initial tracks.
+     *
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target muxes the media into a
+     * Matroska file in pure PHP: the frames are stored as-is, so the video tracks are whatever codec the
+     * peer sends (VP8/VP9/H.264/H.265/AV1) and the audio is OPUS. {@see RecordingFormat::Opus} writes an
+     * audio-only OGG OPUS stream, and is supported by one-to-one calls only. When `$format` is null it
+     * is autodetected from the extension of `$file` if a {@see LocalFile} was passed; a raw stream,
      * whose extension is unknown, defaults to OGG OPUS in a one-to-one call and to Matroska otherwise.
      *
      * @psalm-impure
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): static;
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static;
 }

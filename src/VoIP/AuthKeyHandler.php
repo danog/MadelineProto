@@ -214,9 +214,9 @@ trait AuthKeyHandler
      * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
      * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
      */
-    public function callSetOutput(int $id, LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
+    public function callSetOutput(int $id, LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
-        ($this->calls[$id] ?? null)?->setOutput($file, $dest, $format);
+        ($this->calls[$id] ?? null)?->setOutput($file, $format);
     }
 
     /**

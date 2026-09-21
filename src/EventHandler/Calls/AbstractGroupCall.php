@@ -354,13 +354,13 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     /**
      * Record group call media, muxed into a Matroska file in pure PHP.
      *
-     * A {@see LocalFile} or {@see WritableStream} records the given `$participant`'s camera+audio (or,
-     * with {@see MediaDestination::Presentation}, their screen-share) into it; a {@see LocalDirectory}
-     * records *every* transmitting participant, each into its own `<dir>/<peerId>.mkv` file plus a
-     * `<dir>/<peerId>.presentation.mkv` for anyone screen-sharing (participants that start transmitting
-     * later are picked up too). Our own media is never recorded.
+     * Only a {@see LocalDirectory} is accepted: it records every transmitting participant — or only the
+     * given `$participant` — as `<dir>/<peerId>.<n>_<streams>.mkv` files, one per combination of the
+     * audio, camera video and screen share they send, each on or off at any time (see
+     * {@see Call::setOutput()}; participants that start transmitting later are picked up too). Our own
+     * media is never recorded.
      *
-     * Participants' frames are stored as-is, so the video track is whatever codec they send and the
+     * Participants' frames are stored as-is, so the video tracks are whatever codec they send and the
      * audio is OPUS; `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm}
      * DocType, autodetected from a `.webm` extension. Audio-only OGG OPUS recordings are not supported,
      * except in [stream mode »](https://core.telegram.org/api/group-calls#stream-mode) ({@see self::isStreamMode()}),
@@ -368,9 +368,9 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      * (a {@see LocalDirectory} records it as `<dir>/stream.ogg`), and any {@see RecordingFormat}.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): static
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
     {
-        $this->getClient()->groupCallSetOutput($this->id, $file, $participant, $dest, $format);
+        $this->getClient()->groupCallSetOutput($this->id, $file, $participant, $format);
         return $this;
     }
 

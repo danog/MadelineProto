@@ -19,6 +19,7 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -28,6 +29,10 @@ use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use Revolt\EventLoop;
 use Throwable;
 use Webrtc\Codecs\Codec;
+use Webrtc\Codecs\EncodedPacket;
+use Webrtc\DataChannel\Enum\State as DataChannelState;
+use Webrtc\DataChannel\Listener\DataChannelMessageListener;
+use Webrtc\DataChannel\Listener\DataChannelOpenListener;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
@@ -37,29 +42,48 @@ use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
 use Webrtc\RTP\RTCRtpTransceiver;
 use Webrtc\RTPParameter\RTCRtpCodecCapability;
+use Webrtc\RTPParameter\RTCRtpCodecParameters;
 use Webrtc\SDP\Enum\SDPDirections;
 use Webrtc\SDP\RTCSessionDescription;
 use Webrtc\Webrtc\Enum\ConnectionState;
 use Webrtc\Webrtc\Enum\SignalingState;
 use Webrtc\Webrtc\Listener\PeerConnectionConnectionStateChangeListener;
+use Webrtc\Webrtc\Listener\PeerConnectionDataChannelListener;
 use Webrtc\Webrtc\Listener\PeerConnectionTrackListener;
 use Webrtc\Webrtc\RTCPeerConnection;
 
 /**
  * WebRTC engine of a modern one-to-one Telegram call.
  *
- * Implements the `10.0.0` tgcalls signaling protocol (tgcalls' `InstanceV2ReferenceImpl` with an
- * external signaling connection): a plain SDP offer/answer plus trickled ICE candidates, serialized
- * as JSON, framed and encrypted with the call auth key by {@see EncryptedConnection}, and carried
- * over [phone.sendSignalingData](https://core.telegram.org/method/phone.sendSignalingData).
+ * Implements the tgcalls signaling protocols: `10.0.0` (tgcalls' `InstanceV2ReferenceImpl`) ships a
+ * plain SDP offer/answer plus trickled ICE candidates; the structured dialects (`InstanceV2Impl`,
+ * `11.0.0` and up) negotiate one-directional channels with `InitialSetup`/`NegotiateChannels`
+ * messages, translated to and from SDP by {@see V2Sdp}. Either way the messages are serialized as
+ * JSON, framed and encrypted with the call auth key by {@see EncryptedConnection}, and carried over
+ * [phone.sendSignalingData](https://core.telegram.org/method/phone.sendSignalingData).
+ *
+ * In the structured dialects the peer connection mirrors tgcalls' channel model: every outgoing
+ * channel (audio, camera video, screencast video) is a send-only transceiver, and every channel the
+ * peer offers gets its own receive-only transceiver, so that each direction keeps its own payload
+ * type numbering. Like tgcalls, only one outgoing video (camera or screencast) is transmitted at a
+ * time: the peer has a single incoming video channel and tells the two apart purely through the
+ * {@see MediaState} `screencastState` flag.
  *
  * @internal
  */
-final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener
+final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, PeerConnectionDataChannelListener, DataChannelOpenListener, DataChannelMessageListener
 {
     private RTCPeerConnection $peerConnection;
     private EncryptedConnection $encryption;
+    /**
+     * The in-band WebRTC data channel of the call. Every tgcalls engine (the SDP reference one and
+     * the structured ones alike) exchanges its {@see MediaState} — mic muted, camera on/off, screen
+     * sharing on/off — *only* over this channel, never over the signaling connection, so without it
+     * the peer's toggles are invisible. The caller opens it (as stream 0, like tgcalls); the callee
+     * receives it. In the structured dialects it runs straight over the media transport with no SDP.
+     */
     private ?RTCDataChannel $dataChannel = null;
+    private bool $dataChannelOpen = false;
 
     private OpusPlaybackTrack $outgoingAudio;
     private VideoPlaybackTrack $outgoingVideo;
@@ -74,10 +98,17 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $screencastEnabled = false;
     private ?OpusRecorder $recorder = null;
     private ?CallRecorder $callRecorder = null;
-    /** Records the peer's incoming presentation (screencast) stream, when a separate output was set. */
-    private ?CallRecorder $presentationRecorder = null;
-    /** Whether an incoming (camera) video track has already been routed to the main recorder. */
-    private bool $seenIncomingVideo = false;
+    /**
+     * Every incoming video track, with the recording slot (camera or screen share) it was routed to.
+     * tgcalls has one incoming video channel: the peer's screencast is a *new* channel that replaces
+     * its camera, told apart only by the peer's MediaState, so each track is routed once, on its first
+     * frame, by that state.
+     *
+     * @var list<array{track: RemoteStreamTrack, target: ?string}>
+     */
+    private array $incomingVideoTracks = [];
+    /** Whether the peer has told us its media state yet (it defaults to "unknown" until then). */
+    private bool $remoteMediaStateKnown = false;
 
     /** @var list<RTCIceCandidate> Candidates received before the remote description was applied. */
     private array $pendingCandidates = [];
@@ -89,8 +120,21 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private ?array $peerInitialSetup = null;
     /** @var list<array<string, mixed>> Structured offers received before InitialSetup. */
     private array $pendingV2Messages = [];
-    /** @var list<array<string, mixed>> Peer offers deferred by glare, answered once our exchange settles. */
-    private array $pendingPeerOffers = [];
+    /**
+     * Until when (unix time) our own re-offers are held back after an exchange, to leave the peer's
+     * offer room to arrive first: see {@see self::flushRenegotiation()}.
+     */
+    private float $holdOffUntil = 0.0;
+    /** Whether a delayed flush of a held-back re-offer is already scheduled. */
+    private bool $flushScheduled = false;
+    /** Whether {@see self::start()} was called: no offer goes out before. */
+    private bool $started = false;
+    /**
+     * Serializes the handling of signaling messages: applying a description suspends (ICE), and the
+     * next message must not be handled in the meantime — the negotiation state it sees would be
+     * stale (an exchange still "in flight" whose answer is being applied, for one).
+     */
+    private LocalMutex $signalingMutex;
     /** The last peer-offer exchange ID we answered, so a re-sent identical offer is not re-processed. */
     private ?string $answeredPeerOfferExchangeId = null;
     /** Exchange ID of our in-flight structured offer. */
@@ -99,6 +143,28 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $localV2Negotiated = false;
     private bool $initialSetupSent = false;
     private bool $renegotiatePending = false;
+    /**
+     * The peer's outgoing channels, from its latest structured offer, keyed by SSRC (decimal string).
+     * tgcalls re-offers its complete channel list every time, so this is replaced wholesale.
+     *
+     * @var array<string, array<array-key, mixed>>
+     */
+    private array $peerContents = [];
+    /**
+     * The receive-only transceiver carrying each of the peer's channels, keyed by the channel's SSRC
+     * (which is also its mid). Kept, inactive, when the peer withdraws the channel: tgcalls never
+     * reuses an m-line and neither do we.
+     *
+     * @var array<string, RTCRtpTransceiver>
+     */
+    private array $recvTransceivers = [];
+    /**
+     * The peer's answer for each of our outgoing channels (the payload types it accepted), from the
+     * latest answer to our offer, keyed by our SSRC (decimal string).
+     *
+     * @var array<string, array<array-key, mixed>>
+     */
+    private array $answeredContents = [];
     private bool $videoEnabled = false;
     private ?string $outgoingVideoCodec = null;
     /** SDP fmtp parameters of the outgoing video file, derived from its bitstream (profile/level/…). */
@@ -111,6 +177,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * they keep seeing the full codec list.
      */
     private bool $dropVp8FromOffer = false;
+    /**
+     * How long (seconds) to hold our re-offers after an exchange, for the peer's offer to arrive
+     * first (see {@see self::flushRenegotiation()}): a signaling round trip through Telegram takes
+     * up to a couple of seconds.
+     */
+    private const PEER_OFFER_GRACE = 3.0;
     /** The SCTP association carrying signaling, for the versions that use one. */
     private ?SignalingSctpTransport $sctp = null;
     /** Last mute state we told the peer about, so media state updates stay consistent. */
@@ -125,6 +197,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         array $connections,
     ) {
         $this->remoteMediaState = new MediaState(true, false, false);
+        $this->signalingMutex = new LocalMutex;
         $this->encryption = new EncryptedConnection($authKey, $outgoing, $this);
 
         if ($version->usesSctp()) {
@@ -137,9 +210,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         ]);
         $dj->setVideoCodecObserver($this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
-        $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendrecv);
+        // In the structured dialects every channel is one-directional (see the class docs): our
+        // audio is a send-only channel, and the peer's audio arrives on a receive-only one of its
+        // own. The plain-SDP dialect is ordinary WebRTC, where both share a sendrecv m-line.
+        $this->peerConnection->addTransceiver($this->outgoingAudio, $this->sendDirection());
         $this->outgoingVideo = new VideoPlaybackTrack($dj, $call);
-        if ($this->outgoing && $this->call->public->video) {
+        if ($this->version->usesSdp() && $this->outgoing && $this->call->public->video) {
             $this->videoEnabled = true;
             $this->ensureVideoTransceiver();
         }
@@ -149,21 +225,131 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // serialize/unserialize cycle (a Closure could not be serialized).
         $this->peerConnection->addTrackListener($this);
         $this->peerConnection->addConnectionStateChangeListener($this);
+        $this->peerConnection->addPeerConnectionDataChannelListener($this);
 
         if (!$this->version->usesSdp()) {
-            EventLoop::queue(function (): void {
+            // tgcalls' InstanceV2Impl runs its data channel as an SCTP association straight over the
+            // media transport (port 5000 both ways), never described in the negotiation.
+            $this->peerConnection->createInbandSctp();
+        }
+        if ($this->outgoing) {
+            // The caller opens the data channel, exactly like tgcalls does (on stream 0: a tgcalls
+            // callee pre-creates its channel with that id and only acknowledges an OPEN for it).
+            $this->adoptDataChannel($this->peerConnection->createDataChannel(
+                new RTCDataChannelParameters('data', id: 0)
+            ));
+        }
+
+    }
+
+    /**
+     * Begin negotiating, once the owner has attached everything the first offer should carry (the
+     * presentation playlist, notably): the callee only announces its transport, the caller also
+     * offers its channels. Queued, so that the playlists' pending codec announcements — which set
+     * the transceivers up — run first.
+     */
+    public function start(): void
+    {
+        EventLoop::queue(function (): void {
+            if ($this->closed) {
+                return;
+            }
+            $this->started = true;
+            if (!$this->version->usesSdp()) {
                 $this->sendV2InitialSetup();
                 if ($this->outgoing) {
                     $this->sendV2Offer();
                 }
-            });
-        } elseif ($this->outgoing) {
-            // The caller creates the data channel and the initial offer, exactly like tgcalls does.
-            $this->dataChannel = $this->peerConnection->createDataChannel(
-                new RTCDataChannelParameters('data')
-            );
-            EventLoop::queue($this->sendLocalDescription(...));
+            } elseif ($this->outgoing) {
+                $this->sendLocalDescription();
+            }
+        });
+    }
+
+    /**
+     * Take a data channel (ours, or the one the caller opened) into use.
+     */
+    private function adoptDataChannel(RTCDataChannel $channel): void
+    {
+        $this->dataChannel = $channel;
+        $channel->addOpenListener($this);
+        $channel->addMessageListener($this);
+        if ($channel->getReadyState() === DataChannelState::Open) {
+            $this->onDataChannelOpen();
         }
+    }
+
+    /**
+     * The peer (the caller) opened the data channel.
+     *
+     * @internal Registered as the peer connection's data channel listener.
+     */
+    #[\Override]
+    public function onPeerConnectionDataChannel(RTCDataChannel $channel): void
+    {
+        $this->call->log("The peer opened the data channel \"{$channel->getLabel()}\" of {$this->call}", Logger::VERBOSE);
+        $this->adoptDataChannel($channel);
+    }
+
+    /**
+     * The data channel is open: tell the peer our media state, which tgcalls only reads from here.
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onDataChannelOpen(): void
+    {
+        $this->dataChannelOpen = true;
+        $this->call->log("The data channel of {$this->call} is open", Logger::VERBOSE);
+        $this->sendMediaState($this->muted);
+    }
+
+    /**
+     * A message from the peer on the data channel: plain (DTLS-protected) JSON in the very same
+     * format as the signaling messages, which is how tgcalls carries its MediaState.
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onDataChannelMessage(string $data): void
+    {
+        try {
+            $decoded = json_decode($data, true, flags: JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
+            $this->call->log("Could not decode a data channel message of {$this->call}: $e", Logger::WARNING);
+            return;
+        }
+        if (!\is_array($decoded) || !isset($decoded['@type'])) {
+            return;
+        }
+        EventLoop::queue($this->onSignalingMessage(...), $decoded);
+    }
+
+    /**
+     * The direction of the transceivers we transmit on: one-directional channels in the structured
+     * dialects, plain WebRTC sendrecv in the SDP one.
+     *
+     * @psalm-mutation-free
+     */
+    private function sendDirection(): SDPDirections
+    {
+        return $this->version->usesSdp() ? SDPDirections::sendrecv : SDPDirections::sendonly;
+    }
+
+    /**
+     * The direction the camera video transceiver should have right now: transmitting only while a
+     * file with video plays on the camera playlist *and* no screencast is active — like tgcalls,
+     * sharing the screen replaces the camera, since the peer has a single incoming video channel.
+     *
+     * @psalm-mutation-free
+     */
+    private function videoDirection(): SDPDirections
+    {
+        $sending = $this->videoEnabled && !$this->screencastEnabled;
+        if ($this->version->usesSdp()) {
+            return $sending ? SDPDirections::sendrecv : SDPDirections::recvonly;
+        }
+        return $sending ? SDPDirections::sendonly : SDPDirections::inactive;
     }
 
     /**
@@ -182,14 +368,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
+        unset($vars['signalingMutex']);
         if ($this->recorder?->file === null) {
             unset($vars['recorder']);
         }
         if ($this->callRecorder?->file === null) {
             unset($vars['callRecorder']);
-        }
-        if ($this->presentationRecorder?->file === null) {
-            unset($vars['presentationRecorder']);
         }
         return $vars;
     }
@@ -206,7 +390,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // only — all async resume work happens in resume(), called once the call graph is whole.
         $this->recorder = null;
         $this->callRecorder = null;
-        $this->presentationRecorder = null;
+        $this->signalingMutex = new LocalMutex;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -228,7 +412,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->outgoingScreencast?->resume();
         $this->recorder?->resume();
         $this->callRecorder?->resume();
-        $this->presentationRecorder?->resume();
+        $this->dataChannelOpen = $this->dataChannel?->getReadyState() === DataChannelState::Open;
+        foreach (array_keys($this->incomingVideoTracks) as $index) {
+            $this->drainIncomingVideo($index);
+        }
         // A serialize/unserialize cycle can rebind our UDP socket to a different local port, which
         // strands the ICE candidates the peer already holds. Refresh them from the live socket and
         // re-signal if anything moved, so connectivity is re-established without a full renegotiation.
@@ -312,37 +499,58 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if (!$track instanceof RemoteStreamTrack) {
             return;
         }
-        $this->call->log('RECDEBUG onPeerConnectionTrack kind='.$track->getKind()->name.' id='.spl_object_id($track).' callRecorder='.($this->callRecorder !== null ? '1' : '0'), Logger::ERROR); // RECDEBUG
+        $this->enableRawReceive();
         if ($track->getKind() === MediaKind::Audio) {
             $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
-            $this->enableRawReceive();
             $this->recorder?->setTrack($track);
-        } elseif ($track->getKind() === MediaKind::Video) {
-            $this->call->log("Got incoming video track in {$this->call}", Logger::VERBOSE);
-            $this->enableRawReceive();
-            // A second incoming video is the peer's screencast (presentation); if a separate
-            // presentation output was requested, record it there instead of the main file.
-            if ($this->seenIncomingVideo && $this->presentationRecorder !== null) {
-                $this->presentationRecorder->setTrack($track);
-                return;
-            }
-            $this->seenIncomingVideo = true;
+            $this->callRecorder?->setTrack($track);
+            return;
         }
-        // The full-call recorder muxes the peer's main (audio + camera) media into one file.
-        $this->callRecorder?->setTrack($track);
+        $this->call->log("Got incoming video track in {$this->call}", Logger::VERBOSE);
+        $this->incomingVideoTracks[] = ['track' => $track, 'target' => null];
+        $this->drainIncomingVideo(array_key_last($this->incomingVideoTracks));
     }
 
     /**
-     * Record the peer's incoming presentation (screencast) stream to a separate file/stream, distinct
-     * from the main recording set by {@see self::setOutput()}. A screencast is a second incoming video
-     * content; it is muxed like the main recording. Audio stays on the main recording.
+     * Forward the frames of one incoming video track to the recording slot they belong to.
+     *
+     * Which slot — the camera or the screen share — is decided once, on the track's first frame,
+     * from the peer's media state at that moment. The peer sends its MediaState (over the data
+     * channel, which is faster than the signaling relay) together with the offer that introduces the
+     * new channel, so by the time its first frame arrives the state is known — deciding when the
+     * track is negotiated would race that message. A recorder set later simply starts getting the
+     * frames from then on.
      */
-    public function setPresentationOutput(LocalFile|WritableStream $file): void
+    private function drainIncomingVideo(int $index): void
     {
-        $this->enableRawReceive();
-        $this->presentationRecorder?->close();
-        $this->presentationRecorder = new CallRecorder($file);
-        // A screencast track that arrives after this point is routed here by onPeerConnectionTrack().
+        EventLoop::queue(function () use ($index): void {
+            $entry = $this->incomingVideoTracks[$index] ?? null;
+            if ($entry === null) {
+                return;
+            }
+            $source = CallRecorder::sourceOf($entry['track']);
+            foreach ($entry['track']->getConsumer() as $frame) {
+                if ($this->closed) {
+                    return;
+                }
+                // The receivers run in raw mode (see enableRawReceive()), so what arrives is the
+                // still-encoded frame.
+                if (!$frame instanceof EncodedPacket) {
+                    continue;
+                }
+                $data = $frame->getData();
+                if ($data === '') {
+                    continue;
+                }
+                $target = $this->incomingVideoTracks[$index]['target'] ?? null;
+                if ($target === null) {
+                    $target = $this->remoteMediaState->screencast ? CallRecorder::SLOT_PRESENTATION : CallRecorder::SLOT_VIDEO;
+                    $this->incomingVideoTracks[$index]['target'] = $target;
+                    $this->call->log("The incoming video track $source of {$this->call} is the peer's $target", Logger::VERBOSE);
+                }
+                $this->callRecorder?->pushVideoFrame($data, $frame->getTimestamp(), $source, $target);
+            }
+        });
     }
 
     /**
@@ -430,17 +638,14 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
 
         if ($format->isMatroska()) {
             $this->callRecorder = new CallRecorder($file, $format);
-            $kinds = [];
-            $recv = 0; // RECDEBUG
+            $this->tellRecorderExpectedStreams();
             foreach ($this->peerConnection->getReceivers() as $receiver) {
-                $recv++; // RECDEBUG
                 $track = $receiver->getTrack();
-                if ($track instanceof RemoteStreamTrack) {
-                    $kinds[] = $track->getKind()->name; // RECDEBUG
+                if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
                     $this->callRecorder->setTrack($track);
                 }
             }
-            $this->call->log("RECDEBUG setOutput mkv: receivers=$recv remoteTracks=[".implode(',', $kinds).']', Logger::ERROR); // RECDEBUG
+            // Video frames reach the recorder through drainIncomingVideo(), from now on.
             return;
         }
 
@@ -455,17 +660,33 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
+     * Pass the peer's media state — which of its mic, camera and screen share are on — to the
+     * recorder, which shapes its segments after it. Nothing is passed until the peer has actually
+     * reported a state: before that the recorder just records whatever arrives.
+     */
+    private function tellRecorderExpectedStreams(): void
+    {
+        if (!$this->remoteMediaStateKnown) {
+            return;
+        }
+        $this->callRecorder?->setExpected(
+            audio: !$this->remoteMediaState->muted,
+            video: $this->remoteMediaState->video,
+            presentation: $this->remoteMediaState->screencast,
+        );
+    }
+
+    /**
      * React to the demuxed file's video finishing: stop transmitting video and tell the peer.
      */
     #[\Override]
     public function onVideoStopped(): void
     {
-        if ($this->videoEnabled) {
-            $this->videoEnabled = false;
-            $this->videoTransceiver?->setDirection(SDPDirections::recvonly);
+        $this->videoEnabled = false;
+        if ($this->applyVideoDirection()) {
             $this->renegotiate();
         }
-        $this->sendMediaState($this->muted, video: false);
+        $this->sendMediaState($this->muted);
     }
 
     /**
@@ -481,7 +702,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     {
         $this->videoEnabled = true;
         $transceiver = $this->ensureVideoTransceiver();
-        $transceiver->setDirection(SDPDirections::sendrecv);
+        $changed = $this->applyVideoDirection();
         // Keep the first (usually only immediately useful) keyframe queued until the answer has
         // selected the codec of this file.
         $this->outgoingVideo->setTransportReady(false);
@@ -489,9 +710,35 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->outgoingVideoCodec = $codec;
             $this->outgoingVideoParameters = $parameters;
             $this->applyVideoCodecPreferences($transceiver);
+            $changed = true;
         }
-        $this->renegotiate();
-        $this->sendMediaState($this->muted, video: true);
+        if ($changed) {
+            $this->renegotiate();
+        } else {
+            $this->outgoingVideo->setTransportReady(true);
+        }
+        $this->sendMediaState($this->muted);
+    }
+
+    /**
+     * Bring the camera transceiver's direction in line with {@see self::videoDirection()}, and hold
+     * or discard the camera frames accordingly: while a screencast replaces the camera its frames
+     * are still consumed (so the playlist keeps its pace) but dropped rather than queued.
+     *
+     * @return bool Whether the direction changed, i.e. a renegotiation is needed.
+     */
+    private function applyVideoDirection(): bool
+    {
+        $this->outgoingVideo->setSuppressed($this->videoEnabled && $this->screencastEnabled);
+        if ($this->videoTransceiver === null) {
+            return false;
+        }
+        $direction = $this->videoDirection();
+        if ($this->videoTransceiver->getDirection() === $direction) {
+            return false;
+        }
+        $this->videoTransceiver->setDirection($direction);
+        return true;
     }
 
     /**
@@ -553,14 +800,17 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if ($this->outgoingScreencast !== null) {
             return;
         }
-        $this->outgoingScreencast = new VideoPlaybackTrack($presentationDj, $this->call);
+        $this->outgoingScreencast = new VideoPlaybackTrack($presentationDj, $this->call, 'screencast');
+        // Nothing goes out before the screencast channel has been negotiated.
+        $this->outgoingScreencast->setTransportReady(false);
         $this->screencastObserver = new ScreencastCodecObserver($this);
         $presentationDj->setVideoCodecObserver($this->screencastObserver);
     }
 
     /**
      * Notified (via {@see ScreencastCodecObserver}) of the codec of the presentation file being played:
-     * bring up the screencast video content and announce it as active.
+     * bring up the screencast video content, which — as in tgcalls — replaces the camera video while
+     * it is active, and announce it.
      */
     public function onScreencastCodec(string $codec, array $parameters = []): void
     {
@@ -570,6 +820,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->screencastEnabled = true;
         $transceiver = $this->ensureScreencastTransceiver();
         $transceiver->setDirection(SDPDirections::sendonly);
+        $this->applyVideoDirection();
         $this->outgoingScreencast->setTransportReady(false);
         if ($codec !== $this->outgoingScreencastCodec || $parameters !== $this->outgoingScreencastParameters) {
             $this->outgoingScreencastCodec = $codec;
@@ -588,11 +839,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     public function isScreencastActive(): bool
     {
-        return $this->screencastEnabled || ($this->outgoingScreencast?->isPlaying() ?? false);
+        return $this->screencastEnabled;
     }
 
     /**
-     * Notified that the presentation playlist finished: stop advertising the screencast.
+     * Notified that the presentation playlist finished: stop advertising the screencast and hand the
+     * outgoing video back to the camera, if a file with video is still playing there.
      */
     public function onScreencastStopped(): void
     {
@@ -601,13 +853,18 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
         $this->screencastEnabled = false;
         $this->screencastTransceiver?->setDirection(SDPDirections::inactive);
-        $this->outgoingScreencast?->setTransportReady(true);
+        if ($this->applyVideoDirection()) {
+            // The camera comes back as a channel the peer has to set up anew: hold its frames until
+            // the answer arrives, then start from a keyframe.
+            $this->outgoingVideo->setTransportReady(false);
+        }
         $this->renegotiate();
         $this->sendMediaState($this->muted);
     }
 
     private function ensureScreencastTransceiver(): RTCRtpTransceiver
     {
+        \assert($this->outgoingScreencast !== null);
         return $this->screencastTransceiver ??= $this->peerConnection->addTransceiver(
             $this->outgoingScreencast,
             SDPDirections::sendonly,
@@ -627,6 +884,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             || $this->videoTransceiver === null
             || $this->outgoingVideoCodec === null
             || !$this->videoEnabled
+            || $this->screencastEnabled
         ) {
             return;
         }
@@ -724,7 +982,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     {
         return $this->videoTransceiver ??= $this->peerConnection->addTransceiver(
             $this->outgoingVideo,
-            $this->videoEnabled ? SDPDirections::sendrecv : SDPDirections::recvonly,
+            $this->videoDirection(),
         );
     }
 
@@ -738,18 +996,32 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
 
     /**
      * Notify the peer of a change in our own media state.
+     *
+     * The camera counts as active only while it is actually the transmitted video: a screencast
+     * replaces it (tgcalls reports exactly the same, and shows the incoming video as whichever of the
+     * two is announced active).
      */
-    public function sendMediaState(bool $muted, bool $batteryLow = false, bool $video = false): void
+    public function sendMediaState(bool $muted, bool $batteryLow = false): void
     {
         $this->muted = $muted;
-        $this->sendSignalingMessage([
+        $message = [
             '@type' => 'MediaState',
             'muted' => $muted,
-            'videoState' => $video || $this->outgoingVideo->isPlaying() ? 'active' : 'inactive',
+            'videoState' => $this->videoEnabled && !$this->screencastEnabled ? 'active' : 'inactive',
             'videoRotation' => 0,
-            'screencastState' => $this->screencastEnabled || ($this->outgoingScreencast?->isPlaying() ?? false) ? 'active' : 'inactive',
+            'screencastState' => $this->screencastEnabled ? 'active' : 'inactive',
             'isBatteryLow' => $batteryLow,
-        ]);
+        ];
+        // tgcalls sends its media state over the data channel only, but accepts it from either
+        // path; send it on both, so the state also reaches a peer whose channel is not up yet.
+        if ($this->dataChannelOpen && $this->dataChannel !== null && !$this->closed) {
+            try {
+                $this->dataChannel->send(json_encode($message, JSON_THROW_ON_ERROR));
+            } catch (Throwable $e) {
+                $this->call->log("Could not send the media state of {$this->call} over the data channel: $e", Logger::WARNING);
+            }
+        }
+        $this->sendSignalingMessage($message);
     }
 
     /**
@@ -761,15 +1033,19 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             return;
         }
         $this->closed = true;
-        $this->recorder?->close();
+        try {
+            $this->recorder?->close();
+            $this->callRecorder?->close();
+        } catch (Throwable $e) {
+            // A recorder that cannot finish its file must not take the whole call down with it.
+            $this->call->log("Could not close the recording of {$this->call}: $e", Logger::WARNING);
+        }
         $this->recorder = null;
-        $this->callRecorder?->close();
         $this->callRecorder = null;
-        $this->presentationRecorder?->close();
-        $this->presentationRecorder = null;
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
+            $this->outgoingScreencast?->stop();
             $this->sctp?->close();
             $this->peerConnection->close();
         } catch (Throwable $e) {
@@ -870,31 +1146,110 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
     }
 
+    /**
+     * Our local offer, with every m-line's mid set the way tgcalls routes channels: a channel we
+     * send is identified by our SSRC, a channel we receive by the peer's (see {@see V2Sdp::useSsrcAsMid()}).
+     */
+    private function localOffer(): RTCSessionDescription
+    {
+        $offer = $this->peerConnection->createOffer();
+        return new RTCSessionDescription(
+            V2Sdp::useSsrcAsMid($offer->getSdp(), $this->recvMidsByIndex($offer->getSdp())),
+            $offer->getType(),
+        );
+    }
+
+    /**
+     * The mid (the peer's SSRC) of every receive-only m-line of a freshly created local offer, by
+     * m-line index.
+     *
+     * php-rtc lays the offer out as the currently negotiated m-lines (matched to transceivers by
+     * their mid) followed by the not-yet-negotiated transceivers in creation order, and matches a
+     * remote description back the same way, so the same walk identifies which transceiver each
+     * new m-line stands for.
+     *
+     * @return array<int, string>
+     */
+    private function recvMidsByIndex(string $sdp): array
+    {
+        $ssrcByTransceiver = [];
+        foreach ($this->recvTransceivers as $ssrc => $transceiver) {
+            $ssrcByTransceiver[spl_object_id($transceiver)] = (string) $ssrc;
+        }
+        $known = [];
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            if ($transceiver->getMid() !== null) {
+                $known[$transceiver->getMid()] = $transceiver;
+            }
+        }
+        $unnegotiated = array_values(array_filter(
+            $this->peerConnection->getTransceivers(),
+            static fn (RTCRtpTransceiver $transceiver): bool => $transceiver->getMid() === null && !$transceiver->isStopped(),
+        ));
+        $result = [];
+        foreach (V2Sdp::mids($sdp) as $index => $mid) {
+            $transceiver = $mid !== null ? ($known[$mid] ?? null) : null;
+            if ($transceiver === null) {
+                $transceiver = array_shift($unnegotiated);
+            }
+            if ($transceiver !== null && isset($ssrcByTransceiver[spl_object_id($transceiver)])) {
+                $result[$index] = $ssrcByTransceiver[spl_object_id($transceiver)];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * The peer's channels keyed by the mid of the m-line that carries each, for {@see V2Sdp::buildRemoteDescription()}.
+     *
+     * @return array<string, array<array-key, mixed>>
+     *
+     * @psalm-mutation-free
+     */
+    private function recvContentsByMid(): array
+    {
+        $result = [];
+        foreach ($this->peerContents as $ssrc => $content) {
+            $transceiver = $this->recvTransceivers[$ssrc] ?? null;
+            $result[$transceiver?->getMid() ?? (string) $ssrc] = $content;
+        }
+        return $result;
+    }
+
     /** Offer our currently active outgoing channels using tgcalls' structured dialect. */
     private function sendV2Offer(): void
     {
+        if (!$this->started) {
+            // The channels are still being set up: the first offer waits for start().
+            $this->renegotiatePending = true;
+            return;
+        }
         if ($this->pendingV2ExchangeId !== null
             || $this->peerConnection->getSignalingState() !== SignalingState::stable
         ) {
+            $this->call->log("Deferring a re-offer of {$this->call}: exchange ".($this->pendingV2ExchangeId ?? 'none').' in flight, signaling state '.$this->peerConnection->getSignalingState()->name, Logger::VERBOSE);
             $this->renegotiatePending = true;
             return;
         }
         try {
             $this->sendV2InitialSetup();
-            $offer = $this->peerConnection->createOffer();
-            // tgcalls routes each channel by an SSRC-derived mid, and demultiplexes the unsignaled
-            // incoming video purely by the sdes:mid RTP extension, so our senders must stamp the
-            // SSRC as the mid rather than the plain m-line index.
-            $offer = new RTCSessionDescription(V2Sdp::useSsrcAsMid($offer->getSdp()), $offer->getType());
-            $this->peerConnection->setLocalDescription($offer);
-            $this->pendingV2ExchangeId = (string) random_int(1, 0x7FFFFFFF);
+            // The offer captures the channels as they are now, so a change requested from here on
+            // needs another one: clear the request before, not after, applying the description —
+            // setLocalDescription() suspends (ICE gathering), and a request made meanwhile would
+            // otherwise be wiped out. Likewise the exchange counts as in flight from this point.
             $this->renegotiatePending = false;
-            $offerContents = V2Sdp::contentsFromOffer($offer->getSdp(), outgoingOnly: true);
-            $this->call->log('OFFERDEBUG re-offer exch='.$this->pendingV2ExchangeId.' contents='.json_encode(array_map(static fn ($c): string => ($c['type'] ?? '?').'#'.($c['ssrc'] ?? '?'), $offerContents)).' localAudioMlines='.substr_count($offer->getSdp(), 'm=audio').' sendaudio='.(str_contains($offer->getSdp(), 'a=sendrecv') ? '?' : 'n'), Logger::ERROR); // OFFERDEBUG
+            $this->pendingV2ExchangeId = (string) random_int(1, 0x7FFFFFFF);
+            $offer = $this->localOffer();
+            $this->peerConnection->setLocalDescription($offer);
+            $contents = V2Sdp::contentsFromOffer($offer->getSdp(), outgoingOnly: true);
+            $this->call->log("Offering exchange {$this->pendingV2ExchangeId} of {$this->call}: ".implode(', ', array_map(
+                static fn (array $content): string => (string) $content['type'].'#'.(string) $content['ssrc'],
+                $contents,
+            )), Logger::VERBOSE);
             $this->sendSignalingMessage([
                 '@type' => 'NegotiateChannels',
                 'exchangeId' => $this->pendingV2ExchangeId,
-                'contents' => $offerContents,
+                'contents' => $contents,
             ]);
             $this->sendLocalCandidates();
         } catch (Throwable $e) {
@@ -910,6 +1265,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             return;
         }
         $this->renegotiatePending = true;
+        if (!$this->started) {
+            return; // start() sends the first offer with everything set up so far.
+        }
         if ($this->version->usesSdp()) {
             if ($this->peerConnection->getSignalingState() === SignalingState::stable) {
                 $this->renegotiatePending = false;
@@ -917,39 +1275,62 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             }
             return;
         }
-        $this->sendV2Offer();
+        $this->flushRenegotiation();
     }
 
     private function flushRenegotiation(): void
     {
-        if ($this->renegotiatePending && $this->peerConnection->getSignalingState() === SignalingState::stable) {
-            $this->renegotiate();
+        if (!$this->renegotiatePending || $this->peerConnection->getSignalingState() !== SignalingState::stable || $this->closed) {
+            return;
         }
+        $wait = $this->holdOffUntil - microtime(true);
+        if ($wait > 0) {
+            // Held back to let the peer's offer arrive first (see onV2Negotiation()); retry then.
+            if (!$this->flushScheduled) {
+                $this->flushScheduled = true;
+                EventLoop::delay($wait, function (): void {
+                    $this->flushScheduled = false;
+                    $this->flushRenegotiation();
+                });
+            }
+            return;
+        }
+        if ($this->version->usesSdp()) {
+            $this->renegotiatePending = false;
+            $this->sendLocalDescription();
+            return;
+        }
+        $this->sendV2Offer();
     }
 
     /**
-     * Fill any media type our offer carries but the peer's answer omits, from our own offer, so its
+     * Fill any channel our offer carries but the peer's answer omits, from our own offer, so its
      * m-line is not marked inactive by {@see V2Sdp::buildRemoteDescription()}. A no-op when the answer
-     * already addresses every offered type.
+     * already addresses every offered channel.
      *
      * @param list<array<array-key, mixed>> $answerContents
-     * @return list<array<array-key, mixed>>
+     * @return array<string, array<array-key, mixed>> The answer, keyed by our SSRC.
      */
     private function completeAnswerContents(string $offer, array $answerContents): array
     {
-        $haveTypes = [];
+        $bySsrc = [];
         foreach ($answerContents as $content) {
-            $haveTypes[(string) ($content['type'] ?? '')] = true;
-        }
-        foreach (V2Sdp::contentsFromOffer($offer, outgoingOnly: true) as $offered) {
-            $type = (string) ($offered['type'] ?? '');
-            if (!isset($haveTypes[$type])) {
-                $this->call->log("NEGDEBUG answer omitted $type; carrying it over from our offer to keep it active", Logger::ERROR); // NEGDEBUG
-                $answerContents[] = $offered;
-                $haveTypes[$type] = true;
+            $ssrc = (string) ($content['ssrc'] ?? '0');
+            if ($ssrc !== '0') {
+                $bySsrc[$ssrc] = $content;
             }
         }
-        return $answerContents;
+        foreach (V2Sdp::contentsFromOffer($offer, outgoingOnly: true) as $offered) {
+            $ssrc = (string) ($offered['ssrc'] ?? '0');
+            if ($ssrc !== '0' && !isset($bySsrc[$ssrc])) {
+                // A peer answering our re-offer may leave out a channel it is not renegotiating
+                // (tweb, whose VP8 pick triggers our AV1-force re-offer, sometimes answers with
+                // video only); without it our audio m-line would go inactive and stop.
+                $this->call->log("The answer of {$this->call} omitted our {$offered['type']} channel $ssrc; keeping it as offered", Logger::VERBOSE);
+                $bySsrc[$ssrc] = $offered;
+            }
+        }
+        return $bySsrc;
     }
 
     /** Process one structured offer or answer after InitialSetup has arrived. */
@@ -963,68 +1344,67 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         /** @var list<array<array-key, mixed>> $contents */
         $contents = array_values((array) ($message['contents'] ?? []));
 
-        // NEGDEBUG
-        $csum = array_map(static function ($c): string {
-            $ssrc = $c['ssrc'] ?? '?';
-            $groups = implode('|', array_map(static fn ($g) => ($g['semantics'] ?? '?').':'.implode('+', $g['ssrcs'] ?? []), $c['ssrcGroups'] ?? []));
-            $pts = implode('/', array_map(static fn ($p) => ($p['name'] ?? '?').':'.($p['id'] ?? '?'), $c['payloadTypes'] ?? []));
-            $exts = implode(',', array_map(static fn ($e) => ($e['id'] ?? '?').'='.substr((string) ($e['uri'] ?? ''), -20), $c['rtpExtensions'] ?? []));
-            return ($c['type'] ?? '?').'#'.$ssrc.' groups['.$groups.'] pts{'.$pts.'} ext['.$exts.']';
-        }, $contents);
-        $t = ($this->pendingV2ExchangeId !== null && $exchangeId === $this->pendingV2ExchangeId) ? 'ANSWER'
-            : ($this->pendingV2ExchangeId !== null ? 'GLARE' : 'PEEROFFER');
-        $this->call->log("NEGDEBUG $t exch=$exchangeId [".implode(',', $csum).']', Logger::ERROR);
-
+        $this->call->log("Negotiation message $exchangeId for {$this->call}: ".implode(', ', array_map(
+            static fn (array $content): string => (string) ($content['type'] ?? '?').'#'.(string) ($content['ssrc'] ?? '?'),
+            $contents,
+        )).($this->pendingV2ExchangeId !== null ? " (our exchange {$this->pendingV2ExchangeId} is in flight)" : ''), Logger::VERBOSE);
         if ($this->pendingV2ExchangeId !== null && $exchangeId === $this->pendingV2ExchangeId) {
             $offer = $this->peerConnection->getLocalDescription()?->getSdp();
             if ($offer === null) {
                 return;
             }
-            // A peer answering our re-offer may leave out a media type it is not renegotiating: tweb,
-            // whose VP8 pick triggers our AV1-force re-offer, sometimes answers with video only. A
-            // WebRTC answer must mirror the offer's m-lines, so buildRemoteDescription() would mark the
-            // unanswered (audio) m-line a=inactive and stop our outgoing audio. Carry any media type our
-            // offer has but the answer omits over from our own offer, so that m-line stays active.
-            $contents = $this->completeAnswerContents($offer, $contents);
-            $sdp = V2Sdp::buildRemoteDescription($offer, $this->peerInitialSetup, $contents, true);
+            $this->answeredContents = $this->completeAnswerContents($offer, $contents);
+            foreach ($this->answeredContents as $ssrc => $content) {
+                $codecs = implode(', ', array_map(
+                    static fn (array $payloadType): string => (string) ($payloadType['name'] ?? '?').'/'.(string) ($payloadType['id'] ?? '?'),
+                    (array) ($content['payloadTypes'] ?? []),
+                ));
+                $this->call->log("The peer of {$this->call} accepted our {$content['type']} channel $ssrc ($codecs)", Logger::VERBOSE);
+            }
+            $sdp = V2Sdp::buildRemoteDescription($offer, $this->peerInitialSetup, $this->answeredContents, $this->recvContentsByMid(), true);
             $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'answer'));
             $this->pendingV2ExchangeId = null;
             $this->localV2Negotiated = true;
             $this->outgoingVideo->setTransportReady(true);
             $this->outgoingScreencast?->setTransportReady(true);
+            $this->logTransceivers('after the answer to exchange '.$exchangeId);
             $this->hasRemoteDescription = true;
             $this->flushPendingCandidates();
             $this->forceFileCodecIfRejected();
+            // The peer (a tgcalls callee answers, then at once offers its own channels) may be about
+            // to offer: an offer of ours crossing it would be a glare, which a tgcalls callee resolves
+            // by discarding its own offer *for good* — its channels would then never be negotiated,
+            // and our answer to the discarded offer would be taken for a fresh offer, rebinding the
+            // peer's incoming channels to nonsense (our own media goes silent for it). So leave the
+            // peer's offer room to arrive before re-offering anything.
+            $this->holdOffUntil = microtime(true) + self::PEER_OFFER_GRACE;
+            $this->dropStalePeerOffers();
             $this->flushRenegotiation();
-            $this->flushPendingPeerOffers();
             return;
         }
 
         // Beyond this point the message is the peer's own offer (a glare collision or a fresh one),
-        // declaring the peer's outgoing media. If it carries no video we ignore it: the peer's audio
-        // already reaches us via payload-type routing on the sendrecv audio transceiver, and answering
-        // an audio-only offer would renegotiate and — because our template's video m-line has no
-        // matching content in the peer's audio-only offer — inactivate our own outgoing video
-        // (buildRemoteDescription marks unmatched m-lines a=inactive), destabilising the call and
-        // closing the connection (observed with Telegram web, which only ever offers audio). We only
-        // engage when the peer adds video (its camera), which we must negotiate to receive and record.
-        if (!array_any($contents, static fn (array $content): bool => ($content['type'] ?? null) === 'video')) {
-            return;
-        }
-
+        // declaring the peer's complete set of outgoing channels (its mic, camera or screencast).
+        // Every one of them must be answered: tgcalls creates its outgoing channels only from our
+        // answer, and cannot send another offer (a camera turned on later, say) while one is
+        // pending — so an ignored offer leaves the peer silent for the rest of the call.
         if ($this->pendingV2ExchangeId !== null) {
-            // InstanceV2Impl resolves glare in favor of the call initiator. As the caller we keep our
-            // in-flight exchange, but must not drop the peer's offer: it declares the peer's own
-            // outgoing media (its mic/camera), which we want to receive and record. Queue it and
-            // answer once our exchange settles — a strict native client (tdesktop) sends nothing until
-            // we answer its media offer.
-            if ($this->outgoing) {
+            // A glare. InstanceV2Impl resolves it in favor of the call initiator: as the callee we
+            // discard our in-flight offer and answer the peer's, re-offering afterwards.
+            if (!$this->outgoing) {
+                $this->peerConnection->setLocalDescription(new RTCSessionDescription('', 'rollback'));
+                $this->pendingV2ExchangeId = null;
+                $this->renegotiatePending = true;
+            } else {
+                // As the caller we keep ours; the peer, on receiving it, discards this offer of its
+                // own — and it will not send it again, tgcalls only re-offers on a further change of
+                // its channels. It arrived ahead of the peer's answer to our exchange, so the peer
+                // sent it before seeing our offer: answering it later would be taken for a fresh
+                // offer of ours and rebind the peer's incoming channels to nonsense. Let it go.
+                $this->call->log("Dropping the peer's offer $exchangeId of {$this->call}: it crossed our in-flight exchange {$this->pendingV2ExchangeId}, the peer discards it", Logger::WARNING);
                 $this->pendingPeerOffers[] = $message;
                 return;
             }
-            $this->peerConnection->setLocalDescription(new RTCSessionDescription('', 'rollback'));
-            $this->pendingV2ExchangeId = null;
-            $this->renegotiatePending = true;
         }
 
         // A peer that has not seen our answer re-sends the same offer; answering it again only churns
@@ -1034,46 +1414,29 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
         $this->answeredPeerOfferExchangeId = $exchangeId;
 
-        if (array_any($contents, static fn (array $content): bool => ($content['type'] ?? null) === 'video')) {
-            $this->ensureVideoTransceiver();
-        }
         // The peer advertises codecs we may not support (e.g. Telegram Android offers H265/HEVC).
         // We echo this offer back as our answer, which is what tells the peer which codec to send; if
         // we echo a codec our RtpRouter has no receiver for, the peer sends it and every packet is
         // dropped (routeRtp can't map the payload type), so its video never records. Keep only the
         // payload types we can actually route/record, so the peer falls back to a mutual codec (H264).
-        $contents = self::filterSupportedPayloadTypes($contents);
-        $template = $this->peerConnection->createOffer()->getSdp();
-        $sdp = V2Sdp::buildRemoteDescription($template, $this->peerInitialSetup, $contents, false);
-        // NEGDEBUG: video-section rtpmap of the remote description we apply (what the receiver registers)
-        $vlines = [];
-        $inVid = false;
-        foreach (explode("\n", str_replace("\r\n", "\n", $sdp)) as $l) {
-            $l = trim($l);
-            if (str_starts_with($l, 'm=')) {
-                $inVid = str_starts_with($l, 'm=video');
-                if ($inVid) {
-                    $vlines[] = $l;
-                }
-            } elseif ($inVid && (str_starts_with($l, 'a=rtpmap:') || preg_match('/^a=(sendrecv|sendonly|recvonly|inactive)$/', $l))) {
-                $vlines[] = $l;
-            }
-        }
-        $this->call->log('NEGDEBUG built remote video: '.implode(' | ', $vlines), Logger::ERROR);
+        $contents = $this->filterSupportedPayloadTypes($contents);
+        $this->syncPeerChannels($contents);
+        $template = $this->localOffer()->getSdp();
+        $sdp = V2Sdp::buildRemoteDescription($template, $this->peerInitialSetup, $this->answeredContents, $this->recvContentsByMid(), false);
         $this->peerConnection->setRemoteDescription(new RTCSessionDescription($sdp, 'offer'));
         $answer = $this->peerConnection->createAnswer();
         $this->peerConnection->setLocalDescription($answer);
+        $this->enableRawReceive();
         $this->sendSignalingMessage([
             '@type' => 'NegotiateChannels',
             'exchangeId' => $exchangeId,
             // The answer must echo the peer's offer verbatim — same exchangeId, SSRCs, ssrcGroups and
             // payload types — which is how tgcalls activates the peer's outgoing channels (it matches
-            // on SSRC + exchangeId). buildRemoteDescription already rejected the message if no mutual
-            // codec existed. We only have to repair one JSON detail: a payload type's `parameters`
-            // round-trips through PHP's json_decode/encode as an empty array `[]` when it was `{}`, and
-            // tgcalls' strict parser rejects the whole NegotiateChannels ("could not parse
-            // PayloadType") if `parameters` is not a JSON object — so the peer silently drops our
-            // answer and never starts sending its media. Force `parameters` back to an object.
+            // on SSRC + exchangeId). We only have to repair one JSON detail: a payload type's
+            // `parameters` round-trips through PHP's json_decode/encode as an empty array `[]` when
+            // it was `{}`, and tgcalls' strict parser rejects the whole NegotiateChannels ("could not
+            // parse PayloadType") if `parameters` is not a JSON object — so the peer silently drops
+            // our answer and never starts sending its media. Force `parameters` back to an object.
             'contents' => self::withObjectParameters($contents),
         ]);
         $this->sendLocalCandidates();
@@ -1082,74 +1445,124 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if (!$this->localV2Negotiated) {
             $this->renegotiatePending = true;
         }
+        // The peer's offer is in: nothing to wait for before re-offering.
+        $this->holdOffUntil = 0.0;
         $this->flushRenegotiation();
-        $this->flushPendingPeerOffers();
     }
 
     /**
-     * Answer a peer offer deferred by glare, once our own exchange has settled. One at a time: each
-     * may start a renegotiation, and the next is picked up when that ends.
+     * Log every transceiver's mid, kind and directions, for diagnosing a negotiation.
      */
-    private function flushPendingPeerOffers(): void
+    private function logTransceivers(string $when): void
     {
-        if ($this->pendingPeerOffers === []
-            || $this->pendingV2ExchangeId !== null
-            || $this->renegotiatePending
-            || $this->peerConnection->getSignalingState() !== SignalingState::stable
-        ) {
-            return;
+        $lines = [];
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            $lines[] = ($transceiver->getMid() ?? '?').':'.$transceiver->getKind()->name
+                .' wanted '.($transceiver->getDirection()?->name ?? '?')
+                .' negotiated '.($transceiver->getCurrentDirection()?->name ?? '?');
         }
-        $this->onV2Negotiation(array_shift($this->pendingPeerOffers));
+        $this->call->log("Transceivers of {$this->call} $when: ".implode('; ', $lines), Logger::VERBOSE);
     }
 
     /**
-     * Drop from each content the payload types whose codec our php-rtc build cannot handle, keeping
-     * the RTX entries only for codecs that survive. We record incoming media by muxing the raw frames,
-     * but the RtpRouter still only routes payload types negotiated from our codec table; a codec we do
-     * not carry (e.g. Telegram Android's H265/HEVC) would be echoed as accepted, chosen by the peer,
-     * and then dropped packet-by-packet. Filtering the answer makes the peer pick a mutual codec we can
-     * route and record (H264).
+     * Bring our receive-only transceivers in line with the channels the peer just offered: one per
+     * channel SSRC, created on first sight, receiving while offered and inactive once withdrawn.
+     *
+     * @param list<array<array-key, mixed>> $contents The peer's complete outgoing channel list.
+     */
+    private function syncPeerChannels(array $contents): void
+    {
+        $this->peerContents = [];
+        foreach ($contents as $content) {
+            $ssrc = (string) ($content['ssrc'] ?? '0');
+            if ($ssrc === '0') {
+                continue;
+            }
+            $this->peerContents[$ssrc] = $content;
+            if (!isset($this->recvTransceivers[$ssrc])) {
+                $kind = ($content['type'] ?? null) === 'video' ? MediaKind::Video : MediaKind::Audio;
+                $codecs = implode(', ', array_map(
+                    static fn (array $payloadType): string => (string) ($payloadType['name'] ?? '?').'/'.(string) ($payloadType['id'] ?? '?'),
+                    (array) ($content['payloadTypes'] ?? []),
+                ));
+                $this->call->log("The peer of {$this->call} offered a new {$kind->name} channel $ssrc ($codecs)", Logger::VERBOSE);
+                $this->recvTransceivers[$ssrc] = $this->peerConnection->addTransceiver($kind, SDPDirections::recvonly);
+            } else {
+                $this->recvTransceivers[$ssrc]->setDirection(SDPDirections::recvonly);
+            }
+        }
+        foreach ($this->recvTransceivers as $ssrc => $transceiver) {
+            if (!isset($this->peerContents[$ssrc]) && $transceiver->getDirection() !== SDPDirections::inactive) {
+                $this->call->log("The peer of {$this->call} withdrew its channel $ssrc", Logger::VERBOSE);
+                $transceiver->setDirection(SDPDirections::inactive);
+            }
+        }
+    }
+
+    /**
+     * Forget the peer offers that crossed our exchange (see {@see self::onV2Negotiation()}): the
+     * peer discarded them, and channels it announced only there stay un-negotiated until it offers
+     * again (on its next camera/screen-share change).
+     */
+    private function dropStalePeerOffers(): void
+    {
+        if ($this->pendingPeerOffers !== []) {
+            $this->call->log(\count($this->pendingPeerOffers)." crossed offer(s) of the peer of {$this->call} discarded", Logger::VERBOSE);
+            $this->pendingPeerOffers = [];
+        }
+    }
+    /**
+     * Drop from each content the payload types our php-rtc build cannot receive, keeping the RTX
+     * entries only for codecs that survive. We record incoming media by muxing the raw frames, but
+     * the RtpRouter still only routes payload types negotiated from our codec table; a codec we do
+     * not carry (e.g. Telegram Android's H265/HEVC), or an H.264 profile/packetization mode we do
+     * not accept (Android's hardware encoders offer High profile first), would be echoed as accepted,
+     * chosen by the peer, and then dropped packet-by-packet — no video, silently. Filtering the answer
+     * with exactly the compatibility rule the peer connection applies makes the peer pick a mutual
+     * codec we can route and record.
      *
      * @param list<array<array-key, mixed>> $contents
      * @return list<array<array-key, mixed>>
      */
-    private static function filterSupportedPayloadTypes(array $contents): array
+    private function filterSupportedPayloadTypes(array $contents): array
     {
         $codec = new Codec();
-        /** @var array<string, array<string, true>> $supported */
-        $supported = [];
-        foreach (['audio', 'video'] as $kind) {
-            foreach ($codec->getCapabilities($kind)->codecs as $capability) {
-                $name = strtolower((string) (explode('/', $capability->mimeType)[1] ?? ''));
-                if ($name !== '') {
-                    $supported[$kind][$name] = true;
-                }
-            }
-        }
         foreach ($contents as &$content) {
             $kind = ($content['type'] ?? null) === 'video' ? 'video' : 'audio';
-            $names = $supported[$kind] ?? [];
             $payloadTypes = $content['payloadTypes'] ?? [];
             if (!\is_array($payloadTypes)) {
                 continue;
             }
-            // Which non-RTX codec ids survive, so a dependent RTX entry can be kept alongside them.
-            $keptIds = [];
+            /** @var list<RTCRtpCodecParameters> $remote */
+            $remote = [];
             foreach ($payloadTypes as $payloadType) {
-                $name = strtolower((string) ($payloadType['name'] ?? ''));
-                if ($name !== 'rtx' && $name !== '' && isset($names[$name])) {
-                    $keptIds[(string) ($payloadType['id'] ?? '')] = true;
+                if (!\is_array($payloadType)) {
+                    continue;
+                }
+                $parameters = [];
+                foreach ((array) ($payloadType['parameters'] ?? []) as $key => $value) {
+                    $parameters[(string) $key] = \is_scalar($value) ? (string) $value : null;
+                }
+                $remote[] = new RTCRtpCodecParameters(
+                    $kind.'/'.(string) ($payloadType['name'] ?? ''),
+                    (int) ($payloadType['clockrate'] ?? 0),
+                    ((int) ($payloadType['channels'] ?? 0)) ?: null,
+                    (int) ($payloadType['id'] ?? 0),
+                    [],
+                    $parameters,
+                );
+            }
+            /** @var list<RTCRtpCodecParameters> $local */
+            $local = $codec->getCodecs($kind);
+            $keptIds = [];
+            foreach ($this->peerConnection->findMutualCodecs($local, $remote) as $mutual) {
+                if ($mutual->payloadType !== null) {
+                    $keptIds[$mutual->payloadType] = true;
                 }
             }
             $kept = [];
             foreach ($payloadTypes as $payloadType) {
-                $name = strtolower((string) ($payloadType['name'] ?? ''));
-                if ($name === 'rtx') {
-                    $apt = (string) (((array) ($payloadType['parameters'] ?? []))['apt'] ?? '');
-                    if (isset($keptIds[$apt])) {
-                        $kept[] = $payloadType;
-                    }
-                } elseif ($name !== '' && isset($names[$name])) {
+                if (\is_array($payloadType) && isset($keptIds[(int) ($payloadType['id'] ?? -1)])) {
                     $kept[] = $payloadType;
                 }
             }
@@ -1158,7 +1571,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             // in the answer makes modern peers (Telegram Android) drive their uplink congestion control
             // off transport-cc, receive no such feedback from us, and throttle to the minimum bitrate
             // ("weak signal", 320x180). Strip the transport-cc feedback type and its RTP extension so
-            // the peer falls back to REMB, which we do send (correctly, once the estimator bug is fixed).
+            // the peer falls back to REMB, which we do send.
             foreach ($content['payloadTypes'] as &$payloadType) {
                 if (isset($payloadType['feedbackTypes']) && \is_array($payloadType['feedbackTypes'])) {
                     $payloadType['feedbackTypes'] = array_values(array_filter(
@@ -1283,6 +1696,16 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
 
     private function onSignalingMessage(array $message): void
     {
+        $lock = $this->signalingMutex->acquire();
+        try {
+            $this->handleSignalingMessage($message);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function handleSignalingMessage(array $message): void
+    {
         try {
             switch ($message['@type']) {
                 case 'offer':
@@ -1294,11 +1717,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                     break;
                 case 'MediaState':
                     $this->remoteMediaState = MediaState::fromSignaling($message);
-                    // Let the recorder commit its header without waiting once the peer's real video
-                    // state is known: its camera counts for the main recording, its screencast for the
-                    // separate presentation recording.
-                    $this->callRecorder?->setRemoteHasVideo($this->remoteMediaState->video);
-                    $this->presentationRecorder?->setRemoteHasVideo($this->remoteMediaState->screencast);
+                    $this->remoteMediaStateKnown = true;
+                    $this->call->log("Peer media state of {$this->call}: ".json_encode($this->remoteMediaState), Logger::VERBOSE);
+                    // The recorder shapes its segments after what the peer sends: a stream turned off
+                    // ends the current segment, one turned on is waited for.
+                    $this->tellRecorderExpectedStreams();
                     break;
                 case 'InitialSetup':
                     /** @var array<string, mixed> $message */

@@ -97,14 +97,11 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     private array $userToSource = [];
     /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Per-participant recording outputs (and their format) requested before the user's media source was known. */
     private array $pendingOutputs = [];
-    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Per-participant presentation recording outputs (and their format) requested before the user's source was known. */
-    private array $pendingPresentationOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
+    private RecordingFormat $outputFormat = RecordingFormat::Mkv;
     /** @var array<int, true> User ids already wired to a per-participant file in folder mode. */
     private array $folderPeers = [];
-    /** @var array<int, true> User ids already wired to a presentation file in folder mode. */
-    private array $folderPresentationPeers = [];
     /**
      * The commit-reveal verification of the current chain head, see {@see self::restartVerification()}:
      * the head it is for, its phase, our own commit/reveal broadcasts (and whether the commit was
@@ -1443,41 +1440,38 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
      * Record conference call media (all end-to-end encrypted; the SFU only ever sees ciphertext, but
      * incoming frames are decrypted before they are muxed, so recordings are plaintext).
      *
-     * Two modes:
-     *  - per participant: `setOutput($file, $userId)` records that one participant's incoming audio and
-     *    (if they transmit a camera) video into the given file or stream, or their screen-share with
-     *    `$dest` set to {@see MediaDestination::Presentation}.
-     *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
-     *    participant into its own `<dir>/<userId>.mkv` Matroska file, including participants that start
-     *    transmitting later, plus a `<dir>/<userId>.presentation.mkv` for anyone screen-sharing. Our own
-     *    media is never recorded.
+     * Only a {@see LocalDirectory} is accepted: every *transmitting* participant — or only the given
+     * `$participant` — is recorded as `<dir>/<userId>.<n>_<streams>.mkv` files, one per combination of
+     * the audio, camera video and screen share they send, which they can turn on and off at any time
+     * (see {@see \danog\MadelineProto\EventHandler\Call::setOutput()}). Participants that start
+     * transmitting later are picked up too; our own media is never recorded.
      *
      * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
     {
-        if ($file instanceof LocalDirectory) {
-            $dir = $file->dir;
-            if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
-                throw new \RuntimeException("Could not create the recording directory $dir");
-            }
-            $this->outputDir = $dir;
-            foreach ($this->userToSource as $userId => $source) {
-                if ($userId !== $this->selfId) {
-                    $this->wireFolderOutput($userId, $source);
-                }
-            }
+        if (!$file instanceof LocalDirectory) {
+            throw new \InvalidArgumentException('A conference call is recorded into a LocalDirectory, one numbered file series per participant; a single file cannot hold them.');
+        }
+        $dir = rtrim($file->dir, '/');
+        if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
+            throw new \RuntimeException("Could not create the recording directory $dir");
+        }
+        $format ??= RecordingFormat::Mkv;
+        if (!$format->isMatroska()) {
+            throw new \InvalidArgumentException('Multi-party call recordings are always Matroska: use RecordingFormat::Mkv or RecordingFormat::Webm.');
+        }
+        if ($participant !== null) {
+            $userId = $this->API->getId($participant);
+            $this->wireOutput($userId, new LocalFile("$dir/$userId"), $format);
             return $this;
         }
-        if ($participant === null) {
-            throw new \InvalidArgumentException('setOutput() requires the participant to record into the file/stream, or a LocalDirectory to record every participant.');
-        }
-        $format = RecordingFormat::matroskaFor($file, $format);
-        $userId = $this->API->getId($participant);
-        if ($dest === MediaDestination::Presentation) {
-            $this->wirePresentationOutput($userId, $file, $format);
-        } else {
-            $this->wireOutput($userId, $file, $format);
+        $this->outputDir = $dir;
+        $this->outputFormat = $format;
+        foreach ($this->userToSource as $userId => $source) {
+            if ($userId !== $this->selfId) {
+                $this->wireFolderOutput($userId, $source);
+            }
         }
         return $this;
     }
@@ -1496,21 +1490,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     }
 
     /**
-     * Route one participant's screen-share output to the connection now, or defer it until their
-     * source is known.
-     */
-    private function wirePresentationOutput(int $userId, LocalFile|WritableStream $file, RecordingFormat $format): void
-    {
-        $source = $this->userToSource[$userId] ?? 0;
-        if ($source !== 0 && $this->connection !== null) {
-            $this->connection->setPresentationOutput($source, $file, $format);
-            return;
-        }
-        $this->pendingPresentationOutputs[$userId] = [$file, $format];
-    }
-
-    /**
-     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<userId>.mkv` file, once each.
+     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<userId>.<n>_<streams>.mkv`
+     * file series, once each.
      */
     private function wireFolderOutput(int $userId, int $source): void
     {
@@ -1523,26 +1504,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
             return;
         }
         $this->folderPeers[$userId] = true;
-        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.mkv'), RecordingFormat::Mkv);
-    }
-
-    /**
-     * In folder mode, give a participant that is screen-sharing its own `<dir>/<userId>.presentation.mkv`
-     * file, once each.
-     */
-    private function wireFolderPresentationOutput(int $userId, int $source, bool $hasPresentation): void
-    {
-        if ($this->outputDir === null
-            || $source === 0
-            || $userId === $this->selfId
-            || !$hasPresentation
-            || isset($this->folderPresentationPeers[$userId])
-            || isset($this->pendingPresentationOutputs[$userId]) // an explicit output takes precedence
-        ) {
-            return;
-        }
-        $this->folderPresentationPeers[$userId] = true;
-        $this->wirePresentationOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.presentation.mkv'), RecordingFormat::Mkv);
+        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId), $this->outputFormat);
     }
 
     /**
@@ -1689,6 +1651,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
             }
             $sources[] = [
                 'audio' => $participant->source,
+                'muted' => $participant->muted,
                 'video' => $participant->videoSources,
                 'presentation' => $participant->presentationSources,
                 'videoEndpoint' => $participant->videoEndpoint,
@@ -1701,13 +1664,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
                 unset($this->pendingOutputs[$userId]);
                 $this->connection?->setOutput($participant->source, $file, $format);
             }
-            if (isset($this->pendingPresentationOutputs[$userId])) {
-                [$file, $format] = $this->pendingPresentationOutputs[$userId];
-                unset($this->pendingPresentationOutputs[$userId]);
-                $this->connection?->setPresentationOutput($participant->source, $file, $format);
-            }
             $this->wireFolderOutput($userId, $participant->source);
-            $this->wireFolderPresentationOutput($userId, $participant->source, $participant->presentationSources !== []);
         }
         $this->connection?->setRemoteSources($sources);
     }

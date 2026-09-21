@@ -86,6 +86,7 @@ final class DjLoop extends VoIPLoop
         'V_VP9' => 'VP9',
         'V_AV1' => 'AV1',
         'V_MPEG4/ISO/AVC' => 'H264',
+        'V_MPEGH/ISO/HEVC' => 'H265',
     ];
 
     /** The audio codecs we can transmit, as `Matroska CodecID => SDP encoding name`. */
@@ -743,10 +744,10 @@ final class DjLoop extends VoIPLoop
     ): void {
         if ($resuming) {
             $matroska = new Matroska($file, $cancellation, $this->resumeOffset, $this->resumeTracks, $this->resumeTimestampScale);
-            if ($this->videoCodec === 'H264' && $this->framing === null) {
+            if (($this->videoCodec === 'H264' || $this->videoCodec === 'H265') && $this->framing === null) {
                 foreach ($this->resumeTracks as $track) {
                     if (($track['type'] ?? 0) === Matroska::TRACK_TYPE_VIDEO) {
-                        $this->framing = new H264Framing($track['private']);
+                        $this->framing = new H264Framing($track['private'], $this->videoCodec === 'H265');
                         break;
                     }
                 }
@@ -911,8 +912,8 @@ final class DjLoop extends VoIPLoop
             }
             $this->videoCodec = self::VIDEO_CODECS[$track['codec']];
             $private = $track['private'] ?? '';
-            if ($this->videoCodec === 'H264') {
-                $this->framing = new H264Framing($private);
+            if ($this->videoCodec === 'H264' || $this->videoCodec === 'H265') {
+                $this->framing = new H264Framing($private, $this->videoCodec === 'H265');
             }
             // Advertise the file's real profile/level/tier instead of the generic fallback.
             $this->videoParameters = Codec::fmtpFromBitstream('video/'.$this->videoCodec, $private);

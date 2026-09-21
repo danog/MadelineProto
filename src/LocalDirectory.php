@@ -19,10 +19,9 @@ namespace danog\MadelineProto;
 /**
  * Indicates a local directory to write output into.
  *
- * Used with {@see EventHandler\Calls\GroupCall::setOutput()} to record every transmitting participant of a group call
- * into its own file inside the directory.
- *
- * @psalm-immutable
+ * Used with {@see EventHandler\Call::setOutput()} to record a call into a directory: every recorded participant
+ * gets a numbered series of `<n>_<streams>.mkv` files there (`<peerId>.<n>_<streams>.mkv` in multi-party calls),
+ * one per combination of audio, camera video and screen share they send.
  */
 final class LocalDirectory
 {

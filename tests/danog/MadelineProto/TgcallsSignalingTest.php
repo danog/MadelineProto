@@ -252,21 +252,57 @@ final class TgcallsSignalingTest extends TestCase
         );
     }
 
+    private const PEER_SETUP = [
+        'ufrag' => 'PEERUF',
+        'pwd' => 'PEERPWD00000000000000000',
+        'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'actpass']],
+    ];
+
+    /** An offer with a third, receive-only m-line carrying one of the peer's channels (mid = its SSRC). */
+    private static function offerWithPeerChannel(): string
+    {
+        return self::OFFER
+            ."m=video 9 UDP/TLS/RTP/SAVPF 96\r\n"
+            ."c=IN IP4 0.0.0.0\r\n"
+            ."a=recvonly\r\n"
+            ."a=mid:55555\r\n"
+            ."a=rtcp-mux\r\n"
+            ."a=ssrc:24680 cname:test\r\n"
+            ."a=rtpmap:96 VP8/90000\r\n"
+            ."a=ice-ufrag:LOCALUF\r\n"
+            ."a=ice-pwd:LOCALPWD0000000000000000\r\n"
+            ."a=fingerprint:sha-256 AA:BB:CC\r\n"
+            ."a=setup:actpass\r\n";
+    }
+
+    /** The peer's own video channel, with its own payload type numbering and an RTX group. */
+    private static function peerVideoContent(): array
+    {
+        return [
+            'type' => 'video',
+            'ssrc' => '55555',
+            'ssrcGroups' => [['semantics' => 'FID', 'ssrcs' => ['55555', '55556']]],
+            'payloadTypes' => [
+                ['id' => 100, 'name' => 'VP8', 'clockrate' => 90000, 'channels' => 0, 'feedbackTypes' => [], 'parameters' => []],
+                ['id' => 101, 'name' => 'rtx', 'clockrate' => 90000, 'channels' => 0, 'feedbackTypes' => [], 'parameters' => ['apt' => '100']],
+            ],
+            'rtpExtensions' => [],
+        ];
+    }
+
     /**
-     * The description synthesized from the peer's messages must carry its transport parameters and
-     * one m-line per content, aligned with our own offer.
+     * The description synthesized from the peer's answer must carry its transport parameters and
+     * one m-line per section of our offer, aligned with it: the peer only *receives* on the channels
+     * we send (with the payload types it accepted), and it sends on the channel of its own.
      */
     public function testBuildRemoteDescription(): void
     {
-        $initialSetup = [
-            'ufrag' => 'PEERUF',
-            'pwd' => 'PEERPWD00000000000000000',
-            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'actpass']],
-        ];
-        $contents = V2Sdp::contentsFromOffer(self::OFFER);
-        $contents[0]['ssrc'] = '99999';
+        $answer = [];
+        foreach (V2Sdp::contentsFromOffer(self::OFFER) as $content) {
+            $answer[$content['ssrc']] = $content;
+        }
 
-        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, true);
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, $answer, ['55555' => self::peerVideoContent()], true);
 
         $this->assertStringContainsString('a=ice-ufrag:PEERUF', $sdp);
         $this->assertStringContainsString('a=ice-pwd:PEERPWD00000000000000000', $sdp);
@@ -274,38 +310,54 @@ final class TgcallsSignalingTest extends TestCase
         // An answer must commit to a concrete DTLS role.
         $this->assertStringContainsString('a=setup:active', $sdp);
         $this->assertStringNotContainsString('a=setup:actpass', $sdp);
-        $this->assertStringContainsString('a=ssrc:99999', $sdp);
-        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $sdp);
-        $this->assertStringContainsString('a=fmtp:111 minptime=10;useinbandfec=1', $sdp);
-        $this->assertStringContainsString('a=rtcp-fb:111 transport-cc', $sdp);
-        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $sdp);
-        $this->assertStringContainsString('a=mid:0', $sdp);
-        $this->assertStringContainsString('a=mid:1', $sdp);
         // The m-line count must match the offer, or the mids stop lining up.
-        $this->assertSame(2, substr_count($sdp, "\r\nm="));
+        $this->assertSame(3, substr_count($sdp, "\r\nm="));
+        [$audio, $video, $peer] = self::sections($sdp);
+
+        $this->assertStringContainsString('a=mid:0', $audio);
+        $this->assertStringContainsString('a=recvonly', $audio);
+        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
+        $this->assertStringContainsString('a=fmtp:111 minptime=10;useinbandfec=1', $audio);
+        $this->assertStringContainsString('a=rtcp-fb:111 transport-cc', $audio);
+        // The peer's answer echoes our SSRC, but that is not an SSRC the peer *sends* with.
+        $this->assertStringNotContainsString('a=ssrc:', $audio);
+
+        $this->assertStringContainsString('a=mid:1', $video);
+        $this->assertStringContainsString('a=recvonly', $video);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
+
+        // The peer's channel keeps its own payload types and SSRCs (with the RTX group bound).
+        $this->assertStringContainsString('a=mid:55555', $peer);
+        $this->assertStringContainsString('a=sendonly', $peer);
+        $this->assertStringContainsString('a=rtpmap:100 VP8/90000', $peer);
+        $this->assertStringContainsString('a=fmtp:101 apt=100', $peer);
+        $this->assertStringContainsString('a=ssrc-group:FID 55555 55556', $peer);
+        $this->assertStringContainsString('a=ssrc:55555 cname:tgcalls55555', $peer);
+        $this->assertStringContainsString('a=ssrc:55556 cname:tgcalls55555', $peer);
+        $this->assertStringNotContainsString('a=ssrc:24680', $peer);
     }
 
     public function testBuildRemoteDescriptionRejectsIncompleteSetup(): void
     {
         $this->expectExceptionMessage('ICE credentials');
-        V2Sdp::buildRemoteDescription(self::OFFER, ['ufrag' => '', 'pwd' => ''], [], true);
+        V2Sdp::buildRemoteDescription(self::OFFER, ['ufrag' => '', 'pwd' => ''], [], [], true);
     }
 
     /**
-     * Telegram may answer an audio+video offer with audio only. The rejected video m-line must be
-     * retained to preserve its index, but does not need to establish codecs or a transport.
+     * An inactive section of our offer (a stopped screencast, a withdrawn peer channel) is rejected
+     * by the peer's answer: retained to preserve its index, without codecs or a transport.
      */
-    public function testBuildRemoteDescriptionRejectsMissingMedia(): void
+    public function testBuildRemoteDescriptionRejectsInactiveMedia(): void
     {
-        $initialSetup = [
-            'ufrag' => 'PEERUF',
-            'pwd' => 'PEERPWD00000000000000000',
-            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
-        ];
-        $contents = [V2Sdp::contentsFromOffer(self::OFFER)[0]];
+        $offer = str_replace("a=mid:1\r\n", "a=mid:1\r\n", str_replace(
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=sendrecv",
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=inactive",
+            self::OFFER,
+        ));
+        $answer = ['12345' => V2Sdp::contentsFromOffer($offer)[0]];
 
-        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, true);
-        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
+        $sdp = V2Sdp::buildRemoteDescription($offer, self::PEER_SETUP, $answer, [], true);
+        [, $video] = self::sections($sdp);
 
         $this->assertStringStartsWith('m=video 0 UDP/TLS/RTP/SAVPF 96', $video);
         $this->assertStringContainsString('a=inactive', $video);
@@ -315,43 +367,65 @@ final class TgcallsSignalingTest extends TestCase
         $this->assertStringNotContainsString('a=rtpmap:', $video);
     }
 
-    public function testBuildRemoteOfferKeepsMissingMediaReusable(): void
+    /**
+     * A channel we send that the peer's message does not mention stays ours: the peer's *offer*
+     * only lists the peer's channels, and must never switch off what we transmit (nor swap our
+     * payload type numbers for the peer's).
+     */
+    public function testBuildRemoteOfferKeepsOurChannelsActive(): void
     {
-        $initialSetup = [
-            'ufrag' => 'PEERUF',
-            'pwd' => 'PEERPWD00000000000000000',
-            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
-        ];
-        $contents = [V2Sdp::contentsFromOffer(self::OFFER)[0]];
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, [], ['55555' => self::peerVideoContent()], false);
+        [$audio, $video, $peer] = self::sections($sdp);
 
-        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, false);
-        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
-
-        $this->assertStringStartsWith('m=video 9 UDP/TLS/RTP/SAVPF 96', $video);
-        $this->assertStringContainsString('a=inactive', $video);
+        $this->assertStringContainsString('a=setup:actpass', $sdp);
+        foreach ([$audio, $video] as $ours) {
+            $this->assertStringStartsWith('m=', $ours);
+            $this->assertStringContainsString(' 9 UDP/TLS/RTP/SAVPF', $ours);
+            $this->assertStringContainsString('a=recvonly', $ours);
+            $this->assertStringContainsString('a=ice-ufrag:PEERUF', $ours);
+        }
+        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
         $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
-        $this->assertStringContainsString('a=ice-ufrag:PEERUF', $video);
+        $this->assertStringContainsString('a=sendonly', $peer);
+        $this->assertStringContainsString('a=rtpmap:100 VP8/90000', $peer);
     }
 
-    public function testBuildRemoteDescriptionMatchesContentsByMediaType(): void
+    /**
+     * A section that carries neither a channel of ours nor one of the peer's is kept inactive but
+     * reusable in an offer, matching tgcalls' persistent channel ordering.
+     */
+    public function testBuildRemoteOfferKeepsUnusedMediaReusable(): void
     {
-        $initialSetup = [
-            'ufrag' => 'PEERUF',
-            'pwd' => 'PEERPWD00000000000000000',
-            'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'passive']],
-        ];
-        $contents = array_reverse(V2Sdp::contentsFromOffer(self::OFFER));
-        $contents[0]['ssrc'] = '88888';
-        $contents[1]['ssrc'] = '99999';
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, [], [], false);
+        [, , $peer] = self::sections($sdp);
 
-        $sdp = V2Sdp::buildRemoteDescription(self::OFFER, $initialSetup, $contents, false);
-        $audio = substr($sdp, (int) strpos($sdp, 'm=audio'), (int) strpos($sdp, 'm=video') - (int) strpos($sdp, 'm=audio'));
-        $video = substr($sdp, (int) strpos($sdp, 'm=video'));
+        $this->assertStringStartsWith('m=video 9 UDP/TLS/RTP/SAVPF 96', $peer);
+        $this->assertStringContainsString('a=inactive', $peer);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $peer);
+        $this->assertStringContainsString('a=ice-ufrag:PEERUF', $peer);
+    }
 
-        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
-        $this->assertStringContainsString('a=ssrc:99999', $audio);
-        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
-        $this->assertStringContainsString('a=ssrc:88888', $video);
+    public function testUseSsrcAsMidHonoursExplicitMids(): void
+    {
+        $sdp = V2Sdp::useSsrcAsMid(self::offerWithPeerChannel(), [2 => '77777']);
+
+        // The test offer's BUNDLE group only lists the first two sections.
+        $this->assertStringContainsString('a=group:BUNDLE 12345 67890', $sdp);
+        $this->assertStringContainsString('a=mid:12345', $sdp);
+        $this->assertStringContainsString('a=mid:67890', $sdp);
+        $this->assertStringContainsString('a=mid:77777', $sdp);
+        $this->assertStringNotContainsString('a=mid:55555', $sdp);
+        $this->assertSame([null, '12345', '67890', '77777'], [null, ...V2Sdp::mids($sdp)]);
+    }
+
+    /**
+     * @return list<string> The media sections of an SDP, in order.
+     */
+    private static function sections(string $sdp): array
+    {
+        $parts = preg_split('/(?=m=)/', $sdp) ?: [];
+        array_shift($parts);
+        return $parts;
     }
 
     // ------------------------------------------------------------ SCTP-framed signaling
