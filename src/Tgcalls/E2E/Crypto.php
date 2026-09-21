@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto\Tgcalls\E2E;
 
+use danog\MadelineProto\Magic;
+
 /**
  * Cryptographic primitives for Telegram end-to-end encrypted conference calls, ported byte-for-byte
  * from TDLib's `tde2e` (see td/tde2e/td/e2e/{MessageEncryption,Keys,Call,Blockchain}.cpp and
@@ -302,12 +304,6 @@ final class Crypto
      *  Pure-PHP X25519 fallback (RFC 7748 + Ed25519->Montgomery conversion), used without sodium.
      * ------------------------------------------------------------------ */
 
-    /** Curve25519 field prime, 2^255 - 19. */
-    private static function fieldPrime(): \phpseclib4\Math\BigInteger
-    {
-        return (new \phpseclib4\Math\BigInteger(2))->pow(new \phpseclib4\Math\BigInteger(255))->subtract(new \phpseclib4\Math\BigInteger(19));
-    }
-
     /**
      * Ed25519 seed -> clamped X25519 scalar: SHA-512(seed)[0:32] with the RFC 7748 clamp.
      *
@@ -324,8 +320,8 @@ final class Crypto
     /** Ed25519 public key -> Montgomery u: u = (1 + y) / (1 - y) mod p, with the sign bit cleared. */
     private static function edPublicToX25519(string $publicKey): string
     {
-        $p = self::fieldPrime();
-        $one = new \phpseclib4\Math\BigInteger(1);
+        $p = Magic::$fieldPrime;
+        $one = Magic::$one;
         $y = (new \phpseclib4\Math\BigInteger(strrev($publicKey), 256))
             ->bitwise_and((new \phpseclib4\Math\BigInteger(2))->pow(new \phpseclib4\Math\BigInteger(255))->subtract($one));
         $u = $one->add($y)->multiply($one->subtract($y)->modInverse($p))->powMod($one, $p);
@@ -335,13 +331,13 @@ final class Crypto
     /** X25519 scalar multiplication (RFC 7748 Montgomery ladder). */
     private static function x25519(string $scalar, string $u): string
     {
-        $p = self::fieldPrime();
-        $one = new \phpseclib4\Math\BigInteger(1);
+        $p = Magic::$fieldPrime;
+        $one = Magic::$one;
         $a24 = new \phpseclib4\Math\BigInteger(121665);
         $k = new \phpseclib4\Math\BigInteger(strrev($scalar), 256);
         $x1 = new \phpseclib4\Math\BigInteger(strrev($u), 256);
         $x2 = $one;
-        $z2 = new \phpseclib4\Math\BigInteger(0);
+        $z2 = Magic::$zero;
         $x3 = $x1;
         $z3 = $one;
         $swap = 0;
