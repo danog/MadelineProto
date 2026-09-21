@@ -420,7 +420,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
-        $format ??= $file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Opus;
+        $format ??= $file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Webm;
 
         $this->enableRawReceive();
 

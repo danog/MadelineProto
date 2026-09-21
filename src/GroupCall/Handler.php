@@ -19,7 +19,7 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
-use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
+use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;

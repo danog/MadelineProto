@@ -18,13 +18,13 @@ namespace danog\MadelineProto\EventHandler\Calls;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\GroupCall\Participant;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\RemoteUrl;
 
 /**

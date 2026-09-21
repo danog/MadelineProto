@@ -14,16 +14,16 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\EventHandler\Calls;
+namespace danog\MadelineProto\Tgcalls\E2E;
 
 use Amp\ByteStream\ReadableStream;
 use danog\MadelineProto\EventHandler\Call;
+use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\E2E\BlockCodec;

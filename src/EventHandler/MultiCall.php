@@ -14,16 +14,14 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
-
-use danog\MadelineProto\EventHandler\Call;
+namespace danog\MadelineProto\EventHandler;
 
 /**
- * Common interface for the multi-party call types — {@see EventHandler\Calls\GroupCall} (video chats, livestreams) and
- * {@see \danog\MadelineProto\EventHandler\Calls\ConferenceCall} (end-to-end encrypted conference calls) — on
+ * Common interface for the multi-party call types — {@see Calls\GroupCall} (video chats, livestreams) and
+ * {@see Calls\ConferenceCall} (end-to-end encrypted conference calls) — on
  * top of the media surface every call shares ({@see Call}).
  *
- * It covers what a call with more than two participants adds over a one-to-one {@see EventHandler\Calls\PrivateCall} call:
+ * It covers what a call with more than two participants adds over a one-to-one {@see Calls\PrivateCall} call:
  * leaving without ending it for everyone else, and enumerating who is in it. Type-specific operations
  * (a group call's {@see EventHandler\Calls\GroupCall::invite()} / per-participant recording, a conference's
  * verification emojis / encrypted messages / participant removal) live on the concrete classes.
@@ -38,7 +36,7 @@ interface MultiCall extends Call
 
     /**
      * The participants currently known to be in the call, keyed by their id. The element type is
-     * call-type specific (a {@see GroupCall\Participant} for a group call, chain state for a
+     * call-type specific (a {@see \danog\MadelineProto\GroupCall\Participant} for a group call, chain state for a
      * conference), so the concrete class documents it.
      *
      * @return array<int, mixed>
