@@ -34,6 +34,14 @@ final class ConferenceChain
     /** Permission bits of e2e.chain.groupParticipant. */
     public const PERMISSION_ADD_USERS = 1;
     public const PERMISSION_REMOVE_USERS = 2;
+    /**
+     * The permissions we take for ourselves when creating or joining a call, and grant to whoever joins
+     * a call we created (its `external_permissions`): tde2e gives every member add+remove, so anyone
+     * can join, and any member can prune the members that left.
+     */
+    public const PERMISSIONS_MEMBER = self::PERMISSION_ADD_USERS | self::PERMISSION_REMOVE_USERS;
+    /** The highest protocol version we support, announced in our e2e.chain.groupParticipant. */
+    public const PROTOCOL_VERSION = 1;
 
     private BlockCodec $codec;
 
@@ -49,9 +57,9 @@ final class ConferenceChain
     /** Hash of the last applied block, 32 zero bytes before the genesis block. */
     private string $lastBlockHash;
     /**
-     * Current participants, `user_id => ['public_key' => string, 'permissions' => int]`.
+     * Current participants, `user_id => ['public_key' => string, 'permissions' => int, 'version' => int]`.
      *
-     * @var array<int, array{public_key: string, permissions: int}>
+     * @var array<int, array{public_key: string, permissions: int, version: int}>
      */
     private array $participants = [];
     /** The current raw (pre-derivation) group shared key, or null if none is set. */
@@ -97,11 +105,14 @@ final class ConferenceChain
      * participant (holding every permission) and installs the first shared key. The zero block must
      * carry a Noop change, as tde2e requires.
      *
+     * @param int $externalPermissions What a non-member may do to the chain: tde2e grants add+remove
+     *                                 users, which is what lets anyone add themselves by joining.
+     *
      * @return array{block: array<string, mixed>, serialized: string, hash: string, raw_shared_key: string}
      */
-    public function buildGenesis(int $externalPermissions = 0): array
+    public function buildGenesis(int $externalPermissions = self::PERMISSIONS_MEMBER): array
     {
-        $participants = [$this->participantChange($this->selfUserId, $this->selfPublicKey, self::PERMISSION_ADD_USERS | self::PERMISSION_REMOVE_USERS)];
+        $participants = [$this->participantChange($this->selfUserId, $this->selfPublicKey, self::PERMISSIONS_MEMBER)];
         $raw = random_bytes(32);
         $changes = [
             [
@@ -217,8 +228,9 @@ final class ConferenceChain
                     $permissions |= ($participant['add_users'] ?? false) ? self::PERMISSION_ADD_USERS : 0;
                     $permissions |= ($participant['remove_users'] ?? false) ? self::PERMISSION_REMOVE_USERS : 0;
                     $this->participants[(int) $participant['user_id']] = [
-                        'public_key' => $participant['public_key'],
+                        'public_key' => (string) $participant['public_key'],
                         'permissions' => $permissions,
+                        'version' => (int) ($participant['version'] ?? 0),
                     ];
                 }
                 // A group-state change clears the shared key, as in tde2e.
@@ -286,17 +298,18 @@ final class ConferenceChain
     /**
      * Build an e2e.chain.changeSetGroupState from a participant list.
      *
-     * @param list<array{0: int, 1: string, 2: int}> $participants `[user_id, public_key, permissions]`.
+     * @param list<array{0: int, 1: string, 2: int, 3?: int}> $participants `[user_id, public_key, permissions, version]`; the version defaults to ours.
      *
      * @return array<string, mixed>
      *
      * @psalm-mutation-free
      */
-    public function groupStateChange(array $participants, int $externalPermissions = 0): array
+    public function groupStateChange(array $participants, int $externalPermissions = self::PERMISSIONS_MEMBER): array
     {
         $list = [];
-        foreach ($participants as [$userId, $publicKey, $permissions]) {
-            $list[] = $this->participantChange($userId, $publicKey, $permissions);
+        foreach ($participants as $participant) {
+            [$userId, $publicKey, $permissions] = $participant;
+            $list[] = $this->participantChange($userId, $publicKey, $permissions, $participant[3] ?? self::PROTOCOL_VERSION);
         }
         return [
             '_' => 'e2e.chain.changeSetGroupState',
@@ -313,7 +326,7 @@ final class ConferenceChain
      *
      * @psalm-pure
      */
-    private function participantChange(int $userId, string $publicKey, int $permissions): array
+    private function participantChange(int $userId, string $publicKey, int $permissions, int $version = self::PROTOCOL_VERSION): array
     {
         return [
             '_' => 'e2e.chain.groupParticipant',
@@ -321,12 +334,39 @@ final class ConferenceChain
             'public_key' => $publicKey,
             'add_users' => ($permissions & self::PERMISSION_ADD_USERS) !== 0,
             'remove_users' => ($permissions & self::PERMISSION_REMOVE_USERS) !== 0,
-            'version' => 1,
+            'version' => $version,
         ];
     }
 
     /**
-     * @return array<int, array{public_key: string, permissions: int}>
+     * The current participants as `[user_id, public_key, permissions, version]` tuples, ready to be
+     * carried over unchanged into the next group state.
+     *
+     * @return list<array{0: int, 1: string, 2: int, 3: int}>
+     *
+     * @psalm-mutation-free
+     */
+    public function getParticipantTuples(): array
+    {
+        $tuples = [];
+        foreach ($this->participants as $userId => $info) {
+            $tuples[] = [$userId, $info['public_key'], $info['permissions'], $info['version']];
+        }
+        return $tuples;
+    }
+
+    /**
+     * Our own permission bits in the current group state, or 0 if we are not (yet) a member.
+     *
+     * @psalm-mutation-free
+     */
+    public function getSelfPermissions(): int
+    {
+        return $this->participants[$this->selfUserId]['permissions'] ?? 0;
+    }
+
+    /**
+     * @return array<int, array{public_key: string, permissions: int, version: int}>
      */
     public function getParticipants(): array
     {

@@ -465,7 +465,7 @@ final class PrivateCallController implements CallControllerInterface
      * @param int<1, 5> $rating  Call rating in stars
      * @param string    $comment Additional comment on call quality.
      */
-    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
+    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null, ?string $conferenceSlug = null): self
     {
         if ($this->callState === CallState::ENDED) {
             return $this;
@@ -489,7 +489,7 @@ final class PrivateCallController implements CallControllerInterface
                 'peer' => $this->call,
                 'duration' => time() - $this->public->date,
                 'connection_id' => 0,
-                'reason' => ['_' => $reason->value],
+                'reason' => ['_' => $reason->value] + ($conferenceSlug !== null ? ['slug' => $conferenceSlug] : []),
             ]);
         } catch (CallAlreadyAcceptedError|CallAlreadyDeclinedError) {
         }
@@ -551,6 +551,35 @@ final class PrivateCallController implements CallControllerInterface
             $this->tgcallsController?->enablePresentation($this->presentationDj);
         }
         return $this->presentationDj;
+    }
+
+    /**
+     * Start sharing a screen: bring up the presentation (screencast) playlist and attach it to the
+     * WebRTC engine as a separate outgoing video stream. Idempotent; the screencast is advertised to
+     * the peer as soon as a file with video plays on it.
+     */
+    public function enablePresentation(): void
+    {
+        $this->dj(MediaDestination::Presentation);
+    }
+
+    /**
+     * Stop sharing the screen: stop the presentation playlist, which makes the engine advertise the
+     * screencast as inactive. The playlist stays attached, ready for the next presentation playback.
+     */
+    public function disablePresentation(): void
+    {
+        $this->presentationDj?->stopPlaying();
+    }
+
+    /**
+     * Whether a screencast is currently being transmitted.
+     *
+     * @psalm-mutation-free
+     */
+    public function isSharingScreen(): bool
+    {
+        return $this->tgcallsController?->isScreencastActive() ?? false;
     }
 
     /**

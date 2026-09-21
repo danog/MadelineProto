@@ -25,6 +25,7 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -146,6 +147,25 @@ trait AuthKeyHandler
     public function discardCall(int $id, DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): void
     {
         ($this->calls[$id] ?? null)?->discard($reason, $rating, $comment);
+    }
+
+    /**
+     * Upgrade a one-to-one call to an [end-to-end encrypted conference call »](https://core.telegram.org/api/group-calls#conference-calls):
+     * create a conference, invite the other party to it, and discard the one-to-one call pointing them
+     * to the conference (`phoneCallDiscardReasonMigrateConferenceCall`).
+     *
+     * @param int  $id    ID of the one-to-one call.
+     * @param bool $muted Whether to join the conference muted.
+     */
+    public function migrateCallToConference(int $id, bool $muted = false): ConferenceCall
+    {
+        $call = $this->calls[$id] ?? throw new AssertionError('Unknown call!');
+        $conference = $this->createConferenceCall($muted);
+        $link = $conference->exportInvite();
+        $slug = substr($link, (int) strrpos($link, '/') + 1);
+        $conference->invite($call->public->otherID);
+        $call->discard(DiscardReason::MIGRATE_CONFERENCE_CALL, conferenceSlug: $slug);
+        return $conference;
     }
 
     /**
@@ -331,6 +351,38 @@ trait AuthKeyHandler
     public function isCallMuted(int $id): bool
     {
         return ($this->calls[$id] ?? null)?->isMuted() ?? true;
+    }
+
+    /**
+     * Start sharing a screen in a call.
+     *
+     * @internal
+     */
+    public function enableCallPresentation(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->enablePresentation();
+    }
+
+    /**
+     * Stop sharing the screen in a call.
+     *
+     * @internal
+     */
+    public function disableCallPresentation(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->disablePresentation();
+    }
+
+    /**
+     * Whether a screencast is currently being transmitted in a call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isCallSharingScreen(int $id): bool
+    {
+        return ($this->calls[$id] ?? null)?->isSharingScreen() ?? false;
     }
 
     /**

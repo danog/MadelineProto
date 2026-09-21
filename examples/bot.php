@@ -307,7 +307,7 @@ class MyEventHandler extends SimpleEventHandler
     #[Handler]
     public function handleIncomingCall(VoIP&Incoming $call): void
     {
-        $call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+        $call->join()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
     }
 
     public static function getPluginPaths(): string|array|null

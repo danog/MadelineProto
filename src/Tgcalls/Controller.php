@@ -582,6 +582,16 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
+     * Whether our screencast is currently being transmitted (advertised as active to the peer).
+     *
+     * @psalm-mutation-free
+     */
+    public function isScreencastActive(): bool
+    {
+        return $this->screencastEnabled || ($this->outgoingScreencast?->isPlaying() ?? false);
+    }
+
+    /**
      * Notified that the presentation playlist finished: stop advertising the screencast.
      */
     public function onScreencastStopped(): void

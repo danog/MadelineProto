@@ -16,6 +16,9 @@
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\WritableStream;
+use InvalidArgumentException;
+
 /**
  * Container format of a call recording, as passed to {@see Call::setOutput()}.
  *
@@ -40,6 +43,8 @@ enum RecordingFormat
     /**
      * Autodetect the recording format from a file's extension: `.mkv` and `.webm` map to the
      * matching Matroska format, and anything else (including an unknown extension) to {@see self::Opus}.
+     *
+     * @psalm-pure
      */
     public static function fromFile(LocalFile $file): self
     {
@@ -50,13 +55,38 @@ enum RecordingFormat
         };
     }
 
-    /** Whether this format muxes video (and audio) into a Matroska container, rather than audio-only OGG. */
+    /**
+     * Resolve the format of a multi-party call recording, which is always Matroska: the given one, or
+     * else {@see self::Webm} for a `.webm` {@see LocalFile} and {@see self::Mkv} for anything else.
+     *
+     * @throws InvalidArgumentException If {@see self::Opus} was requested.
+     *
+     * @psalm-pure
+     */
+    public static function matroskaFor(LocalFile|WritableStream $file, ?self $format): self
+    {
+        $format ??= $file instanceof LocalFile && self::fromFile($file) === self::Webm ? self::Webm : self::Mkv;
+        if (!$format->isMatroska()) {
+            throw new InvalidArgumentException('Multi-party call recordings are always Matroska: use RecordingFormat::Mkv or RecordingFormat::Webm.');
+        }
+        return $format;
+    }
+
+    /**
+     * Whether this format muxes video (and audio) into a Matroska container, rather than audio-only OGG.
+     *
+     * @psalm-mutation-free
+     */
     public function isMatroska(): bool
     {
         return $this !== self::Opus;
     }
 
-    /** The EBML DocType to declare in the Matroska header for this format. */
+    /**
+     * The EBML DocType to declare in the Matroska header for this format.
+     *
+     * @psalm-mutation-free
+     */
     public function docType(): string
     {
         return match ($this) {

@@ -49,6 +49,7 @@
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\Call;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\GroupCall;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
@@ -58,7 +59,6 @@ use danog\MadelineProto\Matroska;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use danog\MadelineProto\Tgcalls\E2E\Crypto;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\VoIP;
@@ -273,7 +273,7 @@ switch ($mode) {
             if ($media === 'screencast') {
                 $presOut = __DIR__.'/../incoming_1to1_screencast.presentation.mkv';
                 info('Also recording any incoming screen-share into '.$presOut);
-                $call->setOutput(new LocalFile($presOut), MediaDestination::Presentation);
+                $call->setOutput(new LocalFile($presOut), dest: MediaDestination::Presentation);
             }
             $emojis = $call->getVisualization();
             if ($emojis !== null) {
@@ -379,11 +379,10 @@ switch ($mode) {
         $API = startApi($session);
         info('Creating a new end-to-end encrypted conference call…');
         $call = $API->createConferenceCall();
-        $ic = $call->getInputCall();
         transmit($call, $m, $file);
         box('SHARE THESE WITH THE OTHER ACCOUNT TO JOIN');
         info('Run on the OTHER account:');
-        info("  php tests/manual_call_features.php conference-join {$ic['id']} {$ic['access_hash']} $media [file] [other-session]");
+        info("  php tests/manual_call_features.php conference-join {$call->id} {$call->accessHash} $media [file] [other-session]");
         runConference($call, $media);
         break;
 
@@ -450,11 +449,9 @@ function runConference(ConferenceCall $call, string $media): void
     };
     click("On the OTHER account, JOIN the conference and confirm $ask, then compare the verification emojis below.");
 
-    info('Starting verification (commit/reveal on subchain 1)…');
-    $call->startVerification();
-    info('Waiting up to 30s for every participant to reveal their nonce…');
-    waitFor(static fn (): bool => $call->getEmojis() !== null, microtime(true) + 30);
-    $emojis = $call->getEmojis();
+    info('Verification (commit/reveal on subchain 1) runs automatically; waiting up to 30s for every participant to reveal their nonce…');
+    waitFor(static fn (): bool => $call->getVisualization() !== null, microtime(true) + 30);
+    $emojis = $call->getVisualization();
     info('Verification emojis (MUST match on every participant): '.($emojis !== null ? implode(' ', $emojis) : '(not enough participants revealed yet)'));
 
     try {
@@ -468,7 +465,7 @@ function runConference(ConferenceCall $call, string $media): void
     $lastReport = 0.0;
     while ($call->isJoined()) {
         if (microtime(true) - $lastReport > 5) {
-            $emojis = $call->getEmojis();
+            $emojis = $call->getVisualization();
             info('… in conference; emojis: '.($emojis !== null ? implode(' ', $emojis) : 'pending'));
             $lastReport = microtime(true);
         }

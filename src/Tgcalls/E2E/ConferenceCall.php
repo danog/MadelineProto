@@ -19,18 +19,20 @@ namespace danog\MadelineProto\Tgcalls\E2E;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
-use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
-use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\GroupCall\GroupCallState;
+use danog\MadelineProto\GroupCall\Participant;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use danog\MadelineProto\Tgcalls\GroupSdp;
@@ -53,7 +55,7 @@ use Throwable;
  * implements the common {@see Call} media interface plus conference-specific controls (verification,
  * encrypted messages).
  */
-final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyProvider
+final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
 {
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
     private const SUBCHAIN_STATE = 0;
@@ -91,11 +93,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     private array $chainOffset = [0, 0];
     /** SSRC (unsigned) => participant user id, for verifying incoming media senders. */
     private array $ssrcToUser = [];
-    /** user id => signed audio source, learned from the participant list, for recording. */
+    /** @var array<int, int> user id => signed audio source, learned from the participant list, for recording. */
     private array $userToSource = [];
-    /** Per-participant recording outputs requested before the user's media source was known. */
+    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Per-participant recording outputs (and their format) requested before the user's media source was known. */
     private array $pendingOutputs = [];
-    /** Per-participant presentation recording outputs requested before the user's source was known. */
+    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Per-participant presentation recording outputs (and their format) requested before the user's source was known. */
     private array $pendingPresentationOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
@@ -103,10 +105,36 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     private array $folderPeers = [];
     /** @var array<int, true> User ids already wired to a presentation file in folder mode. */
     private array $folderPresentationPeers = [];
-    /** user id => revealed verification nonce, for computing the emoji hash. */
-    private array $verificationNonces = [];
-    /** Our own verification nonce for the current chain head, if a verification is in progress. */
-    private ?string $ownNonce = null;
+    /**
+     * The commit-reveal verification of the current chain head, see {@see self::restartVerification()}:
+     * the head it is for, its phase, our own commit/reveal broadcasts (and whether the commit was
+     * sent), the members (user id => public key) that must take part, what they committed/revealed,
+     * and the resulting emojis once everyone revealed.
+     *
+     * @var array{height: int, hash: string, state: 'commit'|'reveal'|'end', sent: bool, commit: array<string, mixed>, reveal: array<string, mixed>, participants: array<int, string>, committed: array<int, string>, revealed: array<int, string>, emojis: list<string>|null}|null
+     */
+    private ?array $verification = null;
+    /** @var array<int, list<string>> Verification broadcasts for chain heights we have not reached yet, by height. */
+    private array $delayedBroadcasts = [];
+    /**
+     * The participants of the underlying group call (the RTC side: sources, video, screen-share), by
+     * user id, from phone.getGroupCall and updateGroupCallParticipants.
+     *
+     * @var array<int, Participant>
+     */
+    private array $rtcParticipants = [];
+    /** Version of the underlying groupCall, for ordering participant updates. */
+    private int $callVersion = 0;
+    /** The raw groupCall constructor of the conference, as last seen. */
+    private ?array $rawCall = null;
+    /** Whether we are leaving on purpose, so that being forbidden is not answered with a rejoin. */
+    private bool $leaving = false;
+    /** Whether an automatic rejoin is already scheduled. */
+    private bool $rejoinScheduled = false;
+    /** Counts backstop poll ticks, to poll every 5 seconds outside of key verification. */
+    private int $pollTick = 0;
+    /** @var array<string, true> Recently seen in-call message ids (`from:random_id`), for deduplication. */
+    private array $seenMessages = [];
 
     private bool $joined = false;
     /** Event-loop id of the backstop chain poll, so it can be cancelled on leave. */
@@ -177,6 +205,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         $this->startPolling();
         $this->syncChain(self::SUBCHAIN_STATE);
         $this->syncChain(self::SUBCHAIN_VERIFICATION);
+        $this->refetchParticipants();
         $this->log("Resumed E2E conference $this after a restart", Logger::NOTICE);
     }
 
@@ -212,7 +241,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     public function getPublic(): ConferenceCallUpdate
     {
         $call = $this->getInputCall();
-        return $this->public ??= new ConferenceCallUpdate($this->API, [
+        return $this->public ??= new ConferenceCallUpdate($this->API, $this->rawCall ?? [
             '_' => 'groupCall',
             'id' => $call['id'],
             'access_hash' => $call['access_hash'],
@@ -220,7 +249,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         ]);
     }
 
-    /** Whether we are currently in the conference (joined and not left/forbidden). */
+    /**
+     * Whether we are currently in the conference (joined and not left/forbidden).
+     *
+     * @psalm-mutation-free
+     */
     public function isJoined(): bool
     {
         return $this->joined;
@@ -310,8 +343,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         $this->chainOffset = [$this->chain->getHeight() + 1, 0];
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->leaving = false;
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         $this->startPolling();
+        $this->restartVerification();
+        $this->refetchParticipants();
         $this->log("Created and joined E2E conference $this", Logger::NOTICE);
     }
 
@@ -319,7 +355,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * Join an existing conference call: fetch the chain, add ourselves in a new block, and join with
      * that block.
      */
-    public function join(bool $muted = false): void
+    public function join(bool $muted = false): self
     {
         $this->syncChain(self::SUBCHAIN_STATE);
         $this->connection = new GroupConnection($this, $this->diskJockey);
@@ -339,11 +375,18 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         ]));
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->leaving = false;
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         // Re-sync so our own accepted block (and any concurrent ones) are applied in server order.
         $this->syncChain(self::SUBCHAIN_STATE);
         $this->startPolling();
+        // Verification of the current head starts as blocks are applied; make sure our commit went out
+        // for a head that was applied before we were joined.
+        $this->restartVerification();
+        $this->ensureVerificationBroadcast();
+        $this->refetchParticipants();
         $this->log("Joined E2E conference $this", Logger::NOTICE);
+        return $this;
     }
 
     /**
@@ -356,11 +399,15 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     {
         $participants = [];
         $recipients = [];
-        foreach ($this->chain->getParticipants() as $userId => $info) {
-            $participants[] = [$userId, $info['public_key'], $info['permissions']];
-            $recipients[] = [$userId, $info['public_key']];
+        foreach ($this->chain->getParticipantTuples() as $tuple) {
+            if ($tuple[0] === $this->selfId) {
+                continue; // a stale entry of ours (an earlier key) is replaced, as tde2e does
+            }
+            $participants[] = $tuple;
+            $recipients[] = [$tuple[0], $tuple[1]];
         }
-        $participants[] = [$this->selfId, $this->chain->getSelfPublicKey(), 0];
+        // The same permissions tde2e takes for itself: they let us prune members that left.
+        $participants[] = [$this->selfId, $this->chain->getSelfPublicKey(), ConferenceChain::PERMISSIONS_MEMBER, ConferenceChain::PROTOCOL_VERSION];
         $recipients[] = [$this->selfId, $this->chain->getSelfPublicKey()];
 
         $raw = random_bytes(32);
@@ -373,24 +420,134 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     }
 
     /**
+     * Change a participant's state (phone.editGroupCallParticipant): mute them for ourselves, set our
+     * playback volume of them, or pause/resume our own video.
+     */
+    public function editParticipant(mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
+    {
+        $params = ['call' => $this->getInputCall(), 'participant' => $participant];
+        if ($muted !== null) {
+            $params['muted'] = $muted;
+        }
+        if ($volume !== null) {
+            if ($volume < 1 || $volume > 20000) {
+                throw new \InvalidArgumentException('The volume must be between 1 and 20000 (10000 = 100%).');
+            }
+            $params['volume'] = $volume;
+        }
+        if ($videoPaused !== null) {
+            $params['video_paused'] = $videoPaused;
+        }
+        $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', $params);
+    }
+
+    /**
+     * Change the conference's settings (phone.toggleGroupCallSettings): whether new members join
+     * muted, whether in-call messages are enabled, or invalidate its conference link.
+     */
+    public function toggleSettings(?bool $joinMuted = null, bool $resetInviteHash = false, ?bool $messagesEnabled = null): void
+    {
+        $params = ['call' => $this->getInputCall(), 'reset_invite_hash' => $resetInviteHash];
+        if ($joinMuted !== null) {
+            $params['join_muted'] = $joinMuted;
+        }
+        if ($messagesEnabled !== null) {
+            $params['messages_enabled'] = $messagesEnabled;
+        }
+        $updates = $this->API->methodCallAsyncRead('phone.toggleGroupCallSettings', $params);
+        if ($resetInviteHash) {
+            // The new link comes back in the updateGroupCall of the response, or on the next fetch.
+            $this->extractCall($updates);
+        }
+    }
+
+    /**
+     * Change the title of the conference call.
+     */
+    public function setTitle(string $title): self
+    {
+        $this->API->methodCallAsyncRead('phone.editGroupCallTitle', [
+            'call' => $this->getInputCall(),
+            'title' => $title,
+        ]);
+        return $this;
+    }
+
+    /**
+     * Invite users to the conference call (phone.inviteConferenceCallParticipant), ringing them; once
+     * they accept they add themselves to the chain with their own self-join block.
+     */
+    public function invite(mixed ...$users): self
+    {
+        /** @var mixed $user */
+        foreach ($users as $user) {
+            $this->API->methodCallAsyncRead('phone.inviteConferenceCallParticipant', [
+                'call' => $this->getInputCall(),
+                'user_id' => $user,
+            ]);
+        }
+        return $this;
+    }
+
+    /**
+     * The [conference link »](https://core.telegram.org/api/links#conference-links) of the call: it is
+     * created with the call and carried by its groupCall (`invite_link`), so, like official clients, we
+     * read it from there rather than exporting one.
+     */
+    public function exportInvite(bool $canSelfUnmute = false): string
+    {
+        $link = (string) ($this->rawCall['invite_link'] ?? '');
+        if ($link === '') {
+            $this->refetchParticipants();
+            $link = (string) ($this->rawCall['invite_link'] ?? '');
+        }
+        if ($link === '') {
+            throw new \RuntimeException("The server did not provide an invite link for $this.");
+        }
+        return $link;
+    }
+
+    /**
      * Remove participants from the conference: build a block dropping them and rekeying for the
      * remaining members, then submit it with phone.deleteConferenceCallParticipants. Requires the
      * `remove_users` permission. The removed members can no longer decrypt media once the new epoch
      * takes over.
      */
-    public function removeParticipant(int ...$userIds): void
+    public function removeParticipant(mixed ...$participants): self
     {
-        $remove = array_flip($userIds);
-        $updates = $this->submitWithChainRetry(function () use ($remove, $userIds): array {
+        $this->submitRemoval(array_values(array_map($this->API->getId(...), $participants)), kick: true);
+        return $this;
+    }
+
+    /**
+     * Drop members from the chain, rekeying for the remaining ones, with
+     * phone.deleteConferenceCallParticipants: `kick` forcibly removes active members (requires the
+     * `remove_users` permission), otherwise the `only_left` flag prunes members that already left the
+     * call. Members not in the chain (and ourselves) are ignored.
+     *
+     * @param list<int> $userIds
+     */
+    private function submitRemoval(array $userIds, bool $kick): void
+    {
+        $remove = [];
+        foreach ($userIds as $userId) {
+            if ($userId !== $this->selfId && isset($this->chain->getParticipants()[$userId])) {
+                $remove[$userId] = true;
+            }
+        }
+        if ($remove === []) {
+            return;
+        }
+        $updates = $this->submitWithChainRetry(function () use ($remove, $kick): array {
             // Built from the current chain state each attempt, so a retry rekeys on the fresh head.
             $participants = [];
             $recipients = [];
-            foreach ($this->chain->getParticipants() as $userId => $info) {
-                if (isset($remove[$userId])) {
+            foreach ($this->chain->getParticipantTuples() as $tuple) {
+                if (isset($remove[$tuple[0]])) {
                     continue;
                 }
-                $participants[] = [$userId, $info['public_key'], $info['permissions']];
-                $recipients[] = [$userId, $info['public_key']];
+                $participants[] = $tuple;
+                $recipients[] = [$tuple[0], $tuple[1]];
             }
             if ($recipients === []) {
                 throw new \RuntimeException('Cannot remove every participant from the conference.');
@@ -402,15 +559,35 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
                 ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
             ]);
             return $this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
-                'kick' => true,
+                'kick' => $kick,
+                'only_left' => !$kick,
                 'call' => $this->getInputCall(),
-                'ids' => $userIds,
+                'ids' => array_keys($remove),
                 'block' => $block['serialized'],
             ]);
         });
         $this->consumeUpdates($updates);
         // Apply our own accepted block (and anything concurrent) in server order.
         $this->syncChain(self::SUBCHAIN_STATE);
+    }
+
+    /**
+     * Prune members of the chain that are no longer in the call (they left, or are missing from a
+     * complete participant list), so the key is rotated away from them and verification no longer
+     * waits for them. Requires the `remove_users` permission, which every member normally holds.
+     *
+     * @param list<int> $userIds
+     */
+    private function pruneStale(array $userIds): void
+    {
+        if (!$this->joined || ($this->chain->getSelfPermissions() & ConferenceChain::PERMISSION_REMOVE_USERS) === 0) {
+            return;
+        }
+        try {
+            $this->submitRemoval($userIds, kick: false);
+        } catch (Throwable $e) {
+            $this->log("Could not prune the members that left $this: $e", Logger::WARNING);
+        }
     }
 
     /**
@@ -449,11 +626,13 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     }
 
     /**
-     * We were forbidden from the call (removed, or the chain reset): stop participating so we neither
-     * poll nor apply further blocks. The caller decides whether to rejoin.
+     * We were forbidden from the call (removed from the chain, or its state was reset): stop
+     * participating so we neither poll nor apply further blocks, then — as official clients do — rejoin
+     * transparently with a fresh key, unless we were leaving anyway.
      */
     private function handleForbidden(): void
     {
+        $wasJoined = $this->joined;
         $this->log("Forbidden from $this; resetting conference state", Logger::WARNING);
         $this->joined = false;
         if ($this->pollWatcher !== null) {
@@ -464,8 +643,54 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             $this->API->unregisterConferenceCall($this->inputCall['id']);
         }
         $this->chainOffset = [0, 0];
+        $this->presentationConnection?->close();
+        $this->presentationConnection = null;
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
         $this->connection?->close();
         $this->connection = null;
+        if ($wasJoined && !$this->leaving) {
+            $this->scheduleRejoin();
+        }
+    }
+
+    /**
+     * Rejoin shortly, once, from the event loop (never from inside the failing request).
+     */
+    private function scheduleRejoin(): void
+    {
+        if ($this->rejoinScheduled) {
+            return;
+        }
+        $this->rejoinScheduled = true;
+        EventLoop::delay(1.0, function (): void {
+            $this->rejoinScheduled = false;
+            if ($this->leaving || $this->joined || $this->inputCall === null) {
+                return;
+            }
+            try {
+                $this->rejoin();
+            } catch (Throwable $e) {
+                $this->log("Could not rejoin $this: $e", Logger::ERROR);
+            }
+        });
+    }
+
+    /**
+     * Join again from scratch with a fresh key pair and an empty local chain, keeping the playlists.
+     */
+    private function rejoin(): void
+    {
+        $this->log("Rejoining $this with a fresh key...", Logger::NOTICE);
+        [$this->selfSeed] = Crypto::generateKeyPair();
+        $this->chain = new ConferenceChain($this->selfId, $this->selfSeed);
+        $this->epochs = [];
+        $this->chainOffset = [0, 0];
+        $this->verification = null;
+        $this->delayedBroadcasts = [];
+        $this->rtcParticipants = [];
+        $this->callVersion = 0;
+        $this->join($this->muted);
     }
 
     /* ------------------------------------------------------------------ *
@@ -493,9 +718,10 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
                 $this->log("Could not fetch chain $subChainId of $this: $e", Logger::WARNING);
                 return;
             }
-            $blocks = $this->extractBlocks($updates);
-            foreach ($blocks as $block) {
-                $this->applyBlock($subChainId, $block);
+            $chunk = $this->extractBlocks($updates);
+            $blocks = $chunk['blocks'] ?? [];
+            if ($chunk !== null) {
+                $this->applyChainBlocks($subChainId, $blocks, $chunk['next'], fromPoll: true);
             }
             $this->consumeUpdates($updates);
         } while (\count($blocks) === 50);
@@ -508,29 +734,55 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      */
     public function onChainBlocks(int $subChainId, array $blocks, int $nextOffset): void
     {
-        foreach ($blocks as $block) {
-            $this->applyBlock($subChainId, $block);
-        }
-        $this->chainOffset[$subChainId] = max($this->chainOffset[$subChainId], $nextOffset);
+        $this->applyChainBlocks($subChainId, $blocks, $nextOffset, fromPoll: false);
     }
 
-    private function applyBlock(int $subChainId, string $serialized): void
+    /**
+     * Apply a run of consecutive blocks of a subchain ending right before `$nextOffset`, in order and
+     * exactly once: blocks before our offset were already applied (the same block may reach us from
+     * both the push update and the polling backstop), and a run starting past our offset means we
+     * missed some, which are fetched first (and then include these).
+     *
+     * @param list<string> $blocks
+     */
+    private function applyChainBlocks(int $subChainId, array $blocks, int $nextOffset, bool $fromPoll): void
+    {
+        $first = $nextOffset - \count($blocks);
+        if ($first > $this->chainOffset[$subChainId]) {
+            if (!$fromPoll) {
+                $this->syncChain($subChainId);
+                return;
+            }
+            // We asked from our offset and the server started later: whatever lies in between no
+            // longer exists server-side, so there is nothing else to fetch; carry on from here.
+            $this->log("The server skipped blocks {$this->chainOffset[$subChainId]}..$first of chain $subChainId of $this", Logger::WARNING);
+            $this->chainOffset[$subChainId] = $first;
+        }
+        foreach ($blocks as $i => $block) {
+            $index = $first + $i;
+            if ($index < $this->chainOffset[$subChainId]) {
+                continue;
+            }
+            $this->applyBlock($subChainId, $index, $block);
+        }
+    }
+
+    private function applyBlock(int $subChainId, int $index, string $serialized): void
     {
         try {
             if ($subChainId === self::SUBCHAIN_STATE) {
-                // Idempotent + ordered: the same block may arrive from both the push update and the
-                // polling backstop; only a newly applied block advances the epoch and offset.
+                // Only a newly applied block advances the epoch, the offset and the verification.
                 if ($this->chain->applyServerBlock($serialized)) {
-                    $this->refreshEpoch();
-                    $this->refreshVerification();
                     $this->chainOffset[self::SUBCHAIN_STATE] = $this->chain->getHeight() + 1;
+                    $this->refreshEpoch();
+                    $this->restartVerification();
                 }
             } else {
+                $this->chainOffset[self::SUBCHAIN_VERIFICATION] = $index + 1;
                 $this->applyBroadcast($serialized);
-                $this->chainOffset[self::SUBCHAIN_VERIFICATION]++;
             }
         } catch (Throwable $e) {
-            $this->log("Could not apply a block on chain $subChainId of $this: $e", Logger::WARNING);
+            $this->log("Could not apply block $index of chain $subChainId of $this: $e", Logger::WARNING);
         }
     }
 
@@ -557,8 +809,14 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         // The primary delivery path is the push updates (updateGroupCallChainBlocks /
         // updateGroupCallEncryptedMessage) routed here by the update dispatcher; this timer is only a
         // backstop that catches anything missed while the update seq was gapped or the process slept.
-        $this->pollWatcher = EventLoop::repeat(5.0, function (): void {
+        // As the protocol asks, it ticks every second while a key verification is in progress and
+        // every 5 seconds otherwise.
+        $this->pollWatcher = EventLoop::repeat(1.0, function (): void {
             if (!$this->joined) {
+                return;
+            }
+            $verifying = $this->verification !== null && $this->verification['state'] !== 'end';
+            if (!$verifying && ++$this->pollTick % 5 !== 0) {
                 return;
             }
             $this->syncChain(self::SUBCHAIN_STATE);
@@ -575,10 +833,10 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * video is end-to-end encrypted with the same conference keys, on its own packet channel so its
      * sequence numbers never collide with the camera's. Idempotent.
      */
-    public function enablePresentation(): void
+    public function enablePresentation(): self
     {
         if ($this->presentationConnection !== null) {
-            return;
+            return $this;
         }
         if (!$this->joined) {
             throw new \RuntimeException('Cannot share a screen before joining the conference.');
@@ -609,15 +867,16 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
                 }
             }
         }
+        return $this;
     }
 
     /**
      * Stop sharing the screen: tear down the presentation connection and tell the server.
      */
-    public function disablePresentation(): void
+    public function disablePresentation(): self
     {
         if ($this->presentationConnection === null) {
-            return;
+            return $this;
         }
         $this->presentationConnection->close();
         $this->presentationConnection = null;
@@ -630,6 +889,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
                 $this->log("Could not leave the presentation of $this: $e", Logger::WARNING);
             }
         }
+        return $this;
     }
 
     /**
@@ -662,7 +922,6 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
 
     private bool $muted = false;
 
-    #[\Override]
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->dj($dest)->play($file);
@@ -692,28 +951,24 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         $deferred->getFuture()->await();
     }
 
-    #[\Override]
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->dj($dest)->play($file);
         return $this;
     }
 
-    #[\Override]
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
     {
         $this->dj($dest)->playOnHold(...$files);
         return $this;
     }
 
-    #[\Override]
     public function skip(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->djOrNull($dest)?->skip();
         return $this;
     }
 
-    #[\Override]
     public function stop(MediaDestination $dest = MediaDestination::Camera): self
     {
         if ($dest === MediaDestination::Presentation) {
@@ -727,7 +982,6 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     /**
      * @psalm-external-mutation-free
      */
-    #[\Override]
     public function pause(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->djOrNull($dest)?->pausePlaying();
@@ -737,7 +991,6 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     /**
      * @psalm-mutation-free
      */
-    #[\Override]
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {
         return $this->djOrNull($dest)?->isAudioPaused() ?? false;
@@ -746,7 +999,6 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     /**
      * @psalm-external-mutation-free
      */
-    #[\Override]
     public function resume(MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->djOrNull($dest)?->resumePlaying();
@@ -756,13 +1008,11 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     /**
      * @psalm-mutation-free
      */
-    #[\Override]
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
         return $this->djOrNull($dest)?->getCurrent();
     }
 
-    #[\Override]
     public function setMuted(bool $muted = true): self
     {
         $this->muted = $muted;
@@ -785,29 +1035,34 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this;
     }
 
-    #[\Override]
     public function isMuted(): bool
     {
         return $this->muted;
     }
 
     /**
-     * Discard (leave) the conference call.
+     * End the conference for everyone (phone.discardGroupCall, allowed to its creator only) and leave
+     * it; if the server refuses, just leave.
      */
-    #[\Override]
     public function discard(): self
     {
-        $this->leave();
-        return $this;
+        if ($this->inputCall !== null && $this->joined) {
+            try {
+                $this->API->methodCallAsyncRead('phone.discardGroupCall', ['call' => $this->inputCall]);
+            } catch (Throwable $e) {
+                $this->log("Could not discard $this, leaving it instead: $e", Logger::WARNING);
+            }
+        }
+        return $this->leave();
     }
 
     /**
      * Leave the conference, keeping it running for the other participants: stop the backstop poll and
      * stop receiving its updates.
      */
-    #[\Override]
     public function leave(): self
     {
+        $this->leaving = true;
         $this->joined = false;
         if ($this->pollWatcher !== null) {
             EventLoop::cancel($this->pollWatcher);
@@ -836,70 +1091,178 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * The participants currently in the conference, keyed by user id, each with their Ed25519
      * `public_key` and `permissions` bits from the shared-state chain.
      *
-     * @return array<int, array{public_key: string, permissions: int}>
+     * @return array<int, array{public_key: string, permissions: int, version: int}>
      *
      * @psalm-mutation-free
      */
-    #[\Override]
     public function getParticipants(): array
     {
         return $this->chain->getParticipants();
     }
 
     /* ------------------------------------------------------------------ *
-     *  Emoji verification (subchain 1).
+     *  Emoji verification (subchain 1), mirroring tde2e's CallVerificationChain.
      * ------------------------------------------------------------------ */
 
     /**
-     * Begin (or restart) verification for the current chain head: broadcast our nonce commit, then
-     * its reveal. All participants then converge on the same four emojis.
+     * (Re)start the commit-reveal verification for the current chain head, as every participant does
+     * whenever a main-chain block is applied: pick a fresh nonce, broadcast its commit (once joined),
+     * then reveal it once every member has committed; the emojis follow once everyone revealed.
+     * A no-op if the current head is already being verified.
      */
-    public function startVerification(): void
+    private function restartVerification(): void
     {
-        $this->verificationNonces = [];
-        $made = Verification::makeNonce($this->selfId, $this->chain->getHeight(), $this->chain->getLastBlockHash(), $this->selfSeed());
-        $this->ownNonce = $made['nonce'];
-        $codec = new BlockCodec();
-        try {
-            $this->API->methodCallAsyncRead('phone.sendConferenceCallBroadcast', ['call' => $this->inputCall, 'block' => $codec->serialize($made['commit'])]);
-            $this->API->methodCallAsyncRead('phone.sendConferenceCallBroadcast', ['call' => $this->inputCall, 'block' => $codec->serialize($made['reveal'])]);
-        } catch (Throwable $e) {
-            $this->log("Could not broadcast verification for $this: $e", Logger::WARNING);
+        $height = $this->chain->getHeight();
+        $hash = $this->chain->getLastBlockHash();
+        if ($height < 0) {
+            return;
+        }
+        if ($this->verification !== null && $this->verification['height'] === $height && $this->verification['hash'] === $hash) {
+            return;
+        }
+        $participants = [];
+        foreach ($this->chain->getParticipants() as $userId => $info) {
+            $participants[$userId] = $info['public_key'];
+        }
+        $made = Verification::makeNonce($this->selfId, $height, $hash, $this->selfSeed);
+        $this->verification = [
+            'height' => $height,
+            'hash' => $hash,
+            'state' => 'commit',
+            'sent' => false,
+            'commit' => $made['commit'],
+            'reveal' => $made['reveal'],
+            'participants' => $participants,
+            'committed' => [],
+            'revealed' => [],
+            'emojis' => null,
+        ];
+        $this->ensureVerificationBroadcast();
+        // Broadcasts for this head that arrived before its block did; older ones are moot.
+        $delayed = $this->delayedBroadcasts[$height] ?? [];
+        foreach ($this->delayedBroadcasts as $h => $_) {
+            if ($h <= $height) {
+                unset($this->delayedBroadcasts[$h]);
+            }
+        }
+        foreach ($delayed as $serialized) {
+            $this->applyBroadcast($serialized);
         }
     }
 
+    /**
+     * Broadcast our nonce commit for the head under verification, if we are in the call and have not
+     * done so yet.
+     */
+    private function ensureVerificationBroadcast(): void
+    {
+        if ($this->verification === null || $this->verification['sent'] || !$this->joined) {
+            return;
+        }
+        $this->verification['sent'] = true;
+        $this->broadcast($this->verification['commit']);
+    }
+
+    /**
+     * Submit a verification broadcast (phone.sendConferenceCallBroadcast); it reaches everyone, us
+     * included, through subchain 1.
+     *
+     * @param array<string, mixed> $broadcast
+     */
+    private function broadcast(array $broadcast): void
+    {
+        try {
+            $this->API->methodCallAsyncRead('phone.sendConferenceCallBroadcast', [
+                'call' => $this->getInputCall(),
+                'block' => (new BlockCodec())->serialize($broadcast),
+            ]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
+                $this->handleForbidden();
+                return;
+            }
+            $this->log("Could not send a verification broadcast for $this: $e", Logger::WARNING);
+        } catch (Throwable $e) {
+            $this->log("Could not send a verification broadcast for $this: $e", Logger::WARNING);
+        }
+    }
+
+    /**
+     * Apply a subchain 1 broadcast: a commit is accepted while collecting commits, a reveal while
+     * collecting reveals (and must match its commit); both must be for the head under verification
+     * (later ones wait for their block, earlier ones are dropped), from a member, and signed by them.
+     */
     private function applyBroadcast(string $serialized): void
     {
         $broadcast = (new BlockCodec())->deserialize($serialized);
-        if (($broadcast['_'] ?? '') === 'e2e.chain.groupBroadcastNonceReveal') {
-            $this->verificationNonces[(int) $broadcast['user_id']] = (string) $broadcast['nonce'];
+        $type = (string) ($broadcast['_'] ?? '');
+        if ($type !== 'e2e.chain.groupBroadcastNonceCommit' && $type !== 'e2e.chain.groupBroadcastNonceReveal') {
+            return;
+        }
+        $height = (int) $broadcast['chain_height'];
+        if ($this->verification === null || $height > $this->verification['height']) {
+            $this->delayedBroadcasts[$height][] = $serialized;
+            return;
+        }
+        if ($height < $this->verification['height']) {
+            return;
+        }
+        $userId = (int) $broadcast['user_id'];
+        if ((string) $broadcast['chain_hash'] !== $this->verification['hash']) {
+            $this->log("Ignoring a verification broadcast of $userId for another chain head of $this", Logger::WARNING);
+            return;
+        }
+        $publicKey = $this->verification['participants'][$userId] ?? null;
+        if ($publicKey === null) {
+            $this->log("Ignoring a verification broadcast of $userId, who is not in $this", Logger::WARNING);
+            return;
+        }
+        if (!Verification::verify($broadcast, $publicKey)) {
+            $this->log("Ignoring a verification broadcast of $userId with a bad signature in $this", Logger::WARNING);
+            return;
+        }
+        $members = \count($this->verification['participants']);
+        if ($type === 'e2e.chain.groupBroadcastNonceCommit') {
+            if ($this->verification['state'] !== 'commit' || isset($this->verification['committed'][$userId])) {
+                return;
+            }
+            $this->verification['committed'][$userId] = (string) $broadcast['nonce_hash'];
+            if (\count($this->verification['committed']) === $members) {
+                $this->verification['state'] = 'reveal';
+                if ($this->joined) {
+                    $this->broadcast($this->verification['reveal']);
+                }
+            }
+            return;
+        }
+        if ($this->verification['state'] !== 'reveal' || isset($this->verification['revealed'][$userId])) {
+            return;
+        }
+        $nonce = (string) $broadcast['nonce'];
+        if (!Verification::checkReveal($this->verification['committed'][$userId] ?? '', $nonce)) {
+            $this->log("Ignoring a nonce of $userId that does not match their commit in $this", Logger::WARNING);
+            return;
+        }
+        $this->verification['revealed'][$userId] = $nonce;
+        if (\count($this->verification['revealed']) === $members) {
+            $this->verification['state'] = 'end';
+            $hash = Verification::emojiHash(array_values($this->verification['revealed']), $this->verification['hash']);
+            $this->verification['emojis'] = Verification::emojis($hash);
+            $this->log("Verified $this: ".implode(' ', $this->verification['emojis']), Logger::NOTICE);
         }
     }
 
     /**
-     * Drop verification state when the chain (and thus the block hash) changes.
-     *
-     * @psalm-external-mutation-free
-     */
-    private function refreshVerification(): void
-    {
-        $this->verificationNonces = [];
-        $this->ownNonce = null;
-    }
-
-    /**
-     * The four verification emojis, or null until every participant's nonce has been revealed.
+     * The four verification emojis of the current chain head, or null until every member has committed
+     * and revealed their nonce for it.
      *
      * @return list<string>|null
+     *
+     * @psalm-mutation-free
      */
-    public function getEmojis(): ?array
+    public function getVisualization(): ?array
     {
-        $expected = \count($this->chain->getParticipants());
-        if ($expected === 0 || \count($this->verificationNonces) < $expected) {
-            return null;
-        }
-        $hash = Verification::emojiHash(array_values($this->verificationNonces), $this->chain->getLastBlockHash());
-        return Verification::emojis($hash);
+        return $this->verification['emojis'] ?? null;
     }
 
     /* ------------------------------------------------------------------ *
@@ -907,17 +1270,93 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * ------------------------------------------------------------------ */
 
     /**
-     * Send an end-to-end encrypted in-call message to every participant (channel 0), encrypted with
-     * {@see CallPacket} for the current epochs.
+     * Send an end-to-end encrypted in-call message to every participant: a `groupCallMessage` JSON
+     * document, as [the protocol](https://core.telegram.org/api/end-to-end/group-calls#in-call-messages)
+     * defines, encrypted with {@see CallPacket} on channel 0 for the current epochs.
      */
-    public function sendMessage(string $message): void
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): self
+    {
+        $entities = [];
+        if ($parseMode === ParseMode::MARKDOWN) {
+            $parsed = TextEntities::fromMarkdown($message);
+            [$message, $entities] = [$parsed->message, $parsed->entities];
+        } elseif ($parseMode === ParseMode::HTML) {
+            $parsed = TextEntities::fromHtml($message);
+            [$message, $entities] = [$parsed->message, $parsed->entities];
+        }
+        $raw = [];
+        foreach ($entities as $entity) {
+            $raw[] = $entity->toMTProto();
+        }
+        $this->sendTextWithEntities($message, self::filterConferenceEntities($raw));
+        return $this;
+    }
+
+    /**
+     * Send an end-to-end encrypted in-call reaction: a single emoji, or a custom emoji with `$emoji`
+     * as its fallback.
+     */
+    public function sendReaction(string $emoji, ?int $customEmojiId = null): self
+    {
+        $entities = [];
+        if ($customEmojiId !== null) {
+            $length = (int) (\strlen(mb_convert_encoding($emoji, 'UTF-16', 'UTF-8')) / 2);
+            $entities[] = ['_' => 'messageEntityCustomEmoji', 'offset' => 0, 'length' => $length, 'document_id' => $customEmojiId];
+        }
+        $this->sendTextWithEntities($emoji, $entities);
+        return $this;
+    }
+
+    /**
+     * The entity types conference messages may carry, per the protocol.
+     */
+    private const CONFERENCE_ENTITIES = ['messageEntityBold', 'messageEntityItalic', 'messageEntityUnderline', 'messageEntityStrike', 'messageEntitySpoiler', 'messageEntityCustomEmoji'];
+
+    /**
+     * Keep only the entities the conference message format supports, in their JSON form.
+     *
+     * @param list<array<array-key, mixed>> $entities
+     *
+     * @return list<array<string, mixed>>
+     *
+     * @psalm-pure
+     */
+    private static function filterConferenceEntities(array $entities): array
+    {
+        $result = [];
+        foreach ($entities as $entity) {
+            $type = (string) ($entity['_'] ?? '');
+            if (!\in_array($type, self::CONFERENCE_ENTITIES, true)) {
+                continue;
+            }
+            $json = ['_' => $type, 'offset' => (int) $entity['offset'], 'length' => (int) $entity['length']];
+            if ($type === 'messageEntityCustomEmoji') {
+                $json['document_id'] = (string) $entity['document_id'];
+            }
+            $result[] = $json;
+        }
+        return $result;
+    }
+
+    /**
+     * Encrypt and send a `groupCallMessage` JSON document on channel 0, as
+     * [the protocol](https://core.telegram.org/api/end-to-end/group-calls#conference-in-call-messages) defines.
+     *
+     * @param list<array<string, mixed>> $entities
+     */
+    private function sendTextWithEntities(string $text, array $entities): void
     {
         $epochs = $this->activeEpochs();
         if ($epochs === []) {
             throw new \RuntimeException('No conference key yet');
         }
-        $packet = CallPacket::encrypt(0, $this->nextMessageSeqno(), $message, $epochs, $this->selfSeed());
-        $this->API->methodCallAsyncRead('phone.sendGroupCallEncryptedMessage', ['call' => $this->inputCall, 'encrypted_message' => $packet]);
+        $json = json_encode([
+            '_' => 'groupCallMessage',
+            'random_id' => (string) random_int(1, PHP_INT_MAX),
+            'message' => ['_' => 'textWithEntities', 'text' => $text, 'entities' => $entities],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $packet = CallPacket::encrypt(0, $this->nextMessageSeqno(), $json, $epochs, $this->selfSeed());
+        $this->API->methodCallAsyncRead('phone.sendGroupCallEncryptedMessage', ['call' => $this->getInputCall(), 'encrypted_message' => $packet]);
     }
 
     private int $messageSeqno = 0;
@@ -931,9 +1370,14 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     }
 
     /**
-     * @internal Decrypt an [updateGroupCallEncryptedMessage](https://core.telegram.org/constructor/updateGroupCallEncryptedMessage).
+     * @internal Decrypt an [updateGroupCallEncryptedMessage](https://core.telegram.org/constructor/updateGroupCallEncryptedMessage),
+     * returning the text and (validated, TL-shaped) entities of the `groupCallMessage` it carries, or
+     * null if it could not be decrypted, is not a message, or is a redelivery (deduplicated by sender
+     * and `random_id`).
+     *
+     * @return array{text: string, entities: list<array<string, mixed>>, random_id: string}|null
      */
-    public function onEncryptedMessage(int $fromUserId, string $encrypted): ?string
+    public function onEncryptedMessage(int $fromUserId, string $encrypted): ?array
     {
         $senderKey = $this->chain->getParticipants()[$fromUserId]['public_key'] ?? null;
         if ($senderKey === null) {
@@ -944,11 +1388,51 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             $secrets[$epoch['hash']] = $epoch['secret'];
         }
         try {
-            return CallPacket::decrypt($encrypted, $secrets, $senderKey)['payload'];
+            $payload = CallPacket::decrypt($encrypted, $secrets, $senderKey)['payload'];
+            $message = json_decode($payload, true, 16, JSON_THROW_ON_ERROR);
         } catch (Throwable $e) {
             $this->log("Could not decrypt an in-call message in $this: $e", Logger::WARNING);
             return null;
         }
+        if (!\is_array($message) || ($message['_'] ?? null) !== 'groupCallMessage' || !\is_array($message['message'] ?? null)) {
+            return null;
+        }
+        $randomId = (string) ($message['random_id'] ?? '');
+        $text = $message['message']['text'] ?? null;
+        if ($randomId === '' || !\is_string($text)) {
+            return null;
+        }
+        $key = "$fromUserId:$randomId";
+        if (isset($this->seenMessages[$key])) {
+            return null;
+        }
+        $this->seenMessages[$key] = true;
+        if (\count($this->seenMessages) > 1024) {
+            array_shift($this->seenMessages);
+        }
+        $length = (int) (\strlen(mb_convert_encoding($text, 'UTF-16', 'UTF-8')) / 2);
+        $entities = [];
+        foreach ($message['message']['entities'] ?? [] as $entity) {
+            if (!\is_array($entity)) {
+                continue;
+            }
+            $type = (string) ($entity['_'] ?? '');
+            $offset = (int) ($entity['offset'] ?? -1);
+            $span = (int) ($entity['length'] ?? 0);
+            if (!\in_array($type, self::CONFERENCE_ENTITIES, true) || $offset < 0 || $span <= 0 || $offset + $span > $length) {
+                continue;
+            }
+            $parsed = ['_' => $type, 'offset' => $offset, 'length' => $span];
+            if ($type === 'messageEntityCustomEmoji') {
+                $documentId = (int) ($entity['document_id'] ?? 0);
+                if ($documentId === 0) {
+                    continue;
+                }
+                $parsed['document_id'] = $documentId;
+            }
+            $entities[] = $parsed;
+        }
+        return ['text' => $text, 'entities' => $entities, 'random_id' => $randomId];
     }
 
     /* ------------------------------------------------------------------ *
@@ -960,17 +1444,20 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * incoming frames are decrypted before they are muxed, so recordings are plaintext).
      *
      * Two modes:
-     *  - per participant: `setOutput($userId, $file)` records that one participant's incoming audio and
-     *    (if they transmit a camera) video into the given file or stream.
+     *  - per participant: `setOutput($file, $userId)` records that one participant's incoming audio and
+     *    (if they transmit a camera) video into the given file or stream, or their screen-share with
+     *    `$dest` set to {@see MediaDestination::Presentation}.
      *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
      *    participant into its own `<dir>/<userId>.mkv` Matroska file, including participants that start
      *    transmitting later, plus a `<dir>/<userId>.presentation.mkv` for anyone screen-sharing. Our own
      *    media is never recorded.
+     *
+     * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
      */
-    public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
     {
-        if ($participant instanceof LocalDirectory) {
-            $dir = $participant->dir;
+        if ($file instanceof LocalDirectory) {
+            $dir = $file->dir;
             if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
                 throw new \RuntimeException("Could not create the recording directory $dir");
             }
@@ -982,24 +1469,44 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             }
             return $this;
         }
-        if ($file === null) {
-            throw new \InvalidArgumentException('setOutput() requires a file/stream to record a participant into, or a LocalDirectory to record every participant.');
+        if ($participant === null) {
+            throw new \InvalidArgumentException('setOutput() requires the participant to record into the file/stream, or a LocalDirectory to record every participant.');
         }
-        $this->wireOutput($this->API->getId($participant), $file);
+        $format = RecordingFormat::matroskaFor($file, $format);
+        $userId = $this->API->getId($participant);
+        if ($dest === MediaDestination::Presentation) {
+            $this->wirePresentationOutput($userId, $file, $format);
+        } else {
+            $this->wireOutput($userId, $file, $format);
+        }
         return $this;
     }
 
     /**
      * Route one participant's output to the connection now, or defer it until their source is known.
      */
-    private function wireOutput(int $userId, LocalFile|WritableStream $file): void
+    private function wireOutput(int $userId, LocalFile|WritableStream $file, RecordingFormat $format): void
     {
         $source = $this->userToSource[$userId] ?? 0;
         if ($source !== 0 && $this->connection !== null) {
-            $this->connection->setOutput($source, $file);
+            $this->connection->setOutput($source, $file, $format);
             return;
         }
-        $this->pendingOutputs[$userId] = $file;
+        $this->pendingOutputs[$userId] = [$file, $format];
+    }
+
+    /**
+     * Route one participant's screen-share output to the connection now, or defer it until their
+     * source is known.
+     */
+    private function wirePresentationOutput(int $userId, LocalFile|WritableStream $file, RecordingFormat $format): void
+    {
+        $source = $this->userToSource[$userId] ?? 0;
+        if ($source !== 0 && $this->connection !== null) {
+            $this->connection->setPresentationOutput($source, $file, $format);
+            return;
+        }
+        $this->pendingPresentationOutputs[$userId] = [$file, $format];
     }
 
     /**
@@ -1016,7 +1523,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             return;
         }
         $this->folderPeers[$userId] = true;
-        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.mkv'));
+        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.mkv'), RecordingFormat::Mkv);
     }
 
     /**
@@ -1035,54 +1542,172 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             return;
         }
         $this->folderPresentationPeers[$userId] = true;
-        $file = new LocalFile($this->outputDir.'/'.$userId.'.presentation.mkv');
-        if ($this->connection !== null) {
-            $this->connection->setPresentationOutput($source, $file);
-        } else {
-            $this->pendingPresentationOutputs[$userId] = $file;
-        }
+        $this->wirePresentationOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.presentation.mkv'), RecordingFormat::Mkv);
     }
 
     /**
-     * Update the SSRC -> user id map from the group call participant list, so incoming media can be
-     * attributed to a sender's public key, and tell the connection which sources to receive.
-     *
-     * @param list<array{user_id: int, source: int, video: list<int>, presentation: list<int>, videoEndpoint: ?string, presentationEndpoint: ?string}> $participants
+     * @internal Apply the participants of an
+     * [updateGroupCallParticipants](https://core.telegram.org/constructor/updateGroupCallParticipants)
+     * of the conference's group call, in `version` order.
      */
-    public function setParticipants(array $participants): void
+    public function onParticipantsUpdate(array $participants, int $version): void
+    {
+        $versioned = false;
+        /** @var array $participant */
+        foreach ($participants as $participant) {
+            if (($participant['versioned'] ?? false) || ($participant['left'] ?? false) || ($participant['just_joined'] ?? false)) {
+                $versioned = true;
+                break;
+            }
+        }
+        if ($versioned && $this->callVersion !== 0) {
+            if ($version < $this->callVersion + 1) {
+                return;
+            }
+            if ($version > $this->callVersion + 1) {
+                // A gap: rather than wait for it to fill, resync the whole list.
+                $this->refetchParticipants();
+                return;
+            }
+        }
+        if ($versioned) {
+            $this->callVersion = $version;
+        }
+        /** @var array $participant */
+        foreach ($participants as $participant) {
+            $this->applyRtcParticipant($participant);
+        }
+        $this->syncSources();
+    }
+
+    /**
+     * @internal Apply an [updateGroupCall](https://core.telegram.org/constructor/updateGroupCall)
+     * carrying the conference's groupCall.
+     */
+    public function onGroupCallUpdate(array $call): void
+    {
+        $this->applyRawCall($call);
+    }
+
+    private function applyRawCall(array $call): void
+    {
+        if (($call['_'] ?? '') === 'groupCallDiscarded') {
+            $this->rawCall = $call;
+            $this->public?->update($call);
+            if ($this->joined) {
+                $this->log("$this was discarded", Logger::NOTICE);
+                $this->leave();
+            }
+            return;
+        }
+        $this->rawCall = $call;
+        $this->callVersion = max($this->callVersion, (int) ($call['version'] ?? 0));
+        $this->public?->update($call);
+    }
+
+    /**
+     * Fetch the conference's groupCall and its full participant list (phone.getGroupCall), replacing
+     * what we know, and prune from the chain the members that are not in the call any more.
+     */
+    private function refetchParticipants(): void
+    {
+        if ($this->inputCall === null) {
+            return;
+        }
+        // Whoever was in the chain before we asked but is missing from the answer has left.
+        $chainMembers = array_keys($this->chain->getParticipants());
+        try {
+            $result = $this->API->methodCallAsyncRead('phone.getGroupCall', ['call' => $this->inputCall, 'limit' => 100]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
+                $this->handleForbidden();
+                return;
+            }
+            $this->log("Could not fetch the participants of $this: $e", Logger::WARNING);
+            return;
+        } catch (Throwable $e) {
+            $this->log("Could not fetch the participants of $this: $e", Logger::WARNING);
+            return;
+        }
+        \assert(\is_array($result) && \is_array($result['call']) && \is_array($result['participants']));
+        $this->applyRawCall($result['call']);
+        if (!$this->joined) {
+            return;
+        }
+        $this->rtcParticipants = [];
+        /** @var array $participant */
+        foreach ($result['participants'] as $participant) {
+            $this->applyRtcParticipant($participant);
+        }
+        $this->syncSources();
+        $complete = (int) ($result['call']['participants_count'] ?? PHP_INT_MAX) <= \count($result['participants']);
+        if ($complete) {
+            $this->pruneStale(array_values(array_filter($chainMembers, fn (int $id): bool => !isset($this->rtcParticipants[$id]))));
+        }
+    }
+
+    private function applyRtcParticipant(array $participant): void
+    {
+        $userId = $this->API->getIdInternal($participant['peer']);
+        if ($userId === null) {
+            return;
+        }
+        if ($participant['left'] ?? false) {
+            unset($this->rtcParticipants[$userId]);
+            if ($userId === $this->selfId) {
+                // Our own source is gone from the call: we were removed, rejoin (as official clients do).
+                if ($this->joined && (int) ($participant['source'] ?? 0) === ($this->connection?->getAudioSource() ?? 0)) {
+                    $this->log("We were removed from $this, rejoining...", Logger::WARNING);
+                    $this->handleForbidden();
+                }
+                return;
+            }
+            $this->pruneStale([$userId]);
+            return;
+        }
+        $this->rtcParticipants[$userId] = Participant::fromRaw($participant, $userId, $this->rtcParticipants[$userId] ?? null);
+    }
+
+    /**
+     * Rebuild the SSRC -> user id map from the participant list, so every incoming packet (audio,
+     * camera or screen-share) can be attributed to its sender's public key, tell the connection which
+     * sources to receive, and attach the recordings that waited for a participant's sources.
+     */
+    private function syncSources(): void
     {
         $sources = [];
-        foreach ($participants as $participant) {
-            if ($participant['source'] === 0) {
+        foreach ($this->rtcParticipants as $userId => $participant) {
+            if ($participant->source === 0) {
                 continue;
             }
-            $userId = $participant['user_id'];
-            $source = $participant['source'];
-            $this->ssrcToUser[GroupSdp::toUnsignedSsrc($source)] = $userId;
-            $this->userToSource[$userId] = $source;
-            if ($userId !== $this->selfId) {
-                $sources[] = [
-                    'audio' => $source,
-                    'video' => $participant['video'],
-                    'presentation' => $participant['presentation'],
-                    'videoEndpoint' => $participant['videoEndpoint'],
-                    'presentationEndpoint' => $participant['presentationEndpoint'],
-                ];
-                // The source is now known: attach any recording deferred until it was, then apply
-                // folder-mode recording to a participant that has just begun transmitting.
-                if (isset($this->pendingOutputs[$userId])) {
-                    $file = $this->pendingOutputs[$userId];
-                    unset($this->pendingOutputs[$userId]);
-                    $this->connection?->setOutput($source, $file);
-                }
-                if (isset($this->pendingPresentationOutputs[$userId])) {
-                    $file = $this->pendingPresentationOutputs[$userId];
-                    unset($this->pendingPresentationOutputs[$userId]);
-                    $this->connection?->setPresentationOutput($source, $file);
-                }
-                $this->wireFolderOutput($userId, $source);
-                $this->wireFolderPresentationOutput($userId, $source, $participant['presentation'] !== []);
+            foreach ([$participant->source, ...$participant->videoSources, ...$participant->presentationSources] as $ssrc) {
+                $this->ssrcToUser[GroupSdp::toUnsignedSsrc($ssrc)] = $userId;
             }
+            $this->userToSource[$userId] = $participant->source;
+            if ($userId === $this->selfId) {
+                continue;
+            }
+            $sources[] = [
+                'audio' => $participant->source,
+                'video' => $participant->videoSources,
+                'presentation' => $participant->presentationSources,
+                'videoEndpoint' => $participant->videoEndpoint,
+                'presentationEndpoint' => $participant->presentationEndpoint,
+            ];
+            // The source is now known: attach any recording deferred until it was, then apply
+            // folder-mode recording to a participant that has just begun transmitting.
+            if (isset($this->pendingOutputs[$userId])) {
+                [$file, $format] = $this->pendingOutputs[$userId];
+                unset($this->pendingOutputs[$userId]);
+                $this->connection?->setOutput($participant->source, $file, $format);
+            }
+            if (isset($this->pendingPresentationOutputs[$userId])) {
+                [$file, $format] = $this->pendingPresentationOutputs[$userId];
+                unset($this->pendingPresentationOutputs[$userId]);
+                $this->connection?->setPresentationOutput($participant->source, $file, $format);
+            }
+            $this->wireFolderOutput($userId, $participant->source);
+            $this->wireFolderPresentationOutput($userId, $participant->source, $participant->presentationSources !== []);
         }
         $this->connection?->setRemoteSources($sources);
     }
@@ -1095,6 +1720,7 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         foreach ($updates['updates'] ?? [] as $update) {
             if ($update['_'] === 'updateGroupCall' && ($update['call']['_'] ?? '') === 'groupCall') {
                 $this->setCall($update['call']);
+                $this->applyRawCall((array) $update['call']);
                 return;
             }
         }
@@ -1113,18 +1739,20 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     }
 
     /**
+     * The chain blocks and next offset carried by an updateGroupCallChainBlocks, if any.
+     *
      * @param array<string, mixed> $updates
      *
-     * @return list<string>
+     * @return array{blocks: list<string>, next: int}|null
      */
-    private function extractBlocks(array $updates): array
+    private function extractBlocks(array $updates): ?array
     {
         foreach ($updates['updates'] ?? [] as $update) {
             if ($update['_'] === 'updateGroupCallChainBlocks') {
-                return array_map('strval', $update['blocks']);
+                return ['blocks' => array_values(array_map('strval', $update['blocks'])), 'next' => (int) $update['next_offset']];
             }
         }
-        return [];
+        return null;
     }
 
     public function getChain(): ConferenceChain

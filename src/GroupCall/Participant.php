@@ -72,6 +72,10 @@ final class Participant implements JsonSerializable
         public readonly ?string $about,
         /** Raised hand rating, if the participant raised their hand. */
         public readonly ?int $raiseHandRating,
+        /** Whether the participant's volume was set by an admin. */
+        public readonly bool $volumeByAdmin = false,
+        /** Live stories: total Telegram Stars donated by this participant. */
+        public readonly ?int $paidStarsTotal = null,
     ) {
     }
 
@@ -121,6 +125,8 @@ final class Participant implements JsonSerializable
             $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
             $participant['about'] ?? null,
             $participant['raise_hand_rating'] ?? null,
+            (bool) ($participant['volume_by_admin'] ?? false),
+            isset($participant['paid_stars_total']) ? (int) $participant['paid_stars_total'] : null,
         );
     }
 

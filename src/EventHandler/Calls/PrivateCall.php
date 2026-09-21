@@ -21,6 +21,7 @@ use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
@@ -29,6 +30,7 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\MediaState;
+use InvalidArgumentException;
 
 /**
  * This update represents a private (one-to-one) VoIP Telegram call.
@@ -83,11 +85,17 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Accept call.
+     * Accept the incoming call.
+     *
+     * @param bool $muted Whether to accept with our own audio muted.
      */
-    public function accept(): self
+    #[\Override]
+    public function join(bool $muted = false): self
     {
         $this->getClient()->acceptCall($this->callID);
+        if ($muted) {
+            $this->getClient()->setCallMuted($this->callID, true);
+        }
         return $this;
     }
     /**
@@ -104,12 +112,61 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Get call emojis (will return null if the call is not inited yet).
+     * Whether the call is running (accepted by both parties and connected).
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    public function isJoined(): bool
+    {
+        return $this->getCallState() === CallState::RUNNING;
+    }
+
+    /**
+     * Get call state.
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    public function getCallState(): CallState
+    {
+        return $this->getClient()->getCallState($this->callID) ?? CallState::ENDED;
+    }
+
+    /**
+     * The other party of the call, keyed by their user ID, with their media state (mute, camera and
+     * screencast status) as reported by their client.
+     *
+     * Empty until the call is connected and the other party has reported their media state.
+     *
+     * @return array<int, MediaState>
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    public function getParticipants(): array
+    {
+        $state = $this->getClient()->getCallRemoteMediaState($this->callID);
+        return $state === null ? [] : [$this->otherID => $state];
+    }
+
+    /**
+     * The media state of the other party, if `$participant` is them and the call is connected.
+     */
+    #[\Override]
+    public function getParticipant(mixed $participant): ?MediaState
+    {
+        return $this->getParticipants()[$this->getClient()->getId($participant)] ?? null;
+    }
+
+    /**
+     * Get the key verification emojis (will return null if the call is not inited yet).
      *
      * @return ?list{string, string, string, string}
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function getVisualization(): ?array
     {
         return $this->getClient()->getCallVisualization($this->callID);
@@ -132,7 +189,23 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Set the output file or stream for the incoming media.
+     * Play a file, blocking until it has finished playing if a stream is provided.
+     */
+    #[\Override]
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    {
+        $this->getClient()->callPlayBlocking($this->callID, $file, $dest);
+
+        return $this;
+    }
+
+    /**
+     * Record the incoming media of the call.
+     *
+     * A {@see LocalFile} or {@see WritableStream} records the other party's camera+audio (or, with
+     * {@see MediaDestination::Presentation}, their screencast) into it; a {@see LocalDirectory} records
+     * them into `<dir>/<userId>.mkv` instead. `$participant` may only be the other party, and is
+     * therefore optional.
      *
      * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
      * audio and video, muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so
@@ -142,8 +215,15 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * When `$format` is null it is autodetected from the extension of `$file`, but only if a
      * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
      */
-    public function setOutput(LocalFile|WritableStream $file, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
+    #[\Override]
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
     {
+        if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
+            throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
+        }
+        if ($file instanceof LocalDirectory) {
+            $file = new LocalFile($file->dir.'/'.$this->otherID.($dest === MediaDestination::Presentation ? '.presentation' : '').'.mkv');
+        }
         $this->getClient()->callSetOutput($this->callID, $file, $dest, $format);
 
         return $this;
@@ -264,26 +344,41 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Get the media state of the other party, as reported by their client.
-     *
-     * Will return null if the call is not connected yet.
-     *
-     * @psalm-mutation-free
+     * Start sharing a screen: bring up the presentation (screencast) video stream, so that files played
+     * on {@see MediaDestination::Presentation} are transmitted as a screencast. The other party is told
+     * the screencast is active as soon as a file with video plays on it.
      */
-    public function getRemoteMediaState(): ?MediaState
+    #[\Override]
+    public function enablePresentation(): self
     {
-        return $this->getClient()->getCallRemoteMediaState($this->callID);
+        $this->getClient()->enableCallPresentation($this->callID);
+
+        return $this;
     }
 
     /**
-     * Get call state.
+     * Stop sharing the screen: stop the presentation playlist and tell the other party the screencast
+     * is inactive.
+     */
+    #[\Override]
+    public function disablePresentation(): self
+    {
+        $this->getClient()->disableCallPresentation($this->callID);
+
+        return $this;
+    }
+
+    /**
+     * Whether a screencast is currently being transmitted.
      *
      * @psalm-mutation-free
      */
-    public function getCallState(): CallState
+    #[\Override]
+    public function isSharingScreen(): bool
     {
-        return $this->getClient()->getCallState($this->callID) ?? CallState::ENDED;
+        return $this->getClient()->isCallSharingScreen($this->callID);
     }
+
     /**
      * Get call representation.
      *

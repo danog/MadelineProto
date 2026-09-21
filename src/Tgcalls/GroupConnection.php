@@ -23,6 +23,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RecordingFormat;
 use Throwable;
 use Webrtc\DataChannel\Enum\State;
 use Webrtc\DataChannel\Listener\DataChannelMessageListener;
@@ -154,6 +155,18 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * @var array<int, LocalFile|WritableStream>
      */
     private array $pendingPresentationOutputs = [];
+    /**
+     * Matroska DocType of the recordings requested per participant, indexed by unsigned audio SSRC.
+     *
+     * @var array<int, RecordingFormat>
+     */
+    private array $formats = [];
+    /**
+     * Matroska DocType of the screen-share recordings requested per participant, indexed by unsigned audio SSRC.
+     *
+     * @var array<int, RecordingFormat>
+     */
+    private array $presentationFormats = [];
 
     /**
      * The colibri data channel: the client sends {@see ReceiverVideoConstraints} on it to tell the
@@ -582,14 +595,16 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * Record a specific participant's incoming media (audio and, if they transmit one, camera video)
      * into a single Matroska file.
      *
-     * @param int $source The participant's signed audio SSRC.
+     * @param int             $source The participant's signed audio SSRC.
+     * @param RecordingFormat $format The Matroska DocType to write.
      */
-    public function setOutput(int $source, LocalFile|WritableStream $file): void
+    public function setOutput(int $source, LocalFile|WritableStream $file, RecordingFormat $format = RecordingFormat::Mkv): void
     {
         $ssrc = GroupSdp::toUnsignedSsrc($source);
         ($this->recorders[$ssrc] ?? null)?->close();
         unset($this->recorders[$ssrc]);
         $this->pendingOutputs[$ssrc] = $file;
+        $this->formats[$ssrc] = $format;
         // Attach against any of this participant's tracks (audio, or video owned by them) that are
         // already live; the recorder is created lazily and shared between them.
         foreach ($this->peerConnection->getReceivers() as $receiver) {
@@ -611,14 +626,16 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     /**
      * Record a specific participant's incoming screen-share (presentation) into its own file.
      *
-     * @param int $source The participant's signed audio SSRC.
+     * @param int             $source The participant's signed audio SSRC.
+     * @param RecordingFormat $format The Matroska DocType to write.
      */
-    public function setPresentationOutput(int $source, LocalFile|WritableStream $file): void
+    public function setPresentationOutput(int $source, LocalFile|WritableStream $file, RecordingFormat $format = RecordingFormat::Mkv): void
     {
         $ssrc = GroupSdp::toUnsignedSsrc($source);
         ($this->presentationRecorders[$ssrc] ?? null)?->close();
         unset($this->presentationRecorders[$ssrc]);
         $this->pendingPresentationOutputs[$ssrc] = $file;
+        $this->presentationFormats[$ssrc] = $format;
         foreach ($this->peerConnection->getReceivers() as $receiver) {
             $track = $receiver->getTrack();
             if (!$track instanceof RemoteStreamTrack || $track->getKind() !== MediaKind::Video) {
@@ -780,7 +797,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             return null;
         }
         unset($this->pendingOutputs[$audioSsrc]);
-        $recorder = new CallRecorder($file);
+        $recorder = new CallRecorder($file, $this->formats[$audioSsrc] ?? RecordingFormat::Mkv);
         // Only hold the header for a video track if this participant is known to be transmitting one.
         $recorder->setRemoteHasVideo($this->participantHasVideo[$audioSsrc] ?? false);
         $this->recorders[$audioSsrc] = $recorder;
@@ -801,7 +818,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             return null;
         }
         unset($this->pendingPresentationOutputs[$audioSsrc]);
-        $recorder = new CallRecorder($file);
+        $recorder = new CallRecorder($file, $this->presentationFormats[$audioSsrc] ?? RecordingFormat::Mkv);
         $this->presentationRecorders[$audioSsrc] = $recorder;
         return $recorder;
     }

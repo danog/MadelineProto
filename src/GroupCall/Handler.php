@@ -21,9 +21,14 @@ use Amp\ByteStream\WritableStream;
 use AssertionError;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MTProto\SpecialMethodType;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
 
@@ -190,9 +195,19 @@ trait Handler
     }
 
     /**
+     * End a conference call for everyone (creator only) and leave it.
+     *
+     * @internal
+     */
+    public function discardConferenceCall(int $id): void
+    {
+        $this->getConferenceCallController($id)->discard();
+    }
+
+    /**
      * Get the participants of a conference call, keyed by their user id.
      *
-     * @return array<int, array{public_key: string, permissions: int}>
+     * @return array<int, array{public_key: string, permissions: int, version: int}>
      *
      * @internal
      *
@@ -208,19 +223,39 @@ trait Handler
      *
      * @internal
      */
-    public function removeConferenceCallParticipants(int $id, int ...$userIds): void
+    public function removeConferenceCallParticipants(int $id, mixed ...$participants): void
     {
-        $this->getConferenceCallController($id)->removeParticipant(...$userIds);
+        $this->getConferenceCallController($id)->removeParticipant(...$participants);
     }
 
     /**
-     * Begin (or restart) emoji verification for a conference call.
+     * Change the title of a conference call.
      *
      * @internal
      */
-    public function startConferenceCallVerification(int $id): void
+    public function setConferenceCallTitle(int $id, string $title): void
     {
-        $this->getConferenceCallController($id)->startVerification();
+        $this->getConferenceCallController($id)->setTitle($title);
+    }
+
+    /**
+     * Invite users to a conference call.
+     *
+     * @internal
+     */
+    public function inviteToConferenceCall(int $id, mixed ...$users): void
+    {
+        $this->getConferenceCallController($id)->invite(...$users);
+    }
+
+    /**
+     * Export a conference link to a conference call.
+     *
+     * @internal
+     */
+    public function exportConferenceCallInvite(int $id): string
+    {
+        return $this->getConferenceCallController($id)->exportInvite();
     }
 
     /**
@@ -232,9 +267,9 @@ trait Handler
      *
      * @psalm-mutation-free
      */
-    public function getConferenceCallEmojis(int $id): ?array
+    public function getConferenceCallVisualization(int $id): ?array
     {
-        return $this->getConferenceCallController($id)->getEmojis();
+        return $this->getConferenceCallController($id)->getVisualization();
     }
 
     /**
@@ -242,9 +277,101 @@ trait Handler
      *
      * @internal
      */
-    public function sendConferenceCallMessage(int $id, string $message): void
+    public function sendConferenceCallMessage(int $id, string $message, ?ParseMode $parseMode = null): void
     {
-        $this->getConferenceCallController($id)->sendMessage($message);
+        $this->getConferenceCallController($id)->sendMessage($message, $parseMode);
+    }
+
+    /**
+     * Send an end-to-end encrypted in-call reaction to every participant of a conference call.
+     *
+     * @internal
+     */
+    public function sendConferenceCallReaction(int $id, string $emoji, ?int $customEmojiId = null): void
+    {
+        $this->getConferenceCallController($id)->sendReaction($emoji, $customEmojiId);
+    }
+
+    /**
+     * Change a participant's state in a conference call (phone.editGroupCallParticipant).
+     *
+     * @internal
+     */
+    public function editConferenceCallParticipant(int $id, mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
+    {
+        $this->getConferenceCallController($id)->editParticipant($participant, $muted, $volume, $videoPaused);
+    }
+
+    /**
+     * Change the settings of a conference call (phone.toggleGroupCallSettings).
+     *
+     * @internal
+     */
+    public function toggleConferenceCallSettings(int $id, ?bool $joinMuted = null, bool $resetInviteHash = false, ?bool $messagesEnabled = null): void
+    {
+        $this->getConferenceCallController($id)->toggleSettings($joinMuted, $resetInviteHash, $messagesEnabled);
+    }
+
+    /**
+     * Get an [end-to-end encrypted conference call »](https://core.telegram.org/api/group-calls#conference-calls)
+     * from its [conference link »](https://core.telegram.org/api/links#conference-links) slug, or null if
+     * the link is not valid any more.
+     */
+    public function getConferenceCallBySlug(string $slug): ?ConferenceCallUpdate
+    {
+        return $this->getConferenceCallByInput(['_' => 'inputGroupCallSlug', 'slug' => $slug]);
+    }
+
+    /**
+     * Join an end-to-end encrypted conference call from its conference link slug.
+     *
+     * @param bool $muted Whether to join muted.
+     */
+    public function joinConferenceCallBySlug(string $slug, bool $muted = false): ConferenceCallUpdate
+    {
+        $call = $this->getConferenceCallBySlug($slug) ?? throw new AssertionError('This conference link is not valid any more!');
+        return $call->join($muted);
+    }
+
+    /**
+     * Join an end-to-end encrypted conference call from the service message that invited us to it
+     * (a `messageActionConferenceCall`, see {@see \danog\MadelineProto\EventHandler\Message\Service\DialogConferenceCall}).
+     *
+     * @param int  $msgId ID of the invitation message.
+     * @param bool $muted Whether to join muted.
+     */
+    public function joinConferenceCallByInviteMessage(int $msgId, bool $muted = false): ConferenceCallUpdate
+    {
+        $call = $this->getConferenceCallByInput(['_' => 'inputGroupCallInviteMessage', 'msg_id' => $msgId])
+            ?? throw new AssertionError('This conference call is not active any more!');
+        return $call->join($muted);
+    }
+
+    /**
+     * Decline an invitation to a conference call.
+     *
+     * @param int $msgId ID of the invitation message (a `messageActionConferenceCall`).
+     */
+    public function declineConferenceCallInvite(int $msgId): void
+    {
+        $this->methodCallAsyncRead('phone.declineConferenceCallInvite', ['msg_id' => $msgId]);
+    }
+
+    /**
+     * Resolve a conference call from any InputGroupCall: the live one we are in, or a handle to one we
+     * are not in (yet).
+     */
+    private function getConferenceCallByInput(array $inputCall): ?ConferenceCallUpdate
+    {
+        $result = $this->methodCallAsyncRead('phone.getGroupCall', ['call' => $inputCall, 'limit' => 1]);
+        $call = $result['call'];
+        if ($call['_'] === 'groupCallDiscarded' || !($call['conference'] ?? false)) {
+            return null;
+        }
+        if (isset($this->conferenceCalls[$call['id']])) {
+            return $this->conferenceCalls[$call['id']]->getPublic();
+        }
+        return new ConferenceCallUpdate($this, $call);
     }
 
     /**
@@ -322,14 +449,14 @@ trait Handler
     }
 
     /**
-     * Record conference call media: one participant to a file/stream, or every transmitting participant
-     * into its own file under a directory when `$file` is null and `$participant` is a LocalDirectory.
+     * Record conference call media: one participant's camera or screen-share to a file/stream, or every
+     * transmitting participant into its own file under a LocalDirectory.
      *
      * @internal
      */
-    public function conferenceCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream|null $file = null): void
+    public function conferenceCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
     {
-        $this->getConferenceCallController($id)->setOutput($participant, $file);
+        $this->getConferenceCallController($id)->setOutput($file, $participant, $dest, $format);
     }
 
     /**
@@ -486,7 +613,7 @@ trait Handler
      *
      * @internal
      */
-    public function getGroupCallByInput(array $inputCall, ?int $peerId = null): ?GroupCallController
+    public function getGroupCallByInput(array $inputCall, ?int $peerId = null, bool $liveStory = false): ?GroupCallController
     {
         if ($inputCall['_'] === 'inputGroupCall' && isset($this->groupCalls[$inputCall['id']])) {
             return $this->groupCalls[$inputCall['id']];
@@ -499,7 +626,7 @@ trait Handler
         if (isset($this->groupCalls[$call['id']])) {
             return $this->groupCalls[$call['id']];
         }
-        $controller = new GroupCallController($this, $call, $peerId);
+        $controller = new GroupCallController($this, $call, $peerId, $liveStory);
         $this->groupCalls[$call['id']] = $controller;
         // We already have the full call and its first page of participants: no need to refetch.
         $controller->applyGroupCall($result);
@@ -633,15 +760,379 @@ trait Handler
     }
 
     /**
-     * Record group call audio: one participant to a file/stream, or every transmitting participant
-     * into its own file under a directory when `$file` is null and `$participant` is a LocalFile dir.
+     * Change a participant's state in a group call (phone.editGroupCallParticipant): mute/unmute them,
+     * set our playback volume of them, raise/lower our own hand, pause/resume our own video.
+     *
+     * @internal
      */
-    public function groupCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream|null $file = null): void
+    public function editGroupCallParticipant(int $id, mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
+    {
+        $this->getGroupCallController($id)->editParticipant($participant, $muted, $volume, $raiseHand, $videoStopped, $videoPaused, $presentationPaused);
+    }
+
+    /**
+     * Change the settings of a group call (phone.toggleGroupCallSettings, admins only).
+     *
+     * @internal
+     */
+    public function toggleGroupCallSettings(int $id, ?bool $joinMuted = null, bool $resetInviteHash = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): void
+    {
+        $this->getGroupCallController($id)->toggleSettings($joinMuted, $resetInviteHash, $messagesEnabled, $sendPaidMessagesStars);
+    }
+
+    /**
+     * Start or stop a server-side recording of a group call (phone.toggleGroupCallRecord, admins only).
+     *
+     * @internal
+     */
+    public function toggleGroupCallRecord(int $id, bool $start, ?string $title = null, bool $video = false, bool $portrait = false): void
+    {
+        $this->getGroupCallController($id)->toggleRecord($start, $title, $video, $portrait);
+    }
+
+    /**
+     * Start a scheduled group call now (admins only).
+     *
+     * @internal
+     */
+    public function startScheduledGroupCall(int $id): void
+    {
+        $this->getGroupCallController($id)->startScheduled();
+    }
+
+    /**
+     * Subscribe to (or unsubscribe from) a notification when a scheduled group call starts.
+     *
+     * @internal
+     */
+    public function toggleGroupCallStartSubscription(int $id, bool $subscribed): void
+    {
+        $this->getGroupCallController($id)->setStartSubscription($subscribed);
+    }
+
+    /**
+     * Send an in-call message (or, in a live story, a donation) in a group call.
+     *
+     * @internal
+     */
+    public function sendGroupCallMessage(int $id, string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): void
+    {
+        $this->getGroupCallController($id)->sendMessage($message, $parseMode, $paidStars, $sendAs);
+    }
+
+    /**
+     * Send an in-call reaction in a group call.
+     *
+     * @internal
+     */
+    public function sendGroupCallReaction(int $id, string $emoji, ?int $customEmojiId = null): void
+    {
+        $this->getGroupCallController($id)->sendReaction($emoji, $customEmojiId);
+    }
+
+    /**
+     * Delete in-call messages of a group call.
+     *
+     * @param list<int> $ids
+     *
+     * @internal
+     */
+    public function deleteGroupCallMessages(int $id, array $ids, bool $reportSpam = false): void
+    {
+        $this->getGroupCallController($id)->deleteMessages($ids, $reportSpam);
+    }
+
+    /**
+     * Delete every in-call message of a participant of a group call (admins only).
+     *
+     * @internal
+     */
+    public function deleteGroupCallParticipantMessages(int $id, mixed $participant, bool $reportSpam = false): void
+    {
+        $this->getGroupCallController($id)->deleteParticipantMessages($participant, $reportSpam);
+    }
+
+    /**
+     * The Telegram Stars donated to a live story so far, and its top donors.
+     *
+     * @internal
+     */
+    public function getGroupCallStars(int $id): GroupCallStars
+    {
+        return $this->getGroupCallController($id)->getStars();
+    }
+
+    /**
+     * The peer we send in-call messages of a live story as by default.
+     *
+     * @internal
+     */
+    public function saveDefaultGroupCallSendAs(int $id, mixed $peer): void
+    {
+        $this->getGroupCallController($id)->saveDefaultSendAs($peer);
+    }
+
+    /**
+     * A participant of a group call by their id, username or peer, or null if they are not in it.
+     *
+     * @internal
+     */
+    public function getGroupCallParticipant(int $id, mixed $participant): ?Participant
+    {
+        return $this->getGroupCallController($id)->getParticipant($participant);
+    }
+
+    /**
+     * Whether a group call is in stream mode (its media is received by downloading chunks).
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isGroupCallStreamMode(int $id): bool
+    {
+        return ($this->groupCalls[$id] ?? null)?->isStreamMode() ?? false;
+    }
+
+    /**
+     * Whether a group call is an RTMP livestream.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isGroupCallRtmpMode(int $id): bool
+    {
+        return ($this->groupCalls[$id] ?? null)?->isRtmpMode() ?? false;
+    }
+
+    /**
+     * The stream channels of an RTMP livestream (phone.getGroupCallStreamChannels): their ids, and the
+     * timestamp of the live edge.
+     *
+     * @return list<array{channel: int, scale: int, last_timestamp_ms: int}>
+     *
+     * @internal
+     */
+    public function getGroupCallStreamChannels(int $id): array
+    {
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $this->getGroupCallController($id)->getInputCall()]);
+        $channels = [];
+        foreach ($result['channels'] as $channel) {
+            $channels[] = ['channel' => (int) $channel['channel'], 'scale' => (int) $channel['scale'], 'last_timestamp_ms' => (int) $channel['last_timestamp_ms']];
+        }
+        return $channels;
+    }
+
+    /**
+     * Download one media chunk of a group call in stream mode (upload.getFile with an
+     * inputGroupCallStream location) from its stream DC, or null on a CDN redirect.
+     *
+     * @internal
+     */
+    public function downloadGroupCallStreamChunk(int $id, int $timeMs, int $scale = 0, ?int $videoChannel = null, ?int $videoQuality = null): ?string
+    {
+        $controller = $this->getGroupCallController($id);
+        $location = ['_' => 'inputGroupCallStream', 'call' => $controller->getInputCall(), 'time_ms' => $timeMs, 'scale' => $scale];
+        if ($videoChannel !== null) {
+            $location['video_channel'] = $videoChannel;
+            $location['video_quality'] = $videoQuality ?? 0;
+        }
+        $dc = $controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc;
+        if ($this->isTestMode() && $dc < 10_000) {
+            $dc += 10_000;
+        }
+        if ($this->datacenter->has(-$dc)) {
+            $dc = -$dc;
+        }
+        $result = $this->methodCallAsyncRead('upload.getFile', [
+            'location' => $location,
+            'offset' => 0,
+            'limit' => 1024 * 1024,
+            'floodWaitLimit' => 0,
+            'specialMethodType' => SpecialMethodType::FILE_RELATED,
+        ], $dc);
+        if ($result['_'] !== 'upload.file') {
+            return null;
+        }
+        return (string) $result['bytes'];
+    }
+
+    /**
+     * Resolve the controller of a group call we are tracking.
+     *
+     * @internal
+     */
+    private function getGroupCallController(int $id): GroupCallController
+    {
+        return $this->groupCalls[$id] ?? throw new AssertionError('Unknown group call!');
+    }
+
+    /**
+     * The peers we may join the video chats and livestreams of a group or channel as: ourselves, the
+     * channels we own, and (for anonymous admins) the group itself. Bot API IDs.
+     *
+     * See [joining a group call on behalf of owned channels »](https://core.telegram.org/api/group-calls#joining-a-group-call-on-behalf-of-owned-channels).
+     *
+     * @return list<int>
+     */
+    public function getGroupCallJoinAs(mixed $peer): array
+    {
+        $result = $this->methodCallAsyncRead('phone.getGroupCallJoinAs', ['peer' => $peer]);
+        $ids = [];
+        foreach ($result['peers'] as $joinAs) {
+            $id = $this->getIdInternal($joinAs);
+            if ($id !== null) {
+                $ids[] = $id;
+            }
+        }
+        return $ids;
+    }
+
+    /**
+     * Save the peer we join the video chats and livestreams of a group or channel as by default.
+     *
+     * @param mixed $peer   The group or channel.
+     * @param mixed $joinAs The peer to join as (one of {@see self::getGroupCallJoinAs()}).
+     */
+    public function saveDefaultGroupCallJoinAs(mixed $peer, mixed $joinAs): void
+    {
+        $this->methodCallAsyncRead('phone.saveDefaultGroupCallJoinAs', ['peer' => $peer, 'join_as' => $joinAs]);
+    }
+
+    /**
+     * Get the RTMP URL and stream key to publish an [RTMP livestream »](https://core.telegram.org/api/group-calls#creating-and-publishing-an-rtmp-livestream)
+     * to, in a group or channel (create the call with `rtmpStream` afterwards, see {@see self::createGroupCall()}),
+     * or as a live story (see {@see self::startLive()}).
+     *
+     * @param mixed $peer      The group or channel (or, for a live story, the user, group or channel it is posted as).
+     * @param bool  $revoke    Whether to generate a new stream key, invalidating the previous one.
+     * @param bool  $liveStory Whether the key is for a live story rather than a video chat/livestream.
+     *
+     * @return array{url: string, key: string}
+     */
+    public function getGroupCallStreamRtmpUrl(mixed $peer, bool $revoke = false, bool $liveStory = false): array
+    {
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamRtmpUrl', ['peer' => $peer, 'revoke' => $revoke, 'live_story' => $liveStory]);
+        return ['url' => (string) $result['url'], 'key' => (string) $result['key']];
+    }
+
+    /**
+     * Start a [live story »](https://core.telegram.org/api/group-calls#live-stories): a livestream posted
+     * as a story, of which we are the single publisher (everyone else joins as a listener).
+     *
+     * @param mixed                     $peer                  Who to post the live story as: ourselves, or a group or channel we administer.
+     * @param string|null               $caption               Caption of the story.
+     * @param ParseMode|null            $parseMode             Whether to parse HTML or Markdown markup in the caption.
+     * @param list<array<string, mixed>> $privacyRules          Who may see the story, as [InputPrivacyRule](https://core.telegram.org/type/InputPrivacyRule)s; everyone by default.
+     * @param bool                      $pinned                Whether to pin the story to the profile.
+     * @param bool                      $noForwards            Whether to forbid forwarding and screenshots.
+     * @param bool                      $rtmpStream            Whether the media is published by an external RTMP application (see {@see self::getGroupCallStreamRtmpUrl()}) rather than by us.
+     * @param bool|null                 $messagesEnabled       Whether viewers may comment with in-call messages.
+     * @param int|null                  $sendPaidMessagesStars The minimum Telegram Stars donation required to comment, if any.
+     */
+    public function startLive(mixed $peer, ?string $caption = null, ?ParseMode $parseMode = null, array $privacyRules = [['_' => 'inputPrivacyValueAllowAll']], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): GroupCall
+    {
+        $params = [
+            'peer' => $peer,
+            'privacy_rules' => $privacyRules,
+            'random_id' => random_int(PHP_INT_MIN, PHP_INT_MAX),
+            'pinned' => $pinned,
+            'noforwards' => $noForwards,
+            'rtmp_stream' => $rtmpStream,
+        ];
+        if ($caption !== null) {
+            $entities = [];
+            if ($parseMode === ParseMode::MARKDOWN) {
+                $parsed = TextEntities::fromMarkdown($caption);
+                [$caption, $entities] = [$parsed->message, $parsed->entities];
+            } elseif ($parseMode === ParseMode::HTML) {
+                $parsed = TextEntities::fromHtml($caption);
+                [$caption, $entities] = [$parsed->message, $parsed->entities];
+            }
+            $params['caption'] = $caption;
+            $params['entities'] = $entities;
+        }
+        if ($messagesEnabled !== null) {
+            $params['messages_enabled'] = $messagesEnabled;
+        }
+        if ($sendPaidMessagesStars !== null) {
+            $params['send_paid_messages_stars'] = $sendPaidMessagesStars;
+        }
+        $updates = $this->methodCallAsyncRead('stories.startLive', $params);
+        foreach ($updates['updates'] ?? [] as $update) {
+            if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
+                $inputCall = ['_' => 'inputGroupCall', 'id' => $update['call']['id'], 'access_hash' => $update['call']['access_hash']];
+                $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer), liveStory: true);
+                if ($controller !== null) {
+                    return $controller->public;
+                }
+            }
+        }
+        throw new AssertionError('The server did not return the started live story!');
+    }
+
+    /**
+     * Record group call media: one participant's camera or screen-share to a file/stream, or every
+     * transmitting participant into its own file under a LocalDirectory.
+     */
+    public function groupCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->setOutput($participant, $file);
+        $this->groupCalls[$id]->setOutput($file, $participant, $dest, $format);
+    }
+
+    /**
+     * Remove participants from a group call, by kicking them from its group or channel.
+     *
+     * @internal
+     */
+    public function removeGroupCallParticipants(int $id, mixed ...$participants): void
+    {
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->removeParticipant(...$participants);
+    }
+
+    /**
+     * Whether a screen-share is currently being transmitted in a group call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isGroupCallSharingScreen(int $id): bool
+    {
+        return ($this->groupCalls[$id] ?? null)?->isSharingScreen() ?? false;
+    }
+
+    /**
+     * Start sharing a screen in a group call.
+     *
+     * @internal
+     */
+    public function enableGroupCallPresentation(int $id): void
+    {
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->enablePresentation();
+    }
+
+    /**
+     * Stop sharing the screen in a group call.
+     *
+     * @internal
+     */
+    public function disableGroupCallPresentation(int $id): void
+    {
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->disablePresentation();
     }
 
     /**
@@ -764,6 +1255,10 @@ trait Handler
             case 'updateGroupCall':
                 $call = $update['call'];
                 $id = $call['id'];
+                if (isset($this->conferenceCalls[$id])) {
+                    EventLoop::queue($this->conferenceCalls[$id]->onGroupCallUpdate(...), $call);
+                    return;
+                }
                 if (!isset($this->groupCalls[$id])) {
                     if ($call['_'] !== 'groupCall') {
                         // A call we never tracked was just discarded: nothing to do.
@@ -774,7 +1269,8 @@ trait Handler
                     $this->groupCalls[$id] = new GroupCallController(
                         $this,
                         $call,
-                        isset($update['peer']) ? $this->getIdInternal($update['peer']) : null
+                        isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
+                        (bool) ($update['live_story'] ?? false),
                     );
                     return;
                 }
@@ -785,6 +1281,14 @@ trait Handler
                 break;
             case 'updateGroupCallParticipants':
                 $id = $update['call']['id'];
+                if (isset($this->conferenceCalls[$id])) {
+                    EventLoop::queue(
+                        $this->conferenceCalls[$id]->onParticipantsUpdate(...),
+                        $update['participants'],
+                        $update['version']
+                    );
+                    return;
+                }
                 if (!isset($this->groupCalls[$id])) {
                     $this->logger->logger("Ignoring participants update for unknown group call $id");
                     return;
@@ -812,11 +1316,27 @@ trait Handler
                 if (!isset($this->conferenceCalls[$id])) {
                     return;
                 }
-                EventLoop::queue(
-                    $this->conferenceCalls[$id]->onEncryptedMessage(...),
-                    $this->getIdInternal($update['from_id']) ?? 0,
-                    (string) $update['encrypted_message']
-                );
+                $fromId = $this->getIdInternal($update['from_id']) ?? 0;
+                $encrypted = (string) $update['encrypted_message'];
+                EventLoop::queue(function () use ($id, $fromId, $encrypted, $update): void {
+                    $message = $this->conferenceCalls[$id]?->onEncryptedMessage($fromId, $encrypted);
+                    if ($message === null) {
+                        return;
+                    }
+                    // Surface it exactly like a plain in-call message, flagged as end-to-end encrypted.
+                    $this->saveUpdate([
+                        '_' => 'updateGroupCallMessage',
+                        'call' => $update['call'],
+                        'encrypted' => true,
+                        'message' => [
+                            '_' => 'groupCallMessage',
+                            'id' => 0,
+                            'from_id' => $update['from_id'],
+                            'date' => time(),
+                            'message' => ['_' => 'textWithEntities', 'text' => $message['text'], 'entities' => $message['entities']],
+                        ],
+                    ]);
+                });
                 break;
         }
     }

@@ -37,6 +37,11 @@ use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
+use danog\MadelineProto\EventHandler\Calls\GroupCall as GroupCallUpdate;
+use danog\MadelineProto\EventHandler\Calls\GroupCallMessage;
+use danog\MadelineProto\EventHandler\Calls\GroupCallMessagesDeleted;
+use danog\MadelineProto\EventHandler\Calls\GroupCallParticipants;
 use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
 use danog\MadelineProto\EventHandler\Channel\MessageForwards;
 use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
@@ -60,6 +65,7 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelMigrateFrom;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatJoinedByLink;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChatMigrateTo;
+use danog\MadelineProto\EventHandler\Message\Service\DialogConferenceCall;
 use danog\MadelineProto\EventHandler\Message\Service\DialogContactSignUp;
 use danog\MadelineProto\EventHandler\Message\Service\DialogCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogDeleteMessages;
@@ -482,6 +488,10 @@ trait UpdateHandler
                     : new InlineButtonQuery($this, $update),
                 'updateBotInlineQuery' => new InlineQuery($this, $update),
                 'updatePhoneCall' => $update['phone_call'],
+                'updateGroupCall' => $this->wrapGroupCall($update),
+                'updateGroupCallParticipants' => new GroupCallParticipants($this, $update),
+                'updateGroupCallMessage' => new GroupCallMessage($this, $update),
+                'updateDeleteGroupCallMessages' => new GroupCallMessagesDeleted($this, $update),
                 'updateBroadcastProgress' => $update['progress'],
                 'updateStory' => $update['story']['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($this, $update)
@@ -517,6 +527,31 @@ trait UpdateHandler
             return null;
         }
     }
+    /**
+     * The handle of the call an updateGroupCall is about: the one we track, or else a fresh one built
+     * from the groupCall the update carries (a conference handle for a conference).
+     */
+    private function wrapGroupCall(array $update): GroupCallUpdate|ConferenceCallUpdate
+    {
+        $call = $update['call'];
+        $id = $call['id'];
+        if (isset($this->conferenceCalls[$id])) {
+            return $this->conferenceCalls[$id]->getPublic();
+        }
+        if (isset($this->groupCalls[$id])) {
+            return $this->groupCalls[$id]->public;
+        }
+        if ($call['conference'] ?? false) {
+            return new ConferenceCallUpdate($this, $call);
+        }
+        return new GroupCallUpdate(
+            $this,
+            $call,
+            isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
+            (bool) ($update['live_story'] ?? false),
+        );
+    }
+
     /**
      * Wrap a Pin constructor into an abstract Pinned object.
      */
@@ -662,6 +697,17 @@ trait UpdateHandler
                     $message,
                     $info,
                     $message['action']['duration'] ?? null,
+                ),
+                'messageActionConferenceCall' => new DialogConferenceCall(
+                    $this,
+                    $message,
+                    $info,
+                    $message['action']['call_id'],
+                    $message['action']['missed'] ?? false,
+                    $message['action']['active'] ?? false,
+                    $message['action']['video'] ?? false,
+                    $message['action']['duration'] ?? null,
+                    array_values(array_filter(array_map($this->getIdInternal(...), $message['action']['other_participants'] ?? []))),
                 ),
                 'messageActionInviteToGroupCall' => new GroupCallInvited(
                     $this,

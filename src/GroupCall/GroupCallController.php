@@ -22,6 +22,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalDirectory;
@@ -31,8 +32,11 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Ogg;
+use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupSdp;
@@ -54,6 +58,9 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     private const CHECK_INTERVAL = 4.0;
     /** How long we wait for a missing `version` before refetching the whole call. */
     private const VERSION_GAP_TIMEOUT = 1.0;
+    /** How many participants are fetched per page, and at most, when (re)loading the participant list. */
+    private const PARTICIPANTS_PAGE = 100;
+    private const PARTICIPANTS_MAX = 5000;
 
     private GroupCallState $callState = GroupCallState::NOT_JOINED;
 
@@ -80,15 +87,17 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     private bool $muted = false;
     private bool $streamMode = false;
     private bool $rtmpMode = false;
+    /** Downloads and records the call's media chunks in stream mode. */
+    private ?StreamReceiver $streamReceiver = null;
     /** Whether the SFU transport parameters of the current join were already applied. */
     private bool $connectionParamsApplied = false;
 
     private ?string $checkWatcher = null;
     private ?string $gapWatcher = null;
 
-    /** Output files/streams requested per participant peer ID. */
+    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Output files/streams (and their format) requested per participant peer ID. */
     private array $pendingOutputs = [];
-    /** Presentation (screen-share) output files/streams requested per participant peer ID. */
+    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Presentation (screen-share) output files/streams (and their format) requested per participant peer ID. */
     private array $pendingPresentationOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
@@ -106,6 +115,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         public readonly MTProto $API,
         array $call,
         ?int $peerId = null,
+        bool $liveStory = false,
     ) {
         $this->call = $call;
         $this->inputCall = [
@@ -113,7 +123,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             'id' => $call['id'],
             'access_hash' => $call['access_hash'],
         ];
-        $this->public = new GroupCall($API, $call, $peerId);
+        $this->public = new GroupCall($API, $call, $peerId, $liveStory);
         $this->diskJockey = new DjLoop($this);
         Assert::true($this->diskJockey->start());
         $this->joinMutex = new LocalMutex;
@@ -127,7 +137,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         $result = get_object_vars($this);
         // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
         // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
-        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher']);
+        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver']);
         return $result;
     }
 
@@ -136,6 +146,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         $this->joinMutex = new LocalMutex;
         $this->checkWatcher = null;
         $this->gapWatcher = null;
+        $this->streamReceiver = null;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
@@ -157,6 +168,12 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             $this->log("Resumed $this after a restart of the process.");
             $this->connection?->resume();
             $this->presentationConnection?->resume();
+            if ($this->streamMode) {
+                // The stream receiver does not survive a restart (its recording does not either):
+                // follow the stream again from the live edge.
+                $this->streamReceiver = new StreamReceiver($this);
+                $this->streamReceiver->start($this->rtmpMode);
+            }
             EventLoop::queue($this->refetch(...));
         });
     }
@@ -262,11 +279,13 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             // The server switched us to stream mode: there is no WebRTC session to set up, media is
             // downloaded in chunks instead. See https://core.telegram.org/api/group-calls#stream-mode.
             $this->log(
-                "$this is in ".($parsed['rtmp'] ? 'RTMP' : 'stream')." mode, WebRTC playback is not available.",
-                Logger::WARNING
+                "$this is in ".($parsed['rtmp'] ? 'RTMP' : 'stream')." mode: media is received by downloading chunks, and cannot be transmitted.",
+                Logger::NOTICE
             );
             $this->connection?->close();
             $this->connection = null;
+            $this->streamReceiver ??= new StreamReceiver($this);
+            $this->streamReceiver->start($parsed['rtmp']);
             return;
         }
         if ($parsed['transport'] === null) {
@@ -285,13 +304,76 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         try {
             $result = $this->API->methodCallAsyncRead('phone.getGroupCall', [
                 'call' => $this->inputCall,
-                'limit' => 100,
+                'limit' => self::PARTICIPANTS_PAGE,
             ]);
         } catch (Throwable $e) {
             $this->log("Could not refetch $this: $e", Logger::WARNING);
             return;
         }
         $this->applyGroupCall($result);
+    }
+
+    /**
+     * Page through the rest of the participant list (phone.getGroupParticipants) after the first page
+     * a phone.groupCall carries, up to a sane maximum.
+     */
+    private function fetchRemainingParticipants(string $offset): void
+    {
+        while ($offset !== '' && \count($this->participants) < self::PARTICIPANTS_MAX) {
+            try {
+                $page = $this->API->methodCallAsyncRead('phone.getGroupParticipants', [
+                    'call' => $this->inputCall,
+                    'ids' => [],
+                    'sources' => [],
+                    'offset' => $offset,
+                    'limit' => self::PARTICIPANTS_PAGE,
+                ]);
+            } catch (Throwable $e) {
+                $this->log("Could not fetch the participants of $this: $e", Logger::WARNING);
+                return;
+            }
+            \assert(\is_array($page) && \is_array($page['participants']));
+            foreach ($page['participants'] as $participant) {
+                \assert(\is_array($participant));
+                $this->applyParticipant($participant);
+            }
+            $offset = (string) ($page['next_offset'] ?? '');
+            if ($page['participants'] === []) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * A participant by their id, username or peer: from the cached list, or else looked up with
+     * phone.getGroupParticipants. Null if they are not in the call.
+     */
+    public function getParticipant(mixed $participant): ?Participant
+    {
+        $peerId = $this->API->getId($participant);
+        if (isset($this->participants[$peerId])) {
+            return $this->participants[$peerId];
+        }
+        try {
+            $page = $this->API->methodCallAsyncRead('phone.getGroupParticipants', [
+                'call' => $this->inputCall,
+                'ids' => [$peerId],
+                'sources' => [],
+                'offset' => '',
+                'limit' => 1,
+            ]);
+        } catch (Throwable $e) {
+            $this->log("Could not look up participant $peerId of $this: $e", Logger::WARNING);
+            return null;
+        }
+        \assert(\is_array($page) && \is_array($page['participants']));
+        foreach ($page['participants'] as $raw) {
+            \assert(\is_array($raw));
+            $this->applyParticipant($raw);
+        }
+        /** @var array<int, Participant> $participants */
+        $participants = $this->participants;
+        return $participants[$peerId] ?? null;
     }
 
     /**
@@ -312,6 +394,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         foreach ($result['participants'] as $participant) {
             $this->applyParticipant($participant);
         }
+        $this->fetchRemainingParticipants((string) ($result['participants_next_offset'] ?? ''));
         $this->syncSources();
     }
 
@@ -397,6 +480,15 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             if ($old !== null) {
                 unset($this->sourceToPeer[$old->source], $this->participants[$peerId]);
             }
+            if (($participant['self'] ?? false)
+                && $this->callState === GroupCallState::JOINED
+                && (int) ($participant['source'] ?? 0) === $this->source
+            ) {
+                // The server dropped our own source: we were removed from the call, rejoin (as
+                // official clients do).
+                $this->log("We were removed from $this, rejoining...", Logger::WARNING);
+                EventLoop::queue($this->rejoin(...));
+            }
             return;
         }
         $parsed = Participant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null);
@@ -404,14 +496,14 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         if ($parsed->source !== 0) {
             $this->sourceToPeer[$parsed->source] = $peerId;
             if (isset($this->pendingOutputs[$peerId])) {
-                $file = $this->pendingOutputs[$peerId];
+                [$file, $format] = $this->pendingOutputs[$peerId];
                 unset($this->pendingOutputs[$peerId]);
-                $this->connection?->setOutput($parsed->source, $file);
+                $this->connection?->setOutput($parsed->source, $file, $format);
             }
             if (isset($this->pendingPresentationOutputs[$peerId])) {
-                $file = $this->pendingPresentationOutputs[$peerId];
+                [$file, $format] = $this->pendingPresentationOutputs[$peerId];
                 unset($this->pendingPresentationOutputs[$peerId]);
-                $this->connection?->setPresentationOutput($parsed->source, $file);
+                $this->connection?->setPresentationOutput($parsed->source, $file, $format);
             }
             // Folder mode: start recording a participant that has just begun transmitting.
             $this->wireFolderOutput($peerId, $parsed);
@@ -479,29 +571,59 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                 $this->stopChecking();
                 return;
             }
+            $sources = [$this->source];
+            $presentationSource = $this->presentationConnection?->getAudioSource();
+            if ($presentationSource !== null) {
+                $sources[] = $presentationSource;
+            }
             try {
                 $alive = $this->API->methodCallAsyncRead('phone.checkGroupCall', [
                     'call' => $this->inputCall,
-                    'sources' => [$this->source],
+                    'sources' => $sources,
                 ]);
             } catch (Throwable) {
                 $alive = [];
             }
             if (\in_array($this->source, $alive, true)) {
+                if ($presentationSource !== null && !\in_array($presentationSource, $alive, true)) {
+                    // Only the screen-share was dropped: rejoin just the presentation.
+                    $this->log("Our screen-share was dropped from $this, rejoining it...", Logger::WARNING);
+                    $this->disablePresentation();
+                    try {
+                        $this->enablePresentation();
+                    } catch (Throwable $e) {
+                        $this->log("Could not rejoin the presentation of $this: $e", Logger::ERROR);
+                    }
+                }
                 return;
             }
             $this->stopChecking();
             $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
-            $muted = $this->muted;
-            $this->connection?->close();
-            $this->connection = null;
-            $this->callState = GroupCallState::NOT_JOINED;
-            try {
-                $this->join($muted);
-            } catch (Throwable $e) {
-                $this->log("Could not rejoin $this: $e", Logger::ERROR);
-            }
+            $this->rejoin();
         });
+    }
+
+    /**
+     * Join again from scratch with a new payload, keeping the playlists.
+     *
+     * @internal
+     */
+    public function rejoin(): void
+    {
+        $this->stopChecking();
+        $muted = $this->muted;
+        $this->presentationConnection?->close();
+        $this->presentationConnection = null;
+        $this->presentationDj?->discard();
+        $this->presentationDj = null;
+        $this->connection?->close();
+        $this->connection = null;
+        $this->callState = GroupCallState::NOT_JOINED;
+        try {
+            $this->join($muted);
+        } catch (Throwable $e) {
+            $this->log("Could not rejoin $this: $e", Logger::ERROR);
+        }
     }
 
     private function stopChecking(): void
@@ -580,6 +702,8 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         $this->presentationConnection = null;
         $this->connection?->close();
         $this->connection = null;
+        $this->streamReceiver?->stop();
+        $this->streamReceiver = null;
         $this->API->cleanupGroupCall($this->public->id);
     }
 
@@ -630,20 +754,36 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     /**
-     * Record group call media.
+     * Record group call media, muxed into Matroska files.
      *
      * Two modes:
-     *  - per participant: `setOutput($participant, $file)` records that one participant's incoming
-     *    audio and (if they transmit a camera) video into the given file or stream.
+     *  - per participant: `setOutput($file, $participant)` records that one participant's incoming
+     *    audio and (if they transmit a camera) video into the given file or stream, or their
+     *    screen-share with `$dest` set to {@see MediaDestination::Presentation}.
      *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
      *    participant into its own `<dir>/<peerId>.mkv` Matroska file, including participants that start
-     *    transmitting later. Each file holds the participant's audio and, once they turn a camera on,
-     *    their video. Our own media is never recorded.
+     *    transmitting later, plus a `<dir>/<peerId>.presentation.mkv` for anyone screen-sharing. Each
+     *    file holds the participant's audio and, once they turn a camera on, their video. Our own media
+     *    is never recorded.
+     *
+     * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
      */
-    public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, MediaDestination $dest = MediaDestination::Camera, ?RecordingFormat $format = null): self
     {
-        if ($participant instanceof LocalDirectory) {
-            $dir = $participant->dir;
+        if ($this->streamMode) {
+            // A single mixed stream, downloaded in chunks: there are no per-participant sources.
+            if ($participant !== null) {
+                throw new \InvalidArgumentException('In stream mode the call is a single mixed stream: record it without specifying a participant.');
+            }
+            if ($file instanceof LocalDirectory) {
+                $file = new LocalFile($file->dir.'/stream.ogg');
+            }
+            $this->streamReceiver ??= new StreamReceiver($this);
+            $this->streamReceiver->setOutput($file, $format);
+            return $this;
+        }
+        if ($file instanceof LocalDirectory) {
+            $dir = $file->dir;
             if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
                 throw new \RuntimeException("Could not create the recording directory $dir");
             }
@@ -654,24 +794,44 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             }
             return $this;
         }
-        if ($file === null) {
-            throw new \InvalidArgumentException('setOutput() requires a file/stream to record a participant into, or a LocalDirectory to record every participant.');
+        if ($participant === null) {
+            throw new \InvalidArgumentException('setOutput() requires the participant to record into the file/stream, or a LocalDirectory to record every participant.');
         }
-        $this->wireOutput($this->API->getId($participant), $file);
+        $format = RecordingFormat::matroskaFor($file, $format);
+        $peerId = $this->API->getId($participant);
+        if ($dest === MediaDestination::Presentation) {
+            $this->wirePresentationOutput($peerId, $file, $format);
+        } else {
+            $this->wireOutput($peerId, $file, $format);
+        }
         return $this;
     }
 
     /**
      * Route one participant's output to the connection now, or defer it until their source is known.
      */
-    private function wireOutput(int $peerId, LocalFile|WritableStream $file): void
+    private function wireOutput(int $peerId, LocalFile|WritableStream $file, RecordingFormat $format): void
     {
         $known = $this->participants[$peerId] ?? null;
         if ($known !== null && $known->source !== 0 && $this->connection !== null) {
-            $this->connection->setOutput($known->source, $file);
+            $this->connection->setOutput($known->source, $file, $format);
             return;
         }
-        $this->pendingOutputs[$peerId] = $file;
+        $this->pendingOutputs[$peerId] = [$file, $format];
+    }
+
+    /**
+     * Route one participant's screen-share output to the connection now, or defer it until their
+     * source is known.
+     */
+    private function wirePresentationOutput(int $peerId, LocalFile|WritableStream $file, RecordingFormat $format): void
+    {
+        $known = $this->participants[$peerId] ?? null;
+        if ($known !== null && $known->source !== 0 && $this->connection !== null) {
+            $this->connection->setPresentationOutput($known->source, $file, $format);
+            return;
+        }
+        $this->pendingPresentationOutputs[$peerId] = [$file, $format];
     }
 
     /**
@@ -690,7 +850,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             return;
         }
         $this->folderPeers[$peerId] = true;
-        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.mkv'));
+        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.mkv'), RecordingFormat::Mkv);
     }
 
     /**
@@ -710,12 +870,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             return;
         }
         $this->folderPresentationPeers[$peerId] = true;
-        $file = new LocalFile($this->outputDir.'/'.$peerId.'.presentation.mkv');
-        if ($this->connection !== null) {
-            $this->connection->setPresentationOutput($participant->source, $file);
-        } else {
-            $this->pendingPresentationOutputs[$peerId] = $file;
-        }
+        $this->wirePresentationOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId.'.presentation.mkv'), RecordingFormat::Mkv);
     }
 
     /**
@@ -761,6 +916,246 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             'call' => $this->inputCall,
             'can_self_unmute' => $canSelfUnmute,
         ])['link'];
+    }
+
+    /**
+     * Change a participant's state with phone.editGroupCallParticipant: mute/unmute them (admins; a
+     * non-admin mutes them only for themselves), set our playback volume of them, raise/lower our own
+     * hand, or pause/resume our own video or screen-share.
+     */
+    public function editParticipant(mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
+    {
+        $params = ['call' => $this->inputCall, 'participant' => $participant];
+        foreach (['muted' => $muted, 'volume' => $volume, 'raise_hand' => $raiseHand, 'video_stopped' => $videoStopped, 'video_paused' => $videoPaused, 'presentation_paused' => $presentationPaused] as $key => $value) {
+            if ($value !== null) {
+                $params[$key] = $value;
+            }
+        }
+        if ($volume !== null && ($volume < 1 || $volume > 20000)) {
+            throw new \InvalidArgumentException('The volume must be between 1 and 20000 (10000 = 100%).');
+        }
+        $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', $params);
+    }
+
+    /**
+     * Change the call's settings with phone.toggleGroupCallSettings (admins only).
+     *
+     * @param int|null $sendPaidMessagesStars Live stories: minimum donation to comment, 0 for none.
+     */
+    public function toggleSettings(?bool $joinMuted = null, bool $resetInviteHash = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): void
+    {
+        $params = ['call' => $this->inputCall, 'reset_invite_hash' => $resetInviteHash];
+        if ($joinMuted !== null) {
+            $params['join_muted'] = $joinMuted;
+        }
+        if ($messagesEnabled !== null) {
+            $params['messages_enabled'] = $messagesEnabled;
+        }
+        if ($sendPaidMessagesStars !== null) {
+            $params['send_paid_messages_stars'] = $sendPaidMessagesStars;
+        }
+        $this->API->methodCallAsyncRead('phone.toggleGroupCallSettings', $params);
+    }
+
+    /**
+     * Start or stop a server-side recording (phone.toggleGroupCallRecord, admins only).
+     */
+    public function toggleRecord(bool $start, ?string $title = null, bool $video = false, bool $portrait = false): void
+    {
+        $params = ['call' => $this->inputCall, 'start' => $start];
+        if ($start) {
+            if ($title !== null) {
+                $params['title'] = $title;
+            }
+            if ($video) {
+                $params['video'] = true;
+                $params['video_portrait'] = $portrait;
+            }
+        }
+        $this->API->methodCallAsyncRead('phone.toggleGroupCallRecord', $params);
+    }
+
+    /**
+     * Start this scheduled call now (phone.startScheduledGroupCall, admins only).
+     */
+    public function startScheduled(): void
+    {
+        $this->API->methodCallAsyncRead('phone.startScheduledGroupCall', ['call' => $this->inputCall]);
+    }
+
+    /**
+     * Subscribe to (or unsubscribe from) a notification when this scheduled call starts.
+     */
+    public function setStartSubscription(bool $subscribed): void
+    {
+        $this->API->methodCallAsyncRead('phone.toggleGroupCallStartSubscription', ['call' => $this->inputCall, 'subscribed' => $subscribed]);
+    }
+
+    /**
+     * Send an in-call message (phone.sendGroupCallMessage): text with entities, or, in a live story, a
+     * donation of `$paidStars` (with an empty text for a standalone donation).
+     */
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): void
+    {
+        $entities = [];
+        if ($parseMode === ParseMode::MARKDOWN) {
+            $parsed = TextEntities::fromMarkdown($message);
+            [$message, $entities] = [$parsed->message, $parsed->entities];
+        } elseif ($parseMode === ParseMode::HTML) {
+            $parsed = TextEntities::fromHtml($message);
+            [$message, $entities] = [$parsed->message, $parsed->entities];
+        }
+        $this->sendTextWithEntities($message, $entities, $paidStars, $sendAs);
+    }
+
+    /**
+     * Send an in-call reaction: a single emoji, or a custom emoji with `$emoji` as its fallback.
+     */
+    public function sendReaction(string $emoji, ?int $customEmojiId = null): void
+    {
+        $entities = [];
+        if ($customEmojiId !== null) {
+            $entities[] = ['_' => 'messageEntityCustomEmoji', 'offset' => 0, 'length' => self::utf16Length($emoji), 'document_id' => $customEmojiId];
+        }
+        $this->sendTextWithEntities($emoji, $entities, null, null);
+    }
+
+    /**
+     * @param list<mixed> $entities
+     */
+    private function sendTextWithEntities(string $text, array $entities, ?int $paidStars, mixed $sendAs): void
+    {
+        $params = [
+            'call' => $this->inputCall,
+            'random_id' => random_int(PHP_INT_MIN, PHP_INT_MAX),
+            'message' => ['_' => 'textWithEntities', 'text' => $text, 'entities' => $entities],
+            ...($paidStars !== null ? ['allow_paid_stars' => $paidStars] : []),
+            ...($sendAs !== null ? ['send_as' => $sendAs] : []),
+        ];
+        $this->API->methodCallAsyncRead('phone.sendGroupCallMessage', $params);
+    }
+
+    /**
+     * The length of a string in UTF-16 code units, as entities count it.
+     *
+     * @psalm-pure
+     */
+    public static function utf16Length(string $text): int
+    {
+        return (int) (\strlen(mb_convert_encoding($text, 'UTF-16', 'UTF-8')) / 2);
+    }
+
+    /**
+     * Delete in-call messages (our own, or anyone's for admins).
+     *
+     * @param list<int> $ids
+     */
+    public function deleteMessages(array $ids, bool $reportSpam = false): void
+    {
+        $this->API->methodCallAsyncRead('phone.deleteGroupCallMessages', [
+            'call' => $this->inputCall,
+            'messages' => $ids,
+            'report_spam' => $reportSpam,
+        ]);
+    }
+
+    /**
+     * Delete every in-call message of a participant (admins only).
+     */
+    public function deleteParticipantMessages(mixed $participant, bool $reportSpam = false): void
+    {
+        $this->API->methodCallAsyncRead('phone.deleteGroupCallParticipantMessages', [
+            'call' => $this->inputCall,
+            'participant' => $participant,
+            'report_spam' => $reportSpam,
+        ]);
+    }
+
+    /**
+     * The Telegram Stars donated to this live story so far, and its top donors.
+     */
+    public function getStars(): GroupCallStars
+    {
+        $result = $this->API->methodCallAsyncRead('phone.getGroupCallStars', ['call' => $this->inputCall]);
+        \assert(\is_array($result));
+        $donors = [];
+        foreach ((array) ($result['top_donors'] ?? []) as $donor) {
+            \assert(\is_array($donor));
+            $donors[] = new GroupCallDonor(
+                isset($donor['peer_id']) ? $this->API->getIdInternal($donor['peer_id']) : null,
+                (int) $donor['stars'],
+                (bool) ($donor['top'] ?? false),
+                (bool) ($donor['my'] ?? false),
+            );
+        }
+        return new GroupCallStars((int) ($result['total_stars'] ?? 0), $donors);
+    }
+
+    /**
+     * The peer we send in-call messages of this live story as by default (phone.saveDefaultSendAs).
+     */
+    public function saveDefaultSendAs(mixed $peer): void
+    {
+        $this->API->methodCallAsyncRead('phone.saveDefaultSendAs', ['call' => $this->inputCall, 'send_as' => $peer]);
+    }
+
+    /**
+     * Remove participants from the video chat by kicking them from the group or channel it belongs to,
+     * which also drops them from the call: a video chat has no notion of removing someone from just
+     * the call, and this is exactly what official clients do (Telegram Desktop's
+     * `Panel::kickParticipantSure`): in a basic group they are removed with messages.deleteChatUser, in
+     * a supergroup or channel they are banned with channels.editBanned using the "kicked" rights (for a
+     * user, all the send restrictions on top of `view_messages`; for a channel participant just
+     * `view_messages`). Requires the `ban_users` admin right.
+     */
+    public function removeParticipant(mixed ...$participants): void
+    {
+        $peerId = $this->public->peerId;
+        if ($peerId === null) {
+            throw new \RuntimeException("The group or channel of $this is unknown, cannot remove participants from it.");
+        }
+        foreach ($participants as $participant) {
+            $participantId = $this->API->getId($participant);
+            if (!DialogId::isSupergroupOrChannel($peerId)) {
+                $this->API->methodCallAsyncRead('messages.deleteChatUser', [
+                    'chat_id' => $peerId,
+                    'user_id' => $participantId,
+                ]);
+                continue;
+            }
+            $rights = ['_' => 'chatBannedRights', 'view_messages' => true, 'until_date' => 0];
+            if (DialogId::isUser($participantId)) {
+                $rights += [
+                    'send_stickers' => true,
+                    'send_gifs' => true,
+                    'send_games' => true,
+                    'send_inline' => true,
+                    'send_photos' => true,
+                    'send_videos' => true,
+                    'send_roundvideos' => true,
+                    'send_audios' => true,
+                    'send_voices' => true,
+                    'send_docs' => true,
+                    'send_plain' => true,
+                    'embed_links' => true,
+                ];
+            }
+            $this->API->methodCallAsyncRead('channels.editBanned', [
+                'channel' => $peerId,
+                'participant' => $participantId,
+                'banned_rights' => $rights,
+            ]);
+        }
+    }
+
+    /**
+     * Whether a screen-share is currently being transmitted.
+     *
+     * @psalm-mutation-free
+     */
+    public function isSharingScreen(): bool
+    {
+        return $this->presentationConnection !== null;
     }
 
     /**

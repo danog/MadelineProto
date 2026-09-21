@@ -22,6 +22,8 @@ use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Action\Cancel;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Keyboard;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -40,11 +42,11 @@ use danog\MadelineProto\EventHandler\Message\Entities\Phone;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
-use danog\MadelineProto\EventHandler\Message\Service\DialogGroupCall\GroupCall;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
 use danog\MadelineProto\EventHandler\Pinned;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;
@@ -459,9 +461,18 @@ abstract class InternalDoc
      * @param int|null    $scheduleDate If set, creates a scheduled call for the specified UNIX timestamp.
      * @param bool        $rtmpStream   Whether the call's media is published by an external RTMP application.
      */
-    final public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): \danog\MadelineProto\GroupCall
+    final public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): \danog\MadelineProto\EventHandler\Calls\GroupCall
     {
         return $this->wrapper->getAPI()->createGroupCall($peer, $title, $scheduleDate, $rtmpStream);
+    }
+    /**
+     * Decline an invitation to a conference call.
+     *
+     * @param int $msgId ID of the invitation message (a `messageActionConferenceCall`).
+     */
+    final public function declineConferenceCallInvite(int $msgId): void
+    {
+        $this->wrapper->getAPI()->declineConferenceCallInvite($msgId);
     }
     /**
      * Discard call.
@@ -752,7 +763,7 @@ abstract class InternalDoc
     /**
      * Get all pending and running calls, indexed by user ID.
      *
-     * @return array<int, VoIP>
+     * @return array<int, PrivateCall>
      */
     final public function getAllCalls(): array
     {
@@ -812,7 +823,7 @@ abstract class InternalDoc
      *
      * @psalm-mutation-free
      */
-    final public function getCall(int $id): ?\danog\MadelineProto\VoIP
+    final public function getCall(int $id): ?\danog\MadelineProto\EventHandler\Calls\PrivateCall
     {
         return $this->wrapper->getAPI()->getCall($id);
     }
@@ -821,7 +832,7 @@ abstract class InternalDoc
      *
      * @psalm-mutation-free
      */
-    final public function getCallByPeer(int $userId): ?\danog\MadelineProto\VoIP
+    final public function getCallByPeer(int $userId): ?\danog\MadelineProto\EventHandler\Calls\PrivateCall
     {
         return $this->wrapper->getAPI()->getCallByPeer($userId);
     }
@@ -858,6 +869,15 @@ abstract class InternalDoc
     final public function getConferenceCall(int $id): ?\danog\MadelineProto\EventHandler\Calls\ConferenceCall
     {
         return $this->wrapper->getAPI()->getConferenceCall($id);
+    }
+    /**
+     * Get an [end-to-end encrypted conference call »](https://core.telegram.org/api/group-calls#conference-calls)
+     * from its [conference link »](https://core.telegram.org/api/links#conference-links) slug, or null if
+     * the link is not valid any more.
+     */
+    final public function getConferenceCallBySlug(string $slug): ?\danog\MadelineProto\EventHandler\Calls\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->getConferenceCallBySlug($slug);
     }
     /**
      * Get cached (or eventually re-fetch) server-side config.
@@ -999,7 +1019,7 @@ abstract class InternalDoc
     /**
      * Get the group call (video chat or livestream) currently active in a group or channel.
      */
-    final public function getGroupCall(mixed $peer): ?\danog\MadelineProto\GroupCall
+    final public function getGroupCall(mixed $peer): ?\danog\MadelineProto\EventHandler\Calls\GroupCall
     {
         return $this->wrapper->getAPI()->getGroupCall($peer);
     }
@@ -1007,9 +1027,21 @@ abstract class InternalDoc
      * Get a group call from its
      * [conference deep link »](https://core.telegram.org/api/links#conference-links) slug.
      */
-    final public function getGroupCallBySlug(string $slug): ?\danog\MadelineProto\GroupCall
+    final public function getGroupCallBySlug(string $slug): ?\danog\MadelineProto\EventHandler\Calls\GroupCall
     {
         return $this->wrapper->getAPI()->getGroupCallBySlug($slug);
+    }
+    /**
+     * The peers we may join the video chats and livestreams of a group or channel as: ourselves, the
+     * channels we own, and (for anonymous admins) the group itself. Bot API IDs.
+     *
+     * See [joining a group call on behalf of owned channels »](https://core.telegram.org/api/group-calls#joining-a-group-call-on-behalf-of-owned-channels).
+     *
+     * @return list<int>
+     */
+    final public function getGroupCallJoinAs(mixed $peer): array
+    {
+        return $this->wrapper->getAPI()->getGroupCallJoinAs($peer);
     }
     /**
      * Get the participants of a group call, indexed by their bot API peer ID.
@@ -1030,6 +1062,21 @@ abstract class InternalDoc
     final public function getGroupCallState(int $id): \danog\MadelineProto\GroupCall\GroupCallState
     {
         return $this->wrapper->getAPI()->getGroupCallState($id);
+    }
+    /**
+     * Get the RTMP URL and stream key to publish an [RTMP livestream »](https://core.telegram.org/api/group-calls#creating-and-publishing-an-rtmp-livestream)
+     * to, in a group or channel (create the call with `rtmpStream` afterwards, see {@see self::createGroupCall()}),
+     * or as a live story (see {@see self::startLive()}).
+     *
+     * @param mixed $peer      The group or channel (or, for a live story, the user, group or channel it is posted as).
+     * @param bool  $revoke    Whether to generate a new stream key, invalidating the previous one.
+     * @param bool  $liveStory Whether the key is for a live story rather than a video chat/livestream.
+     *
+     * @return array{url: string, key: string}
+     */
+    final public function getGroupCallStreamRtmpUrl(mixed $peer, bool $revoke = false, bool $liveStory = false): array
+    {
+        return $this->wrapper->getAPI()->getGroupCallStreamRtmpUrl($peer, $revoke, $liveStory);
     }
     /**
      * Get async HTTP client.
@@ -1421,12 +1468,12 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->groupCallResumePlay($id, $dest);
     }
     /**
-     * Record group call audio: one participant to a file/stream, or every transmitting participant
-     * into its own file under a directory when `$file` is null and `$participant` is a LocalFile dir.
+     * Record group call media: one participant's camera or screen-share to a file/stream, or every
+     * transmitting participant into its own file under a LocalDirectory.
      */
-    final public function groupCallSetOutput(int $id, mixed $participant, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream|null $file = null): void
+    final public function groupCallSetOutput(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\LocalDirectory|\Amp\ByteStream\WritableStream $file, mixed $participant = null, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, ?\danog\MadelineProto\RecordingFormat $format = null): void
     {
-        $this->wrapper->getAPI()->groupCallSetOutput($id, $participant, $file);
+        $this->wrapper->getAPI()->groupCallSetOutput($id, $file, $participant, $dest, $format);
     }
     /**
      * Skip to the next file in the playlist of a group call.
@@ -1694,6 +1741,26 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->joinConferenceCall($call, $muted);
     }
     /**
+     * Join an end-to-end encrypted conference call from the service message that invited us to it
+     * (a `messageActionConferenceCall`, see {@see \danog\MadelineProto\EventHandler\Message\Service\DialogConferenceCall}).
+     *
+     * @param int  $msgId ID of the invitation message.
+     * @param bool $muted Whether to join muted.
+     */
+    final public function joinConferenceCallByInviteMessage(int $msgId, bool $muted = false): \danog\MadelineProto\EventHandler\Calls\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->joinConferenceCallByInviteMessage($msgId, $muted);
+    }
+    /**
+     * Join an end-to-end encrypted conference call from its conference link slug.
+     *
+     * @param bool $muted Whether to join muted.
+     */
+    final public function joinConferenceCallBySlug(string $slug, bool $muted = false): \danog\MadelineProto\EventHandler\Calls\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->joinConferenceCallBySlug($slug, $muted);
+    }
+    /**
      * Join the group call currently active in a group or channel.
      *
      * @param mixed       $peer       The group or channel whose call should be joined.
@@ -1701,7 +1768,7 @@ abstract class InternalDoc
      * @param mixed       $joinAs     Peer to join as, defaults to ourselves.
      * @param string|null $inviteHash Invite hash from a video chat invite link, if any.
      */
-    final public function joinGroupCall(mixed $peer, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): \danog\MadelineProto\GroupCall
+    final public function joinGroupCall(mixed $peer, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): \danog\MadelineProto\EventHandler\Calls\GroupCall
     {
         return $this->wrapper->getAPI()->joinGroupCall($peer, $muted, $joinAs, $inviteHash);
     }
@@ -1830,6 +1897,18 @@ abstract class InternalDoc
     final public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
         return \danog\MadelineProto\StrTools::mbSubstr($text, $offset, $length);
+    }
+    /**
+     * Upgrade a one-to-one call to an [end-to-end encrypted conference call »](https://core.telegram.org/api/group-calls#conference-calls):
+     * create a conference, invite the other party to it, and discard the one-to-one call pointing them
+     * to the conference (`phoneCallDiscardReasonMigrateConferenceCall`).
+     *
+     * @param int  $id    ID of the one-to-one call.
+     * @param bool $muted Whether to join the conference muted.
+     */
+    final public function migrateCallToConference(int $id, bool $muted = false): \danog\MadelineProto\EventHandler\Calls\ConferenceCall
+    {
+        return $this->wrapper->getAPI()->migrateCallToConference($id, $muted);
     }
     /**
      * Provide a buffered reader for a file, URL or amp stream, optionally starting at a byte offset.
@@ -2034,7 +2113,7 @@ abstract class InternalDoc
      * @param mixed $user  User
      * @param bool  $video Whether to start a video call.
      */
-    final public function requestCall(mixed $user, bool $video = false): \danog\MadelineProto\VoIP
+    final public function requestCall(mixed $user, bool $video = false): \danog\MadelineProto\EventHandler\Calls\PrivateCall
     {
         return $this->wrapper->getAPI()->requestCall($user, $video);
     }
@@ -2098,6 +2177,16 @@ abstract class InternalDoc
     final public static function rleEncode(string $string): string
     {
         return \danog\MadelineProto\Tools::rleEncode($string);
+    }
+    /**
+     * Save the peer we join the video chats and livestreams of a group or channel as by default.
+     *
+     * @param mixed $peer   The group or channel.
+     * @param mixed $joinAs The peer to join as (one of {@see self::getGroupCallJoinAs()}).
+     */
+    final public function saveDefaultGroupCallJoinAs(mixed $peer, mixed $joinAs): void
+    {
+        $this->wrapper->getAPI()->saveDefaultGroupCallJoinAs($peer, $joinAs);
     }
     /**
      * Sends an audio.
@@ -2459,6 +2548,29 @@ abstract class InternalDoc
     final public function start(): array
     {
         return $this->wrapper->getAPI()->start();
+    }
+    /**
+     * Start a [live story »](https://core.telegram.org/api/group-calls#live-stories): a livestream posted
+     * as a story, of which we are the single publisher (everyone else joins as a listener).
+     *
+     * @param mixed                     $peer                  Who to post the live story as: ourselves, or a group or channel we administer.
+     * @param string|null               $caption               Caption of the story.
+     * @param ParseMode|null            $parseMode             Whether to parse HTML or Markdown markup in the caption.
+     * @param list<array<string, mixed>> $privacyRules          Who may see the story, as [InputPrivacyRule](https://core.telegram.org/type/InputPrivacyRule)s; everyone by default.
+     * @param bool                      $pinned                Whether to pin the story to the profile.
+     * @param bool                      $noForwards            Whether to forbid forwarding and screenshots.
+     * @param bool                      $rtmpStream            Whether the media is published by an external RTMP application (see {@see self::getGroupCallStreamRtmpUrl()}) rather than by us.
+     * @param bool|null                 $messagesEnabled       Whether viewers may comment with in-call messages.
+     * @param int|null                  $sendPaidMessagesStars The minimum Telegram Stars donation required to comment, if any.
+     */
+    final public function startLive(mixed $peer, ?string $caption = null, ?\danog\MadelineProto\ParseMode $parseMode = null, array $privacyRules = [
+        0 =>
+        [
+            '_' => 'inputPrivacyValueAllowAll',
+        ],
+    ], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): \danog\MadelineProto\EventHandler\Calls\GroupCall
+    {
+        return $this->wrapper->getAPI()->startLive($peer, $caption, $parseMode, $privacyRules, $pinned, $noForwards, $rtmpStream, $messagesEnabled, $sendPaidMessagesStars);
     }
     /**
      * Stop update loop.

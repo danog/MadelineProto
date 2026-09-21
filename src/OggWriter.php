@@ -141,15 +141,23 @@ final class OggWriter
         );
         $this->out->write($data);
     }
+    /**
+     * Write the OpusHead and OpusTags header pages.
+     *
+     * @param string|null $opusHead A complete OpusHead packet to use verbatim (for a multichannel or
+     *                              pre-existing stream), instead of building a family-0 one from
+     *                              `$channels` and `$sampleRate`.
+     */
     public function writeHeader(
         int $channels,
         int $sampleRate,
-        string $opusVersion
+        string $opusVersion,
+        ?string $opusHead = null,
     ): void {
         $this->writePage(
             Ogg::BOS,
             0,
-            'OpusHead'.pack(
+            $opusHead ?? 'OpusHead'.pack(
                 'CCvVvC',
                 1,
                 $channels,

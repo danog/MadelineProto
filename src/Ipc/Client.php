@@ -208,6 +208,17 @@ final class Client extends ClientAbstract
     }
 
     /**
+     * Play file in call, blocking until the file has finished playing if a stream is provided.
+     */
+    public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $params = [$id, &$file, $dest];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call('callPlayBlocking', $wrapper);
+    }
+
+    /**
      * Play files on hold in call.
      */
     public function callPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
@@ -234,6 +245,17 @@ final class Client extends ClientAbstract
     }
 
     /**
+     * Play file in group call, blocking until the file has finished playing if a stream is provided.
+     */
+    public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $params = [$id, &$file, $dest];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call('groupCallPlayBlocking', $wrapper);
+    }
+
+    /**
      * Play files on hold in group call.
      */
     public function groupCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
@@ -252,6 +274,17 @@ final class Client extends ClientAbstract
      * Play file in conference call.
      */
     public function conferenceCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $params = [$id, &$file, $dest];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call('conferenceCallPlayBlocking', $wrapper);
+    }
+
+    /**
+     * Play file in conference call, blocking until the file has finished playing if a stream is provided.
+     */
+    public function conferenceCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
         $params = [$id, &$file, $dest];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);

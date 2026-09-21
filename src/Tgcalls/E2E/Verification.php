@@ -79,6 +79,19 @@ final class Verification
     }
 
     /**
+     * Verify the Ed25519 signature of a received broadcast against its sender's public key.
+     *
+     * @param array<string, mixed> $broadcast
+     */
+    public static function verify(array $broadcast, string $publicKey): bool
+    {
+        $signature = (string) ($broadcast['signature'] ?? '');
+        $payload = $broadcast;
+        $payload['signature'] = BlockCodec::ZERO_SIGNATURE;
+        return \strlen($signature) === 64 && Crypto::verify($signature, (new BlockCodec())->serialize($payload), $publicKey);
+    }
+
+    /**
      * Whether a revealed nonce matches a previously committed hash.
      *
      * @psalm-pure
