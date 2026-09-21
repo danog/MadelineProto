@@ -74,8 +74,17 @@ final class CallRecorder
     private ?float $waitingSince = null;
 
     private ?RemoteStreamTrack $audioTrack = null;
-    /** @var array<string, RemoteStreamTrack> Video tracks drained by the recorder itself, by slot. */
+    /**
+     * Video tracks drained by the recorder itself, keyed by `<slot>:<source>`. A slot may have
+     * several: a group call participant's camera is simulcast on several SSRCs and the SFU forwards
+     * whichever layer it picks, so all of them feed the slot, and a switch between them is just a
+     * change of source.
+     *
+     * @var array<string, RemoteStreamTrack>
+     */
     private array $videoTracks = [];
+    /** @var array<string, string> The slot of each video track, by the same key. */
+    private array $videoSlots = [];
     private ?ConcurrentIterator $audioConsumer = null;
     /** @var array<string, ConcurrentIterator> */
     private array $videoConsumers = [];
@@ -108,6 +117,8 @@ final class CallRecorder
     private bool $rollPending = false;
     /** Whether the stream output was already told that it cannot follow a stream change. */
     private bool $warnedUnrollable = false;
+    /** @var array<string, true> Slots that delivered at least one frame (for the diagnostics log). */
+    private array $seenSlots = [];
 
     /** The file the recording was requested to, or null for a stream (which cannot survive a serialize cycle). */
     public readonly ?LocalFile $file;
@@ -184,10 +195,10 @@ final class CallRecorder
             $this->audioConsumer = $this->audioTrack->getConsumer();
             EventLoop::queue($this->drainAudio(...));
         }
-        foreach ($this->videoTracks as $slot => $track) {
-            if (!isset($this->videoConsumers[$slot])) {
-                $this->videoConsumers[$slot] = $track->getConsumer();
-                EventLoop::queue(fn () => $this->drainVideo($slot));
+        foreach ($this->videoTracks as $key => $track) {
+            if (!isset($this->videoConsumers[$key])) {
+                $this->videoConsumers[$key] = $track->getConsumer();
+                EventLoop::queue(fn () => $this->drainVideo($key));
             }
         }
     }
@@ -214,12 +225,14 @@ final class CallRecorder
             return;
         }
         \assert(\in_array($slot, self::VIDEO_SLOTS, true));
-        if (($this->videoTracks[$slot] ?? null) === $track) {
+        $key = $slot.':'.self::sourceOf($track);
+        if (isset($this->videoTracks[$key])) {
             return;
         }
-        $this->videoTracks[$slot] = $track;
-        $this->videoConsumers[$slot] = $track->getConsumer();
-        EventLoop::queue(fn () => $this->drainVideo($slot));
+        $this->videoTracks[$key] = $track;
+        $this->videoSlots[$key] = $slot;
+        $this->videoConsumers[$key] = $track->getConsumer();
+        EventLoop::queue(fn () => $this->drainVideo($key));
     }
 
     /**
@@ -295,16 +308,17 @@ final class CallRecorder
         }
     }
 
-    private function drainVideo(string $slot): void
+    private function drainVideo(string $key): void
     {
-        $consumer = $this->videoConsumers[$slot] ?? null;
-        $track = $this->videoTracks[$slot] ?? null;
-        if ($consumer === null || $track === null) {
+        $consumer = $this->videoConsumers[$key] ?? null;
+        $track = $this->videoTracks[$key] ?? null;
+        $slot = $this->videoSlots[$key] ?? null;
+        if ($consumer === null || $track === null || $slot === null) {
             return;
         }
         $source = self::sourceOf($track);
         foreach ($consumer as $frame) {
-            if ($this->closed || ($this->videoTracks[$slot] ?? null) !== $track) {
+            if ($this->closed || ($this->videoTracks[$key] ?? null) !== $track) {
                 return;
             }
             if ($frame instanceof EncodedPacket) {
@@ -406,6 +420,10 @@ final class CallRecorder
      */
     private function handleFrame(string $slot, string $data, int $ms, bool $keyframe): void
     {
+        if (!isset($this->seenSlots[$slot])) {
+            $this->seenSlots[$slot] = true;
+            Logger::log("First $slot frame of the recording ".($this->file?->file ?? 'stream')." at {$ms}ms; expected streams ".json_encode($this->expected), Logger::VERBOSE);
+        }
         if ($this->expected[$slot] === false) {
             // Signaling says this stream is off: a straggler, or a stream that came back before
             // its state did — either way it is not part of any segment until the state says so.
@@ -649,6 +667,7 @@ final class CallRecorder
         $this->closed = true;
         $this->audioTrack = null;
         $this->videoTracks = [];
+        $this->videoSlots = [];
         $this->writer?->close();
         $this->writer = null;
     }

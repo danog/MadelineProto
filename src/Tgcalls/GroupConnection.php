@@ -193,6 +193,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         private readonly bool $screencast = false,
     ) {
         $this->peerConnection = new RTCPeerConnection(['iceServers' => []]);
+        if (getenv('MP_RTC_DEBUG') === '1') {
+            // Route php-rtc's own debug output (DTLS, SRTP, SCTP, RTP routing) into the call log.
+            $this->peerConnection->setLogger(new RtcDebugLogger($call));
+        }
         $dj->setVideoCodecObserver($this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
         $transceiver = $this->peerConnection->addTransceiver($this->outgoingAudio, SDPDirections::sendonly);
@@ -208,7 +212,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         // client always initiates it (although it is the ICE-controlled side) and opens the channel
         // as stream 0 — see GroupNetworkManager.cpp and SctpDataChannelProviderInterfaceImpl.cpp.
         // A screen-share-only connection subscribes to nothing, so it needs no channel.
-        if (!$this->screencast) {
+        if (!$this->screencast && getenv('MP_GROUP_DATACHANNEL') !== '0') {
             $this->peerConnection->createInbandSctp(client: true);
             $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true, id: 0));
             $this->dataChannel->addOpenListener($this);
@@ -496,6 +500,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 'video' => $videoSsrcs !== [],
                 'presentation' => ($participant['presentation'] ?? []) !== [],
             ];
+            $this->call->log("Participant $audio of {$this->call} sends: ".json_encode($this->participantStreams[$audio]).', video sources '.json_encode($videoSsrcs).', presentation sources '.json_encode(array_map(GroupSdp::toUnsignedSsrc(...), (array) ($participant['presentation'] ?? []))), Logger::VERBOSE);
             $this->tellRecorderExpectedStreams($audio);
         }
         // The SFU never removes m-lines, so we only ever add; nothing to do if none were missing.
@@ -592,6 +597,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         unset($this->recorders[$ssrc]);
         $this->pendingOutputs[$ssrc] = $file;
         $this->formats[$ssrc] = $format;
+        $this->call->log("Recording of participant $ssrc of {$this->call} requested into ".($file instanceof LocalFile ? $file->file : 'a stream'), Logger::VERBOSE);
         // Attach against any of this participant's tracks (audio, or video owned by them) that are
         // already live; the recorder is created lazily and shared between them.
         foreach ($this->peerConnection->getReceivers() as $receiver) {
@@ -722,8 +728,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             $this->call->log("Got the audio track of source $ssrc in {$this->call}", Logger::VERBOSE);
             $this->call->onIncomingSource(GroupSdp::toSignedSsrc($ssrc));
         } else {
-            $owner = $this->videoOwner[$ssrc] ?? null;
-            $this->call->log("Got a video track (source $ssrc, owner ".($owner ?? 'unknown').") in {$this->call}", Logger::VERBOSE);
+            $owner = $this->videoOwner[$ssrc] ?? $this->presentationOwner[$ssrc] ?? null;
+            $this->call->log("Got a video track (source $ssrc, owner ".($owner ?? 'unknown').(isset($this->presentationOwner[$ssrc]) ? ', screen share' : '').") in {$this->call}", Logger::VERBOSE);
         }
         $this->attachTrack($track, $ssrc);
     }
@@ -737,14 +743,18 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     private function attachTrack(RemoteStreamTrack $track, int $ssrc): void
     {
         if ($track->getKind() === MediaKind::Video && isset($this->presentationOwner[$ssrc])) {
-            $this->ensureRecorder($this->presentationOwner[$ssrc])?->setTrack($track, CallRecorder::SLOT_PRESENTATION);
-            return;
+            $owner = $this->presentationOwner[$ssrc];
+            $slot = CallRecorder::SLOT_PRESENTATION;
+        } else {
+            $owner = $track->getKind() === MediaKind::Video ? ($this->videoOwner[$ssrc] ?? null) : $ssrc;
+            $slot = CallRecorder::SLOT_VIDEO;
         }
-        $owner = $track->getKind() === MediaKind::Video ? ($this->videoOwner[$ssrc] ?? null) : $ssrc;
         if ($owner === null) {
             return;
         }
-        $this->ensureRecorder($owner)?->setTrack($track, CallRecorder::SLOT_VIDEO);
+        $recorder = $this->ensureRecorder($owner);
+        $this->call->log("Track $ssrc ({$track->getKind()->name}, $slot) of participant $owner in {$this->call}: ".($recorder === null ? 'no recording requested' : 'attached to its recording'), Logger::VERBOSE);
+        $recorder?->setTrack($track, $slot);
     }
 
     /**
