@@ -48,7 +48,7 @@
  */
 
 use danog\MadelineProto\API;
-use danog\MadelineProto\Call;
+use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\GroupCall;
 use danog\MadelineProto\GroupCall\GroupCallState;
