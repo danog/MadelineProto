@@ -74,7 +74,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
 
     public function __construct(
         private readonly DjLoop $source,
-        private readonly CallInterface $call,
+        private readonly CallControllerInterface $call,
     ) {
         parent::__construct(MediaKind::Video);
         $this->startProducing();

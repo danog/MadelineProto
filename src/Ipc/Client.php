@@ -249,6 +249,32 @@ final class Client extends ClientAbstract
     }
 
     /**
+     * Play file in conference call.
+     */
+    public function conferenceCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $params = [$id, &$file, $dest];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call('conferenceCallPlayBlocking', $wrapper);
+    }
+
+    /**
+     * Play files on hold in conference call.
+     */
+    public function conferenceCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        $params = [$id, $dest, $files];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        foreach ($params as &$param) {
+            if ($param instanceof ReadableStream) {
+                $wrapper->wrap($param, true);
+            }
+        }
+        $this->__call('conferenceCallPlayOnHold', $wrapper);
+    }
+
+    /**
      * Upload file from callable.
      *
      * The callable must accept two parameters: int $offset, int $size

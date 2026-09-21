@@ -19,11 +19,12 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
-use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
 
 /**
@@ -120,11 +121,11 @@ trait Handler
      *
      * @param bool $muted Whether to join muted.
      */
-    public function createConferenceCall(bool $muted = false): ConferenceCall
+    public function createConferenceCall(bool $muted = false): ConferenceCallUpdate
     {
         $conference = new ConferenceCall($this);
         $conference->create($muted);
-        return $conference;
+        return $conference->getPublic();
     }
 
     /**
@@ -136,12 +137,12 @@ trait Handler
      * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
      * @param bool  $muted Whether to join muted.
      */
-    public function joinConferenceCall(array $call, bool $muted = false): ConferenceCall
+    public function joinConferenceCall(array $call, bool $muted = false): ConferenceCallUpdate
     {
         $conference = new ConferenceCall($this);
         $conference->setCall($call);
         $conference->join($muted);
-        return $conference;
+        return $conference->getPublic();
     }
 
     /**
@@ -149,9 +150,276 @@ trait Handler
      *
      * @psalm-mutation-free
      */
-    public function getConferenceCall(int $id): ?ConferenceCall
+    public function getConferenceCall(int $id): ?ConferenceCallUpdate
     {
-        return $this->conferenceCalls[$id] ?? null;
+        return $this->conferenceCalls[$id]?->getPublic();
+    }
+
+    /**
+     * Resolve the live controller of a conference call we are tracking.
+     *
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
+    private function getConferenceCallController(int $id): ConferenceCall
+    {
+        return $this->conferenceCalls[$id] ?? throw new AssertionError('Unknown conference call!');
+    }
+
+    /**
+     * Whether we are currently in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isConferenceCallJoined(int $id): bool
+    {
+        return $this->conferenceCalls[$id]?->isJoined() ?? false;
+    }
+
+    /**
+     * Leave a conference call, without ending it for the other participants.
+     *
+     * @internal
+     */
+    public function leaveConferenceCall(int $id): void
+    {
+        $this->getConferenceCallController($id)->leave();
+    }
+
+    /**
+     * Get the participants of a conference call, keyed by their user id.
+     *
+     * @return array<int, array{public_key: string, permissions: int}>
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getConferenceCallParticipants(int $id): array
+    {
+        return $this->getConferenceCallController($id)->getParticipants();
+    }
+
+    /**
+     * Remove participants from a conference call, rekeying for the remaining members.
+     *
+     * @internal
+     */
+    public function removeConferenceCallParticipants(int $id, int ...$userIds): void
+    {
+        $this->getConferenceCallController($id)->removeParticipant(...$userIds);
+    }
+
+    /**
+     * Begin (or restart) emoji verification for a conference call.
+     *
+     * @internal
+     */
+    public function startConferenceCallVerification(int $id): void
+    {
+        $this->getConferenceCallController($id)->startVerification();
+    }
+
+    /**
+     * The four verification emojis of a conference call, or null until every nonce has been revealed.
+     *
+     * @return list<string>|null
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getConferenceCallEmojis(int $id): ?array
+    {
+        return $this->getConferenceCallController($id)->getEmojis();
+    }
+
+    /**
+     * Send an end-to-end encrypted in-call message to every participant of a conference call.
+     *
+     * @internal
+     */
+    public function sendConferenceCallMessage(int $id, string $message): void
+    {
+        $this->getConferenceCallController($id)->sendMessage($message);
+    }
+
+    /**
+     * Whether a screen-share is currently being transmitted in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isConferenceCallSharingScreen(int $id): bool
+    {
+        return $this->getConferenceCallController($id)->isSharingScreen();
+    }
+
+    /**
+     * Start sharing a screen in a conference call.
+     *
+     * @internal
+     */
+    public function enableConferenceCallPresentation(int $id): void
+    {
+        $this->getConferenceCallController($id)->enablePresentation();
+    }
+
+    /**
+     * Stop sharing the screen in a conference call.
+     *
+     * @internal
+     */
+    public function disableConferenceCallPresentation(int $id): void
+    {
+        $this->getConferenceCallController($id)->disablePresentation();
+    }
+
+    /**
+     * Mute or unmute our own audio stream in a conference call.
+     *
+     * @internal
+     */
+    public function setConferenceCallMuted(int $id, bool $muted = true): void
+    {
+        $this->getConferenceCallController($id)->setMuted($muted);
+    }
+
+    /**
+     * Whether our own audio stream is muted in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isConferenceCallMuted(int $id): bool
+    {
+        return $this->getConferenceCallController($id)->isMuted();
+    }
+
+    /**
+     * Play a file in a conference call.
+     *
+     * @internal
+     */
+    public function conferenceCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->play($file, $dest);
+    }
+
+    /**
+     * Play a file in a conference call, blocking until it has finished playing if a stream is provided.
+     *
+     * @internal
+     */
+    public function conferenceCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->playBlocking($file, $dest);
+    }
+
+    /**
+     * Record conference call media: one participant to a file/stream, or every transmitting participant
+     * into its own file under a directory when `$file` is null and `$participant` is a LocalDirectory.
+     *
+     * @internal
+     */
+    public function conferenceCallSetOutput(int $id, mixed $participant, LocalFile|WritableStream|null $file = null): void
+    {
+        $this->getConferenceCallController($id)->setOutput($participant, $file);
+    }
+
+    /**
+     * Get the state of a conference call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getConferenceCallState(int $id): GroupCallState
+    {
+        return ($this->conferenceCalls[$id] ?? null)?->getCallState() ?? GroupCallState::NOT_JOINED;
+    }
+
+    /**
+     * Files to play on hold in a conference call.
+     *
+     * @internal
+     */
+    public function conferenceCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        $this->getConferenceCallController($id)->playOnHold($dest, ...$files);
+    }
+
+    /**
+     * Skip to the next file in the playlist of a conference call.
+     *
+     * @internal
+     */
+    public function conferenceCallSkipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->skip($dest);
+    }
+
+    /**
+     * Stop playing all files in a conference call, clearing the main and the hold playlist.
+     *
+     * @internal
+     */
+    public function conferenceCallStopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->stop($dest);
+    }
+
+    /**
+     * Pause playback of the current file in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
+    public function conferenceCallPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->pause($dest);
+    }
+
+    /**
+     * Resume playback of the current file in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
+    public function conferenceCallResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getConferenceCallController($id)->resume($dest);
+    }
+
+    /**
+     * Whether the currently playing file of a conference call is paused.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isConferenceCallPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
+    {
+        return $this->getConferenceCallController($id)->isPaused($dest);
+    }
+
+    /**
+     * Get the file that is currently being played in a conference call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function conferenceCallGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
+    {
+        return $this->getConferenceCallController($id)->getCurrent($dest);
     }
 
     /**

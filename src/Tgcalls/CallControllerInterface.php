@@ -25,7 +25,7 @@ use Stringable;
  * @internal
  * @psalm-mutable
  */
-interface CallInterface extends Stringable
+interface CallControllerInterface extends Stringable
 {
     /**
      * Log a message, prefixed by the call description.

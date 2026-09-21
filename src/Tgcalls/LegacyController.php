@@ -25,7 +25,6 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
-use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -64,7 +63,7 @@ final class LegacyController
     private ?OpusRecorder $recorder = null;
 
     public function __construct(
-        private readonly VoIPController $call,
+        private readonly PrivateCallController $call,
         private readonly string $authKey,
         private readonly bool $outgoing,
         private readonly DjLoop $dj,
@@ -111,7 +110,7 @@ final class LegacyController
         }
         // The read and write loops are detached event-loop tasks that cannot be serialized: redo the
         // libtgvoip handshake over the reconnecting sockets, which restarts both loops. Recording,
-        // if any, is re-attached by VoIPController::__unserialize().
+        // if any, is re-attached by PrivateCallController::__unserialize().
         EventLoop::queue(function (): void {
             if ($this->closed) {
                 return;

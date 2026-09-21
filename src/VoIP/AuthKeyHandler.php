@@ -34,8 +34,8 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\Tgcalls\PrivateCallController;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\VoIPController;
 use phpseclib4\Math\BigInteger;
 use Throwable;
 
@@ -51,9 +51,9 @@ use const STR_PAD_LEFT;
  */
 trait AuthKeyHandler
 {
-    /** @var array<int, VoIPController> */
+    /** @var array<int, PrivateCallController> */
     private array $calls = [];
-    /** @var array<int, VoIPController> */
+    /** @var array<int, PrivateCallController> */
     private array $callsByPeer = [];
     private array $pendingCalls = [];
     /**
@@ -87,11 +87,11 @@ trait AuthKeyHandler
                 'video' => $video,
                 'user_id' => $user,
                 'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
-                'protocol' => VoIPController::CALL_PROTOCOL,
+                'protocol' => PrivateCallController::CALL_PROTOCOL,
             ])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-            $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
+            $this->calls[$res['id']] = $controller = new PrivateCallController($this, $res);
             $this->callsByPeer[$controller->public->otherID] = $controller;
             unset($this->pendingCalls[$user]);
             $deferred->complete($controller->public);
@@ -165,7 +165,7 @@ trait AuthKeyHandler
      */
     public function getAllCalls(): array
     {
-        return array_map(static fn (VoIPController $v): PrivateCall => $v->public, $this->callsByPeer);
+        return array_map(static fn (PrivateCallController $v): PrivateCall => $v->public, $this->callsByPeer);
     }
 
     /**

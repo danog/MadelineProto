@@ -90,7 +90,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
 
     public function __construct(
         private readonly DjLoop $dj,
-        private readonly CallInterface $call,
+        private readonly CallControllerInterface $call,
     ) {
         parent::__construct(MediaKind::Audio);
         $this->startProducing();

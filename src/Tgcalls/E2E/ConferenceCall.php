@@ -17,8 +17,13 @@
 namespace danog\MadelineProto\Tgcalls\E2E;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
+use Amp\DeferredFuture;
 use danog\MadelineProto\EventHandler\Call;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\MultiCall;
+use danog\MadelineProto\GroupCall\GroupCallState;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -26,13 +31,6 @@ use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
-use danog\MadelineProto\Tgcalls\E2E\CallPacket;
-use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
-use danog\MadelineProto\Tgcalls\E2E\Crypto;
-use danog\MadelineProto\Tgcalls\E2E\E2EKeyProvider;
-use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
-use danog\MadelineProto\Tgcalls\E2E\Verification;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use danog\MadelineProto\Tgcalls\GroupSdp;
@@ -48,9 +46,12 @@ use Throwable;
  * end-to-end encrypted by a {@see FrameCryptor} — the SFU only ever forwards ciphertext. It is both
  * the connection's owner and the cryptor's key provider.
  *
- * This is the public object returned by {@see \danog\MadelineProto\MTProto::createConferenceCall()}
- * and {@see \danog\MadelineProto\MTProto::joinConferenceCall()}; it implements the common
- * {@see Call} media interface plus conference-specific controls (verification, encrypted messages).
+ * This is the internal controller; the public handle library users receive from
+ * {@see \danog\MadelineProto\MTProto::createConferenceCall()} and
+ * {@see \danog\MadelineProto\MTProto::joinConferenceCall()} is the {@see ConferenceCallUpdate}
+ * returned by {@see self::getPublic()}, which delegates back here by call id. The controller
+ * implements the common {@see Call} media interface plus conference-specific controls (verification,
+ * encrypted messages).
  */
 final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyProvider
 {
@@ -90,6 +91,18 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     private array $chainOffset = [0, 0];
     /** SSRC (unsigned) => participant user id, for verifying incoming media senders. */
     private array $ssrcToUser = [];
+    /** user id => signed audio source, learned from the participant list, for recording. */
+    private array $userToSource = [];
+    /** Per-participant recording outputs requested before the user's media source was known. */
+    private array $pendingOutputs = [];
+    /** Per-participant presentation recording outputs requested before the user's source was known. */
+    private array $pendingPresentationOutputs = [];
+    /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
+    private ?string $outputDir = null;
+    /** @var array<int, true> User ids already wired to a per-participant file in folder mode. */
+    private array $folderPeers = [];
+    /** @var array<int, true> User ids already wired to a presentation file in folder mode. */
+    private array $folderPresentationPeers = [];
     /** user id => revealed verification nonce, for computing the emoji hash. */
     private array $verificationNonces = [];
     /** Our own verification nonce for the current chain head, if a verification is in progress. */
@@ -98,6 +111,9 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
     private bool $joined = false;
     /** Event-loop id of the backstop chain poll, so it can be cancelled on leave. */
     private ?string $pollWatcher = null;
+
+    /** The public event-handler handle for this conference, built lazily once the call exists. */
+    private ?ConferenceCallUpdate $public = null;
 
     public function __construct(
         public readonly MTProto $API,
@@ -188,10 +204,36 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this->inputCall ?? throw new \RuntimeException('The conference call does not exist yet.');
     }
 
+    /**
+     * The public {@see ConferenceCallUpdate} handle for this conference, built lazily once the call
+     * exists. This is the object handed to library users; it delegates every operation back to this
+     * controller by call id.
+     */
+    public function getPublic(): ConferenceCallUpdate
+    {
+        $call = $this->getInputCall();
+        return $this->public ??= new ConferenceCallUpdate($this->API, [
+            '_' => 'groupCall',
+            'id' => $call['id'],
+            'access_hash' => $call['access_hash'],
+            'conference' => true,
+        ]);
+    }
+
     /** Whether we are currently in the conference (joined and not left/forbidden). */
     public function isJoined(): bool
     {
         return $this->joined;
+    }
+
+    /**
+     * Get the state of the conference call.
+     *
+     * @psalm-mutation-free
+     */
+    public function getCallState(): GroupCallState
+    {
+        return $this->joined ? GroupCallState::JOINED : GroupCallState::NOT_JOINED;
     }
 
     /**
@@ -627,6 +669,29 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
         return $this;
     }
 
+    /**
+     * Play a file, blocking until it has finished playing if a stream is provided.
+     */
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    {
+        $this->play($file, $dest);
+        self::awaitStream($file);
+        return $this;
+    }
+
+    /**
+     * Block until a played stream has finished; a no-op for files and URLs.
+     */
+    private static function awaitStream(LocalFile|RemoteUrl|ReadableStream $file): void
+    {
+        if (!$file instanceof ReadableStream) {
+            return;
+        }
+        $deferred = new DeferredFuture;
+        $file->onClose($deferred->complete(...));
+        $deferred->getFuture()->await();
+    }
+
     #[\Override]
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
@@ -891,6 +956,94 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
      * ------------------------------------------------------------------ */
 
     /**
+     * Record conference call media (all end-to-end encrypted; the SFU only ever sees ciphertext, but
+     * incoming frames are decrypted before they are muxed, so recordings are plaintext).
+     *
+     * Two modes:
+     *  - per participant: `setOutput($userId, $file)` records that one participant's incoming audio and
+     *    (if they transmit a camera) video into the given file or stream.
+     *  - folder (all participants): `setOutput(new LocalDirectory($dir))` records every *transmitting*
+     *    participant into its own `<dir>/<userId>.mkv` Matroska file, including participants that start
+     *    transmitting later, plus a `<dir>/<userId>.presentation.mkv` for anyone screen-sharing. Our own
+     *    media is never recorded.
+     */
+    public function setOutput(mixed $participant, LocalFile|WritableStream|null $file = null): self
+    {
+        if ($participant instanceof LocalDirectory) {
+            $dir = $participant->dir;
+            if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
+                throw new \RuntimeException("Could not create the recording directory $dir");
+            }
+            $this->outputDir = $dir;
+            foreach ($this->userToSource as $userId => $source) {
+                if ($userId !== $this->selfId) {
+                    $this->wireFolderOutput($userId, $source);
+                }
+            }
+            return $this;
+        }
+        if ($file === null) {
+            throw new \InvalidArgumentException('setOutput() requires a file/stream to record a participant into, or a LocalDirectory to record every participant.');
+        }
+        $this->wireOutput($this->API->getId($participant), $file);
+        return $this;
+    }
+
+    /**
+     * Route one participant's output to the connection now, or defer it until their source is known.
+     */
+    private function wireOutput(int $userId, LocalFile|WritableStream $file): void
+    {
+        $source = $this->userToSource[$userId] ?? 0;
+        if ($source !== 0 && $this->connection !== null) {
+            $this->connection->setOutput($source, $file);
+            return;
+        }
+        $this->pendingOutputs[$userId] = $file;
+    }
+
+    /**
+     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<userId>.mkv` file, once each.
+     */
+    private function wireFolderOutput(int $userId, int $source): void
+    {
+        if ($this->outputDir === null
+            || $source === 0
+            || $userId === $this->selfId
+            || isset($this->folderPeers[$userId])
+            || isset($this->pendingOutputs[$userId]) // an explicit per-participant output takes precedence
+        ) {
+            return;
+        }
+        $this->folderPeers[$userId] = true;
+        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId.'.mkv'));
+    }
+
+    /**
+     * In folder mode, give a participant that is screen-sharing its own `<dir>/<userId>.presentation.mkv`
+     * file, once each.
+     */
+    private function wireFolderPresentationOutput(int $userId, int $source, bool $hasPresentation): void
+    {
+        if ($this->outputDir === null
+            || $source === 0
+            || $userId === $this->selfId
+            || !$hasPresentation
+            || isset($this->folderPresentationPeers[$userId])
+            || isset($this->pendingPresentationOutputs[$userId]) // an explicit output takes precedence
+        ) {
+            return;
+        }
+        $this->folderPresentationPeers[$userId] = true;
+        $file = new LocalFile($this->outputDir.'/'.$userId.'.presentation.mkv');
+        if ($this->connection !== null) {
+            $this->connection->setPresentationOutput($source, $file);
+        } else {
+            $this->pendingPresentationOutputs[$userId] = $file;
+        }
+    }
+
+    /**
      * Update the SSRC -> user id map from the group call participant list, so incoming media can be
      * attributed to a sender's public key, and tell the connection which sources to receive.
      *
@@ -903,15 +1056,32 @@ final class ConferenceCall implements MultiCall, GroupConnectionOwner, E2EKeyPro
             if ($participant['source'] === 0) {
                 continue;
             }
-            $this->ssrcToUser[GroupSdp::toUnsignedSsrc($participant['source'])] = $participant['user_id'];
-            if ($participant['user_id'] !== $this->selfId) {
+            $userId = $participant['user_id'];
+            $source = $participant['source'];
+            $this->ssrcToUser[GroupSdp::toUnsignedSsrc($source)] = $userId;
+            $this->userToSource[$userId] = $source;
+            if ($userId !== $this->selfId) {
                 $sources[] = [
-                    'audio' => $participant['source'],
+                    'audio' => $source,
                     'video' => $participant['video'],
                     'presentation' => $participant['presentation'],
                     'videoEndpoint' => $participant['videoEndpoint'],
                     'presentationEndpoint' => $participant['presentationEndpoint'],
                 ];
+                // The source is now known: attach any recording deferred until it was, then apply
+                // folder-mode recording to a participant that has just begun transmitting.
+                if (isset($this->pendingOutputs[$userId])) {
+                    $file = $this->pendingOutputs[$userId];
+                    unset($this->pendingOutputs[$userId]);
+                    $this->connection?->setOutput($source, $file);
+                }
+                if (isset($this->pendingPresentationOutputs[$userId])) {
+                    $file = $this->pendingPresentationOutputs[$userId];
+                    unset($this->pendingPresentationOutputs[$userId]);
+                    $this->connection?->setPresentationOutput($source, $file);
+                }
+                $this->wireFolderOutput($userId, $source);
+                $this->wireFolderPresentationOutput($userId, $source, $participant['presentation'] !== []);
             }
         }
         $this->connection?->setRemoteSources($sources);

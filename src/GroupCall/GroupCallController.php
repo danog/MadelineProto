@@ -33,7 +33,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Tgcalls\CallInterface;
+use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupSdp;
 use danog\MadelineProto\Tools;
@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final class GroupCallController implements CallInterface, \danog\MadelineProto\Tgcalls\GroupConnectionOwner
+final class GroupCallController implements CallControllerInterface, \danog\MadelineProto\Tgcalls\GroupConnectionOwner
 {
     /** How often [phone.checkGroupCall](https://core.telegram.org/method/phone.checkGroupCall) is polled while reconnecting. */
     private const CHECK_INTERVAL = 4.0;

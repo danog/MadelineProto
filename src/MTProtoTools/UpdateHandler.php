@@ -136,10 +136,10 @@ use danog\MadelineProto\RPCError\MsgIdInvalidError;
 use danog\MadelineProto\RPCError\SessionPasswordNeededError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
+use danog\MadelineProto\Tgcalls\PrivateCallController;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP\DiscardReason;
-use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use SplQueue;
 use Throwable;
@@ -1234,7 +1234,7 @@ trait UpdateHandler
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
+                    $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
                         $this,
                         $update['phone_call'],
                     );
@@ -1245,7 +1245,7 @@ trait UpdateHandler
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
-                    $this->calls[$update['phone_call']['id']] = $controller = new VoIPController(
+                    $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
                         $this,
                         $update['phone_call']
                     );

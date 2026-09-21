@@ -22,7 +22,7 @@ namespace danog\MadelineProto\Loop;
 
 use danog\Loop\Loop;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Tgcalls\CallInterface;
+use danog\MadelineProto\Tgcalls\CallControllerInterface;
 
 /**
  * @internal
@@ -33,7 +33,7 @@ abstract class VoIPLoop extends Loop
      * @psalm-mutation-free
      */
     public function __construct(
-        protected CallInterface $instance,
+        protected CallControllerInterface $instance,
     ) {
     }
     /**

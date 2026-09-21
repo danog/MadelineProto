@@ -444,7 +444,7 @@ abstract class InternalDoc
      *
      * @param bool $muted Whether to join muted.
      */
-    final public function createConferenceCall(bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    final public function createConferenceCall(bool $muted = false): \danog\MadelineProto\EventHandler\Calls\ConferenceCall
     {
         return $this->wrapper->getAPI()->createConferenceCall($muted);
     }
@@ -855,7 +855,7 @@ abstract class InternalDoc
      *
      * @psalm-mutation-free
      */
-    final public function getConferenceCall(int $id): ?\danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    final public function getConferenceCall(int $id): ?\danog\MadelineProto\EventHandler\Calls\ConferenceCall
     {
         return $this->wrapper->getAPI()->getConferenceCall($id);
     }
@@ -1689,7 +1689,7 @@ abstract class InternalDoc
      * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
      * @param bool  $muted Whether to join muted.
      */
-    final public function joinConferenceCall(array $call, bool $muted = false): \danog\MadelineProto\Tgcalls\E2E\ConferenceCall
+    final public function joinConferenceCall(array $call, bool $muted = false): \danog\MadelineProto\EventHandler\Calls\ConferenceCall
     {
         return $this->wrapper->getAPI()->joinConferenceCall($call, $muted);
     }

@@ -25,7 +25,6 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
-use danog\MadelineProto\VoIPController;
 use Revolt\EventLoop;
 use Throwable;
 use Webrtc\Codecs\Codec;
@@ -118,7 +117,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private bool $muted = false;
 
     public function __construct(
-        private readonly VoIPController $call,
+        private readonly PrivateCallController $call,
         string $authKey,
         private readonly bool $outgoing,
         private readonly SignalingProtocolVersion $version,
@@ -217,7 +216,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * Restart everything that was intentionally left dormant during deserialization, once the whole
      * call graph is restored: the playback producers and (file-backed) recorders reopen their files,
      * re-subscribe to the resumed tracks and start their loops. Must run outside __unserialize (it does
-     * async work); {@see \danog\MadelineProto\VoIPController} calls it on wakeup for a running call.
+     * async work); {@see \danog\MadelineProto\Tgcalls\PrivateCallController} calls it on wakeup for a running call.
      */
     public function resume(): void
     {

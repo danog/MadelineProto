@@ -34,7 +34,7 @@ use danog\MadelineProto\Loop\VoIPLoop;
 use danog\MadelineProto\Matroska;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\Tgcalls\CallInterface;
+use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\H264Framing;
 use danog\MadelineProto\Tgcalls\VideoCodecObserver;
 use danog\MadelineProto\Tools;
@@ -189,7 +189,7 @@ final class DjLoop extends VoIPLoop
      * @param bool $videoOnly When true, the audio of played files is dropped and only their video is
      *                        queued — used for a presentation/screencast stream, which carries no audio.
      */
-    public function __construct(CallInterface $instance, private bool $videoOnly = false)
+    public function __construct(CallControllerInterface $instance, private bool $videoOnly = false)
     {
         parent::__construct($instance);
         $this->oggQueue = new SplQueue;
@@ -542,7 +542,7 @@ final class DjLoop extends VoIPLoop
         }
         $this->readerRunning = true;
         // The call-ended check lives in the (deferred) reader loop, not here: startReader() can run
-        // from __unserialize before VoIPController has restored its state, so it must not touch it.
+        // from __unserialize before PrivateCallController has restored its state, so it must not touch it.
         EventLoop::queue($this->readerLoop(...));
     }
 

@@ -16,20 +16,26 @@
 
 // Please keep the above notice the next time you copy my code, or I will sue you :)
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
+use danog\MadelineProto\Lang;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\Magic;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
 use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;
-use danog\MadelineProto\Tgcalls\CallInterface;
-use danog\MadelineProto\Tgcalls\Controller;
-use danog\MadelineProto\Tgcalls\LegacyController;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\VoIP\CallState;
 use danog\MadelineProto\VoIP\DiscardReason;
 use danog\MadelineProto\VoIP\MediaState;
@@ -40,7 +46,7 @@ use Throwable;
 use Webmozart\Assert\Assert;
 
 /** @internal */
-final class VoIPController implements CallInterface
+final class PrivateCallController implements CallControllerInterface
 {
     /**
      * The [phoneCallProtocol](https://core.telegram.org/constructor/phoneCallProtocol) we advertise.
