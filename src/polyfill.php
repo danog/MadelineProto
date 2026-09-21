@@ -14,6 +14,8 @@ use danog\AsyncOrm\Internal\Containers\CacheContainer;
 use danog\AsyncOrm\Internal\Driver\MysqlArray;
 use danog\AsyncOrm\Internal\Driver\PostgresArray;
 use danog\AsyncOrm\Internal\Driver\RedisArray;
+use danog\MadelineProto\Tgcalls\PrivateCallController;
+use danog\MadelineProto\GroupCall\GroupCallController;
 use phpseclib4\Math\BigInteger;
 
 class_alias(MysqlArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray');
@@ -27,6 +29,8 @@ class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\RedisArray');
 class_alias(CacheContainer::class, '\\danog\\MadelineProto\\Db\\CacheContainer');
 
 class_alias(BigInteger::class, '\\phpseclib3\\Math\\BigInteger');
+
+class_alias(PrivateCallController::class, '\\danog\\MadelineProto\\VoIPController');
 
 // Backwards-compatibility aliases for the call classes moved under EventHandler\Calls (and the
 // GroupCallController moved under GroupCall). PrivateCall was previously named VoIP.

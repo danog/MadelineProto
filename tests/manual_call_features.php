@@ -223,6 +223,7 @@ switch ($mode) {
         break;
 
     case '1to1':
+    case '1t1':
         $arg     = $argv[2] ?? null;
         $media   = $argv[3] ?? null;
         $file    = $argv[4] ?? (__DIR__.'/../new.webm');
