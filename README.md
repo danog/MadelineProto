@@ -2,7 +2,7 @@
 
 Created by <a href="https://daniil.it" target="_blank" rel="noopener">Daniil Gentili</a>
 
-`#StandWithUkraine 🇺🇦`
+`#StandWithUkraine 💯`
 
 Do join the official channel, [@MadelineProto](https://t.me/MadelineProto) and the [support groups](https://t.me/pwrtelegramgroup)!
 
@@ -49,8 +49,9 @@ if (!$me['bot']) {
 $MadelineProto->echo('OK, done!');
 ```
 
-Try running this code in a browser or in a console!  
+#CINIS AI 
 
+Try running this code in a browser or in a console!  
 
 Tip: if you receive an error (or nothing), [send us](https://t.me/pwrtelegramgroup) the error message and the `MadelineProto.log` file that was created in the same directory (if running from a browser).  
 
