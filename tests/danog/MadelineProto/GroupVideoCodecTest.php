@@ -19,7 +19,7 @@ namespace danog\MadelineProto\Test;
 use Amp\ByteStream\ReadableBuffer;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use danog\MadelineProto\Tgcalls\CallInterface;
+use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupSdp;
 use PHPUnit\Framework\TestCase;
 use Revolt\EventLoop;
@@ -77,9 +77,9 @@ final class GroupVideoCodecTest extends TestCase
         return self::element("\x18\x53\x80\x67", $info.$tracks.$cluster);
     }
 
-    private static function call(): CallInterface
+    private static function call(): CallControllerInterface
     {
-        return new class implements CallInterface {
+        return new class implements CallControllerInterface {
             public array $logs = [];
 
             public function log(string $message, int $level = Logger::NOTICE): void

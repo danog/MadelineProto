@@ -243,11 +243,11 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                     if ($e->rpc === 'GROUPCALL_SSRC_DUPLICATE_MUCH') {
                         // The server asks us to retry with a fresh SSRC.
                         $this->log("Retrying to join $this with a new SSRC...", Logger::WARNING);
-                    } elseif ($e->code === 500 && $attempt < 4) {
+                    } elseif ($e->getCode() === 500 && $attempt < 4) {
                         // Transient server-side failures (e.g. GROUPCALL_ADD_PARTICIPANTS_FAILED right
                         // after we were dropped from the call): back off and try again.
                         $this->log("Could not join $this ({$e->rpc}), retrying...", Logger::WARNING);
-                        Tools::sleep(1.0 + $attempt);
+                        Tools::sleep(1.0 + (float) $attempt);
                     } else {
                         throw $e;
                     }

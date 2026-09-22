@@ -1025,7 +1025,7 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.fulfillStarsSubscription.html" name="payments.fulfillStarsSubscription">Re-join a private channel associated to an active Telegram Star subscription »: payments.fulfillStarsSubscription</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.sendReaction.html" name="stories.sendReaction">React to a story: stories.sendReaction</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.sendReaction.html" name="messages.sendReaction">React to message: messages.sendReaction</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallSetOutput" name="groupCallSetOutput">Record group call media: one participant's camera or screen-share to a file/stream, or every: groupCallSetOutput</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#groupCallSetOutput" name="groupCallSetOutput">Record group call media: one participant's audio, camera and screen-share to a file/stream, or: groupCallSetOutput</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshFullPeerCache" name="refreshFullPeerCache">Refresh full peer cache for a certain peer: refreshFullPeerCache</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#refreshPeerCache" name="refreshPeerCache">Refresh peer cache for a certain peer: refreshPeerCache</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.refundStarsCharge.html" name="payments.refundStarsCharge">Refund a Telegram Stars transaction, see here » for more info: payments.refundStarsCharge</a>

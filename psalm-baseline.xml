@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@99e6f6ee4a70eaf0806423c9ac9f2bd19c26e057">
+<files psalm-version="dev-master@b131e78705e702c76030a6683f557276f08e5a51">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[$settings]]></code>
@@ -59,6 +59,8 @@
       <code><![CDATA[API]]></code>
       <code><![CDATA[API]]></code>
       <code><![CDATA[API]]></code>
+      <code><![CDATA[API]]></code>
+      <code><![CDATA[API]]></code>
     </PropertyNotSetInConstructor>
     <TaintedTextWithQuotes>
       <code><![CDATA[echo $e;]]></code>
@@ -69,6 +71,9 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/APIWrapper.php">
+    <ImpureMethodCall>
+      <code><![CDATA[($this->API->logger ?? Logger::$default)->logger($param, $level, $file)]]></code>
+    </ImpureMethodCall>
     <MixedArgument>
       <code><![CDATA[$API->serializeSession($this)]]></code>
     </MixedArgument>
@@ -504,6 +509,9 @@
       <code><![CDATA[$subdomain]]></code>
       <code><![CDATA[$subdomain]]></code>
     </MixedOperand>
+    <ParadoxicalCondition>
+      <code><![CDATA[isset($this->list[$dc]) && $this->list[$dc]->hasCtx()]]></code>
+    </ParadoxicalCondition>
     <PossiblyNullArrayAccess>
       <code><![CDATA[$combo[\count($combo) - 2][0]]]></code>
       <code><![CDATA[$default[2][0]]]></code>
@@ -524,6 +532,9 @@
     <TooManyArguments>
       <code><![CDATA[new DataCenterConnection($this->API, $dc, $legacy)]]></code>
     </TooManyArguments>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->list[$dc]->hasCtx()]]></code>
+    </TypeDoesNotContainType>
   </file>
   <file src="src/DataCenterConnection.php">
     <DeprecatedProperty>
@@ -644,6 +655,8 @@
       <code><![CDATA[rethrowInner]]></code>
     </PossiblyNullReference>
     <PropertyNotSetInConstructor>
+      <code><![CDATA[EventHandler]]></code>
+      <code><![CDATA[EventHandler]]></code>
       <code><![CDATA[EventHandler]]></code>
     </PropertyNotSetInConstructor>
     <PropertyTypeCoercion>
@@ -927,6 +940,11 @@
         )]]></code>
     </PropertyTypeCoercion>
   </file>
+  <file src="src/EventHandler/Call.php">
+    <MissingInterfaceImmutableAnnotation>
+      <code><![CDATA[Call]]></code>
+    </MissingInterfaceImmutableAnnotation>
+  </file>
   <file src="src/EventHandler/CallbackQuery.php">
     <MixedAssignment>
       <code><![CDATA[$this->chatInstance]]></code>
@@ -945,6 +963,25 @@
             ],
         )]]></code>
     </MixedReturnStatement>
+  </file>
+  <file src="src/EventHandler/Calls/ConferenceCall.php">
+    <MixedAssignment>
+      <code><![CDATA[$this->accessHash]]></code>
+      <code><![CDATA[$this->id]]></code>
+    </MixedAssignment>
+  </file>
+  <file src="src/EventHandler/Calls/PrivateCall.php">
+    <MixedAssignment>
+      <code><![CDATA[$this->callID]]></code>
+      <code><![CDATA[$this->date]]></code>
+      <code><![CDATA[$this->otherID]]></code>
+      <code><![CDATA[$this->otherID]]></code>
+      <code><![CDATA[$this->video]]></code>
+    </MixedAssignment>
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$API->getSelf()['id']]]></code>
+      <code><![CDATA[$API->getSelf()['id']]]></code>
+    </PossiblyInvalidArrayAccess>
   </file>
   <file src="src/EventHandler/Channel/ChannelParticipant.php">
     <MixedArgument>
@@ -1049,21 +1086,43 @@
     </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSender.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$peerResolved]]></code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Filter/AbstractFilterFromSenders.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$peersResolved]]></code>
     </PropertyNotSetInConstructor>
   </file>
+  <file src="src/EventHandler/Filter/Combinator/FiltersAnd.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
+  </file>
+  <file src="src/EventHandler/Filter/FilterBotCommand.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
+  </file>
   <file src="src/EventHandler/Filter/FilterForwardedFrom.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$peerResolved]]></code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Filter/FilterFromAdmin.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
     <MissingConstructor>
       <code><![CDATA[$adminIds]]></code>
     </MissingConstructor>
@@ -1077,6 +1136,9 @@
     </MissingConstructor>
   </file>
   <file src="src/EventHandler/Filter/FilterPeer.php">
+    <ImmutableDependency>
+      <code><![CDATA[#[\Override]]]></code>
+    </ImmutableDependency>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$peerResolved]]></code>
     </PropertyNotSetInConstructor>
@@ -1123,6 +1185,9 @@
     </PropertyTypeCoercion>
   </file>
   <file src="src/EventHandler/Media.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
     <LessSpecificReturnStatement>
       <code><![CDATA[$result]]></code>
     </LessSpecificReturnStatement>
@@ -1316,6 +1381,9 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="src/EventHandler/Media/MediaStory.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
     <MixedArrayAccess>
       <code><![CDATA[$result['_']]]></code>
     </MixedArrayAccess>
@@ -1770,6 +1838,11 @@
       <code><![CDATA[$this->emoticon]]></code>
     </MixedAssignment>
   </file>
+  <file src="src/EventHandler/MultiCall.php">
+    <MissingInterfaceImmutableAnnotation>
+      <code><![CDATA[MultiCall]]></code>
+    </MissingInterfaceImmutableAnnotation>
+  </file>
   <file src="src/EventHandler/Participant.php">
     <MixedAssignment>
       <code><![CDATA[$res[$prop->getName()]]]></code>
@@ -1916,6 +1989,9 @@
     </MixedAssignment>
   </file>
   <file src="src/EventHandler/Payments/StarGift.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
     <InvalidArrayOffset>
       <code><![CDATA[$v['API']]]></code>
     </InvalidArrayOffset>
@@ -1951,6 +2027,8 @@
   </file>
   <file src="src/EventHandler/Plugin/RestartPlugin.php">
     <PropertyNotSetInConstructor>
+      <code><![CDATA[RestartPlugin]]></code>
+      <code><![CDATA[RestartPlugin]]></code>
       <code><![CDATA[RestartPlugin]]></code>
     </PropertyNotSetInConstructor>
   </file>
@@ -2283,6 +2361,9 @@
     </PossiblyNullPropertyAssignmentValue>
   </file>
   <file src="src/EventHandler/Update.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
     <MixedAssignment>
       <code><![CDATA[$res[$prop->getName()]]]></code>
     </MixedAssignment>
@@ -2459,132 +2540,46 @@
       <code><![CDATA[$id]]></code>
     </TypeDoesNotContainType>
   </file>
-  <file src="src/GroupCall.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->accessHash]]></code>
-      <code><![CDATA[$this->conference]]></code>
-      <code><![CDATA[$this->creator]]></code>
-      <code><![CDATA[$this->id]]></code>
-      <code><![CDATA[$this->inviteLink]]></code>
-      <code><![CDATA[$this->joinMuted]]></code>
-      <code><![CDATA[$this->participantsCount]]></code>
-      <code><![CDATA[$this->rtmpStream]]></code>
-      <code><![CDATA[$this->scheduleDate]]></code>
-      <code><![CDATA[$this->streamDcId]]></code>
-      <code><![CDATA[$this->title]]></code>
-    </MixedAssignment>
-    <RedundantCondition>
-      <code><![CDATA[$this->getClient()->getGroupCallState($this->id)]]></code>
-    </RedundantCondition>
-    <TypeDoesNotContainNull>
-      <code><![CDATA[GroupCallState::NOT_JOINED]]></code>
-    </TypeDoesNotContainNull>
-  </file>
-  <file src="src/GroupCall/Handler.php">
-    <MixedArgument>
-      <code><![CDATA[$call]]></code>
-      <code><![CDATA[$call]]></code>
-      <code><![CDATA[$inputCall]]></code>
-      <code><![CDATA[$inputCall]]></code>
-      <code><![CDATA[$result]]></code>
-    </MixedArgument>
-    <MixedArrayAccess>
-      <code><![CDATA[$call['_']]]></code>
-      <code><![CDATA[$call['_']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$call['id']]]></code>
-      <code><![CDATA[$result['call']]]></code>
-      <code><![CDATA[$update['_']]]></code>
-      <code><![CDATA[$update['call']]]></code>
-      <code><![CDATA[$update['call']]]></code>
-      <code><![CDATA[$update['call']]]></code>
-      <code><![CDATA[$update['call']['_']]]></code>
-      <code><![CDATA[$update['call']['access_hash']]]></code>
-      <code><![CDATA[$update['call']['id']]]></code>
-      <code><![CDATA[$update['call']['id']]]></code>
-      <code><![CDATA[$updates['updates']]]></code>
-    </MixedArrayAccess>
-    <MixedArrayOffset>
-      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
-      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
-      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
-      <code><![CDATA[$this->groupCalls[$id]]]></code>
-      <code><![CDATA[$this->groupCalls[$id]]]></code>
-      <code><![CDATA[$this->groupCalls[$id]]]></code>
-      <code><![CDATA[$this->groupCalls[$inputCall['id']]]]></code>
-      <code><![CDATA[$this->groupCalls[$inputCall['id']]]]></code>
-    </MixedArrayOffset>
-    <MixedAssignment>
-      <code><![CDATA[$call]]></code>
-      <code><![CDATA[$call]]></code>
-      <code><![CDATA[$id]]></code>
-      <code><![CDATA[$id]]></code>
-      <code><![CDATA[$inputCall]]></code>
-      <code><![CDATA[$inputCall]]></code>
-      <code><![CDATA[$result]]></code>
-      <code><![CDATA[$update]]></code>
-      <code><![CDATA[$updates]]></code>
-    </MixedAssignment>
-    <MixedPropertyTypeCoercion>
-      <code><![CDATA[$this->groupCalls]]></code>
-      <code><![CDATA[$this->groupCalls]]></code>
-    </MixedPropertyTypeCoercion>
-  </file>
-  <file src="src/GroupCall/Participant.php">
-    <MixedArgument>
-      <code><![CDATA[$min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false)]]></code>
-      <code><![CDATA[$min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000)]]></code>
-      <code><![CDATA[$participant['about'] ?? null]]></code>
-      <code><![CDATA[$participant['active_date'] ?? null]]></code>
-      <code><![CDATA[$participant['can_self_unmute'] ?? false]]></code>
-      <code><![CDATA[$participant['date'] ?? 0]]></code>
-      <code><![CDATA[$participant['just_joined'] ?? false]]></code>
-      <code><![CDATA[$participant['muted'] ?? false]]></code>
-      <code><![CDATA[$participant['raise_hand_rating'] ?? null]]></code>
-      <code><![CDATA[$participant['self'] ?? false]]></code>
-      <code><![CDATA[$participant['source'] ?? 0]]></code>
-      <code><![CDATA[$participant['video_joined'] ?? false]]></code>
-    </MixedArgument>
-    <MixedAssignment>
-      <code><![CDATA[$min]]></code>
-    </MixedAssignment>
-  </file>
-  <file src="src/GroupCallController.php">
+  <file src="src/GroupCall/GroupCallController.php">
     <MixedArgument>
       <code><![CDATA[$alive]]></code>
-      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$alive]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$result]]></code>
-      <code><![CDATA[$result['call']]]></code>
+      <code><![CDATA[$update['params']]]></code>
       <code><![CDATA[$update['params']]]></code>
     </MixedArgument>
     <MixedArrayAccess>
       <code><![CDATA[$participant['just_joined']]]></code>
       <code><![CDATA[$participant['left']]]></code>
       <code><![CDATA[$participant['versioned']]]></code>
-      <code><![CDATA[$result['call']['_']]]></code>
       <code><![CDATA[$this->API->methodCallAsyncRead('phone.exportGroupCallInvite', [
             'call' => $this->inputCall,
             'can_self_unmute' => $canSelfUnmute,
         ])['link']]]></code>
       <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['params']]]></code>
       <code><![CDATA[$update['params']]]></code>
       <code><![CDATA[$update['presentation']]]></code>
+      <code><![CDATA[$update['presentation']]]></code>
+      <code><![CDATA[$updates['updates']]]></code>
       <code><![CDATA[$updates['updates']]]></code>
     </MixedArrayAccess>
     <MixedAssignment>
       <code><![CDATA[$alive]]></code>
       <code><![CDATA[$cached]]></code>
       <code><![CDATA[$cached]]></code>
-      <code><![CDATA[$file]]></code>
+      <code><![CDATA[$participant]]></code>
+      <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$result]]></code>
-      <code><![CDATA[$this->call]]></code>
       <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$updates]]></code>
       <code><![CDATA[$updates]]></code>
       <code><![CDATA[$value]]></code>
       <code><![CDATA[$version]]></code>
@@ -2604,11 +2599,177 @@
       <code><![CDATA[isset($this->API->logger)]]></code>
     </TypeDoesNotContainType>
   </file>
+  <file src="src/GroupCall/Handler.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
+    </DocblockTypeContradiction>
+    <ImpureMethodCall>
+      <code><![CDATA[($this->conferenceCalls[$id] ?? null)?->getPublic()]]></code>
+    </ImpureMethodCall>
+    <MissingPureAnnotation>
+      <code><![CDATA[getConferenceCallController]]></code>
+      <code><![CDATA[getGroupCallController]]></code>
+    </MissingPureAnnotation>
+    <MixedArgument>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$inputCall]]></code>
+      <code><![CDATA[$inputCall]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$call['_']]]></code>
+      <code><![CDATA[$call['_']]]></code>
+      <code><![CDATA[$call['_']]]></code>
+      <code><![CDATA[$call['conference']]]></code>
+      <code><![CDATA[$call['id']]]></code>
+      <code><![CDATA[$call['id']]]></code>
+      <code><![CDATA[$call['id']]]></code>
+      <code><![CDATA[$call['id']]]></code>
+      <code><![CDATA[$call['id']]]></code>
+      <code><![CDATA[$channel['channel']]]></code>
+      <code><![CDATA[$channel['last_timestamp_ms']]]></code>
+      <code><![CDATA[$channel['scale']]]></code>
+      <code><![CDATA[$result['_']]]></code>
+      <code><![CDATA[$result['bytes']]]></code>
+      <code><![CDATA[$result['call']]]></code>
+      <code><![CDATA[$result['call']]]></code>
+      <code><![CDATA[$result['channels']]]></code>
+      <code><![CDATA[$result['key']]]></code>
+      <code><![CDATA[$result['peers']]]></code>
+      <code><![CDATA[$result['url']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']['_']]]></code>
+      <code><![CDATA[$update['call']['_']]]></code>
+      <code><![CDATA[$update['call']['access_hash']]]></code>
+      <code><![CDATA[$update['call']['access_hash']]]></code>
+      <code><![CDATA[$update['call']['id']]]></code>
+      <code><![CDATA[$update['call']['id']]]></code>
+      <code><![CDATA[$update['call']['id']]]></code>
+      <code><![CDATA[$update['call']['id']]]></code>
+      <code><![CDATA[$update['call']['id']]]></code>
+      <code><![CDATA[$updates['updates']]]></code>
+      <code><![CDATA[$updates['updates']]]></code>
+    </MixedArrayAccess>
+    <MixedArrayOffset>
+      <code><![CDATA[$this->conferenceCalls[$call['id']]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$call['id']]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
+      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
+      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
+      <code><![CDATA[$this->groupCalls[$call['id']]]]></code>
+      <code><![CDATA[$this->groupCalls[$id]]]></code>
+      <code><![CDATA[$this->groupCalls[$id]]]></code>
+      <code><![CDATA[$this->groupCalls[$id]]]></code>
+      <code><![CDATA[$this->groupCalls[$inputCall['id']]]]></code>
+      <code><![CDATA[$this->groupCalls[$inputCall['id']]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$channel]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$id]]></code>
+      <code><![CDATA[$inputCall]]></code>
+      <code><![CDATA[$inputCall]]></code>
+      <code><![CDATA[$joinAs]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+    </MixedAssignment>
+    <MixedPropertyTypeCoercion>
+      <code><![CDATA[$this->groupCalls]]></code>
+      <code><![CDATA[$this->groupCalls]]></code>
+    </MixedPropertyTypeCoercion>
+    <PossiblyNullOperand>
+      <code><![CDATA[$dc]]></code>
+    </PossiblyNullOperand>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[$this->conferenceCalls[$id]?->onEncryptedMessage($fromId, $encrypted)]]></code>
+    </RedundantConditionGivenDocblockType>
+  </file>
+  <file src="src/GroupCall/OggDemuxer.php">
+    <MissingImmutableAnnotation>
+      <code><![CDATA[OggDemuxer]]></code>
+    </MissingImmutableAnnotation>
+  </file>
+  <file src="src/GroupCall/Participant.php">
+    <ImpureMethodCall>
+      <code><![CDATA[foreach ($group['sources'] ?? [] as $index => $source) {
+                if ($sim || $index === 0) {
+                    $sources[$source] = true;
+                }
+            }]]></code>
+      <code><![CDATA[foreach ($video['source_groups'] ?? [] as $group) {
+            $sim = ($group['semantics'] ?? '') === 'SIM';
+            foreach ($group['sources'] ?? [] as $index => $source) {
+                if ($sim || $index === 0) {
+                    $sources[$source] = true;
+                }
+            }
+        }]]></code>
+    </ImpureMethodCall>
+    <MixedArgument>
+      <code><![CDATA[$min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false)]]></code>
+      <code><![CDATA[$min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000)]]></code>
+      <code><![CDATA[$participant['about'] ?? null]]></code>
+      <code><![CDATA[$participant['active_date'] ?? null]]></code>
+      <code><![CDATA[$participant['can_self_unmute'] ?? false]]></code>
+      <code><![CDATA[$participant['date'] ?? 0]]></code>
+      <code><![CDATA[$participant['just_joined'] ?? false]]></code>
+      <code><![CDATA[$participant['muted'] ?? false]]></code>
+      <code><![CDATA[$participant['raise_hand_rating'] ?? null]]></code>
+      <code><![CDATA[$participant['self'] ?? false]]></code>
+      <code><![CDATA[$participant['source'] ?? 0]]></code>
+      <code><![CDATA[$participant['video_joined'] ?? false]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$group['semantics']]]></code>
+      <code><![CDATA[$group['sources']]]></code>
+    </MixedArrayAccess>
+    <MixedArrayOffset>
+      <code><![CDATA[$sources[$source]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$endpoint]]></code>
+      <code><![CDATA[$group]]></code>
+      <code><![CDATA[$index]]></code>
+      <code><![CDATA[$min]]></code>
+      <code><![CDATA[$source]]></code>
+    </MixedAssignment>
+    <MixedReturnTypeCoercion>
+      <code><![CDATA[array_values(array_keys($sources))]]></code>
+      <code><![CDATA[list<int>]]></code>
+    </MixedReturnTypeCoercion>
+    <RedundantFunctionCallGivenDocblockType>
+      <code><![CDATA[array_values]]></code>
+    </RedundantFunctionCallGivenDocblockType>
+  </file>
   <file src="src/Ipc/AbstractServer.php">
-    <MissingClassConstType>
-      <code><![CDATA[SHUTDOWN = 0]]></code>
-      <code><![CDATA[VERSION = 1]]></code>
-    </MissingClassConstType>
     <MixedAssignment>
       <code><![CDATA[$payload]]></code>
       <code><![CDATA[$payload[1]]]></code>
@@ -2664,6 +2825,7 @@
       <code><![CDATA[$media]]></code>
       <code><![CDATA[$param]]></code>
       <code><![CDATA[$param]]></code>
+      <code><![CDATA[$param]]></code>
       <code><![CDATA[$url]]></code>
     </MixedAssignment>
     <MixedReturnStatement>
@@ -2697,6 +2859,11 @@
       <code><![CDATA[$logger]]></code>
       <code><![CDATA[$server]]></code>
     </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/Ipc/EventHandlerProxy.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
   </file>
   <file src="src/Ipc/ExitFailure.php">
     <MixedArgument>
@@ -2860,6 +3027,13 @@
       <code><![CDATA[$this->__call('isWritable')]]></code>
     </MixedReturnStatement>
   </file>
+  <file src="src/Lang.php">
+    <InaccessibleProperty>
+      <code><![CDATA[$currentPercentage]]></code>
+      <code><![CDATA[$current_lang]]></code>
+      <code><![CDATA[$lang]]></code>
+    </InaccessibleProperty>
+  </file>
   <file src="src/LegacyMigrator.php">
     <MixedArgument>
       <code><![CDATA[$this->{$propName}->getArrayCopy()]]></code>
@@ -2875,6 +3049,11 @@
     <InvalidPropertyAssignmentValue>
       <code><![CDATA[$API->getEventHandler()::class]]></code>
     </InvalidPropertyAssignmentValue>
+  </file>
+  <file src="src/LocalDirectory.php">
+    <MissingImmutableAnnotation>
+      <code><![CDATA[LocalDirectory]]></code>
+    </MissingImmutableAnnotation>
   </file>
   <file src="src/Logger.php">
     <MixedArgument>
@@ -3400,12 +3579,31 @@
     </RedundantConditionGivenDocblockType>
   </file>
   <file src="src/Loop/VoIP/DjLoop.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[static fn () => $observer->onVideoCodec($codec, $parameters)]]></code>
+    </ImpureFunctionCall>
+    <ImpureMethodCall>
+      <code><![CDATA[EventLoop::queue(static fn () => $observer->onVideoCodec($codec, $parameters))]]></code>
+    </ImpureMethodCall>
+    <MixedArgument>
+      <code><![CDATA[$track['private']]]></code>
+    </MixedArgument>
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[$parameters]]></code>
+      <code><![CDATA[$this->resumeTracks]]></code>
+    </MixedArgumentTypeCoercion>
+    <MixedArrayAccess>
+      <code><![CDATA[$track['private']]]></code>
+      <code><![CDATA[$track['type']]]></code>
+    </MixedArrayAccess>
     <MixedAssignment>
+      <code><![CDATA[$track]]></code>
       <code><![CDATA[$value]]></code>
     </MixedAssignment>
-    <MixedReturnStatement>
-      <code><![CDATA[$queue->dequeue()]]></code>
-    </MixedReturnStatement>
+    <MixedReturnTypeCoercion>
+      <code><![CDATA[$this->videoParameters]]></code>
+      <code><![CDATA[array<string, string>]]></code>
+    </MixedReturnTypeCoercion>
   </file>
   <file src="src/MTProto.php">
     <DeprecatedProperty>
@@ -3425,6 +3623,36 @@
     <FalsableReturnStatement>
       <code><![CDATA[stream_get_contents($file)]]></code>
     </FalsableReturnStatement>
+    <ImpureMethodCall>
+      <code><![CDATA[($this->logger ?? Logger::$default)?->logger($param, $level, $file)]]></code>
+      <code><![CDATA[GarbageCollector::$prometheus->getOrRegisterCounter(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+        )]]></code>
+      <code><![CDATA[GarbageCollector::$prometheus->getOrRegisterGauge(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+        )]]></code>
+      <code><![CDATA[GarbageCollector::$prometheus->getOrRegisterHistogram(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            $buckets
+        )]]></code>
+      <code><![CDATA[GarbageCollector::$prometheus->getOrRegisterSummary(
+            $namespace,
+            $name,
+            $help,
+            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            $maxAgeSeconds,
+            $quantiles
+        )]]></code>
+    </ImpureMethodCall>
     <InvalidArgument>
       <code><![CDATA[$callbacks]]></code>
       <code><![CDATA[$callbacks]]></code>
@@ -3650,50 +3878,10 @@
       <code><![CDATA[$this->content[self::RESPONSE_ID_MAP[$this->content['_']]]]]></code>
     </MixedReturnStatement>
   </file>
-  <file src="src/MTProto/MTProtoMessage.php">
-    <MissingClassConstType>
-      <code><![CDATA[NOT_CONTENT_RELATED = [
-        'rpc_drop_answer' => true,
-        'rpc_answer_unknown' => true,
-        'rpc_answer_dropped_running' => true,
-        'rpc_answer_dropped' => true,
-        'get_future_salts' => true,
-        'future_salt' => true,
-        'future_salts' => true,
-        'ping' => true,
-        'pong' => true,
-        'ping_delay_disconnect' => true,
-        'destroy_session' => true,
-        'destroy_session_ok' => true,
-        'destroy_session_none' => true,
-        //'new_session_created' => true,
-        'msg_container' => true,
-        'msg_copy' => true,
-        'gzip_packed' => true,
-        'http_wait' => true,
-        'msgs_ack' => true,
-        'bad_msg_notification' => true,
-        'bad_server_salt' => true,
-        'msgs_state_req' => true,
-        'msgs_state_info' => true,
-        'msgs_all_info' => true,
-        'msg_detailed_info' => true,
-        'msg_new_detailed_info' => true,
-        'msg_resend_req' => true,
-        'msg_resend_ans_req' => true,
-    ]]]></code>
-    </MissingClassConstType>
-  </file>
   <file src="src/MTProto/MTProtoOutgoingMessage.php">
     <InvalidOperand>
       <code><![CDATA[(hrtime(true) - $this->sent) / 1_000_000_000]]></code>
     </InvalidOperand>
-    <MissingClassConstType>
-      <code><![CDATA[STATE_ACKED = 2]]></code>
-      <code><![CDATA[STATE_PENDING = 0]]></code>
-      <code><![CDATA[STATE_REPLIED = self::STATE_ACKED | 4]]></code>
-      <code><![CDATA[STATE_SENT = 1]]></code>
-    </MissingClassConstType>
     <MissingReturnType>
       <code><![CDATA[getBody]]></code>
     </MissingReturnType>
@@ -5295,9 +5483,17 @@
     <InaccessibleProperty>
       <code><![CDATA[$last->nextSent]]></code>
     </InaccessibleProperty>
+    <InvalidArgument>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+    </InvalidArgument>
     <MissingParamType>
       <code><![CDATA[$update]]></code>
     </MissingParamType>
+    <MissingPureAnnotation>
+      <code><![CDATA[wrapGroupCall]]></code>
+    </MissingPureAnnotation>
     <MissingReturnType>
       <code><![CDATA[getUpdatesState]]></code>
       <code><![CDATA[loadUpdateState]]></code>
@@ -5308,11 +5504,16 @@
       <code><![CDATA[$action['random_ids']]]></code>
       <code><![CDATA[$action['ttl_seconds']]]></code>
       <code><![CDATA[$authorization]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
       <code><![CDATA[$datacenter]]></code>
+      <code><![CDATA[$message['action']['active'] ?? false]]></code>
       <code><![CDATA[$message['action']['amount']]]></code>
       <code><![CDATA[$message['action']['amount']]]></code>
       <code><![CDATA[$message['action']['auto_setting_from'] ?? null]]></code>
       <code><![CDATA[$message['action']['button_id']]]></code>
+      <code><![CDATA[$message['action']['call_id']]]></code>
       <code><![CDATA[$message['action']['call_id']]]></code>
       <code><![CDATA[$message['action']['channel_id']]]></code>
       <code><![CDATA[$message['action']['charge']['id']]]></code>
@@ -5333,6 +5534,7 @@
       <code><![CDATA[$message['action']['distance']]]></code>
       <code><![CDATA[$message['action']['duration'] ?? null]]></code>
       <code><![CDATA[$message['action']['duration'] ?? null]]></code>
+      <code><![CDATA[$message['action']['duration'] ?? null]]></code>
       <code><![CDATA[$message['action']['expired']]]></code>
       <code><![CDATA[$message['action']['game_id']]]></code>
       <code><![CDATA[$message['action']['gift']]]></code>
@@ -5348,10 +5550,12 @@
       <code><![CDATA[$message['action']['message']['entities']]]></code>
       <code><![CDATA[$message['action']['message']['parse_mode']]]></code>
       <code><![CDATA[$message['action']['message']['text']]]></code>
+      <code><![CDATA[$message['action']['missed'] ?? false]]></code>
       <code><![CDATA[$message['action']['months']]]></code>
       <code><![CDATA[$message['action']['name_hidden'] ?? null]]></code>
       <code><![CDATA[$message['action']['new_value']]]></code>
       <code><![CDATA[$message['action']['new_value']]]></code>
+      <code><![CDATA[$message['action']['other_participants'] ?? []]]></code>
       <code><![CDATA[$message['action']['payload']]]></code>
       <code><![CDATA[$message['action']['peers']]]></code>
       <code><![CDATA[$message['action']['period']]]></code>
@@ -5388,6 +5592,7 @@
       <code><![CDATA[$message['action']['users']]]></code>
       <code><![CDATA[$message['action']['users']]]></code>
       <code><![CDATA[$message['action']['video']]]></code>
+      <code><![CDATA[$message['action']['video'] ?? false]]></code>
       <code><![CDATA[$message['action']['wallpaper']]]></code>
       <code><![CDATA[$message['action']['wallpaper']]]></code>
       <code><![CDATA[$result]]></code>
@@ -5429,11 +5634,15 @@
       <code><![CDATA[$authorization['_']]]></code>
       <code><![CDATA[$authorization['dc_id']]]></code>
       <code><![CDATA[$authorization['dc_id']]]></code>
+      <code><![CDATA[$call['conference']]]></code>
+      <code><![CDATA[$call['id']]]></code>
       <code><![CDATA[$message['action']['_']]]></code>
+      <code><![CDATA[$message['action']['active']]]></code>
       <code><![CDATA[$message['action']['amount']]]></code>
       <code><![CDATA[$message['action']['amount']]]></code>
       <code><![CDATA[$message['action']['auto_setting_from']]]></code>
       <code><![CDATA[$message['action']['button_id']]]></code>
+      <code><![CDATA[$message['action']['call_id']]]></code>
       <code><![CDATA[$message['action']['call_id']]]></code>
       <code><![CDATA[$message['action']['channel_id']]]></code>
       <code><![CDATA[$message['action']['charge']]]></code>
@@ -5454,6 +5663,7 @@
       <code><![CDATA[$message['action']['currency']]]></code>
       <code><![CDATA[$message['action']['data']]]></code>
       <code><![CDATA[$message['action']['distance']]]></code>
+      <code><![CDATA[$message['action']['duration']]]></code>
       <code><![CDATA[$message['action']['duration']]]></code>
       <code><![CDATA[$message['action']['duration']]]></code>
       <code><![CDATA[$message['action']['expired']]]></code>
@@ -5478,10 +5688,12 @@
       <code><![CDATA[$message['action']['message']['entities']]]></code>
       <code><![CDATA[$message['action']['message']['parse_mode']]]></code>
       <code><![CDATA[$message['action']['message']['text']]]></code>
+      <code><![CDATA[$message['action']['missed']]]></code>
       <code><![CDATA[$message['action']['months']]]></code>
       <code><![CDATA[$message['action']['name_hidden']]]></code>
       <code><![CDATA[$message['action']['new_value']]]></code>
       <code><![CDATA[$message['action']['new_value']]]></code>
+      <code><![CDATA[$message['action']['other_participants']]]></code>
       <code><![CDATA[$message['action']['payload']]]></code>
       <code><![CDATA[$message['action']['peers']]]></code>
       <code><![CDATA[$message['action']['period']]]></code>
@@ -5519,6 +5731,7 @@
       <code><![CDATA[$message['action']['users']]]></code>
       <code><![CDATA[$message['action']['users']]]></code>
       <code><![CDATA[$message['action']['users']]]></code>
+      <code><![CDATA[$message['action']['video']]]></code>
       <code><![CDATA[$message['action']['video']]]></code>
       <code><![CDATA[$message['action']['wallpaper']]]></code>
       <code><![CDATA[$message['action']['wallpaper']]]></code>
@@ -5589,9 +5802,11 @@
       <code><![CDATA[$this->calls[$update['phone_call']['id']]]]></code>
       <code><![CDATA[$this->calls[$update['phone_call_id']]]]></code>
       <code><![CDATA[$this->calls[$update['phone_call_id']]]]></code>
+      <code><![CDATA[$this->conferenceCalls[$id]]]></code>
       <code><![CDATA[$this->eventHandlerMethods[$updateType]]]></code>
       <code><![CDATA[$this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($update)]]]></code>
       <code><![CDATA[$this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]]]></code>
+      <code><![CDATA[$this->groupCalls[$id]]]></code>
       <code><![CDATA[$this->msg_ids[$peer_id]]]></code>
       <code><![CDATA[$this->msg_ids[$peer_id]]]></code>
       <code><![CDATA[$this->secretChats[$update['message']['chat_id']]]]></code>
@@ -5602,12 +5817,14 @@
       <code><![CDATA[$action]]></code>
       <code><![CDATA[$authorization]]></code>
       <code><![CDATA[$authorization]]></code>
+      <code><![CDATA[$call]]></code>
       <code><![CDATA[$closure]]></code>
       <code><![CDATA[$cur_state]]></code>
       <code><![CDATA[$data]]></code>
       <code><![CDATA[$datacenter]]></code>
       <code><![CDATA[$from_id]]></code>
       <code><![CDATA[$from_id]]></code>
+      <code><![CDATA[$id]]></code>
       <code><![CDATA[$key]]></code>
       <code><![CDATA[$message['from_id']]]></code>
       <code><![CDATA[$message['from_id']]]></code>
@@ -5728,6 +5945,21 @@
       <code><![CDATA[$res['human_result']]]></code>
     </MixedOperand>
   </file>
+  <file src="src/MatroskaWriter.php">
+    <MissingPureAnnotation>
+      <code><![CDATA[hasAudioTrack]]></code>
+      <code><![CDATA[setVideoTrack]]></code>
+    </MissingPureAnnotation>
+    <MixedAssignment>
+      <code><![CDATA[$value]]></code>
+    </MixedAssignment>
+    <RedundantCondition>
+      <code><![CDATA[\assert($this->out instanceof File)]]></code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA[$this->closed || !$this->headerWritten || !isset($this->out)]]></code>
+    </TypeDoesNotContainType>
+  </file>
   <file src="src/MyTelegramOrgWrapper.php">
     <MissingReturnType>
       <code><![CDATA[completeLogin]]></code>
@@ -5770,6 +6002,11 @@
     <PropertyNotSetInConstructor>
       <code><![CDATA[$wrapper]]></code>
     </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/Namespace/Blacklist.php">
+    <MissingImmutableAnnotation>
+      <code><![CDATA[Blacklist]]></code>
+    </MissingImmutableAnnotation>
   </file>
   <file src="src/Ogg.php">
     <ArgumentTypeCoercion>
@@ -6069,6 +6306,11 @@
       <code><![CDATA[$user['user_id']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
+  <file src="src/SecretChats/SecretChat.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
+  </file>
   <file src="src/SecretChats/SecretChatController.php">
     <DocblockTypeContradiction>
       <code><![CDATA[$result === null]]></code>
@@ -6337,12 +6579,46 @@
       <code><![CDATA[unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f)]]></code>
     </TaintedFile>
   </file>
+  <file src="src/Settings.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
+  </file>
+  <file src="src/Settings/AppInfo.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
+  </file>
+  <file src="src/Settings/Connection.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
+  </file>
   <file src="src/Settings/Database/DriverDatabaseAbstract.php">
+    <ImmutableDependency>
+      <code><![CDATA[DatabaseAbstract]]></code>
+    </ImmutableDependency>
     <PropertyTypeCoercion>
       <code><![CDATA[\is_int($cacheTtl) ? $cacheTtl : strtotime($cacheTtl) - time()]]></code>
     </PropertyTypeCoercion>
   </file>
+  <file src="src/Settings/DatabaseAbstract.php">
+    <ImpureFunctionCall>
+      <code><![CDATA[getOrmSettings]]></code>
+    </ImpureFunctionCall>
+  </file>
+  <file src="src/Settings/Ipc.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
+    <ImpureStaticProperty>
+      <code><![CDATA[Magic::$isIpcWorker]]></code>
+    </ImpureStaticProperty>
+  </file>
   <file src="src/Settings/Logger.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
     <PossiblyInvalidArgument>
       <code><![CDATA[$this->extra]]></code>
     </PossiblyInvalidArgument>
@@ -6351,6 +6627,9 @@
     </PossiblyInvalidCast>
   </file>
   <file src="src/Settings/TLSchema.php">
+    <ImmutableDependency>
+      <code><![CDATA[SettingsAbstract]]></code>
+    </ImmutableDependency>
     <MixedArgument>
       <code><![CDATA[parent::__sleep()]]></code>
     </MixedArgument>
@@ -7812,7 +8091,10 @@
       <code><![CDATA[$x['value']]]></code>
     </PossiblyInvalidIterator>
     <PossiblyNullReference>
-      <code><![CDATA[botAPIToMTProto]]></code>
+      <code><![CDATA[getSecretChatController]]></code>
+      <code><![CDATA[getSettings]]></code>
+      <code><![CDATA[upload]]></code>
+      <code><![CDATA[uploadEncrypted]]></code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$elem[1]]]></code>
@@ -7979,11 +8261,57 @@
     </MixedOperand>
   </file>
   <file src="src/TL/Types/Button.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
     <MissingReturnType>
       <code><![CDATA[click]]></code>
     </MissingReturnType>
     <MixedAssignment>
       <code><![CDATA[$this->label]]></code>
+    </MixedAssignment>
+  </file>
+  <file src="src/TL/Types/LoginQrCode.php">
+    <ImmutableDependency>
+      <code><![CDATA[IpcCapable]]></code>
+    </ImmutableDependency>
+  </file>
+  <file src="src/Tgcalls/Av1Bitstream.php">
+    <ImpureMethodCall>
+      <code><![CDATA[self::uvlc($br)]]></code>
+    </ImpureMethodCall>
+    <MissingPureAnnotation>
+      <code><![CDATA[uvlc]]></code>
+    </MissingPureAnnotation>
+  </file>
+  <file src="src/Tgcalls/BitReader.php">
+    <MissingPureAnnotation>
+      <code><![CDATA[overflowed]]></code>
+    </MissingPureAnnotation>
+  </file>
+  <file src="src/Tgcalls/CallRecorder.php">
+    <ImpureMethodCall>
+      <code><![CDATA[Av1Bitstream::describe($frame)]]></code>
+      <code><![CDATA[Av1Bitstream::isKeyframe($frame)]]></code>
+      <code><![CDATA[Av1Bitstream::isKeyframe($frame)]]></code>
+    </ImpureMethodCall>
+    <MissingPureAnnotation>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[awaitingExpected]]></code>
+      <code><![CDATA[flowingSlots]]></code>
+      <code><![CDATA[inSegment]]></code>
+      <code><![CDATA[placeOnClock]]></code>
+      <code><![CDATA[positionMs]]></code>
+      <code><![CDATA[segmentPath]]></code>
+    </MissingPureAnnotation>
+    <MixedArrayAccess>
+      <code><![CDATA[$a['ms']]]></code>
+      <code><![CDATA[$b['ms']]]></code>
+    </MixedArrayAccess>
+    <MixedAssignment>
+      <code><![CDATA[$frame]]></code>
+      <code><![CDATA[$frame]]></code>
+      <code><![CDATA[$value]]></code>
     </MixedAssignment>
   </file>
   <file src="src/Tgcalls/Controller.php">
@@ -7992,6 +8320,24 @@
             'iceServers' => self::buildIceServers($connections),
         ]]]></code>
     </ArgumentTypeCoercion>
+    <ImpureMethodCall>
+      <code><![CDATA[new LocalMutex]]></code>
+    </ImpureMethodCall>
+    <MissingClosureParamType>
+      <code><![CDATA[$capability]]></code>
+      <code><![CDATA[$capability]]></code>
+    </MissingClosureParamType>
+    <MixedArgument>
+      <code><![CDATA[$capability->mimeType]]></code>
+      <code><![CDATA[$capability->mimeType]]></code>
+      <code><![CDATA[$this->pendingPeerOffers]]></code>
+    </MixedArgument>
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[$parameters === [] ? [] : ['video/'.$codec => $parameters]]]></code>
+      <code><![CDATA[$this->outgoingVideoParameters === []
+                ? []
+                : ['video/'.$this->outgoingVideoCodec => $this->outgoingVideoParameters]]]></code>
+    </MixedArgumentTypeCoercion>
     <MixedArrayAccess>
       <code><![CDATA[$candidate['sdpString']]]></code>
       <code><![CDATA[$connection['_']]]></code>
@@ -8004,11 +8350,20 @@
       <code><![CDATA[$connection['stun']]]></code>
       <code><![CDATA[$connection['turn']]]></code>
       <code><![CDATA[$connection['username']]]></code>
+      <code><![CDATA[$e['uri']]]></code>
+      <code><![CDATA[$fb['type']]]></code>
     </MixedArrayAccess>
+    <MixedArrayAssignment>
+      <code><![CDATA[$this->pendingPeerOffers[]]]></code>
+    </MixedArrayAssignment>
     <MixedAssignment>
       <code><![CDATA[$candidate]]></code>
       <code><![CDATA[$connection]]></code>
       <code><![CDATA[$ip]]></code>
+      <code><![CDATA[$payloadType]]></code>
+      <code><![CDATA[$payloadType]]></code>
+      <code><![CDATA[$payloadType]]></code>
+      <code><![CDATA[$value]]></code>
       <code><![CDATA[$value]]></code>
     </MixedAssignment>
     <MixedOperand>
@@ -8018,9 +8373,256 @@
       <code><![CDATA[$ip]]></code>
       <code><![CDATA[$ip]]></code>
     </MixedOperand>
+    <MixedPropertyFetch>
+      <code><![CDATA[$capability->mimeType]]></code>
+      <code><![CDATA[$capability->mimeType]]></code>
+    </MixedPropertyFetch>
     <MixedPropertyTypeCoercion>
       <code><![CDATA[$this->pendingV2Messages]]></code>
     </MixedPropertyTypeCoercion>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$this->incomingVideoTracks]]></code>
+    </PropertyTypeCoercion>
+    <RedundantCastGivenDocblockType>
+      <code><![CDATA[(string) $ssrc]]></code>
+      <code><![CDATA[(string) $ssrc]]></code>
+    </RedundantCastGivenDocblockType>
+    <UndefinedThisPropertyAssignment>
+      <code><![CDATA[$this->pendingPeerOffers]]></code>
+      <code><![CDATA[$this->pendingPeerOffers]]></code>
+    </UndefinedThisPropertyAssignment>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->pendingPeerOffers]]></code>
+      <code><![CDATA[$this->pendingPeerOffers]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Tgcalls/E2E/BlockCodec.php">
+    <MixedArgument>
+      <code><![CDATA[$object['_'] ?? '']]></code>
+      <code><![CDATA[$object['_'] ?? 'e2e']]></code>
+    </MixedArgument>
+    <MixedArrayOffset>
+      <code><![CDATA[self::SERVER_ID_FIXUPS[$id]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$id]]></code>
+    </MixedAssignment>
+  </file>
+  <file src="src/Tgcalls/E2E/CallPacket.php">
+    <MixedArgument>
+      <code><![CDATA[$prefixLen]]></code>
+      <code><![CDATA[4 + $count * 32]]></code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code><![CDATA[$channelId]]></code>
+      <code><![CDATA[$count]]></code>
+      <code><![CDATA[$head]]></code>
+      <code><![CDATA[$prefixLen]]></code>
+      <code><![CDATA[$seqno]]></code>
+    </MixedAssignment>
+    <MixedOperand>
+      <code><![CDATA[$count]]></code>
+      <code><![CDATA[$count * 32]]></code>
+      <code><![CDATA[$head]]></code>
+      <code><![CDATA[$head]]></code>
+      <code><![CDATA[$head]]></code>
+    </MixedOperand>
+    <MixedReturnTypeCoercion>
+      <code><![CDATA[[
+                'channel_id' => $channelId,
+                'seqno' => $seqno,
+                'payload' => substr($packetPayload, 8),
+                'unencrypted_prefix' => $unencryptedPrefix,
+            ]]]></code>
+      <code><![CDATA[array{channel_id: int, seqno: int, payload: string, unencrypted_prefix: string}]]></code>
+    </MixedReturnTypeCoercion>
+  </file>
+  <file src="src/Tgcalls/E2E/ConferenceCall.php">
+    <MissingPureAnnotation>
+      <code><![CDATA[getPublic]]></code>
+    </MissingPureAnnotation>
+    <MixedArgument>
+      <code><![CDATA[$this->getInputCall()['id']]]></code>
+      <code><![CDATA[$this->getInputCall()['id']]]></code>
+      <code><![CDATA[$this->inputCall['id']]]></code>
+      <code><![CDATA[$this->inputCall['id']]]></code>
+      <code><![CDATA[$this->inputCall['id']]]></code>
+      <code><![CDATA[$this->selfId]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['params']]]></code>
+      <code><![CDATA[$update['params']]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['_']]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['blocks']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']]]></code>
+      <code><![CDATA[$update['call']['_']]]></code>
+      <code><![CDATA[$update['next_offset']]]></code>
+      <code><![CDATA[$update['params']]]></code>
+      <code><![CDATA[$update['params']]]></code>
+      <code><![CDATA[$update['presentation']]]></code>
+      <code><![CDATA[$update['presentation']]]></code>
+      <code><![CDATA[$updates['updates']]]></code>
+    </MixedArrayAccess>
+    <MixedArrayOffset>
+      <code><![CDATA[$this->chain->getParticipants()[$userId]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$this->selfId]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$update]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$updates]]></code>
+      <code><![CDATA[$userId]]></code>
+      <code><![CDATA[$value]]></code>
+    </MixedAssignment>
+    <MixedOperand>
+      <code><![CDATA[$this->inputCall['id'] ?? '(new)']]></code>
+    </MixedOperand>
+    <MixedReturnStatement>
+      <code><![CDATA[$this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
+                'kick' => $kick,
+                'only_left' => !$kick,
+                'call' => $this->getInputCall(),
+                'ids' => array_keys($remove),
+                'block' => $block['serialized'],
+            ])]]></code>
+      <code><![CDATA[$this->API->methodCallAsyncRead('phone.joinGroupCall', [
+            'muted' => $muted,
+            'video_stopped' => true,
+            'call' => $this->inputCall,
+            'join_as' => ['_' => 'inputPeerSelf'],
+            'public_key' => $this->chain->getSelfPublicKey(),
+            'block' => $this->buildSelfAddBlock()['serialized'],
+            'params' => $params,
+        ])]]></code>
+    </MixedReturnStatement>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$this->chainOffset]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/Tgcalls/E2E/ConferenceChain.php">
+    <MixedArgument>
+      <code><![CDATA[$block['signature']]]></code>
+      <code><![CDATA[$change]]></code>
+      <code><![CDATA[$change['shared_key']]]></code>
+      <code><![CDATA[$sharedKey['dest_user_id'] ?? []]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$participant['add_users']]]></code>
+      <code><![CDATA[$participant['public_key']]]></code>
+      <code><![CDATA[$participant['remove_users']]]></code>
+      <code><![CDATA[$participant['set_value']]]></code>
+      <code><![CDATA[$participant['user_id']]]></code>
+      <code><![CDATA[$participant['version']]]></code>
+      <code><![CDATA[$sharedKey['dest_header'][$index]]]></code>
+    </MixedArrayAccess>
+    <MixedArrayOffset>
+      <code><![CDATA[$sharedKey['dest_header'][$index]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$change]]></code>
+      <code><![CDATA[$index]]></code>
+      <code><![CDATA[$participant]]></code>
+    </MixedAssignment>
+  </file>
+  <file src="src/Tgcalls/E2E/Crypto.php">
+    <InvalidArgument>
+      <code><![CDATA[$padLen]]></code>
+    </InvalidArgument>
+    <MixedArgument>
+      <code><![CDATA[$aesIv]]></code>
+      <code><![CDATA[$aesIv]]></code>
+      <code><![CDATA[$aesIv]]></code>
+      <code><![CDATA[$aesIv]]></code>
+      <code><![CDATA[$aesKey]]></code>
+      <code><![CDATA[$aesKey]]></code>
+      <code><![CDATA[$aesKey]]></code>
+      <code><![CDATA[$aesKey]]></code>
+      <code><![CDATA[$curve->extractSecret($seed)['dA']]]></code>
+    </MixedArgument>
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[$point]]></code>
+    </MixedArgumentTypeCoercion>
+    <MixedReturnStatement>
+      <code><![CDATA[\phpseclib4\Crypt\EC::loadFormat('libsodium', $publicKey)->verify($message, $signature)]]></code>
+      <code><![CDATA[\phpseclib4\Crypt\EC::loadFormat('libsodium', $seed.self::publicKey($seed))->sign($message)]]></code>
+    </MixedReturnStatement>
+    <PossiblyNullArgument>
+      <code><![CDATA[$one->subtract($y)->modInverse($p)]]></code>
+      <code><![CDATA[$z2->modInverse($p)]]></code>
+    </PossiblyNullArgument>
+    <UndefinedMethod>
+      <code><![CDATA[sign]]></code>
+      <code><![CDATA[verify]]></code>
+    </UndefinedMethod>
+  </file>
+  <file src="src/Tgcalls/E2E/E2EKeyProvider.php">
+    <MissingAbstractPureAnnotation>
+      <code><![CDATA[activeEpochs]]></code>
+      <code><![CDATA[publicKeyForSsrc]]></code>
+      <code><![CDATA[selfSeed]]></code>
+    </MissingAbstractPureAnnotation>
+    <MissingInterfaceImmutableAnnotation>
+      <code><![CDATA[E2EKeyProvider]]></code>
+    </MissingInterfaceImmutableAnnotation>
+  </file>
+  <file src="src/Tgcalls/E2E/FrameCryptor.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$result]]></code>
+    </LessSpecificReturnStatement>
+    <MissingPureAnnotation>
+      <code><![CDATA[__construct]]></code>
+      <code><![CDATA[h264CiphertextIsClean]]></code>
+      <code><![CDATA[h264NaluIndices]]></code>
+      <code><![CDATA[h264PlaintextHeader]]></code>
+      <code><![CDATA[h264SliceHeaderBytesForPpsId]]></code>
+      <code><![CDATA[setOutgoingVideoCodec]]></code>
+      <code><![CDATA[vp8PlaintextHeader]]></code>
+    </MissingPureAnnotation>
+    <MoreSpecificReturnType>
+      <code><![CDATA[list<array{0: int, 1: int, 2: int}>]]></code>
+    </MoreSpecificReturnType>
+  </file>
+  <file src="src/Tgcalls/E2E/FrameCryptorState.php">
+    <MissingImmutableAnnotation>
+      <code><![CDATA[FrameCryptorState]]></code>
+    </MissingImmutableAnnotation>
+    <MissingPureAnnotation>
+      <code><![CDATA[checkReplay]]></code>
+      <code><![CDATA[nextSeqno]]></code>
+    </MissingPureAnnotation>
+    <PossiblyNullArrayOffset>
+      <code><![CDATA[$window]]></code>
+    </PossiblyNullArrayOffset>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[\assert(\is_int($oldest))]]></code>
+      <code><![CDATA[\is_int($oldest)]]></code>
+    </RedundantConditionGivenDocblockType>
+  </file>
+  <file src="src/Tgcalls/E2E/Verification.php">
+    <MixedAssignment>
+      <code><![CDATA[$result[]]]></code>
+    </MixedAssignment>
+    <MixedReturnTypeCoercion>
+      <code><![CDATA[$result]]></code>
+      <code><![CDATA[list<string>]]></code>
+    </MixedReturnTypeCoercion>
   </file>
   <file src="src/Tgcalls/EncryptedConnection.php">
     <MixedArgument>
@@ -8034,18 +8636,128 @@
     </MixedArgument>
   </file>
   <file src="src/Tgcalls/GroupConnection.php">
+    <InvalidArgument>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$call]]></code>
+      <code><![CDATA[$this->call]]></code>
+    </InvalidArgument>
     <MixedArgumentTypeCoercion>
       <code><![CDATA[$this->video]]></code>
     </MixedArgumentTypeCoercion>
     <MixedAssignment>
       <code><![CDATA[$value]]></code>
     </MixedAssignment>
+    <PossiblyNullArrayOffset>
+      <code><![CDATA[$endpoints]]></code>
+      <code><![CDATA[$endpoints]]></code>
+    </PossiblyNullArrayOffset>
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$participant['presentationEndpoint']]]></code>
+      <code><![CDATA[$participant['videoEndpoint']]]></code>
+    </PossiblyUndefinedArrayOffset>
+    <RedundantCastGivenDocblockType>
+      <code><![CDATA[(array) ($participant['presentation'] ?? [])]]></code>
+      <code><![CDATA[(bool) ($participant['muted'] ?? false)]]></code>
+    </RedundantCastGivenDocblockType>
+  </file>
+  <file src="src/Tgcalls/GroupConnectionOwner.php">
+    <MissingAbstractPureAnnotation>
+      <code><![CDATA[log]]></code>
+      <code><![CDATA[onConnectionFailed]]></code>
+      <code><![CDATA[onIncomingSource]]></code>
+      <code><![CDATA[setPresentationPaused]]></code>
+      <code><![CDATA[setVideoStopped]]></code>
+    </MissingAbstractPureAnnotation>
+    <MissingInterfaceImmutableAnnotation>
+      <code><![CDATA[GroupConnectionOwner]]></code>
+    </MissingInterfaceImmutableAnnotation>
   </file>
   <file src="src/Tgcalls/GroupSdp.php">
     <InvalidArgument>
       <code><![CDATA[$result]]></code>
     </InvalidArgument>
+    <InvalidConstantAssignmentValue>
+      <code><![CDATA[CODECS = [
+        'audio' => [
+            [
+                'id' => self::OPUS_PAYLOAD_TYPE,
+                'name' => 'opus',
+                'clockrate' => 48000,
+                'channels' => 2,
+                'parameters' => ['minptime' => '10', 'useinbandfec' => '1'],
+                'feedback' => ['transport-cc'],
+            ],
+            [
+                'id' => self::L16_PAYLOAD_TYPE,
+                'name' => 'L16',
+                'clockrate' => 48000,
+                'channels' => 1,
+                'parameters' => [],
+                'feedback' => [],
+            ],
+        ],
+        'video' => [
+            [
+                'id' => self::VP8_PAYLOAD_TYPE,
+                'name' => 'VP8',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => [],
+                'feedback' => self::VIDEO_FEEDBACK,
+            ],
+            [
+                'id' => self::VP8_RTX_PAYLOAD_TYPE,
+                'name' => 'rtx',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => ['apt' => self::VP8_PAYLOAD_TYPE],
+                'feedback' => [],
+            ],
+            [
+                'id' => self::VP9_PAYLOAD_TYPE,
+                'name' => 'VP9',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => ['profile-id' => '0'],
+                'feedback' => self::VIDEO_FEEDBACK,
+            ],
+            [
+                'id' => self::VP9_RTX_PAYLOAD_TYPE,
+                'name' => 'rtx',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => ['apt' => self::VP9_PAYLOAD_TYPE],
+                'feedback' => [],
+            ],
+            [
+                'id' => self::H264_PAYLOAD_TYPE,
+                'name' => 'H264',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => [
+                    'level-asymmetry-allowed' => '1',
+                    'packetization-mode' => '1',
+                    'profile-level-id' => '42e01f',
+                ],
+                'feedback' => self::VIDEO_FEEDBACK,
+            ],
+            [
+                'id' => self::H264_RTX_PAYLOAD_TYPE,
+                'name' => 'rtx',
+                'clockrate' => 90000,
+                'channels' => 0,
+                'parameters' => ['apt' => self::H264_PAYLOAD_TYPE],
+                'feedback' => [],
+            ],
+        ],
+    ]]]></code>
+    </InvalidConstantAssignmentValue>
+    <InvalidReturnStatement>
+      <code><![CDATA[$canonical]]></code>
+    </InvalidReturnStatement>
     <LessSpecificReturnStatement>
+      <code><![CDATA[$result]]></code>
       <code><![CDATA[$sections]]></code>
     </LessSpecificReturnStatement>
     <MixedArgument>
@@ -8092,7 +8804,6 @@
       <code><![CDATA[$fingerprint['hash']]]></code>
     </MixedOperand>
     <MixedReturnTypeCoercion>
-      <code><![CDATA[$result]]></code>
       <code><![CDATA[[
             'stream' => (bool) ($params['stream'] ?? false),
             'rtmp' => (bool) ($params['rtmp'] ?? false),
@@ -8100,10 +8811,10 @@
             'video' => \is_array($params['video'] ?? null) ? self::parseVideoInformation($params['video']) : null,
         ]]]></code>
       <code><![CDATA[array{stream: bool, rtmp: bool, transport: ?array, video: ?array{payloadTypes: list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>, extensions: list<array{id: int, uri: string}>}}]]></code>
-      <code><![CDATA[list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>]]></code>
     </MixedReturnTypeCoercion>
     <MoreSpecificReturnType>
       <code><![CDATA[array{session: list<string>}&array<int, array{string, string, SDPDirections}>]]></code>
+      <code><![CDATA[list<array{id: int, name: string, clockrate: int, channels: int, parameters: array<string, string>, feedback: list<string>}>]]></code>
     </MoreSpecificReturnType>
     <PossiblyInvalidArgument>
       <code><![CDATA[$direction]]></code>
@@ -8126,6 +8837,18 @@
     <RedundantCastGivenDocblockType>
       <code><![CDATA[(string) $apt]]></code>
     </RedundantCastGivenDocblockType>
+  </file>
+  <file src="src/Tgcalls/H264Framing.php">
+    <MixedArgument>
+      <code><![CDATA[$size]]></code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code><![CDATA[$count]]></code>
+      <code><![CDATA[$size]]></code>
+    </MixedAssignment>
+    <MixedOperand>
+      <code><![CDATA[$size]]></code>
+    </MixedOperand>
   </file>
   <file src="src/Tgcalls/LegacyController.php">
     <MixedArgument>
@@ -8180,6 +8903,70 @@
       <code><![CDATA[$delta / (float) self::CLOCK_RATE]]></code>
     </InvalidOperand>
   </file>
+  <file src="src/Tgcalls/OpusRecorder.php">
+    <MixedAssignment>
+      <code><![CDATA[$value]]></code>
+    </MixedAssignment>
+  </file>
+  <file src="src/Tgcalls/PrivateCallController.php">
+    <MixedArgument>
+      <code><![CDATA[$call['connections'] ?? []]]></code>
+      <code><![CDATA[$call['connections'] ?? []]]></code>
+      <code><![CDATA[$call['protocol'] ?? []]]></code>
+      <code><![CDATA[$dh_config['p']]]></code>
+      <code><![CDATA[$dh_config['p']]]></code>
+      <code><![CDATA[$dh_config['p']]]></code>
+      <code><![CDATA[$dh_config['p']]]></code>
+      <code><![CDATA[$dh_config['p']]]></code>
+      <code><![CDATA[$dh_config['p']->subtract(Magic::$two)]]></code>
+      <code><![CDATA[$g_b]]></code>
+      <code><![CDATA[$params['id']]]></code>
+      <code><![CDATA[$reason['_']]]></code>
+      <code><![CDATA[$res]]></code>
+      <code><![CDATA[$this->call['a']]]></code>
+      <code><![CDATA[$this->call['b']]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$reason['_']]]></code>
+      <code><![CDATA[$reason['slug']]]></code>
+      <code><![CDATA[($this->API->methodCallAsyncRead('phone.confirmCall', [
+                    'key_fingerprint' => substr(sha1($key, true), -8),
+                    'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
+                    'g_a' => $this->call['g_a'],
+                    'protocol' => self::CALL_PROTOCOL,
+                ]))['phone_call']]]></code>
+    </MixedArrayAccess>
+    <MixedAssignment>
+      <code><![CDATA[$g_b]]></code>
+      <code><![CDATA[$reason]]></code>
+      <code><![CDATA[$res]]></code>
+      <code><![CDATA[$this->public->conferenceSlug]]></code>
+      <code><![CDATA[$value]]></code>
+      <code><![CDATA[$visualization[]]]></code>
+    </MixedAssignment>
+    <MixedMethodCall>
+      <code><![CDATA[powMod]]></code>
+      <code><![CDATA[subtract]]></code>
+    </MixedMethodCall>
+    <RedundantCondition>
+      <code><![CDATA[true]]></code>
+      <code><![CDATA[true]]></code>
+    </RedundantCondition>
+    <TypeDoesNotContainType>
+      <code><![CDATA[!isset($this->callState)]]></code>
+      <code><![CDATA[!isset($this->callState) || !isset($this->public)]]></code>
+      <code><![CDATA[!isset($this->callState) || !isset($this->public) || !isset($this->call)]]></code>
+      <code><![CDATA[isset($this->API->logger)]]></code>
+    </TypeDoesNotContainType>
+  </file>
+  <file src="src/Tgcalls/RtcDebugLogger.php">
+    <MissingParamType>
+      <code><![CDATA[$level]]></code>
+    </MissingParamType>
+    <MissingPureAnnotation>
+      <code><![CDATA[__construct]]></code>
+    </MissingPureAnnotation>
+  </file>
   <file src="src/Tgcalls/SignalingSctpTransport.php">
     <MixedArgument>
       <code><![CDATA[$message]]></code>
@@ -8195,9 +8982,6 @@
     <MixedArgument>
       <code><![CDATA[$extensions]]></code>
     </MixedArgument>
-    <MixedArgumentTypeCoercion>
-      <code><![CDATA[$result]]></code>
-    </MixedArgumentTypeCoercion>
     <MixedArrayAccess>
       <code><![CDATA[$extension['id']]]></code>
       <code><![CDATA[$extension['uri']]]></code>
@@ -8241,14 +9025,11 @@
       <code><![CDATA[$payloadType['name']]]></code>
       <code><![CDATA[$value]]></code>
     </MixedOperand>
-    <NoValue>
-      <code><![CDATA[$pending]]></code>
-    </NoValue>
-    <RedundantCondition>
-      <code><![CDATA[$pending === []]]></code>
-    </RedundantCondition>
   </file>
   <file src="src/Tools.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[$length]]></code>
+    </ArgumentTypeCoercion>
     <InvalidOperand>
       <code><![CDATA[memory_get_usage(true)/1024/1024]]></code>
     </InvalidOperand>
@@ -8309,26 +9090,17 @@
     <TypeDoesNotContainNull>
       <code><![CDATA[$buffer === null]]></code>
     </TypeDoesNotContainNull>
-    <UndefinedClass>
-      <code><![CDATA[Random]]></code>
-    </UndefinedClass>
     <UnsupportedReferenceUsage>
       <code><![CDATA[$this->{$var} =& $val]]></code>
     </UnsupportedReferenceUsage>
   </file>
-  <file src="src/VoIP.php">
-    <MixedAssignment>
-      <code><![CDATA[$this->callID]]></code>
-      <code><![CDATA[$this->date]]></code>
-      <code><![CDATA[$this->otherID]]></code>
-      <code><![CDATA[$this->otherID]]></code>
-      <code><![CDATA[$this->video]]></code>
-    </MixedAssignment>
-    <PossiblyInvalidArrayAccess>
-      <code><![CDATA[$API->getSelf()['id']]]></code>
-    </PossiblyInvalidArrayAccess>
-  </file>
   <file src="src/VoIP/AuthKeyHandler.php">
+    <ImpureMethodCall>
+      <code><![CDATA[($this->calls[$id] ?? null)?->getCurrent($dest)]]></code>
+      <code><![CDATA[($this->calls[$id] ?? null)?->isPaused($dest)]]></code>
+      <code><![CDATA[($this->calls[$id] ?? null)?->pause($dest)]]></code>
+      <code><![CDATA[($this->calls[$id] ?? null)?->resume($dest)]]></code>
+    </ImpureMethodCall>
     <MixedArgument>
       <code><![CDATA[$dh_config['p']]]></code>
       <code><![CDATA[$dh_config['p']->subtract(Magic::$two)]]></code>
@@ -8340,7 +9112,7 @@
                 'video' => $video,
                 'user_id' => $user,
                 'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
-                'protocol' => VoIPController::CALL_PROTOCOL,
+                'protocol' => PrivateCallController::CALL_PROTOCOL,
             ])['phone_call']]]></code>
     </MixedArrayAccess>
     <MixedArrayAssignment>
@@ -8633,50 +9405,6 @@
       <code><![CDATA[$stream['codec']]]></code>
     </MixedOperand>
   </file>
-  <file src="src/VoIPController.php">
-    <MixedArgument>
-      <code><![CDATA[$call['connections'] ?? []]]></code>
-      <code><![CDATA[$call['connections'] ?? []]]></code>
-      <code><![CDATA[$call['protocol'] ?? []]]></code>
-      <code><![CDATA[$dh_config['p']]]></code>
-      <code><![CDATA[$dh_config['p']]]></code>
-      <code><![CDATA[$dh_config['p']]]></code>
-      <code><![CDATA[$dh_config['p']]]></code>
-      <code><![CDATA[$dh_config['p']]]></code>
-      <code><![CDATA[$dh_config['p']->subtract(Magic::$two)]]></code>
-      <code><![CDATA[$g_b]]></code>
-      <code><![CDATA[$params['id']]]></code>
-      <code><![CDATA[$reason['_']]]></code>
-      <code><![CDATA[$res]]></code>
-      <code><![CDATA[$this->call['a']]]></code>
-      <code><![CDATA[$this->call['b']]]></code>
-    </MixedArgument>
-    <MixedArrayAccess>
-      <code><![CDATA[$reason['_']]]></code>
-      <code><![CDATA[$reason['slug']]]></code>
-      <code><![CDATA[($this->API->methodCallAsyncRead('phone.confirmCall', [
-                    'key_fingerprint' => substr(sha1($key, true), -8),
-                    'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
-                    'g_a' => $this->call['g_a'],
-                    'protocol' => self::CALL_PROTOCOL,
-                ]))['phone_call']]]></code>
-    </MixedArrayAccess>
-    <MixedAssignment>
-      <code><![CDATA[$g_b]]></code>
-      <code><![CDATA[$reason]]></code>
-      <code><![CDATA[$res]]></code>
-      <code><![CDATA[$this->public->conferenceSlug]]></code>
-      <code><![CDATA[$value]]></code>
-      <code><![CDATA[$visualization[]]]></code>
-    </MixedAssignment>
-    <MixedMethodCall>
-      <code><![CDATA[powMod]]></code>
-      <code><![CDATA[subtract]]></code>
-    </MixedMethodCall>
-    <TypeDoesNotContainType>
-      <code><![CDATA[isset($this->API->logger)]]></code>
-    </TypeDoesNotContainType>
-  </file>
   <file src="src/Wrappers/Ads.php">
     <MixedArgument>
       <code><![CDATA[$result]]></code>
@@ -8859,6 +9587,9 @@
     </PossiblyInvalidOperand>
   </file>
   <file src="src/Wrappers/Start.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[$this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN]]></code>
+    </DocblockTypeContradiction>
     <InvalidFalsableReturnType>
       <code><![CDATA[array]]></code>
     </InvalidFalsableReturnType>

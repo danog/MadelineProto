@@ -277,9 +277,6 @@ final class DjLoop extends VoIPLoop
         $this->oggQueue ??= new SplQueue;
         $this->webmAudioQueue ??= new SplQueue;
         $this->videoQueue ??= new SplQueue;
-        // Sessions serialized before video-only mode existed carry no value for it.
-        $this->videoOnly ??= false;
-        $this->videoParameters ??= [];
         // Do NOT restart the reader here: its loop reads the call's state, which is only restored once
         // the whole call graph has finished deserializing. Starting it now could run it
         // mid-deserialization (if a nested resume suspends the fiber) and dereference not-yet-restored

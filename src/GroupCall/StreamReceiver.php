@@ -145,7 +145,7 @@ final class StreamReceiver
         $this->closeWriters();
         $this->outputDir = null;
         $this->outputFile = $file;
-        $this->outputFormat = $format ?? ($file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Opus);
+        $this->outputFormat = $format ?? ($file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Mkv);
     }
 
     /**
@@ -158,7 +158,7 @@ final class StreamReceiver
         if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
             throw new \RuntimeException("Could not create the recording directory $dir");
         }
-        $format ??= $this->rtmp ? RecordingFormat::Mkv : RecordingFormat::Opus;
+        $format ??= RecordingFormat::Mkv;
         $extension = match ($format) {
             RecordingFormat::Opus => 'ogg',
             RecordingFormat::Webm => 'webm',
