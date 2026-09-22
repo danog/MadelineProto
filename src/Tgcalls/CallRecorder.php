@@ -190,7 +190,22 @@ final class CallRecorder
         if ($this->closed) {
             return;
         }
-        $this->writer?->resume();
+        if ($this->file !== null) {
+            // The recording folder may have been deleted while we were away: recreate it, once, now.
+            $dir = str_ends_with($this->stem, '/') ? rtrim($this->stem, '/') : \dirname($this->stem);
+            if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
+                throw new \RuntimeException("Could not recreate the recording directory $dir");
+            }
+        }
+        if ($this->writer !== null && !$this->writer->resume()) {
+            // The open segment was deleted while we were away: drop it and let the next frames open a
+            // fresh segment with whatever streams are flowing.
+            Logger::log('The recording segment of '.($this->file?->file ?? 'stream').' no longer exists, starting a new one', Logger::WARNING);
+            $this->writer = null;
+            $this->started = false;
+            $this->waitingSince = null;
+            $this->rollPending = false;
+        }
         if ($this->audioTrack !== null && $this->audioConsumer === null) {
             $this->audioConsumer = $this->audioTrack->getConsumer();
             EventLoop::queue($this->drainAudio(...));
@@ -603,6 +618,11 @@ final class CallRecorder
         }
         $out = $this->out;
         if ($this->file !== null) {
+            if ($this->segment === 0) {
+                // Continue an existing series (after a re-join, or a restart of the process) rather
+                // than overwriting its first segment.
+                $this->segment = $this->nextSegmentNumber();
+            }
             $out = new LocalFile($this->segmentPath($slots));
             $this->segment++;
         }
@@ -638,6 +658,29 @@ final class CallRecorder
             $this->write($f['slot'], $f['data'], $f['ms'], $f['keyframe']);
         }
         $this->buffers = [];
+    }
+
+    /**
+     * The number the next segment of this series should get: one past the highest-numbered segment
+     * already on disk (so that a recording resumed after a re-join or a restart appends to the series
+     * instead of overwriting it), or 0 if there is none (yet, or any more).
+     */
+    private function nextSegmentNumber(): int
+    {
+        $directoryStem = str_ends_with($this->stem, '/');
+        $dir = $directoryStem ? rtrim($this->stem, '/') : \dirname($this->stem);
+        $prefix = $directoryStem ? '' : basename($this->stem).'.';
+        $suffix = '.'.($this->format === RecordingFormat::Webm ? 'webm' : 'mkv');
+        $next = 0;
+        foreach (is_dir($dir) ? (scandir($dir) ?: []) : [] as $name) {
+            if (!str_starts_with($name, $prefix) || !str_ends_with($name, $suffix)) {
+                continue;
+            }
+            if (preg_match('/^(\d+)_/', substr($name, \strlen($prefix)), $m)) {
+                $next = max($next, (int) $m[1] + 1);
+            }
+        }
+        return $next;
     }
 
     /**

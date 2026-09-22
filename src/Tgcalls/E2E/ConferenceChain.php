@@ -34,6 +34,13 @@ final class ConferenceChain
     /** Permission bits of e2e.chain.groupParticipant. */
     public const PERMISSION_ADD_USERS = 1;
     public const PERMISSION_REMOVE_USERS = 2;
+    public const PERMISSION_SET_VALUE = 4;
+    /**
+     * The kv_hash of the empty key-value trie: tde2e hashes the TL serialization of its empty root
+     * node (the int32 node type 0), not 32 zero bytes. It is what every block of a call that never
+     * sets a value must carry in its state proof.
+     */
+    public const EMPTY_KV_HASH = "\xdf\x3f\x61\x98\x04\xa9\x2f\xdb\x40\x57\x19\x2d\xc4\x3d\xd7\x48\xea\x77\x8a\xdc\x52\xbc\x49\x8c\xe8\x05\x24\xc0\x14\xb8\x11\x19";
     /**
      * The permissions we take for ourselves when creating or joining a call, and grant to whoever joins
      * a call we created (its `external_permissions`): tde2e gives every member add+remove, so anyone
@@ -64,6 +71,11 @@ final class ConferenceChain
     private array $participants = [];
     /** The current raw (pre-derivation) group shared key, or null if none is set. */
     private ?string $rawSharedKey = null;
+    /**
+     * The root hash of the key-value trie after the last applied block. We never set values, so it
+     * only changes if another participant does: the state proof of every block we build must repeat it.
+     */
+    private string $kvHash = self::EMPTY_KV_HASH;
 
     public function __construct(int $selfUserId, string $selfSeed)
     {
@@ -97,13 +109,36 @@ final class ConferenceChain
      */
     public function getGroupKey(): ?string
     {
-        return $this->rawSharedKey === null ? null : Crypto::deriveGroupKey($this->rawSharedKey, $this->lastBlockHash);
+        if ($this->rawSharedKey === null) {
+            return null;
+        }
+        // Protocol version 0 (what tde2e-based clients announce) uses the raw key as is; the hashed
+        // key is only used once every participant supports version 1, as tde2e's Call does.
+        return $this->getVersion() >= 1 ? Crypto::deriveGroupKey($this->rawSharedKey, $this->lastBlockHash) : $this->rawSharedKey;
+    }
+
+    /**
+     * The protocol version in effect: the smallest version announced by a participant, clamped to
+     * 0..255 (0 for an empty group), as tde2e's GroupState::version().
+     *
+     * @psalm-mutation-free
+     */
+    public function getVersion(): int
+    {
+        if ($this->participants === []) {
+            return 0;
+        }
+        $version = PHP_INT_MAX;
+        foreach ($this->participants as $participant) {
+            $version = min($version, $participant['version']);
+        }
+        return max(0, min(255, $version));
     }
 
     /**
      * Build and sign the genesis (height 0) block that creates the call with ourselves as the sole
-     * participant (holding every permission) and installs the first shared key. The zero block must
-     * carry a Noop change, as tde2e requires.
+     * participant and installs the first shared key: exactly the two changes tde2e's
+     * Call::create_zero_block() emits.
      *
      * @param int $externalPermissions What a non-member may do to the chain: tde2e grants add+remove
      *                                 users, which is what lets anyone add themselves by joining.
@@ -124,7 +159,6 @@ final class ConferenceChain
                 ],
             ],
             ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->buildSharedKey($raw, [[$this->selfUserId, $this->selfPublicKey]])],
-            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
         ];
         $block = $this->buildBlock(0, str_repeat("\0", 32), $changes);
         return [
@@ -151,7 +185,9 @@ final class ConferenceChain
             'prev_block_hash' => $prevBlockHash,
             'changes' => $changes,
             'height' => $height,
-            'state_proof' => ['_' => 'e2e.chain.stateProof', 'kv_hash' => str_repeat("\0", 32)],
+            // A block that changes the group state (every block we build) omits the group state and
+            // the shared key from its proof; only the key-value root hash is carried (tde2e build_block).
+            'state_proof' => ['_' => 'e2e.chain.stateProof', 'kv_hash' => $this->kvHash],
             'signature_public_key' => $this->selfPublicKey,
         ];
         $signed = $this->sign($block);
@@ -212,6 +248,10 @@ final class ConferenceChain
         }
         $this->height = (int) $block['height'];
         $this->lastBlockHash = $this->codec->blockHash($canonical);
+        $kvHash = (string) ($block['state_proof']['kv_hash'] ?? '');
+        if (\strlen($kvHash) === 32) {
+            $this->kvHash = $kvHash;
+        }
         return true;
     }
 
@@ -227,6 +267,7 @@ final class ConferenceChain
                     $permissions = 0;
                     $permissions |= ($participant['add_users'] ?? false) ? self::PERMISSION_ADD_USERS : 0;
                     $permissions |= ($participant['remove_users'] ?? false) ? self::PERMISSION_REMOVE_USERS : 0;
+                    $permissions |= ($participant['set_value'] ?? false) ? self::PERMISSION_SET_VALUE : 0;
                     $this->participants[(int) $participant['user_id']] = [
                         'public_key' => (string) $participant['public_key'],
                         'permissions' => $permissions,
@@ -334,6 +375,7 @@ final class ConferenceChain
             'public_key' => $publicKey,
             'add_users' => ($permissions & self::PERMISSION_ADD_USERS) !== 0,
             'remove_users' => ($permissions & self::PERMISSION_REMOVE_USERS) !== 0,
+            'set_value' => ($permissions & self::PERMISSION_SET_VALUE) !== 0,
             'version' => $version,
         ];
     }

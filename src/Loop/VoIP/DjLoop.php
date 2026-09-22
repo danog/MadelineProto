@@ -552,8 +552,15 @@ final class DjLoop extends VoIPLoop
         try {
             while (!$this->instance->isCallEnded()) {
                 if ($this->currentFile === null && !$this->openNextFile()) {
-                    // Nothing to play: exit. play()/playOnHold()/skip() restart the reader.
-                    return;
+                    if ($this->holdFiles === []) {
+                        // Nothing to play: exit. play()/playOnHold()/skip() restart the reader.
+                        return;
+                    }
+                    // Hold files only start once the queued frames of the last file have played out
+                    // (openNextFile() refuses to open one on top of them): wait for the tracks to drain
+                    // the queues and try again, rather than exiting and never playing the hold files.
+                    Tools::sleep(0.1);
+                    continue;
                 }
                 $this->streamCurrentFile();
                 $this->currentFile = null;

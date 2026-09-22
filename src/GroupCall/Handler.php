@@ -160,7 +160,7 @@ trait Handler
      */
     public function getConferenceCall(int $id): ?ConferenceCallUpdate
     {
-        return $this->conferenceCalls[$id]?->getPublic();
+        return ($this->conferenceCalls[$id] ?? null)?->getPublic();
     }
 
     /**

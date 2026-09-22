@@ -124,7 +124,8 @@ final class Verification
      */
     public static function emojis(string $emojiHash): array
     {
-        Magic::start(light: true);
+        // The emoji table is only decoded by the full initialization (a no-op once the API started).
+        Magic::start(light: false);
         $table = Magic::$emojis;
         $count = \count($table);
         $result = [];

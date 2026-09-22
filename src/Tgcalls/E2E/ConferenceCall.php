@@ -33,6 +33,7 @@ use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
+use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use danog\MadelineProto\Tgcalls\GroupSdp;
@@ -55,7 +56,7 @@ use Throwable;
  * implements the common {@see Call} media interface plus conference-specific controls (verification,
  * encrypted messages).
  */
-final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
+final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, CallControllerInterface
 {
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
     private const SUBCHAIN_STATE = 0;
@@ -72,6 +73,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     private ?GroupConnection $connection = null;
     private DjLoop $diskJockey;
     private FrameCryptor $frameCryptor;
+    /** Packet counters shared by the camera and screen-share cryptors (serialized with the call). */
+    private FrameCryptorState $cryptorState;
     /** The separate screen-share connection (phone.joinGroupCallPresentation), while sharing a screen. */
     private ?GroupConnection $presentationConnection = null;
     /** The video-only disk jockey feeding the screen-share connection, if any. */
@@ -150,7 +153,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         $this->selfId = $self['id'];
         [$this->selfSeed] = Crypto::generateKeyPair();
         $this->chain = new ConferenceChain($this->selfId, $this->selfSeed);
-        $this->frameCryptor = new FrameCryptor($this);
+        $this->cryptorState = new FrameCryptorState();
+        $this->frameCryptor = new FrameCryptor($this, $this->cryptorState);
         $this->diskJockey = new DjLoop($this);
         $this->diskJockey->start();
     }
@@ -179,6 +183,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
+        // Sessions serialized before the packet counters were shared carry no state object.
+        $this->cryptorState ??= new FrameCryptorState();
         $this->pollWatcher = null;
         $this->diskJockey->start();
         $this->presentationDj?->start();
@@ -196,6 +202,10 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         if (!$this->joined || $this->inputCall === null) {
             return;
         }
+        // Restart the demuxers/readers (DjLoop::__unserialize() leaves them dormant), or nothing is
+        // transmitted after a restart.
+        $this->diskJockey->resumeReader();
+        $this->presentationDj?->resumeReader();
         $this->connection?->resume();
         $this->presentationConnection?->resume();
         $this->API->registerConferenceCall($this->inputCall['id'], $this);
@@ -254,6 +264,18 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
     public function isJoined(): bool
     {
         return $this->joined;
+    }
+
+    /**
+     * Whether we left (or discarded) the conference for good: the playback machinery stops then, but
+     * not while we are merely between a drop and the automatic re-join.
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    public function isCallEnded(): bool
+    {
+        return $this->leaving;
     }
 
     /**
@@ -411,7 +433,6 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         $changes = [
             $this->chain->groupStateChange($participants),
             ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->chain->buildSharedKey($raw, $recipients)],
-            ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
         ];
         return $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), $changes);
     }
@@ -553,7 +574,6 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
             $block = $this->chain->buildBlock($this->chain->getHeight() + 1, $this->chain->getLastBlockHash(), [
                 $this->chain->groupStateChange($participants),
                 ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $this->chain->buildSharedKey($raw, $recipients)],
-                ['_' => 'e2e.chain.changeNoop', 'nonce' => random_bytes(32)],
             ]);
             return $this->API->methodCallAsyncRead('phone.deleteConferenceCallParticipants', [
                 'kick' => $kick,
@@ -841,7 +861,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider
         $this->presentationDj ??= new DjLoop($this, videoOnly: true);
         $this->presentationDj->start();
         // Distinct channels (screen video = 3) so replay windows don't clash with the camera (video = 2).
-        $this->presentationCryptor ??= new FrameCryptor($this, audioChannel: 4, videoChannel: 3);
+        $this->presentationCryptor ??= new FrameCryptor($this, $this->cryptorState);
         $connection = new GroupConnection($this, $this->presentationDj, screencast: true);
         $connection->setFrameCryptor($this->presentationCryptor);
         $params = $connection->buildJoinPayload();

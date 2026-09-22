@@ -843,6 +843,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'calls',
             'callsByPeer',
             'groupCalls',
+            'conferenceCalls',
             'snitch',
 
             'seqUpdater',

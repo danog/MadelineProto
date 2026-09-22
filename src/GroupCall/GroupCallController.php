@@ -37,6 +37,7 @@ use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
@@ -97,6 +98,13 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
 
     /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Output files/streams (and their format) requested per participant peer ID. */
     private array $pendingOutputs = [];
+    /**
+     * Outputs requested for specific participants, kept so they can be re-wired onto a new WebRTC
+     * connection after a re-join (the connection owns the live recorders, and is recreated then).
+     *
+     * @var array<int, array{LocalFile, RecordingFormat}>
+     */
+    private array $explicitOutputs = [];
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
     private RecordingFormat $outputFormat = RecordingFormat::Mkv;
@@ -163,6 +171,10 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             // now that the whole graph is back, resume the recorders (reopen their files, re-subscribe
             // to their live tracks) and re-poll the participant list so received sources are in sync.
             $this->log("Resumed $this after a restart of the process.");
+            // Restart the demuxers/readers too (DjLoop::__unserialize() deliberately leaves them dormant),
+            // or nothing is transmitted after a restart.
+            $this->diskJockey->resumeReader();
+            $this->presentationDj?->resumeReader();
             $this->connection?->resume();
             $this->presentationConnection?->resume();
             if ($this->streamMode) {
@@ -216,7 +228,9 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                     'call' => $this->inputCall,
                     'join_as' => $joinAs ?? ['_' => 'inputPeerSelf'],
                     'muted' => $muted,
-                    'video_stopped' => true,
+                    // Announce the video we are already playing (e.g. when re-joining after the transport
+                    // failed): the other clients only request our video if the server says we send some.
+                    'video_stopped' => $this->diskJockey->getVideoCodec() === null,
                     // DataJSON arguments are encoded by the TL serializer, pass the decoded payload.
                     'params' => $params,
                 ];
@@ -226,11 +240,17 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                 try {
                     $updates = $this->API->methodCallAsyncRead('phone.joinGroupCall', $request);
                 } catch (RPCErrorException $e) {
-                    if ($e->rpc !== 'GROUPCALL_SSRC_DUPLICATE_MUCH') {
+                    if ($e->rpc === 'GROUPCALL_SSRC_DUPLICATE_MUCH') {
+                        // The server asks us to retry with a fresh SSRC.
+                        $this->log("Retrying to join $this with a new SSRC...", Logger::WARNING);
+                    } elseif ($e->code === 500 && $attempt < 4) {
+                        // Transient server-side failures (e.g. GROUPCALL_ADD_PARTICIPANTS_FAILED right
+                        // after we were dropped from the call): back off and try again.
+                        $this->log("Could not join $this ({$e->rpc}), retrying...", Logger::WARNING);
+                        Tools::sleep(1.0 + $attempt);
+                    } else {
                         throw $e;
                     }
-                    // The server asks us to retry with a fresh SSRC.
-                    $this->log("Retrying to join $this with a new SSRC...", Logger::WARNING);
                 }
             }
             if ($updates === null) {
@@ -243,6 +263,9 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             }
             $this->callState = GroupCallState::JOINED;
             $this->log("Joined $this!", Logger::NOTICE);
+            // A (re-)join always starts from a fresh WebRTC connection: hand it every recording that
+            // was requested, so recordings resume (in new segments) instead of silently stopping.
+            $this->rewireOutputs();
             EventLoop::queue($this->refetch(...));
             return $this;
         } catch (Throwable $e) {
@@ -786,6 +809,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         }
         if ($participant !== null) {
             $peerId = $this->API->getId($participant);
+            $this->explicitOutputs[$peerId] = [new LocalFile("$dir/$peerId"), $format];
             $this->wireOutput($peerId, new LocalFile("$dir/$peerId"), $format);
             return $this;
         }
@@ -811,6 +835,22 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     /**
+     * Wire every requested recording onto the current WebRTC connection: the explicit per-participant
+     * outputs and, in folder mode, one file series per transmitting participant. Used after every
+     * (re-)join, since each join creates a new connection and the recorders live in the connection.
+     */
+    private function rewireOutputs(): void
+    {
+        $this->folderPeers = [];
+        foreach ($this->explicitOutputs as $peerId => [$file, $format]) {
+            $this->wireOutput($peerId, $file, $format);
+        }
+        foreach ($this->participants as $peerId => $known) {
+            $this->wireFolderOutput($peerId, $known);
+        }
+    }
+
+    /**
      * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.<n>_<streams>.mkv`
      * file series, once each.
      */
@@ -821,7 +861,8 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
             || $participant->self
             || $participant->source === $this->source
             || isset($this->folderPeers[$peerId])
-            || isset($this->pendingOutputs[$peerId]) // an explicit per-participant output takes precedence
+            || isset($this->explicitOutputs[$peerId]) // an explicit per-participant output takes precedence
+            || isset($this->pendingOutputs[$peerId])
         ) {
             return;
         }
@@ -1296,6 +1337,15 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
                 'participant' => ['_' => 'inputPeerSelf'],
                 'video_stopped' => $stopped,
             ]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'PARTICIPANT_JOIN_MISSING') {
+                // The server no longer has our participant (it dropped us while the process was
+                // down): rejoin right away rather than waiting for the transport to time out.
+                $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
+                EventLoop::queue($this->rejoin(...));
+                return;
+            }
+            $this->log("Could not change the video state of $this: $e", Logger::WARNING);
         } catch (Throwable $e) {
             $this->log("Could not change the video state of $this: $e", Logger::WARNING);
         }

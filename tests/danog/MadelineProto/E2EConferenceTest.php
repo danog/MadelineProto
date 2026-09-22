@@ -22,6 +22,7 @@ use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
 use danog\MadelineProto\Tgcalls\E2E\Crypto;
 use danog\MadelineProto\Tgcalls\E2E\E2EKeyProvider;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
+use danog\MadelineProto\Tgcalls\E2E\FrameCryptorState;
 use danog\MadelineProto\Tgcalls\E2E\Verification;
 use PHPUnit\Framework\TestCase;
 use Webrtc\RTP\Enum\MediaKind;
@@ -340,25 +341,79 @@ final class E2EConferenceTest extends TestCase
     }
 
     /**
-     * The camera and screen-share connections use distinct video channels, so the same sender's
-     * frames on each are accepted by a receiver without a replay false-positive even at equal seqnos.
+     * The camera and screen-share cryptors of one call draw their sequence numbers from the same
+     * shared counter (official clients encrypt everything on channel 0), so a receiver never sees a
+     * replay false-positive between them.
      */
-    public function testFrameCryptorChannelSeparation(): void
+    public function testFrameCryptorsShareSequenceNumbers(): void
     {
         $this->requireCrypto();
         [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
         $epoch = ['hash' => random_bytes(32), 'secret' => random_bytes(32)];
         $provider = self::keyProvider($senderSeed, [$epoch], [9 => $senderPublic]);
 
-        $camera = new FrameCryptor($provider); // video channel 2 (default)
-        $screen = new FrameCryptor($provider, audioChannel: 4, videoChannel: 3);
+        $state = new FrameCryptorState();
+        $camera = new FrameCryptor($provider, $state);
+        $screen = new FrameCryptor($provider, $state);
         $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [$epoch], [9 => $senderPublic]));
 
-        // Both start at seqno 1, but on different channels — the receiver accepts both.
-        $cameraFrame = $receiver->decryptFrame(MediaKind::Video, 9, $camera->encryptFrame(MediaKind::Video, 9, 'cam'));
-        $screenFrame = $receiver->decryptFrame(MediaKind::Video, 9, $screen->encryptFrame(MediaKind::Video, 9, 'screen'));
-        $this->assertSame('cam', $cameraFrame);
-        $this->assertSame('screen', $screenFrame);
+        $cameraWire = $camera->encryptFrame(MediaKind::Video, 9, 'cam');
+        $screenWire = $screen->encryptFrame(MediaKind::Video, 9, 'screen');
+        $this->assertSame('cam', $receiver->decryptFrame(MediaKind::Video, 9, $cameraWire));
+        $this->assertSame('screen', $receiver->decryptFrame(MediaKind::Video, 9, $screenWire));
+        $this->assertSame(1, CallPacket::decrypt($cameraWire, [$epoch['hash'] => $epoch['secret']], $senderPublic)['seqno']);
+        $this->assertSame(2, CallPacket::decrypt($screenWire, [$epoch['hash'] => $epoch['secret']], $senderPublic)['seqno']);
+        $this->assertSame(0, CallPacket::decrypt($screenWire, [$epoch['hash'] => $epoch['secret']], $senderPublic)['channel_id']);
+    }
+
+    /**
+     * The framing tgcalls' FrameTransformer applies before encryption: audio frames carry a trailing
+     * extension-flags byte and audio level byte, VP8 keeps its payload header in the clear, and H.264
+     * keeps its parameter sets and the first slice header in the clear with 4-byte start codes.
+     */
+    public function testFrameCryptorMatchesTgcallsFraming(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
+        $epoch = ['hash' => random_bytes(32), 'secret' => random_bytes(32)];
+        $secrets = [$epoch['hash'] => $epoch['secret']];
+        $sender = new FrameCryptor(self::keyProvider($senderSeed, [$epoch], null));
+        $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [$epoch], [5 => $senderPublic]));
+
+        // Audio: two trailing bytes (0x01 flags, speech flag | level), stripped again by the receiver.
+        $audio = random_bytes(80);
+        $wire = $sender->encryptFrame(MediaKind::Audio, 5, $audio);
+        $inner = CallPacket::decrypt($wire, $secrets, $senderPublic)['payload'];
+        $this->assertSame($audio."\x01".\chr(0x80 | 20), $inner);
+        $this->assertSame($audio, $receiver->decryptFrame(MediaKind::Audio, 5, $wire));
+
+        // VP8 keyframe (bit 0 of the first byte clear): the first 10 bytes stay in the clear.
+        $sender->setOutgoingVideoCodec('VP8');
+        $key = "\x10\x02\x00\x9d\x01\x2a".pack('vv', 320, 180).random_bytes(200);
+        $wire = $sender->encryptFrame(MediaKind::Video, 5, $key);
+        $this->assertSame(substr($key, 0, 10), substr($wire, 0, 10));
+        $this->assertSame($key, $receiver->decryptFrame(MediaKind::Video, 5, $wire));
+        $delta = "\x11\x02\x00".random_bytes(50); // delta frame: only the first byte
+        $wire = $sender->encryptFrame(MediaKind::Video, 5, $delta);
+        $this->assertSame($delta[0], $wire[0]);
+        $this->assertNotSame(substr($delta, 0, 3), substr($wire, 0, 3));
+        $this->assertSame($delta, $receiver->decryptFrame(MediaKind::Video, 5, $wire));
+
+        // H.264: SPS + PPS whole, the IDR slice up to its PPS id, all start codes widened to 4 bytes.
+        $sender->setOutgoingVideoCodec('H264');
+        $sps = "\x67\x42\xc0\x1f\xda\x02\x80\xf6\x80\x6d\x0a\x13\x50";
+        $pps = "\x68\xce\x38\x80";
+        $idr = "\x65\x88\x84\x00\x10".random_bytes(300); // first_mb=0, slice_type=7, pps_id=0 fit in the first bytes
+        $frame = "\x00\x00\x01".$sps."\x00\x00\x00\x01".$pps."\x00\x00\x01".$idr;
+        $wire = $sender->encryptFrame(MediaKind::Video, 5, $frame);
+        $widened = "\x00\x00\x00\x01".$sps."\x00\x00\x00\x01".$pps."\x00\x00\x00\x01".$idr;
+        $this->assertStringStartsWith("\x00\x00\x00\x01".$sps."\x00\x00\x00\x01".$pps."\x00\x00\x00\x01\x65", $wire);
+        $prefixLen = unpack('V', substr($wire, -4))[1];
+        $this->assertSame(substr($widened, 0, $prefixLen), substr($wire, 0, $prefixLen));
+        $this->assertLessThan(\strlen("\x00\x00\x00\x01".$sps."\x00\x00\x00\x01".$pps) + 12, $prefixLen);
+        $this->assertFalse(strpos($wire, "\x00\x00\x01", $prefixLen - 2), 'no start code in the ciphertext');
+        // What the receiver decrypts is the widened frame, i.e. what a WebRTC depacketizer rebuilds.
+        $this->assertSame($widened, $receiver->decryptFrame(MediaKind::Video, 5, $wire));
     }
 
     public function testFrameCryptorRejectsReplay(): void

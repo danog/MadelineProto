@@ -38,6 +38,8 @@ final class GroupCall extends AbstractGroupCall
     public ?int $recordStartDate = null;
     /** When the call is scheduled to start, if it is a scheduled call. */
     public ?int $scheduleDate = null;
+    /** Whether this is an end-to-end encrypted conference call rather than a video chat/livestream. */
+    public bool $conference = false;
 
     /**
      * @internal
@@ -56,6 +58,7 @@ final class GroupCall extends AbstractGroupCall
         $this->recordVideoActive = (bool) ($call['record_video_active'] ?? false);
         $this->recordStartDate = isset($call['record_start_date']) ? (int) $call['record_start_date'] : null;
         $this->scheduleDate = isset($call['schedule_date']) ? (int) $call['schedule_date'] : null;
+        $this->conference = (bool) ($call['conference'] ?? false);
     }
 
     /**

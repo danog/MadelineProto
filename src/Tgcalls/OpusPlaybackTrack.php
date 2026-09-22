@@ -16,7 +16,9 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use Amp\Pipeline\DisposedException;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
@@ -131,10 +133,29 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         }
         $this->producing = true;
         EventLoop::queue(function (): void {
+            try {
+                $this->produceLoop();
+            } finally {
+                $this->producing = false;
+            }
+        });
+    }
+
+    private function produceLoop(): void
+    {
+        {
             while (!$this->isEnded() && !$this->call->isCallEnded()) {
                 $packet = $this->produce();
                 if ($packet !== null) {
-                    $this->frameQueue->push($packet);
+                    try {
+                        $this->frameQueue->push($packet);
+                    } catch (DisposedException|\Error $e) {
+                        // The consumer (the RTP sender) went away — its connection was closed or
+                        // replaced — while a frame was waiting to be taken: this track will never be
+                        // read again, so stop producing instead of crashing the event loop.
+                        $this->call->log("The outgoing audio track of {$this->call} lost its consumer: {$e->getMessage()}", Logger::VERBOSE);
+                        return;
+                    }
                 }
                 // Sleep reactively until the next frame is due (its media cadence), rather than
                 // polling for work at a fixed interval.
@@ -143,7 +164,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
                     delay($wait);
                 }
             }
-        });
+        }
     }
 
     /**

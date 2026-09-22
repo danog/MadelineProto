@@ -157,15 +157,27 @@ final class MatroskaWriter
 
     /**
      * Reopen the file in append mode to continue the recording, after the whole graph has been
-     * deserialized. Only file-backed writers are ever serialized (their parent drops stream-backed
+     * deserialized. Returns false if the recording cannot continue in this file (it was closed, or
+     * the segment file no longer exists): the owner should then start a fresh segment.
+     * Only file-backed writers are ever serialized (their parent drops stream-backed
      * recorders), so there is always a file to reopen; the guard is purely defensive.
      */
-    public function resume(): void
+    public function resume(): bool
     {
-        if ($this->closed || $this->localFile === null || isset($this->out)) {
-            return;
+        if ($this->closed || $this->localFile === null) {
+            return false;
+        }
+        if (isset($this->out)) {
+            return true;
+        }
+        if (!is_file($this->localFile->file)) {
+            // The segment (or its whole folder) was deleted while we were away: there is nothing to
+            // append to, and appending would produce a headerless file. The owner opens a new segment.
+            $this->closed = true;
+            return false;
         }
         $this->out = openFile($this->localFile->file, 'a');
+        return true;
     }
 
     /**

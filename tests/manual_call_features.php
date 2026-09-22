@@ -38,7 +38,7 @@
  *   php tests/manual_call_features.php 1to1  <user> <mode>   [file] [session]
  *   php tests/manual_call_features.php group <chat> <mode>   [file] [session]
  *   php tests/manual_call_features.php conference   <mode>   [file] [session]
- *   php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
+ *   php tests/manual_call_features.php conference-join <link> <mode> [file] [session]
  *
  * <mode> is one of: audio | video | screencast
  *
@@ -200,8 +200,9 @@ function transmit(Call $call, array $m, string $file): void
     if ($m['needsVideoFile'] && !hasVideoTrack($file)) {
         info('⚠️  '.basename($file).' has no video track — '.$m['desc'].' needs one. Pass a WebM/MKV with video.');
     }
-    info('Transmitting '.basename($file).' as '.$m['desc'].'.');
+    info('Transmitting '.basename($file).' as '.$m['desc'].' (looped on hold, so it keeps playing until the call ends).');
     $call->play(new LocalFile($file), $m['dest']);
+    $call->playOnHold($m['dest'], new LocalFile($file));
 }
 
 /** Whether a file has a transmittable video track (best-effort demux). */
@@ -351,6 +352,10 @@ switch ($mode) {
         if ($joined) {
             $call = $existing;
             info('Already joined — attaching, not rejoining. Per-participant recordings resumed in '.$dir);
+            if ($call->getCurrent($m['dest']) === null) {
+                info('Nothing is playing any more: starting the transmission again.');
+                transmit($call, $m, $file);
+            }
             click('Nothing to do. Ctrl-C detaches (call keeps running); recordings keep growing.');
         } else {
             /** @var GroupCall $call */
@@ -406,33 +411,44 @@ switch ($mode) {
         info('Creating a new end-to-end encrypted conference call…');
         $call = $API->createConferenceCall();
         transmit($call, $m, $file);
-        box('SHARE THESE WITH THE OTHER ACCOUNT TO JOIN');
-        info('Run on the OTHER account:');
-        info("  php tests/manual_call_features.php conference-join {$call->id} {$call->accessHash} $media [file] [other-session]");
+        $link = $call->exportInvite();
+        box('SHARE THIS LINK WITH THE OTHER ACCOUNT TO JOIN');
+        info("Conference link: $link");
+        info('Open it in any official client, or run on another MadelineProto session:');
+        info("  php tests/manual_call_features.php conference-join $link $media [file] [other-session]");
         runConference($call, $media);
         break;
 
     case 'conference-join':
-        $id      = $argv[2] ?? null;
-        $hash    = $argv[3] ?? null;
-        $media   = $argv[4] ?? null;
-        $file    = $argv[5] ?? (__DIR__.'/../new.webm');
-        $session = $argv[6] ?? 'fuzz_user.madeline';
-        if ($id === null || $hash === null || $media === null) {
-            fwrite(STDERR, "Usage: php tests/manual_call_features.php conference-join <id> <access_hash> <audio|video|screencast> [file] [session]\n");
+        $link    = $argv[2] ?? null;
+        $media   = $argv[3] ?? null;
+        $file    = $argv[4] ?? (__DIR__.'/../new.webm');
+        $session = $argv[5] ?? 'fuzz_user.madeline';
+        if ($link === null || $media === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php conference-join <link> <audio|video|screencast> [file] [session]\n");
             exit(2);
         }
         $m = modeInfo($media);
+        $slug = conferenceSlug($link);
 
         box("TEST: E2E CONFERENCE CALL (joiner) — $m[desc]");
         $API = startApi($session);
-        $existing = $API->getConferenceCall((int) $id);
-        if ($existing !== null && $existing->isJoined()) {
+        $existing = $API->getConferenceCallBySlug($slug);
+        if ($existing === null) {
+            fwrite(STDERR, "The conference link $link is not valid (any more).\n");
+            exit(1);
+        }
+        if ($existing->isJoined()) {
             $call = $existing;
             info('Already in this conference — attaching, not rejoining.');
+            info('Currently playing: '.json_encode($call->getCurrent($m['dest'])));
+            if ($call->getCurrent($m['dest']) === null) {
+                info('Nothing is playing any more: starting the transmission again.');
+                transmit($call, $m, $file);
+            }
         } else {
             info('Joining the end-to-end encrypted conference…');
-            $call = $API->joinConferenceCall(['_' => 'inputGroupCall', 'id' => (int) $id, 'access_hash' => (int) $hash]);
+            $call = $API->joinConferenceCallBySlug($slug);
             transmit($call, $m, $file);
         }
         runConference($call, $media);
@@ -448,7 +464,7 @@ switch ($mode) {
               php tests/manual_call_features.php 1to1  <user> <mode> [file] [session]
               php tests/manual_call_features.php group <chat> <mode> [file] [session]
               php tests/manual_call_features.php conference      <mode> [file] [session]
-              php tests/manual_call_features.php conference-join <id> <access_hash> <mode> [file] [session]
+              php tests/manual_call_features.php conference-join <link> <mode> [file] [session]
 
               <mode> = audio | video | screencast
 
@@ -466,6 +482,18 @@ switch ($mode) {
  * Drive a conference call after it is up: transmit, compute + print the verification emojis, send an
  * encrypted in-call message, and monitor until Ctrl-C (which detaches without leaving).
  */
+/**
+ * The slug of a conference link: `https://t.me/call/<slug>`, `t.me/call/<slug>`, `tg://call?slug=<slug>`,
+ * or a bare slug.
+ */
+function conferenceSlug(string $link): string
+{
+    if (preg_match('~(?:t\.me/call/|[?&]slug=)([A-Za-z0-9_-]+)~', $link, $m)) {
+        return $m[1];
+    }
+    return trim($link, "/ \t\n");
+}
+
 function runConference(ConferenceCall $call, string $media): void
 {
     $ask = match ($media) {

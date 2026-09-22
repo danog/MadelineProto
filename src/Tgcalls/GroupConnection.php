@@ -31,6 +31,7 @@ use Webrtc\DataChannel\Listener\DataChannelOpenListener;
 use Webrtc\DataChannel\RTCDataChannel;
 use Webrtc\DataChannel\RTCDataChannelParameters;
 use Webrtc\DTLS\DTLS\RTCDtlsTransport;
+use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
 use Webrtc\RTP\Crypto\FrameCryptorInterface;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
@@ -212,7 +213,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         // client always initiates it (although it is the ICE-controlled side) and opens the channel
         // as stream 0 — see GroupNetworkManager.cpp and SctpDataChannelProviderInterfaceImpl.cpp.
         // A screen-share-only connection subscribes to nothing, so it needs no channel.
-        if (!$this->screencast && getenv('MP_GROUP_DATACHANNEL') !== '0') {
+        if (!$this->screencast) {
             $this->peerConnection->createInbandSctp(client: true);
             $this->dataChannel = $this->peerConnection->createDataChannel(new RTCDataChannelParameters(ordered: true, id: 0));
             $this->dataChannel->addOpenListener($this);
@@ -234,6 +235,9 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function setFrameCryptor(?FrameCryptorInterface $frameCryptor): void
     {
         $this->frameCryptor = $frameCryptor;
+        if ($frameCryptor instanceof FrameCryptor) {
+            $frameCryptor->setOutgoingVideoCodec($this->outgoingVideoCodec);
+        }
         foreach ($this->peerConnection->getTransceivers() as $transceiver) {
             $this->applyCryptor($transceiver);
         }
@@ -296,6 +300,13 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     {
         if ($this->closed) {
             return;
+        }
+        // The outgoing playback producers were left dormant by deserialization: restart them, or
+        // nothing is transmitted after a restart (the demuxer feeding them is restarted by the call).
+        $this->outgoingAudio->resume();
+        $this->outgoingVideo->resume();
+        if (getenv('MP_RTC_DEBUG') === '1') {
+            $this->peerConnection->setLogger(new RtcDebugLogger($this->call));
         }
         foreach ($this->recorders as $recorder) {
             $recorder->resume();
@@ -397,6 +408,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         }
         $this->call->log("Switching the outgoing video of {$this->call} to $codec");
         $this->outgoingVideoCodec = $codec;
+        if ($this->frameCryptor instanceof FrameCryptor) {
+            // How much of each frame stays in the clear depends on the codec (see FrameCryptor).
+            $this->frameCryptor->setOutgoingVideoCodec($codec);
+        }
         $this->outgoingVideoParameters = $parameters;
         $this->renegotiate();
     }

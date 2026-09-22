@@ -58,6 +58,8 @@ final class BitReader
     private function bit(): int
     {
         if ($this->bitPos >= $this->length) {
+            // Past the end: keep counting so callers can detect the overflow.
+            $this->bitPos++;
             return 0;
         }
         $byte = \ord($this->data[$this->bitPos >> 3]);
@@ -71,6 +73,22 @@ final class BitReader
      *
      * @psalm-mutation-free
      */
+    /**
+     * How many bits were consumed so far (may exceed the data length after reading past its end).
+     */
+    public function position(): int
+    {
+        return $this->bitPos;
+    }
+
+    /**
+     * Whether a read went past the end of the data.
+     */
+    public function overflowed(): bool
+    {
+        return $this->bitPos > $this->length;
+    }
+
     public function ue(): int
     {
         $zeros = 0;
