@@ -240,7 +240,7 @@ final class GroupVideoCodecTest extends TestCase
      */
     public function testAFileWithNoSendableVideoReportsNoCodec(): void
     {
-        [$codec, $queued] = self::play(self::buildFile('V_MPEGH/ISO/HEVC'));
+        [$codec, $queued] = self::play(self::buildFile('V_MPEGH/ISO/UNSUPPORTED'));
 
         $this->assertNull($codec);
         $this->assertNull($queued);
