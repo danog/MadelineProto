@@ -16,9 +16,9 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use Amp\Pipeline\DisposedException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use Amp\Pipeline\DisposedException;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;

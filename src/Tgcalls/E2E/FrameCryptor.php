@@ -23,7 +23,7 @@ use Webrtc\RTP\Enum\MediaKind;
 /**
  * End-to-end encryption of the media frames of a conference call, exactly as tgcalls'
  * FrameTransformer (GroupInstanceCustomImpl.cpp) plus tde2e's call_encrypt/call_decrypt do it, so
- * that the official clients can decrypt what we send and vice versa:
+ * that the official clients can decrypt what we send and vice versa:.
  *
  * - every encoded frame is encrypted as one packet ({@see CallPacket}), before RTP packetization, on
  *   channel 0 (the only channel the official clients use, for audio, video and screen share alike);

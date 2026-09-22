@@ -36,6 +36,33 @@ $logger = new Logger(new SettingsLogger);
 
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
+$classes = [];
+foreach (new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator(
+        __DIR__.'/../src/',
+        FilesystemIterator::CURRENT_AS_PATHNAME|FilesystemIterator::SKIP_DOTS,
+    ),
+    RecursiveIteratorIterator::LEAVES_ONLY,
+) as $f
+) {
+    $f = realpath($f);
+    $f = substr($f, strlen(realpath(__DIR__.'/../src/'))+1);
+    if (str_ends_with($f, '.php')) {
+        if ($f === 'polyfill.php' || basename($f) === 'entry.php') {
+            continue;
+        }
+        $f = str_replace(['/', '.php', 'src\\'], ['\\', '', ''], $f);
+        $f = "danog\\MadelineProto\\$f";
+        $classes[$f] = true;
+    }
+}
+
+foreach ($classes as $class => $_) {
+    if (!class_exists($class) && !interface_exists($class) && !trait_exists($class)) {
+        throw new \RuntimeException("Class $class does not exist");
+    }
+}
+
 /**
  * @internal
  */

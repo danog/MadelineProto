@@ -109,7 +109,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @param bool $muted Whether to join muted.
      */
     #[\Override]
-    public function join(bool $muted = false): self
+    public function join(bool $muted = false): static
     {
         $this->getClient()->joinConferenceCall([
             '_' => 'inputGroupCall',
@@ -145,7 +145,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Leave the conference call, without ending it for the other participants.
      */
     #[\Override]
-    public function leave(): self
+    public function leave(): static
     {
         $this->getClient()->leaveConferenceCall($this->id);
         return $this;
@@ -158,7 +158,7 @@ final class ConferenceCall extends Update implements MultiCall
      * {@see self::leave()}s the call.
      */
     #[\Override]
-    public function discard(): self
+    public function discard(): static
     {
         $this->getClient()->discardConferenceCall($this->id);
         return $this;
@@ -195,7 +195,7 @@ final class ConferenceCall extends Update implements MultiCall
      * members can no longer decrypt the call's media. Requires the `remove_users` permission.
      */
     #[\Override]
-    public function removeParticipant(mixed ...$participants): self
+    public function removeParticipant(mixed ...$participants): static
     {
         $this->getClient()->removeConferenceCallParticipants($this->id, ...$participants);
         return $this;
@@ -205,7 +205,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Invite users to the conference call, ringing them.
      */
     #[\Override]
-    public function invite(mixed ...$users): self
+    public function invite(mixed ...$users): static
     {
         $this->getClient()->inviteToConferenceCall($this->id, ...$users);
         return $this;
@@ -227,7 +227,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Change the title of the conference call.
      */
     #[\Override]
-    public function setTitle(string $title): self
+    public function setTitle(string $title): static
     {
         $this->getClient()->setConferenceCallTitle($this->id, $title);
         return $this;
@@ -260,7 +260,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @param mixed          $sendAs    Ignored: conference messages are always sent as ourselves.
      */
     #[\Override]
-    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): self
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): static
     {
         $this->getClient()->sendConferenceCallMessage($this->id, $message, $parseMode);
         return $this;
@@ -273,7 +273,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @param int|null $customEmojiId The document id of a custom emoji to send instead, `$emoji` being its fallback.
      */
     #[\Override]
-    public function sendReaction(string $emoji, ?int $customEmojiId = null): self
+    public function sendReaction(string $emoji, ?int $customEmojiId = null): static
     {
         $this->getClient()->sendConferenceCallReaction($this->id, $emoji, $customEmojiId);
         return $this;
@@ -283,7 +283,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Enable or disable in-call messages.
      */
     #[\Override]
-    public function setMessagesEnabled(bool $enabled): self
+    public function setMessagesEnabled(bool $enabled): static
     {
         $this->getClient()->toggleConferenceCallSettings($this->id, messagesEnabled: $enabled);
         return $this;
@@ -293,7 +293,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Mute a participant for ourselves only (a conference has no admins).
      */
     #[\Override]
-    public function muteParticipant(mixed $participant, bool $muted = true): self
+    public function muteParticipant(mixed $participant, bool $muted = true): static
     {
         $this->getClient()->editConferenceCallParticipant($this->id, $participant, muted: $muted);
         return $this;
@@ -305,7 +305,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @param int $volume From 1 to 20000, where 10000 is 100%.
      */
     #[\Override]
-    public function setParticipantVolume(mixed $participant, int $volume): self
+    public function setParticipantVolume(mixed $participant, int $volume): static
     {
         $this->getClient()->editConferenceCallParticipant($this->id, $participant, volume: $volume);
         return $this;
@@ -316,7 +316,7 @@ final class ConferenceCall extends Update implements MultiCall
      * frame rather than hiding it.
      */
     #[\Override]
-    public function setVideoPaused(bool $paused): self
+    public function setVideoPaused(bool $paused): static
     {
         $this->getClient()->editConferenceCallParticipant($this->id, ['_' => 'inputPeerSelf'], videoPaused: $paused);
         return $this;
@@ -326,7 +326,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Whether new participants join muted.
      */
     #[\Override]
-    public function setJoinMuted(bool $joinMuted): self
+    public function setJoinMuted(bool $joinMuted): static
     {
         $this->getClient()->toggleConferenceCallSettings($this->id, joinMuted: $joinMuted);
         return $this;
@@ -336,7 +336,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Invalidate the conference link exported so far, so a new one is generated.
      */
     #[\Override]
-    public function resetInviteHash(): self
+    public function resetInviteHash(): static
     {
         $this->getClient()->toggleConferenceCallSettings($this->id, resetInviteHash: true);
         return $this;
@@ -380,7 +380,7 @@ final class ConferenceCall extends Update implements MultiCall
      * the {@see MediaDestination::Presentation} stream. Idempotent; requires the call to be joined.
      */
     #[\Override]
-    public function enablePresentation(): self
+    public function enablePresentation(): static
     {
         $this->getClient()->enableConferenceCallPresentation($this->id);
         return $this;
@@ -390,7 +390,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Stop sharing the screen.
      */
     #[\Override]
-    public function disablePresentation(): self
+    public function disablePresentation(): static
     {
         $this->getClient()->disableConferenceCallPresentation($this->id);
         return $this;
@@ -411,7 +411,7 @@ final class ConferenceCall extends Update implements MultiCall
      * DocType, autodetected from a `.webm` extension. Audio-only OGG OPUS recordings are not supported.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
     {
         $this->getClient()->conferenceCallSetOutput($this->id, $file, $participant, $format);
         return $this;
@@ -421,7 +421,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Mute or unmute our own audio stream.
      */
     #[\Override]
-    public function setMuted(bool $muted = true): self
+    public function setMuted(bool $muted = true): static
     {
         $this->getClient()->setConferenceCallMuted($this->id, $muted);
         return $this;
@@ -448,7 +448,7 @@ final class ConferenceCall extends Update implements MultiCall
      * pre-encoded WebM/OGG-OPUS input.
      */
     #[\Override]
-    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallPlay($this->id, $file, $dest);
         return $this;
@@ -458,7 +458,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Play a file, blocking until it has finished playing if a stream is provided.
      */
     #[\Override]
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallPlayBlocking($this->id, $file, $dest);
         return $this;
@@ -468,7 +468,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Play file.
      */
     #[\Override]
-    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallPlay($this->id, $file, $dest);
         return $this;
@@ -478,7 +478,7 @@ final class ConferenceCall extends Update implements MultiCall
      * When called, skips to the next file in the playlist.
      */
     #[\Override]
-    public function skip(MediaDestination $dest = MediaDestination::Camera): self
+    public function skip(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallSkipPlay($this->id, $dest);
         return $this;
@@ -488,7 +488,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Stops playing all files, clears the main and the hold playlist.
      */
     #[\Override]
-    public function stop(MediaDestination $dest = MediaDestination::Camera): self
+    public function stop(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallStopPlay($this->id, $dest);
         return $this;
@@ -500,7 +500,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @psalm-external-mutation-free
      */
     #[\Override]
-    public function pause(MediaDestination $dest = MediaDestination::Camera): self
+    public function pause(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallPausePlay($this->id, $dest);
         return $this;
@@ -523,7 +523,7 @@ final class ConferenceCall extends Update implements MultiCall
      * @psalm-external-mutation-free
      */
     #[\Override]
-    public function resume(MediaDestination $dest = MediaDestination::Camera): self
+    public function resume(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->conferenceCallResumePlay($this->id, $dest);
         return $this;
@@ -533,7 +533,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Files to play on hold.
      */
     #[\Override]
-    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static
     {
         $this->getClient()->conferenceCallPlayOnHold($this->id, $dest, ...$files);
         return $this;

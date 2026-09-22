@@ -373,9 +373,9 @@ abstract class InternalDoc
      * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
      * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
      */
-    final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, ?\danog\MadelineProto\RecordingFormat $format = null): void
+    final public function callSetOutput(int $id, \danog\MadelineProto\LocalFile|\Amp\ByteStream\WritableStream $file, ?\danog\MadelineProto\RecordingFormat $format = null): void
     {
-        $this->wrapper->getAPI()->callSetOutput($id, $file, $dest, $format);
+        $this->wrapper->getAPI()->callSetOutput($id, $file, $format);
     }
     /**
      * Whether we can convert any audio/video file to a VoIP OGG OPUS file, or the files must be preconverted using @libtgvoipbot.
@@ -1469,12 +1469,12 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->groupCallResumePlay($id, $dest);
     }
     /**
-     * Record group call media: one participant's camera or screen-share to a file/stream, or every
-     * transmitting participant into its own file under a LocalDirectory.
+     * Record group call media: one participant's audio, camera and screen-share to a file/stream, or
+     * every transmitting participant into its own file under a LocalDirectory.
      */
-    final public function groupCallSetOutput(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\LocalDirectory|\Amp\ByteStream\WritableStream $file, mixed $participant = null, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, ?\danog\MadelineProto\RecordingFormat $format = null): void
+    final public function groupCallSetOutput(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\LocalDirectory|\Amp\ByteStream\WritableStream $file, mixed $participant = null, ?\danog\MadelineProto\RecordingFormat $format = null): void
     {
-        $this->wrapper->getAPI()->groupCallSetOutput($id, $file, $participant, $dest, $format);
+        $this->wrapper->getAPI()->groupCallSetOutput($id, $file, $participant, $format);
     }
     /**
      * Skip to the next file in the playlist of a group call.

@@ -90,7 +90,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * @param bool $muted Whether to accept with our own audio muted.
      */
     #[\Override]
-    public function join(bool $muted = false): self
+    public function join(bool $muted = false): static
     {
         $this->getClient()->acceptCall($this->callID);
         if ($muted) {
@@ -105,7 +105,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * @param string    $comment Additional comment on call quality.
      */
     #[\Override]
-    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): self
+    public function discard(DiscardReason $reason = DiscardReason::HANGUP, ?int $rating = null, ?string $comment = null): static
     {
         $this->getClient()->discardCall($this->callID, $reason, $rating, $comment);
         return $this;
@@ -181,7 +181,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * required for pre-encoded WebM/OGG-OPUS input.
      */
     #[\Override]
-    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->callPlay($this->callID, $file, $dest);
 
@@ -192,7 +192,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Play a file, blocking until it has finished playing if a stream is provided.
      */
     #[\Override]
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->callPlayBlocking($this->callID, $file, $dest);
 
@@ -218,7 +218,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
     {
         if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
             throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
@@ -236,7 +236,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Play file.
      */
     #[\Override]
-    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->callPlay($this->callID, $file, $dest);
 
@@ -246,7 +246,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * When called, skips to the next file in the playlist.
      */
     #[\Override]
-    public function skip(MediaDestination $dest = MediaDestination::Camera): self
+    public function skip(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->skipPlay($this->callID, $dest);
 
@@ -256,7 +256,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Stops playing all files, clears the main and the hold playlist.
      */
     #[\Override]
-    public function stop(MediaDestination $dest = MediaDestination::Camera): self
+    public function stop(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->stopPlay($this->callID, $dest);
 
@@ -269,7 +269,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * @psalm-external-mutation-free
      */
     #[\Override]
-    public function pause(MediaDestination $dest = MediaDestination::Camera): self
+    public function pause(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->pausePlay($this->callID, $dest);
 
@@ -293,7 +293,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * @psalm-external-mutation-free
      */
     #[\Override]
-    public function resume(MediaDestination $dest = MediaDestination::Camera): self
+    public function resume(MediaDestination $dest = MediaDestination::Camera): static
     {
         $this->getClient()->resumePlay($this->callID, $dest);
 
@@ -304,7 +304,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Files to play on hold.
      */
     #[\Override]
-    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static
     {
         $this->getClient()->callPlayOnHold($this->callID, $dest, ...$files);
 
@@ -328,7 +328,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Mute or unmute our own audio stream.
      */
     #[\Override]
-    public function setMuted(bool $muted = true): self
+    public function setMuted(bool $muted = true): static
     {
         $this->getClient()->setCallMuted($this->callID, $muted);
 
@@ -352,7 +352,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * the screencast is active as soon as a file with video plays on it.
      */
     #[\Override]
-    public function enablePresentation(): self
+    public function enablePresentation(): static
     {
         $this->getClient()->enableCallPresentation($this->callID);
 
@@ -364,7 +364,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * is inactive.
      */
     #[\Override]
-    public function disablePresentation(): self
+    public function disablePresentation(): static
     {
         $this->getClient()->disableCallPresentation($this->callID);
 

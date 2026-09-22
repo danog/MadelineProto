@@ -79,7 +79,7 @@ final class GroupCall extends AbstractGroupCall
      * Change the title of the group call.
      */
     #[\Override]
-    public function setTitle(string $title): self
+    public function setTitle(string $title): static
     {
         $this->getClient()->setGroupCallTitle($this->id, $title);
         return $this;
@@ -89,7 +89,7 @@ final class GroupCall extends AbstractGroupCall
      * Invite users to the group call.
      */
     #[\Override]
-    public function invite(mixed ...$users): self
+    public function invite(mixed ...$users): static
     {
         $this->getClient()->inviteToGroupCall($this->id, ...$users);
         return $this;
@@ -114,7 +114,7 @@ final class GroupCall extends AbstractGroupCall
      * a supergroup or channel), which also drops them from the call. Requires the `ban_users` admin right.
      */
     #[\Override]
-    public function removeParticipant(mixed ...$participants): self
+    public function removeParticipant(mixed ...$participants): static
     {
         $this->getClient()->removeGroupCallParticipants($this->id, ...$participants);
         return $this;
@@ -123,7 +123,7 @@ final class GroupCall extends AbstractGroupCall
     /**
      * Raise or lower our hand, asking the admins to let us speak when muted by them.
      */
-    public function raiseHand(bool $raised = true): self
+    public function raiseHand(bool $raised = true): static
     {
         $this->getClient()->editGroupCallParticipant($this->id, ['_' => 'inputPeerSelf'], raiseHand: $raised);
         return $this;
@@ -137,7 +137,7 @@ final class GroupCall extends AbstractGroupCall
      * @param bool        $video    Whether to record video as well as audio.
      * @param bool        $portrait Whether the video is recorded in portrait (true) or landscape (false) orientation.
      */
-    public function startRecording(?string $title = null, bool $video = false, bool $portrait = false): self
+    public function startRecording(?string $title = null, bool $video = false, bool $portrait = false): static
     {
         $this->getClient()->toggleGroupCallRecord($this->id, true, $title, $video, $portrait);
         return $this;
@@ -146,7 +146,7 @@ final class GroupCall extends AbstractGroupCall
     /**
      * Stop the server-side recording of the call (admins only).
      */
-    public function stopRecording(): self
+    public function stopRecording(): static
     {
         $this->getClient()->toggleGroupCallRecord($this->id, false);
         return $this;
@@ -155,7 +155,7 @@ final class GroupCall extends AbstractGroupCall
     /**
      * Start this scheduled call now (admins only).
      */
-    public function startScheduled(): self
+    public function startScheduled(): static
     {
         $this->getClient()->startScheduledGroupCall($this->id);
         return $this;
@@ -165,7 +165,7 @@ final class GroupCall extends AbstractGroupCall
      * Subscribe to (or unsubscribe from) a notification from the Telegram service account when this
      * scheduled call starts.
      */
-    public function setStartSubscription(bool $subscribed): self
+    public function setStartSubscription(bool $subscribed): static
     {
         $this->getClient()->toggleGroupCallStartSubscription($this->id, $subscribed);
         return $this;
