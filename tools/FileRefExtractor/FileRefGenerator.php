@@ -233,6 +233,13 @@ final class FileRefGenerator
             ],
             'fileSourceChannelFull'
         );
+        $locations['communityFull'][] = new CallOp(
+            'channels.getFullChannel',
+            [
+                'channel' => new GetInputChannelOp(new Path([['communityFull', 'id']])),
+            ],
+            'fileSourceCommunityFull'
+        );
         $locations['help.getPremiumPromo'][] = new CopyMethodCallOp('help.getPremiumPromo', 'fileSourcePremiumPromo');
 
         $locations['help.getAppUpdate'][] = new Noop("Don't handle file references from ephemeral app update info");
@@ -455,6 +462,15 @@ final class FileRefGenerator
             'fileSourceSavedMusic'
         );
 
+        $locations['ephemeral.getWelcomeMessages'][] = new CallOp(
+            'ephemeral.getWelcomeMessages',
+            [
+                'peer' => new GetInputPeerOp(new Path([['ephemeral.getWelcomeMessages', 'peer']], true)),
+                'hash' => new PrimitiveLiteralOp('long', 0),
+            ],
+            'fileSourceWelcomeMessages'
+        );
+
         // Ignore these for now
         foreach (['payments.ResaleStarGifts', 'payments.StarGiftUpgradePreview', 'StarGift', 'StarGiftCollection', 'payments.StarGiftCollections', 'payments.StarGiftUpgradeAttributes'] as $type) {
             foreach ($TL->getConstructorsOfType($type) as $constructor => $_) {
@@ -464,6 +480,13 @@ final class FileRefGenerator
                 $locations[$constructor][] = new Noop('Contexts for star gifts are not yet implemented');
             }
         }
+
+        $locations['updateEditEphemeralMessage'][] = new Noop('Do not store file references from ephemeral messages');
+        $locations['updateEphemeralBotCallbackQuery'][] = new Noop('Do not store file references from ephemeral messages');
+        $locations['updateNewEphemeralMessage'][] = new Noop('Do not store file references from ephemeral messages');
+
+        $locations['messages.translatedRichMessage'][] = new Noop('Do not store file references from translated rich messages');
+        $locations['messages.composedRichMessageWithAI'][] = new Noop('Do not store file references from composed rich messages');
 
         foreach (['updateChatUserTyping', 'updateChannelUserTyping', 'updateUserTyping'] as $type) {
             $locations[$type][] = new Noop('Documents encountered in rich text message live drafts are ephemeral');

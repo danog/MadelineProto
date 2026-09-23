@@ -1111,6 +1111,10 @@ final class TL implements TLInterface
             $x['channel_id'] = $x['channel_id'] > Magic::MAX_CHANNEL_ID
                 ? DialogId::fromMonoforumId($x['channel_id'])
                 : DialogId::fromSupergroupOrChannelId($x['channel_id']);
+        } elseif (isset($x['community_id'])) {
+            $x['community_id'] = $x['community_id'] > Magic::MAX_CHANNEL_ID
+                ? DialogId::fromMonoforumId($x['community_id'])
+                : DialogId::fromSupergroupOrChannelId($x['community_id']);
         } elseif (isset($x['random_bytes'])) {
             if (\strlen((string) $x['random_bytes']) < 15) {
                 throw new SecurityException('Random_bytes is too small!');
@@ -1119,6 +1123,9 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'channel'
             || $x['_'] === 'channelForbidden'
             || $x['_'] === 'channelFull'
+            || $x['_'] === 'communityFull'
+            || $x['_'] === 'community'
+            || $x['_'] === 'communityForbidden'
         ) {
             $x['id'] = $x['id'] > Magic::MAX_CHANNEL_ID
                 ? DialogId::fromMonoforumId($x['id'])
@@ -1127,6 +1134,11 @@ final class TL implements TLInterface
                 $x['linked_monoforum_id'] = $x['linked_monoforum_id'] > Magic::MAX_CHANNEL_ID
                     ? DialogId::fromMonoforumId($x['linked_monoforum_id'])
                     : DialogId::fromSupergroupOrChannelId($x['linked_monoforum_id']);
+            }
+            if (isset($x['linked_community_id'])) {
+                $x['linked_community_id'] = $x['linked_community_id'] > Magic::MAX_CHANNEL_ID
+                    ? DialogId::fromMonoforumId($x['linked_community_id'])
+                    : DialogId::fromSupergroupOrChannelId($x['linked_community_id']);
             }
         } elseif ($x['_'] === 'chat'
             || $x['_'] === 'chatForbidden'
@@ -1179,6 +1191,9 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'channel'
             || $x['_'] === 'channelForbidden'
             || $x['_'] === 'channelFull'
+            || $x['_'] === 'communityFull'
+            || $x['_'] === 'community'
+            || $x['_'] === 'communityForbidden'
         ) {
             unset($x['flags'], $x['flags2'], $x['access_hash']);
         } elseif ($x['_'] === 'chat'

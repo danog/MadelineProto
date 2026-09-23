@@ -153,6 +153,7 @@ final class InternalState
                         'chat' => $this->filter->allowGroups,
                         'supergroup' => $this->filter->allowGroups,
                         'channel' => $this->filter->allowChannels,
+                        'community' => false,
                     }) {
                         return false;
                     }

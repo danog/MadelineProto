@@ -537,7 +537,11 @@ final class PeerDatabase implements TLCallback
             if ($chat['_'] === 'channelEmpty') {
                 return;
             }
-            if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
+            if ($chat['_'] !== 'channel'
+                && $chat['_'] !== 'channelForbidden'
+                && $chat['_'] !== 'community'
+                && $chat['_'] !== 'communityForbidden'
+            ) {
                 throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
             }
             $bot_api_id = $chat['id'];
@@ -644,9 +648,9 @@ final class PeerDatabase implements TLCallback
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return array_merge(
-            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden', 'community', 'communityForbidden'], [$this->addChat(...)]),
             array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
-            array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
+            array_fill_keys(['chatFull', 'channelFull', 'userFull', 'communityFull'], [$this->addFullChat(...)]),
         );
     }
     /**
