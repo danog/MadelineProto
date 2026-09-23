@@ -660,7 +660,6 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.getGroupCallStreamRtmpUrl.html" name="phone.getGroupCallStreamRtmpUrl">Get RTMP URL and stream key for RTMP livestreams. Can be used even before creating the actual RTMP livestream with phone.createGroupCall (the rtmp_stream flag must be set): phone.getGroupCallStreamRtmpUrl</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/smsjobs.getStatus.html" name="smsjobs.getStatus">Get SMS jobs status (official clients only): smsjobs.getStatus</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getMethodNamespaces" name="getMethodNamespaces">Get TL namespaces: getMethodNamespaces</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#getTL" name="getTL">Get TL serializer: getTL</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/help.getPremiumPromo.html" name="help.getPremiumPromo">Get Telegram Premium promotion information: help.getPremiumPromo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarsRevenueStats.html" name="payments.getStarsRevenueStats">Get Telegram Star revenue statistics »: payments.getStarsRevenueStats</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#mbStrlen" name="mbStrlen">Get Telegram UTF-8 length of string: mbStrlen</a>

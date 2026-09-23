@@ -252,7 +252,9 @@ abstract class EventHandler extends AbstractAPI
                 return [[], []];
             }
 
-            $constructors = $this->getTL()->getConstructors();
+            $API = $this->wrapper->getAPI();
+            \assert($API !== null);
+            $constructors = $API->getTL()->getConstructors();
             $methods = [];
             $handlers = [];
             $has_any = false;

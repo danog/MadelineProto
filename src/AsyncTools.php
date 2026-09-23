@@ -22,9 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
-use Amp\DeferredCancellation;
 use Amp\Future;
-use Amp\TimeoutException;
 use Closure;
 use Generator;
 use Revolt\EventLoop;
@@ -131,10 +129,9 @@ abstract class AsyncTools extends StrTools
      */
     public static function getTimeoutCancellation(float $timeout, string $message = "Operation timed out"): Cancellation
     {
-        $e = new TimeoutException($message);
-        $deferred = new DeferredCancellation;
-        EventLoop::delay($timeout, static fn () => $deferred->cancel($e));
-        return $deferred->getCancellation();
+        // Deliberately not Amp\TimeoutCancellation: its timer is unreferenced,
+        // but some callers rely on this timer alone to keep the event loop alive.
+        return new ReferencedTimeoutCancellation($timeout, $message);
     }
 
     /**

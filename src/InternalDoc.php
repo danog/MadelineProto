@@ -1381,13 +1381,6 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::getStreamPipe();
     }
     /**
-     * Get TL serializer.
-     */
-    final public function getTL(): \danog\MadelineProto\TL\TLInterface
-    {
-        return $this->wrapper->getAPI()->getTL();
-    }
-    /**
      * Get type of peer.
      *
      * @param mixed $id Peer

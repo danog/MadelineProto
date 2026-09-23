@@ -888,6 +888,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get TL serializer.
+     *
+     * @internal
      */
     public function getTL(): TLInterface
     {
