@@ -465,7 +465,7 @@ final class FileRefGenerator
         $locations['ephemeral.getWelcomeMessages'][] = new CallOp(
             'ephemeral.getWelcomeMessages',
             [
-                'peer' => new GetInputPeerOp(new Path([['ephemeral.getWelcomeMessages', 'peer']], true)),
+                'peer' => new GetInputPeerOp(new Path([['ephemeral.getWelcomeMessages', 'peer']])),
                 'hash' => new PrimitiveLiteralOp('long', 0),
             ],
             'fileSourceWelcomeMessages'
