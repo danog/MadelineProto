@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Calls;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
@@ -200,34 +201,55 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Record the incoming media of the call.
+     * Record the other party into one file (or stream) with a fixed set of tracks.
      *
-     * A {@see LocalFile} `name.mkv` records everything the other party sends — their audio, camera and
-     * screencast, each on or off at any time — as `name.0_<streams>.mkv`, `name.1_<streams>.mkv`, …,
-     * one file per combination of streams flowing (see {@see Call::setOutput()}); a
-     * {@see LocalDirectory} records the same as `<dir>/0_<streams>.mkv`, `<dir>/1_<streams>.mkv`, …. A
-     * {@see WritableStream} gets a single file that cannot roll over. `$participant` may only be the
-     * other party, and is therefore optional.
+     * The file holds the streams chosen with `$streams` — a bitmask of {@see CallStream::AUDIO},
+     * {@see CallStream::VIDEO} and {@see CallStream::SCREEN}, every one of which must be available — or,
+     * when null, every stream the other party currently sends; the available streams are returned. The
+     * tracks are fixed for the whole file: a stream turned off stops being written and resumes when it
+     * comes back, and only a change of codec or the end of the call finishes the file (see
+     * {@see Call::setOutput()}); every such event is reported by a {@see CallStreams} update.
+     * `$participant` may only be the other party, and is therefore optional.
      *
-     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records the incoming audio
-     * and video, muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so the
-     * video tracks are whatever codec the peer sends — VP8/VP9/H.264/H.265/AV1 — and the audio is OPUS).
-     * {@see RecordingFormat::Opus} keeps the audio-only behaviour and receives an OGG OPUS stream.
+     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records the chosen streams,
+     * muxed into a Matroska file in pure PHP (the peer's frames are stored as-is, so the video tracks are
+     * whatever codec the peer sends — VP8/VP9/H.264/H.265/AV1 — and the audio is OPUS).
+     * {@see RecordingFormat::Opus} writes an audio-only OGG OPUS stream (so only {@see CallStream::AUDIO}
+     * may be chosen); it is the only format the legacy libtgvoip engine, negotiated by very old clients,
+     * supports. When `$format` is null it is autodetected from the extension of `$file`, but only if a
+     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to WebM.
      *
-     * When `$format` is null it is autodetected from the extension of `$file`, but only if a
-     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
+     * Before the call is connected (the other party has not reported what it sends yet) any set of
+     * streams is accepted, the recording starts with the chosen ones once media flows, and 0 is returned.
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @throws InvalidArgumentException If a chosen stream is not available, or nothing is.
+     *
+     * @return int The streams the other party currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
             throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
         }
-        if ($file instanceof LocalDirectory) {
-            $file = new LocalFile(rtrim($file->dir, '/').'/');
-            $format ??= RecordingFormat::Mkv;
+        return $this->getClient()->callSetOutput($this->callID, $file, $format, $streams);
+    }
+
+    /**
+     * Record the other party into a directory, as `<dir>/0_<streams>.mkv`, `<dir>/1_<streams>.mkv`, …:
+     * one file per combination of streams (audio, camera, screencast) they send, a new one each time
+     * they turn one on or off (see {@see Call::setOutputFolder()}). `$participant` may only be the
+     * other party, and is therefore optional.
+     */
+    #[\Override]
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    {
+        if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
+            throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
         }
-        $this->getClient()->callSetOutput($this->callID, $file, $format);
+        $this->getClient()->callSetOutputFolder($this->callID, $dir, $format);
 
         return $this;
     }

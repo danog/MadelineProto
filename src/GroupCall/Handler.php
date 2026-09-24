@@ -19,6 +19,7 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
@@ -452,14 +453,30 @@ trait Handler
     }
 
     /**
-     * Record conference call media: one participant's audio, camera and screen-share to a file/stream,
-     * or every transmitting participant into its own file under a LocalDirectory.
+     * Record one participant of a conference call into a single file (or stream) with a fixed set of
+     * tracks, see {@see \danog\MadelineProto\EventHandler\Calls\ConferenceCall::setOutput()}.
+     *
+     * @internal
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
+     */
+    public function conferenceCallSetOutput(int $id, LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    {
+        return $this->getConferenceCallController($id)->setOutput($file, $participant, $format, $streams);
+    }
+
+    /**
+     * Record conference call media into a directory: every transmitting participant (or only the
+     * given one) as its own numbered series of files, see
+     * {@see \danog\MadelineProto\EventHandler\Calls\ConferenceCall::setOutputFolder()}.
      *
      * @internal
      */
-    public function conferenceCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): void
+    public function conferenceCallSetOutputFolder(int $id, LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): void
     {
-        $this->getConferenceCallController($id)->setOutput($file, $participant, $format);
+        $this->getConferenceCallController($id)->setOutputFolder($dir, $participant, $format);
     }
 
     /**
@@ -1079,15 +1096,32 @@ trait Handler
     }
 
     /**
-     * Record group call media: one participant's audio, camera and screen-share to a file/stream, or
-     * every transmitting participant into its own file under a LocalDirectory.
+     * Record one participant of a group call (or, in stream mode, its mixed stream) into a single file
+     * (or stream) with a fixed set of tracks, see {@see \danog\MadelineProto\EventHandler\Calls\AbstractGroupCall::setOutput()}.
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
-    public function groupCallSetOutput(int $id, LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): void
+    public function groupCallSetOutput(int $id, LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
         }
-        $this->groupCalls[$id]->setOutput($file, $participant, $format);
+        return $this->groupCalls[$id]->setOutput($file, $participant, $format, $streams);
+    }
+
+    /**
+     * Record group call media into a directory: every transmitting participant (or only the given
+     * one) as its own numbered series of files, see
+     * {@see \danog\MadelineProto\EventHandler\Calls\AbstractGroupCall::setOutputFolder()}.
+     */
+    public function groupCallSetOutputFolder(int $id, LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): void
+    {
+        if (!isset($this->groupCalls[$id])) {
+            throw new AssertionError('Unknown group call!');
+        }
+        $this->groupCalls[$id]->setOutputFolder($dir, $participant, $format);
     }
 
     /**

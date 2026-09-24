@@ -14,20 +14,24 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\Tgcalls;
+
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\RecordingEvent;
 
 /**
- * Which media stream of a call a playback or recording operation targets.
+ * Told by an {@see IncomingMedia} router when the streams a participant sends (or their codecs)
+ * change, or a recording of them starts or ends.
  *
- * A call carries two independent outgoing video streams: the main camera stream (transmitted
- * alongside the microphone audio) and a separate presentation (screen-sharing) stream. The playlist
- * controls ({@see Call::play()} and friends) take one of these to say which stream they act on; it
- * defaults to {@see self::Camera}. Recordings ({@see Call::setOutput()}) pick their streams with {@see CallStream} flags instead.
+ * @internal
  */
-enum MediaDestination
+interface IncomingMediaObserver
 {
-    /** The main stream: the camera video, transmitted together with the microphone audio. */
-    case Camera;
-    /** The presentation stream: a separate screen-sharing (screencast) video. */
-    case Presentation;
+    /**
+     * @param ?RecordingEvent $recording Whether a recording started or ended, or null if only the streams changed.
+     * @param ?LocalFile      $file      The file of the recording event, if it is a local file.
+     *
+     * @psalm-impure
+     */
+    public function onIncomingMediaChanged(IncomingMedia $media, ?RecordingEvent $recording, ?LocalFile $file): void;
 }

@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -38,7 +39,7 @@ use Stringable;
  *    key verification emojis ({@see self::getVisualization()}),
  *  - the playlist/DJ playback controls and the mute controls,
  *  - screen sharing ({@see self::enablePresentation()} and friends) and
- *  - recording ({@see self::setOutput()}).
+ *  - recording ({@see self::setOutput()} and {@see self::setOutputFolder()}).
  *
  * Every playlist control takes a {@see MediaDestination} selecting the stream it acts on: the main
  * camera+mic stream (default) or a separate presentation (screen-share) stream, which is started on
@@ -230,34 +231,69 @@ interface Call extends Stringable
     public function isSharingScreen(): bool;
 
     /**
-     * Record the incoming media of the call.
+     * Record the incoming media of a participant into one file (or stream) with a fixed set of tracks.
      *
-     * A recording holds *everything* a participant sends: their microphone audio, their camera video
-     * and their screen share (a second video track), whichever of them are on. A participant may turn
-     * any of these on or off at any time, in any combination; since a Matroska file's track list is
-     * fixed in its header, every such change closes the current file and continues in a new one, so
-     * a recording is a numbered series of files, each named after the streams it holds: `<stem>.0_audio.mkv`,
-     * `<stem>.1_audio,video.mkv`, `<stem>.2_audio,video,screen.mkv`, … (`audio`, `video` and `screen`,
-     * joined by commas, in that order).
+     * A participant sends up to three streams — their microphone audio, their camera video and their
+     * screen share (a second video track), see {@see CallStream} — and may turn any of them on or off
+     * at any time. `$streams` picks which of them the recording holds, as a bitmask of
+     * {@see CallStream::AUDIO}, {@see CallStream::VIDEO} and {@see CallStream::SCREEN}; every chosen
+     * stream must be available (sent by the participant right now, see {@see Calls\CallStreams}) or an
+     * exception is thrown. When `$streams` is null, every available stream is recorded (and if none is,
+     * an exception is thrown). Either way the streams currently available are returned.
      *
-     * `$file` is where to record to:
-     *  - in a one-to-one call, a {@see LocalFile} `name.mkv` records the other party as `name.<n>_<streams>.mkv`,
-     *    and a {@see LocalDirectory} as `<dir>/<n>_<streams>.mkv`;
-     *  - in a multi-party call only a {@see LocalDirectory} is accepted (stream-mode livestreams aside):
-     *    every participant that transmits something (including ones that start later) is recorded as
-     *    `<dir>/<peerId>.<n>_<streams>.mkv`, or only the one given as `$participant` (a user id, username
-     *    or peer) if any. Our own media is never recorded;
-     *  - a {@see WritableStream} (one-to-one calls only) gets a single file that cannot roll over, so it
-     *    keeps its initial tracks.
+     * A Matroska file's track list is fixed in its header, so the file keeps its tracks for its whole
+     * duration: a stream the participant turns off simply stops being written, and is written again when
+     * it comes back; a stream that becomes available later is not added (call this method again to start
+     * a new file with it). Only two things finish the file early: a change of codec of one of its video
+     * streams, or the end of the call (or our leaving it). Every start and end of a recording, and every
+     * change of the available streams or their codecs, is reported by a {@see Calls\CallStreams} update.
+     *
+     * `$file` is where to record to: a {@see LocalFile}, or a {@see WritableStream}. `$participant` is
+     * who to record: in a one-to-one call it may only be the other party, and is therefore optional;
+     * in a multi-party call it is required, every participant being recorded to its own file (see
+     * {@see self::setOutputFolder()} to record everyone at once) — except in
+     * [stream mode »](https://core.telegram.org/api/group-calls#stream-mode), where the call is a
+     * single mixed stream, recorded without specifying a participant. Our own media is never recorded.
      *
      * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target muxes the media into a
      * Matroska file in pure PHP: the frames are stored as-is, so the video tracks are whatever codec the
-     * peer sends (VP8/VP9/H.264/H.265/AV1) and the audio is OPUS. {@see RecordingFormat::Opus} writes an
-     * audio-only OGG OPUS stream, and is supported by one-to-one calls only. When `$format` is null it
-     * is autodetected from the extension of `$file` if a {@see LocalFile} was passed; a raw stream,
-     * whose extension is unknown, defaults to OGG OPUS in a one-to-one call and to Matroska otherwise.
+     * participant sends (VP8/VP9/H.264/H.265/AV1) and the audio is OPUS. {@see RecordingFormat::Opus} writes
+     * an audio-only OGG OPUS stream, and is supported by one-to-one calls (and stream mode) only. When
+     * `$format` is null it is autodetected from the extension of `$file` if a {@see LocalFile} was passed;
+     * a raw stream, whose extension is unknown, defaults to WebM.
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
+     *
+     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      *
      * @psalm-impure
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static;
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int;
+
+    /**
+     * Record the incoming media of the call into a directory, following every change of the streams.
+     *
+     * Unlike {@see self::setOutput()}, whose file keeps a fixed set of tracks, a directory recording
+     * follows the participants turning their microphone, camera and screen share on and off: since a
+     * Matroska file's track list is fixed in its header, every such change closes the current file and
+     * continues in a new one, so each participant's recording is a numbered series of files, each named
+     * after the streams it holds: `<n>_<streams>.mkv`, with `n` counting from 0 and `streams` listing
+     * `audio`, `video` and `screen` (joined by commas, in that order): `0_audio.mkv`, `1_audio,video.mkv`,
+     * `2_audio,video,screen.mkv`, …. Every file opened and finished is reported by a {@see Calls\CallStreams} update.
+     *
+     * In a one-to-one call the other party is recorded as `<dir>/<n>_<streams>.mkv`. In a multi-party
+     * call every participant that transmits something (including ones that start later) is recorded as
+     * `<dir>/<peerId>.<n>_<streams>.mkv`, or only the one given as `$participant` (a user id, username
+     * or peer) if any; our own media is never recorded. In
+     * [stream mode »](https://core.telegram.org/api/group-calls#stream-mode) the mixed stream is recorded
+     * as `<dir>/stream.mkv` (`.webm`, or `.ogg` for {@see RecordingFormat::Opus}) and, in an
+     * automatically-scaled livestream, each publisher's video as `<dir>/video-<endpoint>.mkv`.
+     *
+     * The files are Matroska ({@see RecordingFormat::Mkv} by default, or {@see RecordingFormat::Webm}).
+     *
+     * @psalm-impure
+     */
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static;
 }

@@ -17,17 +17,12 @@
 namespace danog\MadelineProto;
 
 /**
- * Which media stream of a call a playback or recording operation targets.
- *
- * A call carries two independent outgoing video streams: the main camera stream (transmitted
- * alongside the microphone audio) and a separate presentation (screen-sharing) stream. The playlist
- * controls ({@see Call::play()} and friends) take one of these to say which stream they act on; it
- * defaults to {@see self::Camera}. Recordings ({@see Call::setOutput()}) pick their streams with {@see CallStream} flags instead.
+ * What happened to a recording, as reported by a {@see EventHandler\Calls\CallStreams} update.
  */
-enum MediaDestination
+enum RecordingEvent: string
 {
-    /** The main stream: the camera video, transmitted together with the microphone audio. */
-    case Camera;
-    /** The presentation stream: a separate screen-sharing (screencast) video. */
-    case Presentation;
+    /** A recording file (or stream) was opened and its header written: media is being recorded into it from now on. */
+    case Started = 'started';
+    /** A recording file (or stream) was finished: nothing more is written to it. */
+    case Ended = 'ended';
 }

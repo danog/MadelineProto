@@ -147,7 +147,7 @@ interface MultiCall extends Call
     /**
      * Whether the server switched us to [stream mode »](https://core.telegram.org/api/group-calls#stream-mode):
      * the call's media is received by downloading chunks rather than over WebRTC, and there is a single
-     * mixed stream to record (see {@see Call::setOutput()}) rather than one per participant.
+     * mixed stream to record (see {@see Call::setOutput()} and {@see Call::setOutputFolder()}) rather than one per participant.
      *
      * @psalm-mutation-free
      */

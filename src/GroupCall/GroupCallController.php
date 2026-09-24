@@ -18,11 +18,11 @@
 
 namespace danog\MadelineProto\GroupCall;
 
-use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
-use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use danog\DialogId\DialogId;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
@@ -31,15 +31,15 @@ use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
-use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
-use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
+use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
+use danog\MadelineProto\Tgcalls\GroupMediaTrait;
 use danog\MadelineProto\Tgcalls\GroupSdp;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
@@ -53,8 +53,10 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final class GroupCallController implements CallControllerInterface, \danog\MadelineProto\Tgcalls\GroupConnectionOwner
+final class GroupCallController implements CallControllerInterface, GroupConnectionOwner
 {
+    use GroupMediaTrait;
+
     /** How often [phone.checkGroupCall](https://core.telegram.org/method/phone.checkGroupCall) is polled while reconnecting. */
     private const CHECK_INTERVAL = 4.0;
     /** How long we wait for a missing `version` before refetching the whole call. */
@@ -70,12 +72,6 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     /** The last known [groupCall](https://core.telegram.org/constructor/groupCall). */
     private array $call;
 
-    private ?GroupConnection $connection = null;
-    private DjLoop $diskJockey;
-    /** The separate screen-share connection (phone.joinGroupCallPresentation), while sharing a screen. */
-    private ?GroupConnection $presentationConnection = null;
-    /** The video-only disk jockey feeding the screen-share connection, if any. */
-    private ?DjLoop $presentationDj = null;
     private LocalMutex $joinMutex;
 
     /** @var array<int, Participant> Participants indexed by their bot API peer ID. */
@@ -85,7 +81,6 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
 
     /** Our own audio source ID, in the signed form used by the API. */
     private int $source = 0;
-    private bool $muted = false;
     private bool $streamMode = false;
     private bool $rtmpMode = false;
     /** Downloads and records the call's media chunks in stream mode. */
@@ -96,20 +91,8 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     private ?string $checkWatcher = null;
     private ?string $gapWatcher = null;
 
-    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Output files/streams (and their format) requested per participant peer ID. */
-    private array $pendingOutputs = [];
-    /**
-     * Outputs requested for specific participants, kept so they can be re-wired onto a new WebRTC
-     * connection after a re-join (the connection owns the live recorders, and is recreated then).
-     *
-     * @var array<int, array{LocalFile, RecordingFormat}>
-     */
-    private array $explicitOutputs = [];
-    /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
-    private ?string $outputDir = null;
-    private RecordingFormat $outputFormat = RecordingFormat::Mkv;
-    /** @var array<int, true> Peer IDs already wired to a per-participant file in folder mode. */
-    private array $folderPeers = [];
+    /** @var array<int, int> Every signed source ever seen => bot API peer ID, to attribute the last events of a participant that left. */
+    private array $sourcePeers = [];
 
     public readonly AbstractGroupCall $public;
 
@@ -192,6 +175,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
      *
      * @internal
      */
+    #[\Override]
     public function getInputCall(): array
     {
         return $this->inputCall;
@@ -218,8 +202,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
 
             $updates = null;
             for ($attempt = 0; $attempt < 5 && $updates === null; $attempt++) {
-                $this->connection?->close();
-                $this->connection = new GroupConnection($this, $this->diskJockey);
+                $this->connection = $this->replaceConnection();
                 $params = $this->connection->buildJoinPayload();
                 $this->source = $this->connection->getAudioSource();
                 $this->log("Join payload of $this: ".json_encode($params), Logger::VERBOSE);
@@ -516,13 +499,12 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         $this->participants[$peerId] = $parsed;
         if ($parsed->source !== 0) {
             $this->sourceToPeer[$parsed->source] = $peerId;
-            if (isset($this->pendingOutputs[$peerId])) {
-                [$file, $format] = $this->pendingOutputs[$peerId];
-                unset($this->pendingOutputs[$peerId]);
-                $this->connection?->setOutput($parsed->source, $file, $format);
+            $this->sourcePeers[$parsed->source] = $peerId;
+            if (isset($this->explicitOutputs[$peerId])) {
+                $this->wireOutput($peerId);
             }
             // Folder mode: start recording a participant that has just begun transmitting.
-            $this->wireFolderOutput($peerId, $parsed);
+            $this->wireFolderOutput($peerId);
         }
     }
 
@@ -628,12 +610,9 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     {
         $this->stopChecking();
         $muted = $this->muted;
-        $this->presentationConnection?->close();
-        $this->presentationConnection = null;
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
-        $this->connection?->close();
-        $this->connection = null;
+        $this->dropPresentation();
+        // Recordings in progress carry on with the connection of the new join.
+        $this->detachConnection();
         $this->callState = GroupCallState::NOT_JOINED;
         try {
             $this->join($muted);
@@ -712,45 +691,11 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         $this->stopChecking();
         $this->cancelGapRefetch();
         $this->diskJockey->discard();
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
-        $this->presentationConnection?->close();
-        $this->presentationConnection = null;
-        $this->connection?->close();
-        $this->connection = null;
+        $this->dropPresentation();
+        $this->closeConnection();
         $this->streamReceiver?->stop();
         $this->streamReceiver = null;
         $this->API->cleanupGroupCall($this->public->id);
-    }
-
-    /**
-     * Mute or unmute ourselves.
-     */
-    public function setMuted(bool $muted): self
-    {
-        $this->muted = $muted;
-        if ($muted) {
-            $this->diskJockey->pausePlaying();
-        } else {
-            $this->diskJockey->resumePlaying();
-        }
-        if ($this->callState === GroupCallState::JOINED) {
-            try {
-                $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                    'call' => $this->inputCall,
-                    'participant' => ['_' => 'inputPeerSelf'],
-                    'muted' => $muted,
-                ]);
-            } catch (Throwable $e) {
-                $this->log("Could not change the mute state of $this: $e", Logger::WARNING);
-            }
-        }
-        return $this;
-    }
-
-    public function isMuted(): bool
-    {
-        return $this->muted;
     }
 
     /**
@@ -770,104 +715,112 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     /**
-     * Record group call media, muxed into Matroska files.
+     * Record one participant's media into a single file (or stream) with a fixed set of tracks (see
+     * {@see GroupMediaTrait::recordParticipant()}), or, in stream mode, the call's single mixed stream
+     * (OGG OPUS is supported there only).
      *
-     * Only a {@see LocalDirectory} is accepted (except in stream mode, a single mixed stream): every
-     * *transmitting* participant — or only the given `$participant` — is recorded as
-     * `<dir>/<peerId>.<n>_<streams>.mkv` files, one per combination of the audio, camera video and
-     * screen share they send, which they can turn on and off at any time (see
-     * {@see \danog\MadelineProto\EventHandler\Call::setOutput()}). Participants that start
-     * transmitting later are picked up too; our own media is never recorded.
+     * @param ?int $streams The {@see CallStream} flags to record, or null for every available one.
      *
-     * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
+     * @return int The streams currently sent, as {@see CallStream} flags.
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        if ($this->streamMode) {
-            // A single mixed stream, downloaded in chunks: there are no per-participant sources.
-            if ($participant !== null) {
-                throw new \InvalidArgumentException('In stream mode the call is a single mixed stream: record it without specifying a participant.');
-            }
-            $this->streamReceiver ??= new StreamReceiver($this);
-            if ($file instanceof LocalDirectory) {
-                $this->streamReceiver->setOutputDirectory($file->dir, $format);
-            } else {
-                $this->streamReceiver->setOutput($file, $format);
-            }
+        if (!$this->streamMode) {
+            return $this->recordParticipant($file, $participant, $format, $streams);
+        }
+        // A single mixed stream, downloaded in chunks: there are no per-participant sources.
+        if ($participant !== null) {
+            throw new \InvalidArgumentException('In stream mode the call is a single mixed stream: record it without specifying a participant.');
+        }
+        if ($streams !== null) {
+            CallStream::validate($streams);
+        }
+        $available = CallStream::AUDIO | ($this->rtmpMode ? CallStream::VIDEO : 0);
+        CallStream::checkAvailable($streams, $available, 'The stream');
+        $this->streamReceiver ??= new StreamReceiver($this);
+        $this->streamReceiver->setOutput($file, $format);
+        return $available;
+    }
+
+    /**
+     * Record the call into a directory, as numbered series of Matroska files, one per participant
+     * (see {@see GroupMediaTrait::recordFolder()}); in stream mode the mixed stream is recorded as
+     * `<dir>/stream.<ext>` (see {@see StreamReceiver::setOutputDirectory()}).
+     */
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): self
+    {
+        if (!$this->streamMode) {
+            $this->recordFolder($dir, $participant, $format);
             return $this;
-        }
-        if (!$file instanceof LocalDirectory) {
-            throw new \InvalidArgumentException('A group call is recorded into a LocalDirectory, one numbered file series per participant; a single file cannot hold them.');
-        }
-        $dir = rtrim($file->dir, '/');
-        if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
-            throw new \RuntimeException("Could not create the recording directory $dir");
-        }
-        $format ??= RecordingFormat::Mkv;
-        if (!$format->isMatroska()) {
-            throw new \InvalidArgumentException('Multi-party call recordings are always Matroska: use RecordingFormat::Mkv or RecordingFormat::Webm.');
         }
         if ($participant !== null) {
-            $peerId = $this->API->getId($participant);
-            $this->explicitOutputs[$peerId] = [new LocalFile("$dir/$peerId"), $format];
-            $this->wireOutput($peerId, new LocalFile("$dir/$peerId"), $format);
-            return $this;
+            throw new \InvalidArgumentException('In stream mode the call is a single mixed stream: record it without specifying a participant.');
         }
-        $this->outputDir = $dir;
-        $this->outputFormat = $format;
-        foreach ($this->participants as $peerId => $known) {
-            $this->wireFolderOutput($peerId, $known);
-        }
+        $this->streamReceiver ??= new StreamReceiver($this);
+        $this->streamReceiver->setOutputDirectory($dir, $format);
         return $this;
     }
 
     /**
-     * Route one participant's output to the connection now, or defer it until their source is known.
+     * @psalm-mutation-free
      */
-    private function wireOutput(int $peerId, LocalFile|WritableStream $file, RecordingFormat $format): void
+    #[\Override]
+    private function callObject(): Call
     {
-        $known = $this->participants[$peerId] ?? null;
-        if ($known !== null && $known->source !== 0 && $this->connection !== null) {
-            $this->connection->setOutput($known->source, $file, $format);
-            return;
-        }
-        $this->pendingOutputs[$peerId] = [$file, $format];
+        return $this->public;
     }
 
     /**
-     * Wire every requested recording onto the current WebRTC connection: the explicit per-participant
-     * outputs and, in folder mode, one file series per transmitting participant. Used after every
-     * (re-)join, since each join creates a new connection and the recorders live in the connection.
+     * @psalm-mutation-free
      */
-    private function rewireOutputs(): void
+    #[\Override]
+    private function configureConnection(GroupConnection $connection, bool $screencast): void
     {
-        $this->folderPeers = [];
-        foreach ($this->explicitOutputs as $peerId => [$file, $format]) {
-            $this->wireOutput($peerId, $file, $format);
-        }
-        foreach ($this->participants as $peerId => $known) {
-            $this->wireFolderOutput($peerId, $known);
-        }
+        // An ordinary group call trusts the SFU: nothing to set up.
+    }
+
+    #[\Override]
+    private function onDroppedByServer(): void
+    {
+        EventLoop::queue($this->rejoin(...));
     }
 
     /**
-     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.<n>_<streams>.mkv`
-     * file series, once each.
+     * @psalm-mutation-free
      */
-    private function wireFolderOutput(int $peerId, Participant $participant): void
+    #[\Override]
+    private function participantOf(int $peerId): ?Participant
     {
-        if ($this->outputDir === null
-            || $participant->source === 0
-            || $participant->self
-            || $participant->source === $this->source
-            || isset($this->folderPeers[$peerId])
-            || isset($this->explicitOutputs[$peerId]) // an explicit per-participant output takes precedence
-            || isset($this->pendingOutputs[$peerId])
-        ) {
-            return;
-        }
-        $this->folderPeers[$peerId] = true;
-        $this->wireOutput($peerId, new LocalFile($this->outputDir.'/'.$peerId), $this->outputFormat);
+        return $this->participants[$peerId] ?? null;
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function isOurself(int $peerId, Participant $participant): bool
+    {
+        return $participant->self || $participant->source === $this->source;
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function peerOfSource(int $source): ?int
+    {
+        return $this->sourceToPeer[$source] ?? $this->sourcePeers[$source] ?? null;
+    }
+
+    /**
+     * @return list<int>
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function knownPeers(): array
+    {
+        return array_keys($this->participants);
     }
 
     /**
@@ -878,17 +831,6 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     public function getParticipants(): array
     {
         return $this->participants;
-    }
-
-    /**
-     * Change the title of the call.
-     */
-    public function setTitle(string $title): void
-    {
-        $this->API->methodCallAsyncRead('phone.editGroupCallTitle', [
-            'call' => $this->inputCall,
-            'title' => $title,
-        ]);
     }
 
     /**
@@ -1146,16 +1088,6 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     /**
-     * Whether a screen-share is currently being transmitted.
-     *
-     * @psalm-mutation-free
-     */
-    public function isSharingScreen(): bool
-    {
-        return $this->presentationConnection !== null;
-    }
-
-    /**
      * Our own audio source ID, in the signed form used by the API.
      */
     public function getSource(): int
@@ -1163,6 +1095,7 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
         return $this->source;
     }
 
+    #[\Override]
     public function getCallState(): GroupCallState
     {
         return $this->callState;
@@ -1194,219 +1127,6 @@ final class GroupCallController implements CallControllerInterface, \danog\Madel
     }
 
     // Playback API, mirroring the one-to-one call API.
-
-    /**
-     * The disk jockey feeding a given destination: the main one for the camera, and the video-only
-     * screen-share one for the presentation (joining the separate presentation connection on first
-     * use). Screen-share is video-only, so it does not require OGG OPUS audio.
-     */
-    private function dj(MediaDestination $dest): DjLoop
-    {
-        if ($dest === MediaDestination::Camera) {
-            return $this->diskJockey;
-        }
-        $this->enablePresentation();
-        \assert($this->presentationDj !== null);
-        return $this->presentationDj;
-    }
-
-    /**
-     * The disk jockey feeding a destination, without starting a screen-share that is not running:
-     * returns null for the presentation when no screen is being shared. For control/query methods.
-     *
-     * @psalm-mutation-free
-     */
-    private function djOrNull(MediaDestination $dest): ?DjLoop
-    {
-        return $dest === MediaDestination::Camera ? $this->diskJockey : $this->presentationDj;
-    }
-
-    /**
-     * Start the separate screen-share connection (phone.joinGroupCallPresentation) if it is not up
-     * yet. The screen-share is a fully separate WebRTC connection with its own SSRC and transport;
-     * see https://core.telegram.org/api/group-calls.
-     */
-    public function enablePresentation(): void
-    {
-        if ($this->presentationConnection !== null) {
-            return;
-        }
-        if ($this->callState !== GroupCallState::JOINED) {
-            throw new \RuntimeException('Cannot share a screen before joining the group call.');
-        }
-        $this->presentationDj ??= new DjLoop($this, videoOnly: true);
-        Assert::true($this->presentationDj->start());
-        $connection = new GroupConnection($this, $this->presentationDj, screencast: true);
-        $params = $connection->buildJoinPayload();
-        $this->presentationConnection = $connection;
-        $this->log("Joining the presentation of $this...", Logger::VERBOSE);
-        try {
-            $updates = $this->API->methodCallAsyncRead('phone.joinGroupCallPresentation', [
-                'call' => $this->inputCall,
-                'params' => $params,
-            ]);
-        } catch (Throwable $e) {
-            $this->presentationConnection = null;
-            $connection->close();
-            throw $e;
-        }
-        foreach ($updates['updates'] as $update) {
-            if ($update['_'] === 'updateGroupCallConnection' && ($update['presentation'] ?? false)) {
-                $parsed = GroupSdp::parseJoinResponse($update['params']);
-                if ($parsed['transport'] !== null) {
-                    $connection->setTransport($parsed['transport'], $parsed['video']);
-                }
-            }
-        }
-    }
-
-    /**
-     * Stop sharing the screen: tear down the presentation connection and tell the server.
-     */
-    public function disablePresentation(): void
-    {
-        if ($this->presentationConnection === null) {
-            return;
-        }
-        $this->presentationConnection->close();
-        $this->presentationConnection = null;
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
-        if ($this->callState === GroupCallState::JOINED) {
-            try {
-                $this->API->methodCallAsyncRead('phone.leaveGroupCallPresentation', ['call' => $this->inputCall]);
-            } catch (Throwable $e) {
-                $this->log("Could not leave the presentation of $this: $e", Logger::WARNING);
-            }
-        }
-    }
-
-    /**
-     * Tell the server whether our screen-share is paused.
-     *
-     * @internal Driven by the screen-share {@see GroupConnection} as its file's video starts and stops.
-     */
-    #[\Override]
-    public function setPresentationPaused(bool $paused): void
-    {
-        if ($this->callState !== GroupCallState::JOINED) {
-            return;
-        }
-        try {
-            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                'call' => $this->inputCall,
-                'participant' => ['_' => 'inputPeerSelf'],
-                'presentation_paused' => $paused,
-            ]);
-        } catch (Throwable $e) {
-            $this->log("Could not change the presentation state of $this: $e", Logger::WARNING);
-        }
-    }
-
-    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
-    {
-        $this->dj($dest)->play($file);
-    }
-    /**
-     * Play a file, blocking until it has finished playing if a stream is provided.
-     */
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
-    {
-        $this->play($file, $dest);
-        self::awaitStream($file);
-    }
-    /**
-     * Tell the server whether we are currently publishing video, so that the other participants
-     * know they should display our video stream.
-     *
-     * Driven by the {@see \danog\MadelineProto\Loop\VoIP\DjLoop} through the WebRTC engine as the
-     * demuxed file's video starts ({@see GroupConnection::onVideoCodec()}) and stops
-     * ({@see GroupConnection::onVideoStopped()}).
-     *
-     * @internal
-     */
-    #[\Override]
-    public function setVideoStopped(bool $stopped): void
-    {
-        if ($this->callState !== GroupCallState::JOINED) {
-            return;
-        }
-        try {
-            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                'call' => $this->inputCall,
-                'participant' => ['_' => 'inputPeerSelf'],
-                'video_stopped' => $stopped,
-            ]);
-        } catch (RPCErrorException $e) {
-            if ($e->rpc === 'PARTICIPANT_JOIN_MISSING') {
-                // The server no longer has our participant (it dropped us while the process was
-                // down): rejoin right away rather than waiting for the transport to time out.
-                $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
-                EventLoop::queue($this->rejoin(...));
-                return;
-            }
-            $this->log("Could not change the video state of $this: $e", Logger::WARNING);
-        } catch (Throwable $e) {
-            $this->log("Could not change the video state of $this: $e", Logger::WARNING);
-        }
-    }
-    public function skip(MediaDestination $dest = MediaDestination::Camera): void
-    {
-        $this->djOrNull($dest)?->skip();
-    }
-    public function stop(MediaDestination $dest = MediaDestination::Camera): void
-    {
-        if ($dest === MediaDestination::Presentation) {
-            $this->disablePresentation();
-            return;
-        }
-        $this->diskJockey->stopPlaying();
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function pause(MediaDestination $dest = MediaDestination::Camera): void
-    {
-        $this->djOrNull($dest)?->pausePlaying();
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function resume(MediaDestination $dest = MediaDestination::Camera): void
-    {
-        $this->djOrNull($dest)?->resumePlaying();
-    }
-    /**
-     * @psalm-mutation-free
-     */
-    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
-    {
-        return $this->djOrNull($dest)?->isAudioPaused() ?? false;
-    }
-    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
-    {
-        $this->dj($dest)->playOnHold(...$files);
-    }
-    /**
-     * @psalm-mutation-free
-     */
-    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
-    {
-        return $this->djOrNull($dest)?->getCurrent();
-    }
-
-    /**
-     * Block until a played stream has finished; a no-op for files and URLs.
-     */
-    private static function awaitStream(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        if (!$file instanceof ReadableStream) {
-            return;
-        }
-        $deferred = new DeferredFuture;
-        $file->onClose($deferred->complete(...));
-        $deferred->getFuture()->await();
-    }
 
     /**
      * @psalm-mutation-free

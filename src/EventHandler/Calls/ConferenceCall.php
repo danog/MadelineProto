@@ -397,23 +397,50 @@ final class ConferenceCall extends Update implements MultiCall
     }
 
     /**
-     * Record conference call media, muxed into a Matroska file in pure PHP.
+     * Record one participant into a single file (or stream) with a fixed set of tracks, muxed into
+     * Matroska in pure PHP. Every recording is plaintext — the frames are decrypted before they are muxed.
      *
-     * Only a {@see LocalDirectory} is accepted: it records every transmitting participant — or only the
-     * given `$participant` — as `<dir>/<userId>.<n>_<streams>.mkv` files, one per combination of the
-     * audio, camera video and screen share they send, each on or off at any time (see
-     * {@see Call::setOutput()}; participants that start transmitting later are picked up too). Our own
-     * media is never recorded. Every recording is plaintext — the frames are decrypted before they are
-     * muxed.
+     * `$participant` (a user id, username or peer) is required: every participant is recorded to its
+     * own file, see {@see self::setOutputFolder()} to record everyone at once. Our own media is never recorded.
+     *
+     * The file holds the streams chosen with `$streams` — a bitmask of {@see CallStream::AUDIO},
+     * {@see CallStream::VIDEO} and {@see CallStream::SCREEN}, every one of which must be available — or,
+     * when null, every stream the participant currently sends; the available streams are returned. The
+     * tracks are fixed for the whole file: a stream turned off stops being written and resumes when it
+     * comes back, and only a change of codec or the end of the call finishes the file (see
+     * {@see Call::setOutput()}); every such event is reported by a {@see CallStreams} update.
      *
      * Participants' frames are stored as-is, so the video tracks are whatever codec they send and the
      * audio is OPUS; `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm}
      * DocType, autodetected from a `.webm` extension. Audio-only OGG OPUS recordings are not supported.
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
+     *
+     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        $this->getClient()->conferenceCallSetOutput($this->id, $file, $participant, $format);
+        return $this->getClient()->conferenceCallSetOutput($this->id, $file, $participant, $format, $streams);
+    }
+
+    /**
+     * Record conference call media into a directory, muxed into Matroska files in pure PHP.
+     *
+     * Records every transmitting participant — or only the given `$participant` — as
+     * `<dir>/<userId>.<n>_<streams>.mkv` files, one per combination of the audio, camera video and
+     * screen share they send, each on or off at any time (see {@see Call::setOutputFolder()};
+     * participants that start transmitting later are picked up too). Our own media is never recorded.
+     * Every recording is plaintext — the frames are decrypted before they are muxed.
+     *
+     * `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm} DocType.
+     */
+    #[\Override]
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    {
+        $this->getClient()->conferenceCallSetOutputFolder($this->id, $dir, $participant, $format);
         return $this;
     }
 

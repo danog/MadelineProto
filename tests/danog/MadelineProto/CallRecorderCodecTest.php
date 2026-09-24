@@ -16,8 +16,10 @@
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Matroska;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\Tgcalls\Av1Bitstream;
 use danog\MadelineProto\Tgcalls\CallRecorder;
 use danog\MadelineProto\Tgcalls\H264Framing;
@@ -85,7 +87,7 @@ final class CallRecorderCodecTest extends TestCase
         $codec = new RTCRtpCodecParameters('video/H265', 90000, null, 98);
 
         $out = tempnam(sys_get_temp_dir(), 'rec').'.mkv';
-        $recorder = new CallRecorder(new LocalFile($out));
+        $recorder = CallRecorder::fixed(new LocalFile($out), RecordingFormat::Mkv, CallStream::VIDEO);
         $sent = [];
         foreach ($source['frames'] as $i => $frame) {
             $annexB = $framing->convert($frame['data'], $frame['keyframe']);
@@ -97,8 +99,8 @@ final class CallRecorderCodecTest extends TestCase
         }
         $recorder->close();
 
-        $recorded = self::demux(substr($out, 0, -4).'.0_video.mkv');
-        unlink(substr($out, 0, -4).'.0_video.mkv');
+        $recorded = self::demux($out);
+        unlink($out);
         $recordedTrack = self::videoTrack($recorded['tracks']);
         $this->assertSame('V_MPEGH/ISO/HEVC', $recordedTrack['codec']);
         [$width, $height] = HevcBitstream::describe($framing->convert($source['frames'][0]['data'], true));
@@ -125,7 +127,7 @@ final class CallRecorderCodecTest extends TestCase
         $codec = new RTCRtpCodecParameters('video/AV1', 90000, null, 99);
 
         $out = tempnam(sys_get_temp_dir(), 'rec').'.mkv';
-        $recorder = new CallRecorder(new LocalFile($out));
+        $recorder = CallRecorder::fixed(new LocalFile($out), RecordingFormat::Mkv, CallStream::VIDEO);
         foreach ($source['frames'] as $i => $frame) {
             $received = self::roundTrip($codec, $frame['data']);
             $this->assertSame($frame['data'], $received, "Temporal unit $i survives packetization");
@@ -134,8 +136,8 @@ final class CallRecorderCodecTest extends TestCase
         }
         $recorder->close();
 
-        $recorded = self::demux(substr($out, 0, -4).'.0_video.mkv');
-        unlink(substr($out, 0, -4).'.0_video.mkv');
+        $recorded = self::demux($out);
+        unlink($out);
         $recordedTrack = self::videoTrack($recorded['tracks']);
         $this->assertSame('V_AV1', $recordedTrack['codec']);
         [$width, $height] = Av1Bitstream::describe($source['frames'][0]['data']);

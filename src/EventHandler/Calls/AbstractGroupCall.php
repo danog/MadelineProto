@@ -352,25 +352,54 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     }
 
     /**
-     * Record group call media, muxed into a Matroska file in pure PHP.
+     * Record one participant into a single file (or stream) with a fixed set of tracks, muxed into
+     * Matroska in pure PHP.
      *
-     * Only a {@see LocalDirectory} is accepted: it records every transmitting participant — or only the
-     * given `$participant` — as `<dir>/<peerId>.<n>_<streams>.mkv` files, one per combination of the
-     * audio, camera video and screen share they send, each on or off at any time (see
-     * {@see Call::setOutput()}; participants that start transmitting later are picked up too). Our own
-     * media is never recorded.
+     * `$participant` (a user id, username or peer) is required — every participant is recorded to
+     * its own file, see {@see self::setOutputFolder()} to record everyone at once — except in
+     * [stream mode »](https://core.telegram.org/api/group-calls#stream-mode) ({@see self::isStreamMode()}),
+     * where there is a single mixed audio (and, for an RTMP livestream, video) stream rather than one per
+     * participant: pass no `$participant`, and any {@see RecordingFormat}. Our own media is never recorded.
+     *
+     * The file holds the streams chosen with `$streams` — a bitmask of {@see CallStream::AUDIO},
+     * {@see CallStream::VIDEO} and {@see CallStream::SCREEN}, every one of which must be available — or,
+     * when null, every stream the participant currently sends; the available streams are returned. The
+     * tracks are fixed for the whole file: a stream turned off stops being written and resumes when it
+     * comes back, and only a change of codec or the end of the call finishes the file (see
+     * {@see Call::setOutput()}); every such event is reported by a {@see CallStreams} update.
      *
      * Participants' frames are stored as-is, so the video tracks are whatever codec they send and the
      * audio is OPUS; `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm}
-     * DocType, autodetected from a `.webm` extension. Audio-only OGG OPUS recordings are not supported,
-     * except in [stream mode »](https://core.telegram.org/api/group-calls#stream-mode) ({@see self::isStreamMode()}),
-     * where there is a single mixed audio stream rather than one per participant: pass no `$participant`
-     * (a {@see LocalDirectory} records it as `<dir>/stream.ogg`), and any {@see RecordingFormat}.
+     * DocType, autodetected from a `.webm` extension.
+     *
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
+     *
+     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        $this->getClient()->groupCallSetOutput($this->id, $file, $participant, $format);
+        return $this->getClient()->groupCallSetOutput($this->id, $file, $participant, $format, $streams);
+    }
+
+    /**
+     * Record group call media into a directory, muxed into Matroska files in pure PHP.
+     *
+     * Records every transmitting participant — or only the given `$participant` — as
+     * `<dir>/<peerId>.<n>_<streams>.mkv` files, one per combination of the audio, camera video and
+     * screen share they send, each on or off at any time (see {@see Call::setOutputFolder()};
+     * participants that start transmitting later are picked up too). Our own media is never recorded.
+     * In [stream mode »](https://core.telegram.org/api/group-calls#stream-mode) the mixed stream is
+     * recorded as `<dir>/stream.mkv` (or `.ogg` for {@see RecordingFormat::Opus}).
+     *
+     * `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm} DocType.
+     */
+    #[\Override]
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    {
+        $this->getClient()->groupCallSetOutputFolder($this->id, $dir, $participant, $format);
         return $this;
     }
 

@@ -25,8 +25,10 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -205,16 +207,31 @@ trait AuthKeyHandler
     }
 
     /**
-     * Set the output file or stream for the incoming media of a call.
+     * Record the incoming media of a call into one file (or stream) with a fixed set of tracks, see
+     * {@see \danog\MadelineProto\EventHandler\Calls\PrivateCall::setOutput()}.
      *
-     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
-     * audio and video, muxed into a Matroska file in pure PHP; {@see RecordingFormat::Opus} keeps the
-     * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
-     * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
+     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @return int The streams the other party currently sends, as a bitmask of {@see CallStream} flags (0 while unknown).
      */
-    public function callSetOutput(int $id, LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
+    public function callSetOutput(int $id, LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        ($this->calls[$id] ?? null)?->setOutput($file, $format);
+        if (!isset($this->calls[$id])) {
+            throw new AssertionError('Unknown call!');
+        }
+        return $this->calls[$id]->setOutput($file, $format, $streams);
+    }
+
+    /**
+     * Record the incoming media of a call into a directory, one numbered file per combination of
+     * streams the other party sends, see {@see \danog\MadelineProto\EventHandler\Calls\PrivateCall::setOutputFolder()}.
+     */
+    public function callSetOutputFolder(int $id, LocalDirectory $dir, ?RecordingFormat $format = null): void
+    {
+        if (!isset($this->calls[$id])) {
+            throw new AssertionError('Unknown call!');
+        }
+        $this->calls[$id]->setOutputFolder($dir, $format);
     }
 
     /**

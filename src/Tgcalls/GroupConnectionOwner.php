@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\RecordingEvent;
 use Stringable;
 
 /**
@@ -31,6 +33,19 @@ interface GroupConnectionOwner extends Stringable
 
     /** A participant's media source started arriving. */
     public function onIncomingSource(int $source): void;
+
+    /**
+     * The streams a participant sends (or their codecs) changed, or a recording of them started or ended.
+     *
+     * @param int                   $source    The participant's signed audio SSRC.
+     * @param int                   $streams   The streams they send, as {@see \danog\MadelineProto\CallStream} flags.
+     * @param array<int, string>    $codecs    The codec of every stream media was seen for, by {@see \danog\MadelineProto\CallStream} flag.
+     * @param ?RecordingEvent       $recording Whether a recording started or ended, or null if only the streams changed.
+     * @param ?LocalFile            $file      The file of the recording event, if it is a local file.
+     *
+     * @psalm-impure
+     */
+    public function onParticipantStreams(int $source, int $streams, array $codecs, ?RecordingEvent $recording, ?LocalFile $file): void;
 
     /** The WebRTC connection failed and should be checked/rejoined. */
     public function onConnectionFailed(): void;

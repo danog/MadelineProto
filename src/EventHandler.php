@@ -270,6 +270,7 @@ abstract class EventHandler extends AbstractAPI
                     ($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update'
                 )
                     || $method_name === 'updateBroadcastProgress'
+                    || $method_name === 'updateCallStreams'
                     || $method_name === 'updateNewOutgoingEncryptedMessage'
                 ) {
                     $methods[$method_name] = [

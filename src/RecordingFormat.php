@@ -20,7 +20,7 @@ use Amp\ByteStream\WritableStream;
 use InvalidArgumentException;
 
 /**
- * Container format of a call recording, as passed to {@see Call::setOutput()}.
+ * Container format of a call recording, as passed to {@see Call::setOutput()} and {@see Call::setOutputFolder()}.
  *
  * {@see self::Webm} and {@see self::Mkv} both mux the incoming audio and video into a Matroska
  * file in pure PHP (the peer's frames are stored as-is, so the video track is whatever codec the
@@ -29,7 +29,7 @@ use InvalidArgumentException;
  *
  * When no format is passed to {@see Call::setOutput()}, it is autodetected from the extension of the
  * target — but only if a {@see LocalFile} was given; a raw stream, whose extension is unknown,
- * defaults to {@see self::Opus}.
+ * defaults to {@see self::Webm}. A {@see Call::setOutputFolder()} recording defaults to {@see self::Mkv}.
  */
 enum RecordingFormat
 {

@@ -38,6 +38,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
+use danog\MadelineProto\EventHandler\Calls\CallStreams;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall as GroupCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCallMessage;
@@ -494,6 +495,7 @@ trait UpdateHandler
                 'updateGroupCallParticipants' => new GroupCallParticipants($this, $update),
                 'updateGroupCallMessage' => new GroupCallMessage($this, $update),
                 'updateDeleteGroupCallMessages' => new GroupCallMessagesDeleted($this, $update),
+                'updateCallStreams' => new CallStreams($this, $update),
                 'updateBroadcastProgress' => $update['progress'],
                 'updateStory' => $update['story']['_'] === 'storyItemDeleted'
                     ? new StoryDeleted($this, $update)

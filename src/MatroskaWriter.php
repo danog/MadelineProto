@@ -68,11 +68,8 @@ final class MatroskaWriter
     private const VIDEO_TRACK_NUMBER = 1;
     private const AUDIO_TRACK_NUMBER = 2;
     private const PRESENTATION_TRACK_NUMBER = 3;
-    /** The camera video slot. */
-    public const SLOT_VIDEO = 'video';
-    /** The screen-share video slot: a second, independent video track. */
-    public const SLOT_PRESENTATION = 'presentation';
-    private const VIDEO_SLOTS = [self::SLOT_VIDEO => self::VIDEO_TRACK_NUMBER, self::SLOT_PRESENTATION => self::PRESENTATION_TRACK_NUMBER];
+    /** The track number of each video slot: the camera ({@see CallStream::VIDEO}) and the screen share ({@see CallStream::SCREEN}). */
+    private const VIDEO_SLOTS = [CallStream::VIDEO => self::VIDEO_TRACK_NUMBER, CallStream::SCREEN => self::PRESENTATION_TRACK_NUMBER];
 
     /** One timestamp tick is a millisecond (TimestampScale = 1e6 ns). */
     private const TIMESTAMP_SCALE_NS = 1000000;
@@ -84,7 +81,7 @@ final class MatroskaWriter
     /** Whether {@see self::$out} is a seekable file we can back-patch the Duration into on close(). */
     private bool $seekable;
 
-    /** @var array<string, array{codecId: string, width: int, height: int, private: string}> Video tracks by slot. */
+    /** @var array<int, array{codecId: string, width: int, height: int, private: string}> Video tracks by slot ({@see CallStream::VIDEO}, {@see CallStream::SCREEN}). */
     private array $video = [];
     /** @var array{codecId: string, rate: int, channels: int, private: string}|null */
     private ?array $audio = null;
@@ -187,10 +184,10 @@ final class MatroskaWriter
      * @psalm-external-mutation-free
      */
     /**
-     * Declare a video track: the camera ({@see self::SLOT_VIDEO}) or a screen share
-     * ({@see self::SLOT_PRESENTATION}), which may both be present at once.
+     * Declare a video track: the camera ({@see CallStream::VIDEO}) or a screen share
+     * ({@see CallStream::SCREEN}), which may both be present at once.
      */
-    public function setVideoTrack(string $codecId, int $width, int $height, string $codecPrivate = '', string $slot = self::SLOT_VIDEO): void
+    public function setVideoTrack(string $codecId, int $width, int $height, string $codecPrivate = '', int $slot = CallStream::VIDEO): void
     {
         \assert(isset(self::VIDEO_SLOTS[$slot]));
         $this->video[$slot] = ['codecId' => $codecId, 'width' => max(1, $width), 'height' => max(1, $height), 'private' => $codecPrivate];
@@ -209,7 +206,7 @@ final class MatroskaWriter
     /**
      * @psalm-mutation-free
      */
-    public function hasVideoTrack(string $slot = self::SLOT_VIDEO): bool
+    public function hasVideoTrack(int $slot = CallStream::VIDEO): bool
     {
         return isset($this->video[$slot]);
     }
@@ -226,7 +223,7 @@ final class MatroskaWriter
      *
      * @psalm-mutation-free
      */
-    public function getVideoTrack(string $slot = self::SLOT_VIDEO): ?array
+    public function getVideoTrack(int $slot = CallStream::VIDEO): ?array
     {
         return $this->video[$slot] ?? null;
     }
@@ -236,7 +233,7 @@ final class MatroskaWriter
      *
      * @psalm-mutation-free
      */
-    public function isHevc(string $slot = self::SLOT_VIDEO): bool
+    public function isHevc(int $slot = CallStream::VIDEO): bool
     {
         return ($this->video[$slot]['codecId'] ?? null) === 'V_MPEGH/ISO/HEVC';
     }
@@ -321,7 +318,7 @@ final class MatroskaWriter
     /**
      * Append one encoded video frame.
      */
-    public function writeVideo(string $data, int $timestampMs, bool $keyframe, string $slot = self::SLOT_VIDEO): void
+    public function writeVideo(string $data, int $timestampMs, bool $keyframe, int $slot = CallStream::VIDEO): void
     {
         if (!isset($this->video[$slot])) {
             return;

@@ -23,8 +23,11 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use AssertionError;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\EventHandler\Calls\CallStreams;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -33,6 +36,7 @@ use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Ogg;
+use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
@@ -86,9 +90,14 @@ final class PrivateCallController implements CallControllerInterface
 
     private LocalMutex $authMutex;
 
+    /** The recording requested before the engine existed (or to re-arm the legacy engine after a restart): a file, or null. */
     private ?LocalFile $outputFile = null;
+    /** The recording requested before the engine existed: a folder, or null. */
+    private ?LocalDirectory $outputFolder = null;
 
     private ?RecordingFormat $outputFormat = null;
+    /** The {@see CallStream} flags requested for the pending file recording, or null for every available stream. */
+    private ?int $outputStreams = null;
 
     private bool $muted = false;
 
@@ -170,8 +179,8 @@ final class PrivateCallController implements CallControllerInterface
             $this->diskJockey->resumeReader();
             $this->tgcallsController?->resume();
             // The legacy (libtgvoip) engine still re-arms its recorder from the remembered output.
-            if ($this->outputFile !== null) {
-                $this->legacyController?->setOutput($this->outputFile);
+            if ($this->legacyController !== null) {
+                $this->applyPendingOutput();
             }
             $this->log("Resumed $this after a restart of the process.");
         });
@@ -350,9 +359,7 @@ final class PrivateCallController implements CallControllerInterface
                 $this->diskJockey,
                 $call['connections'] ?? [],
             );
-            if ($this->outputFile !== null) {
-                $this->legacyController->setOutput($this->outputFile);
-            }
+            $this->applyPendingOutput();
             return;
         }
         $this->log("Starting the WebRTC engine of $this using tgcalls protocol {$version->value}", Logger::NOTICE);
@@ -364,9 +371,7 @@ final class PrivateCallController implements CallControllerInterface
             $this->diskJockey,
             $call['connections'] ?? [],
         );
-        if ($this->outputFile !== null) {
-            $this->tgcallsController->setOutput($this->outputFile, $this->outputFormat);
-        }
+        $this->applyPendingOutput();
         // A presentation playlist requested before the engine existed is attached now, before the
         // first offer goes out, so that the screencast is in it from the start.
         if ($this->presentationDj !== null) {
@@ -521,19 +526,95 @@ final class PrivateCallController implements CallControllerInterface
     }
 
     /**
-     * Set the output file or stream for the incoming media.
+     * Record the incoming media into one file (or stream) with a fixed set of tracks, see
+     * {@see Controller::setOutput()}. Before the engine exists (the call is still connecting) the
+     * request is remembered and applied once it starts; the legacy libtgvoip engine records audio only.
      *
-     * A {@see RecordingFormat::Webm} or {@see RecordingFormat::Mkv} target records both the incoming
-     * audio and video, muxed into a Matroska file in pure PHP; {@see RecordingFormat::Opus} keeps the
-     * audio-only behaviour, writing an OGG OPUS stream. When `$format` is null it is autodetected from
-     * the extension of `$file`, but only if a {@see LocalFile} was passed (a raw stream defaults to OGG).
+     * @param ?int $streams The {@see CallStream} flags to record, or null for every stream the peer currently sends.
+     *
+     * @return int The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
      */
-    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
+    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {
+        if ($streams !== null) {
+            CallStream::validate($streams);
+        }
+        if ($this->legacyController !== null) {
+            if ($streams !== null && ($streams & ~CallStream::AUDIO) !== 0) {
+                throw new \InvalidArgumentException('The legacy libtgvoip engine carries audio only: choose CallStream::AUDIO.');
+            }
+            if ($format !== null && $format->isMatroska()) {
+                throw new \InvalidArgumentException('The legacy libtgvoip engine records audio only, to OGG OPUS: use RecordingFormat::Opus.');
+            }
+        }
         $this->outputFile = $file instanceof LocalFile ? $file : null;
+        $this->outputFolder = null;
         $this->outputFormat = $format;
-        $this->tgcallsController?->setOutput($file, $format);
-        $this->legacyController?->setOutput($file);
+        $this->outputStreams = $streams;
+        if ($this->tgcallsController !== null) {
+            return $this->tgcallsController->setOutput($file, $format, $streams);
+        }
+        if ($this->legacyController !== null) {
+            $this->legacyController->setOutput($file);
+            return CallStream::AUDIO;
+        }
+        return 0;
+    }
+
+    /**
+     * Record the incoming media into a directory, as a numbered series of `<n>_<streams>.mkv` files,
+     * one per combination of streams the peer sends, see {@see Controller::setOutputFolder()}.
+     */
+    public function setOutputFolder(LocalDirectory $dir, ?RecordingFormat $format = null): void
+    {
+        $this->outputFile = null;
+        $this->outputFolder = $dir;
+        $this->outputFormat = $format;
+        $this->outputStreams = null;
+        if ($this->tgcallsController !== null) {
+            $this->tgcallsController->setOutputFolder($dir, $format);
+        } elseif ($this->legacyController !== null) {
+            $this->legacyController->setOutput(self::legacyFolderFile($dir));
+        }
+    }
+
+    /**
+     * Hand the remembered recording request to the engine that just started (or came back).
+     */
+    private function applyPendingOutput(): void
+    {
+        try {
+            if ($this->outputFolder !== null) {
+                $this->tgcallsController?->setOutputFolder($this->outputFolder, $this->outputFormat);
+                $this->legacyController?->setOutput(self::legacyFolderFile($this->outputFolder));
+            } elseif ($this->outputFile !== null) {
+                $this->tgcallsController?->setOutput($this->outputFile, $this->outputFormat, $this->outputStreams);
+                $this->legacyController?->setOutput($this->outputFile);
+            }
+        } catch (Throwable $e) {
+            $this->log("Could not start the recording of $this: $e", Logger::ERROR);
+        }
+    }
+
+    /**
+     * The OGG file the legacy audio-only engine records into when a folder was requested.
+     */
+    private static function legacyFolderFile(LocalDirectory $dir): LocalFile
+    {
+        return new LocalFile($dir->create().'/audio.ogg');
+    }
+
+    /**
+     * The peer's streams or codecs changed, or a recording of them started or ended: emit a
+     * {@see \danog\MadelineProto\EventHandler\Calls\CallStreams} update.
+     *
+     * @param array<int, string> $codecs By {@see CallStream} flag.
+     *
+     * @internal
+     */
+    public function onStreamsChanged(int $streams, array $codecs, ?RecordingEvent $recording, ?LocalFile $file): void
+    {
+        CallStreams::dispatch($this->API, $this->public, $this->public->otherID, $streams, $codecs, $recording, $file);
     }
 
     /**

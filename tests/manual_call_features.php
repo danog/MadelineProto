@@ -50,6 +50,7 @@
  */
 
 use danog\MadelineProto\API;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\GroupCall;
@@ -298,8 +299,8 @@ switch ($mode) {
             }
             info('Connected ✅');
             info('Recording the incoming camera/mic into '.$out);
-            $call->setOutput(new LocalFile($out));
-            info('Every stream the peer sends (mic, camera, screen share) is recorded as '.basename($out, '.mkv').'.<n>_<streams>.mkv, a new file each time the peer turns one on or off.');
+            $streams = $call->setOutput(new LocalFile($out));
+            info('The peer currently sends '.CallStream::describe($streams).': the file keeps exactly these tracks, a stream turned off just pauses; only a codec change or the end of the call finishes it.');
             $emojis = $call->getVisualization();
             if ($emojis !== null) {
                 info('Call verification emojis (compare with the peer): '.implode(' ', $emojis));
@@ -362,8 +363,8 @@ switch ($mode) {
             $call = $API->joinGroupCall($arg);
             click('Open the SAME group call on one or more OTHER accounts, JOIN, and transmit ('.$m['desc'].').');
             transmit($call, $m, $file);
-            info('Recording every transmitting participant into '.$dir.'/<peerId>.mkv');
-            $call->setOutput(new LocalDirectory($dir));
+            info('Recording every transmitting participant into '.$dir.'/<peerId>.<n>_<streams>.mkv');
+            $call->setOutputFolder(new LocalDirectory($dir));
         }
 
         // A freshly re-attached call may still be JOINING; wait until it is actually JOINED.

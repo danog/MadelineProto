@@ -20,9 +20,12 @@ namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
 use Amp\Sync\LocalMutex;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
@@ -71,7 +74,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  *
  * @internal
  */
-final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, PeerConnectionDataChannelListener, DataChannelOpenListener, DataChannelMessageListener
+final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, PeerConnectionDataChannelListener, DataChannelOpenListener, DataChannelMessageListener, IncomingMediaObserver
 {
     private RTCPeerConnection $peerConnection;
     private EncryptedConnection $encryption;
@@ -96,15 +99,15 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     /** SDP fmtp parameters of the outgoing screencast file, derived from its bitstream. */
     private array $outgoingScreencastParameters = [];
     private bool $screencastEnabled = false;
-    private ?OpusRecorder $recorder = null;
-    private ?CallRecorder $callRecorder = null;
+    /** The peer's incoming media: what it sends, in which codecs, and the recorder its frames go to. */
+    private IncomingMedia $media;
     /**
      * Every incoming video track, with the recording slot (camera or screen share) it was routed to.
      * tgcalls has one incoming video channel: the peer's screencast is a *new* channel that replaces
      * its camera, told apart only by the peer's MediaState, so each track is routed once, on its first
      * frame, by that state.
      *
-     * @var list<array{track: RemoteStreamTrack, target: ?string}>
+     * @var list<array{track: RemoteStreamTrack, target: ?int}>
      */
     private array $incomingVideoTracks = [];
     /** Whether the peer has told us its media state yet (it defaults to "unknown" until then). */
@@ -197,6 +200,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         array $connections,
     ) {
         $this->remoteMediaState = new MediaState(true, false, false);
+        $this->media = new IncomingMedia($this);
         $this->signalingMutex = new LocalMutex;
         $this->encryption = new EncryptedConnection($authKey, $outgoing, $this);
 
@@ -369,12 +373,6 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     {
         $vars = get_object_vars($this);
         unset($vars['signalingMutex']);
-        if ($this->recorder?->file === null) {
-            unset($vars['recorder']);
-        }
-        if ($this->callRecorder?->file === null) {
-            unset($vars['callRecorder']);
-        }
         return $vars;
     }
 
@@ -385,11 +383,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     public function __unserialize(array $data): void
     {
-        // A stream-backed recorder was dropped in __serialize; a file-backed one is restored below and
-        // resumes itself. Default to none, then apply whatever was serialized. Synchronous restore
-        // only — all async resume work happens in resume(), called once the call graph is whole.
-        $this->recorder = null;
-        $this->callRecorder = null;
+        // Synchronous restore only — all async resume work (the recorders reopening their files, notably)
+        // happens in resume(), called once the call graph is whole.
         $this->signalingMutex = new LocalMutex;
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
@@ -410,8 +405,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->outgoingAudio->resume();
         $this->outgoingVideo->resume();
         $this->outgoingScreencast?->resume();
-        $this->recorder?->resume();
-        $this->callRecorder?->resume();
+        $this->media->resume();
         $this->dataChannelOpen = $this->dataChannel?->getReadyState() === DataChannelState::Open;
         foreach (array_keys($this->incomingVideoTracks) as $index) {
             $this->drainIncomingVideo($index);
@@ -502,8 +496,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->enableRawReceive();
         if ($track->getKind() === MediaKind::Audio) {
             $this->call->log("Got incoming audio track in {$this->call}", Logger::VERBOSE);
-            $this->recorder?->setTrack($track);
-            $this->callRecorder?->setTrack($track);
+            $this->media->setTrack($track);
             return;
         }
         $this->call->log("Got incoming video track in {$this->call}", Logger::VERBOSE);
@@ -528,7 +521,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             if ($entry === null) {
                 return;
             }
-            $source = CallRecorder::sourceOf($entry['track']);
+            $source = IncomingMedia::sourceOf($entry['track']);
             foreach ($entry['track']->getConsumer() as $frame) {
                 if ($this->closed) {
                     return;
@@ -544,11 +537,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                 }
                 $target = $this->incomingVideoTracks[$index]['target'] ?? null;
                 if ($target === null) {
-                    $target = $this->remoteMediaState->screencast ? CallRecorder::SLOT_PRESENTATION : CallRecorder::SLOT_VIDEO;
+                    $target = $this->remoteMediaState->screencast ? CallStream::SCREEN : CallStream::VIDEO;
                     $this->incomingVideoTracks[$index]['target'] = $target;
-                    $this->call->log("The incoming video track $source of {$this->call} is the peer's $target", Logger::VERBOSE);
+                    $this->call->log("The incoming video track $source of {$this->call} is the peer's ".CallStream::NAMES[$target], Logger::VERBOSE);
                 }
-                $this->callRecorder?->pushVideoFrame($data, $frame->getTimestamp(), $source, $target);
+                $this->media->pushVideoFrame($data, $frame->getTimestamp(), $source, $target);
             }
         });
     }
@@ -616,64 +609,107 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     }
 
     /**
-     * Set the output file or stream for the incoming media.
+     * Record the incoming media into one file (or stream) with a fixed set of tracks.
      *
-     * {@see RecordingFormat::Webm} and {@see RecordingFormat::Mkv} record both the incoming audio and
-     * video, muxed into Matroska in pure PHP ({@see CallRecorder}); {@see RecordingFormat::Opus} keeps
-     * the audio-only behaviour, writing an OGG OPUS stream ({@see OpusRecorder}).
-     *
+     * {@see RecordingFormat::Webm} and {@see RecordingFormat::Mkv} record the chosen streams, muxed
+     * into Matroska in pure PHP ({@see CallRecorder}); {@see RecordingFormat::Opus} writes an
+     * audio-only OGG OPUS stream ({@see OpusRecorder}), so only {@see CallStream::AUDIO} can be chosen.
      * When `$format` is null it is autodetected from the extension of `$file` — but only if a
-     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to OGG OPUS.
+     * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to WebM.
+     *
+     * @param ?int $streams The {@see CallStream} flags to record, or null for every stream the peer
+     *                      currently sends. Every chosen stream must be available, once the peer has
+     *                      reported its media state; before that (the call is still connecting)
+     *                      anything is accepted, and a null set takes whatever flows when the
+     *                      recording starts.
+     *
+     * @throws \InvalidArgumentException If a chosen stream is not available.
+     *
+     * @return int The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
      */
-    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
+    public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         $format ??= $file instanceof LocalFile ? RecordingFormat::fromFile($file) : RecordingFormat::Webm;
+        if ($streams !== null) {
+            CallStream::validate($streams);
+        }
+        if (!$format->isMatroska()) {
+            if ($streams !== null && ($streams & ~CallStream::AUDIO) !== 0) {
+                throw new \InvalidArgumentException('An OGG OPUS recording holds audio only: choose CallStream::AUDIO, or record to a .mkv/.webm file to get video.');
+            }
+            $streams = CallStream::AUDIO;
+        }
+        $available = $this->getAvailableStreams();
+        if ($available !== null) {
+            CallStream::checkAvailable($streams, $available, 'The other party');
+            $streams ??= $available;
+        }
 
         $this->enableRawReceive();
-
-        $this->recorder?->close();
-        $this->recorder = null;
-        $this->callRecorder?->close();
-        $this->callRecorder = null;
-
+        $this->media->stopRecording();
+        $this->media->setOpusRecorder(null);
         if ($format->isMatroska()) {
-            $this->callRecorder = new CallRecorder($file, $format);
-            $this->tellRecorderExpectedStreams();
-            foreach ($this->peerConnection->getReceivers() as $receiver) {
-                $track = $receiver->getTrack();
-                if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
-                    $this->callRecorder->setTrack($track);
-                }
-            }
-            // Video frames reach the recorder through drainIncomingVideo(), from now on.
-            return;
+            $this->media->recordFixed($file, $format, $streams);
+        } else {
+            $this->media->setOpusRecorder(new OpusRecorder($file));
         }
-
-        $this->recorder = new OpusRecorder($file);
-        foreach ($this->peerConnection->getReceivers() as $receiver) {
-            $track = $receiver->getTrack();
-            if ($track instanceof RemoteStreamTrack && $track->getKind() === MediaKind::Audio) {
-                $this->recorder->setTrack($track);
-                break;
-            }
-        }
+        return $available ?? 0;
     }
 
     /**
-     * Pass the peer's media state — which of its mic, camera and screen share are on — to the
-     * recorder, which shapes its segments after it. Nothing is passed until the peer has actually
-     * reported a state: before that the recorder just records whatever arrives.
+     * Record the incoming media into a directory, as a numbered series of `<n>_<streams>.mkv` files,
+     * one per combination of streams the peer sends (see {@see CallRecorder::series()}).
+     */
+    public function setOutputFolder(LocalDirectory $dir, ?RecordingFormat $format = null): void
+    {
+        $path = $dir->create();
+        $format = RecordingFormat::matroskaFor(new LocalFile("$path/"), $format);
+        $this->enableRawReceive();
+        $this->media->setOpusRecorder(null);
+        $this->media->recordSeries(new LocalFile("$path/"), $format);
+    }
+
+    /**
+     * The streams the peer currently sends, as {@see CallStream} flags, or null if it has not
+     * reported its media state yet.
+     *
+     * @psalm-mutation-free
+     */
+    public function getAvailableStreams(): ?int
+    {
+        if (!$this->remoteMediaStateKnown) {
+            return null;
+        }
+        return CallStream::of(!$this->remoteMediaState->muted, $this->remoteMediaState->video, $this->remoteMediaState->screencast);
+    }
+
+    /**
+     * Pass the peer's media state — which of its mic, camera and screen share are on — to its
+     * incoming media router (and thus to the recorder, which shapes its file after it). Nothing is
+     * passed until the peer has actually reported a state: before that whatever arrives is recorded.
      */
     private function tellRecorderExpectedStreams(): void
     {
         if (!$this->remoteMediaStateKnown) {
             return;
         }
-        $this->callRecorder?->setExpected(
+        $this->media->setExpected(
             audio: !$this->remoteMediaState->muted,
             video: $this->remoteMediaState->video,
             presentation: $this->remoteMediaState->screencast,
         );
+    }
+
+    /**
+     * The peer's streams or codecs changed, or a recording of them started or ended: surface it as
+     * a {@see \danog\MadelineProto\EventHandler\Calls\CallStreams} update.
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onIncomingMediaChanged(IncomingMedia $media, ?RecordingEvent $recording, ?LocalFile $file): void
+    {
+        $this->call->onStreamsChanged($media->getAvailable(), $media->getCodecs(), $recording, $file);
     }
 
     /**
@@ -1034,14 +1070,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
         $this->closed = true;
         try {
-            $this->recorder?->close();
-            $this->callRecorder?->close();
+            $this->media->close();
         } catch (Throwable $e) {
             // A recorder that cannot finish its file must not take the whole call down with it.
             $this->call->log("Could not close the recording of {$this->call}: $e", Logger::WARNING);
         }
-        $this->recorder = null;
-        $this->callRecorder = null;
         try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();

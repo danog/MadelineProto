@@ -16,14 +16,17 @@
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Matroska;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\Tgcalls\CallRecorder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The recorder follows the party turning its mic, camera and screen share on and off: every change of
- * the flowing streams closes the file and continues in `<base>.N.mkv` with exactly those streams.
+ * A series recorder (the {@see \danog\MadelineProto\EventHandler\Call::setOutputFolder()} mode) follows the
+ * party turning its mic, camera and screen share on and off: every change of the flowing streams closes
+ * the file and continues in `<base>.<n>_<streams>.mkv` with exactly those streams.
  */
 final class CallRecorderSegmentsTest extends TestCase
 {
@@ -82,7 +85,7 @@ final class CallRecorderSegmentsTest extends TestCase
 
     public function testSegmentsFollowTheStreams(): void
     {
-        $recorder = new CallRecorder(new LocalFile($this->base));
+        $recorder = CallRecorder::series(new LocalFile($this->base), RecordingFormat::Mkv);
         $audioTs = 0;
         $audio = static function (int $frames) use ($recorder, &$audioTs): void {
             for ($i = 0; $i < $frames; $i++) {
@@ -114,23 +117,23 @@ final class CallRecorderSegmentsTest extends TestCase
 
         // 4. A screen share starts: audio + the presentation track.
         $recorder->setExpected(presentation: true);
-        $recorder->pushVideoFrame(self::vp8(true, 1280, 720), 100000, 20, CallRecorder::SLOT_PRESENTATION);
+        $recorder->pushVideoFrame(self::vp8(true, 1280, 720), 100000, 20, CallStream::SCREEN);
         $this->assertFileExists($this->segment(3, 'audio,screen'));
-        $recorder->pushVideoFrame(self::vp8(false), 103000, 20, CallRecorder::SLOT_PRESENTATION);
+        $recorder->pushVideoFrame(self::vp8(false), 103000, 20, CallStream::SCREEN);
         $audio(5);
 
         // 5. The peer mutes: the screen share alone.
         $recorder->setExpected(audio: false);
         $this->assertFileExists($this->segment(4, 'screen'));
         $audio(3); // stragglers, ignored
-        $recorder->pushVideoFrame(self::vp8(false), 106000, 20, CallRecorder::SLOT_PRESENTATION);
+        $recorder->pushVideoFrame(self::vp8(false), 106000, 20, CallStream::SCREEN);
 
         // 6. The camera comes back while the screen share is on: both video tracks, no audio.
         $recorder->setExpected(video: true);
         $recorder->pushVideoFrame(self::vp8(true, 640, 360), 200000, 30);
         $this->assertFileExists($this->segment(5, 'video,screen'));
         $recorder->pushVideoFrame(self::vp8(false), 203000, 30);
-        $recorder->pushVideoFrame(self::vp8(false), 109000, 20, CallRecorder::SLOT_PRESENTATION);
+        $recorder->pushVideoFrame(self::vp8(false), 109000, 20, CallStream::SCREEN);
         $recorder->close();
         $this->assertCount(6, glob(substr($this->base, 0, -4).'.*.mkv') ?: []);
 
@@ -152,7 +155,7 @@ final class CallRecorderSegmentsTest extends TestCase
 
     public function testCodecChangeStartsANewSegment(): void
     {
-        $recorder = new CallRecorder(new LocalFile($this->base));
+        $recorder = CallRecorder::series(new LocalFile($this->base), RecordingFormat::Mkv);
         $recorder->setExpected(audio: false, video: true, presentation: false);
         $recorder->pushVideoFrame(self::vp8(true), 0, 1);
         $recorder->pushVideoFrame(self::vp8(false), 3000, 1);
@@ -173,10 +176,10 @@ final class CallRecorderSegmentsTest extends TestCase
     {
         $dir = sys_get_temp_dir().'/rec_'.bin2hex(random_bytes(4)).'/';
         mkdir($dir);
-        $recorder = new CallRecorder(new LocalFile($dir));
+        $recorder = CallRecorder::series(new LocalFile($dir), RecordingFormat::Mkv);
         $recorder->close();
         $this->assertSame([], glob($dir.'*') ?: []);
-        $recorder = new CallRecorder(new LocalFile($dir), \danog\MadelineProto\RecordingFormat::Webm);
+        $recorder = CallRecorder::series(new LocalFile($dir), RecordingFormat::Webm);
         $recorder->setExpected(audio: true, video: false, presentation: false);
         $recorder->pushAudioFrame('aaaa', 0, 1);
         $recorder->close();

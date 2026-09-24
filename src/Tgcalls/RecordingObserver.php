@@ -14,38 +14,29 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto;
+namespace danog\MadelineProto\Tgcalls;
+
+use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\LocalFile;
 
 /**
- * Indicates a local directory to write output into.
+ * Told by a {@see CallRecorder} when it opens or finishes an output file (or stream).
  *
- * Used with {@see EventHandler\Call::setOutputFolder()} to record a call into a directory: every recorded participant
- * gets a numbered series of `<n>_<streams>.mkv` files there (`<peerId>.<n>_<streams>.mkv` in multi-party calls),
- * one per combination of audio, camera video and screen share they send.
+ * @internal
  */
-final class LocalDirectory
+interface RecordingObserver
 {
     /**
-     * @psalm-mutation-free
+     * The recorder wrote the header of a file (or stream): media is recorded into it from now on.
+     *
+     * @psalm-impure
      */
-    public function __construct(
-        public readonly string $dir
-    ) {
-    }
+    public function onRecordingStarted(CallRecorder $recorder, LocalFile|WritableStream $out): void;
 
     /**
-     * Create the directory if it does not exist yet, and return its path without a trailing slash.
+     * The recorder finished a file (or stream): nothing more is written to it.
      *
-     * @internal
-     *
-     * @throws \RuntimeException If it cannot be created.
+     * @psalm-impure
      */
-    public function create(): string
-    {
-        $path = rtrim($this->dir, '/');
-        if (!is_dir($path) && !mkdir($path, 0o777, true) && !is_dir($path)) {
-            throw new \RuntimeException("Could not create the recording directory $path");
-        }
-        return $path;
-    }
+    public function onRecordingEnded(CallRecorder $recorder, LocalFile|WritableStream $out): void;
 }

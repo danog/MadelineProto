@@ -18,7 +18,8 @@ namespace danog\MadelineProto\Tgcalls\E2E;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
-use Amp\DeferredFuture;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\GroupCall\Participant;
@@ -36,6 +37,7 @@ use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
+use danog\MadelineProto\Tgcalls\GroupMediaTrait;
 use danog\MadelineProto\Tgcalls\GroupSdp;
 use Revolt\EventLoop;
 use Throwable;
@@ -58,6 +60,8 @@ use Throwable;
  */
 final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, CallControllerInterface
 {
+    use GroupMediaTrait;
+
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
     private const SUBCHAIN_STATE = 0;
     private const SUBCHAIN_VERIFICATION = 1;
@@ -70,15 +74,9 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     /** Our Ed25519 signing seed: signs both chain blocks and media/message packets. */
     private string $selfSeed;
     private ConferenceChain $chain;
-    private ?GroupConnection $connection = null;
-    private DjLoop $diskJockey;
     private FrameCryptor $frameCryptor;
     /** Packet counters shared by the camera and screen-share cryptors (serialized with the call). */
     private FrameCryptorState $cryptorState;
-    /** The separate screen-share connection (phone.joinGroupCallPresentation), while sharing a screen. */
-    private ?GroupConnection $presentationConnection = null;
-    /** The video-only disk jockey feeding the screen-share connection, if any. */
-    private ?DjLoop $presentationDj = null;
     /** Frame cryptor for the screen-share, on its own channel so its seqnos don't collide with camera. */
     private ?FrameCryptor $presentationCryptor = null;
 
@@ -94,17 +92,10 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * @var array{0: int, 1: int}
      */
     private array $chainOffset = [0, 0];
-    /** SSRC (unsigned) => participant user id, for verifying incoming media senders. */
+    /** @var array<int, int> SSRC (unsigned) => participant user id, for verifying incoming media senders. */
     private array $ssrcToUser = [];
     /** @var array<int, int> user id => signed audio source, learned from the participant list, for recording. */
     private array $userToSource = [];
-    /** @var array<int, array{LocalFile|WritableStream, RecordingFormat}> Per-participant recording outputs (and their format) requested before the user's media source was known. */
-    private array $pendingOutputs = [];
-    /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
-    private ?string $outputDir = null;
-    private RecordingFormat $outputFormat = RecordingFormat::Mkv;
-    /** @var array<int, true> User ids already wired to a per-participant file in folder mode. */
-    private array $folderPeers = [];
     /**
      * The commit-reveal verification of the current chain head, see {@see self::restartVerification()}:
      * the head it is for, its phase, our own commit/reveal broadcasts (and whether the commit was
@@ -235,6 +226,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function getInputCall(): array
     {
         return $this->inputCall ?? throw new \RuntimeException('The conference call does not exist yet.');
@@ -244,6 +236,8 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * The public {@see ConferenceCallUpdate} handle for this conference, built lazily once the call
      * exists. This is the object handed to library users; it delegates every operation back to this
      * controller by call id.
+     *
+     * @psalm-external-mutation-free
      */
     public function getPublic(): ConferenceCallUpdate
     {
@@ -283,19 +277,10 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      *
      * @psalm-mutation-free
      */
+    #[\Override]
     public function getCallState(): GroupCallState
     {
         return $this->joined ? GroupCallState::JOINED : GroupCallState::NOT_JOINED;
-    }
-
-    /**
-     * Whether a screen-share is currently being transmitted.
-     *
-     * @psalm-mutation-free
-     */
-    public function isSharingScreen(): bool
-    {
-        return $this->presentationConnection !== null;
     }
 
     /* ------------------------------------------------------------------ *
@@ -342,8 +327,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     public function create(bool $muted = false): void
     {
         $genesis = $this->chain->buildGenesis();
-        $this->connection = new GroupConnection($this, $this->diskJockey);
-        $this->connection->setFrameCryptor($this->frameCryptor);
+        $this->connection = $this->replaceConnection();
         $params = $this->connection->buildJoinPayload();
 
         $updates = $this->API->methodCallAsyncRead('phone.createConferenceCall', [
@@ -377,8 +361,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     public function join(bool $muted = false): self
     {
         $this->syncChain(self::SUBCHAIN_STATE);
-        $this->connection = new GroupConnection($this, $this->diskJockey);
-        $this->connection->setFrameCryptor($this->frameCryptor);
+        $this->connection = $this->replaceConnection();
         $params = $this->connection->buildJoinPayload();
 
         // If another member's block took our height while we were building, rebuild the self-add
@@ -477,18 +460,6 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             // The new link comes back in the updateGroupCall of the response, or on the next fetch.
             $this->extractCall($updates);
         }
-    }
-
-    /**
-     * Change the title of the conference call.
-     */
-    public function setTitle(string $title): self
-    {
-        $this->API->methodCallAsyncRead('phone.editGroupCallTitle', [
-            'call' => $this->getInputCall(),
-            'title' => $title,
-        ]);
-        return $this;
     }
 
     /**
@@ -660,14 +631,13 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             $this->API->unregisterConferenceCall($this->inputCall['id']);
         }
         $this->chainOffset = [0, 0];
-        $this->presentationConnection?->close();
-        $this->presentationConnection = null;
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
-        $this->connection?->close();
-        $this->connection = null;
+        $this->dropPresentation();
         if ($wasJoined && !$this->leaving) {
+            // Recordings in progress carry on with the connection of the rejoin.
+            $this->detachConnection();
             $this->scheduleRejoin();
+        } else {
+            $this->closeConnection();
         }
     }
 
@@ -845,216 +815,15 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      *  Screen-share: a second, end-to-end encrypted connection.
      * ------------------------------------------------------------------ */
 
-    /**
-     * Start sharing a screen: a second WebRTC connection (phone.joinGroupCallPresentation) whose
-     * video is end-to-end encrypted with the same conference keys, on its own packet channel so its
-     * sequence numbers never collide with the camera's. Idempotent.
-     */
-    public function enablePresentation(): self
-    {
-        if ($this->presentationConnection !== null) {
-            return $this;
-        }
-        if (!$this->joined) {
-            throw new \RuntimeException('Cannot share a screen before joining the conference.');
-        }
-        $this->presentationDj ??= new DjLoop($this, videoOnly: true);
-        $this->presentationDj->start();
-        // Distinct channels (screen video = 3) so replay windows don't clash with the camera (video = 2).
-        $this->presentationCryptor ??= new FrameCryptor($this, $this->cryptorState);
-        $connection = new GroupConnection($this, $this->presentationDj, screencast: true);
-        $connection->setFrameCryptor($this->presentationCryptor);
-        $params = $connection->buildJoinPayload();
-        $this->presentationConnection = $connection;
-        try {
-            $updates = $this->API->methodCallAsyncRead('phone.joinGroupCallPresentation', [
-                'call' => $this->getInputCall(),
-                'params' => $params,
-            ]);
-        } catch (Throwable $e) {
-            $this->presentationConnection = null;
-            $connection->close();
-            throw $e;
-        }
-        foreach ($updates['updates'] ?? [] as $update) {
-            if ($update['_'] === 'updateGroupCallConnection' && ($update['presentation'] ?? false)) {
-                $parsed = GroupSdp::parseJoinResponse($update['params']);
-                if ($parsed['transport'] !== null) {
-                    $connection->setTransport($parsed['transport'], $parsed['video']);
-                }
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * Stop sharing the screen: tear down the presentation connection and tell the server.
-     */
-    public function disablePresentation(): self
-    {
-        if ($this->presentationConnection === null) {
-            return $this;
-        }
-        $this->presentationConnection->close();
-        $this->presentationConnection = null;
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
-        if ($this->joined) {
-            try {
-                $this->API->methodCallAsyncRead('phone.leaveGroupCallPresentation', ['call' => $this->getInputCall()]);
-            } catch (Throwable $e) {
-                $this->log("Could not leave the presentation of $this: $e", Logger::WARNING);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * The disk jockey feeding a destination, starting the screen-share on first use of Presentation.
-     */
-    private function dj(MediaDestination $dest): DjLoop
-    {
-        if ($dest === MediaDestination::Camera) {
-            return $this->diskJockey;
-        }
-        $this->enablePresentation();
-        \assert($this->presentationDj !== null);
-        return $this->presentationDj;
-    }
-
-    /**
-     * The disk jockey for a destination without starting a screen-share that is not running.
-     *
-     * @psalm-mutation-free
-     */
-    private function djOrNull(MediaDestination $dest): ?DjLoop
-    {
-        return $dest === MediaDestination::Camera ? $this->diskJockey : $this->presentationDj;
-    }
-
     /* ------------------------------------------------------------------ *
      *  Media playback — the common {@see Call} interface. Every frame is end-to-end
      *  encrypted (camera and screen-share alike) before it reaches the SFU.
      * ------------------------------------------------------------------ */
 
-    private bool $muted = false;
-
-    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
-    {
-        $this->dj($dest)->play($file);
-        return $this;
-    }
-
-    /**
-     * Play a file, blocking until it has finished playing if a stream is provided.
-     */
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
-    {
-        $this->play($file, $dest);
-        self::awaitStream($file);
-        return $this;
-    }
-
-    /**
-     * Block until a played stream has finished; a no-op for files and URLs.
-     */
-    private static function awaitStream(LocalFile|RemoteUrl|ReadableStream $file): void
-    {
-        if (!$file instanceof ReadableStream) {
-            return;
-        }
-        $deferred = new DeferredFuture;
-        $file->onClose($deferred->complete(...));
-        $deferred->getFuture()->await();
-    }
-
     public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): self
     {
         $this->dj($dest)->play($file);
         return $this;
-    }
-
-    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): self
-    {
-        $this->dj($dest)->playOnHold(...$files);
-        return $this;
-    }
-
-    public function skip(MediaDestination $dest = MediaDestination::Camera): self
-    {
-        $this->djOrNull($dest)?->skip();
-        return $this;
-    }
-
-    public function stop(MediaDestination $dest = MediaDestination::Camera): self
-    {
-        if ($dest === MediaDestination::Presentation) {
-            $this->disablePresentation();
-            return $this;
-        }
-        $this->diskJockey->stopPlaying();
-        return $this;
-    }
-
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function pause(MediaDestination $dest = MediaDestination::Camera): self
-    {
-        $this->djOrNull($dest)?->pausePlaying();
-        return $this;
-    }
-
-    /**
-     * @psalm-mutation-free
-     */
-    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
-    {
-        return $this->djOrNull($dest)?->isAudioPaused() ?? false;
-    }
-
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function resume(MediaDestination $dest = MediaDestination::Camera): self
-    {
-        $this->djOrNull($dest)?->resumePlaying();
-        return $this;
-    }
-
-    /**
-     * @psalm-mutation-free
-     */
-    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
-    {
-        return $this->djOrNull($dest)?->getCurrent();
-    }
-
-    public function setMuted(bool $muted = true): self
-    {
-        $this->muted = $muted;
-        if ($muted) {
-            $this->diskJockey->pausePlaying();
-        } else {
-            $this->diskJockey->resumePlaying();
-        }
-        if ($this->joined && $this->inputCall !== null) {
-            try {
-                $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                    'call' => $this->inputCall,
-                    'participant' => ['_' => 'inputPeerSelf'],
-                    'muted' => $muted,
-                ]);
-            } catch (Throwable $e) {
-                $this->log("Could not change the mute state of $this: $e", Logger::WARNING);
-            }
-        }
-        return $this;
-    }
-
-    public function isMuted(): bool
-    {
-        return $this->muted;
     }
 
     /**
@@ -1085,17 +854,14 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             EventLoop::cancel($this->pollWatcher);
             $this->pollWatcher = null;
         }
-        $this->presentationConnection?->close();
-        $this->presentationConnection = null;
-        $this->presentationDj?->discard();
-        $this->presentationDj = null;
+        $this->dropPresentation();
         if ($this->inputCall === null) {
+            $this->closeConnection();
             return $this;
         }
         $this->API->unregisterConferenceCall($this->inputCall['id']);
         $source = $this->connection?->getAudioSource() ?? 0;
-        $this->connection?->close();
-        $this->connection = null;
+        $this->closeConnection();
         try {
             $this->API->methodCallAsyncRead('phone.leaveGroupCall', ['call' => $this->inputCall, 'source' => $source]);
         } catch (Throwable $e) {
@@ -1457,74 +1223,96 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * ------------------------------------------------------------------ */
 
     /**
-     * Record conference call media (all end-to-end encrypted; the SFU only ever sees ciphertext, but
-     * incoming frames are decrypted before they are muxed, so recordings are plaintext).
+     * Record one participant's (decrypted) media into a single file (or stream) with a fixed set of
+     * tracks, see {@see GroupMediaTrait::recordParticipant()}.
      *
-     * Only a {@see LocalDirectory} is accepted: every *transmitting* participant — or only the given
-     * `$participant` — is recorded as `<dir>/<userId>.<n>_<streams>.mkv` files, one per combination of
-     * the audio, camera video and screen share they send, which they can turn on and off at any time
-     * (see {@see \danog\MadelineProto\EventHandler\Call::setOutput()}). Participants that start
-     * transmitting later are picked up too; our own media is never recorded.
+     * @param ?int $streams The {@see CallStream} flags to record, or null for every available one.
      *
-     * `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}); OGG OPUS is not supported.
+     * @return int The streams the participant currently sends, as {@see CallStream} flags.
      */
-    public function setOutput(LocalFile|LocalDirectory|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        if (!$file instanceof LocalDirectory) {
-            throw new \InvalidArgumentException('A conference call is recorded into a LocalDirectory, one numbered file series per participant; a single file cannot hold them.');
-        }
-        $dir = rtrim($file->dir, '/');
-        if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
-            throw new \RuntimeException("Could not create the recording directory $dir");
-        }
-        $format ??= RecordingFormat::Mkv;
-        if (!$format->isMatroska()) {
-            throw new \InvalidArgumentException('Multi-party call recordings are always Matroska: use RecordingFormat::Mkv or RecordingFormat::Webm.');
-        }
-        if ($participant !== null) {
-            $userId = $this->API->getId($participant);
-            $this->wireOutput($userId, new LocalFile("$dir/$userId"), $format);
-            return $this;
-        }
-        $this->outputDir = $dir;
-        $this->outputFormat = $format;
-        foreach ($this->userToSource as $userId => $source) {
-            if ($userId !== $this->selfId) {
-                $this->wireFolderOutput($userId, $source);
-            }
-        }
+        return $this->recordParticipant($file, $participant, $format, $streams);
+    }
+
+    /**
+     * Record the conference (decrypted) into a directory, as numbered series of Matroska files, one
+     * per participant, see {@see GroupMediaTrait::recordFolder()}.
+     */
+    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): self
+    {
+        $this->recordFolder($dir, $participant, $format);
         return $this;
     }
 
     /**
-     * Route one participant's output to the connection now, or defer it until their source is known.
+     * @psalm-external-mutation-free
      */
-    private function wireOutput(int $userId, LocalFile|WritableStream $file, RecordingFormat $format): void
+    #[\Override]
+    private function callObject(): Call
     {
-        $source = $this->userToSource[$userId] ?? 0;
-        if ($source !== 0 && $this->connection !== null) {
-            $this->connection->setOutput($source, $file, $format);
-            return;
-        }
-        $this->pendingOutputs[$userId] = [$file, $format];
+        return $this->getPublic();
     }
 
     /**
-     * In folder mode, give a transmitting (non-self) participant its own `<dir>/<userId>.<n>_<streams>.mkv`
-     * file series, once each.
+     * Every connection encrypts its frames end-to-end with the conference keys; the screen share on
+     * its own packet channel (screen video = 3), so its sequence numbers never collide with the
+     * camera's (video = 2).
      */
-    private function wireFolderOutput(int $userId, int $source): void
+    #[\Override]
+    private function configureConnection(GroupConnection $connection, bool $screencast): void
     {
-        if ($this->outputDir === null
-            || $source === 0
-            || $userId === $this->selfId
-            || isset($this->folderPeers[$userId])
-            || isset($this->pendingOutputs[$userId]) // an explicit per-participant output takes precedence
-        ) {
+        if (!$screencast) {
+            $connection->setFrameCryptor($this->frameCryptor);
             return;
         }
-        $this->folderPeers[$userId] = true;
-        $this->wireOutput($userId, new LocalFile($this->outputDir.'/'.$userId), $this->outputFormat);
+        $this->presentationCryptor ??= new FrameCryptor($this, $this->cryptorState);
+        $connection->setFrameCryptor($this->presentationCryptor);
+    }
+
+    #[\Override]
+    private function onDroppedByServer(): void
+    {
+        // Exactly what being forbidden from the call means: reset and rejoin with a fresh key.
+        $this->handleForbidden();
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function participantOf(int $peerId): ?Participant
+    {
+        return $this->rtcParticipants[$peerId] ?? null;
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function isOurself(int $peerId, Participant $participant): bool
+    {
+        return $peerId === $this->selfId;
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function peerOfSource(int $source): ?int
+    {
+        return $this->ssrcToUser[GroupSdp::toUnsignedSsrc($source)] ?? null;
+    }
+
+    /**
+     * @return list<int>
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    private function knownPeers(): array
+    {
+        return array_keys($this->rtcParticipants);
     }
 
     /**
@@ -1679,12 +1467,10 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             ];
             // The source is now known: attach any recording deferred until it was, then apply
             // folder-mode recording to a participant that has just begun transmitting.
-            if (isset($this->pendingOutputs[$userId])) {
-                [$file, $format] = $this->pendingOutputs[$userId];
-                unset($this->pendingOutputs[$userId]);
-                $this->connection?->setOutput($participant->source, $file, $format);
+            if (isset($this->explicitOutputs[$userId])) {
+                $this->wireOutput($userId);
             }
-            $this->wireFolderOutput($userId, $participant->source);
+            $this->wireFolderOutput($userId);
         }
         $this->connection?->setRemoteSources($sources);
     }
@@ -1760,40 +1546,6 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     public function onConnectionFailed(): void
     {
         $this->log("The WebRTC connection of $this failed", Logger::WARNING);
-    }
-
-    #[\Override]
-    public function setVideoStopped(bool $stopped): void
-    {
-        if (!$this->joined) {
-            return;
-        }
-        try {
-            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                'call' => $this->inputCall,
-                'participant' => ['_' => 'inputPeerSelf'],
-                'video_stopped' => $stopped,
-            ]);
-        } catch (Throwable $e) {
-            $this->log("Could not change the video state of $this: $e", Logger::WARNING);
-        }
-    }
-
-    #[\Override]
-    public function setPresentationPaused(bool $paused): void
-    {
-        if (!$this->joined || $this->inputCall === null) {
-            return;
-        }
-        try {
-            $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
-                'call' => $this->inputCall,
-                'participant' => ['_' => 'inputPeerSelf'],
-                'presentation_paused' => $paused,
-            ]);
-        } catch (Throwable $e) {
-            $this->log("Could not change the presentation state of $this: $e", Logger::WARNING);
-        }
     }
 
     /**

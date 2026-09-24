@@ -19,9 +19,11 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
@@ -123,12 +125,27 @@ final class LegacyController
     }
 
     /**
-     * Set the output file or stream for the incoming audio.
+     * Set the output file or stream for the incoming audio (libtgvoip carries nothing else).
      */
     public function setOutput(LocalFile|WritableStream $file): void
     {
-        $this->recorder?->close();
+        $this->closeRecorder();
         $this->recorder = new OpusRecorder($file);
+        $this->call->onStreamsChanged(CallStream::AUDIO, [CallStream::AUDIO => 'A_OPUS'], RecordingEvent::Started, $this->recorder->file);
+    }
+
+    /**
+     * Finish the recording, if any, and report it.
+     */
+    private function closeRecorder(): void
+    {
+        if ($this->recorder === null) {
+            return;
+        }
+        $file = $this->recorder->file;
+        $this->recorder->close();
+        $this->recorder = null;
+        $this->call->onStreamsChanged(CallStream::AUDIO, [CallStream::AUDIO => 'A_OPUS'], RecordingEvent::Ended, $file);
     }
 
     /**
@@ -140,8 +157,7 @@ final class LegacyController
             return;
         }
         $this->closed = true;
-        $this->recorder?->close();
-        $this->recorder = null;
+        $this->closeRecorder();
         if ($this->timeoutWatcher !== null) {
             EventLoop::cancel($this->timeoutWatcher);
             $this->timeoutWatcher = null;

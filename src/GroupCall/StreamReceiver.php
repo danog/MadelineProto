@@ -18,12 +18,15 @@ namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\WritableStream;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Matroska;
 use danog\MadelineProto\MatroskaWriter;
 use danog\MadelineProto\Mp4;
 use danog\MadelineProto\OggWriter;
+use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
@@ -72,6 +75,8 @@ final class StreamReceiver
     private ?RecordingFormat $outputFormat = null;
     private ?OggWriter $ogg = null;
     private ?MatroskaWriter $mkv = null;
+    /** @var array<int, string> The codecs of the mixed stream's open recording, by {@see CallStream} flag. */
+    private array $mainCodecs = [];
     private ?WritableStream $out = null;
     /** Milliseconds of audio written so far, for Matroska timestamps. */
     private int $writtenMs = 0;
@@ -89,7 +94,7 @@ final class StreamReceiver
     /**
      * Per-publisher video recorders in folder mode, by video channel.
      *
-     * @var array<int, array{endpoint: string, writer: MatroskaWriter, out: WritableStream, start: int, started: bool}>
+     * @var array<int, array{endpoint: string, writer: MatroskaWriter, out: WritableStream, start: int, started: bool, file: string, codec: string}>
      */
     private array $videoWriters = [];
     private bool $unsupportedLogged = false;
@@ -153,11 +158,9 @@ final class StreamReceiver
      * `stream.ogg` (or `.mkv`/`.webm` for a Matroska `$format`, the default for RTMP), and, in an
      * automatically-scaled livestream, each publisher's video as `video-<endpoint>.mkv`.
      */
-    public function setOutputDirectory(string $dir, ?RecordingFormat $format = null): void
+    public function setOutputDirectory(LocalDirectory $directory, ?RecordingFormat $format = null): void
     {
-        if (!is_dir($dir) && !mkdir($dir, 0o777, true) && !is_dir($dir)) {
-            throw new \RuntimeException("Could not create the recording directory $dir");
-        }
+        $dir = $directory->create();
         $format ??= RecordingFormat::Mkv;
         $extension = match ($format) {
             RecordingFormat::Opus => 'ogg',
@@ -510,11 +513,14 @@ final class StreamReceiver
         if ($format->isMatroska()) {
             $this->mkv = new MatroskaWriter($this->out, $format->docType());
             $this->mkv->setAudioTrack($audioCodec, $rate, max(1, $channels), $audioPrivate);
+            $this->mainCodecs = [CallStream::AUDIO => $audioCodec];
             if ($video !== null && (int) ($video['width'] ?? 0) > 0) {
                 $this->mkv->setVideoTrack((string) $video['codec'], (int) $video['width'], (int) ($video['height'] ?? 0), (string) ($video['private'] ?? ''));
                 $this->mainHasVideo = true;
+                $this->mainCodecs[CallStream::VIDEO] = (string) $video['codec'];
             }
             $this->mkv->start();
+            $this->reportMain(RecordingEvent::Started);
             return;
         }
         if ($audioCodec !== 'A_OPUS') {
@@ -522,6 +528,18 @@ final class StreamReceiver
         }
         $this->ogg = new OggWriter($this->out);
         $this->ogg->writeHeader($channels, 48000, 'livestream', $audioPrivate);
+        $this->mainCodecs = [CallStream::AUDIO => $audioCodec];
+        $this->reportMain(RecordingEvent::Started);
+    }
+
+    /**
+     * Report the mixed stream's recording starting or ending as a {@see \danog\MadelineProto\EventHandler\Calls\CallStreams}
+     * update of participant 0 (there are no per-participant sources in stream mode).
+     */
+    private function reportMain(RecordingEvent $event): void
+    {
+        $streams = CallStream::AUDIO | ($this->mainHasVideo ? CallStream::VIDEO : 0);
+        $this->call->onParticipantStreams(0, $streams, $this->mainCodecs, $event, $this->outputFile instanceof LocalFile ? $this->outputFile : null);
     }
 
     private function writeAudio(string $packet, int $samples): void
@@ -573,8 +591,9 @@ final class StreamReceiver
                 $mkv = new MatroskaWriter($out, RecordingFormat::Mkv->docType());
                 $mkv->setVideoTrack((string) $track['codec'], (int) $track['width'], (int) ($track['height'] ?? 0), (string) ($track['private'] ?? ''));
                 $mkv->start();
-                $writer = ['endpoint' => $endpoint, 'writer' => $mkv, 'out' => $out, 'start' => $timestamp, 'started' => true];
+                $writer = ['endpoint' => $endpoint, 'writer' => $mkv, 'out' => $out, 'start' => $timestamp, 'started' => true, 'file' => $file, 'codec' => (string) $track['codec']];
                 $this->videoWriters[$channel] = $writer;
+                $this->call->onParticipantStreams(0, CallStream::VIDEO, [CallStream::VIDEO => $writer['codec']], RecordingEvent::Started, new LocalFile($file));
             }
             $writer['writer']->writeVideo($frame['data'], $timestamp - $writer['start'] + ($frame['timestamp'] - $chunkBase), $frame['keyframe']);
         }
@@ -592,10 +611,12 @@ final class StreamReceiver
         } catch (Throwable $e) {
             $this->call->log("Could not close the video recording of {$writer['endpoint']} in {$this->call}: $e", Logger::WARNING);
         }
+        $this->call->onParticipantStreams(0, CallStream::VIDEO, [CallStream::VIDEO => $writer['codec']], RecordingEvent::Ended, new LocalFile($writer['file']));
     }
 
     private function closeWriters(): void
     {
+        $open = $this->ogg !== null || $this->mkv !== null;
         try {
             if ($this->ogg !== null) {
                 $this->ogg->writeChunk('', 0, true);
@@ -610,7 +631,11 @@ final class StreamReceiver
         $this->ogg = null;
         $this->mkv = null;
         $this->out = null;
+        if ($open) {
+            $this->reportMain(RecordingEvent::Ended);
+        }
         $this->mainHasVideo = false;
+        $this->mainCodecs = [];
         $this->recordingStart = null;
         foreach (array_keys($this->videoWriters) as $channel) {
             $this->closeVideoWriter($channel);

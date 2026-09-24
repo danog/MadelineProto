@@ -17,40 +17,27 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
-use Amp\Pipeline\ConcurrentIterator;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\OggWriter;
-use Revolt\EventLoop;
 use Throwable;
-use Webrtc\Codecs\EncodedPacket;
-use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
 
 use function Amp\File\openFile;
 
 /**
- * Writes the audio of a remote WebRTC track to an OGG OPUS stream.
+ * Writes the incoming audio of a call to an OGG OPUS stream.
  *
- * The receiver is put in raw mode, so the OPUS frames that arrive over RTP are muxed into OGG
- * exactly as they were sent, with no decode/encode round trip: the recording is bit-identical to
- * what the peer transmitted, it costs almost nothing, and it needs no codec library (and therefore
- * no FFI extension). The resulting file can be played back by MadelineProto as-is.
+ * The receiver is put in raw mode, so the OPUS frames that arrive over RTP (pushed in by the
+ * {@see IncomingMedia} router, or by the legacy libtgvoip engine) are muxed into OGG exactly as they
+ * were sent, with no decode/encode round trip: the recording is bit-identical to what the peer
+ * transmitted, it costs almost nothing, and it needs no codec library (and therefore no FFI
+ * extension). The resulting file can be played back by MadelineProto as-is.
  *
  * @internal
  */
 final class OpusRecorder
 {
-    /** Granule position increment assumed for a frame whose duration we cannot derive. */
-    private const DEFAULT_FRAME_SAMPLES = 960;
-    /** An OPUS frame can never be longer than 120ms, i.e. 5760 samples at 48kHz. */
-    private const MAX_FRAME_SAMPLES = 5760;
-
     private OggWriter $writer;
-    private ?RemoteStreamTrack $track = null;
-    private ?ConcurrentIterator $consumer = null;
-    private bool $draining = false;
     private bool $closed = false;
-    /** RTP timestamp of the previously written frame, used to derive granule increments. */
-    private ?int $lastTimestamp = null;
 
     public readonly int $streamId;
     public readonly ?LocalFile $file;
@@ -69,15 +56,15 @@ final class OpusRecorder
     }
 
     /**
-     * Drop the (unserializable) OGG writer and live subscription; {@see self::__unserialize()} reopens
-     * the file and continues recording, so an incoming stream survives a serialize/deserialize cycle.
+     * Drop the (unserializable) OGG writer; {@see self::resume()} reopens the file and continues
+     * recording, so an incoming stream survives a serialize/deserialize cycle.
      *
      * @psalm-mutation-free
      */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        unset($vars['writer'], $vars['consumer']);
+        unset($vars['writer']);
         return $vars;
     }
 
@@ -91,15 +78,12 @@ final class OpusRecorder
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        $this->consumer = null;
-        $this->draining = false;
-        $this->lastTimestamp = null;
     }
 
     /**
      * Reopen the file and resume recording after the whole call graph has been deserialized: append a
-     * fresh chained Opus stream and re-subscribe to the resumed track. Called by the controller's
-     * resume(); never during unserialize (opening the file suspends the fiber).
+     * fresh chained Opus stream. Called by the owner's resume(); never during unserialize (opening the
+     * file suspends the fiber).
      */
     public function resume(): void
     {
@@ -111,71 +95,14 @@ final class OpusRecorder
         // Append a fresh chained Opus stream (its own serial) to the existing recording.
         $this->writer = new OggWriter(openFile($this->file->file, 'a'), random_int(-(2**31), (2**31) - 1));
         $this->writer->writeHeader(1, OpusPlaybackTrack::CLOCK_RATE, 'incoming audio stream (resumed)');
-        if ($this->track !== null && !$this->draining) {
-            $this->consumer = $this->track->getConsumer();
-            $this->draining = true;
-            EventLoop::queue($this->drain(...));
-        }
     }
 
     /**
-     * Attach the remote track whose audio should be recorded.
-     */
-    public function setTrack(RemoteStreamTrack $track): void
-    {
-        if ($this->closed) {
-            return;
-        }
-        $this->track = $track;
-        $this->consumer = $track->getConsumer();
-        if (!$this->draining) {
-            $this->draining = true;
-            EventLoop::queue($this->drain(...));
-        }
-    }
-
-    private function drain(): void
-    {
-        // The track feeds its frames reactively through a concurrency-safe queue, so instead of
-        // polling a `receiveData()` (which no longer exists) we iterate the consumer, which
-        // suspends this single task between frames until one is enqueued or the track is stopped.
-        // A single long-lived foreach — the same shape the RTP sender uses to drain a track — is
-        // deliberate: a repeated timer that re-entered a blocking continue() would leak one parked
-        // fiber per tick, since amphp's ConcurrentIterator hands each waiter a different frame.
-        $consumer = $this->consumer;
-        if ($consumer === null) {
-            return;
-        }
-        foreach ($consumer as $frame) {
-            if ($this->closed) {
-                break;
-            }
-            if (!$frame instanceof EncodedPacket) {
-                // The receiver was not put in raw mode: decoded PCM cannot be muxed into OGG OPUS.
-                continue;
-            }
-            $timestamp = $frame->getTimestamp();
-            // The OGG granule position must advance by the duration of each frame, which the RTP
-            // timestamps give us directly; the first frame has no predecessor to measure against.
-            $granule = self::DEFAULT_FRAME_SAMPLES;
-            if ($this->lastTimestamp !== null) {
-                $delta = ($timestamp - $this->lastTimestamp) & 0xFFFFFFFF;
-                if ($delta > 0 && $delta <= self::MAX_FRAME_SAMPLES) {
-                    $granule = $delta;
-                }
-            }
-            $this->lastTimestamp = $timestamp;
-            $this->writer->writeChunk($frame->getData(), $granule, false);
-        }
-        // The track was stopped and its queue exhausted (or we were closed): close() finalizes.
-        $this->draining = false;
-        $this->consumer = null;
-    }
-
-    /**
-     * Write one bare OPUS frame, as delivered by the legacy libtgvoip engine.
+     * Write one bare OPUS frame.
      *
-     * libtgvoip always uses 60ms frames, so the granule advances by a fixed amount.
+     * @param int $samples The frame's duration in samples at 48 kHz, by which the granule position
+     *                     advances: the RTP timestamp delta for WebRTC audio, and 60ms (the fixed
+     *                     libtgvoip frame) by default.
      */
     public function writeOpus(string $frame, int $samples = 2880): void
     {
@@ -200,7 +127,5 @@ final class OpusRecorder
             }
         } catch (Throwable) {
         }
-        $this->track = null;
-        $this->consumer = null;
     }
 }
