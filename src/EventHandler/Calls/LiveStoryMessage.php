@@ -34,7 +34,7 @@ final class LiveStoryMessage extends AbstractGroupCallMessage
     /**
      * @internal
      *
-     * @param array{call: array{id: int}, message: array{id: int, from_id: mixed, date: int, from_admin?: bool, paid_message_stars?: int, message: array{text: string, entities?: list<array<array-key, mixed>>}}} $rawUpdate
+     * @param array{call: array{id: int}, message: array{id: int, from_id: mixed, date: int, from_admin: bool, paid_message_stars?: int, message: array{text: string, entities?: list<array<array-key, mixed>>}}} $rawUpdate
      *
      * @psalm-mutation-free
      */

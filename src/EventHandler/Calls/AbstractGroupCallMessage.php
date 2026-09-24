@@ -33,7 +33,7 @@ abstract class AbstractGroupCallMessage extends MultiCallMessage
     /**
      * @internal
      *
-     * @param array{call: array{id: int}, message: array{id: int, from_id: mixed, date: int, from_admin?: bool, message: array{text: string, entities?: list<array<array-key, mixed>>}}} $rawUpdate
+     * @param array{call: array{id: int}, message: array{id: int, from_id: mixed, date: int, from_admin: bool, message: array{text: string, entities?: list<array<array-key, mixed>>}}} $rawUpdate
      *
      * @psalm-mutation-free
      */

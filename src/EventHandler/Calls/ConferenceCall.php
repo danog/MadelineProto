@@ -49,6 +49,8 @@ final class ConferenceCall extends Update implements MultiCall
 {
     /** Conference call ID. */
     public readonly int $id;
+    /** Access hash of the conference call. */
+    public readonly int $accessHash;
 
     /** Number of participants. */
     public int $participantsCount = 0;

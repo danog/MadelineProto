@@ -118,9 +118,10 @@ final class CallRecorder
     private ?RecordingObserver $observer = null;
 
     /**
+     * @psalm-import-type StreamMask from CallStream
      * @param bool $series   Whether to roll a new segment on every change of the flowing streams
      *                       (false: one file with fixed tracks).
-     * @param ?int $streams  Fixed mode: the {@see CallStream} flags of the tracks the file holds, or
+     * @param ?StreamMask $streams  Fixed mode: the {@see CallStream} flags of the tracks the file holds, or
      *                       null to take every stream flowing when the header is committed.
      */
     private function __construct(LocalFile|WritableStream $out, RecordingFormat $format, private readonly bool $series, private readonly ?int $streams)
@@ -142,7 +143,9 @@ final class CallRecorder
     /**
      * A recorder writing one file (or stream) with a fixed set of tracks.
      *
-     * @param ?int $streams The {@see CallStream} flags of the tracks to hold, or null to take every
+     * @psalm-import-type StreamMask from CallStream
+     * 
+     * @param ?StreamMask $streams The {@see CallStream} flags of the tracks to hold, or null to take every
      *                      stream flowing when the header is committed. A file holding no video
      *                      track is opened right away; one with video tracks is opened once each of
      *                      them was described by its first keyframe (or the grace period passed).

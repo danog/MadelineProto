@@ -727,7 +727,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * {@see GroupMediaTrait::recordParticipant()}), or, in stream mode, the call's single mixed stream
      * (OGG OPUS is supported there only).
      *
-     * @param ?int $streams The {@see CallStream} flags to record, or null for every available one.
+     * @psalm-import-type StreamMask from CallStream
+     * @param ?StreamMask $streams The {@see CallStream} flags to record, or null for every available one.
      *
      * @return int The streams currently sent, as {@see CallStream} flags.
      */

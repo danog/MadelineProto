@@ -965,9 +965,6 @@
     </MixedReturnStatement>
   </file>
   <file src="src/EventHandler/Calls/AbstractGroupCall.php">
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$this->getClient()->groupCallSetOutput($this->id, $file, $participant, $format, $streams)]]></code>
-    </LessSpecificReturnStatement>
     <MixedAssignment>
       <code><![CDATA[$this->accessHash]]></code>
       <code><![CDATA[$this->canChangeJoinMuted]]></code>
@@ -987,9 +984,6 @@
       <code><![CDATA[$this->unmutedVideoCount]]></code>
       <code><![CDATA[$this->unmutedVideoLimit]]></code>
     </MixedAssignment>
-    <MoreSpecificReturnType>
-      <code><![CDATA[StreamMask]]></code>
-    </MoreSpecificReturnType>
   </file>
   <file src="src/EventHandler/Calls/AbstractGroupCallParticipant.php">
     <ImpureMethodCall>
@@ -2713,9 +2707,9 @@
     <MixedArgument>
       <code><![CDATA[$alive]]></code>
       <code><![CDATA[$alive]]></code>
-      <code><![CDATA[$donor['my'] ?? false]]></code>
+      <code><![CDATA[$donor['my']]]></code>
       <code><![CDATA[$donor['stars']]]></code>
-      <code><![CDATA[$donor['top'] ?? false]]></code>
+      <code><![CDATA[$donor['top']]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$participant]]></code>
       <code><![CDATA[$result]]></code>
@@ -2790,9 +2784,6 @@
       <code><![CDATA[$call]]></code>
       <code><![CDATA[$inputCall]]></code>
       <code><![CDATA[$inputCall]]></code>
-      <code><![CDATA[$joinAs]]></code>
-      <code><![CDATA[$joinAs]]></code>
-      <code><![CDATA[$peer]]></code>
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$update['blocks']]]></code>
       <code><![CDATA[$update['blocks']]]></code>
@@ -2882,6 +2873,9 @@
       <code><![CDATA[$this->groupCalls]]></code>
       <code><![CDATA[$this->groupCalls]]></code>
     </MixedPropertyTypeCoercion>
+    <MoreSpecificReturnType>
+      <code><![CDATA[StreamMask]]></code>
+    </MoreSpecificReturnType>
     <PossiblyNullOperand>
       <code><![CDATA[$dc]]></code>
     </PossiblyNullOperand>

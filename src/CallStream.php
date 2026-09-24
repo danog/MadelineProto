@@ -126,6 +126,8 @@ final class CallStream
     /**
      * Check that a set only holds known flags.
      *
+     * @param StreamMask $streams
+     * 
      * @throws InvalidArgumentException
      *
      * @psalm-pure

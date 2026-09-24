@@ -46,6 +46,8 @@ abstract class AbstractGroupCall extends Update implements MultiCall
 {
     /** Group call ID. */
     public readonly int $id;
+    /** Access hash of the group call. */
+    public readonly int $accessHash;
     /** Bot API ID of the peer the call belongs to (the group or channel of a video chat, the poster of a live story), if known. */
     public readonly ?int $peerId;
 

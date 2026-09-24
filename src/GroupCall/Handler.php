@@ -43,6 +43,8 @@ use Revolt\EventLoop;
  * Manages group calls (video chats, livestreams and live stories).
  *
  * See https://core.telegram.org/api/group-calls for more info.
+ * 
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  *
  * @internal
  */
@@ -82,12 +84,12 @@ trait Handler
      * Requires the `manage_call` admin right, see
      * [video chats/livestreams »](https://core.telegram.org/api/group-calls#video-chats-livestreams).
      *
-     * @param mixed       $peer         The group or channel where the call should be created.
+     * @param string|int       $peer         The group or channel where the call should be created.
      * @param string|null $title        Custom title, defaults to the group/channel name.
      * @param int|null    $scheduleDate If set, creates a scheduled call for the specified UNIX timestamp.
      * @param bool        $rtmpStream   Whether the call's media is published by an external RTMP application.
      */
-    public function createGroupCall(mixed $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): GroupCall
+    public function createGroupCall(string|int $peer, ?string $title = null, ?int $scheduleDate = null, bool $rtmpStream = false): GroupCall
     {
         $params = [
             'peer' => $peer,
@@ -462,7 +464,8 @@ trait Handler
      *
      * @internal
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @psalm-import-type StreamMask from CallStream
+     * @param ?StreamMask $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
@@ -576,7 +579,7 @@ trait Handler
     /**
      * Get the group call (video chat or livestream) currently active in a group or channel.
      */
-    public function getGroupCall(mixed $peer): ?GroupCall
+    public function getGroupCall(string|int $peer): ?GroupCall
     {
         $full = $this->getFullInfo($peer);
         $inputCall = $full['full']['call'] ?? null;
@@ -600,12 +603,12 @@ trait Handler
     /**
      * Join the group call currently active in a group or channel.
      *
-     * @param mixed       $peer       The group or channel whose call should be joined.
+     * @param string|int       $peer       The group or channel whose call should be joined.
      * @param bool        $muted      Whether to join muted.
-     * @param mixed       $joinAs     Peer to join as, defaults to ourselves.
+     * @param string|int|null  $joinAs     Peer to join as, defaults to ourselves.
      * @param string|null $inviteHash Invite hash from a video chat invite link, if any.
      */
-    public function joinGroupCall(mixed $peer, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): GroupCall
+    public function joinGroupCall(string|int $peer, bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): GroupCall
     {
         $full = $this->getFullInfo($peer);
         $inputCall = $full['full']['call'] ?? null;
@@ -626,7 +629,7 @@ trait Handler
      *
      * @internal
      */
-    public function joinGroupCallById(int $id, bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): void
+    public function joinGroupCallById(int $id, bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
@@ -907,7 +910,7 @@ trait Handler
      *
      * @internal
      */
-    public function saveDefaultGroupCallSendAs(int $id, mixed $peer): void
+    public function saveDefaultGroupCallSendAs(int $id, string|int $peer): void
     {
         $this->getGroupCallController($id)->saveDefaultSendAs($peer);
     }
@@ -1016,7 +1019,7 @@ trait Handler
      *
      * @return list<int>
      */
-    public function getGroupCallJoinAs(mixed $peer): array
+    public function getGroupCallJoinAs(string|int $peer): array
     {
         $result = $this->methodCallAsyncRead('phone.getGroupCallJoinAs', ['peer' => $peer]);
         $ids = [];
@@ -1032,10 +1035,10 @@ trait Handler
     /**
      * Save the peer we join the video chats and livestreams of a group or channel as by default.
      *
-     * @param mixed $peer   The group or channel.
-     * @param mixed $joinAs The peer to join as (one of {@see self::getGroupCallJoinAs()}).
+     * @param string|int $peer   The group or channel.
+     * @param string|int $joinAs The peer to join as (one of {@see self::getGroupCallJoinAs()}).
      */
-    public function saveDefaultGroupCallJoinAs(mixed $peer, mixed $joinAs): void
+    public function saveDefaultGroupCallJoinAs(string|int $peer, string|int $joinAs): void
     {
         $this->methodCallAsyncRead('phone.saveDefaultGroupCallJoinAs', ['peer' => $peer, 'join_as' => $joinAs]);
     }
@@ -1045,13 +1048,13 @@ trait Handler
      * to, in a group or channel (create the call with `rtmpStream` afterwards, see {@see self::createGroupCall()}),
      * or as a live story (see {@see self::startLive()}).
      *
-     * @param mixed $peer      The group or channel (or, for a live story, the user, group or channel it is posted as).
+     * @param string|int $peer      The group or channel (or, for a live story, the user, group or channel it is posted as).
      * @param bool  $revoke    Whether to generate a new stream key, invalidating the previous one.
      * @param bool  $liveStory Whether the key is for a live story rather than a video chat/livestream.
      *
      * @return array{url: string, key: string}
      */
-    public function getGroupCallStreamRtmpUrl(mixed $peer, bool $revoke = false, bool $liveStory = false): array
+    public function getGroupCallStreamRtmpUrl(string|int $peer, bool $revoke = false, bool $liveStory = false): array
     {
         $result = $this->methodCallAsyncRead('phone.getGroupCallStreamRtmpUrl', ['peer' => $peer, 'revoke' => $revoke, 'live_story' => $liveStory]);
         return ['url' => (string) $result['url'], 'key' => (string) $result['key']];
@@ -1061,7 +1064,7 @@ trait Handler
      * Start a [live story »](https://core.telegram.org/api/group-calls#live-stories): a livestream posted
      * as a story, of which we are the single publisher (everyone else joins as a listener).
      *
-     * @param mixed                     $peer                  Who to post the live story as: ourselves, or a group or channel we administer.
+     * @param string|int                $peer                  Who to post the live story as: ourselves, or a group or channel we administer.
      * @param string|null               $caption               Caption of the story.
      * @param ParseMode|null            $parseMode             Whether to parse HTML or Markdown markup in the caption.
      * @param list<array<string, mixed>> $privacyRules          Who may see the story, as [InputPrivacyRule](https://core.telegram.org/type/InputPrivacyRule)s; everyone by default.
@@ -1071,7 +1074,7 @@ trait Handler
      * @param bool|null                 $messagesEnabled       Whether viewers may comment with in-call messages.
      * @param int|null                  $sendPaidMessagesStars The minimum Telegram Stars donation required to comment, if any.
      */
-    public function startLive(mixed $peer, ?string $caption = null, ?ParseMode $parseMode = null, array $privacyRules = [['_' => 'inputPrivacyValueAllowAll']], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): LiveStory
+    public function startLive(string|int $peer, ?string $caption = null, ?ParseMode $parseMode = null, array $privacyRules = [['_' => 'inputPrivacyValueAllowAll']], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): LiveStory
     {
         $params = [
             'peer' => $peer,
@@ -1116,9 +1119,9 @@ trait Handler
      * Record one participant of a group call (or, in stream mode, its mixed stream) into a single file
      * (or stream) with a fixed set of tracks, see {@see \danog\MadelineProto\EventHandler\Calls\AbstractGroupCall::setOutput()}.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param ?StreamMask $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
-     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
     public function groupCallSetOutput(int $id, LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
