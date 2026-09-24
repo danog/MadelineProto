@@ -43,6 +43,8 @@ use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
  * available streams or their codecs change, and whenever a recording starts or ends, and turns that
  * into a {@see \danog\MadelineProto\EventHandler\Calls\CallStreams} update.
  *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
+ *
  * @internal
  */
 final class IncomingMedia implements RecordingObserver
@@ -56,7 +58,7 @@ final class IncomingMedia implements RecordingObserver
     /**
      * Which streams the party is sending, as far as signaling tells: true on, false off, null unknown.
      *
-     * @var array<int, ?bool> By {@see CallStream} flag.
+     * @var array<CallStream::AUDIO|CallStream::VIDEO|CallStream::SCREEN, ?bool> By {@see CallStream} flag.
      */
     private array $expected = [CallStream::AUDIO => null, CallStream::VIDEO => null, CallStream::SCREEN => null];
     /** @var array<int, string> The Matroska codec ID of every slot ({@see CallStream} flag) media was seen for, while it is on. */
@@ -232,6 +234,8 @@ final class IncomingMedia implements RecordingObserver
      * The streams the party currently sends, as {@see CallStream} flags.
      *
      * @psalm-mutation-free
+     *
+     * @return StreamMask
      */
     public function getAvailable(): int
     {
@@ -265,6 +269,8 @@ final class IncomingMedia implements RecordingObserver
     /**
      * Record the party into one file (or stream) with a fixed set of tracks (see
      * {@see CallRecorder::fixed()}), finishing the previous recording (if any).
+     *
+     * @param ?StreamMask $streams The {@see CallStream} flags to record, or null for every stream the peer currently sends.
      */
     public function recordFixed(LocalFile|WritableStream $out, RecordingFormat $format, ?int $streams): void
     {

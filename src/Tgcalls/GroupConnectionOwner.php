@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Tgcalls;
 
+use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\RecordingEvent;
 use Stringable;
@@ -25,6 +26,7 @@ use Stringable;
  * implemented by both the ordinary group call ({@see \danog\MadelineProto\GroupCall\GroupCallController}) and
  * the end-to-end encrypted conference call, so the same engine drives either.
  *
+ * @psalm-import-type StreamMask from CallStream
  * @internal
  */
 interface GroupConnectionOwner extends Stringable
@@ -38,7 +40,7 @@ interface GroupConnectionOwner extends Stringable
      * The streams a participant sends (or their codecs) changed, or a recording of them started or ended.
      *
      * @param int                   $source    The participant's signed audio SSRC.
-     * @param int                   $streams   The streams they send, as {@see \danog\MadelineProto\CallStream} flags.
+     * @param StreamMask            $streams   The streams they send, as {@see \danog\MadelineProto\CallStream} flags.
      * @param array<int, string>    $codecs    The codec of every stream media was seen for, by {@see \danog\MadelineProto\CallStream} flag.
      * @param ?RecordingEvent       $recording Whether a recording started or ended, or null if only the streams changed.
      * @param ?LocalFile            $file      The file of the recording event, if it is a local file.

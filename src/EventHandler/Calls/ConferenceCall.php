@@ -187,7 +187,6 @@ final class ConferenceCall extends Update implements MultiCall
      * A participant of the conference by their id, username or peer, with their Ed25519 public key,
      * permission bits and protocol version from the shared-state chain, or null if not in it.
      *
-     * @return ConferenceCallParticipant|null
      */
     #[\Override]
     public function getParticipant(string|int $participant): ?ConferenceCallParticipant

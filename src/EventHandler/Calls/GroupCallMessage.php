@@ -17,8 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
+ * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
  * ({@see GroupCall}), mirroring [groupCallMessage](https://core.telegram.org/constructor/groupCallMessage).
  */
 final class GroupCallMessage extends AbstractGroupCallMessage

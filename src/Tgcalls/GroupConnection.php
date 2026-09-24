@@ -49,6 +49,8 @@ use Webrtc\Webrtc\RTCPeerConnection;
 /**
  * WebRTC engine of a Telegram group call.
  *
+ * @psalm-import-type StreamMask from CallStream
+ *
  * The Telegram SFU does not exchange SDP: the client sends a small JSON join payload describing its
  * ICE/DTLS parameters and outgoing audio SSRC to
  * [phone.joinGroupCall](https://core.telegram.org/method/phone.joinGroupCall), and gets back the
@@ -594,7 +596,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      *
      * @param int             $source  The participant's signed audio SSRC.
      * @param RecordingFormat $format  The Matroska DocType to write.
-     * @param ?int            $streams The {@see \danog\MadelineProto\CallStream} flags to record, or null
+     * @param ?StreamMask     $streams The {@see \danog\MadelineProto\CallStream} flags to record, or null
      *                                 for every stream flowing when the recording starts.
      */
     public function setOutput(int $source, LocalFile|WritableStream $file, RecordingFormat $format = RecordingFormat::Mkv, ?int $streams = null): void

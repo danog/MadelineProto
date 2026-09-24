@@ -72,6 +72,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  * time: the peer has a single incoming video channel and tells the two apart purely through the
  * {@see MediaState} `screencastState` flag.
  *
+ * @psalm-import-type StreamMask from CallStream
  * @internal
  */
 final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, PeerConnectionDataChannelListener, DataChannelOpenListener, DataChannelMessageListener, IncomingMediaObserver
@@ -617,7 +618,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * When `$format` is null it is autodetected from the extension of `$file` — but only if a
      * {@see LocalFile} was passed; a raw stream, whose extension is unknown, defaults to WebM.
      *
-     * @param ?int $streams The {@see CallStream} flags to record, or null for every stream the peer
+     * @param ?StreamMask $streams The {@see CallStream} flags to record, or null for every stream the peer
      *                      currently sends. Every chosen stream must be available, once the peer has
      *                      reported its media state; before that (the call is still connecting)
      *                      anything is accepted, and a null set takes whatever flows when the
@@ -625,7 +626,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      *
      * @throws \InvalidArgumentException If a chosen stream is not available.
      *
-     * @return int The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
+     * @return StreamMask The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
      */
     public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {
@@ -674,6 +675,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      * reported its media state yet.
      *
      * @psalm-mutation-free
+     *
+     * @return ?StreamMask
      */
     public function getAvailableStreams(): ?int
     {

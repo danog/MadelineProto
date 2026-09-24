@@ -56,6 +56,7 @@ use danog\MadelineProto\RecordingFormat;
  * committed once every expected stream has been seen, or after a short grace period. A
  * {@see RecordingObserver} is told whenever a file is opened or finished.
  *
+ * @psalm-import-type StreamMask from CallStream
  * @internal
  */
 final class CallRecorder
@@ -118,7 +119,6 @@ final class CallRecorder
     private ?RecordingObserver $observer = null;
 
     /**
-     * @psalm-import-type StreamMask from CallStream
      * @param bool $series   Whether to roll a new segment on every change of the flowing streams
      *                       (false: one file with fixed tracks).
      * @param ?StreamMask $streams  Fixed mode: the {@see CallStream} flags of the tracks the file holds, or
@@ -143,8 +143,6 @@ final class CallRecorder
     /**
      * A recorder writing one file (or stream) with a fixed set of tracks.
      *
-     * @psalm-import-type StreamMask from CallStream
-     * 
      * @param ?StreamMask $streams The {@see CallStream} flags of the tracks to hold, or null to take every
      *                      stream flowing when the header is committed. A file holding no video
      *                      track is opened right away; one with video tracks is opened once each of

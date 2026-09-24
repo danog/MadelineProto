@@ -23,8 +23,7 @@ use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent in
- * a multi-party call, shown as an overlay by the participants' clients (there is no chat history).
+ * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent in a multi-party call, shown as an overlay by the participants' clients (there is no chat history).
  *
  * The concrete type depends on the call: a {@see GroupCallMessage} for a video chat or livestream, a
  * {@see LiveStoryMessage} (which can carry a Telegram Stars donation) for a live story, or a

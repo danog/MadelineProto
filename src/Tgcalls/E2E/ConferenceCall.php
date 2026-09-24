@@ -59,6 +59,8 @@ use Throwable;
  * returned by {@see self::getPublic()}, which delegates back here by call id. The controller
  * implements the common {@see Call} media interface plus conference-specific controls (verification,
  * encrypted messages).
+ *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  */
 final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, CallControllerInterface
 {
@@ -1232,9 +1234,9 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * Record one participant's (decrypted) media into a single file (or stream) with a fixed set of
      * tracks, see {@see GroupMediaTrait::recordParticipant()}.
      *
-     * @param ?int $streams The {@see CallStream} flags to record, or null for every available one.
+     * @param ?StreamMask $streams The {@see CallStream} flags to record, or null for every available one.
      *
-     * @return int The streams the participant currently sends, as {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as {@see CallStream} flags.
      */
     public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {

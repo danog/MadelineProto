@@ -52,7 +52,10 @@ use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
-/** @internal */
+/**
+ * @internal
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
+ */
 final class PrivateCallController implements CallControllerInterface
 {
     /**
@@ -96,7 +99,10 @@ final class PrivateCallController implements CallControllerInterface
     private ?LocalDirectory $outputFolder = null;
 
     private ?RecordingFormat $outputFormat = null;
-    /** The {@see CallStream} flags requested for the pending file recording, or null for every available stream. */
+    /**
+     * The {@see CallStream} flags requested for the pending file recording, or null for every available stream.
+     * @var ?StreamMask
+     */
     private ?int $outputStreams = null;
 
     private bool $muted = false;
@@ -530,9 +536,9 @@ final class PrivateCallController implements CallControllerInterface
      * {@see Controller::setOutput()}. Before the engine exists (the call is still connecting) the
      * request is remembered and applied once it starts; the legacy libtgvoip engine records audio only.
      *
-     * @param ?int $streams The {@see CallStream} flags to record, or null for every stream the peer currently sends.
+     * @param ?StreamMask $streams The {@see CallStream} flags to record, or null for every stream the peer currently sends.
      *
-     * @return int The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
+     * @return StreamMask The streams the peer currently sends, as {@see CallStream} flags (0 while unknown).
      */
     public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {

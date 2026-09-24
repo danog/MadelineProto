@@ -43,7 +43,7 @@ use Revolt\EventLoop;
  * Manages group calls (video chats, livestreams and live stories).
  *
  * See https://core.telegram.org/api/group-calls for more info.
- * 
+ *
  * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  *
  * @internal
@@ -464,7 +464,6 @@ trait Handler
      *
      * @internal
      *
-     * @psalm-import-type StreamMask from CallStream
      * @param ?StreamMask $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.

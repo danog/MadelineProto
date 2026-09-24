@@ -19,8 +19,7 @@ namespace danog\MadelineProto\EventHandler\Calls;
 use danog\MadelineProto\MTProto;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [live story »](https://core.telegram.org/api/group-calls#live-stories) ({@see LiveStory}).
+ * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent in a [live story »](https://core.telegram.org/api/group-calls#live-stories) ({@see LiveStory}).
  *
  * On top of a plain {@see AbstractGroupCallMessage}, a live story message may carry a Telegram Stars
  * donation ({@see self::$paidStars}); a donation with an empty text is a standalone donation

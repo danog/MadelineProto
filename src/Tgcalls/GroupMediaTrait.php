@@ -49,6 +49,8 @@ use Webmozart\Assert\Assert;
  * `inputGroupCall` it drives, how it prepares a fresh connection, and how it maps participants to
  * their media sources (see the abstract methods).
  *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
+ *
  * @internal
  */
 trait GroupMediaTrait
@@ -69,7 +71,7 @@ trait GroupMediaTrait
      * ({@see self::recordParticipant()}, wired once, then dropped) or a segment series
      * ({@see self::recordFolder()} with a participant, kept so it is re-wired after a re-join).
      *
-     * @var array<int, array{file: LocalFile|WritableStream, format: RecordingFormat, streams: ?int, series: bool}>
+     * @var array<int, array{file: LocalFile|WritableStream, format: RecordingFormat, streams: ?StreamMask, series: bool}>
      */
     private array $explicitOutputs = [];
     /**
@@ -526,12 +528,12 @@ trait GroupMediaTrait
      * recorded. `$format` picks the Matroska DocType ({@see RecordingFormat::matroskaFor()}).
      *
      * @param mixed $participant The participant to record (required).
-     * @param ?int  $streams     The {@see CallStream} flags to record, or null for every stream the
+     * @param ?StreamMask  $streams     The {@see CallStream} flags to record, or null for every stream the
      *                           participant currently sends. Every chosen stream must be available.
      *
      * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
      *
-     * @return int The streams the participant currently sends, as {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as {@see CallStream} flags.
      */
     private function recordParticipant(LocalFile|WritableStream $file, mixed $participant, ?RecordingFormat $format, ?int $streams): int
     {
@@ -596,6 +598,8 @@ trait GroupMediaTrait
      * transmitting, or unknown).
      *
      * @psalm-mutation-free
+     *
+     * @return StreamMask A bitmask of {@see CallStream} flags.
      */
     private function availableStreams(int $peerId): int
     {

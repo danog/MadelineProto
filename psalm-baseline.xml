@@ -210,6 +210,11 @@
       <code><![CDATA[\is_array($this->filter->whitelist) && !\in_array($peer, $this->filter->whitelist, true)]]></code>
     </RedundantCondition>
   </file>
+  <file src="src/CallStream.php">
+    <TypeDoesNotContainType>
+      <code><![CDATA[$streams & ~self::ALL]]></code>
+    </TypeDoesNotContainType>
+  </file>
   <file src="src/Connection.php">
     <DocblockTypeContradiction>
       <code><![CDATA[$this->stream]]></code>
@@ -1125,9 +1130,6 @@
     </ArgumentTypeCoercion>
   </file>
   <file src="src/EventHandler/Calls/PrivateCall.php">
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$this->getClient()->callSetOutput($this->callID, $file, $format, $streams)]]></code>
-    </LessSpecificReturnStatement>
     <MixedAssignment>
       <code><![CDATA[$this->callID]]></code>
       <code><![CDATA[$this->date]]></code>
@@ -1135,9 +1137,6 @@
       <code><![CDATA[$this->otherID]]></code>
       <code><![CDATA[$this->video]]></code>
     </MixedAssignment>
-    <MoreSpecificReturnType>
-      <code><![CDATA[StreamMask]]></code>
-    </MoreSpecificReturnType>
     <PossiblyInvalidArrayAccess>
       <code><![CDATA[$API->getSelf()['id']]]></code>
       <code><![CDATA[$API->getSelf()['id']]]></code>
@@ -2701,9 +2700,6 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/GroupCall/GroupCallController.php">
-    <ArgumentTypeCoercion>
-      <code><![CDATA[$streams]]></code>
-    </ArgumentTypeCoercion>
     <MixedArgument>
       <code><![CDATA[$alive]]></code>
       <code><![CDATA[$alive]]></code>
@@ -8443,8 +8439,6 @@
   </file>
   <file src="src/Tgcalls/Controller.php">
     <ArgumentTypeCoercion>
-      <code><![CDATA[$available]]></code>
-      <code><![CDATA[$streams]]></code>
       <code><![CDATA[[
             'iceServers' => self::buildIceServers($connections),
         ]]]></code>
@@ -8795,8 +8789,6 @@
   </file>
   <file src="src/Tgcalls/GroupMediaTrait.php">
     <ArgumentTypeCoercion>
-      <code><![CDATA[$available]]></code>
-      <code><![CDATA[$streams]]></code>
       <code><![CDATA[$streams]]></code>
     </ArgumentTypeCoercion>
   </file>
@@ -8976,6 +8968,14 @@
     <MixedOperand>
       <code><![CDATA[$size]]></code>
     </MixedOperand>
+  </file>
+  <file src="src/Tgcalls/IncomingMedia.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$streams]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[StreamMask]]></code>
+    </MoreSpecificReturnType>
   </file>
   <file src="src/Tgcalls/LegacyController.php">
     <MixedArgument>

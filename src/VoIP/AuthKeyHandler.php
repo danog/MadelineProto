@@ -48,6 +48,7 @@ use const STR_PAD_LEFT;
  * https://core.telegram.org/mtproto/auth_key
  * https://core.telegram.org/mtproto/samples-auth_key
  *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  * @internal
  */
 trait AuthKeyHandler
@@ -210,9 +211,9 @@ trait AuthKeyHandler
      * Record the incoming media of a call into one file (or stream) with a fixed set of tracks, see
      * {@see \danog\MadelineProto\EventHandler\Calls\PrivateCall::setOutput()}.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param ?StreamMask $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
-     * @return int The streams the other party currently sends, as a bitmask of {@see CallStream} flags (0 while unknown).
+     * @return StreamMask The streams the other party currently sends, as a bitmask of {@see CallStream} flags (0 while unknown).
      */
     public function callSetOutput(int $id, LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {

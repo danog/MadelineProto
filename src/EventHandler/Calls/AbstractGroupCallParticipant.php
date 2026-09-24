@@ -59,9 +59,9 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
         public readonly ?string $videoEndpoint,
         /** The SFU endpoint id of this participant's screen-share stream, needed to subscribe to it. */
         public readonly ?string $presentationEndpoint,
-        /** 
+        /**
          * Playback volume, from 1 to 20000 where 10000 is 100%.
-         * 
+         *
          * @var int<1, 20000>
          */
         public readonly int $volume,
