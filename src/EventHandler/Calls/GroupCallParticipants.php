@@ -17,7 +17,6 @@
 namespace danog\MadelineProto\EventHandler\Calls;
 
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\GroupCall\Participant;
 use danog\MadelineProto\MTProto;
 
 /**
@@ -31,7 +30,7 @@ final class GroupCallParticipants extends Update
     /**
      * The participants that changed, by their bot API peer ID.
      *
-     * @var array<int, Participant>
+     * @var array<int, AbstractGroupCallParticipant>
      */
     public readonly array $participants;
     /**
@@ -52,6 +51,7 @@ final class GroupCallParticipants extends Update
     {
         parent::__construct($API);
         $this->callId = $rawUpdate['call']['id'];
+        $liveStory = $API->isGroupCallLiveStory($this->callId);
         $participants = [];
         $left = [];
         foreach ($rawUpdate['participants'] as $participant) {
@@ -63,7 +63,9 @@ final class GroupCallParticipants extends Update
                 $left[] = $peerId;
                 continue;
             }
-            $participants[$peerId] = Participant::fromRaw($participant, $peerId);
+            $participants[$peerId] = $liveStory
+                ? LiveStoryParticipant::fromRaw($participant, $peerId)
+                : GroupCallParticipant::fromRaw($participant, $peerId);
         }
         $this->participants = $participants;
         $this->left = $left;

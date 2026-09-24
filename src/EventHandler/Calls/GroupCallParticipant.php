@@ -14,19 +14,24 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\GroupCall;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * State of a group call we are interacting with.
+ * A participant of a [video chat/livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
+ * ({@see GroupCall}), mirroring [groupCallParticipant](https://core.telegram.org/constructor/groupCallParticipant).
  */
-enum GroupCallState
+final class GroupCallParticipant extends AbstractGroupCallParticipant
 {
-    /** The call exists but we did not join it yet. */
-    case NOT_JOINED;
-    /** We are joining the call. */
-    case JOINING;
-    /** We joined the call and media is flowing. */
-    case JOINED;
-    /** We left the call, or the call ended. */
-    case LEFT;
+    /**
+     * @internal
+     *
+     * @param array<string, mixed>              $participant
+     * @param AbstractGroupCallParticipant|null $cached      The previously known state of this participant, if any.
+     *
+     * @psalm-mutation-free
+     */
+    public static function fromRaw(array $participant, int $peerId, ?AbstractGroupCallParticipant $cached = null): self
+    {
+        return new self(...self::commonArgs($participant, $peerId, $cached));
+    }
 }

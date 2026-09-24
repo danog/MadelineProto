@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\EventHandler\Calls\MultiCallParticipant;
 use danog\MadelineProto\ParseMode;
 
 /**
@@ -29,9 +30,33 @@ use danog\MadelineProto\ParseMode;
  * offer (server-side recording, scheduling, raising a hand, moderating messages, donations) lives on the
  * concrete classes: {@see Calls\AbstractGroupCall} for everything a video chat and a live story share,
  * {@see Calls\GroupCall} and {@see Calls\LiveStory} for their own.
+ *
+ * @template TParticipant of MultiCallParticipant
  */
 interface MultiCall extends Call
 {
+    /**
+     * The participants currently known to be in the call, keyed by their bot API id.
+     *
+     * The element type is call-type specific: a {@see Calls\GroupCallParticipant} (or, for a live
+     * story, a {@see Calls\LiveStoryParticipant}) for a group call, a {@see Calls\ConferenceCallParticipant}
+     * for a conference.
+     *
+     * @return array<int, TParticipant>
+     *
+     * @psalm-mutation-free
+     */
+    public function getParticipants(): array;
+
+    /**
+     * A participant of the call by their id, username or peer, or null if they are not in it.
+     *
+     * @return TParticipant|null
+     *
+     * @psalm-impure
+     */
+    public function getParticipant(string|int $participant): ?MultiCallParticipant;
+
     /**
      * Leave the call, keeping it running for the other participants (unlike {@see Call::discard()},
      * which ends it).
@@ -50,11 +75,11 @@ interface MultiCall extends Call
     /**
      * Invite users to the call.
      *
-     * @param mixed ...$users The users to invite (user ids, usernames or peers).
+     * @param string|int ...$users The users to invite (user ids, usernames or peers).
      *
      * @psalm-impure
      */
-    public function invite(mixed ...$users): static;
+    public function invite(string|int ...$users): static;
 
     /**
      * Export an invite link to the call.
@@ -68,11 +93,11 @@ interface MultiCall extends Call
     /**
      * Remove participants from the call.
      *
-     * @param mixed ...$participants The participants to remove (user ids, usernames or peers).
+     * @param string|int ...$participants The participants to remove (user ids, usernames or peers).
      *
      * @psalm-impure
      */
-    public function removeParticipant(mixed ...$participants): static;
+    public function removeParticipant(string|int ...$participants): static;
 
     /**
      * Send an [in-call message »](https://core.telegram.org/api/group-calls#in-call-messages) to the
@@ -81,11 +106,11 @@ interface MultiCall extends Call
      * @param string         $message   The text; markup in `$parseMode` is converted to entities.
      * @param ParseMode|null $parseMode Whether to parse HTML or Markdown markup in the text.
      * @param int|null       $paidStars Live stories only: Telegram Stars to donate with the message (at least the story's minimum, see {@see Calls\LiveStory::setPaidMessagesStars()}).
-     * @param mixed          $sendAs    Live stories only: the peer to send the message as.
+     * @param string|int|null $sendAs    Live stories only: the peer to send the message as.
      *
      * @psalm-impure
      */
-    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): static;
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, string|int|null $sendAs = null): static;
 
     /**
      * Send an [in-call reaction »](https://core.telegram.org/api/group-calls#in-call-reactions): a
@@ -111,16 +136,16 @@ interface MultiCall extends Call
      *
      * @psalm-impure
      */
-    public function muteParticipant(mixed $participant, bool $muted = true): static;
+    public function muteParticipant(string|int $participant, bool $muted = true): static;
 
     /**
      * Set our local playback volume of a participant.
      *
-     * @param int $volume From 1 to 20000, where 10000 is 100%.
+     * @param int<1, 20000> $volume From 1 to 20000, where 10000 is 100%.
      *
      * @psalm-impure
      */
-    public function setParticipantVolume(mixed $participant, int $volume): static;
+    public function setParticipantVolume(string|int $participant, int $volume): static;
 
     /**
      * Pause or resume our own video stream, telling the other participants to keep showing the last

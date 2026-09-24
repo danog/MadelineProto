@@ -24,8 +24,14 @@ use danog\DialogId\DialogId;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\EventHandler\Calls\GroupCallDonor;
+use danog\MadelineProto\EventHandler\Calls\GroupCallParticipant;
+use danog\MadelineProto\EventHandler\Calls\GroupCallStars;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
+use danog\MadelineProto\EventHandler\Calls\LiveStoryParticipant;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -74,7 +80,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
 
     private LocalMutex $joinMutex;
 
-    /** @var array<int, Participant> Participants indexed by their bot API peer ID. */
+    /** @var array<int, AbstractGroupCallParticipant> Participants indexed by their bot API peer ID. */
     private array $participants = [];
     /** @var array<int, int> Signed source ID => bot API peer ID. */
     private array $sourceToPeer = [];
@@ -185,10 +191,10 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * Join the group call.
      *
      * @param bool  $muted    Whether to join muted.
-     * @param mixed $joinAs   Peer to join as, only for video chats/livestreams.
+     * @param string|int|null $joinAs   Peer to join as, only for video chats/livestreams.
      * @param string|null $inviteHash Invite hash from a video chat invite link, if any.
      */
-    public function join(bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): self
+    public function join(bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): self
     {
         $lock = $this->joinMutex->acquire();
         try {
@@ -351,7 +357,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * A participant by their id, username or peer: from the cached list, or else looked up with
      * phone.getGroupParticipants. Null if they are not in the call.
      */
-    public function getParticipant(mixed $participant): ?Participant
+    public function getParticipant(string|int $participant): ?AbstractGroupCallParticipant
     {
         $peerId = $this->API->getId($participant);
         if (isset($this->participants[$peerId])) {
@@ -374,7 +380,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             \assert(\is_array($raw));
             $this->applyParticipant($raw);
         }
-        /** @var array<int, Participant> $participants */
+        /** @var array<int, AbstractGroupCallParticipant> $participants */
         $participants = $this->participants;
         return $participants[$peerId] ?? null;
     }
@@ -495,7 +501,9 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             }
             return;
         }
-        $parsed = Participant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null);
+        $parsed = $this->public instanceof LiveStory
+            ? LiveStoryParticipant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null)
+            : GroupCallParticipant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null);
         $this->participants[$peerId] = $parsed;
         if ($parsed->source !== 0) {
             $this->sourceToPeer[$parsed->source] = $peerId;
@@ -723,7 +731,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      *
      * @return int The streams currently sent, as {@see CallStream} flags.
      */
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         if (!$this->streamMode) {
             return $this->recordParticipant($file, $participant, $format, $streams);
@@ -747,7 +755,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * (see {@see GroupMediaTrait::recordFolder()}); in stream mode the mixed stream is recorded as
      * `<dir>/stream.<ext>` (see {@see StreamReceiver::setOutputDirectory()}).
      */
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): self
     {
         if (!$this->streamMode) {
             $this->recordFolder($dir, $participant, $format);
@@ -789,7 +797,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * @psalm-mutation-free
      */
     #[\Override]
-    private function participantOf(int $peerId): ?Participant
+    private function participantOf(int $peerId): ?AbstractGroupCallParticipant
     {
         return $this->participants[$peerId] ?? null;
     }
@@ -798,7 +806,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * @psalm-mutation-free
      */
     #[\Override]
-    private function isOurself(int $peerId, Participant $participant): bool
+    private function isOurself(int $peerId, AbstractGroupCallParticipant $participant): bool
     {
         return $participant->self || $participant->source === $this->source;
     }
@@ -826,7 +834,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     /**
      * Get all known participants, indexed by their bot API peer ID.
      *
-     * @return array<int, Participant>
+     * @return array<int, AbstractGroupCallParticipant>
      */
     public function getParticipants(): array
     {
@@ -836,7 +844,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     /**
      * Invite users to the call.
      */
-    public function invite(mixed ...$users): void
+    public function invite(string|int ...$users): void
     {
         $this->API->methodCallAsyncRead('phone.inviteToGroupCall', [
             'call' => $this->inputCall,
@@ -862,7 +870,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * non-admin mutes them only for themselves), set our playback volume of them, raise/lower our own
      * hand, or pause/resume our own video or screen-share.
      */
-    public function editParticipant(mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
+    public function editParticipant(string|int|array $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
     {
         $params = ['call' => $this->inputCall, 'participant' => $participant];
         foreach (['muted' => $muted, 'volume' => $volume, 'raise_hand' => $raiseHand, 'video_stopped' => $videoStopped, 'video_paused' => $videoPaused, 'presentation_paused' => $presentationPaused] as $key => $value) {
@@ -934,7 +942,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * Send an in-call message (phone.sendGroupCallMessage): text with entities, or, in a live story, a
      * donation of `$paidStars` (with an empty text for a standalone donation).
      */
-    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): void
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, string|int|null $sendAs = null): void
     {
         $entities = [];
         if ($parseMode === ParseMode::MARKDOWN) {
@@ -962,7 +970,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     /**
      * @param list<mixed> $entities
      */
-    private function sendTextWithEntities(string $text, array $entities, ?int $paidStars, mixed $sendAs): void
+    private function sendTextWithEntities(string $text, array $entities, ?int $paidStars, string|int|null $sendAs): void
     {
         $params = [
             'call' => $this->inputCall,
@@ -1001,7 +1009,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     /**
      * Delete every in-call message of a participant (admins only).
      */
-    public function deleteParticipantMessages(mixed $participant, bool $reportSpam = false): void
+    public function deleteParticipantMessages(string|int $participant, bool $reportSpam = false): void
     {
         $this->API->methodCallAsyncRead('phone.deleteGroupCallParticipantMessages', [
             'call' => $this->inputCall,
@@ -1018,7 +1026,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = $this->API->methodCallAsyncRead('phone.getGroupCallStars', ['call' => $this->inputCall]);
         \assert(\is_array($result));
         $donors = [];
-        foreach ((array) ($result['top_donors'] ?? []) as $donor) {
+        foreach ((array) $result['top_donors'] as $donor) {
             \assert(\is_array($donor));
             $donors[] = new GroupCallDonor(
                 isset($donor['peer_id']) ? $this->API->getIdInternal($donor['peer_id']) : null,
@@ -1027,13 +1035,13 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
                 (bool) ($donor['my'] ?? false),
             );
         }
-        return new GroupCallStars((int) ($result['total_stars'] ?? 0), $donors);
+        return new GroupCallStars((int) $result['total_stars'], $donors);
     }
 
     /**
      * The peer we send in-call messages of this live story as by default (phone.saveDefaultSendAs).
      */
-    public function saveDefaultSendAs(mixed $peer): void
+    public function saveDefaultSendAs(string|int $peer): void
     {
         $this->API->methodCallAsyncRead('phone.saveDefaultSendAs', ['call' => $this->inputCall, 'send_as' => $peer]);
     }
@@ -1047,7 +1055,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      * user, all the send restrictions on top of `view_messages`; for a channel participant just
      * `view_messages`). Requires the `ban_users` admin right.
      */
-    public function removeParticipant(mixed ...$participants): void
+    public function removeParticipant(string|int ...$participants): void
     {
         $peerId = $this->public->peerId;
         if ($peerId === null) {

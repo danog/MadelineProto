@@ -17,10 +17,16 @@
 namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
- * ({@see GroupCall}), mirroring [groupCallMessage](https://core.telegram.org/constructor/groupCallMessage).
+ * State of a group call we are interacting with.
  */
-final class GroupCallMessage extends AbstractGroupCallMessage
+enum GroupCallState
 {
+    /** The call exists but we did not join it yet. */
+    case NOT_JOINED;
+    /** We are joining the call. */
+    case JOINING;
+    /** We joined the call and media is flowing. */
+    case JOINED;
+    /** We left the call, or the call ended. */
+    case LEFT;
 }

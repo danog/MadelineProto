@@ -17,10 +17,12 @@
 namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
- * ({@see GroupCall}), mirroring [groupCallMessage](https://core.telegram.org/constructor/groupCallMessage).
+ * An end-to-end encrypted [in-call message or reaction »](https://core.telegram.org/api/end-to-end/group-calls#conference-in-call-messages)
+ * sent in a {@see ConferenceCall}.
+ *
+ * Conference messages carry no server-assigned id and cannot be deleted or moderated, unlike a plain
+ * {@see AbstractGroupCallMessage}.
  */
-final class GroupCallMessage extends AbstractGroupCallMessage
+final class ConferenceCallMessage extends MultiCallMessage
 {
 }

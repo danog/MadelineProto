@@ -21,8 +21,12 @@ use Amp\ByteStream\WritableStream;
 use AssertionError;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCallParticipant;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
+use danog\MadelineProto\EventHandler\Calls\GroupCallStars;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -211,7 +215,7 @@ trait Handler
     /**
      * Get the participants of a conference call, keyed by their user id.
      *
-     * @return array<int, array{public_key: string, permissions: int, version: int}>
+     * @return array<int, ConferenceCallParticipant>
      *
      * @internal
      *
@@ -227,7 +231,7 @@ trait Handler
      *
      * @internal
      */
-    public function removeConferenceCallParticipants(int $id, mixed ...$participants): void
+    public function removeConferenceCallParticipants(int $id, string|int ...$participants): void
     {
         $this->getConferenceCallController($id)->removeParticipant(...$participants);
     }
@@ -247,7 +251,7 @@ trait Handler
      *
      * @internal
      */
-    public function inviteToConferenceCall(int $id, mixed ...$users): void
+    public function inviteToConferenceCall(int $id, string|int ...$users): void
     {
         $this->getConferenceCallController($id)->invite(...$users);
     }
@@ -301,7 +305,7 @@ trait Handler
      *
      * @internal
      */
-    public function editConferenceCallParticipant(int $id, mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
+    public function editConferenceCallParticipant(int $id, string|int|array $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
     {
         $this->getConferenceCallController($id)->editParticipant($participant, $muted, $volume, $videoPaused);
     }
@@ -462,7 +466,7 @@ trait Handler
      *
      * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
-    public function conferenceCallSetOutput(int $id, LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function conferenceCallSetOutput(int $id, LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         return $this->getConferenceCallController($id)->setOutput($file, $participant, $format, $streams);
     }
@@ -474,7 +478,7 @@ trait Handler
      *
      * @internal
      */
-    public function conferenceCallSetOutputFolder(int $id, LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): void
+    public function conferenceCallSetOutputFolder(int $id, LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): void
     {
         $this->getConferenceCallController($id)->setOutputFolder($dir, $participant, $format);
     }
@@ -709,9 +713,22 @@ trait Handler
     }
 
     /**
+     * Whether a group call we are tracking is a live story (and thus has {@see LiveStoryParticipant}
+     * participants), false for a video chat/livestream or a call we do not track.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isGroupCallLiveStory(int $id): bool
+    {
+        return ($this->groupCalls[$id] ?? null)?->public instanceof LiveStory;
+    }
+
+    /**
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
-     * @return array<int, Participant>
+     * @return array<int, AbstractGroupCallParticipant>
      *
      * @psalm-mutation-free
      */
@@ -761,7 +778,7 @@ trait Handler
     /**
      * Invite users to a group call.
      */
-    public function inviteToGroupCall(int $id, mixed ...$users): void
+    public function inviteToGroupCall(int $id, string|int ...$users): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
@@ -788,7 +805,7 @@ trait Handler
      *
      * @internal
      */
-    public function editGroupCallParticipant(int $id, mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
+    public function editGroupCallParticipant(int $id, string|int|array $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): void
     {
         $this->getGroupCallController($id)->editParticipant($participant, $muted, $volume, $raiseHand, $videoStopped, $videoPaused, $presentationPaused);
     }
@@ -838,7 +855,7 @@ trait Handler
      *
      * @internal
      */
-    public function sendGroupCallMessage(int $id, string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): void
+    public function sendGroupCallMessage(int $id, string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, string|int|null $sendAs = null): void
     {
         $this->getGroupCallController($id)->sendMessage($message, $parseMode, $paidStars, $sendAs);
     }
@@ -870,7 +887,7 @@ trait Handler
      *
      * @internal
      */
-    public function deleteGroupCallParticipantMessages(int $id, mixed $participant, bool $reportSpam = false): void
+    public function deleteGroupCallParticipantMessages(int $id, string|int $participant, bool $reportSpam = false): void
     {
         $this->getGroupCallController($id)->deleteParticipantMessages($participant, $reportSpam);
     }
@@ -900,7 +917,7 @@ trait Handler
      *
      * @internal
      */
-    public function getGroupCallParticipant(int $id, mixed $participant): ?Participant
+    public function getGroupCallParticipant(int $id, string|int $participant): ?AbstractGroupCallParticipant
     {
         return $this->getGroupCallController($id)->getParticipant($participant);
     }
@@ -1103,7 +1120,7 @@ trait Handler
      *
      * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
-    public function groupCallSetOutput(int $id, LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function groupCallSetOutput(int $id, LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
@@ -1116,7 +1133,7 @@ trait Handler
      * one) as its own numbered series of files, see
      * {@see \danog\MadelineProto\EventHandler\Calls\AbstractGroupCall::setOutputFolder()}.
      */
-    public function groupCallSetOutputFolder(int $id, LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): void
+    public function groupCallSetOutputFolder(int $id, LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');
@@ -1129,7 +1146,7 @@ trait Handler
      *
      * @internal
      */
-    public function removeGroupCallParticipants(int $id, mixed ...$participants): void
+    public function removeGroupCallParticipants(int $id, string|int ...$participants): void
     {
         if (!isset($this->groupCalls[$id])) {
             throw new AssertionError('Unknown group call!');

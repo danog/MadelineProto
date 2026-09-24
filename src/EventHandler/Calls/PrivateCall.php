@@ -37,6 +37,8 @@ use InvalidArgumentException;
  * This update represents a private (one-to-one) VoIP Telegram call.
  *
  * The old name {@see \danog\MadelineProto\VoIP} is kept as an alias for backwards compatibility.
+ *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  */
 final class PrivateCall extends Update implements SimpleFilters, Call
 {
@@ -140,24 +142,11 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      *
      * Empty until the call is connected and the other party has reported their media state.
      *
-     * @return array<int, MediaState>
-     *
      * @psalm-mutation-free
      */
-    #[\Override]
-    public function getParticipants(): array
+    public function getRemoteMediaState(): ?MediaState
     {
-        $state = $this->getClient()->getCallRemoteMediaState($this->callID);
-        return $state === null ? [] : [$this->otherID => $state];
-    }
-
-    /**
-     * The media state of the other party, if `$participant` is them and the call is connected.
-     */
-    #[\Override]
-    public function getParticipant(mixed $participant): ?MediaState
-    {
-        return $this->getParticipants()[$this->getClient()->getId($participant)] ?? null;
+        return $this->getClient()->getCallRemoteMediaState($this->callID);
     }
 
     /**
@@ -222,14 +211,14 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * Before the call is connected (the other party has not reported what it sends yet) any set of
      * streams is accepted, the recording starts with the chosen ones once media flows, and 0 is returned.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param StreamMask|null $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @throws InvalidArgumentException If a chosen stream is not available, or nothing is.
      *
-     * @return int The streams the other party currently sends, as a bitmask of {@see CallStream} flags.
+     * @return StreamMask The streams the other party currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
             throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");
@@ -244,7 +233,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
      * other party, and is therefore optional.
      */
     #[\Override]
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): static
     {
         if ($participant !== null && $this->getClient()->getId($participant) !== $this->otherID) {
             throw new InvalidArgumentException("Only the other party ({$this->otherID}) of a one-to-one call can be recorded.");

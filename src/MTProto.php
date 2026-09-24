@@ -52,7 +52,7 @@ use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
 use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\GroupCall\GroupCallState;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;

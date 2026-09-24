@@ -17,10 +17,25 @@
 namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
- * ({@see GroupCall}), mirroring [groupCallMessage](https://core.telegram.org/constructor/groupCallMessage).
+ * A participant of an end-to-end encrypted {@see ConferenceCall}, as reconstructed from the
+ * [shared-state chain »](https://core.telegram.org/api/end-to-end/group-calls).
  */
-final class GroupCallMessage extends AbstractGroupCallMessage
+final class ConferenceCallParticipant extends MultiCallParticipant
 {
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function __construct(
+        int $peerId,
+        /** The participant's Ed25519 public key. */
+        public readonly string $publicKey,
+        /** The participant's permission bits in the shared-state chain. */
+        public readonly int $permissions,
+        /** The protocol version of the shared-state block that last updated this participant. */
+        public readonly int $version,
+    ) {
+        parent::__construct($peerId);
+    }
 }

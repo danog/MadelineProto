@@ -20,9 +20,11 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
-use danog\MadelineProto\GroupCall\GroupCallState;
-use danog\MadelineProto\GroupCall\Participant;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCallParticipant;
+use danog\MadelineProto\EventHandler\Calls\GroupCallParticipant;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -111,7 +113,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * The participants of the underlying group call (the RTC side: sources, video, screen-share), by
      * user id, from phone.getGroupCall and updateGroupCallParticipants.
      *
-     * @var array<int, Participant>
+     * @var array<int, GroupCallParticipant>
      */
     private array $rtcParticipants = [];
     /** Version of the underlying groupCall, for ordering participant updates. */
@@ -424,7 +426,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * Change a participant's state (phone.editGroupCallParticipant): mute them for ourselves, set our
      * playback volume of them, or pause/resume our own video.
      */
-    public function editParticipant(mixed $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
+    public function editParticipant(string|int|array $participant, ?bool $muted = null, ?int $volume = null, ?bool $videoPaused = null): void
     {
         $params = ['call' => $this->getInputCall(), 'participant' => $participant];
         if ($muted !== null) {
@@ -466,9 +468,9 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * Invite users to the conference call (phone.inviteConferenceCallParticipant), ringing them; once
      * they accept they add themselves to the chain with their own self-join block.
      */
-    public function invite(mixed ...$users): self
+    public function invite(string|int ...$users): self
     {
-        /** @var mixed $user */
+        /** @var string|int $user */
         foreach ($users as $user) {
             $this->API->methodCallAsyncRead('phone.inviteConferenceCallParticipant', [
                 'call' => $this->getInputCall(),
@@ -502,7 +504,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * `remove_users` permission. The removed members can no longer decrypt media once the new epoch
      * takes over.
      */
-    public function removeParticipant(mixed ...$participants): self
+    public function removeParticipant(string|int ...$participants): self
     {
         $this->submitRemoval(array_values(array_map($this->API->getId(...), $participants)), kick: true);
         return $this;
@@ -872,15 +874,19 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
 
     /**
      * The participants currently in the conference, keyed by user id, each with their Ed25519
-     * `public_key` and `permissions` bits from the shared-state chain.
+     * public key, permission bits and protocol version from the shared-state chain.
      *
-     * @return array<int, array{public_key: string, permissions: int, version: int}>
+     * @return array<int, ConferenceCallParticipant>
      *
      * @psalm-mutation-free
      */
     public function getParticipants(): array
     {
-        return $this->chain->getParticipants();
+        $participants = [];
+        foreach ($this->chain->getParticipants() as $userId => $info) {
+            $participants[$userId] = new ConferenceCallParticipant($userId, $info['public_key'], $info['permissions'], $info['version']);
+        }
+        return $participants;
     }
 
     /* ------------------------------------------------------------------ *
@@ -1230,7 +1236,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      *
      * @return int The streams the participant currently sends, as {@see CallStream} flags.
      */
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         return $this->recordParticipant($file, $participant, $format, $streams);
     }
@@ -1239,7 +1245,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * Record the conference (decrypted) into a directory, as numbered series of Matroska files, one
      * per participant, see {@see GroupMediaTrait::recordFolder()}.
      */
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): self
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): self
     {
         $this->recordFolder($dir, $participant, $format);
         return $this;
@@ -1281,7 +1287,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * @psalm-mutation-free
      */
     #[\Override]
-    private function participantOf(int $peerId): ?Participant
+    private function participantOf(int $peerId): ?AbstractGroupCallParticipant
     {
         return $this->rtcParticipants[$peerId] ?? null;
     }
@@ -1290,7 +1296,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * @psalm-mutation-free
      */
     #[\Override]
-    private function isOurself(int $peerId, Participant $participant): bool
+    private function isOurself(int $peerId, AbstractGroupCallParticipant $participant): bool
     {
         return $peerId === $this->selfId;
     }
@@ -1435,7 +1441,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             $this->pruneStale([$userId]);
             return;
         }
-        $this->rtcParticipants[$userId] = Participant::fromRaw($participant, $userId, $this->rtcParticipants[$userId] ?? null);
+        $this->rtcParticipants[$userId] = GroupCallParticipant::fromRaw($participant, $userId, $this->rtcParticipants[$userId] ?? null);
     }
 
     /**

@@ -16,8 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler\Calls;
 
-use danog\MadelineProto\GroupCall\GroupCallStars;
-
 /**
  * This update represents a Telegram [live story »](https://core.telegram.org/api/group-calls#live-stories):
  * a livestream posted as a story by a user, group or channel, of which the poster is the only
@@ -26,6 +24,8 @@ use danog\MadelineProto\GroupCall\GroupCallStars;
  * On top of what every group call offers ({@see AbstractGroupCall}), a live story takes paid comments
  * and Telegram Stars donations. It has no title (its caption is the story's), cannot be scheduled or
  * recorded server-side, and does not support screen sharing.
+ *
+ * @extends AbstractGroupCall<LiveStoryParticipant>
  */
 final class LiveStory extends AbstractGroupCall
 {
@@ -36,6 +36,8 @@ final class LiveStory extends AbstractGroupCall
 
     /**
      * @internal
+     *
+     * @param array<string, mixed> $call
      *
      * @psalm-external-mutation-free
      */
@@ -62,16 +64,6 @@ final class LiveStory extends AbstractGroupCall
     }
 
     /**
-     * Invite users to watch the live story.
-     */
-    #[\Override]
-    public function invite(mixed ...$users): static
-    {
-        $this->getClient()->inviteToGroupCall($this->id, ...$users);
-        return $this;
-    }
-
-    /**
      * Export an invite link to the live story.
      *
      * @param bool $canSelfUnmute Ignored: only the poster of a live story publishes media.
@@ -89,7 +81,7 @@ final class LiveStory extends AbstractGroupCall
      * @psalm-pure
      */
     #[\Override]
-    public function removeParticipant(mixed ...$participants): static
+    public function removeParticipant(string|int ...$participants): static
     {
         throw new \LogicException('Viewers cannot be removed from a live story.');
     }
@@ -125,7 +117,7 @@ final class LiveStory extends AbstractGroupCall
     /**
      * the peer we send in-call messages as by default.
      */
-    public function setDefaultSendAs(mixed $peer): self
+    public function setDefaultSendAs(string|int $peer): self
     {
         $this->getClient()->saveDefaultGroupCallSendAs($this->id, $peer);
         return $this;

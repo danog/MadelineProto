@@ -41,7 +41,7 @@ use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\CallStreams;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall as ConferenceCallUpdate;
 use danog\MadelineProto\EventHandler\Calls\GroupCall as GroupCallUpdate;
-use danog\MadelineProto\EventHandler\Calls\GroupCallMessage;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Calls\GroupCallMessagesDeleted;
 use danog\MadelineProto\EventHandler\Calls\GroupCallParticipants;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
@@ -493,7 +493,7 @@ trait UpdateHandler
                 'updatePhoneCall' => $update['phone_call'],
                 'updateGroupCall' => $this->wrapGroupCall($update),
                 'updateGroupCallParticipants' => new GroupCallParticipants($this, $update),
-                'updateGroupCallMessage' => new GroupCallMessage($this, $update),
+                'updateGroupCallMessage' => MultiCallMessage::fromUpdate($this, $update),
                 'updateDeleteGroupCallMessages' => new GroupCallMessagesDeleted($this, $update),
                 'updateCallStreams' => new CallStreams($this, $update),
                 'updateBroadcastProgress' => $update['progress'],

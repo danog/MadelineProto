@@ -14,24 +14,25 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\GroupCall;
-
-use JsonSerializable;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 /**
- * A participant of a group call, mirroring
+ * What a participant of a video chat ({@see GroupCallParticipant}) and of a live story
+ * ({@see LiveStoryParticipant}) have in common, mirroring the shared fields of
  * [groupCallParticipant](https://core.telegram.org/constructor/groupCallParticipant).
  */
-final class Participant implements JsonSerializable
+abstract class AbstractGroupCallParticipant extends MultiCallParticipant
 {
     /**
      * @internal
      *
+     * @param list<int> $videoSources        Signed SSRCs of this participant's camera video streams, empty if none.
+     * @param list<int> $presentationSources Signed SSRCs of this participant's screen-share (presentation) streams, empty if none.
+     *
      * @psalm-mutation-free
      */
     public function __construct(
-        /** Bot API ID of the peer that joined the call. */
-        public readonly int $peerId,
+        int $peerId,
         /** WebRTC audio source ID (SSRC) of this participant, `0` if unknown. */
         public readonly int $source,
         /** When did this participant join the call. */
@@ -50,47 +51,45 @@ final class Participant implements JsonSerializable
         public readonly bool $justJoined,
         /** Whether the participant is transmitting video. */
         public readonly bool $videoJoined,
-        /**
-         * Signed SSRCs of this participant's camera video streams, empty if none.
-         *
-         * @var list<int>
-         */
+        /** @var list<int> */
         public readonly array $videoSources,
-        /**
-         * Signed SSRCs of this participant's screen-share (presentation) streams, empty if none.
-         *
-         * @var list<int>
-         */
+        /** @var list<int> */
         public readonly array $presentationSources,
         /** The SFU endpoint id of this participant's camera stream, needed to subscribe to it. */
         public readonly ?string $videoEndpoint,
         /** The SFU endpoint id of this participant's screen-share stream, needed to subscribe to it. */
         public readonly ?string $presentationEndpoint,
-        /** Playback volume, from 1 to 20000 where 10000 is 100%. */
+        /** 
+         * Playback volume, from 1 to 20000 where 10000 is 100%.
+         * 
+         * @var int<1, 20000>
+         */
         public readonly int $volume,
         /** Bio of the participant, if any. */
         public readonly ?string $about,
         /** Raised hand rating, if the participant raised their hand. */
         public readonly ?int $raiseHandRating,
         /** Whether the participant's volume was set by an admin. */
-        public readonly bool $volumeByAdmin = false,
-        /** Live stories: total Telegram Stars donated by this participant. */
-        public readonly ?int $paidStarsTotal = null,
+        public readonly bool $volumeByAdmin,
     ) {
+        parent::__construct($peerId);
     }
 
     /**
-     * @internal
+     * The common {@see groupCallParticipant} fields, as named constructor arguments shared by every
+     * subclass, applying the `min` rules (a min update keeps `volume`, `muted_by_you` and the video
+     * source groups from the cached state, see https://core.telegram.org/constructor/groupCallParticipant).
      *
-     * @param self|null $cached The previously known state of this participant, if any: when the
-     *                          `min` flag is set, `volume` and `muted_by_you` must be kept from it,
-     *                          see https://core.telegram.org/constructor/groupCallParticipant.
+     * @param array<string, mixed> $participant
+     * @param self|null            $cached      The previously known state of this participant, if any.
+     *
+     * @return array<string, mixed>
      *
      * @psalm-mutation-free
      */
-    public static function fromRaw(array $participant, int $peerId, ?self $cached = null): self
+    final protected static function commonArgs(array $participant, int $peerId, ?self $cached): array
     {
-        $min = $participant['min'];
+        $min = $participant['min'] ?? false;
         // Video/presentation source groups are only carried in full (non-min) updates; a min update
         // keeps whatever the cached state already had, exactly like volume and muted_by_you.
         $video = self::videoSources($participant['video'] ?? null);
@@ -107,27 +106,26 @@ final class Participant implements JsonSerializable
                 $presentationEndpoint = $cached->presentationEndpoint;
             }
         }
-        return new self(
-            $peerId,
-            $participant['source'] ?? 0,
-            $participant['date'] ?? 0,
-            $participant['active_date'] ?? null,
-            $participant['muted'] ?? false,
-            $participant['can_self_unmute'] ?? false,
-            $min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false),
-            $participant['self'] ?? false,
-            $participant['just_joined'] ?? false,
-            $participant['video_joined'] ?? false,
-            $video,
-            $presentation,
-            $videoEndpoint,
-            $presentationEndpoint,
-            $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
-            $participant['about'] ?? null,
-            $participant['raise_hand_rating'] ?? null,
-            (bool) ($participant['volume_by_admin'] ?? false),
-            isset($participant['paid_stars_total']) ? (int) $participant['paid_stars_total'] : null,
-        );
+        return [
+            'peerId' => $peerId,
+            'source' => $participant['source'],
+            'date' => $participant['date'],
+            'activeDate' => $participant['active_date'] ?? null,
+            'muted' => $participant['muted'] ?? false,
+            'canSelfUnmute' => $participant['can_self_unmute'] ?? false,
+            'mutedByYou' => $min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false),
+            'self' => $participant['self'] ?? false,
+            'justJoined' => $participant['just_joined'] ?? false,
+            'videoJoined' => $participant['video_joined'] ?? false,
+            'videoSources' => $video,
+            'presentationSources' => $presentation,
+            'videoEndpoint' => $videoEndpoint,
+            'presentationEndpoint' => $presentationEndpoint,
+            'volume' => $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
+            'about' => $participant['about'] ?? null,
+            'raiseHandRating' => $participant['raise_hand_rating'] ?? null,
+            'volumeByAdmin' => (bool) ($participant['volume_by_admin'] ?? false),
+        ];
     }
 
     /**
@@ -172,16 +170,5 @@ final class Participant implements JsonSerializable
         }
         $endpoint = $video['endpoint'] ?? null;
         return \is_string($endpoint) && $endpoint !== '' ? $endpoint : null;
-    }
-
-    /**
-     * @internal
-     *
-     * @psalm-mutation-free
-     */
-    #[\Override]
-    public function jsonSerialize(): array
-    {
-        return get_object_vars($this);
     }
 }

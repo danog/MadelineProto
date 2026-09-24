@@ -19,7 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\CallStream;
-use danog\MadelineProto\GroupCall\GroupCallState;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
@@ -35,7 +35,7 @@ use Stringable;
  *
  * It covers the whole surface shared by all call types, so code can drive any call uniformly:
  *  - the lifecycle ({@see self::join()}, {@see self::discard()}, {@see self::isJoined()}, {@see self::getCallState()}),
- *  - who is in the call ({@see self::getParticipants()}) and, for end-to-end encrypted calls, the
+ *  - who is in a multi-party call ({@see MultiCall::getParticipants()}) and, for end-to-end encrypted calls, the
  *    key verification emojis ({@see self::getVisualization()}),
  *  - the playlist/DJ playback controls and the mute controls,
  *  - screen sharing ({@see self::enablePresentation()} and friends) and
@@ -44,6 +44,8 @@ use Stringable;
  * Every playlist control takes a {@see MediaDestination} selecting the stream it acts on: the main
  * camera+mic stream (default) or a separate presentation (screen-share) stream, which is started on
  * first use.
+ *
+ * @psalm-import-type StreamMask from CallStream
  */
 interface Call extends Stringable
 {
@@ -79,27 +81,6 @@ interface Call extends Stringable
      * @psalm-mutation-free
      */
     public function getCallState(): CallState|GroupCallState;
-
-    /**
-     * The participants currently known to be in the call, keyed by their bot API id.
-     *
-     * The element type is call-type specific, so the concrete class documents it: the other party's
-     * {@see \danog\MadelineProto\VoIP\MediaState} for a one-to-one call, a
-     * {@see \danog\MadelineProto\GroupCall\Participant} for a group call, the chain state for a conference.
-     *
-     * @return array<int, mixed>
-     *
-     * @psalm-mutation-free
-     */
-    public function getParticipants(): array;
-
-    /**
-     * A participant of the call by their id, username or peer, or null if they are not in it; the
-     * element type is the same as {@see self::getParticipants()}'s.
-     *
-     * @psalm-impure
-     */
-    public function getParticipant(mixed $participant): mixed;
 
     /**
      * The key verification emojis of an end-to-end encrypted call (a one-to-one call or a conference),
@@ -262,15 +243,15 @@ interface Call extends Stringable
      * `$format` is null it is autodetected from the extension of `$file` if a {@see LocalFile} was passed;
      * a raw stream, whose extension is unknown, defaults to WebM.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param StreamMask|null $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
      *
-     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      *
      * @psalm-impure
      */
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int;
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int;
 
     /**
      * Record the incoming media of the call into a directory, following every change of the streams.
@@ -295,5 +276,5 @@ interface Call extends Stringable
      *
      * @psalm-impure
      */
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static;
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): static;
 }

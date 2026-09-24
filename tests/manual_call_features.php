@@ -54,7 +54,7 @@ use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\GroupCall;
-use danog\MadelineProto\GroupCall\GroupCallState;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;

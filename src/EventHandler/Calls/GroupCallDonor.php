@@ -14,34 +14,32 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\GroupCall;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 use JsonSerializable;
 
 /**
- * The [Telegram Stars donations](https://core.telegram.org/api/group-calls#paid-live-story-donations)
- * received by a live story, from [phone.groupCallStars](https://core.telegram.org/constructor/phone.groupCallStars).
+ * A donor of a [live story](https://core.telegram.org/api/group-calls#live-stories), from
+ * [groupCallDonor](https://core.telegram.org/constructor/groupCallDonor).
  *
  * @psalm-immutable
  */
-final class GroupCallStars implements JsonSerializable
+final class GroupCallDonor implements JsonSerializable
 {
     /**
      * @internal
      *
-     * @param list<GroupCallDonor> $topDonors
-     *
      * @psalm-mutation-free
      */
     public function __construct(
-        /** Total Telegram Stars donated so far. */
-        public readonly int $totalStars,
-        /**
-         * The top donors.
-         *
-         * @var list<GroupCallDonor>
-         */
-        public readonly array $topDonors,
+        /** Bot API ID of the donor, or null for an anonymous donor. */
+        public readonly ?int $peerId,
+        /** How many Telegram Stars they donated. */
+        public readonly int $stars,
+        /** Whether this is one of the top donors. */
+        public readonly bool $top,
+        /** Whether this is us. */
+        public readonly bool $my,
     ) {
     }
 

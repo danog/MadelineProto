@@ -20,8 +20,6 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\GroupCall\GroupCallState;
-use danog\MadelineProto\GroupCall\Participant;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
@@ -37,6 +35,12 @@ use danog\MadelineProto\RemoteUrl;
  * with the same joining, participants, playback, recording, in-call messages and settings.
  *
  * See https://core.telegram.org/api/group-calls for more info.
+ *
+ * @template TParticipant of AbstractGroupCallParticipant
+ *
+ * @implements MultiCall<TParticipant>
+ *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  */
 abstract class AbstractGroupCall extends Update implements MultiCall
 {
@@ -85,6 +89,8 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      *
      * @internal
      *
+     * @param array<string, mixed> $call
+     *
      * @psalm-mutation-free
      */
     public function __construct(
@@ -101,6 +107,8 @@ abstract class AbstractGroupCall extends Update implements MultiCall
 
     /**
      * @internal
+     *
+     * @param array<string, mixed> $call
      *
      * @psalm-external-mutation-free
      */
@@ -160,6 +168,16 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     }
 
     /**
+     * Invite users to the group call (or, for a live story, to watch it).
+     */
+    #[\Override]
+    public function invite(string|int ...$users): static
+    {
+        $this->getClient()->inviteToGroupCall($this->id, ...$users);
+        return $this;
+    }
+
+    /**
      * Whether we are currently in the group call (joined and not left).
      *
      * @psalm-mutation-free
@@ -184,22 +202,26 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     /**
      * Get all known participants, indexed by their bot API peer ID.
      *
-     * @return array<int, Participant>
+     * @return array<int, TParticipant>
      *
      * @psalm-mutation-free
      */
     #[\Override]
     public function getParticipants(): array
     {
+        /** @var array<int, TParticipant> */
         return $this->getClient()->getGroupCallParticipants($this->id);
     }
 
     /**
      * A participant of the call by their id, username or peer, or null if they are not in it.
+     *
+     * @return TParticipant|null
      */
     #[\Override]
-    public function getParticipant(mixed $participant): ?Participant
+    public function getParticipant(string|int $participant): ?AbstractGroupCallParticipant
     {
+        /** @var TParticipant|null */
         return $this->getClient()->getGroupCallParticipant($this->id, $participant);
     }
 
@@ -242,10 +264,10 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      * @param string         $message   The text; markup in `$parseMode` is converted to entities.
      * @param ParseMode|null $parseMode Whether to parse HTML or Markdown markup in the text.
      * @param int|null       $paidStars Live stories only: Telegram Stars to donate with the message (at least {@see self::$sendPaidMessagesStars}).
-     * @param mixed          $sendAs    Live stories only: the peer to send the message as.
+     * @param string|int|null $sendAs    Live stories only: the peer to send the message as.
      */
     #[\Override]
-    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): static
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, string|int|null $sendAs = null): static
     {
         $this->getClient()->sendGroupCallMessage($this->id, $message, $parseMode, $paidStars, $sendAs);
         return $this;
@@ -281,7 +303,7 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      *
      * @param bool $reportSpam Also report them as spam.
      */
-    public function deleteParticipantMessages(mixed $participant, bool $reportSpam = false): static
+    public function deleteParticipantMessages(string|int $participant, bool $reportSpam = false): static
     {
         $this->getClient()->deleteGroupCallParticipantMessages($this->id, $participant, $reportSpam);
         return $this;
@@ -302,7 +324,7 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      * themselves), or, for a non-admin, mute a participant only for ourselves.
      */
     #[\Override]
-    public function muteParticipant(mixed $participant, bool $muted = true): static
+    public function muteParticipant(string|int $participant, bool $muted = true): static
     {
         $this->getClient()->editGroupCallParticipant($this->id, $participant, muted: $muted);
         return $this;
@@ -311,10 +333,10 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     /**
      * Set our local playback volume of a participant.
      *
-     * @param int $volume From 1 to 20000, where 10000 is 100%.
+     * @param int<1, 20000> $volume From 1 to 20000, where 10000 is 100%.
      */
     #[\Override]
-    public function setParticipantVolume(mixed $participant, int $volume): static
+    public function setParticipantVolume(string|int $participant, int $volume): static
     {
         $this->getClient()->editGroupCallParticipant($this->id, $participant, volume: $volume);
         return $this;
@@ -372,14 +394,14 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      * audio is OPUS; `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm}
      * DocType, autodetected from a `.webm` extension.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param StreamMask|null $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
      *
-     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         return $this->getClient()->groupCallSetOutput($this->id, $file, $participant, $format, $streams);
     }
@@ -397,7 +419,7 @@ abstract class AbstractGroupCall extends Update implements MultiCall
      * `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm} DocType.
      */
     #[\Override]
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): static
     {
         $this->getClient()->groupCallSetOutputFolder($this->id, $dir, $participant, $format);
         return $this;

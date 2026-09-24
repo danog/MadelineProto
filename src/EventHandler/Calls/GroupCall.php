@@ -25,6 +25,8 @@ use danog\MadelineProto\MTProto;
  * On top of what every group call offers ({@see AbstractGroupCall}), a video chat has a title, can be
  * scheduled, recorded server-side, joined on behalf of a channel we own, and moderated by its admins.
  * See https://core.telegram.org/api/group-calls for more info.
+ *
+ * @extends AbstractGroupCall<GroupCallParticipant>
  */
 final class GroupCall extends AbstractGroupCall
 {
@@ -43,6 +45,8 @@ final class GroupCall extends AbstractGroupCall
 
     /**
      * @internal
+     *
+     * @param array<string, mixed> $call
      *
      * @psalm-external-mutation-free
      */
@@ -65,11 +69,11 @@ final class GroupCall extends AbstractGroupCall
      * Join the group call.
      *
      * @param bool        $muted      Whether to join muted.
-     * @param mixed       $joinAs     Peer to join as: ourselves, or a channel we own (see {@see MTProto::getGroupCallJoinAs()}).
+     * @param string|int|null $joinAs     Peer to join as: ourselves, or a channel we own (see {@see MTProto::getGroupCallJoinAs()}).
      * @param string|null $inviteHash Invite hash from a [video chat invite link »](https://core.telegram.org/api/links#video-chat-livestream-links), if any.
      */
     #[\Override]
-    public function join(bool $muted = false, mixed $joinAs = null, ?string $inviteHash = null): static
+    public function join(bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): static
     {
         $this->getClient()->joinGroupCallById($this->id, $muted, $joinAs, $inviteHash);
         return $this;
@@ -82,16 +86,6 @@ final class GroupCall extends AbstractGroupCall
     public function setTitle(string $title): static
     {
         $this->getClient()->setGroupCallTitle($this->id, $title);
-        return $this;
-    }
-
-    /**
-     * Invite users to the group call.
-     */
-    #[\Override]
-    public function invite(mixed ...$users): static
-    {
-        $this->getClient()->inviteToGroupCall($this->id, ...$users);
         return $this;
     }
 
@@ -114,7 +108,7 @@ final class GroupCall extends AbstractGroupCall
      * a supergroup or channel), which also drops them from the call. Requires the `ban_users` admin right.
      */
     #[\Override]
-    public function removeParticipant(mixed ...$participants): static
+    public function removeParticipant(string|int ...$participants): static
     {
         $this->getClient()->removeGroupCallParticipants($this->id, ...$participants);
         return $this;

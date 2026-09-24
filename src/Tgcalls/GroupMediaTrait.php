@@ -21,9 +21,9 @@ use Amp\ByteStream\WritableStream;
 use Amp\DeferredFuture;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
 use danog\MadelineProto\EventHandler\Calls\CallStreams;
-use danog\MadelineProto\GroupCall\GroupCallState;
-use danog\MadelineProto\GroupCall\Participant;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -118,12 +118,12 @@ trait GroupMediaTrait
     /**
      * A participant of the call by bot API peer id, or null if unknown.
      */
-    abstract private function participantOf(int $peerId): ?Participant;
+    abstract private function participantOf(int $peerId): ?AbstractGroupCallParticipant;
 
     /**
      * Whether a participant is ourselves (whose media is never recorded).
      */
-    abstract private function isOurself(int $peerId, Participant $participant): bool;
+    abstract private function isOurself(int $peerId, AbstractGroupCallParticipant $participant): bool;
 
     /**
      * The bot API peer id of the participant a signed audio SSRC belongs to, or null if unknown.
@@ -685,6 +685,6 @@ trait GroupMediaTrait
             $this->log("Streams of unknown source $source of $this changed, ignoring", Logger::VERBOSE);
             return;
         }
-        CallStreams::dispatch($this->API, $this->callObject(), $peerId, $streams, $codecs, $recording, $file);
+        CallStreamsDispatcher::dispatch($this->API, $this->callObject(), $peerId, $streams, $codecs, $recording, $file);
     }
 }

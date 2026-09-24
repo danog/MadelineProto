@@ -27,6 +27,8 @@ use InvalidArgumentException;
  * {@see EventHandler\Call::setOutput()} to pick the tracks of a recording and reported by
  * {@see EventHandler\Calls\CallStreams} updates.
  *
+ * @psalm-type StreamMask = int-mask<CallStream::AUDIO, CallStream::VIDEO, CallStream::SCREEN>
+ *
  * @psalm-immutable
  */
 final class CallStream
@@ -53,6 +55,8 @@ final class CallStream
     /**
      * The names of the streams in a set, in order: `audio`, `video`, `screen`.
      *
+     * @param StreamMask $streams
+     *
      * @return list<string>
      *
      * @psalm-pure
@@ -71,6 +75,8 @@ final class CallStream
     /**
      * A human-readable description of a set of streams: `audio+video`, or `nothing` for an empty set.
      *
+     * @param StreamMask $streams
+     *
      * @psalm-pure
      */
     public static function describe(int $streams): string
@@ -80,6 +86,8 @@ final class CallStream
 
     /**
      * Build a set from the state of each stream.
+     *
+     * @return StreamMask
      *
      * @psalm-pure
      */
@@ -91,9 +99,9 @@ final class CallStream
     /**
      * Check that every stream of a chosen set is available (and that, with no choice, something is).
      *
-     * @param ?int   $streams   The chosen set, or null for "everything available".
-     * @param int    $available The streams currently available.
-     * @param string $who       Who sends them, for the error message.
+     * @param StreamMask|null $streams   The chosen set, or null for "everything available".
+     * @param StreamMask      $available The streams currently available.
+     * @param string          $who       Who sends them, for the error message.
      *
      * @throws InvalidArgumentException
      *

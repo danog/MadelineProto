@@ -605,8 +605,8 @@ final class PrivateCallController implements CallControllerInterface
     }
 
     /**
-     * The peer's streams or codecs changed, or a recording of them started or ended: emit a
-     * {@see \danog\MadelineProto\EventHandler\Calls\CallStreams} update.
+     * The peer's streams or codecs changed, or a recording of them ended: emit a
+     * {@see CallStreams} update.
      *
      * @param array<int, string> $codecs By {@see CallStream} flag.
      *
@@ -614,7 +614,7 @@ final class PrivateCallController implements CallControllerInterface
      */
     public function onStreamsChanged(int $streams, array $codecs, ?RecordingEvent $recording, ?LocalFile $file): void
     {
-        CallStreams::dispatch($this->API, $this->public, $this->public->otherID, $streams, $codecs, $recording, $file);
+        CallStreamsDispatcher::dispatch($this->API, $this->public, $this->public->otherID, $streams, $codecs, $recording, $file);
     }
 
     /**

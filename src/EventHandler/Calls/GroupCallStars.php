@@ -16,11 +16,43 @@
 
 namespace danog\MadelineProto\EventHandler\Calls;
 
+use JsonSerializable;
+
 /**
- * An [in-call message or reaction »](https://core.telegram.org/api/group-calls#in-call-messages) sent
- * in a [video chat or livestream »](https://core.telegram.org/api/group-calls#video-chats-livestreams)
- * ({@see GroupCall}), mirroring [groupCallMessage](https://core.telegram.org/constructor/groupCallMessage).
+ * The [Telegram Stars donations](https://core.telegram.org/api/group-calls#paid-live-story-donations)
+ * received by a live story, from [phone.groupCallStars](https://core.telegram.org/constructor/phone.groupCallStars).
+ *
+ * @psalm-immutable
  */
-final class GroupCallMessage extends AbstractGroupCallMessage
+final class GroupCallStars implements JsonSerializable
 {
+    /**
+     * @internal
+     *
+     * @param list<GroupCallDonor> $topDonors
+     *
+     * @psalm-mutation-free
+     */
+    public function __construct(
+        /** Total Telegram Stars donated so far. */
+        public readonly int $totalStars,
+        /**
+         * The top donors.
+         *
+         * @var list<GroupCallDonor>
+         */
+        public readonly array $topDonors,
+    ) {
+    }
+
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
+    }
 }

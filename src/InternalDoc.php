@@ -1055,7 +1055,7 @@ abstract class InternalDoc
     /**
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
-     * @return array<int, Participant>
+     * @return array<int, \danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant>
      *
      * @psalm-mutation-free
      */
@@ -1068,7 +1068,7 @@ abstract class InternalDoc
      *
      * @psalm-mutation-free
      */
-    final public function getGroupCallState(int $id): \danog\MadelineProto\GroupCall\GroupCallState
+    final public function getGroupCallState(int $id): \danog\MadelineProto\EventHandler\Calls\GroupCallState
     {
         return $this->wrapper->getAPI()->getGroupCallState($id);
     }

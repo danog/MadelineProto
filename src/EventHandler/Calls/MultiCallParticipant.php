@@ -14,17 +14,19 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\GroupCall;
+namespace danog\MadelineProto\EventHandler\Calls;
 
 use JsonSerializable;
 
 /**
- * A donor of a [live story](https://core.telegram.org/api/group-calls#live-stories), from
- * [groupCallDonor](https://core.telegram.org/constructor/groupCallDonor).
+ * A participant of a multi-party call, returned by {@see \danog\MadelineProto\EventHandler\MultiCall::getParticipants()}
+ * and {@see \danog\MadelineProto\EventHandler\MultiCall::getParticipant()}.
  *
- * @psalm-immutable
+ * The concrete type depends on the call: a {@see \danog\MadelineProto\EventHandler\Calls\GroupCallParticipant}
+ * for a group call (video chat or livestream, {@see AbstractGroupCall}), or a {@see ConferenceCallParticipant}
+ * for an end-to-end encrypted {@see ConferenceCall}.
  */
-final class GroupCallDonor implements JsonSerializable
+abstract class MultiCallParticipant implements JsonSerializable
 {
     /**
      * @internal
@@ -32,19 +34,13 @@ final class GroupCallDonor implements JsonSerializable
      * @psalm-mutation-free
      */
     public function __construct(
-        /** Bot API ID of the donor, or null for an anonymous donor. */
-        public readonly ?int $peerId,
-        /** How many Telegram Stars they donated. */
-        public readonly int $stars,
-        /** Whether this is one of the top donors. */
-        public readonly bool $top,
-        /** Whether this is us. */
-        public readonly bool $my,
+        /** Bot API ID of the peer this participant is (a user id, in a conference). */
+        public readonly int $peerId,
     ) {
     }
 
     /**
-     * @internal
+     * @return array<string, mixed>
      *
      * @psalm-mutation-free
      */

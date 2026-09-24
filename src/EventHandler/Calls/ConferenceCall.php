@@ -20,7 +20,6 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\EventHandler\MultiCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\GroupCall\GroupCallState;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
@@ -41,6 +40,10 @@ use danog\MadelineProto\RemoteUrl;
  * This is a thin, serializable handle: every operation is delegated to the live conference controller
  * ({@see \danog\MadelineProto\Tgcalls\E2E\ConferenceCall}) by call ID, so it keeps working across a
  * process restart and over IPC.
+ *
+ * @implements MultiCall<ConferenceCallParticipant>
+ *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  */
 final class ConferenceCall extends Update implements MultiCall
 {
@@ -85,6 +88,8 @@ final class ConferenceCall extends Update implements MultiCall
 
     /**
      * @internal
+     *
+     * @param array<string, mixed> $call
      *
      * @psalm-external-mutation-free
      */
@@ -166,9 +171,9 @@ final class ConferenceCall extends Update implements MultiCall
 
     /**
      * Get the participants currently in the conference, keyed by their user id, each with their
-     * Ed25519 `public_key`, `permissions` bits and protocol `version` from the shared-state chain.
+     * Ed25519 public key, permission bits and protocol version from the shared-state chain.
      *
-     * @return array<int, array{public_key: string, permissions: int, version: int}>
+     * @return array<int, ConferenceCallParticipant>
      *
      * @psalm-mutation-free
      */
@@ -179,13 +184,13 @@ final class ConferenceCall extends Update implements MultiCall
     }
 
     /**
-     * A participant of the conference by their id, username or peer, with their Ed25519 `public_key`,
-     * `permissions` bits and protocol `version` from the shared-state chain, or null if not in it.
+     * A participant of the conference by their id, username or peer, with their Ed25519 public key,
+     * permission bits and protocol version from the shared-state chain, or null if not in it.
      *
-     * @return array{public_key: string, permissions: int, version: int}|null
+     * @return ConferenceCallParticipant|null
      */
     #[\Override]
-    public function getParticipant(mixed $participant): ?array
+    public function getParticipant(string|int $participant): ?ConferenceCallParticipant
     {
         return $this->getParticipants()[$this->getClient()->getId($participant)] ?? null;
     }
@@ -195,7 +200,7 @@ final class ConferenceCall extends Update implements MultiCall
      * members can no longer decrypt the call's media. Requires the `remove_users` permission.
      */
     #[\Override]
-    public function removeParticipant(mixed ...$participants): static
+    public function removeParticipant(string|int ...$participants): static
     {
         $this->getClient()->removeConferenceCallParticipants($this->id, ...$participants);
         return $this;
@@ -205,7 +210,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Invite users to the conference call, ringing them.
      */
     #[\Override]
-    public function invite(mixed ...$users): static
+    public function invite(string|int ...$users): static
     {
         $this->getClient()->inviteToConferenceCall($this->id, ...$users);
         return $this;
@@ -257,10 +262,10 @@ final class ConferenceCall extends Update implements MultiCall
      * @param string         $message   The text; markup in `$parseMode` is converted to entities (bold, italic, underline, strikethrough, spoiler and custom emoji are supported).
      * @param ParseMode|null $parseMode Whether to parse HTML or Markdown markup in the text.
      * @param int|null       $paidStars Ignored: conference messages cannot carry donations.
-     * @param mixed          $sendAs    Ignored: conference messages are always sent as ourselves.
+     * @param string|int|null $sendAs    Ignored: conference messages are always sent as ourselves.
      */
     #[\Override]
-    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, mixed $sendAs = null): static
+    public function sendMessage(string $message, ?ParseMode $parseMode = null, ?int $paidStars = null, string|int|null $sendAs = null): static
     {
         $this->getClient()->sendConferenceCallMessage($this->id, $message, $parseMode);
         return $this;
@@ -293,7 +298,7 @@ final class ConferenceCall extends Update implements MultiCall
      * Mute a participant for ourselves only (a conference has no admins).
      */
     #[\Override]
-    public function muteParticipant(mixed $participant, bool $muted = true): static
+    public function muteParticipant(string|int $participant, bool $muted = true): static
     {
         $this->getClient()->editConferenceCallParticipant($this->id, $participant, muted: $muted);
         return $this;
@@ -302,10 +307,10 @@ final class ConferenceCall extends Update implements MultiCall
     /**
      * Set our local playback volume of a participant.
      *
-     * @param int $volume From 1 to 20000, where 10000 is 100%.
+     * @param int<1, 20000> $volume From 1 to 20000, where 10000 is 100%.
      */
     #[\Override]
-    public function setParticipantVolume(mixed $participant, int $volume): static
+    public function setParticipantVolume(string|int $participant, int $volume): static
     {
         $this->getClient()->editConferenceCallParticipant($this->id, $participant, volume: $volume);
         return $this;
@@ -414,14 +419,14 @@ final class ConferenceCall extends Update implements MultiCall
      * audio is OPUS; `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm}
      * DocType, autodetected from a `.webm` extension. Audio-only OGG OPUS recordings are not supported.
      *
-     * @param ?int $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     * @param StreamMask|null $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
      *
      * @throws \InvalidArgumentException If a chosen stream is not available, or nothing is.
      *
-     * @return int The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
+     * @return StreamMask The streams the participant currently sends, as a bitmask of {@see CallStream} flags.
      */
     #[\Override]
-    public function setOutput(LocalFile|WritableStream $file, mixed $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
+    public function setOutput(LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
         return $this->getClient()->conferenceCallSetOutput($this->id, $file, $participant, $format, $streams);
     }
@@ -438,7 +443,7 @@ final class ConferenceCall extends Update implements MultiCall
      * `$format` picks the {@see RecordingFormat::Mkv} (default) or {@see RecordingFormat::Webm} DocType.
      */
     #[\Override]
-    public function setOutputFolder(LocalDirectory $dir, mixed $participant = null, ?RecordingFormat $format = null): static
+    public function setOutputFolder(LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): static
     {
         $this->getClient()->conferenceCallSetOutputFolder($this->id, $dir, $participant, $format);
         return $this;
