@@ -48,19 +48,8 @@ final class LiveStory extends AbstractGroupCall
         if ($call['_'] === 'groupCallDiscarded') {
             return;
         }
-        $this->sendPaidMessagesStars = isset($call['send_paid_messages_stars']) ? (int) $call['send_paid_messages_stars'] : null;
+        $this->sendPaidMessagesStars = $call['send_paid_messages_stars'] ?? null;
         $this->defaultSendAs = isset($call['default_send_as']) ? $this->getClient()->getIdInternal($call['default_send_as']) : null;
-    }
-
-    /**
-     * A live story has no title of its own (its caption is the story's).
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function setTitle(string $title): static
-    {
-        throw new \LogicException('A live story has no title: its caption is set when it is started.');
     }
 
     /**
@@ -84,17 +73,6 @@ final class LiveStory extends AbstractGroupCall
     public function removeParticipant(string|int ...$participants): static
     {
         throw new \LogicException('Viewers cannot be removed from a live story.');
-    }
-
-    /**
-     * Live stories do not support screen sharing: the poster publishes a single video stream.
-     *
-     * @psalm-pure
-     */
-    #[\Override]
-    public function enablePresentation(): static
-    {
-        throw new \LogicException('Live stories do not support screen sharing.');
     }
 
     /**

@@ -45,6 +45,6 @@ final class GroupCallMessagesDeleted extends Update
     {
         parent::__construct($API);
         $this->callId = $rawUpdate['call']['id'];
-        $this->ids = array_map('intval', $rawUpdate['messages']);
+        $this->ids = $rawUpdate['messages'];
     }
 }

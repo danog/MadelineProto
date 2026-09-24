@@ -88,7 +88,7 @@ final class LiveStoryParticipant extends AbstractGroupCallParticipant
     {
         return new self(
             ...self::commonArgs($participant, $peerId, $cached),
-            paidStarsTotal: isset($participant['paid_stars_total']) ? (int) $participant['paid_stars_total'] : null,
+            paidStarsTotal: $participant['paid_stars_total'] ?? null,
         );
     }
 }

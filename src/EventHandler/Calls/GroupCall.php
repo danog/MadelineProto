@@ -57,12 +57,12 @@ final class GroupCall extends AbstractGroupCall
         if ($call['_'] === 'groupCallDiscarded') {
             return;
         }
-        $this->title = isset($call['title']) ? (string) $call['title'] : null;
-        $this->scheduleStartSubscribed = (bool) ($call['schedule_start_subscribed'] ?? false);
-        $this->recordVideoActive = (bool) ($call['record_video_active'] ?? false);
-        $this->recordStartDate = isset($call['record_start_date']) ? (int) $call['record_start_date'] : null;
-        $this->scheduleDate = isset($call['schedule_date']) ? (int) $call['schedule_date'] : null;
-        $this->conference = (bool) ($call['conference'] ?? false);
+        $this->title = $call['title'] ?? null;
+        $this->scheduleStartSubscribed = $call['schedule_start_subscribed'];
+        $this->recordVideoActive = $call['record_video_active'];
+        $this->recordStartDate = $call['record_start_date'] ?? null;
+        $this->scheduleDate = $call['schedule_date'] ?? null;
+        $this->conference = $call['conference'];
     }
 
     /**
@@ -76,16 +76,6 @@ final class GroupCall extends AbstractGroupCall
     public function join(bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): static
     {
         $this->getClient()->joinGroupCallById($this->id, $muted, $joinAs, $inviteHash);
-        return $this;
-    }
-
-    /**
-     * Change the title of the group call.
-     */
-    #[\Override]
-    public function setTitle(string $title): static
-    {
-        $this->getClient()->setGroupCallTitle($this->id, $title);
         return $this;
     }
 

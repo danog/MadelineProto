@@ -89,7 +89,7 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
      */
     final protected static function commonArgs(array $participant, int $peerId, ?self $cached): array
     {
-        $min = $participant['min'] ?? false;
+        $min = $participant['min'];
         // Video/presentation source groups are only carried in full (non-min) updates; a min update
         // keeps whatever the cached state already had, exactly like volume and muted_by_you.
         $video = self::videoSources($participant['video'] ?? null);
@@ -111,12 +111,12 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
             'source' => $participant['source'],
             'date' => $participant['date'],
             'activeDate' => $participant['active_date'] ?? null,
-            'muted' => $participant['muted'] ?? false,
-            'canSelfUnmute' => $participant['can_self_unmute'] ?? false,
-            'mutedByYou' => $min && $cached !== null ? $cached->mutedByYou : ($participant['muted_by_you'] ?? false),
-            'self' => $participant['self'] ?? false,
-            'justJoined' => $participant['just_joined'] ?? false,
-            'videoJoined' => $participant['video_joined'] ?? false,
+            'muted' => $participant['muted'],
+            'canSelfUnmute' => $participant['can_self_unmute'],
+            'mutedByYou' => $min && $cached !== null ? $cached->mutedByYou : $participant['muted_by_you'],
+            'self' => $participant['self'],
+            'justJoined' => $participant['just_joined'],
+            'videoJoined' => $participant['video_joined'],
             'videoSources' => $video,
             'presentationSources' => $presentation,
             'videoEndpoint' => $videoEndpoint,
@@ -124,7 +124,7 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
             'volume' => $min && $cached !== null ? $cached->volume : ($participant['volume'] ?? 10000),
             'about' => $participant['about'] ?? null,
             'raiseHandRating' => $participant['raise_hand_rating'] ?? null,
-            'volumeByAdmin' => (bool) ($participant['volume_by_admin'] ?? false),
+            'volumeByAdmin' => $participant['volume_by_admin'],
         ];
     }
 

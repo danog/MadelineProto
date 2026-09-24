@@ -49,8 +49,6 @@ final class ConferenceCall extends Update implements MultiCall
 {
     /** Conference call ID. */
     public readonly int $id;
-    /** Access hash of the conference call. */
-    public readonly int $accessHash;
 
     /** Number of participants. */
     public int $participantsCount = 0;
@@ -97,15 +95,15 @@ final class ConferenceCall extends Update implements MultiCall
     {
         if ($call['_'] === 'groupCallDiscarded') {
             $this->discarded = true;
-            $this->duration = isset($call['duration']) ? (int) $call['duration'] : null;
+            $this->duration = $call['duration'] ?? null;
             return;
         }
-        $this->participantsCount = (int) ($call['participants_count'] ?? 0);
-        $this->creator = (bool) ($call['creator'] ?? false);
-        $this->inviteLink = isset($call['invite_link']) ? (string) $call['invite_link'] : null;
-        $this->messagesEnabled = (bool) ($call['messages_enabled'] ?? false);
-        $this->unmutedVideoCount = isset($call['unmuted_video_count']) ? (int) $call['unmuted_video_count'] : null;
-        $this->unmutedVideoLimit = (int) ($call['unmuted_video_limit'] ?? 0);
+        $this->participantsCount = $call['participants_count'];
+        $this->creator = $call['creator'];
+        $this->inviteLink = $call['invite_link'] ?? null;
+        $this->messagesEnabled = $call['messages_enabled'];
+        $this->unmutedVideoCount = $call['unmuted_video_count'] ?? null;
+        $this->unmutedVideoLimit = $call['unmuted_video_limit'];
     }
 
     /**

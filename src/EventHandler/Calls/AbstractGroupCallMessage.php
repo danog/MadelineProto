@@ -42,7 +42,7 @@ abstract class AbstractGroupCallMessage extends MultiCallMessage
         parent::__construct($API, $rawUpdate);
         $message = $rawUpdate['message'];
         $this->id = $message['id'];
-        $this->fromAdmin = $message['from_admin'] ?? false;
+        $this->fromAdmin = $message['from_admin'];
     }
 
     /**

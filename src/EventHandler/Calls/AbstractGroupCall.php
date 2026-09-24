@@ -46,8 +46,6 @@ abstract class AbstractGroupCall extends Update implements MultiCall
 {
     /** Group call ID. */
     public readonly int $id;
-    /** Access hash of the group call. */
-    public readonly int $accessHash;
     /** Bot API ID of the peer the call belongs to (the group or channel of a video chat, the poster of a live story), if known. */
     public readonly ?int $peerId;
 
@@ -99,8 +97,8 @@ abstract class AbstractGroupCall extends Update implements MultiCall
         ?int $peerId = null,
     ) {
         parent::__construct($API);
-        $this->id = (int) $call['id'];
-        $this->accessHash = (int) $call['access_hash'];
+        $this->id = $call['id'];
+        $this->accessHash = $call['access_hash'];
         $this->peerId = $peerId;
         $this->update($call);
     }
@@ -116,23 +114,23 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     {
         if ($call['_'] === 'groupCallDiscarded') {
             $this->discarded = true;
-            $this->duration = isset($call['duration']) ? (int) $call['duration'] : null;
+            $this->duration = $call['duration'] ?? null;
             return;
         }
-        $this->participantsCount = (int) ($call['participants_count'] ?? 0);
-        $this->joinMuted = (bool) ($call['join_muted'] ?? false);
-        $this->canChangeJoinMuted = (bool) ($call['can_change_join_muted'] ?? false);
-        $this->joinDateAsc = (bool) ($call['join_date_asc'] ?? false);
-        $this->canStartVideo = (bool) ($call['can_start_video'] ?? false);
-        $this->rtmpStream = (bool) ($call['rtmp_stream'] ?? false);
-        $this->listenersHidden = (bool) ($call['listeners_hidden'] ?? false);
-        $this->creator = (bool) ($call['creator'] ?? false);
-        $this->messagesEnabled = (bool) ($call['messages_enabled'] ?? false);
-        $this->canChangeMessagesEnabled = (bool) ($call['can_change_messages_enabled'] ?? false);
-        $this->inviteLink = isset($call['invite_link']) ? (string) $call['invite_link'] : null;
-        $this->unmutedVideoCount = isset($call['unmuted_video_count']) ? (int) $call['unmuted_video_count'] : null;
-        $this->unmutedVideoLimit = (int) ($call['unmuted_video_limit'] ?? 0);
-        $this->streamDcId = isset($call['stream_dc_id']) ? (int) $call['stream_dc_id'] : null;
+        $this->participantsCount = $call['participants_count'];
+        $this->joinMuted = $call['join_muted'];
+        $this->canChangeJoinMuted = $call['can_change_join_muted'];
+        $this->joinDateAsc = $call['join_date_asc'];
+        $this->canStartVideo = $call['can_start_video'];
+        $this->rtmpStream = $call['rtmp_stream'];
+        $this->listenersHidden = $call['listeners_hidden'];
+        $this->creator = $call['creator'];
+        $this->messagesEnabled = $call['messages_enabled'];
+        $this->canChangeMessagesEnabled = $call['can_change_messages_enabled'];
+        $this->inviteLink = $call['invite_link'] ?? null;
+        $this->unmutedVideoCount = $call['unmuted_video_count'] ?? null;
+        $this->unmutedVideoLimit = $call['unmuted_video_limit'];
+        $this->streamDcId = $call['stream_dc_id'] ?? null;
     }
 
     /**
@@ -174,6 +172,16 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     public function invite(string|int ...$users): static
     {
         $this->getClient()->inviteToGroupCall($this->id, ...$users);
+        return $this;
+    }
+
+    /**
+     * Change the title of the group call.
+     */
+    #[\Override]
+    public function setTitle(string $title): static
+    {
+        $this->getClient()->setGroupCallTitle($this->id, $title);
         return $this;
     }
 

@@ -59,7 +59,7 @@ final class GroupCallParticipants extends Update
             if ($peerId === null) {
                 continue;
             }
-            if ($participant['left'] ?? false) {
+            if ($participant['left']) {
                 $left[] = $peerId;
                 continue;
             }

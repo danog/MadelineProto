@@ -1026,16 +1026,16 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = $this->API->methodCallAsyncRead('phone.getGroupCallStars', ['call' => $this->inputCall]);
         \assert(\is_array($result));
         $donors = [];
-        foreach ((array) $result['top_donors'] as $donor) {
+        foreach ($result['top_donors'] as $donor) {
             \assert(\is_array($donor));
             $donors[] = new GroupCallDonor(
                 isset($donor['peer_id']) ? $this->API->getIdInternal($donor['peer_id']) : null,
-                (int) $donor['stars'],
-                (bool) ($donor['top'] ?? false),
-                (bool) ($donor['my'] ?? false),
+                $donor['stars'],
+                $donor['top'],
+                $donor['my'],
             );
         }
-        return new GroupCallStars((int) $result['total_stars'], $donors);
+        return new GroupCallStars($result['total_stars'], $donors);
     }
 
     /**
