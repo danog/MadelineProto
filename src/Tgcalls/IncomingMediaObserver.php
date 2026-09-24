@@ -24,6 +24,7 @@ use danog\MadelineProto\RecordingEvent;
  * change, or a recording of them starts or ends.
  *
  * @internal
+ * @psalm-mutable
  */
 interface IncomingMediaObserver
 {

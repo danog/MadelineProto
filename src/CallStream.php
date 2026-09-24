@@ -26,6 +26,8 @@ use InvalidArgumentException;
  * turn on and off at any time. A *set* of streams is a bitmask of these flags, as used by
  * {@see EventHandler\Call::setOutput()} to pick the tracks of a recording and reported by
  * {@see EventHandler\Calls\CallStreams} updates.
+ *
+ * @psalm-immutable
  */
 final class CallStream
 {

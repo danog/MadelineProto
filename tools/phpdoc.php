@@ -106,6 +106,7 @@ $filter = static function (string $class) use ($ignore): bool {
     || str_starts_with($class, 'danog\\MadelineProto\\MTProtoSession\\')
     || str_starts_with($class, 'danog\\MadelineProto\\PhpDoc\\')
     || str_starts_with($class, 'danog\\MadelineProto\\Stream\\')
+    || str_starts_with($class, 'danog\\MadelineProto\\Test\\')
     || str_starts_with($class, 'danog\\MadelineProto\\Db\\NullCache')) {
         return false;
     }

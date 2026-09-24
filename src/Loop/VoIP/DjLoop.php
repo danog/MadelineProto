@@ -374,6 +374,11 @@ final class DjLoop extends VoIPLoop
         $this->pause = false;
     }
 
+    /**
+     * Whether playback is paused.
+     *
+     * @psalm-mutation-free
+     */
     public function isAudioPaused(): bool
     {
         return $this->pause;
@@ -382,6 +387,8 @@ final class DjLoop extends VoIPLoop
     /**
      * Get info about what is currently being played: a description string for a stream, otherwise
      * the related {@see LocalFile} or {@see RemoteUrl}.
+     *
+     * @psalm-mutation-free
      */
     public function getCurrent(): LocalFile|RemoteUrl|string|null
     {

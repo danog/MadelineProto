@@ -255,6 +255,8 @@ trait GroupMediaTrait
 
     /**
      * The file or stream currently being played, if any.
+     *
+     * @psalm-mutation-free
      */
     public function getCurrent(MediaDestination $dest = MediaDestination::Camera): LocalFile|RemoteUrl|string|null
     {
@@ -263,6 +265,8 @@ trait GroupMediaTrait
 
     /**
      * Whether playback of the current file is paused.
+     *
+     * @psalm-mutation-free
      */
     public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool
     {

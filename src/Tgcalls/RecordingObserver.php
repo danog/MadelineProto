@@ -23,6 +23,7 @@ use danog\MadelineProto\LocalFile;
  * Told by a {@see CallRecorder} when it opens or finishes an output file (or stream).
  *
  * @internal
+ * @psalm-mutable
  */
 interface RecordingObserver
 {
