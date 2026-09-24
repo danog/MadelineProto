@@ -24,6 +24,7 @@ use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
@@ -45,7 +46,6 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
-use danog\MadelineProto\VoIP;
 
 use function Amp\Socket\SocketAddress\fromString;
 
@@ -291,7 +291,7 @@ class MyEventHandler extends SimpleEventHandler
     #[FilterCommand('call')]
     public function callVoip(Incoming&Message $message): void
     {
-        $this->requestCall($message->senderId)->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+        $this->requestCall($message->senderId)->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
     }
 
     // Plays incoming audio files into a Telegram call
@@ -305,9 +305,9 @@ class MyEventHandler extends SimpleEventHandler
     }
 
     #[Handler]
-    public function handleIncomingCall(VoIP&Incoming $call): void
+    public function handleIncomingCall(PrivateCall&Incoming $call): void
     {
-        $call->join()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+        $call->join()->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
     }
 
     public static function getPluginPaths(): string|array|null

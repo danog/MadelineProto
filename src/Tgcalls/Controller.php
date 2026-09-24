@@ -143,6 +143,13 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     private ?string $answeredPeerOfferExchangeId = null;
     /** Exchange ID of our in-flight structured offer. */
     private ?string $pendingV2ExchangeId = null;
+    /**
+     * Peer offers that crossed our in-flight exchange (see {@see self::onV2Negotiation()}): the peer
+     * discards them on seeing our offer, so we hold them here and drop them once our exchange resolves.
+     *
+     * @var list<array<array-key, mixed>>
+     */
+    private array $pendingPeerOffers = [];
     /** Whether our outgoing channels have completed at least one structured negotiation. */
     private bool $localV2Negotiated = false;
     private bool $initialSetupSent = false;
