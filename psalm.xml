@@ -36,4 +36,7 @@
 
         <MissingClassConstType errorLevel="suppress" />
     </issueHandlers>
+    <plugins>
+        <pluginClass class="Webmozart\Assert\PsalmPlugin"></pluginClass>
+    </plugins>
 </psalm>
