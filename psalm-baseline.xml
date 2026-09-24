@@ -5143,6 +5143,7 @@
     <MixedArrayAccess>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['chat_photo']]]></code>
+      <code><![CDATA[$full['full']['chat_photo']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
       <code><![CDATA[$full['full']['exported_invite']]]></code>
       <code><![CDATA[$full['full']['exported_invite']['link']]]></code>
@@ -5225,17 +5226,22 @@
       <code><![CDATA[$res[$key]]]></code>
       <code><![CDATA[$res[$key]]]></code>
       <code><![CDATA[$res[$key]]]></code>
+      <code><![CDATA[$res[$key]]]></code>
+      <code><![CDATA[$res[$key]]]></code>
+      <code><![CDATA[$res['bot_api_id']]]></code>
       <code><![CDATA[$res['bot_api_id']]]></code>
       <code><![CDATA[$res['bot_api_id']]]></code>
       <code><![CDATA[$res['bot_api_id']]]></code>
       <code><![CDATA[$res['channel_id']]]></code>
       <code><![CDATA[$res['chat_id']]]></code>
+      <code><![CDATA[$res['community_id']]]></code>
       <code><![CDATA[$res['fallback_photo']]]></code>
       <code><![CDATA[$res['invite']]]></code>
       <code><![CDATA[$res['invite']]]></code>
       <code><![CDATA[$res['participants']]]></code>
       <code><![CDATA[$res['participants'][$participant['user_id'] ?? $this->getIdInternal($participant['peer'])]]]></code>
       <code><![CDATA[$res['personal_photo']]]></code>
+      <code><![CDATA[$res['photo']]]></code>
       <code><![CDATA[$res['photo']]]></code>
       <code><![CDATA[$res['photo']]]></code>
       <code><![CDATA[$res['photo']]]></code>
@@ -7794,9 +7800,13 @@
       <code><![CDATA[$x['_']]]></code>
       <code><![CDATA[$x['channel_id']]]></code>
       <code><![CDATA[$x['channel_id']]]></code>
+      <code><![CDATA[$x['community_id']]]></code>
+      <code><![CDATA[$x['community_id']]]></code>
       <code><![CDATA[$x['data']]]></code>
       <code><![CDATA[$x['id']]]></code>
       <code><![CDATA[$x['id']]]></code>
+      <code><![CDATA[$x['linked_community_id']]]></code>
+      <code><![CDATA[$x['linked_community_id']]]></code>
       <code><![CDATA[$x['linked_monoforum_id']]]></code>
       <code><![CDATA[$x['linked_monoforum_id']]]></code>
       <code><![CDATA[$x['result']]]></code>
