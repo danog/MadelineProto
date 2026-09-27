@@ -84,7 +84,10 @@
         "danog/php-rtc-exception": "^1.1.10",
         "danog/php-rtc-mixin": "^2.0.8",
         "danog/php-rtc-rtp-parameter": "^1.1.8",
-        "symfony/polyfill-iconv": "^1.37"
+        "symfony/polyfill-iconv": "^1.37",
+        "symfony/polyfill-php84": "^1.38",
+        "symfony/polyfill-php85": "^1.41",
+        "symfony/polyfill-php86": "^1.41"
     },
     "require-dev": {
         "ext-ctype": "*",

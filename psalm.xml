@@ -30,7 +30,6 @@
         <!-- Should totally go in level 1... -->
         <RiskyTruthyFalsyComparison errorLevel="suppress" />
         <ParamNameMismatch errorLevel="suppress" />
-        <StringIncrement errorLevel="suppress" />
         <InvalidTraversableImplementation errorLevel="suppress" />
         <RedundantPropertyInitializationCheck errorLevel="suppress" />
 
