@@ -41,6 +41,18 @@ final class Cancellation implements AmpCancellation
     }
 
     /**
+     * Get what to send back to the client in place of this cancellation.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getReference(): CancellationReference
+    {
+        return new CancellationReference($this->inner->getMethodId('wait'));
+    }
+
+    /**
      * Subscribes a new handler to be invoked on a cancellation request.
      *
      * This handler might be invoked immediately in case the cancellation has already been requested. Any unhandled

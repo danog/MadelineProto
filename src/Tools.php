@@ -681,13 +681,16 @@ abstract class Tools extends AsyncTools
      * Provide a buffered reader for a file, URL or amp stream, optionally starting at a byte offset.
      *
      * The `$offset` makes a demuxer resumable across a serialize/unserialize cycle: a `LocalFile` is
-     * seeked and a `RemoteUrl` is fetched with a `Range` request. A raw {@see ReadableStream} cannot
-     * be seeked, so a non-zero offset on one is rejected.
+     * seeked and a `RemoteUrl` is fetched with a `Range` request. A {@see ResumableStream} is skipped
+     * forward from its current position (without downloading the skipped part, for a
+     * {@see ResumableDownloadStream}). Any other {@see ReadableStream} cannot be seeked, so a non-zero
+     * offset on one is rejected.
      *
      * @return Closure(int): ?string
      */
     public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null, int $offset = 0): Closure
     {
+        $buffer = '';
         if ($stream instanceof LocalFile) {
             $stream = openFile($stream->file, 'r');
             if ($offset !== 0) {
@@ -708,9 +711,14 @@ abstract class Tools extends AsyncTools
                 $cancellation
             )->getBody();
         } elseif ($offset !== 0) {
-            throw new Exception('Cannot resume a raw stream from a byte offset: it is not seekable.');
+            if ($stream instanceof ResumableDownloadStream) {
+                $stream->skip($offset);
+            } elseif ($stream instanceof ResumableStream) {
+                $buffer = self::skipStream($stream, $offset, $cancellation);
+            } else {
+                throw new Exception('Cannot resume a raw stream from a byte offset: it is not seekable.');
+            }
         }
-        $buffer = '';
         return static function (int $len) use (&$buffer, $stream, $cancellation): ?string {
             if ($buffer === null) {
                 return null;
@@ -730,6 +738,23 @@ abstract class Tools extends AsyncTools
                 $buffer .= $chunk;
             } while (true);
         };
+    }
+
+    /**
+     * Read and discard the next bytes of a stream.
+     *
+     * @return ?string What was read past the skipped bytes, null if the stream ended first.
+     */
+    private static function skipStream(ReadableStream $stream, int $bytes, ?Cancellation $cancellation): ?string
+    {
+        while (($chunk = $stream->read($cancellation)) !== null) {
+            $len = \strlen($chunk);
+            if ($len >= $bytes) {
+                return substr($chunk, $bytes);
+            }
+            $bytes -= $len;
+        }
+        return null;
     }
 
     private const BLOCKING_FUNCTIONS = [

@@ -2894,12 +2894,14 @@ abstract class InternalDoc
      * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
      * @param boolean                                   $encrypted Whether to encrypt file for secret chats
+     * @param ?string                                   $resumeKey Identifies the uploaded file across restarts: if an upload of the same file (with the same size) was interrupted, it is resumed.
+     *                                                             A non-seekable callable must then accept starting from a non-zero offset (the first missing part).
      *
      * @return array InputFile constructor
      */
-    final public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null): array
+    final public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?\Amp\Cancellation $cancellation = null, ?string $resumeKey = null): array
     {
-        return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
+        return $this->wrapper->getAPI()->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
     }
     /**
      * Upload file from stream.

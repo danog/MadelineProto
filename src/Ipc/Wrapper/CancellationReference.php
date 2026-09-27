@@ -16,43 +16,20 @@
 
 namespace danog\MadelineProto\Ipc\Wrapper;
 
-use danog\MadelineProto\Ipc\ClientAbstract;
-use danog\MadelineProto\Ipc\Wrapper;
-
 /**
- * Generic callback wrapper object.
+ * Sent back to an IPC client in place of the proxy of one of its cancellations, which can't be
+ * serialized: the client resolves it to the original cancellation.
  *
  * @internal
  */
-abstract class Obj
+final class CancellationReference
 {
     /**
-     * Constructor.
-     *
-     * @param array<string, int> $methods
+     * @param int $id ID of a callback of the wrapped cancellation.
      *
      * @psalm-mutation-free
      */
-    public function __construct(private ClientAbstract $wrapper, private array $methods)
+    public function __construct(public readonly int $id)
     {
-    }
-    /**
-     * Call method.
-     */
-    public function __call(string $name, array $arguments = []): mixed
-    {
-        return $this->wrapper->__call($this->methods[$name], $arguments);
-    }
-
-    /**
-     * Get the ID of the callback of a method.
-     *
-     * @internal
-     *
-     * @psalm-mutation-free
-     */
-    public function getMethodId(string $name): int
-    {
-        return $this->methods[$name];
     }
 }

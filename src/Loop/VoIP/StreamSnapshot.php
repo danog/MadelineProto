@@ -14,45 +14,36 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\Ipc\Wrapper;
+namespace danog\MadelineProto\Loop\VoIP;
 
-use danog\MadelineProto\Ipc\ClientAbstract;
-use danog\MadelineProto\Ipc\Wrapper;
+use Amp\ByteStream\ReadableStream;
+use danog\MadelineProto\ResumableStream;
+use Webmozart\Assert\Assert;
 
 /**
- * Generic callback wrapper object.
+ * A resumable stream queued for playback.
+ *
+ * It is serialized as soon as it is queued, before anything reads it, so that it can be reopened from
+ * the start of the item any number of times: to resume it after a restart, or to loop it as a hold file.
  *
  * @internal
  */
-abstract class Obj
+final class StreamSnapshot
 {
-    /**
-     * Constructor.
-     *
-     * @param array<string, int> $methods
-     *
-     * @psalm-mutation-free
-     */
-    public function __construct(private ClientAbstract $wrapper, private array $methods)
+    private readonly string $serialized;
+
+    public function __construct(ReadableStream&ResumableStream $stream)
     {
-    }
-    /**
-     * Call method.
-     */
-    public function __call(string $name, array $arguments = []): mixed
-    {
-        return $this->wrapper->__call($this->methods[$name], $arguments);
+        $this->serialized = serialize($stream);
     }
 
     /**
-     * Get the ID of the callback of a method.
-     *
-     * @internal
-     *
-     * @psalm-mutation-free
+     * Get a new stream, positioned where the snapshotted one was when it was queued.
      */
-    public function getMethodId(string $name): int
+    public function open(): ReadableStream
     {
-        return $this->methods[$name];
+        $stream = unserialize($this->serialized);
+        Assert::isInstanceOf($stream, ReadableStream::class);
+        return $stream;
     }
 }

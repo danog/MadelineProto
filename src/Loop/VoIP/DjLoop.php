@@ -34,6 +34,7 @@ use danog\MadelineProto\Loop\VoIPLoop;
 use danog\MadelineProto\Matroska;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\H264Framing;
 use danog\MadelineProto\Tgcalls\VideoCodecObserver;
@@ -110,9 +111,9 @@ final class DjLoop extends VoIPLoop
      *  Playlist.
      * -------------------------------------------------------------------- */
 
-    /** @var list<LocalFile|RemoteUrl|ReadableStream> */
+    /** @var list<LocalFile|RemoteUrl|ReadableStream|StreamSnapshot> */
     private array $inputFiles = [];
-    /** @var array<LocalFile|RemoteUrl|ReadableStream> */
+    /** @var array<LocalFile|RemoteUrl|ReadableStream|StreamSnapshot> */
     private array $holdFiles = [];
     private int $holdIndex = 0;
     private bool $playingHold = false;
@@ -138,7 +139,7 @@ final class DjLoop extends VoIPLoop
      *  Current file + its byte-offset resume state.
      * -------------------------------------------------------------------- */
 
-    private LocalFile|RemoteUrl|ReadableStream|null $currentFile = null;
+    private LocalFile|RemoteUrl|ReadableStream|StreamSnapshot|null $currentFile = null;
     private LocalFile|RemoteUrl|string|null $currentDesc = null;
     /** 'ogg' or 'matroska', or null when nothing is playing. */
     private ?string $currentKind = null;
@@ -327,7 +328,7 @@ final class DjLoop extends VoIPLoop
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file): void
     {
-        $this->inputFiles[] = $file;
+        $this->inputFiles[] = self::snapshot($file);
         if ($this->playingHold) {
             $this->playingHold = false;
             $this->skip();
@@ -400,7 +401,7 @@ final class DjLoop extends VoIPLoop
      */
     public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $this->holdFiles = $files;
+        $this->holdFiles = array_map(self::snapshot(...), $files);
         $this->startReader();
     }
 
@@ -598,10 +599,10 @@ final class DjLoop extends VoIPLoop
     /**
      * @psalm-external-mutation-free
      */
-    private function setCurrent(LocalFile|RemoteUrl|ReadableStream $file, bool $resuming): void
+    private function setCurrent(LocalFile|RemoteUrl|ReadableStream|StreamSnapshot $file, bool $resuming): void
     {
         $this->currentFile = $file;
-        $this->currentDesc = $file instanceof ReadableStream ? 'stream '.spl_object_id($file) : $file;
+        $this->currentDesc = $file instanceof ReadableStream || $file instanceof StreamSnapshot ? 'stream '.spl_object_id($file) : $file;
         $this->finishedCurrent = false;
         if (!$resuming) {
             $this->resumeOffset = 0;
@@ -620,13 +621,16 @@ final class DjLoop extends VoIPLoop
         $generation = ++$this->generation;
         $this->readerCancel = new DeferredCancellation;
         $cancellation = $this->readerCancel->getCancellation();
-        $file = $this->currentFile;
-        \assert($file !== null);
+        $item = $this->currentFile;
+        \assert($item !== null);
         $resuming = $this->currentKind !== null; // set only when resuming from __unserialize
         try {
+            // A snapshotted resumable stream is reopened from the start of the item on every play.
+            $file = $item instanceof StreamSnapshot ? $item->open() : $item;
             [$kind, $source, $convert] = $this->prepareSource($file, $cancellation, $resuming);
             $this->currentKind = $kind;
-            $this->currentResumable = !$convert && !$source instanceof ReadableStream;
+            // A resumable stream can be reopened and skipped forward, like a file.
+            $this->currentResumable = !$convert && (!$source instanceof ReadableStream || $item instanceof StreamSnapshot);
             if ($kind === 'matroska') {
                 $this->streamMatroska($source, $file, $generation, $cancellation, $resuming);
             } else {
@@ -635,7 +639,7 @@ final class DjLoop extends VoIPLoop
         } catch (CancelledException) {
             // Skipped or discarded: the next file (if any) starts on the next loop turn.
         } catch (Throwable $e) {
-            $this->instance->log("Could not play {$this->describe($file)} in {$this}: $e", Logger::ERROR);
+            $this->instance->log("Could not play {$this->describe($item)} in {$this}: $e", Logger::ERROR);
         } finally {
             if ($generation === $this->generation) {
                 $this->finishedCurrent = true;
@@ -971,9 +975,18 @@ final class DjLoop extends VoIPLoop
     }
 
     /**
+     * Resumable streams are snapshotted as soon as they are queued, so they survive a restart and can
+     * be replayed (hold files loop); other streams can only be read once, and don't survive a restart.
+     */
+    private static function snapshot(LocalFile|RemoteUrl|ReadableStream $file): LocalFile|RemoteUrl|ReadableStream|StreamSnapshot
+    {
+        return $file instanceof ReadableStream && $file instanceof ResumableStream ? new StreamSnapshot($file) : $file;
+    }
+
+    /**
      * @psalm-pure
      */
-    private function describe(LocalFile|RemoteUrl|ReadableStream $file): string
+    private function describe(LocalFile|RemoteUrl|ReadableStream|StreamSnapshot $file): string
     {
         return match (true) {
             $file instanceof LocalFile => $file->file,

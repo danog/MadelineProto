@@ -50,6 +50,18 @@ abstract class IGE
         return new IGEPhpseclib($key, $iv);
     }
 
+    /**
+     * Get the current chaining state.
+     *
+     * Passing it as the IV of a new instance with the same key continues the chain from this point.
+     *
+     * @psalm-mutation-free
+     */
+    public function getState(): string
+    {
+        return $this->iv_part_1.$this->iv_part_2;
+    }
+
     /** @psalm-impure */
     abstract protected function __construct(string $key, string $iv);
     /** @psalm-impure */

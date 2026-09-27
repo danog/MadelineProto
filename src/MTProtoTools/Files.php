@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -218,7 +219,30 @@ trait Files
         $mime = trim(explode(';', $response->getHeader('content-type') ?? '')[0]) ?: null;
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
-        return $this->uploadFromStream($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
+        // An interrupted upload can only be resumed if we can tell that the file did not change since.
+        $validator = $response->getHeader('etag') ?? $response->getHeader('last-modified');
+        $resumeKey = $validator !== null ? 'url:'.$url."\0".$validator : null;
+        $reopenAt = null;
+        if ($validator !== null && strtolower($response->getHeader('accept-ranges') ?? '') === 'bytes') {
+            $reopenAt = function (int $offset) use ($url, $validator, $cancellation): ?ReadableStream {
+                $request = new Request($url);
+                $request->setTransferTimeout(INF);
+                $request->setInactivityTimeout(INF);
+                $request->setBodySizeLimit(512 * 1024 * 8000);
+                $request->setHeader('Range', "bytes=$offset-");
+                $request->setHeader('If-Range', $validator);
+                $response = $this->datacenter->getHTTPClient()->request($request, $cancellation);
+                if ($response->getStatus() !== 206
+                    || !str_starts_with($response->getHeader('content-range') ?? '', "bytes $offset-")
+                ) {
+                    // The range was ignored (for example, because the file changed).
+                    $response->getBody()->close();
+                    return null;
+                }
+                return $response->getBody();
+            };
+        }
+        return $this->uploadFromStreamInternal($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation, $resumeKey, $reopenAt);
     }
     /**
      * Upload file from callable.
@@ -233,10 +257,12 @@ trait Files
      * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
      * @param boolean                                   $encrypted Whether to encrypt file for secret chats
+     * @param ?string                                   $resumeKey Identifies the uploaded file across restarts: if an upload of the same file (with the same size) was interrupted, it is resumed.
+     *                                                             A non-seekable callable must then accept starting from a non-zero offset (the first missing part).
      *
      * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null): array
+    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null, ?string $resumeKey = null): array
     {
         if ($cb === null) {
             $cb = function (float $percent, float $speed, float $time): void {
@@ -263,19 +289,57 @@ trait Files
         $part_num = 0;
         $method = $size > 10 * 1024 * 1024 || !$size ? 'upload.saveBigFilePart' : 'upload.saveFilePart';
         $constructor = 'input'.($encrypted === true ? 'Encrypted' : '').($size > 10 * 1024 * 1024 || !$size ? 'FileBig' : 'File').($encrypted === true ? 'Uploaded' : '');
-        $file_id = Tools::random(8);
+        $stateKey = $this->getUploadStateKey($resumeKey, $size, $encrypted);
+        $state = $stateKey !== null ? $this->resumableUploads[$stateKey] ?? null : null;
+        if ($state !== null && $state['part_size'] !== $part_size) {
+            $state = null;
+        }
+        $file_id = $state['file_id'] ?? Tools::random(8);
         $ige = null;
         $fingerprint = null;
         $iv = null;
         $key = null;
         if ($encrypted === true) {
-            $key = Tools::random(32);
-            $iv = Tools::random(32);
+            $key = $state['key'] ?? Tools::random(32);
+            $iv = $state['iv'] ?? Tools::random(32);
             $digest = hash('md5', $key.$iv, true);
             $fingerprint = Tools::unpackSignedInt(substr($digest, 0, 4) ^ substr($digest, 4, 4));
-            $ige = IGE::getInstance($key, $iv);
+            // IGE is chained: resume encrypting from the last saved point.
+            $ige = IGE::getInstance($key, $state['ige_state'] ?? $iv);
             $seekable = false;
         }
+        /** @var array<int, true> */
+        $uploaded = $state['parts'] ?? [];
+        if (!$seekable) {
+            // Sequential sources restart from the first missing part,
+            // or from the last point where the encryption state was saved.
+            if ($encrypted) {
+                $part_num = $state['ige_part'] ?? 0;
+            } else {
+                while (isset($uploaded[$part_num])) {
+                    $part_num++;
+                }
+            }
+        }
+        if ($stateKey !== null) {
+            if ($state !== null) {
+                $this->logger->logger('Resuming upload of '.($fileName ?: 'file').': '.\count($uploaded)." of $part_total_num parts were already uploaded", Logger::NOTICE);
+            }
+            $this->resumableUploads[$stateKey] = $state ?? [
+                'file_id' => $file_id,
+                'part_size' => $part_size,
+                'parts' => [],
+                'time' => time(),
+            ] + ($encrypted ? [
+                'key' => $key,
+                'iv' => $iv,
+                'ige_part' => 0,
+                'ige_state' => $iv,
+            ] : []);
+            $this->activeUploads[$stateKey] = true;
+        }
+        /** @var array<int, string> Encryption state after each part, until it is saved in the resume state. */
+        $igeStates = [];
         //$ctx = \hash_init('md5');
         $promises = [];
         $speed = 0;
@@ -287,16 +351,22 @@ trait Files
                 $cb($cur * 100 / $part_total_num, $speed, $time);
             };
         }
-        $totalSize = 0;
+        // Parts before the first one we read were already uploaded.
+        $totalSize = min($part_num * $part_size, $size);
+        if ($size) {
+            for ($x = 0; $x < $part_num; $x++) {
+                $cb();
+            }
+        }
         if (!$seekable) {
-            $nextOffset = 0;
+            $nextOffset = $part_num * $part_size;
             $callable = static function (int $offset, int $size, ?Cancellation $cancellation) use ($callable, &$nextOffset): string {
                 Assert::eq($offset, $nextOffset);
                 $nextOffset += $size;
                 return $callable($offset, $size, $cancellation);
             };
         }
-        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige, $cancellation): array {
+        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $callable, $ige, &$igeStates, $cancellation): array {
             $bytes = $callable(
                 $part_num * $part_size,
                 $part_size,
@@ -315,6 +385,7 @@ trait Files
 
             if ($ige) {
                 $bytes = $ige->encrypt(str_pad($bytes, $part_size, \chr(0)));
+                $igeStates[$part_num + 1] = $ige->getState();
             }
 
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
@@ -323,78 +394,109 @@ trait Files
         $start = microtime(true);
         /** @var ?FloodPremiumWaitError */
         $floodWaitError = null;
-        while ($part_num < $part_total_num || !$size) {
-            if ($seekable) {
-                $writeCb = function () use ($method, $callable, $part_num, $cancellation, &$datacenter, &$floodWaitError): WrappedFuture {
-                    $floodWaitError?->wait($cancellation);
-                    return $this->methodCallAsyncWrite(
-                        $method,
-                        $callable($part_num) + ['cancellation' => $cancellation, 'floodWaitLimit' => 0, 'specialMethodType' => SpecialMethodType::FILE_RELATED],
-                        $datacenter
-                    );
-                };
-            } else {
-                try {
-                    $part = $callable($part_num) + ['cancellation' => $cancellation, 'floodWaitLimit' => 0, 'specialMethodType' => SpecialMethodType::FILE_RELATED];
-                } catch (StreamEof) {
-                    break;
+        try {
+            while ($part_num < $part_total_num || !$size) {
+                if ($seekable && isset($uploaded[$part_num])) {
+                    $totalSize += min($part_size, $size - $part_num * $part_size);
+                    $cb();
+                    ++$part_num;
+                    continue;
                 }
-                $writeCb = function () use ($method, $part, &$datacenter, &$floodWaitError, $cancellation): WrappedFuture {
-                    $floodWaitError?->wait($cancellation);
-                    return $this->methodCallAsyncWrite(
-                        $method,
-                        $part,
-                        $datacenter
-                    );
-                };
-            }
-            $writePromise = async($writeCb);
-            EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError): void {
-                $d = new DeferredFuture;
-                $resPromises[] = $d->getFuture();
-                do {
-                    $readFuture = $writePromise->await($cancellation);
+                if ($seekable) {
+                    $writeCb = function () use ($method, $callable, $part_num, $cancellation, &$datacenter, &$floodWaitError): WrappedFuture {
+                        $floodWaitError?->wait($cancellation);
+                        return $this->methodCallAsyncWrite(
+                            $method,
+                            $callable($part_num) + ['cancellation' => $cancellation, 'floodWaitLimit' => 0, 'specialMethodType' => SpecialMethodType::FILE_RELATED],
+                            $datacenter
+                        );
+                    };
+                } else {
                     try {
-                        // Wrote chunk!
-                        if (!$readFuture->await($cancellation)) {
-                            throw new Exception('Upload of part '.$part_num.' failed');
-                        }
-                        // Got OK from server for chunk!
-                        if ($size) {
-                            $cb();
-                        }
-                        $d->complete();
-                        return;
-                    } catch (FloodPremiumWaitError $e) {
-                        $this->logger("Got {$e->rpc} while uploading part $part_num: {$datacenter}, waiting and retrying...");
-                        $floodWaitError = $e;
-                        $writePromise = async($writeCb);
-                    } catch (FileRedirect $e) {
-                        $datacenter = $e->dc;
-                        $this->logger("Got redirect while uploading part $part_num: {$datacenter}");
-                        $writePromise = async($writeCb);
-                    } catch (Throwable $e) {
-                        $cancellation?->throwIfRequested();
-                        $this->logger("Got exception while uploading part $part_num: {$e}");
-                        $writePromise = async($writeCb);
-                    }
-                } while (true);
-            });
-            $promises[] = $writePromise;
-            ++$part_num;
-            if (\count($promises) === $parallel_chunks) {
-                // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
-                awaitFirst($promises, $cancellation);
-                foreach ($promises as $k => $p) {
-                    if ($p->isComplete()) {
-                        unset($promises[$k]);
+                        $part = $callable($part_num) + ['cancellation' => $cancellation, 'floodWaitLimit' => 0, 'specialMethodType' => SpecialMethodType::FILE_RELATED];
+                    } catch (StreamEof) {
                         break;
                     }
+                    if (isset($uploaded[$part_num])) {
+                        // Only read (and encrypted) to get to the next part.
+                        $cb();
+                        ++$part_num;
+                        continue;
+                    }
+                    $writeCb = function () use ($method, $part, &$datacenter, &$floodWaitError, $cancellation): WrappedFuture {
+                        $floodWaitError?->wait($cancellation);
+                        return $this->methodCallAsyncWrite(
+                            $method,
+                            $part,
+                            $datacenter
+                        );
+                    };
+                }
+                // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
+                $writePromise = async($writeCb)->ignore();
+                EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError, $stateKey, &$igeStates): void {
+                    $d = new DeferredFuture;
+                    // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
+                    $resPromises[] = $d->getFuture()->ignore();
+                    try {
+                        do {
+                            $readFuture = $writePromise->await($cancellation);
+                            try {
+                                // Wrote chunk!
+                                if (!$readFuture->await($cancellation)) {
+                                    throw new Exception('Upload of part '.$part_num.' failed');
+                                }
+                                // Got OK from server for chunk!
+                                if ($stateKey !== null) {
+                                    $this->markPartUploaded($stateKey, $part_num, $igeStates);
+                                }
+                                if ($size) {
+                                    $cb();
+                                }
+                                $d->complete();
+                                return;
+                            } catch (FloodPremiumWaitError $e) {
+                                $this->logger("Got {$e->rpc} while uploading part $part_num: {$datacenter}, waiting and retrying...");
+                                $floodWaitError = $e;
+                                $writePromise = async($writeCb);
+                            } catch (FileRedirect $e) {
+                                $datacenter = $e->dc;
+                                $this->logger("Got redirect while uploading part $part_num: {$datacenter}");
+                                $writePromise = async($writeCb);
+                            } catch (Throwable $e) {
+                                $cancellation?->throwIfRequested();
+                                $this->logger("Got exception while uploading part $part_num: {$e}");
+                                $writePromise = async($writeCb);
+                            }
+                        } while (true);
+                    } catch (Throwable $e) {
+                        // Hand the error (e.g. a cancellation) to the caller, instead of the event loop.
+                        $d->error($e);
+                    }
+                });
+                $promises[] = $writePromise;
+                ++$part_num;
+                if (\count($promises) === $parallel_chunks) {
+                    // By default, 10 mb at a time, for a typical bandwidth of 1gbps (run the code in this every second)
+                    awaitFirst($promises, $cancellation);
+                    foreach ($promises as $k => $p) {
+                        if ($p->isComplete()) {
+                            unset($promises[$k]);
+                            break;
+                        }
+                    }
                 }
             }
+            await($promises, $cancellation);
+            await($resPromises, $cancellation);
+            if ($stateKey !== null) {
+                unset($this->resumableUploads[$stateKey]);
+            }
+        } finally {
+            if ($stateKey !== null) {
+                unset($this->activeUploads[$stateKey]);
+            }
         }
-        await($promises, $cancellation);
-        await($resPromises, $cancellation);
         if ($totalSize === 0) {
             throw new AssertionError('You uploaded an empty file!');
         }
@@ -415,6 +517,78 @@ trait Files
         $constructor['md5_checksum'] = '';
         //\hash_final($ctx);
         return $constructor;
+    }
+    /**
+     * For how long the state of an interrupted upload is kept, in seconds.
+     *
+     * Telegram only keeps uploaded parts for a limited time.
+     */
+    private const UPLOAD_RESUME_TTL = 3600;
+
+    /**
+     * State of interrupted uploads, to resume them.
+     *
+     * @var array<string, array{file_id: string, part_size: int, parts: array<int, true>, time: int, key?: string, iv?: string, ige_part?: int, ige_state?: string}>
+     */
+    private array $resumableUploads = [];
+
+    /**
+     * Uploads in progress in this process, by resume state key.
+     *
+     * @var array<string, true>
+     */
+    private array $activeUploads = [];
+
+    /**
+     * Get the key of the resume state of an upload, dropping expired states.
+     *
+     * Returns null if the upload can't be resumed: its source or size is not known, or the same file
+     * is already being uploaded (the two uploads must not share their state).
+     */
+    private function getUploadStateKey(?string $resumeKey, int $size, bool $encrypted): ?string
+    {
+        $expired = time() - self::UPLOAD_RESUME_TTL;
+        foreach ($this->resumableUploads as $key => $state) {
+            if ($state['time'] < $expired && !isset($this->activeUploads[$key])) {
+                unset($this->resumableUploads[$key]);
+            }
+        }
+        if ($resumeKey === null || $size <= 0) {
+            return null;
+        }
+        $key = hash('sha256', $resumeKey."\0".$size."\0".($encrypted ? 'encrypted' : 'plain'));
+        return isset($this->activeUploads[$key]) ? null : $key;
+    }
+
+    /**
+     * Record that a part was uploaded, saving the encryption state if the uploaded prefix grew.
+     *
+     * @param array<int, string> $igeStates Encryption state after each part
+     */
+    private function markPartUploaded(string $stateKey, int $part, array &$igeStates): void
+    {
+        if (!isset($this->resumableUploads[$stateKey])) {
+            return;
+        }
+        $state = &$this->resumableUploads[$stateKey];
+        $state['parts'][$part] = true;
+        $state['time'] = time();
+        if (!isset($state['ige_part'])) {
+            return;
+        }
+        $prefix = $state['ige_part'];
+        while (isset($state['parts'][$prefix])) {
+            $prefix++;
+        }
+        if ($prefix > $state['ige_part'] && isset($igeStates[$prefix])) {
+            $state['ige_part'] = $prefix;
+            $state['ige_state'] = $igeStates[$prefix];
+            foreach ($igeStates as $k => $_) {
+                if ($k <= $prefix) {
+                    unset($igeStates[$k]);
+                }
+            }
+        }
     }
     /**
      * Reupload telegram file.

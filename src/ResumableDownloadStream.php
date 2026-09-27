@@ -101,6 +101,58 @@ final class ResumableDownloadStream implements ReadableStream, ResumableStream, 
     }
 
     /**
+     * Skips the next bytes of the file without downloading them.
+     *
+     * @internal
+     */
+    public function skip(int $bytes): void
+    {
+        if ($bytes <= 0 || $this->closed || $this->eof) {
+            return;
+        }
+        // Abort the running download, if any: the next read restarts it at the new offset.
+        $this->deferredCancellation?->cancel();
+        $this->deferredCancellation = null;
+        $this->stream?->close();
+        $this->stream = null;
+        $this->offset += $bytes;
+        $end = $this->getEnd();
+        if ($end !== null && $this->offset >= $end) {
+            $this->offset = $end;
+            $this->eof = true;
+        }
+    }
+
+    /**
+     * Number of bytes left to read, if the size of the file is known.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getRemainingSize(): ?int
+    {
+        if ($this->eof) {
+            return 0;
+        }
+        $end = $this->getEnd();
+        return $end === null ? null : max(0, $end - $this->offset);
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    private function getEnd(): ?int
+    {
+        if ($this->end !== -1) {
+            return $this->end;
+        }
+        /** @var mixed */
+        $size = $this->media['size'] ?? null;
+        return \is_int($size) && $size > 0 ? $size : null;
+    }
+
+    /**
      * Starts downloading from the current offset.
      */
     private function startDownload(): ReadableIterableStream

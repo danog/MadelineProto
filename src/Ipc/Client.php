@@ -32,6 +32,7 @@ use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Wrappers\Start;
 use Revolt\EventLoop;
@@ -201,10 +202,7 @@ final class Client extends ClientAbstract
      */
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('callPlayBlocking', $wrapper);
+        $this->callPlayInternal('call', $id, $file, $dest, false);
     }
 
     /**
@@ -212,10 +210,7 @@ final class Client extends ClientAbstract
      */
     public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('callPlayBlocking', $wrapper);
+        $this->callPlayInternal('call', $id, $file, $dest, true);
     }
 
     /**
@@ -223,14 +218,7 @@ final class Client extends ClientAbstract
      */
     public function callPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $params = [$id, $dest, $files];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        foreach ($params as &$param) {
-            if ($param instanceof ReadableStream) {
-                $wrapper->wrap($param, true);
-            }
-        }
-        $this->__call('callPlayOnHold', $wrapper);
+        $this->callPlayOnHoldInternal('call', $id, $dest, $files);
     }
 
     /**
@@ -238,10 +226,7 @@ final class Client extends ClientAbstract
      */
     public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('groupCallPlayBlocking', $wrapper);
+        $this->callPlayInternal('groupCall', $id, $file, $dest, false);
     }
 
     /**
@@ -249,10 +234,7 @@ final class Client extends ClientAbstract
      */
     public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('groupCallPlayBlocking', $wrapper);
+        $this->callPlayInternal('groupCall', $id, $file, $dest, true);
     }
 
     /**
@@ -260,14 +242,7 @@ final class Client extends ClientAbstract
      */
     public function groupCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $params = [$id, $dest, $files];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        foreach ($params as &$param) {
-            if ($param instanceof ReadableStream) {
-                $wrapper->wrap($param, true);
-            }
-        }
-        $this->__call('groupCallPlayOnHold', $wrapper);
+        $this->callPlayOnHoldInternal('groupCall', $id, $dest, $files);
     }
 
     /**
@@ -275,10 +250,7 @@ final class Client extends ClientAbstract
      */
     public function conferenceCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('conferenceCallPlayBlocking', $wrapper);
+        $this->callPlayInternal('conferenceCall', $id, $file, $dest, false);
     }
 
     /**
@@ -286,10 +258,7 @@ final class Client extends ClientAbstract
      */
     public function conferenceCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        $wrapper->wrap($file, true);
-        $this->__call('conferenceCallPlayBlocking', $wrapper);
+        $this->callPlayInternal('conferenceCall', $id, $file, $dest, true);
     }
 
     /**
@@ -297,14 +266,45 @@ final class Client extends ClientAbstract
      */
     public function conferenceCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        $params = [$id, $dest, $files];
+        $this->callPlayOnHoldInternal('conferenceCall', $id, $dest, $files);
+    }
+
+    /**
+     * Files, URLs and resumable streams are sent to the IPC server as they are, and survive restarts
+     * of the call; other streams are read through a callback connection, which only lives as long as
+     * the IPC call that created it: that's why they're always played blocking.
+     */
+    private function callPlayInternal(string $prefix, int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest, bool $blocking): void
+    {
+        if (!$file instanceof ReadableStream || $file instanceof ResumableStream) {
+            $this->__call($prefix.($blocking ? 'PlayBlocking' : 'Play'), [$id, $file, $dest]);
+            return;
+        }
+        $params = [$id, &$file, $dest];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($file, true);
+        $this->__call($prefix.'PlayBlocking', $wrapper);
+    }
+
+    /**
+     * @param array<LocalFile|RemoteUrl|ReadableStream> $files
+     */
+    private function callPlayOnHoldInternal(string $prefix, int $id, MediaDestination $dest, array $files): void
+    {
+        $params = [$id, $dest, ...array_values($files)];
+        $proxied = array_filter($files, static fn ($file) => $file instanceof ReadableStream && !$file instanceof ResumableStream);
+        if ($proxied === []) {
+            $this->__call($prefix.'PlayOnHold', $params);
+            return;
+        }
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         foreach ($params as &$param) {
-            if ($param instanceof ReadableStream) {
+            if ($param instanceof ReadableStream && !$param instanceof ResumableStream) {
                 $wrapper->wrap($param, true);
             }
         }
-        $this->__call('conferenceCallPlayOnHold', $wrapper);
+        unset($param);
+        $this->__call($prefix.'PlayOnHold', $wrapper);
     }
 
     /**
@@ -320,14 +320,15 @@ final class Client extends ClientAbstract
      * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
+     * @param ?string  $resumeKey Identifies the uploaded file across restarts, to resume interrupted uploads
      */
-    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
+    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null, ?string $resumeKey = null)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
             $callable = $callable->getFile();
         }
-        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation];
+        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation, $resumeKey];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);

@@ -39,6 +39,18 @@ final class WrappedCancellation
     }
 
     /**
+     * Get the wrapped cancellation.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getCancellation(): AmpCancellation
+    {
+        return $this->cancellation;
+    }
+
+    /**
      * Waits until cancellation is requested, throwing the `CancelledException`.
      *
      * Returns normally if the IPC connection is closed first.

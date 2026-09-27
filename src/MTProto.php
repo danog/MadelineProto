@@ -840,6 +840,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             // Report URI
             'reportDest',
 
+            // Interrupted uploads
+            'resumableUploads',
+
             'calls',
             'callsByPeer',
             'groupCalls',

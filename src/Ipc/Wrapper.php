@@ -24,6 +24,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
+use danog\MadelineProto\Ipc\Wrapper\CancellationReference;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
@@ -199,7 +200,19 @@ final class Wrapper extends ClientAbstract
     private function clientRequest(int $id, array $payload): void
     {
         try {
-            $result = $this->callbacks[$payload[0]](...$payload[1]);
+            /** @var list<mixed> */
+            $args = $payload[1];
+            /** @var mixed $arg */
+            foreach ($args as &$arg) {
+                if ($arg instanceof CancellationReference) {
+                    $callback = $this->callbacks[$arg->id] ?? null;
+                    $arg = \is_array($callback) && $callback[0] instanceof WrappedCancellation
+                        ? $callback[0]->getCancellation()
+                        : null;
+                }
+            }
+            unset($arg);
+            $result = $this->callbacks[$payload[0]](...$args);
         } catch (CancelledException $e) {
             $result = new ExitFailure($e);
         } catch (Throwable $e) {
@@ -220,6 +233,29 @@ final class Wrapper extends ClientAbstract
             }
         }
     }
+    /**
+     * Call a callback of the client.
+     *
+     * @param string|int    $function  Callback ID
+     * @param array|Wrapper $arguments Arguments
+     */
+    #[\Override]
+    public function __call(string|int $function, array|Wrapper $arguments)
+    {
+        if (\is_array($arguments)) {
+            /** @var mixed $argument */
+            foreach ($arguments as &$argument) {
+                if ($argument instanceof WrapperCancellation) {
+                    // Proxies of the client's cancellations can't be serialized:
+                    // the client resolves the reference to the original cancellation.
+                    $argument = $argument->getReference();
+                }
+            }
+            unset($argument);
+        }
+        return parent::__call($function, $arguments);
+    }
+
     /**
      * Get remote socket ID.
      *
