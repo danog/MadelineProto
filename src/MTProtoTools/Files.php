@@ -1144,6 +1144,17 @@ trait Files
             $cb($cur * 100 / $count, $time, $speed);
         };
         $cdn = false;
+        if (isset($messageMedia['key']) && $params[0]['offset'] > 0) {
+            // IGE decryption is chained: each block depends on the previous plaintext block,
+            // so resuming requires decrypting everything before the first requested part.
+            $this->logger->logger("Decrypting the first {$params[0]['offset']} bytes of an encrypted file to start downloading from offset $offset");
+            $skip = static fn (string $payload): int => \strlen($payload);
+            $noop = static function (): void {
+            };
+            for ($x = 0; $x < $params[0]['offset']; $x += $part_size) {
+                $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $noop, ['offset' => $x, 'limit' => $part_size, 'part_start_at' => 0, 'part_end_at' => $part_size, 'previous_promise' => true], $skip, false, $cancellation);
+            }
+        }
         $params[0]['previous_promise'] = true;
         $start = microtime(true);
         $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = array_shift($params), $callable, $seekable, $cancellation);
@@ -1294,14 +1305,15 @@ trait Files
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
                 $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $cancellation);
             }
+            if (!$seekable && $offset['previous_promise'] instanceof Future) {
+                $offset['previous_promise']->await($cancellation);
+            }
             if (isset($messageMedia['key'])) {
+                // IGE decryption is chained, so parts must be decrypted in order (encrypted downloads are never seekable).
                 $res['bytes'] = $ige->decrypt($res['bytes']);
             }
             if ($offset['part_start_at'] || $offset['part_end_at'] !== $offset['limit']) {
                 $res['bytes'] = substr($res['bytes'], $offset['part_start_at'], $offset['part_end_at'] - $offset['part_start_at']);
-            }
-            if (!$seekable && $offset['previous_promise'] instanceof Future) {
-                $offset['previous_promise']->await($cancellation);
             }
             $len = \strlen($res['bytes']);
             $res = $callable($res['bytes'], $offset['offset'] + $offset['part_start_at']);

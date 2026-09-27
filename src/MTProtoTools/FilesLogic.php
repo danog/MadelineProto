@@ -43,6 +43,8 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\ResumableDownloadStream;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
@@ -138,17 +140,25 @@ trait FilesLogic
     /**
      * Download file to an amphp stream, returning it.
      *
+     * The returned stream is resumable: it can be serialized, and once unserialized,
+     * reading continues from the end of the last chunk read before serialization.
+     * The progress callback and cancellation are not preserved by serialization.
+     *
      * @param mixed    $messageMedia File to download
      * @param callable $cb           Callback
      * @param int      $offset       Offset where to start downloading
      * @param int      $end          Offset where to end download
      */
-    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream&ResumableStream
     {
-        $pipe = new Pipe(1024*1024);
-        $sink = $pipe->getSink();
-        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end, $cancellation)->finally($sink->close(...));
-        return $pipe->getSource();
+        return new ResumableDownloadStream(
+            $this,
+            $this->getDownloadInfo($messageMedia),
+            $cb === null ? null : $cb(...),
+            $offset,
+            $end,
+            $cancellation,
+        );
     }
     /**
      * Download file to stream.

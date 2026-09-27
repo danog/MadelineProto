@@ -26,6 +26,11 @@ use Amp\DeferredFuture;
 final class WrappedCancellation
 {
     /**
+     * @var array<int, DeferredFuture>
+     */
+    private array $waiting = [];
+
+    /**
      * @psalm-mutation-free
      */
     public function __construct(
@@ -34,55 +39,41 @@ final class WrappedCancellation
     }
 
     /**
-     * @var array<string, DeferredFuture>
-     */
-    private array $handlers = [];
-    private string $id = 'a';
-    /**
-     * @psalm-mutation-free
-     */
-    public function getId(): string
-    {
-        return $this->id++;
-    }
-    public function wait(string $id): void
-    {
-        $this->handlers[$id] = $deferred = new DeferredFuture;
-        $id = $this->cancellation->subscribe(function (CancelledException $e) use ($deferred, &$id): void {
-            unset($this->handlers[$id]);
-            $deferred->error($e);
-        });
-        $deferred->getFuture()->await();
-    }
-
-    /**
-     * Unsubscribes a previously registered handler.
+     * Waits until cancellation is requested, throwing the `CancelledException`.
      *
-     * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
+     * Returns normally if the IPC connection is closed first.
      */
-    public function unsubscribe(string $id): void
+    public function wait(): void
     {
-        if (isset($this->handlers[$id])) {
-            $this->handlers[$id]->complete();
-            unset($this->handlers[$id]);
+        $deferred = new DeferredFuture;
+        $this->waiting[spl_object_id($deferred)] = $deferred;
+        $id = $this->cancellation->subscribe(static function (CancelledException $e) use ($deferred): void {
+            if (!$deferred->isComplete()) {
+                $deferred->error($e);
+            }
+        });
+        try {
+            $deferred->getFuture()->await();
+        } finally {
+            unset($this->waiting[spl_object_id($deferred)]);
+            $this->cancellation->unsubscribe($id);
         }
     }
 
     /**
-     * Returns whether cancellation has been requested yet.
-     */
-    public function isRequested(): bool
-    {
-        return $this->cancellation->isRequested();
-    }
-
-    /**
-     * Throws the `CancelledException` if cancellation has been requested, otherwise does nothing.
+     * Stops all pending waits, called when the IPC connection is closed.
      *
-     * @throws CancelledException
+     * @internal
      */
-    public function throwIfRequested(): void
+    public function disconnect(): void
     {
-        $this->cancellation->throwIfRequested();
+        $waiting = $this->waiting;
+        $this->waiting = [];
+        foreach ($waiting as $deferred) {
+            // Might have been failed by the cancellation, with the waiting fiber not resumed yet.
+            if (!$deferred->isComplete()) {
+                $deferred->complete();
+            }
+        }
     }
 }

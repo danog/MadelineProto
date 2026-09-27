@@ -22,6 +22,7 @@ namespace danog\MadelineProto\Ipc;
 
 use Amp\DeferredFuture;
 use Amp\Future;
+use Amp\Ipc\Sync\ChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Logger;
 use Throwable;
@@ -143,10 +144,21 @@ abstract class ClientAbstract
                         $this->server->disconnect();
                     } catch (Throwable $e) {
                     }
-                    return;
+                    break;
                 }
             }
         } while ($this->run);
+        $requests = $this->requests;
+        $this->requests = [];
+        foreach ($requests as [$function, , $deferred]) {
+            if (!$this->run && $this instanceof Wrapper) {
+                // Callback wrappers are closed once their IPC call returns: calls still pending at that point
+                // (late progress notifications, cancellation waits) belong to nobody, so they're dropped.
+                $deferred->complete(null);
+            } else {
+                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!"));
+            }
+        }
     }
     /**
      * Disconnect cleanly from main instance.
@@ -169,6 +181,10 @@ abstract class ClientAbstract
      */
     public function __call(string|int $function, array|Wrapper $arguments)
     {
+        if (!$this->run && $this instanceof Wrapper) {
+            // See loopInternal().
+            return null;
+        }
         $this->serverFuture?->await();
 
         $deferred = new DeferredFuture;

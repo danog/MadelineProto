@@ -26,7 +26,6 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Closure;
 use danog\MadelineProto\Connection;
-use danog\MadelineProto\Exception;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -469,16 +468,13 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Wait for message to be sent.
      *
-     * @return Future<null>
+     * Completes immediately if the message was already sent, or replied to (for example, if it was cancelled before being sent).
      *
-     * @psalm-mutation-free
+     * @return Future<null>
      */
     public function getSendPromise(): Future
     {
-        if (!$this->sendDeferred) {
-            throw new Exception("Message was already sent, can't get send promise!");
-        }
-        return $this->sendDeferred->getFuture();
+        return $this->sendDeferred?->getFuture() ?? Future::complete();
     }
 
     /**

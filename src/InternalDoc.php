@@ -595,12 +595,16 @@ abstract class InternalDoc
     /**
      * Download file to an amphp stream, returning it.
      *
+     * The returned stream is resumable: it can be serialized, and once unserialized,
+     * reading continues from the end of the last chunk read before serialization.
+     * The progress callback and cancellation are not preserved by serialization.
+     *
      * @param mixed    $messageMedia File to download
      * @param callable $cb           Callback
      * @param int      $offset       Offset where to start downloading
      * @param int      $end          Offset where to end download
      */
-    final public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?\Amp\Cancellation $cancellation = null): \Amp\ByteStream\ReadableStream
+    final public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?\Amp\Cancellation $cancellation = null): \Amp\ByteStream\ReadableStream&\danog\MadelineProto\ResumableStream
     {
         return $this->wrapper->getAPI()->downloadToReturnedStream($messageMedia, $cb, $offset, $end, $cancellation);
     }

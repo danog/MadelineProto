@@ -35,6 +35,7 @@ class_alias(PrivateCallController::class, '\\danog\\MadelineProto\\VoIPControlle
 // Backwards-compatibility aliases for the call classes moved under EventHandler\Calls (and the
 // GroupCallController moved under GroupCall). PrivateCall was previously named VoIP.
 class_alias(\danog\MadelineProto\EventHandler\Calls\PrivateCall::class, '\\danog\\MadelineProto\\VoIP');
+class_alias(\danog\MadelineProto\EventHandler\Calls\GroupCallState::class, '\\danog\\MadelineProto\\GroupCall\\GroupCallState');
 
 if ((PHP_MINOR_VERSION === 2 && PHP_VERSION_ID < 80204)
     || PHP_MAJOR_VERSION < 8

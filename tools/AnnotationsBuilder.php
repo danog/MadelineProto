@@ -24,6 +24,7 @@ use AssertionError;
 use danog\ClassFinder\ClassFinder;
 use danog\MadelineProto\TL\TL;
 use ReflectionClass;
+use ReflectionIntersectionType;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionType;
@@ -708,6 +709,8 @@ final class Blacklist {
             $new .= $type->getName() === 'self' ? $this->reflectionClasses['API'] : $type->getName();
         } elseif ($type instanceof ReflectionUnionType) {
             return implode('|', array_map($this->typeToStr(...), $type->getTypes()));
+        } elseif ($type instanceof ReflectionIntersectionType) {
+            return implode('&', array_map($this->typeToStr(...), $type->getTypes()));
         }
         return $new;
     }

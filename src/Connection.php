@@ -571,6 +571,10 @@ final class Connection
             unset($body);
         }
         $this->connect();
+        if ($message->hasReply()) {
+            // Replied to (e.g. cancelled) while connecting: its body was already freed, and it must not be sent.
+            return;
+        }
         $this->pendingOutgoingGauge?->inc();
         if ($message->unencrypted) {
             $this->unencryptedPendingOutgoing->enqueue($message);

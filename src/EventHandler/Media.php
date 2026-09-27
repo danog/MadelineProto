@@ -20,6 +20,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\TL\Types\Bytes;
 use JsonSerializable;
 
@@ -138,9 +139,12 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /**
      * Get a readable amp stream with the file contents.
      *
+     * The returned stream is resumable: it can be serialized, and once unserialized,
+     * reading continues from the end of the last chunk read before serialization.
+     *
      * @param (callable(float, float, float): void)|null $cb Progress callback
      */
-    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
+    public function getStream(?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream&ResumableStream
     {
         return $this->getClient()->downloadToReturnedStream($this, $cb, $offset, $end, $cancellation);
     }

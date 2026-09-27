@@ -18,13 +18,51 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
 use Amp\CancelledException;
+use Closure;
+use danog\MadelineProto\Ipc\ClientAbstract;
 use Revolt\EventLoop;
+use Throwable;
 
 /**
  * @internal
  */
 final class CancellationInner extends Obj implements AmpCancellation
 {
+    private ?CancelledException $exception = null;
+    /**
+     * @var array<string, Closure(CancelledException)>
+     */
+    private array $callbacks = [];
+    private string $nextId = 'a';
+
+    /**
+     * Constructor.
+     *
+     * @param array<string, int> $methods
+     */
+    public function __construct(ClientAbstract $wrapper, array $methods)
+    {
+        parent::__construct($wrapper, $methods);
+        // Cancellation methods must never suspend: amp calls them between fetching a fiber's suspension
+        // and suspending it (Future::await(), FutureIterator::consume()).
+        // So instead of querying the remote cancellation, we get notified by a single long-running wait call.
+        EventLoop::queue(function (): void {
+            try {
+                $this->__call('wait');
+            } catch (CancelledException $e) {
+                $this->exception = $e;
+                $callbacks = $this->callbacks;
+                $this->callbacks = [];
+                foreach ($callbacks as $callback) {
+                    EventLoop::queue(static function () use ($callback, $e): void {
+                        $callback($e);
+                    });
+                }
+            } catch (Throwable) {
+            }
+        });
+    }
+
     /**
      * Subscribes a new handler to be invoked on a cancellation request.
      *
@@ -39,15 +77,16 @@ final class CancellationInner extends Obj implements AmpCancellation
     #[\Override]
     public function subscribe(\Closure $callback): string
     {
-        $id = $this->__call('getId');
-        EventLoop::queue(function () use ($id, $callback): void {
-            try {
-                $this->__call('wait', [$id]);
-            } catch (CancelledException $e) {
-                $callback($e);
-            } catch (\Throwable) {
-            }
-        });
+        $id = $this->nextId;
+        $this->nextId = str_increment($id);
+        $exception = $this->exception;
+        if ($exception !== null) {
+            EventLoop::queue(static function () use ($callback, $exception): void {
+                $callback($exception);
+            });
+        } else {
+            $this->callbacks[$id] = $callback;
+        }
         return $id;
     }
 
@@ -55,30 +94,38 @@ final class CancellationInner extends Obj implements AmpCancellation
      * Unsubscribes a previously registered handler.
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function unsubscribe(string $id): void
     {
-        EventLoop::queue($this->__call(...), 'unsubscribe', [$id]);
+        unset($this->callbacks[$id]);
     }
 
     /**
      * Returns whether cancellation has been requested yet.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function isRequested(): bool
     {
-        return $this->__call('isRequested');
+        return $this->exception !== null;
     }
 
     /**
      * Throws the `CancelledException` if cancellation has been requested, otherwise does nothing.
      *
      * @throws CancelledException
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function throwIfRequested(): void
     {
-        $this->__call('throwIfRequested');
+        if ($this->exception !== null) {
+            throw $this->exception;
+        }
     }
 }

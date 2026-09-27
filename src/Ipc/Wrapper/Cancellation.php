@@ -34,8 +34,6 @@ final class Cancellation implements AmpCancellation
      * Constructor.
      *
      * @param array<string, int> $methods
-     *
-     * @psalm-mutation-free
      */
     public function __construct(ClientAbstract $wrapper, array $methods)
     {
@@ -65,6 +63,8 @@ final class Cancellation implements AmpCancellation
      * Unsubscribes a previously registered handler.
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function unsubscribe(string $id): void
@@ -75,6 +75,8 @@ final class Cancellation implements AmpCancellation
 
     /**
      * Returns whether cancellation has been requested yet.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function isRequested(): bool
@@ -86,6 +88,8 @@ final class Cancellation implements AmpCancellation
      * Throws the `CancelledException` if cancellation has been requested, otherwise does nothing.
      *
      * @throws CancelledException
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function throwIfRequested(): void
@@ -93,6 +97,9 @@ final class Cancellation implements AmpCancellation
         $this->inner->throwIfRequested();
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __destruct()
     {
         foreach ($this->handlers as $handler => $_) {

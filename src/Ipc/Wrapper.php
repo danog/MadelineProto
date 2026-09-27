@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Ipc;
 use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
@@ -57,6 +58,16 @@ final class Wrapper extends ClientAbstract
      * @var array<callable>
      */
     private array $callbacks = [];
+    /**
+     * Wrapped cancellations, stopped when the connection is closed.
+     *
+     * @var list<WrappedCancellation>
+     */
+    private array $cancellations = [];
+    /**
+     * Whether the callback connection was closed.
+     */
+    private bool $disconnected = false;
     /**
      * Callbacks IDs.
      *
@@ -113,6 +124,7 @@ final class Wrapper extends ClientAbstract
         if (\is_object($callback) && $wrapObjects) {
             if ($callback instanceof Cancellation) {
                 $callback = new WrappedCancellation($callback);
+                $this->cancellations[] = $callback;
             }
             if ($callback instanceof FileCallbackInterface) {
                 $file = $callback->getFile();
@@ -170,6 +182,10 @@ final class Wrapper extends ClientAbstract
                 EventLoop::queue($this->clientRequest(...), $id++, $payload);
             }
         } finally {
+            $this->disconnected = true;
+            foreach ($this->cancellations as $cancellation) {
+                $cancellation->disconnect();
+            }
             EventLoop::queue($this->server->disconnect(...), "exiting receiverLoop");
         }
     }
@@ -184,9 +200,14 @@ final class Wrapper extends ClientAbstract
     {
         try {
             $result = $this->callbacks[$payload[0]](...$payload[1]);
+        } catch (CancelledException $e) {
+            $result = new ExitFailure($e);
         } catch (Throwable $e) {
             $this->logger->logger("Got error while calling reverse IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
+        }
+        if ($this->disconnected) {
+            return;
         }
         try {
             $this->server->send([$id, $result]);
