@@ -1310,6 +1310,27 @@
       <code><![CDATA[$matches]]></code>
     </PropertyTypeCoercion>
   </file>
+  <file src="src/EventHandler/GroupOrChannelMessage.php">
+    <MixedArgument>
+      <code><![CDATA[$result]]></code>
+    </MixedArgument>
+    <MixedArrayAccess>
+      <code><![CDATA[$client->methodCallAsyncRead(
+            'channels.getParticipant',
+            [
+                'channel' => $this->chatId,
+                'participant' => $member,
+            ]
+        )['participant']]]></code>
+    </MixedArrayAccess>
+    <MixedAssignment>
+      <code><![CDATA[$result]]></code>
+    </MixedAssignment>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[GroupOrChannelMessage]]></code>
+      <code><![CDATA[GroupOrChannelMessage]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="src/EventHandler/InlineQuery.php">
     <MixedArgument>
       <code><![CDATA[$rawInlineQuery['geo']]]></code>
@@ -1762,16 +1783,8 @@
     <MixedArgument>
       <code><![CDATA[$r]]></code>
       <code><![CDATA[$r]]></code>
-      <code><![CDATA[$result]]></code>
     </MixedArgument>
     <MixedArrayAccess>
-      <code><![CDATA[$client->methodCallAsyncRead(
-            'channels.getParticipant',
-            [
-                'channel' => $this->chatId,
-                'participant' => $member,
-            ]
-        )['participant']]]></code>
       <code><![CDATA[$this->getClient()->methodCallAsyncRead(
                 'messages.getDiscussionMessage',
                 ['peer' => $this->chatId, 'msg_id' => $this->id]
@@ -1780,7 +1793,6 @@
     <MixedAssignment>
       <code><![CDATA[$r]]></code>
       <code><![CDATA[$r]]></code>
-      <code><![CDATA[$result]]></code>
     </MixedAssignment>
     <PropertyNotSetInConstructor>
       <code><![CDATA[ChannelMessage]]></code>
@@ -1872,21 +1884,12 @@
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>
-      <code><![CDATA[$result]]></code>
     </MixedArgument>
     <MixedArrayAccess>
-      <code><![CDATA[$client->methodCallAsyncRead(
-            'channels.getParticipant',
-            [
-                'channel' => $this->chatId,
-                'participant' => $member,
-            ]
-        )['participant']]]></code>
       <code><![CDATA[$result['updates']]]></code>
       <code><![CDATA[$result['updates'][0]]]></code>
     </MixedArrayAccess>
     <MixedAssignment>
-      <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>
       <code><![CDATA[$result]]></code>

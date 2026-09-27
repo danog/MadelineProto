@@ -16,16 +16,14 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
-use AssertionError;
-use danog\MadelineProto\EventHandler\Message;
-use danog\MadelineProto\EventHandler\Participant;
+use danog\MadelineProto\EventHandler\GroupOrChannelMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCError\MsgIdInvalidError;
 
 /**
  * Represents an incoming or outgoing channel message.
  */
-final class ChannelMessage extends Message
+final class ChannelMessage extends GroupOrChannelMessage
 {
     /** @internal */
     public function __construct(MTProto $API, array $rawMessage, array $info, bool $scheduled)
@@ -90,25 +88,6 @@ final class ChannelMessage extends Message
     }
 
     /**
-     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
-     *
-     * @param  string|integer $member Participant to get info about.
-     * @throws AssertionError
-     */
-    public function getMember(string|int $member): Participant
-    {
-        $client = $this->getClient();
-        $result = $client->methodCallAsyncRead(
-            'channels.getParticipant',
-            [
-                'channel' => $this->chatId,
-                'participant' => $member,
-            ]
-        )['participant'];
-        return Participant::fromRawParticipant($result);
-    }
-
-    /**
      * Increase the view counter of a current message in the channel.
      *
      */
@@ -149,36 +128,6 @@ final class ChannelMessage extends Message
             'channels.toggleParticipantsHidden',
             [
                 'channel' => $this->chatId,
-                'enabled' => false,
-            ]
-        );
-    }
-
-    /**
-     * Enable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel.
-     *
-     */
-    public function enableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
-                'enabled' => true,
-            ]
-        );
-    }
-
-    /**
-     * Disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a channel.
-     *
-     */
-    public function disableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
                 'enabled' => false,
             ]
         );

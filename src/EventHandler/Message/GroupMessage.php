@@ -16,12 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
-use AssertionError;
 use danog\DialogId\DialogId;
-use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\GroupOrChannelMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
-use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Topic\IconColor;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
@@ -29,28 +27,8 @@ use Webmozart\Assert\InvalidArgumentException;
 /**
  * Represents an incoming or outgoing group message.
  */
-class GroupMessage extends Message
+class GroupMessage extends GroupOrChannelMessage
 {
-    /**
-     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
-     *
-     * @param  string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
-     * @throws AssertionError
-     */
-    public function getMember(string|int|null $member = null): Participant
-    {
-        $client = $this->getClient();
-        $member ??= $this->senderId;
-        $result = $client->methodCallAsyncRead(
-            'channels.getParticipant',
-            [
-                'channel' => $this->chatId,
-                'participant' => $member,
-            ]
-        )['participant'];
-        return Participant::fromRawParticipant($result);
-    }
-
     /**
      * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
@@ -489,36 +467,6 @@ class GroupMessage extends Message
             [
                 'channel' => $this->chatId,
                 'seconds' => 0,
-            ]
-        );
-    }
-
-    /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
-     *
-     */
-    public function enableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
-                'enabled' => true,
-            ]
-        );
-    }
-
-    /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
-     *
-     */
-    public function disableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
-                'enabled' => false,
             ]
         );
     }

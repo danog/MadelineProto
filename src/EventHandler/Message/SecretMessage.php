@@ -32,6 +32,17 @@ final class SecretMessage extends AbstractPrivateMessage
         parent::__construct($API, $rawMessage, $info, $scheduled);
     }
 
+    /**
+     * ID of the other user in this secret chat.
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    protected function getCallPeer(): int
+    {
+        return $this->senderId;
+    }
+
     #[\Override]
     public function getReply(string $class = SecretMessage::class): ?SecretMessage
     {
