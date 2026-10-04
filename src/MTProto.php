@@ -68,6 +68,7 @@ use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
+use danog\MadelineProto\MTProtoTools\ResumableCalls;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\ResponseInfo;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
@@ -142,6 +143,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         LegacyMigrator::saveDbProperties as private internalSaveDbProperties;
     }
     use Broadcast;
+    use ResumableCalls;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
     /** @internal */
@@ -840,8 +842,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             // Report URI
             'reportDest',
 
-            // Interrupted uploads
+            // Interrupted uploads, and the calls that made them
             'resumableUploads',
+            'resumableCalls',
 
             'calls',
             'callsByPeer',
@@ -1264,7 +1267,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->loginState->wakeup();
 
             // Connect to all DCs, start internal loops
+            $loggedIn = false;
             if ($this->fullGetSelf()) {
+                $loggedIn = true;
                 $this->setupLogger();
                 $this->startLoops();
                 $this->getCdnConfig();
@@ -1289,6 +1294,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             foreach ($this->broadcasts as $broadcast) {
                 $broadcast->resume();
+            }
+            if ($loggedIn) {
+                $this->resumeCalls();
             }
 
             foreach ($this->calls as $id => $call) {

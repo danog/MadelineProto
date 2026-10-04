@@ -2973,6 +2973,9 @@
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file']]]></code>
     </PossiblyUndefinedArrayOffset>
+    <PossiblyUndefinedVariable>
+      <code><![CDATA[$requests]]></code>
+    </PossiblyUndefinedVariable>
     <PropertyNotSetInConstructor>
       <code><![CDATA[$logger]]></code>
       <code><![CDATA[$server]]></code>
@@ -4763,6 +4766,9 @@
     </TypeDoesNotContainType>
   </file>
   <file src="src/MTProtoTools/FilesAbstraction.php">
+    <DocblockTypeContradiction>
+      <code><![CDATA[\is_array($file)]]></code>
+    </DocblockTypeContradiction>
     <InvalidReturnType>
       <code><![CDATA[Media]]></code>
       <code><![CDATA[Media]]></code>
@@ -4891,7 +4897,11 @@
     <RedundantCondition>
       <code><![CDATA[\is_array($media['file'])]]></code>
     </RedundantCondition>
+    <RedundantConditionGivenDocblockType>
+      <code><![CDATA[\is_array($media['file'])]]></code>
+    </RedundantConditionGivenDocblockType>
     <ReferenceConstraintViolation>
+      <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>
       <code><![CDATA[$file]]></code>

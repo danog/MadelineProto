@@ -45,17 +45,20 @@ use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\StreamDuplicator;
 use danog\MadelineProto\TL\Types\Bytes;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Tools;
 use finfo;
 use Webmozart\Assert\Assert;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
+use function Amp\File\getModificationTime;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 use function Amp\Future\await;
@@ -1445,6 +1448,62 @@ trait FilesAbstraction
         bool $forceResend,
         ?Cancellation $cancellation,
         bool $uploadOnly,
+        ?int $randomId = null,
+    ): Message|Media {
+        $args = get_defined_vars();
+        if (!$this instanceof MTProto) {
+            /** @psalm-suppress MixedArgument */
+            return $this->sendMediaInternal(...$args);
+        }
+        $resumableCall = null;
+        if (!$uploadOnly && $peer !== null && !DialogId::isSecretChat($this->getId($peer))) {
+            // Interrupted sends are resumed after a restart: choose the random ID beforehand,
+            // so that it's saved with the call, and the message isn't sent twice.
+            $args['randomId'] = $randomId ?? Tools::randomInt();
+            $resumableCall = $this->registerResumableCall('sendMedia', 'sendMedia', $args);
+        }
+        try {
+            /** @psalm-suppress MixedArgument */
+            return $this->sendMediaInternal(...$args);
+        } finally {
+            $this->unregisterResumableCall($resumableCall);
+        }
+    }
+
+    /**
+     * Sends a media, see sendMedia().
+     *
+     * @param class-string<Media> $type
+     *
+     * @internal
+     */
+    public function sendMediaInternal(
+        string $type,
+        int|string|null $peer,
+        ?string $mimeType,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb,
+        array $attributesOrig,
+        string $caption,
+        ParseMode $parseMode,
+        ?callable $callback,
+        ?string $fileName,
+        ?int $ttl,
+        bool $spoiler,
+        ?int $replyToMsgId,
+        ?int $topMsgId,
+        ?array $replyMarkup,
+        int|string|null $sendAs,
+        ?int $scheduleDate,
+        bool $silent,
+        bool $noForwards,
+        bool $background,
+        bool $clearDraft,
+        bool $updateStickersetsOrder,
+        bool $forceResend,
+        ?Cancellation $cancellation,
+        bool $uploadOnly,
+        ?int $randomId = null,
     ): Message|Media {
         if ($file instanceof Message) {
             $file = $file->media;
@@ -1800,6 +1859,7 @@ trait FilesAbstraction
             'schedule_date' => $scheduleDate,
             'send_as' => $sendAs,
             'media' => $media,
+            'random_id' => $randomId,
             'cancellation' => $cancellation,
         ];
         if ($ttl) {
@@ -1825,19 +1885,57 @@ trait FilesAbstraction
 
     }
 
+    /**
+     * Provide a stream for a file to upload, and the key identifying its source across restarts,
+     * to resume an interrupted upload (null if the source can't be identified).
+     */
+    private function openUploadSource(Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file, ?Cancellation $cancellation, ?int &$size, ?string &$resumeKey): ReadableStream
+    {
+        $resumeKey = null;
+        if ($file instanceof LocalFile) {
+            $path = Tools::absolute($file->file);
+            $size = getSize($path);
+            $resumeKey = 'file:'.$path."\0".getModificationTime($path);
+            return openFile($path, 'r');
+        }
+        if ($file instanceof RemoteUrl) {
+            self::$client ??= HttpClientBuilder::buildDefault();
+            $request = new Request($file->url);
+            $request->setTransferTimeout(INF);
+            $request->setInactivityTimeout(INF);
+            $request->setBodySizeLimit(512 * 1024 * 8000);
+            $response = self::$client->request($request, $cancellation);
+            if (($status = $response->getStatus()) !== 200) {
+                throw new Exception("Wrong status code: {$status} ".$response->getReason());
+            }
+            $size = (int) ($response->getHeader('content-length') ?? $size);
+            $validator = $response->getHeader('etag') ?? $response->getHeader('last-modified');
+            if ($validator !== null) {
+                $resumeKey = 'url:'.$file->url."\0".$validator;
+            }
+            return $response->getBody();
+        }
+        $stream = $this->getStream($file, $cancellation, $size);
+        if ($stream instanceof ResumableStream) {
+            // Before anything is read from it.
+            $resumeKey = 'stream:'.serialize($stream);
+        }
+        return $stream;
+    }
     private function extractMime(bool $secret, Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream &$file, ?string $fileName, ?callable $callback, ?Cancellation $cancellation): string
     {
         $size = 0;
-        $file = $this->getStream($file, $cancellation, $size);
+        $file = $this->openUploadSource($file, $cancellation, $size, $resumeKey);
         $p = new Pipe(1024*1024);
-        $fileFuture = async(fn () => $this->uploadFromStream(
+        $fileFuture = async(fn () => $this->uploadFromStreamInternal(
             new StreamDuplicator($file, $p->getSink()),
             $size,
             null,
             $fileName ?? '',
             $callback,
             $secret,
-            $cancellation
+            $cancellation,
+            $resumeKey,
         ));
 
         $buff = '';
@@ -1875,7 +1973,7 @@ trait FilesAbstraction
         }
 
         $size = 0;
-        $file = $this->getStream($file, $cancellation, $size);
+        $file = $this->openUploadSource($file, $cancellation, $size, $resumeKey);
         $process = Process::start('ffmpeg -i pipe: -f image2pipe -', cancellation: $cancellation);
         $stdin = $process->getStdin();
         $stdout = $process->getStdout();
@@ -1901,14 +1999,15 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->uploadFromStream(
+        $fileFuture = async(fn () => $this->uploadFromStreamInternal(
             new StreamDuplicator($file, ...$streams),
             $size,
             null,
             $fileName ?? '',
             $callback,
             $secret,
-            $cancellation
+            $cancellation,
+            $resumeKey,
         ));
         [$stdout, $stderr] = await($f);
 
@@ -1958,7 +2057,7 @@ trait FilesAbstraction
         }
 
         $size = 0;
-        $file = $this->getStream($file, $cancellation, $size);
+        $file = $this->openUploadSource($file, $cancellation, $size, $resumeKey);
         $ffmpeg = 'ffmpeg -i pipe: -ss '.$thumbSeek.' -frames:v 1 -f image2pipe -';
         $process = Process::start($ffmpeg, cancellation: $cancellation);
         $stdin = $process->getStdin();
@@ -1983,14 +2082,15 @@ trait FilesAbstraction
             unset($p);
         }
 
-        $fileFuture = async(fn () => $this->uploadFromStream(
+        $fileFuture = async(fn () => $this->uploadFromStreamInternal(
             new StreamDuplicator($file, ...$streams),
             $size,
             $mimeType,
             $fileName ?? '',
             $callback,
             $secret,
-            $cancellation
+            $cancellation,
+            $resumeKey,
         ));
         [$stdout, $stderr] = await($f);
 

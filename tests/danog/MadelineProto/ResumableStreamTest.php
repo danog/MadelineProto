@@ -18,10 +18,20 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\ByteStream\ReadableIterableStream;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
+use Amp\DeferredFuture;
+use Amp\Http\HttpStatus;
+use Amp\Http\Server\DefaultErrorHandler;
+use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
+use Amp\Http\Server\Response;
+use Amp\Http\Server\SocketHttpServer;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResumableStream;
+use Psr\Log\NullLogger;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
@@ -36,8 +46,6 @@ use function Amp\delay;
  */
 final class ResumableStreamTest extends MadelineTestCase
 {
-    private const PART_SIZE = 512 * 1024;
-
     /** Contents of the test file. */
     private static string $data;
     /** Path of the test file. */
@@ -236,135 +244,168 @@ final class ResumableStreamTest extends MadelineTestCase
     }
 
     /* -------------------------------------------------------------------- *
-     *  Resumable uploads.
+     *  Resumable uploads and calls.
      * -------------------------------------------------------------------- */
 
+    /** Log of the IPC server, as configured by MadelineTestCase. */
+    private const LOG = __DIR__.'/../../MadelineProto.log';
+
     /**
-     * Start uploading from a callable, and interrupt the upload once the first three parts were uploaded.
+     * What was logged after the specified offset of the log.
      */
-    private static function interruptedUpload(string $resumeKey, bool $seekable, bool $encrypted): void
+    private static function logSince(int $offset): string
     {
-        $data = self::$data;
-        $deferred = new DeferredCancellation;
-        $parts = 0;
-        try {
-            self::$MadelineProto->uploadFromCallable(
-                static function (int $offset, int $size) use ($data, &$parts, $deferred): string {
-                    if ($offset === 3 * self::PART_SIZE) {
-                        // Parts are uploaded in parallel and can complete out of order: wait for the
-                        // first three (for a sequential upload, the only ones read so far) before interrupting.
-                        for ($x = 0; $parts < 3 && $x < 600; $x++) {
-                            delay(0.05);
-                        }
-                        $deferred->cancel();
-                    }
-                    return substr($data, $offset, $size);
-                },
-                \strlen($data),
-                'application/octet-stream',
-                'test.bin',
-                static function () use (&$parts): void {
-                    $parts++;
-                },
-                $seekable,
-                $encrypted,
-                $deferred->getCancellation(),
-                $resumeKey,
-            );
-            self::fail('The upload was not interrupted');
-        } catch (CancelledException) {
-        }
+        clearstatcache();
+        $log = (string) file_get_contents(self::LOG);
+        // The logger truncates the file once it gets too big.
+        return \strlen($log) >= $offset ? substr($log, $offset) : $log;
+    }
+
+    private static function logSize(): int
+    {
+        clearstatcache();
+        return file_exists(self::LOG) ? (int) filesize(self::LOG) : 0;
     }
 
     /**
-     * Upload from a callable, recording the requested offsets.
-     *
-     * @param list<int> $requested
+     * Assert that an upload was resumed, with at least one part already uploaded.
      */
-    private static function resumedUpload(string $resumeKey, bool $seekable, bool $encrypted, array &$requested): array
+    private static function assertUploadResumed(string $log, string $fileName): void
     {
-        $data = self::$data;
-        return self::$MadelineProto->uploadFromCallable(
-            static function (int $offset, int $size) use ($data, &$requested): string {
-                $requested[] = $offset;
-                return substr($data, $offset, $size);
-            },
-            \strlen($data),
-            'application/octet-stream',
-            'test.bin',
-            null,
-            $seekable,
-            $encrypted,
-            null,
-            $resumeKey,
+        self::assertMatchesRegularExpression(
+            '/Resuming upload of '.preg_quote($fileName, '/').': [1-9]\d* of \d+ parts were already uploaded/',
+            $log,
+            'The upload was not resumed'
         );
     }
 
-    public function testResumingASeekableUpload(): void
+    /**
+     * Run an upload, interrupting it (as a restart would) once it's halfway through.
+     *
+     * @param callable(callable, \Amp\Cancellation): mixed $upload
+     */
+    private static function interrupt(callable $upload): void
     {
-        $key = 'test:'.bin2hex(random_bytes(8));
-        self::interruptedUpload($key, true, false);
-        $requested = [];
-        $file = self::resumedUpload($key, true, false, $requested);
-
-        self::assertLessThan((int) ceil(self::size() / self::PART_SIZE), \count($requested), 'Every part was uploaded again');
-        self::assertSame(self::$data, self::download(self::uploadMedia($file)));
-    }
-
-    public function testResumingASequentialUpload(): void
-    {
-        $key = 'test:'.bin2hex(random_bytes(8));
-        self::interruptedUpload($key, false, false);
-        $requested = [];
-        $file = self::resumedUpload($key, false, false, $requested);
-
-        self::assertGreaterThan(0, $requested[0], 'The upload restarted from the beginning');
-        self::assertSame(range($requested[0], $requested[0] + (\count($requested) - 1) * self::PART_SIZE, self::PART_SIZE), $requested);
-        self::assertSame(self::$data, self::download(self::uploadMedia($file)));
-    }
-
-    public function testResumingAnEncryptedUpload(): void
-    {
-        $key = 'test:'.bin2hex(random_bytes(8));
-        self::interruptedUpload($key, false, true);
-        $requested = [];
-        $file = self::resumedUpload($key, false, true, $requested);
-
-        // Encrypted files can only be checked by sending them to a secret chat.
-        self::assertGreaterThan(0, $requested[0], 'The upload restarted from the beginning');
-        self::assertSame(range($requested[0], $requested[0] + (\count($requested) - 1) * self::PART_SIZE, self::PART_SIZE), $requested);
-        self::assertSame(self::size(), $file['size']);
+        $deferred = new DeferredCancellation;
+        try {
+            $upload(static function (float $progress) use ($deferred): void {
+                if ($progress >= 50) {
+                    $deferred->cancel();
+                }
+            }, $deferred->getCancellation());
+            self::fail('The upload was not interrupted');
+        } catch (CancelledException) {
+        }
     }
 
     public function testResumingAFileUpload(): void
     {
-        $deferred = new DeferredCancellation;
-        try {
-            self::$MadelineProto->upload(new LocalFile(self::$path), cb: static function (float $progress) use ($deferred): void {
-                if ($progress >= 40) {
-                    $deferred->cancel();
-                }
-            }, cancellation: $deferred->getCancellation());
-            self::fail('The upload was not interrupted');
-        } catch (CancelledException) {
-        }
+        $name = basename(self::$path);
+        self::interrupt(static fn (callable $cb, $cancellation) => self::$MadelineProto->upload(new LocalFile(self::$path), cb: $cb, cancellation: $cancellation));
+        $offset = self::logSize();
         $file = self::$MadelineProto->upload(new LocalFile(self::$path));
+
+        self::assertUploadResumed(self::logSince($offset), $name);
         self::assertSame(self::$data, self::download(self::uploadMedia($file)));
     }
 
     public function testResumingAStreamUpload(): void
     {
-        $deferred = new DeferredCancellation;
-        try {
-            self::$MadelineProto->upload(self::$MadelineProto->downloadToReturnedStream(self::$media), cb: static function (float $progress) use ($deferred): void {
-                if ($progress >= 40) {
-                    $deferred->cancel();
-                }
-            }, cancellation: $deferred->getCancellation());
-            self::fail('The upload was not interrupted');
-        } catch (CancelledException) {
-        }
-        $file = self::$MadelineProto->upload(self::$MadelineProto->downloadToReturnedStream(self::$media));
+        // Resumable streams are read sequentially.
+        self::interrupt(static fn (callable $cb, $cancellation) => self::$MadelineProto->upload(self::$MadelineProto->downloadToReturnedStream(self::$media), 'stream.bin', $cb, cancellation: $cancellation));
+        $offset = self::logSize();
+        $file = self::$MadelineProto->upload(self::$MadelineProto->downloadToReturnedStream(self::$media), 'stream.bin');
+
+        self::assertUploadResumed(self::logSince($offset), 'stream.bin');
         self::assertSame(self::$data, self::download(self::uploadMedia($file)));
+    }
+
+    public function testResumingAnEncryptedUpload(): void
+    {
+        self::interrupt(static fn (callable $cb, $cancellation) => self::$MadelineProto->uploadEncrypted(new LocalFile(self::$path), 'encrypted.bin', $cb, $cancellation));
+        $offset = self::logSize();
+        $file = self::$MadelineProto->uploadEncrypted(new LocalFile(self::$path), 'encrypted.bin');
+
+        // Encrypted files can only be checked by sending them to a secret chat.
+        self::assertUploadResumed(self::logSince($offset), 'encrypted.bin');
+        self::assertSame(self::size(), $file['size']);
+    }
+
+    public function testAnInterruptedSendIsResumedAfterARestart(): void
+    {
+        // Serve the file from a local server that stalls after the first four parts, until released.
+        $stallAt = 4 * 512 * 1024;
+        $release = new DeferredFuture;
+        $data = self::$data;
+        $server = SocketHttpServer::createForDirectAccess(new NullLogger);
+        $server->expose('127.0.0.1:0');
+        $server->start(new ClosureRequestHandler(static function () use ($data, $stallAt, $release): Response {
+            $body = (static function () use ($data, $stallAt, $release): \Generator {
+                yield substr($data, 0, $stallAt);
+                $release->getFuture()->await();
+                yield substr($data, $stallAt);
+            })();
+            return new Response(HttpStatus::OK, [
+                'content-type' => 'application/octet-stream',
+                'content-length' => (string) \strlen($data),
+                'etag' => '"resumable-test"',
+            ], new ReadableIterableStream($body));
+        }), new DefaultErrorHandler);
+        $url = 'http://'.$server->getServers()[0]->getAddress()->toString().'/resumed.bin';
+
+        try {
+            $caption = 'Resumed send '.bin2hex(random_bytes(8));
+            $progress = 0.0;
+            // Not inside the arrow function, which would capture $progress by value.
+            $callback = static function (float $p) use (&$progress): void {
+                $progress = $p;
+            };
+            $send = async(static fn () => self::$MadelineProto->sendDocument(
+                peer: getenv('DEST'),
+                file: new RemoteUrl($url),
+                caption: $caption,
+                fileName: 'resumed.bin',
+                callback: $callback,
+            ));
+            $send->ignore();
+            // Wait for the four parts before the stall to be uploaded.
+            for ($x = 0; $progress < 57 && !$send->isComplete() && $x < 1200; $x++) {
+                delay(0.05);
+            }
+            if ($send->isComplete()) {
+                // Surface the error, if any.
+                $send->await();
+                self::fail('The send completed before it could be interrupted');
+            }
+            self::assertGreaterThanOrEqual(57, $progress, 'The upload did not reach the stall');
+
+            // Restart the IPC server: it saves the session and exits, then the client starts it again.
+            $offset = self::logSize();
+            self::$MadelineProto->restart();
+            $release->complete();
+
+            $id = $chat = null;
+            for ($x = 0; $id === null && $x < 1200; $x++) {
+                delay(0.1);
+                if (preg_match('/Resumed interrupted sendMedia call \(message (\d+) in chat (-?\d+)\)/', self::logSince($offset), $matches)) {
+                    $id = (int) $matches[1];
+                    $chat = (int) $matches[2];
+                }
+            }
+            self::assertNotNull($id, 'The send was not resumed');
+            self::assertUploadResumed(self::logSince($offset), 'resumed.bin');
+
+            $message = (DialogId::isSupergroupOrChannel($chat)
+                ? self::$MadelineProto->channels->getMessages(channel: $chat, id: [$id])
+                : self::$MadelineProto->messages->getMessages(id: [$id]))['messages'][0];
+            self::assertSame($caption, $message['message']);
+            self::assertSame(self::size(), $message['media']['document']['size']);
+            self::assertSame(self::$data, self::download($message['media']));
+        } finally {
+            if (!$release->isComplete()) {
+                $release->complete();
+            }
+            $server->stop();
+        }
     }
 }

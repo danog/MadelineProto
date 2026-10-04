@@ -28,7 +28,7 @@ abstract class MadelineTestCase extends TestCase
         }
         $settings = new Settings;
         $settings->getAppInfo()->setApiId((int) getenv('API_ID'))->setApiHash(getenv('API_HASH'));
-        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra(__DIR__.'/../../MadelineProto.log')->setLevel(Logger::ULTRA_VERBOSE);
+        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra(__DIR__.'/../../MadelineProto.log')->setLevel(Logger::ULTRA_VERBOSE)->setMaxSize(100 * 1024 * 1024);
         self::$MadelineProto = new API(
             'testing.madeline',
             $settings

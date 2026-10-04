@@ -69,6 +69,10 @@ abstract class AbstractServer extends Loop
      */
     public const SHUTDOWN = 0;
     /**
+     * Maximum time to wait for a started IPC server to report its state, in seconds.
+     */
+    private const STARTUP_TIMEOUT = 30;
+    /**
      * Boolean to shut down worker, if started.
      */
     private static bool $shutdown = false;
@@ -109,10 +113,13 @@ abstract class AbstractServer extends Loop
      * Start IPC server in background.
      *
      * @param SessionPaths $session Session path
+     *
+     * @return Future<bool|Throwable>
      */
     public static function startMe(SessionPaths $session): Future
     {
         $id = Tools::randomInt(2000000000);
+        $startTime = microtime(true);
         $started = false;
         $e = null;
         try {
@@ -120,7 +127,7 @@ abstract class AbstractServer extends Loop
             ProcessRunner::start((string) $session, $id);
             $started = true;
             WebRunner::start((string) $session, $id);
-            return async(self::monitor(...), $session, $id, $started, null);
+            return async(self::monitor(...), $session, $id, $startTime, $started, null);
         } catch (Throwable $e) {
             Logger::log($e);
         }
@@ -137,12 +144,14 @@ abstract class AbstractServer extends Loop
                 $e = $e2;
             }
         }
-        return async(self::monitor(...), $session, $id, $started, $e);
+        return async(self::monitor(...), $session, $id, $startTime, $started, $e);
     }
     /**
      * Monitor session.
+     *
+     * @param float $startTime When the server was started, to recognize servers started concurrently by other processes
      */
-    private static function monitor(SessionPaths $session, int $id, bool $started, ?\Throwable $e): bool|Throwable
+    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -157,8 +166,15 @@ abstract class AbstractServer extends Loop
                 }
                 Logger::log('IPC server started successfully!');
                 return true;
+            } elseif ($state && $state->getStartupTime() >= $startTime && !$state->getException()) {
+                // Another process started the server concurrently, overwriting our startup ID
+                Logger::log('IPC server started successfully by another process!');
+                return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!", previous: $e);
+            } elseif ($count >= self::STARTUP_TIMEOUT*2) {
+                // The server died before reporting its state, or got stuck while starting
+                return new Exception("The IPC server didn't start within ".self::STARTUP_TIMEOUT." seconds, please check the logs!", previous: $e);
             }
             delay(0.5);
             $count++;

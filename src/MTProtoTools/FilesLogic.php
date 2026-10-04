@@ -42,6 +42,7 @@ use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResumableDownloadStream;
@@ -395,6 +396,21 @@ trait FilesLogic
     }
 
     /**
+     * Upload from callable, resuming interrupted uploads of the same file.
+     *
+     * Resuming only happens in the process owning the session: IPC clients send uploads of resumable
+     * sources to it as a whole (see {@see \danog\MadelineProto\Ipc\Client::upload()}).
+     */
+    private function uploadFromCallableResumable(callable $callable, int $size, ?string $mime, string $fileName, ?callable $cb, bool $seekable, bool $encrypted, ?Cancellation $cancellation, ?string $resumeKey): array
+    {
+        if ($this instanceof MTProto) {
+            /** @psalm-suppress InaccessibleMethod Same class */
+            return $this->uploadFromCallableInternal($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
+        }
+        return $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
+    }
+
+    /**
      * Upload file from stream, resuming an interrupted upload of the same file if possible.
      *
      * Uploads of files and resumable streams are identified automatically.
@@ -475,7 +491,7 @@ trait FilesLogic
                     EventLoop::queue($l->release(...));
                 }
             };
-            return $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
+            return $this->uploadFromCallableResumable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
         }
         /** @var ?BufferedRawStream */
         $buffered = $stream instanceof BufferedRawStream ? $stream : null;
@@ -519,7 +535,7 @@ trait FilesLogic
             return $read($size);
         };
         try {
-            return $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, false, $encrypted, $cancellation, $resumeKey);
+            return $this->uploadFromCallableResumable($callable, $size, $mime, $fileName, $cb, false, $encrypted, $cancellation, $resumeKey);
         } finally {
             if ($created) {
                 /** @var StreamInterface $buffered */

@@ -25,6 +25,7 @@ use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Http\Client\Request;
+use Amp\Ipc\Sync\ChannelException;
 use AssertionError;
 use danog\Decoder\FileIdType;
 use danog\MadelineProto\BotApiFileId;
@@ -257,12 +258,21 @@ trait Files
      * @param (callable(float, float, float): void)       $cb        Status callback
      * @param boolean                                   $seekable  Whether chunks can be fetched out of order
      * @param boolean                                   $encrypted Whether to encrypt file for secret chats
-     * @param ?string                                   $resumeKey Identifies the uploaded file across restarts: if an upload of the same file (with the same size) was interrupted, it is resumed.
-     *                                                             A non-seekable callable must then accept starting from a non-zero offset (the first missing part).
      *
      * @return array InputFile constructor
      */
-    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null, ?string $resumeKey = null): array
+    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null): array
+    {
+        return $this->uploadFromCallableInternal($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
+    }
+    /**
+     * Upload file from callable, resuming an interrupted upload of the same file if possible.
+     *
+     * @param ?string $resumeKey Identifies the source of the file across restarts: if an upload of the same file
+     *                           (with the same size) was interrupted, it is resumed.
+     *                           A non-seekable callable must then accept starting from a non-zero offset (the first missing part).
+     */
+    private function uploadFromCallableInternal(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null, ?string $resumeKey = null): array
     {
         if ($cb === null) {
             $cb = function (float $percent, float $speed, float $time): void {
@@ -271,7 +281,11 @@ trait Files
         } else {
             $cb = static function (float $percent, float $speed, float $time) use ($cb): void {
                 EventLoop::queue(static function () use ($percent, $speed, $time, $cb): void {
-                    $cb($percent, $speed, $time);
+                    try {
+                        $cb($percent, $speed, $time);
+                    } catch (ChannelException) {
+                        // The IPC client this progress was meant for is gone.
+                    }
                 });
             };
         }
@@ -1256,7 +1270,11 @@ trait Files
         } else {
             $cb = static function (float $percent, float $speed, float $time) use ($cb): void {
                 EventLoop::queue(static function () use ($percent, $speed, $time, $cb): void {
-                    $cb($percent, $speed, $time);
+                    try {
+                        $cb($percent, $speed, $time);
+                    } catch (ChannelException) {
+                        // The IPC client this progress was meant for is gone.
+                    }
                 });
             };
         }

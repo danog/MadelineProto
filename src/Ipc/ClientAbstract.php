@@ -25,11 +25,10 @@ use Amp\Future;
 use Amp\Ipc\Sync\ChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Serialization;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
-
-use function Amp\Ipc\connect;
 
 /**
  * IPC client.
@@ -121,8 +120,12 @@ abstract class ClientAbstract
                     } catch (Throwable $e) {
                     }
                     try {
-                        Server::startMe($this->session)->await();
-                        $this->server = connect($this->session->getIpcPath());
+                        // Connect as soon as any server is listening, even if it was started by another process
+                        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session));
+                        if (!$server instanceof ChannelledSocket) {
+                            throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
+                        }
+                        $this->server = $server;
                         $this->logger('Reconnected to IPC server!');
                         $requests = $this->requests;
                         $this->requests = [];
@@ -136,8 +139,11 @@ abstract class ClientAbstract
                         $this->serverFuture = null;
                         $this->logger('Resumed IPC queries!');
                     } catch (Throwable $e) {
+                        $this->logger("Could not reconnect to IPC server: $e", Logger::FATAL_ERROR);
+                        // Fail future calls, and pending calls below, instead of leaving them hanging
+                        $f->getFuture()->ignore();
                         $f->error($e);
-                        throw $e;
+                        $this->run = false;
                     }
                 } else {
                     try {

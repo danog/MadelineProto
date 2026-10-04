@@ -24,6 +24,9 @@ use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\DeferredCancellation;
 use Amp\Ipc\Sync\ChannelledSocket;
+use danog\MadelineProto\BotApiFileId;
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\LocalFile;
@@ -31,14 +34,19 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\FilesLogic;
+use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\SessionPaths;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\Wrappers\Start;
 use Revolt\EventLoop;
 use Throwable;
 
+use const FILTER_VALIDATE_URL;
+
 use function Amp\async;
+use function Amp\File\exists;
 
 /**
  * IPC client.
@@ -50,7 +58,11 @@ use function Amp\async;
 final class Client extends ClientAbstract
 {
     use Start;
-    use FilesLogic;
+    use FilesLogic {
+        upload as private uploadLocally;
+        uploadFromStream as private uploadFromStreamLocally;
+        sendMedia as private sendMediaLocally;
+    }
 
     /**
      * Instances.
@@ -198,6 +210,140 @@ final class Client extends ClientAbstract
     }
 
     /**
+     * Upload file.
+     *
+     * Everything but raw streams is uploaded by the IPC server, which can resume interrupted uploads.
+     *
+     * @param FileCallbackInterface|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|string|array|resource $file      File, URL or Telegram file to upload
+     * @param string                                                                       $fileName  File name
+     * @param callable                                                                     $cb        Callback
+     * @param boolean                                                                      $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
+     */
+    public function upload($file, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
+    {
+        if ($file instanceof FileCallbackInterface) {
+            $cb = $file;
+            /** @var mixed */
+            $file = $file->getFile();
+        }
+        if (\is_resource($file) || ($file instanceof ReadableStream && !$file instanceof ResumableStream)) {
+            /** @psalm-suppress MixedArgument */
+            return $this->uploadLocally($file, $fileName, $cb, $encrypted, $cancellation);
+        }
+        // The IPC server might have a different working directory.
+        if ($file instanceof LocalFile) {
+            $file = new LocalFile(Tools::absolute($file->file));
+        } elseif (\is_string($file) && !filter_var($file, FILTER_VALIDATE_URL) && exists(Tools::absolute($file))) {
+            $file = Tools::absolute($file);
+        }
+        $params = [$file, $fileName, &$cb, $encrypted, &$cancellation];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        $wrapper->wrap($cancellation);
+        /** @var array */
+        return $this->__call('upload', $wrapper);
+    }
+
+    /**
+     * Sends a media.
+     *
+     * Unless the file is a raw stream, the IPC server sends it, resuming the upload and the send if they're interrupted by a restart.
+     *
+     * @param class-string<Media> $type
+     *
+     * @internal
+     */
+    public function sendMedia(
+        string $type,
+        int|string|null $peer,
+        ?string $mimeType,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file,
+        Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb,
+        array $attributesOrig,
+        string $caption,
+        ParseMode $parseMode,
+        ?callable $callback,
+        ?string $fileName,
+        ?int $ttl,
+        bool $spoiler,
+        ?int $replyToMsgId,
+        ?int $topMsgId,
+        ?array $replyMarkup,
+        int|string|null $sendAs,
+        ?int $scheduleDate,
+        bool $silent,
+        bool $noForwards,
+        bool $background,
+        bool $clearDraft,
+        bool $updateStickersetsOrder,
+        bool $forceResend,
+        ?Cancellation $cancellation,
+        bool $uploadOnly,
+        ?int $randomId = null,
+    ): Message|Media {
+        /** @var array<string, mixed> */
+        $args = get_defined_vars();
+        foreach ([$file, $thumb] as $f) {
+            if ($f instanceof ReadableStream && !$f instanceof ResumableStream) {
+                /** @psalm-suppress MixedArgument */
+                return $this->sendMediaLocally(...$args);
+            }
+        }
+        if ($file instanceof LocalFile) {
+            $args['file'] = new LocalFile(Tools::absolute($file->file));
+        }
+        if ($thumb instanceof LocalFile) {
+            $args['thumb'] = new LocalFile(Tools::absolute($thumb->file));
+        }
+        if (!$uploadOnly) {
+            // Chosen here, so that if this call is sent again after a restart of the IPC server
+            // (which also resumes it on its own), the message isn't sent twice.
+            $args['randomId'] = $randomId ?? Tools::randomInt();
+        }
+        $callback = &$args['callback'];
+        $cancellation = &$args['cancellation'];
+        $wrapper = Wrapper::create($args, $this->session, $this->logger);
+        $wrapper->wrap($callback, false);
+        $wrapper->wrap($cancellation);
+        /** @var Message|Media */
+        return $this->__call('sendMedia', $wrapper);
+    }
+
+    /**
+     * Upload file from stream.
+     *
+     * Resumable streams are uploaded by the IPC server, which can resume interrupted uploads.
+     *
+     * @param mixed    $stream    PHP resource or AMPHP async stream
+     * @param integer  $size      File size
+     * @param string   $mime      Mime type
+     * @param string   $fileName  File name
+     * @param callable $cb        Callback
+     * @param boolean  $encrypted Whether to encrypt file for secret chats
+     *
+     * @return array InputFile constructor
+     */
+    public function uploadFromStream(mixed $stream, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
+    {
+        if ($stream instanceof FileCallbackInterface) {
+            $cb = $stream;
+            /** @var mixed */
+            $stream = $stream->getFile();
+        }
+        if (!$stream instanceof ResumableStream) {
+            return $this->uploadFromStreamLocally($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
+        }
+        $params = [$stream, $size, $mime, $fileName, &$cb, $encrypted, &$cancellation];
+        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper->wrap($cb, false);
+        $wrapper->wrap($cancellation);
+        /** @var array */
+        return $this->__call('uploadFromStream', $wrapper);
+    }
+
+    /**
      * Play file in call.
      */
     public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
@@ -292,8 +438,8 @@ final class Client extends ClientAbstract
     private function callPlayOnHoldInternal(string $prefix, int $id, MediaDestination $dest, array $files): void
     {
         $params = [$id, $dest, ...array_values($files)];
-        $proxied = array_filter($files, static fn ($file) => $file instanceof ReadableStream && !$file instanceof ResumableStream);
-        if ($proxied === []) {
+        $proxied = array_any($files, static fn ($file) => $file instanceof ReadableStream && !$file instanceof ResumableStream);
+        if (!$proxied) {
             $this->__call($prefix.'PlayOnHold', $params);
             return;
         }
@@ -320,15 +466,14 @@ final class Client extends ClientAbstract
      * @param callable $cb        Callback
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
-     * @param ?string  $resumeKey Identifies the uploaded file across restarts, to resume interrupted uploads
      */
-    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null, ?string $resumeKey = null)
+    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
             $callable = $callable->getFile();
         }
-        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation, $resumeKey];
+        $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation];
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);
