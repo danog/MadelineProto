@@ -49,6 +49,11 @@ final class Files extends SettingsAbstract
     protected ?string $downloadLink = null;
 
     /**
+     * Whether to resume interrupted calls that upload files after a restart.
+     */
+    protected bool $resumeInterruptedCalls = true;
+
+    /**
      * Get allow automatic upload of files from file paths present in constructors?
      */
     public function getAllowAutomaticUpload(): bool
@@ -110,6 +115,34 @@ final class Files extends SettingsAbstract
     public function setDownloadParallelChunks(int $downloadParallelChunks): self
     {
         $this->downloadParallelChunks = $downloadParallelChunks;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to resume interrupted calls that upload files after a restart.
+     */
+    public function getResumeInterruptedCalls(): bool
+    {
+        return $this->resumeInterruptedCalls;
+    }
+
+    /**
+     * Set whether to resume interrupted calls that upload files after a restart.
+     *
+     * If enabled, method calls and sendMedia calls (sendDocument, sendPhoto, ...) uploading a file that survives a restart
+     * (a local file, a URL, a Telegram file or a resumable stream) are saved in the session until they complete:
+     * if the session is restarted in the meantime, the call is made again once the session starts, resuming the interrupted upload.
+     *
+     * Disable it if your code already makes interrupted calls again after a restart, to avoid sending files twice.
+     *
+     * @param bool $resumeInterruptedCalls Whether to resume interrupted calls that upload files after a restart
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setResumeInterruptedCalls(bool $resumeInterruptedCalls): self
+    {
+        $this->resumeInterruptedCalls = $resumeInterruptedCalls;
 
         return $this;
     }

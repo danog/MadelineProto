@@ -24,6 +24,7 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\TimeoutException;
@@ -176,6 +177,8 @@ trait UpdateHandler
     private $getUpdatesQueue;
     private int $getUpdatesQueueKey = 0;
     private SplQueue $updateQueue;
+    /** Whether the updates postponed while the event handler is starting will be handled once it started. */
+    private bool $updateQueueReplay = false;
 
     /**
      * Set NOOP update handler, ignoring all updates.
@@ -233,11 +236,7 @@ trait UpdateHandler
         if ($f = $this->event_handler_instance->waitForInternalStart()) {
             $this->logger->logger("Postponing update handling, onStart is still running (if stuck here for too long, make sure to fork long-running tasks in onStart using \$this->callFork(function () { ... }) to fix this)...", Logger::NOTICE);
             $this->updateQueue->enqueue($update);
-            $f->map(function (): void {
-                foreach ($this->updateQueue as $update) {
-                    $this->handleUpdate($update);
-                }
-            });
+            $this->handlePostponedUpdates($f);
             return;
         }
         if (\count($this->eventHandlerHandlers) !== 0 && \is_array($update)) {
@@ -1409,12 +1408,34 @@ trait UpdateHandler
 
         $this->handleUpdate($update);
     }
+    /**
+     * Handle the updates postponed while the event handler is starting, once it started.
+     *
+     * @param Future<mixed> $started
+     */
+    private function handlePostponedUpdates(Future $started): void
+    {
+        if ($this->updateQueueReplay) {
+            return;
+        }
+        $this->updateQueueReplay = true;
+        $started->map(function (): void {
+            $this->updateQueueReplay = false;
+            // Only the updates postponed until now: if the event handler failed to start, they're postponed again
+            // until it's started again, instead of being postponed and handled again in an endless loop.
+            for ($x = $this->updateQueue->count(); $x > 0; $x--) {
+                $this->handleUpdate($this->updateQueue->dequeue());
+            }
+        });
+    }
     private ?BetterCounter $updateCtr;
     private function handleUpdate(array $update): void
     {
         $this->updateCtr?->inc(['type' => $update['_']]);
         /** @var UpdateHandlerType::EVENT_HANDLER|UpdateHandlerType::WEBHOOK|UpdateHandlerType::GET_UPDATES $this->updateHandlerType */
         match ($this->updateHandlerType) {
+            // Custom events can be sent before an update handler is set (for example, in the onStart of the event handler).
+            UpdateHandlerType::NOOP => null,
             UpdateHandlerType::EVENT_HANDLER => $this->eventUpdateHandler($update),
             UpdateHandlerType::WEBHOOK => EventLoop::queue($this->pwrWebhook(...), $update),
             UpdateHandlerType::GET_UPDATES => EventLoop::queue($this->addGetUpdatesUpdate(...), $update),

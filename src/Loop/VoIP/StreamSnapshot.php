@@ -26,15 +26,20 @@ use Webmozart\Assert\Assert;
  * It is serialized as soon as it is queued, before anything reads it, so that it can be reopened from
  * the start of the item any number of times: to resume it after a restart, or to loop it as a hold file.
  *
+ * The first play reads the queued stream itself, keeping its progress callback and cancellation, which
+ * are not serialized.
+ *
  * @internal
  */
 final class StreamSnapshot
 {
     private readonly string $serialized;
+    private ?ReadableStream $stream;
 
     public function __construct(ReadableStream&ResumableStream $stream)
     {
         $this->serialized = serialize($stream);
+        $this->stream = $stream;
     }
 
     /**
@@ -42,8 +47,33 @@ final class StreamSnapshot
      */
     public function open(): ReadableStream
     {
+        if ($this->stream !== null) {
+            $stream = $this->stream;
+            $this->stream = null;
+            return $stream;
+        }
+
         $stream = unserialize($this->serialized);
         Assert::isInstanceOf($stream, ReadableStream::class);
         return $stream;
+    }
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return array{serialized: string}
+     */
+    public function __serialize(): array
+    {
+        return ['serialized' => $this->serialized];
+    }
+
+    /**
+     * @param array{serialized: string} $data
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->serialized = $data['serialized'];
+        $this->stream = null;
     }
 }

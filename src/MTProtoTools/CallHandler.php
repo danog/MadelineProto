@@ -47,12 +47,12 @@ trait CallHandler
             $datacenter = $this->loginState->getState()->authorizedDc;
         }
         // Calls uploading files are resumed if interrupted by a restart.
-        $resumableCall = $this->registerResumableCall('method', $method, $args);
-        try {
-            return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
-        } finally {
-            $this->unregisterResumableCall($resumableCall);
-        }
+        return $this->makeResumableCall(
+            'method',
+            $method,
+            $args,
+            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+        );
     }
     /**
      * Call method and make sure it is asynchronously sent.

@@ -225,7 +225,7 @@ final class Client extends ClientAbstract
     {
         if ($file instanceof FileCallbackInterface) {
             $cb = $file;
-            /** @var mixed */
+
             $file = $file->getFile();
         }
         if (\is_resource($file) || ($file instanceof ReadableStream && !$file instanceof ResumableStream)) {
@@ -239,6 +239,11 @@ final class Client extends ClientAbstract
             $file = Tools::absolute($file);
         }
         $params = [$file, $fileName, &$cb, $encrypted, &$cancellation];
+        if ($cb === null && $cancellation === null) {
+            // Without callbacks, the call can be sent again if the IPC server restarts.
+            /** @var array */
+            return $this->__call('upload', $params);
+        }
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
@@ -302,6 +307,11 @@ final class Client extends ClientAbstract
             // (which also resumes it on its own), the message isn't sent twice.
             $args['randomId'] = $randomId ?? Tools::randomInt();
         }
+        if ($callback === null && $cancellation === null) {
+            // Without callbacks, the call can be sent again if the IPC server restarts.
+            /** @var Message|Media */
+            return $this->__call('sendMedia', $args);
+        }
         $callback = &$args['callback'];
         $cancellation = &$args['cancellation'];
         $wrapper = Wrapper::create($args, $this->session, $this->logger);
@@ -329,13 +339,18 @@ final class Client extends ClientAbstract
     {
         if ($stream instanceof FileCallbackInterface) {
             $cb = $stream;
-            /** @var mixed */
+
             $stream = $stream->getFile();
         }
         if (!$stream instanceof ResumableStream) {
             return $this->uploadFromStreamLocally($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
         }
         $params = [$stream, $size, $mime, $fileName, &$cb, $encrypted, &$cancellation];
+        if ($cb === null && $cancellation === null) {
+            // Without callbacks, the call can be sent again if the IPC server restarts.
+            /** @var array */
+            return $this->__call('uploadFromStream', $params);
+        }
         $wrapper = Wrapper::create($params, $this->session, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
@@ -422,6 +437,10 @@ final class Client extends ClientAbstract
      */
     private function callPlayInternal(string $prefix, int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest, bool $blocking): void
     {
+        // The IPC server might have a different working directory.
+        if ($file instanceof LocalFile) {
+            $file = new LocalFile(Tools::absolute($file->file));
+        }
         if (!$file instanceof ReadableStream || $file instanceof ResumableStream) {
             $this->__call($prefix.($blocking ? 'PlayBlocking' : 'Play'), [$id, $file, $dest]);
             return;
@@ -437,20 +456,16 @@ final class Client extends ClientAbstract
      */
     private function callPlayOnHoldInternal(string $prefix, int $id, MediaDestination $dest, array $files): void
     {
-        $params = [$id, $dest, ...array_values($files)];
-        $proxied = array_any($files, static fn ($file) => $file instanceof ReadableStream && !$file instanceof ResumableStream);
-        if (!$proxied) {
-            $this->__call($prefix.'PlayOnHold', $params);
-            return;
-        }
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
-        foreach ($params as &$param) {
-            if ($param instanceof ReadableStream && !$param instanceof ResumableStream) {
-                $wrapper->wrap($param, true);
+        $params = [$id, $dest];
+        foreach ($files as $file) {
+            if ($file instanceof ReadableStream && !$file instanceof ResumableStream) {
+                // Hold files are played after this call returns, when the stream can't be read through IPC anymore.
+                throw new Exception('Only files, URLs and resumable streams can be played on hold through the IPC server: buffer other streams to a file first.');
             }
+            // The IPC server might have a different working directory.
+            $params[] = $file instanceof LocalFile ? new LocalFile(Tools::absolute($file->file)) : $file;
         }
-        unset($param);
-        $this->__call($prefix.'PlayOnHold', $wrapper);
+        $this->__call($prefix.'PlayOnHold', $params);
     }
 
     /**
@@ -522,11 +537,13 @@ final class Client extends ClientAbstract
                 }
             }
         }
+        // Identifies the call if it's resumed by the IPC server, and sent again after a restart.
+        $args['resumableCallId'] ??= bin2hex(random_bytes(16));
         if (isset($args['cancellation']) && $args['cancellation'] instanceof Cancellation) {
             $params = [$method, &$args, $dcId];
             $wrapper = Wrapper::create($params, $this->session, $this->logger);
             $wrapper->wrap($args['cancellation']);
-            return $this->__call('methodCallAsyncRead', $params);
+            return $this->__call('methodCallAsyncRead', $wrapper);
         }
         return $this->__call('methodCallAsyncRead', [$method, $args, $dcId]);
     }

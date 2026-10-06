@@ -17,6 +17,8 @@
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\ByteStream\ReadableStream;
+use Amp\Future;
+use Closure;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
@@ -26,8 +28,11 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\UploadResumeException;
 use Revolt\EventLoop;
 use Throwable;
+
+use function Amp\async;
 
 /**
  * Resumes interrupted method calls that upload files.
@@ -47,49 +52,109 @@ trait ResumableCalls
     /**
      * Interrupted calls, by ID.
      *
-     * @var array<string, array{kind: 'method'|'sendMedia', method: string, args: array, time: int}>
+     * The arguments are serialized when the call is made, before its streams are read.
+     *
+     * @var array<string, array{kind: 'method'|'sendMedia', method: string, args: string, time: int}>
      */
     private array $resumableCalls = [];
 
     /**
-     * Save a method call made with the specified arguments, if it uploads a file that survives a restart.
+     * Resumable calls running in this process, by ID.
+     *
+     * @var array<string, Future>
+     */
+    private array $runningResumableCalls = [];
+
+    /**
+     * Make a call, saving it until it completes if it uploads a file that survives a restart.
      *
      * The missing random IDs of the call are chosen and added to the arguments.
      *
-     * @param 'method'|'sendMedia' $kind Either an API method, or a call to sendMedia().
-     * @param array<array-key, mixed> $args
+     * If the same call is already running (an interrupted call resumed after a restart, that an IPC client
+     * sent again after reconnecting), its result is awaited, instead of making the call twice.
      *
-     * @return ?string ID of the call, to unregister it once it completes.
+     * Internal arguments:
+     * - resumableCallId: identifies an API method call across restarts, chosen by IPC clients (sendMedia() calls are identified by their random ID).
+     * - resumable: false for the calls made by a call that is already resumable.
+     *
+     * @template T
+     *
+     * @param 'method'|'sendMedia'                    $kind Either an API method, or a call to sendMedia().
+     * @param array<array-key, mixed>                 $args
+     * @param Closure(array<array-key, mixed>): T     $call Makes the call with the specified arguments.
+     *
+     * @return T
      */
-    private function registerResumableCall(string $kind, string $method, array &$args): ?string
+    private function makeResumableCall(string $kind, string $method, array $args, Closure $call): mixed
     {
-        if (!self::hasResumableSource($args)) {
-            return null;
+        $id = $this->registerResumableCall($kind, $method, $args);
+        if ($id === null) {
+            return $call($args);
         }
-        if ($kind === 'method') {
-            $this->fillRandomIds($method, $args);
+        if (isset($this->runningResumableCalls[$id])) {
+            $this->logger->logger("Waiting for the same $method call, which is already running", Logger::NOTICE);
+            /** @var T */
+            return $this->runningResumableCalls[$id]->await($args['cancellation'] ?? null);
         }
-        $saved = $args;
-        unset($saved['cancellation'], $saved['callback']);
+        $future = async($call, $args);
+        $this->runningResumableCalls[$id] = $future;
+        // Calls are only resumed if they were running recently.
+        $refresh = EventLoop::unreference(EventLoop::repeat(60, function () use ($id): void {
+            if (isset($this->resumableCalls[$id])) {
+                $this->resumableCalls[$id]['time'] = time();
+            }
+        }));
         try {
-            $serialized = serialize($saved);
-        } catch (Throwable) {
-            return null;
+            return $future->await();
+        } finally {
+            EventLoop::cancel($refresh);
+            unset($this->runningResumableCalls[$id], $this->resumableCalls[$id]);
         }
-        $id = hash('sha256', $kind."\0".$method."\0".$serialized);
-        // A resumed call registers itself again, with the same arguments.
-        $this->resumableCalls[$id] ??= ['kind' => $kind, 'method' => $method, 'args' => $saved, 'time' => time()];
-        return $id;
     }
 
     /**
-     * Forget a call once it completed (successfully or not).
+     * Save a call made with the specified arguments, if it uploads a file that survives a restart, and it can be made again safely.
+     *
+     * @param 'method'|'sendMedia' $kind
+     * @param array<array-key, mixed> $args
+     *
+     * @return ?string ID of the call
      */
-    private function unregisterResumableCall(?string $id): void
+    private function registerResumableCall(string $kind, string $method, array &$args): ?string
     {
-        if ($id !== null) {
-            unset($this->resumableCalls[$id]);
+        $callId = $args['resumableCallId'] ?? null;
+        $resumable = $args['resumable'] ?? true;
+        unset($args['resumableCallId'], $args['resumable']);
+        if (!$resumable || !$this->settings->getFiles()->getResumeInterruptedCalls() || !self::hasResumableSource($args)) {
+            return null;
         }
+        if ($kind === 'method') {
+            // A call made again must not be executed twice by Telegram.
+            // Secret chat messages can't be sent again with the same random ID, as it's encrypted with a new sequence number.
+            if (str_starts_with($method, 'messages.sendEncrypted') || !$this->fillRandomIds($method, $args)) {
+                return null;
+            }
+            $callId ??= bin2hex(random_bytes(16));
+            $id = 'method:'.$callId;
+        } else {
+            \assert(isset($args['randomId']));
+            $id = 'sendMedia:'.$args['randomId'];
+        }
+        if (!isset($this->resumableCalls[$id])) {
+            $saved = $args;
+            unset($saved['cancellation'], $saved['callback']);
+            if ($kind === 'method') {
+                $saved['resumableCallId'] = $callId;
+            }
+            try {
+                // Now, before its streams are read.
+                $serialized = serialize($saved);
+            } catch (Throwable) {
+                return null;
+            }
+            $this->resumableCalls[$id] = ['kind' => $kind, 'method' => $method, 'args' => $serialized, 'time' => time()];
+        }
+        return $id;
     }
 
     /**
@@ -97,8 +162,19 @@ trait ResumableCalls
      */
     private function resumeCalls(): void
     {
+        if (!$this->settings->getFiles()->getResumeInterruptedCalls()) {
+            foreach ($this->resumableCalls as $call) {
+                $this->logger->logger("Not resuming interrupted {$call['method']} call, resuming interrupted calls is disabled", Logger::WARNING);
+            }
+            $this->resumableCalls = [];
+            return;
+        }
         $expired = time() - self::UPLOAD_RESUME_TTL;
         foreach ($this->resumableCalls as $id => $call) {
+            if (isset($this->runningResumableCalls[$id])) {
+                // Already made again by an IPC client.
+                continue;
+            }
             if ($call['time'] < $expired) {
                 $this->logger->logger("Not resuming interrupted {$call['method']} call, it is too old", Logger::WARNING);
                 unset($this->resumableCalls[$id]);
@@ -107,12 +183,25 @@ trait ResumableCalls
             $this->logger->logger("Resuming interrupted {$call['method']} call", Logger::NOTICE);
             EventLoop::queue(function () use ($id, $call): void {
                 try {
+                    $args = unserialize($call['args']);
+                    \assert(\is_array($args));
                     if ($call['kind'] === 'sendMedia') {
-                        $result = $this->sendMedia(...$call['args'] + ['callback' => null, 'cancellation' => null]);
+                        /** @psalm-suppress MixedArgument */
+                        $result = $this->sendMedia(...$args + ['callback' => null, 'cancellation' => null]);
                     } else {
-                        $result = $this->methodCallAsyncRead($call['method'], $call['args']);
+                        $result = $this->methodCallAsyncRead($call['method'], $args);
                     }
-                    $message = $result instanceof Message ? " (message {$result->id} in chat {$result->chatId})" : '';
+                    $message = '';
+                    if ($result instanceof Message) {
+                        $message = " (message {$result->id} in chat {$result->chatId})";
+                    } elseif (\is_array($result) && \in_array($result['_'] ?? null, ['updates', 'updateShortSentMessage', 'updatesCombined'], true)) {
+                        try {
+                            $sent = $this->extractMessage($result);
+                            $message = " (message {$sent['id']} in chat {$this->getId($sent['peer_id'])})";
+                        } catch (Throwable) {
+                            // Not a call sending a message.
+                        }
+                    }
                     $this->logger->logger("Resumed interrupted {$call['method']} call$message", Logger::NOTICE);
                 } catch (RPCErrorException $e) {
                     if ($e->rpc === 'RANDOM_ID_DUPLICATE') {
@@ -120,6 +209,9 @@ trait ResumableCalls
                     } else {
                         $this->logger->logger("Could not resume interrupted {$call['method']} call: $e", Logger::ERROR);
                     }
+                } catch (UploadResumeException $e) {
+                    // Nobody is waiting for the result of a resumed call.
+                    $this->report("Could not resume interrupted {$call['method']} call, the file was not sent: $e");
                 } catch (Throwable $e) {
                     $this->logger->logger("Could not resume interrupted {$call['method']} call: $e", Logger::ERROR);
                 } finally {
@@ -166,51 +258,59 @@ trait ResumableCalls
      * Choose the random IDs of a method call beforehand, so that they're saved with it.
      *
      * @param array<array-key, mixed> $args
+     *
+     * @return bool Whether the call has random IDs.
      */
-    private function fillRandomIds(string $method, array &$args): void
+    private function fillRandomIds(string $method, array &$args): bool
     {
+        $found = false;
         $info = $this->getTL()->getMethods()->findByMethod($method);
         if ($info !== false) {
-            self::fillRandomId($info['params'], $args);
+            $found = self::fillRandomId($info['params'], $args);
         }
         foreach ($args as &$arg) {
             if (\is_array($arg)) {
-                $this->fillNestedRandomIds($arg, 0);
+                $found = $this->fillNestedRandomIds($arg, 0) || $found;
             }
         }
+        return $found;
     }
 
     /**
      * @param array<array-key, mixed> $args
      */
-    private function fillNestedRandomIds(array &$args, int $depth): void
+    private function fillNestedRandomIds(array &$args, int $depth): bool
     {
         if ($depth >= 5) {
-            return;
+            return false;
         }
+        $found = false;
         if (isset($args['_']) && \is_string($args['_'])) {
             $info = $this->getTL()->getConstructors()->findByPredicate($args['_']);
             if ($info !== false) {
-                self::fillRandomId($info['params'], $args);
+                $found = self::fillRandomId($info['params'], $args);
             }
         }
         foreach ($args as &$arg) {
             if (\is_array($arg)) {
-                $this->fillNestedRandomIds($arg, $depth + 1);
+                $found = $this->fillNestedRandomIds($arg, $depth + 1) || $found;
             }
         }
+        return $found;
     }
 
     /**
      * @param list<array{name: string, type: string, ...}> $params
      * @param array<array-key, mixed> $args
      */
-    private static function fillRandomId(array $params, array &$args): void
+    private static function fillRandomId(array $params, array &$args): bool
     {
         foreach ($params as $param) {
-            if ($param['name'] === 'random_id' && $param['type'] === 'long' && !isset($args['random_id'])) {
-                $args['random_id'] = Tools::randomInt();
+            if ($param['name'] === 'random_id' && $param['type'] === 'long') {
+                $args['random_id'] ??= Tools::randomInt();
+                return true;
             }
         }
+        return false;
     }
 }

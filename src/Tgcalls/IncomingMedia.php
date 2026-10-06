@@ -17,15 +17,20 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
+use Amp\CancelledException;
+use Amp\Future;
 use Amp\Pipeline\ConcurrentIterator;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
-use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
+
+use function Amp\async;
+use function Amp\Future\awaitAll;
 
 /**
  * The incoming media of one party of a call: which streams they send, in which codecs, and the
@@ -85,6 +90,8 @@ final class IncomingMedia implements RecordingObserver
     /** @var array<string, int> The slot of each video track, by the same key. */
     private array $videoSlots = [];
     private ?ConcurrentIterator $audioConsumer = null;
+    /** @var array<int, Future<void>> The loops draining the tracks, which end with their track. */
+    private array $drains = [];
     /** @var array<string, ConcurrentIterator> */
     private array $videoConsumers = [];
     private bool $closed = false;
@@ -115,7 +122,7 @@ final class IncomingMedia implements RecordingObserver
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
-        unset($vars['audioConsumer'], $vars['videoConsumers']);
+        unset($vars['audioConsumer'], $vars['videoConsumers'], $vars['drains']);
         if ($this->recorder?->file === null) {
             unset($vars['recorder']);
         }
@@ -141,6 +148,34 @@ final class IncomingMedia implements RecordingObserver
         }
         $this->audioConsumer = null;
         $this->videoConsumers = [];
+        $this->drains = [];
+    }
+
+    /**
+     * Start a loop draining a track.
+     *
+     * @param \Closure(): void $loop
+     */
+    private function drain(\Closure $loop): void
+    {
+        $future = async($loop);
+        $id = spl_object_id($future);
+        $this->drains[$id] = $future;
+        $future->finally(function () use ($id): void {
+            unset($this->drains[$id]);
+        })->ignore();
+    }
+
+    /**
+     * Wait for the frames still queued in the tracks to be routed, once the tracks were stopped.
+     */
+    public function finishDraining(float $timeout): void
+    {
+        try {
+            awaitAll($this->drains, new TimeoutCancellation($timeout));
+        } catch (CancelledException) {
+            // Whatever wasn't routed in time is dropped.
+        }
     }
 
     /**
@@ -167,12 +202,12 @@ final class IncomingMedia implements RecordingObserver
         }
         if ($this->audioTrack !== null && $this->audioConsumer === null) {
             $this->audioConsumer = $this->audioTrack->getConsumer();
-            EventLoop::queue($this->drainAudio(...));
+            $this->drain($this->drainAudio(...));
         }
         foreach ($this->videoTracks as $key => $track) {
             if (!isset($this->videoConsumers[$key])) {
                 $this->videoConsumers[$key] = $track->getConsumer();
-                EventLoop::queue(fn () => $this->drainVideo($key));
+                $this->drain(fn () => $this->drainVideo($key));
             }
         }
     }
@@ -354,7 +389,7 @@ final class IncomingMedia implements RecordingObserver
             }
             $this->audioTrack = $track;
             $this->audioConsumer = $track->getConsumer();
-            EventLoop::queue($this->drainAudio(...));
+            $this->drain($this->drainAudio(...));
             return;
         }
         $key = $slot.':'.self::sourceOf($track);
@@ -364,7 +399,7 @@ final class IncomingMedia implements RecordingObserver
         $this->videoTracks[$key] = $track;
         $this->videoSlots[$key] = $slot;
         $this->videoConsumers[$key] = $track->getConsumer();
-        EventLoop::queue(fn () => $this->drainVideo($key));
+        $this->drain(fn () => $this->drainVideo($key));
     }
 
     private function drainAudio(): void

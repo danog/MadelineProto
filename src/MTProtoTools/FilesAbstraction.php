@@ -48,10 +48,11 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\ResumableDownloadStream;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\StreamDuplicator;
 use danog\MadelineProto\TL\Types\Bytes;
-use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Tools;
 use finfo;
 use Webmozart\Assert\Assert;
@@ -1455,19 +1456,15 @@ trait FilesAbstraction
             /** @psalm-suppress MixedArgument */
             return $this->sendMediaInternal(...$args);
         }
-        $resumableCall = null;
-        if (!$uploadOnly && $peer !== null && !DialogId::isSecretChat($this->getId($peer))) {
-            // Interrupted sends are resumed after a restart: choose the random ID beforehand,
-            // so that it's saved with the call, and the message isn't sent twice.
-            $args['randomId'] = $randomId ?? Tools::randomInt();
-            $resumableCall = $this->registerResumableCall('sendMedia', 'sendMedia', $args);
-        }
-        try {
+        if ($uploadOnly || $peer === null || DialogId::isSecretChat($this->getId($peer))) {
             /** @psalm-suppress MixedArgument */
             return $this->sendMediaInternal(...$args);
-        } finally {
-            $this->unregisterResumableCall($resumableCall);
         }
+        // Interrupted sends are resumed after a restart: choose the random ID beforehand,
+        // so that it's saved with the call, and the message isn't sent twice.
+        $args['randomId'] = $randomId ?? Tools::randomInt();
+        /** @psalm-suppress MixedArgument */
+        return $this->makeResumableCall('sendMedia', 'sendMedia', $args, fn (array $args) => $this->sendMediaInternal(...$args));
     }
 
     /**
@@ -1861,6 +1858,8 @@ trait FilesAbstraction
             'media' => $media,
             'random_id' => $randomId,
             'cancellation' => $cancellation,
+            // Already resumed as a whole by sendMedia().
+            'resumable' => false,
         ];
         if ($ttl) {
             if ($uploadOnly) {
@@ -1919,6 +1918,10 @@ trait FilesAbstraction
         if ($stream instanceof ResumableStream) {
             // Before anything is read from it.
             $resumeKey = 'stream:'.serialize($stream);
+        }
+        if (!$size && $stream instanceof ResumableDownloadStream) {
+            // Uploads can only be resumed if their size is known.
+            $size = $stream->getRemainingSize() ?? 0;
         }
         return $stream;
     }

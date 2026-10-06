@@ -220,6 +220,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         $this->peerConnection = new RTCPeerConnection([
             'iceServers' => self::buildIceServers($connections),
         ]);
+        if (getenv('MP_RTC_DEBUG') === '1') {
+            // Route php-rtc's own debug output (ICE, DTLS, SRTP, SCTP, RTP routing) into the call log.
+            $this->peerConnection->setLogger(new RtcDebugLogger($call));
+        }
         $dj->setVideoCodecObserver($this);
         $this->outgoingAudio = new OpusPlaybackTrack($dj, $call);
         // In the structured dialects every channel is one-directional (see the class docs): our
@@ -409,6 +413,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     {
         if ($this->closed) {
             return;
+        }
+        if (getenv('MP_RTC_DEBUG') === '1') {
+            $this->peerConnection->setLogger(new RtcDebugLogger($this->call));
         }
         $this->outgoingAudio->resume();
         $this->outgoingVideo->resume();
@@ -1080,19 +1087,22 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         }
         $this->closed = true;
         try {
-            $this->media->close();
-        } catch (Throwable $e) {
-            // A recorder that cannot finish its file must not take the whole call down with it.
-            $this->call->log("Could not close the recording of {$this->call}: $e", Logger::WARNING);
-        }
-        try {
             $this->outgoingAudio->stop();
             $this->outgoingVideo->stop();
             $this->outgoingScreencast?->stop();
             $this->sctp?->close();
+            // Stops the receivers, which hand over the frames still in their jitter buffers.
             $this->peerConnection->close();
         } catch (Throwable $e) {
             $this->call->log("Got $e while closing the WebRTC connection of {$this->call}");
+        }
+        try {
+            // Record them before closing the recording.
+            $this->media->finishDraining(1.0);
+            $this->media->close();
+        } catch (Throwable $e) {
+            // A recorder that cannot finish its file must not take the whole call down with it.
+            $this->call->log("Could not close the recording of {$this->call}: $e", Logger::WARNING);
         }
     }
 
@@ -1783,8 +1793,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                     break;
                 case 'Candidates':
                     // The InstanceV2Impl dialect batches candidates into one message.
+                    // They belong to the single (bundled) transport, the one of the first media section: the
+                    // sdpMLineIndex we add for web clients refers to the media sections of the sender, which don't
+                    // match ours, as each party describes its own outgoing channels.
                     foreach ($message['candidates'] ?? [] as $candidate) {
-                        $this->onRemoteCandidate(['sdp' => $candidate['sdpString'] ?? '', 'mid' => '0', 'mline' => 0]);
+                        $this->onRemoteCandidate(['sdp' => $candidate['sdpString'] ?? '', 'mline' => 0]);
                     }
                     break;
                 default:
@@ -1828,8 +1841,9 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             return;
         }
         $candidate = RTCIceCandidate::parseSDP($sdp);
-        // The library keys candidates by a numeric mid, which is what tgcalls always generates.
-        $candidate->setSdpMid((int) ($message['mid'] ?? $message['mline'] ?? 0));
+        // All media sections share one transport (BUNDLE), so the m-line index is enough to place the candidate:
+        // the mids can't be used, as in the structured dialects ours are SSRCs, which the peer's candidates don't carry.
+        $candidate->setSdpMLineIndex((int) ($message['mline'] ?? 0));
         if (!$this->hasRemoteDescription) {
             $this->pendingCandidates[] = $candidate;
             return;

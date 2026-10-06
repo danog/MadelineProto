@@ -68,9 +68,9 @@ use danog\MadelineProto\MTProtoTools\MinDatabase;
 use danog\MadelineProto\MTProtoTools\PasswordCalculator;
 use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
-use danog\MadelineProto\MTProtoTools\ResumableCalls;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\ResponseInfo;
+use danog\MadelineProto\MTProtoTools\ResumableCalls;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
 use danog\MadelineProto\Reactive\Publisher;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
@@ -1284,11 +1284,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if ($this->event_handler_instance instanceof EventHandler
                 && $f = $this->event_handler_instance->waitForInternalStart()
             ) {
-                $f->map(function (): void {
-                    foreach ($this->updateQueue as $update) {
-                        $this->handleUpdate($update);
-                    }
-                });
+                $this->handlePostponedUpdates($f);
             }
             $this->cacheFullDialogs();
 

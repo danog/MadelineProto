@@ -31,6 +31,11 @@ final class WrappedCancellation
     private array $waiting = [];
 
     /**
+     * Whether the IPC connection was closed.
+     */
+    private bool $disconnected = false;
+
+    /**
      * @psalm-mutation-free
      */
     public function __construct(
@@ -57,6 +62,10 @@ final class WrappedCancellation
      */
     public function wait(): void
     {
+        if ($this->disconnected) {
+            // A wait request that was received right before the connection was closed.
+            return;
+        }
         $deferred = new DeferredFuture;
         $this->waiting[spl_object_id($deferred)] = $deferred;
         $id = $this->cancellation->subscribe(static function (CancelledException $e) use ($deferred): void {
@@ -79,6 +88,7 @@ final class WrappedCancellation
      */
     public function disconnect(): void
     {
+        $this->disconnected = true;
         $waiting = $this->waiting;
         $this->waiting = [];
         foreach ($waiting as $deferred) {

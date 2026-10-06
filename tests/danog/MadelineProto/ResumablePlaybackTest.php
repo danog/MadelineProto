@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\ReadableStreamIteratorAggregate;
@@ -68,6 +69,28 @@ final class ResumablePlaybackTest extends TestCase
             );
         }
         return self::element("\x18\x53\x80\x67", $info.$tracks.$clusters);
+    }
+
+    /**
+     * Build a Matroska file with a single cluster, where each VP8 keyframe (a second apart) is followed by a frame of a
+     * subtitle track, which is not transmitted.
+     */
+    private static function buildSingleClusterFile(): string
+    {
+        $video = self::element("\xD7", "\x01")            // TrackNumber = 1
+            .self::element("\x83", "\x01")                // TrackType = video
+            .self::element("\x86", 'V_VP8');               // CodecID
+        $subtitles = self::element("\xD7", "\x02")        // TrackNumber = 2
+            .self::element("\x83", "\x11")                // TrackType = subtitle
+            .self::element("\x86", 'S_TEXT/UTF8');         // CodecID
+        $tracks = self::element("\x16\x54\xAE\x6B", self::element("\xAE", $video).self::element("\xAE", $subtitles));
+        $info = self::element("\x15\x49\xA9\x66", self::element("\x2A\xD7\xB1", "\x0F\x42\x40"));
+        $blocks = self::element("\xE7", pack('n', 0));
+        for ($x = 0; $x < self::FRAMES; $x++) {
+            $blocks .= self::element("\xA3", "\x81".pack('n', $x * 1000)."\x80"."FRAME$x")
+                .self::element("\xA3", "\x82".pack('n', $x * 1000)."\x80"."SUBTITLE$x");
+        }
+        return self::element("\x18\x53\x80\x67", $info.$tracks.self::element("\x1F\x43\xB6\x75", $blocks));
     }
 
     /**
@@ -162,6 +185,102 @@ final class ResumablePlaybackTest extends TestCase
         self::assertSame([...self::expected(), ...self::expected()], \array_slice($played, 0, 2 * self::FRAMES));
     }
 
+    public function testDroppedFramesAreSkippedWhenResumingMidCluster(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play(new ChunkedResumableStream(self::buildSingleClusterFile(), 7));
+        delay(0.1);
+        $played = self::pullAll($dj);
+        self::assertNotEmpty($played);
+        self::assertLessThan(self::FRAMES, \count($played), 'The whole file was read, nothing to resume');
+
+        $dj = self::restart($dj);
+        $dj->setPlaybackPosition(PHP_INT_MAX);
+        delay(0.1);
+        $played = [...$played, ...self::pullAll($dj)];
+
+        // No frame is played twice.
+        self::assertSame(self::expected(), $played);
+        $dj->discard();
+    }
+
+    public function testResumableHoldFilesSurviveARestartNextToAPlainStream(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->playOnHold(
+            new ChunkedResumableStream(self::buildFile(), 7),
+            new ReadableBuffer(self::buildFile()),
+            new ChunkedResumableStream(self::buildFile(), 7),
+        );
+        // The plain stream is dropped: the two resumable streams are played in a loop.
+        $dj = self::restart($dj);
+        $played = [];
+        for ($x = 0; $x < 20 && \count($played) < 3 * self::FRAMES; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.15);
+            $played = [...$played, ...self::pullAll($dj)];
+        }
+        $dj->discard();
+
+        self::assertSame([...self::expected(), ...self::expected(), ...self::expected()], \array_slice($played, 0, 3 * self::FRAMES));
+    }
+
+    public function testTheFirstPlayReadsTheQueuedStream(): void
+    {
+        // Its progress callback and cancellation are not serialized.
+        $file = self::buildFile();
+        $stream = new ChunkedResumableStream($file, 7);
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play($stream);
+        $played = [];
+        for ($x = 0; $x < 10 && \count($played) < self::FRAMES; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.1);
+            $played = [...$played, ...self::pullAll($dj)];
+        }
+        $dj->discard();
+
+        self::assertSame(self::expected(), $played);
+        self::assertSame(\strlen($file), $stream->getPosition());
+    }
+
+    public function testASkippedStreamIsClosed(): void
+    {
+        $stream = new ChunkedResumableStream(self::buildFile(), 7);
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play($stream);
+        delay(0.1);
+        self::assertNotEmpty(self::pullAll($dj));
+        self::assertFalse($stream->wasClosed());
+
+        $dj->skip();
+        delay(0.1);
+        self::assertTrue($stream->wasClosed());
+        $dj->discard();
+    }
+
+    public function testTheLoopCanBeSerializedWhileAPlainStreamIsProbed(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play(new ChunkedResumableStream(self::buildFile(), 7));
+        // Never written to: probing it suspends the reader.
+        $pipe = new Pipe(1);
+        $dj->play($pipe->getSource());
+        $probed = 'stream '.spl_object_id($pipe->getSource());
+        for ($x = 0; $x < 20 && $dj->getCurrent() !== $probed; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.1);
+            self::pullAll($dj);
+        }
+        self::assertSame($probed, $dj->getCurrent());
+
+        // The plain stream is dropped, instead of being serialized as the resumable stream before it.
+        $dj = self::restart($dj);
+        self::assertNull($dj->getCurrent());
+        $dj->discard();
+        $pipe->getSink()->close();
+    }
+
     public function testAPlainStreamDoesNotSurviveARestart(): void
     {
         $dj = new DjLoop(new ResumablePlaybackTestCall);
@@ -215,6 +334,16 @@ final class ChunkedResumableStream implements ReadableStream, ResumableStream, I
 
     private bool $closed = false;
     private DeferredFuture $onClose;
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function wasClosed(): bool
+    {
+        return $this->closed;
+    }
 
     public function __construct(private string $data, private int $chunkSize, private int $position = 0)
     {

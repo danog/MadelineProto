@@ -55,6 +55,7 @@ use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\UploadResumeException;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -478,7 +479,9 @@ trait FilesLogic
                         // When resuming an upload, the first parts were already uploaded.
                         while ($nextOffset < $offset) {
                             $skipped = $stream->read($cancellation, min($offset - $nextOffset, 1024 * 1024));
-                            \assert($skipped !== null);
+                            if ($skipped === null) {
+                                throw new UploadResumeException("Could not resume the upload: the file ended at offset $nextOffset, before the offset $offset to resume from, it changed since the upload was interrupted");
+                            }
                             $nextOffset += \strlen($skipped);
                         }
                         Assert::eq($offset, $nextOffset);
@@ -530,7 +533,11 @@ trait FilesLogic
                 return $result;
             };
             while ($skip > 0) {
-                $skip -= \strlen($read(min($skip, 1024 * 1024)));
+                $skipped = \strlen($read(min($skip, 1024 * 1024)));
+                if ($skipped === 0) {
+                    throw new UploadResumeException('Could not resume the upload: the stream ended at offset '.($offset - $skip).", before the offset $offset to resume from, it changed since the upload was interrupted");
+                }
+                $skip -= $skipped;
             }
             return $read($size);
         };

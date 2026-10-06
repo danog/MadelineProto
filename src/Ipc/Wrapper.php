@@ -124,6 +124,11 @@ final class Wrapper extends ClientAbstract
     {
         if (\is_object($callback) && $wrapObjects) {
             if ($callback instanceof Cancellation) {
+                if ($callback->isRequested()) {
+                    // The IPC server only learns about cancellations asynchronously: don't even start the call.
+                    $this->disconnect();
+                    $callback->throwIfRequested();
+                }
                 $callback = new WrappedCancellation($callback);
                 $this->cancellations[] = $callback;
             }

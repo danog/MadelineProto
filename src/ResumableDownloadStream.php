@@ -147,7 +147,7 @@ final class ResumableDownloadStream implements ReadableStream, ResumableStream, 
         if ($this->end !== -1) {
             return $this->end;
         }
-        /** @var mixed */
+
         $size = $this->media['size'] ?? null;
         return \is_int($size) && $size > 0 ? $size : null;
     }

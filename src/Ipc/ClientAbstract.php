@@ -119,6 +119,7 @@ abstract class ClientAbstract
                         $this->server->disconnect();
                     } catch (Throwable $e) {
                     }
+                    $requests = [];
                     try {
                         // Connect as soon as any server is listening, even if it was started by another process
                         [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session));
@@ -130,7 +131,15 @@ abstract class ClientAbstract
                         $requests = $this->requests;
                         $this->requests = [];
                         $this->id = 0;
-                        foreach ($requests as [$function, $arguments, $deferred]) {
+                        while ($requests) {
+                            [$function, $arguments, $deferred] = array_shift($requests);
+                            if ($arguments instanceof Wrapper) {
+                                // Its callbacks were connected to the previous server, which can't call them anymore.
+                                // (Interrupted uploads and sends are resumed by the server on its own.)
+                                $arguments->disconnect();
+                                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!"));
+                                continue;
+                            }
                             $id = $this->id++;
                             $this->requests[$id] = [$function, $arguments, $deferred];
                             $this->server->send([$function, $arguments]);
@@ -140,6 +149,11 @@ abstract class ClientAbstract
                         $this->logger('Resumed IPC queries!');
                     } catch (Throwable $e) {
                         $this->logger("Could not reconnect to IPC server: $e", Logger::FATAL_ERROR);
+                        // The requests that were not sent again yet are failed below, too
+                        /** @var array<int, list{string|int, array|Wrapper, DeferredFuture}> $requests */
+                        foreach ($requests as $request) {
+                            $this->requests[] = $request;
+                        }
                         // Fail future calls, and pending calls below, instead of leaving them hanging
                         $f->getFuture()->ignore();
                         $f->error($e);

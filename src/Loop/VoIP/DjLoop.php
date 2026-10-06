@@ -242,7 +242,7 @@ final class DjLoop extends VoIPLoop
             'instance' => $this->instance,
             'pause' => $this->pause,
             'inputFiles' => array_values(array_filter($inputFiles, static fn ($v) => !$v instanceof ReadableStream)),
-            'holdFiles' => array_filter($this->holdFiles, static fn ($v) => !$v instanceof ReadableStream),
+            'holdFiles' => array_values(array_filter($this->holdFiles, static fn ($v) => !$v instanceof ReadableStream)),
             'holdIndex' => $this->holdIndex,
             'playingHold' => $this->playingHold,
             'oggQueue' => $this->oggQueue,
@@ -567,10 +567,14 @@ final class DjLoop extends VoIPLoop
                     Tools::sleep(0.1);
                     continue;
                 }
-                $this->streamCurrentFile();
+                $played = $this->streamCurrentFile();
                 $this->currentFile = null;
                 $this->currentKind = null;
                 $this->currentDesc = null;
+                if (!$played && $this->playingHold) {
+                    // Hold files are played in a loop: don't retry one that keeps failing in a tight loop.
+                    Tools::sleep(1);
+                }
             }
         } catch (Throwable $e) {
             $this->instance->log("DJ reader stopped in {$this}: $e", Logger::ERROR);
@@ -605,6 +609,8 @@ final class DjLoop extends VoIPLoop
         $this->currentDesc = $file instanceof ReadableStream || $file instanceof StreamSnapshot ? 'stream '.spl_object_id($file) : $file;
         $this->finishedCurrent = false;
         if (!$resuming) {
+            // Until the new file is probed, it can't be resumed.
+            $this->currentResumable = false;
             $this->resumeOffset = 0;
             $this->resumeSkip = 0;
             $this->resumeUnitOffset = -1;
@@ -616,7 +622,10 @@ final class DjLoop extends VoIPLoop
         }
     }
 
-    private function streamCurrentFile(): void
+    /**
+     * @return bool Whether the file could be played (even if it was skipped).
+     */
+    private function streamCurrentFile(): bool
     {
         $generation = ++$this->generation;
         $this->readerCancel = new DeferredCancellation;
@@ -624,6 +633,7 @@ final class DjLoop extends VoIPLoop
         $item = $this->currentFile;
         \assert($item !== null);
         $resuming = $this->currentKind !== null; // set only when resuming from __unserialize
+        $file = null;
         try {
             // A snapshotted resumable stream is reopened from the start of the item on every play.
             $file = $item instanceof StreamSnapshot ? $item->open() : $item;
@@ -640,12 +650,18 @@ final class DjLoop extends VoIPLoop
             // Skipped or discarded: the next file (if any) starts on the next loop turn.
         } catch (Throwable $e) {
             $this->instance->log("Could not play {$this->describe($item)} in {$this}: $e", Logger::ERROR);
+            return false;
         } finally {
+            if ($item instanceof StreamSnapshot && $file instanceof ReadableStream) {
+                // Stop the download, if the stream was skipped before its end.
+                $file->close();
+            }
             if ($generation === $this->generation) {
                 $this->finishedCurrent = true;
                 $this->wakePacketWaiters();
             }
         }
+        return true;
     }
 
     /**
@@ -783,8 +799,9 @@ final class DjLoop extends VoIPLoop
                 $skip--;
                 continue;
             }
+            // Dropped frames are counted too, as the skip above counts all frames of the unit.
+            $this->trackResume($unit);
             if ($this->pushFrame($frame)) {
-                $this->trackResume($unit);
                 $this->wakePacketWaiters();
                 $this->throttle($generation, $cancellation);
             }
