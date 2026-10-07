@@ -84,8 +84,6 @@ trait GroupMediaTrait
     /** Directory into which every transmitting participant is recorded, or null if not in folder mode. */
     private ?string $outputDir = null;
     private RecordingFormat $outputFormat = RecordingFormat::Mkv;
-    /** @var array<int, true> Peer IDs already wired to a per-participant file series in folder mode. */
-    private array $folderPeers = [];
 
     /* ------------------------------------------------------------------ *
      *  What the using class provides.
@@ -482,7 +480,6 @@ trait GroupMediaTrait
         $this->configureConnection($connection, false);
         $connection->adoptIncomingMedia($this->inheritedMedia);
         $this->inheritedMedia = [];
-        $this->folderPeers = [];
         return $connection;
     }
 
@@ -636,11 +633,12 @@ trait GroupMediaTrait
 
     /**
      * In folder mode, give a transmitting (non-self) participant its own `<dir>/<peerId>.<n>_<streams>.mkv`
-     * file series, once each. Called whenever a participant's source becomes known.
+     * file series, unless they are already being recorded: a participant that left (which finished its
+     * recording) and joined again continues the series. Called whenever a participant's source becomes known.
      */
     private function wireFolderOutput(int $peerId): void
     {
-        if ($this->outputDir === null || $this->connection === null || isset($this->folderPeers[$peerId])
+        if ($this->outputDir === null || $this->connection === null
             || isset($this->explicitOutputs[$peerId]) // an explicit per-participant output takes precedence
         ) {
             return;
@@ -649,7 +647,6 @@ trait GroupMediaTrait
         if ($source === 0) {
             return;
         }
-        $this->folderPeers[$peerId] = true;
         if ($this->connection->isRecording($source)) {
             return; // Carried over from the previous connection, or an explicit recording.
         }

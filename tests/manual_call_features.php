@@ -47,20 +47,22 @@
  * result files for verification — never to record; all recording and muxing is pure PHP.
  *
  * Set CALL_TEST_LOG=<file> to get a verbose MadelineProto log of the call in that file.
+ * Set CALL_TEST_NOTIFY=<user> to also send group call and conference invite links to that user via Telegram.
  */
 
+use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
-use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
+use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
-use danog\MadelineProto\GroupCall;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Matroska;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MultiCall;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tgcalls\E2E\Crypto;
 use danog\MadelineProto\Tools;
@@ -142,19 +144,19 @@ function reportDerivedCodec(string $file): void
     info('No transmittable video track found in '.$file);
 }
 
-/** The segment files of a recording requested as `$base` (`name.mkv` → `name.<n>_<streams>.mkv`). */
-function segments(string $base): array
+/** The segment files of a folder recording (`<dir>/<n>_<streams>.mkv`). */
+function segments(string $dir): array
 {
-    $files = glob(substr($base, 0, -4).'.*_*.mkv') ?: [];
+    $files = glob($dir.'/*.mkv') ?: [];
     natsort($files);
     return array_values($files);
 }
 
-/** Inspect a recording (every segment) with ffprobe (verification only). */
-function inspect(string $base): void
+/** Inspect a folder recording (every segment) with ffprobe (verification only). */
+function inspect(string $dir): void
 {
     clearstatcache();
-    $files = segments($base);
+    $files = segments($dir);
     if ($files === []) {
         info('⚠️  No segment files — the peer may not have transmitted media.');
         return;
@@ -185,6 +187,34 @@ function startApi(string $session): API
     $API = new API($session, $settings);
     $API->start();
     return $API;
+}
+
+/** Print a call invite link and, if CALL_TEST_NOTIFY is set, send it to that user via Telegram. */
+function shareLink(API $API, string $what, string $link): void
+{
+    info("$what link: $link");
+    $peer = getenv('CALL_TEST_NOTIFY');
+    if (is_string($peer) && $peer !== '') {
+        $API->sendMessage(peer: $peer, message: "MadelineProto call test — $what: $link");
+        info("Sent the link to $peer via Telegram.");
+    }
+}
+
+/** A group call's invite link; private chats have none, so point to the chat instead. */
+function groupCallLink(API $API, GroupCall $call, string|int $chat): string
+{
+    try {
+        return $call->exportInvite();
+    } catch (RPCErrorException $e) {
+        if ($e->rpc !== 'PUBLIC_CHANNEL_MISSING') {
+            throw $e;
+        }
+    }
+    $id = $API->getId($chat);
+    if (DialogId::isSupergroupOrChannel($id)) {
+        return 'https://t.me/c/'.DialogId::toSupergroupOrChannelId($id).'?videochat';
+    }
+    return 'join the video chat of the private group "'.($API->getInfo($chat)['Chat']['title'] ?? $chat).'"';
 }
 
 /** Poll a call's state reactively until it matches, or the deadline passes. */
@@ -254,7 +284,7 @@ switch ($mode) {
             exit(2);
         }
         $m = modeInfo($media);
-        $out = __DIR__.'/../incoming_1to1_'.$media.'.mkv';
+        $out = __DIR__.'/../incoming_1to1_'.$media;
 
         box("TEST: 1:1 CALL — $m[desc]");
         if ($m['needsVideoFile']) {
@@ -298,9 +328,8 @@ switch ($mode) {
                 exit(1);
             }
             info('Connected ✅');
-            info('Recording the incoming camera/mic into '.$out);
-            $streams = $call->setOutput(new LocalFile($out));
-            info('The peer currently sends '.CallStream::describe($streams).': the file keeps exactly these tracks, a stream turned off just pauses; only a codec change or the end of the call finishes it.');
+            info('Recording the incoming media into '.$out.'/<n>_<streams>.mkv, a new file for every change of what the peer sends');
+            $call->setOutputFolder(new LocalDirectory($out));
             $emojis = $call->getVisualization();
             if ($emojis !== null) {
                 info('Call verification emojis (compare with the peer): '.implode(' ', $emojis));
@@ -357,10 +386,12 @@ switch ($mode) {
                 info('Nothing is playing any more: starting the transmission again.');
                 transmit($call, $m, $file);
             }
+            shareLink($API, 'Group call', groupCallLink($API, $call, $arg));
             click('Nothing to do. Ctrl-C detaches (call keeps running); recordings keep growing.');
         } else {
             /** @var GroupCall $call */
             $call = $API->joinGroupCall($arg);
+            shareLink($API, 'Group call', groupCallLink($API, $call, $arg));
             click('Open the SAME group call on one or more OTHER accounts, JOIN, and transmit ('.$m['desc'].').');
             transmit($call, $m, $file);
             info('Recording every transmitting participant into '.$dir.'/<peerId>.<n>_<streams>.mkv');
@@ -376,7 +407,7 @@ switch ($mode) {
         while (in_array($call->getCallState(), [GroupCallState::JOINED, GroupCallState::JOINING], true)) {
             if (microtime(true) - $lastReport > 5) {
                 $files = glob($dir.'/*.mkv') ?: [];
-                info('… joined; '.count($files).' segment file(s) in '.$dir);
+                info('… '.$call->getCallState()->name.'; '.count($files).' segment file(s) in '.$dir);
                 $lastReport = microtime(true);
             }
             Tools::sleep(1.0);
@@ -412,12 +443,13 @@ switch ($mode) {
         info('Creating a new end-to-end encrypted conference call…');
         $call = $API->createConferenceCall();
         transmit($call, $m, $file);
+        $dir = conferenceRecordings($call, $media);
         $link = $call->exportInvite();
         box('SHARE THIS LINK WITH THE OTHER ACCOUNT TO JOIN');
-        info("Conference link: $link");
+        shareLink($API, 'E2E conference', $link);
         info('Open it in any official client, or run on another MadelineProto session:');
         info("  php tests/manual_call_features.php conference-join $link $media [file] [other-session]");
-        runConference($call, $media);
+        runConference($call, $media, $dir);
         break;
 
     case 'conference-join':
@@ -452,7 +484,7 @@ switch ($mode) {
             $call = $API->joinConferenceCallBySlug($slug);
             transmit($call, $m, $file);
         }
-        runConference($call, $media);
+        runConference($call, $media, conferenceRecordings($call, $media));
         break;
 
     default:
@@ -495,7 +527,16 @@ function conferenceSlug(string $link): string
     return trim($link, "/ \t\n");
 }
 
-function runConference(ConferenceCall $call, string $media): void
+/** Record every transmitting conference participant into conference_recordings_<mode>/ (resumes on re-attach). */
+function conferenceRecordings(ConferenceCall $call, string $media): string
+{
+    $dir = __DIR__.'/../conference_recordings_'.$media;
+    info('Recording every transmitting participant into '.$dir.'/<peerId>.<n>_<streams>.mkv');
+    $call->setOutputFolder(new LocalDirectory($dir));
+    return $dir;
+}
+
+function runConference(ConferenceCall $call, string $media, string $dir): void
 {
     $ask = match ($media) {
         'audio' => 'you HEAR our audio',
@@ -521,11 +562,19 @@ function runConference(ConferenceCall $call, string $media): void
     while ($call->isJoined()) {
         if (microtime(true) - $lastReport > 5) {
             $emojis = $call->getVisualization();
-            info('… in conference; emojis: '.($emojis !== null ? implode(' ', $emojis) : 'pending'));
+            $files = glob($dir.'/*.mkv') ?: [];
+            info('… in conference; emojis: '.($emojis !== null ? implode(' ', $emojis) : 'pending').'; '.count($files).' segment file(s) in '.$dir);
             $lastReport = microtime(true);
         }
         Tools::sleep(1.0);
     }
     box('CONFERENCE ENDED');
+    $files = glob($dir.'/*.mkv') ?: [];
+    if ($files === []) {
+        info('⚠️  No per-participant files — did anyone else actually transmit?');
+    }
+    foreach ($files as $f) {
+        info(basename($f).' — '.number_format((int) filesize($f)).' bytes');
+    }
     info('Expect: the peer saw/heard the '.$media.' stream (all E2E-encrypted) and the emojis matched.');
 }

@@ -32,21 +32,31 @@ final class IncomingMediaTest extends TestCase
 {
     /** @var list<array{int, array<int, string>, ?RecordingEvent, ?string}> */
     private array $events = [];
+    /** @var list<int> The sources a keyframe was requested of. */
+    private array $keyframeRequests = [];
     private IncomingMedia $media;
     private string $file;
 
     protected function setUp(): void
     {
         $this->events = [];
+        $this->keyframeRequests = [];
         $this->file = sys_get_temp_dir().'/rec_'.bin2hex(random_bytes(4)).'.mkv';
-        $observer = new class($this->events) implements IncomingMediaObserver {
-            /** @param list<array{int, array<int, string>, ?RecordingEvent, ?string}> $events */
-            public function __construct(private array &$events)
+        $observer = new class($this->events, $this->keyframeRequests) implements IncomingMediaObserver {
+            /**
+             * @param list<array{int, array<int, string>, ?RecordingEvent, ?string}> $events
+             * @param list<int>                                                      $keyframeRequests
+             */
+            public function __construct(private array &$events, private array &$keyframeRequests)
             {
             }
             public function onIncomingMediaChanged(IncomingMedia $media, ?RecordingEvent $recording, ?LocalFile $file): void
             {
                 $this->events[] = [$media->getAvailable(), $media->getCodecs(), $recording, $file !== null ? basename($file->file) : null];
+            }
+            public function onKeyframeNeeded(IncomingMedia $media, int $source): void
+            {
+                $this->keyframeRequests[] = $source;
             }
         };
         $this->media = new IncomingMedia($observer);
@@ -104,6 +114,23 @@ final class IncomingMediaTest extends TestCase
             [CallStream::AUDIO, [CallStream::AUDIO => 'A_OPUS'], RecordingEvent::Ended, basename($this->file)],
         ], $this->events);
         $this->assertFileExists($this->file);
+    }
+
+    public function testARecordingStartingMidStreamAsksForAKeyframe(): void
+    {
+        $this->media->setExpected(audio: false, video: true, presentation: false);
+        $this->media->recordFixed(new LocalFile($this->file), RecordingFormat::Mkv, CallStream::VIDEO);
+        // The track is joined mid-GOP: its frames are useless until a keyframe, so one is asked for,
+        // only once in a while however many frames are dropped meanwhile.
+        $this->media->pushVideoFrame(self::vp8(false), 0, 10);
+        $this->media->pushVideoFrame(self::vp8(false), 3000, 10);
+        $this->media->pushVideoFrame(self::vp8(false), 0, 11);
+        $this->assertSame([10, 11], $this->keyframeRequests);
+        // Once the keyframe arrived, nothing more is needed.
+        $this->media->pushVideoFrame(self::vp8(true), 6000, 10);
+        $this->media->pushVideoFrame(self::vp8(false), 9000, 10);
+        $this->assertSame([10, 11], $this->keyframeRequests);
+        $this->media->close();
     }
 
     public function testCloseFinishesTheRecording(): void

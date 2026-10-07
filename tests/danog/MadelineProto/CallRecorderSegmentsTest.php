@@ -44,6 +44,12 @@ final class CallRecorderSegmentsTest extends TestCase
         }
     }
 
+    /** A synthetic VP9 frame: frame marker 0b10, profile 0, and a keyframe (frame_type 0) or not. */
+    private static function vp9(bool $keyframe): string
+    {
+        return ($keyframe ? "\x82" : "\x86")."\x49\x83\x42\x00\x01\x3f\x00\xb3".str_repeat('v', 30);
+    }
+
     /** A synthetic VP8 frame: a keyframe carries the start code and picture size. */
     private static function vp8(bool $keyframe, int $width = 320, int $height = 180): string
     {
@@ -159,17 +165,20 @@ final class CallRecorderSegmentsTest extends TestCase
         $recorder->setExpected(audio: false, video: true, presentation: false);
         $recorder->pushVideoFrame(self::vp8(true), 0, 1);
         $recorder->pushVideoFrame(self::vp8(false), 3000, 1);
-        // The camera is turned off and on: a new track, and a bigger picture — a new segment.
-        $recorder->pushVideoFrame(self::vp8(false), 6000, 2); // the new track's inter frame: not yet
-        $this->assertFileDoesNotExist($this->segment(1, 'video'));
+        // A new track (a simulcast layer switch, or the camera turned off and on) with a bigger
+        // picture: decoders take the size from the bitstream, so the segment continues.
+        $recorder->pushVideoFrame(self::vp8(false), 6000, 2); // the new track's inter frame: dropped
         $recorder->pushVideoFrame(self::vp8(true, 1280, 720), 9000, 2);
+        $this->assertFileDoesNotExist($this->segment(1, 'video'));
+        // Another codec: a Matroska track cannot change it, so a new segment.
+        $recorder->pushVideoFrame(self::vp9(false), 12000, 3); // the new track's inter frame: dropped
+        $this->assertFileDoesNotExist($this->segment(1, 'video'));
+        $recorder->pushVideoFrame(self::vp9(true), 15000, 3);
         $this->assertFileExists($this->segment(1, 'video'));
-        // Same size and codec again on yet another track: the segment continues.
-        $recorder->pushVideoFrame(self::vp8(true, 1280, 720), 20000, 3);
         $recorder->close();
         $this->assertFileDoesNotExist($this->segment(2, 'video'));
-        $this->assertSame(2, self::describe($this->segment(0, 'video'))['frames']);
-        $this->assertSame(2, self::describe($this->segment(1, 'video'))['frames']);
+        $this->assertSame(3, self::describe($this->segment(0, 'video'))['frames']);
+        $this->assertSame(1, self::describe($this->segment(1, 'video'))['frames']);
     }
 
     public function testDirectoryStemAndNothingRecorded(): void

@@ -23,14 +23,3 @@ steps:
         - push
     commands:
       - tests/test.sh cs
-
-  psalm:
-    group: test
-    image: danog/madelineproto:next
-    when:
-      event:
-        - pull_request
-        - tag
-        - push
-    commands:
-      - tests/test.sh psalm

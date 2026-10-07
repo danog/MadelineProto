@@ -35,4 +35,13 @@ interface IncomingMediaObserver
      * @psalm-impure
      */
     public function onIncomingMediaChanged(IncomingMedia $media, ?RecordingEvent $recording, ?LocalFile $file): void;
+
+    /**
+     * The recording needs a keyframe of an incoming video track: ask its sender for one (RTCP PLI).
+     *
+     * @param int $source The track, as given by {@see IncomingMedia::sourceOf()}.
+     *
+     * @psalm-impure
+     */
+    public function onKeyframeNeeded(IncomingMedia $media, int $source): void;
 }

@@ -45,7 +45,8 @@ use danog\MadelineProto\RecordingFormat;
  *    closed for good;
  *  - a *series* recorder ({@see self::series()}) follows every change instead: whenever the set of
  *    flowing streams changes (a stream starts or stops, or a video stream comes back with another
- *    codec or picture size), the current file is closed and a new one is opened, whose tracks are
+ *    codec; not merely another picture size, which decoders follow from the bitstream), the current
+ *    file is closed and a new one is opened, whose tracks are
  *    exactly the streams flowing from then on. Segment files are named `<stem>.<n>_<streams>.mkv`
  *    (or `.webm`): `n` counts from 0 and `streams` lists what the file holds — `audio`, `video`
  *    (the camera) and `screen`, joined by commas — so `dir/123` yields `dir/123.0_audio.mkv`,
@@ -342,6 +343,7 @@ final class CallRecorder
             // its frames before that keyframe are useless.
             if (!$keyframe) {
                 unset($this->sources[$slot]);
+                $this->observer?->onKeyframeNeeded($this, $source);
                 return;
             }
             [$codecId, $width, $height, $private] = self::describeVideo($data);
@@ -351,13 +353,15 @@ final class CallRecorder
                 $this->described[$slot] = $description;
                 [$out, $keyframe] = self::transformVideo($data, $codecId);
                 $declared = $this->started ? $this->writer?->getVideoTrack($slot) : null;
-                if ($declared !== null && $declared !== $description) {
+                // A Matroska track cannot change codec. A new picture size (a camera turned off and
+                // on again, a simulcast layer switch) is fine, though: decoders take it from the
+                // bitstream, whose keyframes keep their parameter sets (see transformVideo()).
+                if ($declared !== null && $declared['codecId'] !== $codecId) {
                     if ($this->series) {
-                        // Another codec or size than the open segment declares: it needs a new segment.
+                        // A new segment, with a track of the new codec.
                         $this->rollPending = true;
-                    } elseif ($declared['codecId'] !== $codecId) {
-                        // A Matroska track cannot change codec: the file is finished here. (A new
-                        // picture size is fine: decoders take it from the bitstream.)
+                    } else {
+                        // The file is finished here.
                         Logger::log('The '.CallStream::NAMES[$slot].' stream of the recording '.($this->file?->file ?? 'stream')." changed codec from {$declared['codecId']} to $codecId: finishing the file", Logger::NOTICE);
                         $this->end();
                         return;
@@ -591,7 +595,7 @@ final class CallRecorder
         $same = $wanted === $current;
         foreach (self::VIDEO_SLOTS as $slot) {
             if ($same && isset($this->described[$slot]) && \in_array($slot, $wanted, true)
-                && $this->writer->getVideoTrack($slot) !== $this->described[$slot]
+                && ($this->writer->getVideoTrack($slot)['codecId'] ?? null) !== $this->described[$slot]['codecId']
             ) {
                 $same = false;
             }

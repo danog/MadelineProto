@@ -40,4 +40,14 @@ interface RecordingObserver
      * @psalm-impure
      */
     public function onRecordingEnded(CallRecorder $recorder, LocalFile|WritableStream $out): void;
+
+    /**
+     * The recorder dropped a video frame, since a track can only start on a keyframe: the sender
+     * should be asked for one, as on its own it sends one only every few seconds.
+     *
+     * @param int $source The source of the frame, as passed to {@see CallRecorder::pushVideoFrame()}.
+     *
+     * @psalm-impure
+     */
+    public function onKeyframeNeeded(CallRecorder $recorder, int $source): void;
 }

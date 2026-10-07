@@ -50,6 +50,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
      * depends on a hardcoded duration.
      */
     private const IDLE_POLL = 0.02;
+    /** The frame interval assumed when a file ends before its cadence was measured. */
+    private const DEFAULT_FRAME_INTERVAL = 1 / 30;
 
     /** Wall clock time corresponding to the first frame we released. */
     private ?float $startedAt = null;
@@ -57,7 +59,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private ?int $baseTimestamp = null;
     /** RTP timestamp offset, so restarting a file does not rewind the clock. */
     private int $timestampOffset = 0;
-    /** @var array{data: string, timestamp: int, keyframe: bool}|null The frame whose presentation time has not arrived yet. */
+    /** @var array{data: string, timestamp: int, keyframe: bool, file: int}|null The frame whose presentation time has not arrived yet. */
     private ?array $pending = null;
     /** RTP timestamp of the last frame we released. */
     private int $lastTimestamp = 0;
@@ -65,6 +67,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private ?int $prevSourceTimestamp = null;
     /** The current file's real inter-frame interval in seconds, measured from its own timestamps. */
     private ?float $frameInterval = null;
+    /** The DJ loop's ID of the file whose frames are being played, see {@see DjLoop::$videoQueue}. */
+    private ?int $file = null;
     /** Wall clock time at which the producer should next attempt to emit a frame. */
     private ?float $nextDue = null;
 
@@ -198,6 +202,22 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     }
 
     /**
+     * The file being played is over: the next one starts on a fresh clock, right after this one.
+     */
+    private function finishFile(): void
+    {
+        $this->playing = false;
+        $this->call->log("Finished playing video in {$this->call}");
+        // Keep the clock advancing so a new file starts one frame after, not on top of, this one:
+        // receivers assemble frames by RTP timestamp.
+        $this->timestampOffset = $this->lastTimestamp + (int) (($this->frameInterval ?? self::DEFAULT_FRAME_INTERVAL) * DjLoop::VIDEO_CLOCK_RATE);
+        $this->startedAt = null;
+        $this->baseTimestamp = null;
+        $this->prevSourceTimestamp = null;
+        $this->frameInterval = null;
+    }
+
+    /**
      * Produce the next video frame, if its presentation time has arrived.
      */
     private function produce(): ?EncodedPacket
@@ -210,14 +230,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         $this->pending = null;
         if ($frame === null) {
             if ($this->playing && $this->source->isExhausted()) {
-                $this->playing = false;
-                $this->call->log("Finished playing video in {$this->call}");
-                // Keep the clock advancing so a new file starts after, not on top of, this one.
-                $this->timestampOffset = $this->lastTimestamp;
-                $this->startedAt = null;
-                $this->baseTimestamp = null;
-                $this->prevSourceTimestamp = null;
-                $this->frameInterval = null;
+                $this->finishFile();
             }
             // The queue momentarily ran dry. If a file is mid-flight, wait exactly one of its own
             // measured frame intervals so the retry tracks the file's real emission rate rather
@@ -227,8 +240,13 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             return null;
         }
 
+        if ($this->playing && $frame['file'] !== $this->file) {
+            // The next file was queued right behind this one, without the queue ever running dry.
+            $this->finishFile();
+        }
         $now = microtime(true);
         if ($this->startedAt === null || $this->baseTimestamp === null) {
+            $this->file = $frame['file'];
             $this->startedAt = $now;
             $this->baseTimestamp = $frame['timestamp'];
             $this->playing = true;

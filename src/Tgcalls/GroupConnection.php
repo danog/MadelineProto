@@ -697,6 +697,35 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     }
 
     /**
+     * A recording needs a keyframe of one of the incoming tracks: ask its sender for one. The SFU
+     * asks for one only when we subscribe, not when a recording starts on a stream already flowing
+     * (or after a restart, as it doesn't know about it).
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onKeyframeNeeded(IncomingMedia $media, int $source): void
+    {
+        if ($this->closed) {
+            return;
+        }
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            $receiver = $transceiver->getReceiver();
+            $track = $receiver->getTrack();
+            if (!$track instanceof RemoteStreamTrack || IncomingMedia::sourceOf($track) !== $source) {
+                continue;
+            }
+            $mid = $transceiver->getMid();
+            $ssrc = $mid !== null ? ($this->sources[$mid] ?? null) : null;
+            if ($ssrc !== null) {
+                $this->call->log("Asking source $ssrc of {$this->call} for a keyframe", Logger::VERBOSE);
+                $receiver->sendRtcpPli($ssrc);
+            }
+            return;
+        }
+    }
+
+    /**
      * A participant's streams or codecs changed, or a recording of them started or ended: pass it
      * on to the call, which surfaces it as an update.
      *

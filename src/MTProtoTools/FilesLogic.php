@@ -417,7 +417,7 @@ trait FilesLogic
      * Uploads of files and resumable streams are identified automatically.
      *
      * @param ?string                            $resumeKey Identifies the source of the file across restarts, see uploadFromCallable().
-     * @param ?(Closure(int): ?ReadableStream)   $reopenAt  Reopens the source at a byte offset, to resume without reading what was already uploaded; returns null if it can't.
+     * @param (Closure(int): ?ReadableStream)|null $reopenAt  Reopens the source at a byte offset, to resume without reading what was already uploaded; returns null if it can't.
      */
     private function uploadFromStreamInternal(mixed $stream, int $size, ?string $mime, string $fileName, ?callable $cb, bool $encrypted, ?Cancellation $cancellation, ?string $resumeKey = null, ?Closure $reopenAt = null): array
     {

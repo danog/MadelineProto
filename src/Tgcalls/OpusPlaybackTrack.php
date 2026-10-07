@@ -79,12 +79,14 @@ final class OpusPlaybackTrack extends MediaStreamTrack
     private ?int $webmBaseTimestamp = null;
     /** RTP timestamp the current WebM file was rebased onto. */
     private int $webmTimestampOffset = 0;
-    /** @var array{data: string, timestamp: int}|null The WebM frame whose presentation time has not arrived yet. */
+    /** @var array{data: string, timestamp: int, file: int}|null The WebM frame whose presentation time has not arrived yet. */
     private ?array $webmPending = null;
     /** Source timestamp of the previously released WebM frame, used to measure its cadence. */
     private ?int $webmPrevTimestamp = null;
     /** The current WebM file's real audio frame interval in seconds, from its own timestamps. */
     private ?float $webmFrameInterval = null;
+    /** The DJ loop's ID of the WebM file whose frames are being played, see {@see DjLoop::$webmAudioQueue}. */
+    private ?int $webmFile = null;
 
     private bool $muted = true;
     /** Whether the producer task is running, to keep {@see self::startProducing()} idempotent. */
@@ -257,10 +259,15 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         }
 
         $now = microtime(true);
-        if ($this->webmStartedAt === null || $this->webmBaseTimestamp === null) {
+        if ($this->webmStartedAt === null || $this->webmBaseTimestamp === null || $frame['file'] !== $this->webmFile) {
+            // The first frame of a file: pace it from now. The next file may follow without the
+            // queue ever running dry, so this must not wait for produce() to notice the previous one ended.
             $this->webmStartedAt = $now;
             $this->webmBaseTimestamp = $frame['timestamp'];
-            // Carry on from the DJ loop's clock, so that the RTP timestamps never rewind.
+            $this->webmFile = $frame['file'];
+            $this->webmPrevTimestamp = null;
+            $this->webmFrameInterval = null;
+            // Carry on from the DJ loop's clock (or the previous file's), so that the RTP timestamps never rewind.
             $this->webmTimestampOffset = $this->timestamp;
         }
 

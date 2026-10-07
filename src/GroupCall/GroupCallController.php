@@ -154,7 +154,14 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             Assert::true($this->presentationDj->start());
         }
         EventLoop::queue(function (): void {
-            if ($this->callState !== GroupCallState::JOINED && $this->callState !== GroupCallState::JOINING) {
+            if ($this->callState === GroupCallState::JOINING) {
+                // The process died in the middle of join(): its phone.joinGroupCall and the payload it
+                // carried are gone with it, and join() itself is a no-op while JOINING, so start over.
+                $this->log("Resumed $this in the middle of a join, joining again...", Logger::WARNING);
+                $this->rejoin();
+                return;
+            }
+            if ($this->callState !== GroupCallState::JOINED) {
                 return;
             }
             // The WebRTC connection restored itself and its transport to the SFU resumes on its own;

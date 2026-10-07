@@ -59,6 +59,8 @@ final class IncomingMedia implements RecordingObserver
     /** Granule increment assumed for an OPUS frame whose duration cannot be derived, and the longest one there is. */
     private const DEFAULT_FRAME_SAMPLES = 960;
     private const MAX_FRAME_SAMPLES = 5760;
+    /** How often to ask a sender for a keyframe at most, in seconds: the request or its answer may be lost. */
+    private const KEYFRAME_REQUEST_INTERVAL = 1.0;
 
     /**
      * Which streams the party is sending, as far as signaling tells: true on, false off, null unknown.
@@ -95,6 +97,8 @@ final class IncomingMedia implements RecordingObserver
     /** @var array<string, ConcurrentIterator> */
     private array $videoConsumers = [];
     private bool $closed = false;
+    /** @var array<int, float> When a keyframe was last requested, by source. */
+    private array $keyframeRequests = [];
 
     /**
      * @psalm-mutation-free
@@ -517,6 +521,17 @@ final class IncomingMedia implements RecordingObserver
     public function onRecordingStarted(CallRecorder $recorder, LocalFile|WritableStream $out): void
     {
         $this->report(RecordingEvent::Started, $out instanceof LocalFile ? $out : null);
+    }
+
+    #[\Override]
+    public function onKeyframeNeeded(CallRecorder $recorder, int $source): void
+    {
+        $now = microtime(true);
+        if ($now - ($this->keyframeRequests[$source] ?? 0.0) < self::KEYFRAME_REQUEST_INTERVAL) {
+            return;
+        }
+        $this->keyframeRequests[$source] = $now;
+        $this->observer?->onKeyframeNeeded($this, $source);
     }
 
     #[\Override]

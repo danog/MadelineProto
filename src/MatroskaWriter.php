@@ -134,8 +134,9 @@ final class MatroskaWriter
     }
 
     /**
-     * Reopen the file in append mode and continue the recording where it left off. The EBML header,
-     * Tracks and Duration placeholder are already on disk, so only new clusters are appended.
+     * Restore the writer, to continue the recording where it left off once {@see self::resume()}
+     * reopened the file. The EBML header, Tracks and Duration placeholder are already on disk, so
+     * only new clusters are appended.
      *
      * @psalm-external-mutation-free
      */
@@ -148,13 +149,11 @@ final class MatroskaWriter
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        // Append mode cannot seek back to patch the Duration, so stop advertising it as seekable.
-        $this->seekable = false;
     }
 
     /**
-     * Reopen the file in append mode to continue the recording, after the whole graph has been
-     * deserialized. Returns false if the recording cannot continue in this file (it was closed, or
+     * Reopen the file at its end to continue the recording, after the whole graph has been
+     * deserialized; not in append mode, which could not seek back to patch the Duration on close(). Returns false if the recording cannot continue in this file (it was closed, or
      * the segment file no longer exists): the owner should then start a fresh segment.
      * Only file-backed writers are ever serialized (their parent drops stream-backed
      * recorders), so there is always a file to reopen; the guard is purely defensive.
@@ -173,7 +172,8 @@ final class MatroskaWriter
             $this->closed = true;
             return false;
         }
-        $this->out = openFile($this->localFile->file, 'a');
+        $this->out = openFile($this->localFile->file, 'c+');
+        $this->out->seek(0, Whence::End);
         return true;
     }
 

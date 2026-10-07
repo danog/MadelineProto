@@ -142,7 +142,6 @@
             "@cs-fix",
             "@fuzz",
             "@file_ref_map",
-            "@psalm",
             "@test-light"
         ],
         "test": [

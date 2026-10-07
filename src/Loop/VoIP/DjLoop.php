@@ -125,9 +125,15 @@ final class DjLoop extends VoIPLoop
 
     /** @var SplQueue<string> OPUS packets of an OGG file, played on the fixed 60ms grid. */
     private SplQueue $oggQueue;
-    /** @var SplQueue<array{data: string, timestamp: int}> OPUS frames of a WebM file (48kHz ts). */
+    /**
+     * @var SplQueue<array{data: string, timestamp: int, file: int}> OPUS frames of a WebM file (48kHz ts).
+     *
+     * The `file` of a queued frame is the {@see self::$generation} of the file it was read from: the
+     * tracks hold a frame until its presentation time, so the next file may already be queued when
+     * they get to it, and they must re-anchor their clocks right where it begins.
+     */
     private SplQueue $webmAudioQueue;
-    /** @var SplQueue<array{data: string, timestamp: int, keyframe: bool}> Video frames (90kHz ts). */
+    /** @var SplQueue<array{data: string, timestamp: int, keyframe: bool, file: int}> Video frames (90kHz ts). */
     private SplQueue $videoQueue;
 
     /** Completed by a track when it drains a queue, to release the reader from back-pressure. */
@@ -183,7 +189,7 @@ final class DjLoop extends VoIPLoop
      * -------------------------------------------------------------------- */
 
     private bool $readerRunning = false;
-    /** Bumped to make the running reader abandon the current file (skip/stop/discard). */
+    /** Bumped to make the running reader abandon the current file (skip/stop/discard), and for every file. */
     private int $generation = 0;
     private ?DeferredCancellation $readerCancel = null;
 
@@ -267,6 +273,9 @@ final class DjLoop extends VoIPLoop
             'videoOnly' => $this->videoOnly,
             'framing' => $this->framing,
             'webmVideoAnnounced' => $this->webmVideoAnnounced,
+            // Kept (not reset) so a file opened after a restart never reuses the ID of one whose
+            // frames the tracks still remember: see the `file` of the queued frames.
+            'generation' => $this->generation,
         ];
     }
 
@@ -283,7 +292,6 @@ final class DjLoop extends VoIPLoop
         // mid-deserialization (if a nested resume suspends the fiber) and dereference not-yet-restored
         // state. The call's deserializer calls {@see self::resume()} once the graph is whole.
         $this->readerRunning = false;
-        $this->generation = 0;
     }
 
     /**
@@ -452,14 +460,14 @@ final class DjLoop extends VoIPLoop
     /**
      * Pull the next OPUS frame of the WebM file being played, or null if none is buffered.
      *
-     * @return array{data: string, timestamp: int}|null
+     * @return array{data: string, timestamp: int, file: int}|null
      */
     public function pullWebmAudio(): ?array
     {
         if ($this->webmAudioQueue->isEmpty()) {
             return null;
         }
-        /** @var array{data: string, timestamp: int} $frame */
+        /** @var array{data: string, timestamp: int, file: int} $frame */
         $frame = $this->webmAudioQueue->dequeue();
         $this->setPlaybackPosition((int) ($frame['timestamp'] * 1000 / self::AUDIO_CLOCK_RATE));
         $this->releaseReader();
@@ -467,14 +475,14 @@ final class DjLoop extends VoIPLoop
     }
 
     /**
-     * @return array{data: string, timestamp: int, keyframe: bool}|null
+     * @return array{data: string, timestamp: int, keyframe: bool, file: int}|null
      */
     public function pullVideo(): ?array
     {
         if ($this->videoQueue->isEmpty()) {
             return null;
         }
-        /** @var array{data: string, timestamp: int, keyframe: bool} $frame */
+        /** @var array{data: string, timestamp: int, keyframe: bool, file: int} $frame */
         $frame = $this->videoQueue->dequeue();
         $this->releaseReader();
         return $frame;
@@ -498,13 +506,15 @@ final class DjLoop extends VoIPLoop
      * Whether the WebM file was fully read and both of its queues are drained.
      *
      * Firing the observer's stop notification exactly once here keeps the video-stop plumbing in the
-     * one place that knows a file has truly finished.
+     * one place that knows a file has truly finished. Not when another file follows, though: the
+     * stop would make the other participants drop our video, only to pick it up again (or not) a
+     * moment later; the next file announces its own video, or the lack of it, when it starts.
      */
     public function isExhausted(): bool
     {
         $exhausted = $this->currentKind !== 'matroska'
             || ($this->finishedCurrent && $this->webmAudioQueue->isEmpty() && $this->videoQueue->isEmpty());
-        if ($exhausted && $this->webmVideoAnnounced) {
+        if ($exhausted && $this->webmVideoAnnounced && $this->inputFiles === [] && $this->holdFiles === []) {
             $this->announceVideoStopped();
         }
         return $exhausted;
@@ -639,6 +649,10 @@ final class DjLoop extends VoIPLoop
             $file = $item instanceof StreamSnapshot ? $item->open() : $item;
             [$kind, $source, $convert] = $this->prepareSource($file, $cancellation, $resuming);
             $this->currentKind = $kind;
+            if ($kind !== 'matroska') {
+                // An OGG file has no video: stop the video a previous file left announced.
+                $this->announceVideoStopped();
+            }
             // A resumable stream can be reopened and skipped forward, like a file.
             $this->currentResumable = !$convert && (!$source instanceof ReadableStream || $item instanceof StreamSnapshot);
             if ($kind === 'matroska') {
@@ -825,6 +839,7 @@ final class DjLoop extends VoIPLoop
             $this->webmAudioQueue->enqueue([
                 'data' => $frame['data'],
                 'timestamp' => (int) ($timestampMs * self::AUDIO_CLOCK_RATE / 1000),
+                'file' => $this->generation,
             ]);
             return true;
         }
@@ -845,6 +860,7 @@ final class DjLoop extends VoIPLoop
             'data' => $this->framing?->convert($frame['data'], $frame['keyframe']) ?? $frame['data'],
             'timestamp' => (int) ($timestampMs * self::VIDEO_CLOCK_RATE / 1000),
             'keyframe' => $frame['keyframe'],
+            'file' => $this->generation,
         ]);
         return true;
     }
@@ -963,6 +979,9 @@ final class DjLoop extends VoIPLoop
             // would decode it as whatever codec the previous file used.
             $this->webmVideoAnnounced = true;
             $this->videoObserver?->onVideoCodec($this->videoCodec, $this->videoParameters);
+        } else {
+            // No video in this file: stop the video a previous file left announced.
+            $this->announceVideoStopped();
         }
     }
 

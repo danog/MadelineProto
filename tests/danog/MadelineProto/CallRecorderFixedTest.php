@@ -54,6 +54,9 @@ final class CallRecorderFixedTest extends TestCase
             {
                 $this->events[] = 'ended:'.($out instanceof LocalFile ? basename($out->file) : 'stream');
             }
+            public function onKeyframeNeeded(CallRecorder $recorder, int $source): void
+            {
+            }
         };
     }
 

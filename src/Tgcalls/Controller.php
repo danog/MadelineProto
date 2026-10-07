@@ -723,6 +723,31 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      *
      * @internal
      */
+    /**
+     * A recording needs a keyframe of an incoming video track: ask the peer for one.
+     *
+     * @internal
+     */
+    #[\Override]
+    public function onKeyframeNeeded(IncomingMedia $media, int $source): void
+    {
+        if ($this->closed) {
+            return;
+        }
+        foreach ($this->peerConnection->getTransceivers() as $transceiver) {
+            $receiver = $transceiver->getReceiver();
+            $track = $receiver->getTrack();
+            if (!$track instanceof RemoteStreamTrack || IncomingMedia::sourceOf($track) !== $source) {
+                continue;
+            }
+            foreach ($receiver->getSynchronizationSources() as $ssrc) {
+                $this->call->log("Asking source {$ssrc->source} of {$this->call} for a keyframe", Logger::VERBOSE);
+                $receiver->sendRtcpPli($ssrc->source);
+            }
+            return;
+        }
+    }
+
     #[\Override]
     public function onIncomingMediaChanged(IncomingMedia $media, ?RecordingEvent $recording, ?LocalFile $file): void
     {
