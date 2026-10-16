@@ -25,4 +25,36 @@ use danog\MadelineProto\SettingsAbstract;
  */
 final class VoIP extends SettingsAbstract
 {
+    /**
+     * How far ahead of playback the files played in calls are read, in milliseconds.
+     */
+    protected int $playbackLookahead = 0;
+
+    /**
+     * Get how far ahead of playback the files played in calls are read, in milliseconds.
+     */
+    public function getPlaybackLookahead(): int
+    {
+        return $this->playbackLookahead;
+    }
+
+    /**
+     * Set how far ahead of playback the files played in calls are read, in milliseconds.
+     *
+     * The frames read ahead are kept in memory, for every call: by default (0), only the next frame is
+     * read ahead, to keep memory usage to a minimum. Reading further ahead avoids stuttering when the
+     * files are read from a slow source (like a slow URL), at the cost of about the file's bitrate
+     * times the lookahead of memory per call.
+     *
+     * @param int<0, max> $playbackLookahead Lookahead, in milliseconds.
+     */
+    public function setPlaybackLookahead(int $playbackLookahead): self
+    {
+        if ($playbackLookahead < 0) {
+            throw new \AssertionError("The playback lookahead can't be negative!");
+        }
+        $this->playbackLookahead = $playbackLookahead;
+
+        return $this;
+    }
 }

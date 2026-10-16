@@ -1970,11 +1970,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             return;
         }
 
+        // A report can't be longer than a message (and long messages are split in many).
+        if ($parseMode === '' && mb_strlen($message, 'UTF-8') > 4096) {
+            $message = mb_substr($message, 0, 4000, 'UTF-8')."\n[... truncated ...]";
+        }
         $this->reportCache ??= new LocalCache();
-        if ($this->reportCache->get($message)) {
+        $key = hash('xxh128', $message);
+        if ($this->reportCache->get($key)) {
             return;
         }
-        $this->reportCache->set($message, true, 60);
+        $this->reportCache->set($key, true, 60);
 
         $this->reportMutex ??= new LocalMutex;
         $lock = $this->reportMutex->acquire();

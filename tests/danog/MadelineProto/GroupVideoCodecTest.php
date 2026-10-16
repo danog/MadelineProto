@@ -92,6 +92,11 @@ final class GroupVideoCodecTest extends TestCase
                 return false;
             }
 
+            public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
+            {
+                return new \danog\MadelineProto\Settings\VoIP;
+            }
+
             public function __toString(): string
             {
                 return 'test call';

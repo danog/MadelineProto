@@ -1133,6 +1133,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->API->logger->logger($message, $level);
     }
 
+    #[\Override]
+    public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
+    {
+        return $this->API->getSettings()->getVoip();
+    }
+
     /**
      * @psalm-mutation-free
      */

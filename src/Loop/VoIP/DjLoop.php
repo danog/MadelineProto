@@ -60,11 +60,12 @@ use Webrtc\Codecs\Codec;
  *   only MadelineProto's own OGG OPUS files are played as-is, and the others are converted too.
  *
  * Nothing is decoded or re-encoded for pre-encoded input, so playback needs no codec library (and
- * therefore no FFI). Frames are **streamed**, not buffered whole: the reader keeps only about
- * {@see self::BUFFER_AHEAD_MS} of look-ahead and blocks until the tracks drain it, so memory stays
- * bounded however long the file is. The reader position is a byte offset into the current file, so
- * playback resumes exactly where it left off across a serialize → destruct → unserialize cycle (for
- * a seekable source — a raw stream or an on-the-fly conversion replays the current item instead).
+ * therefore no FFI). Frames are **streamed**, not buffered whole: the reader reads only as far ahead
+ * of playback as configured ({@see \danog\MadelineProto\Settings\VoIP::setPlaybackLookahead()}, just
+ * the next frame by default) and blocks until the tracks drain it, so memory stays bounded however
+ * long the file is. The frames read ahead are not saved: playback resumes exactly from the first one
+ * that was not played across a serialize → destruct → unserialize cycle (for a seekable source — a
+ * raw stream or an on-the-fly conversion replays the current item instead).
  *
  * The whole playlist API — {@see self::play()}, {@see self::skip()}, {@see self::playOnHold()},
  * pausing, {@see self::getCurrent()} — applies to every file regardless of what media it carries.
@@ -103,9 +104,6 @@ final class DjLoop extends VoIPLoop
     /** OGG capture pattern: how an OGG file begins. */
     private const OGG_MAGIC = 'OggS';
 
-    /** How far ahead of playback the reader is allowed to buffer, in milliseconds. */
-    private const BUFFER_AHEAD_MS = 2000;
-
     /* -------------------------------------------------------------------- *
      *  Playlist.
      * -------------------------------------------------------------------- */
@@ -119,24 +117,28 @@ final class DjLoop extends VoIPLoop
     private bool $pause = false;
 
     /* -------------------------------------------------------------------- *
-     *  Bounded look-ahead queues (serializable), drained by the tracks.
+     *  Bounded look-ahead queues, drained by the tracks.
+     *
+     *  They are not serialized: the current file is resumed from the position of its first frame
+     *  that was not played yet, instead. Every queued frame carries its `position` in the file
+     *  (see {@see self::trackResume()}), null if the file can't be resumed.
      * -------------------------------------------------------------------- */
 
-    /** @var SplQueue<string> OPUS packets of an OGG file. */
+    /** @var SplQueue<array{data: string, position: ?list{int, int}, file: int}> OPUS packets of an OGG file. */
     private SplQueue $oggQueue;
     /** Total duration of the packets in {@see self::$oggQueue}, in 48kHz samples. */
     private int $oggQueueSamples = 0;
     /** Whether OGG files must be MadelineProto's own 60ms ones, others being converted (for the legacy libtgvoip engine). */
     private bool $fixedOggGrid = false;
     /**
-     * @var SplQueue<array{data: string, timestamp: int, file: int}> OPUS frames of a WebM file (48kHz ts).
+     * @var SplQueue<array{data: string, timestamp: int, position: ?list{int, int}, file: int}> OPUS frames of a WebM file (48kHz ts).
      *
      * The `file` of a queued frame is the {@see self::$generation} of the file it was read from: the
      * tracks hold a frame until its presentation time, so the next file may already be queued when
      * they get to it, and they must re-anchor their clocks right where it begins.
      */
     private SplQueue $webmAudioQueue;
-    /** @var SplQueue<array{data: string, timestamp: int, keyframe: bool, file: int}> Video frames (90kHz ts). */
+    /** @var SplQueue<array{data: string, timestamp: int, keyframe: bool, position: ?list{int, int}, file: int}> Video frames (90kHz ts). */
     private SplQueue $videoQueue;
 
     /** Completed by a track when it drains a queue, to release the reader from back-pressure. */
@@ -161,6 +163,30 @@ final class DjLoop extends VoIPLoop
     private int $resumeSkip = 0;
     /** Byte offset of the unit the last produced frame came from, used to keep {@see self::$resumeSkip}. */
     private int $resumeUnitOffset = -1;
+    /**
+     * Position of the last played audio and video frame of the files whose frames are queued, by
+     * {@see self::$generation}, see {@see self::trackResume()}.
+     *
+     * The audio and video frames of a WebM file are interleaved, but played separately: when resuming
+     * from the first frame that was not played, the frames of the other kind that were already played
+     * are skipped, see {@see self::$resumePlayed}.
+     *
+     * @var array<int, array{audio?: list{int, int}, video?: list{int, int}}>
+     */
+    private array $playedPositions = [];
+    /**
+     * Position of the last played audio and video frame of the file being resumed.
+     *
+     * @var array{audio?: list{int, int}, video?: list{int, int}}
+     */
+    private array $resumePlayed = [];
+    /**
+     * The files read before the current one, oldest first, while some of their frames may still be
+     * queued, to resume them from the first one that was not played: see {@see self::fileState()}.
+     *
+     * @var list<array<string, mixed>>
+     */
+    private array $previous = [];
     /** The Matroska track list, needed to resume a WebM file past its (once-only) header. */
     private array $resumeTracks = [];
     /** The Matroska timestamp scale, needed to resume a WebM file. */
@@ -234,48 +260,98 @@ final class DjLoop extends VoIPLoop
         }
     }
 
+    /**
+     * The state needed to resume the current file.
+     *
+     * @return array<string, mixed>
+     */
+    private function fileState(): array
+    {
+        return [
+            'generation' => $this->generation,
+            'file' => $this->currentFile,
+            'desc' => $this->currentDesc,
+            'kind' => $this->currentKind,
+            'hold' => $this->playingHold,
+            'resumeOffset' => $this->resumeOffset,
+            'resumeSkip' => $this->resumeSkip,
+            'resumeUnitOffset' => $this->resumeUnitOffset,
+            'resumeTracks' => $this->resumeTracks,
+            'resumeTimestampScale' => $this->resumeTimestampScale,
+            'videoCodec' => $this->videoCodec,
+            'videoParameters' => $this->videoParameters,
+            'videoProfileFromFrame' => $this->videoProfileFromFrame,
+            'framing' => $this->framing,
+        ];
+    }
+
     public function __serialize(): array
     {
-        // Only a seekable, non-converted file can resume mid-stream; a raw stream or an on-the-fly
-        // conversion replays its item from the start (files) or is dropped (streams).
+        // The queued frames are not saved: a seekable, non-converted file is resumed from the first of its
+        // frames that was not played. A raw stream or an on-the-fly conversion replays its item from the
+        // start (files) or is dropped (streams).
         $inputFiles = $this->inputFiles;
-        $currentFile = null;
-        if ($this->currentFile !== null && !$this->finishedCurrent) {
+        $holdIndex = $this->holdIndex;
+        $state = null;
+        $position = null;
+        foreach ($this->previous as $k => $previous) {
+            if (($position = $this->firstUnplayedPosition($previous['generation'])) !== null) {
+                // The end of a previous file was not played yet: resume it, followed by the files after
+                // it, whose frames come after its own.
+                $state = $previous;
+                $next = array_column(\array_slice($this->previous, $k + 1), 'file');
+                if ($this->currentFile !== null) {
+                    if ($this->playingHold) {
+                        $holdIndex--;
+                    } else {
+                        $next[] = $this->currentFile;
+                    }
+                }
+                array_unshift($inputFiles, ...$next);
+                break;
+            }
+        }
+        if ($state === null && $this->currentFile !== null && !$this->finishedCurrent) {
             if ($this->currentResumable) {
-                $currentFile = $this->currentFile;
+                $state = $this->fileState();
+                $position = $this->firstUnplayedPosition($this->generation);
             } elseif (!$this->currentFile instanceof ReadableStream) {
                 array_unshift($inputFiles, $this->currentFile);
             }
+        }
+        // Without a position, every frame read so far was played: resume right after the last one.
+        if ($state !== null && $position !== null) {
+            [$state['resumeOffset'], $state['resumeSkip']] = $position;
+            $state['resumeUnitOffset'] = $position[0];
         }
         return [
             'instance' => $this->instance,
             'pause' => $this->pause,
             'inputFiles' => array_values(array_filter($inputFiles, static fn ($v) => !$v instanceof ReadableStream)),
             'holdFiles' => array_values(array_filter($this->holdFiles, static fn ($v) => !$v instanceof ReadableStream)),
-            'holdIndex' => $this->holdIndex,
-            'playingHold' => $this->playingHold,
-            'oggQueue' => $this->oggQueue,
+            'holdIndex' => $holdIndex,
+            'playingHold' => $state['hold'] ?? false,
             'fixedOggGrid' => $this->fixedOggGrid,
-            'webmAudioQueue' => $this->webmAudioQueue,
-            'videoQueue' => $this->videoQueue,
-            'currentFile' => $currentFile,
-            'currentDesc' => $currentFile !== null ? $this->currentDesc : null,
-            'currentKind' => $currentFile !== null ? $this->currentKind : null,
-            'currentResumable' => $currentFile !== null,
-            'finishedCurrent' => $currentFile === null,
-            'resumeOffset' => $this->resumeOffset,
-            'resumeSkip' => $this->resumeSkip,
-            'resumeUnitOffset' => $this->resumeUnitOffset,
-            'resumeTracks' => $this->resumeTracks,
-            'resumeTimestampScale' => $this->resumeTimestampScale,
-            'bufferedUntilMs' => $this->bufferedUntilMs,
-            'playbackMs' => $this->playbackMs,
+            'currentFile' => $state['file'] ?? null,
+            'currentDesc' => $state['desc'] ?? null,
+            'currentKind' => $state['kind'] ?? null,
+            'currentResumable' => $state !== null,
+            'finishedCurrent' => $state === null,
+            'resumeOffset' => $state['resumeOffset'] ?? 0,
+            'resumeSkip' => $state['resumeSkip'] ?? 0,
+            'resumeUnitOffset' => $state['resumeUnitOffset'] ?? -1,
+            'resumePlayed' => $state !== null ? $this->playedPositions[$state['generation']] ?? [] : [],
+            'resumeTracks' => $state['resumeTracks'] ?? [],
+            'resumeTimestampScale' => $state['resumeTimestampScale'] ?? 0,
+            // Nothing is buffered once resumed: playback restarts from the first frame read again.
+            'bufferedUntilMs' => 0,
+            'playbackMs' => 0,
             'videoObserver' => $this->videoObserver,
-            'videoCodec' => $this->videoCodec,
-            'videoParameters' => $this->videoParameters,
-            'videoProfileFromFrame' => $this->videoProfileFromFrame,
+            'videoCodec' => $state !== null ? $state['videoCodec'] : $this->videoCodec,
+            'videoParameters' => $state !== null ? $state['videoParameters'] : $this->videoParameters,
+            'videoProfileFromFrame' => $state !== null ? $state['videoProfileFromFrame'] : $this->videoProfileFromFrame,
             'videoOnly' => $this->videoOnly,
-            'framing' => $this->framing,
+            'framing' => $state !== null ? $state['framing'] : $this->framing,
             'webmVideoAnnounced' => $this->webmVideoAnnounced,
             // Kept (not reset) so a file opened after a restart never reuses the ID of one whose
             // frames the tracks still remember: see the `file` of the queued frames.
@@ -288,15 +364,13 @@ final class DjLoop extends VoIPLoop
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
-        $this->oggQueue ??= new SplQueue;
-        $this->webmAudioQueue ??= new SplQueue;
-        $this->videoQueue ??= new SplQueue;
+        // Older versions saved the queued frames: they are dropped (along with at most a couple of seconds of playback).
+        $this->oggQueue = new SplQueue;
+        $this->oggQueueSamples = 0;
+        $this->webmAudioQueue = new SplQueue;
+        $this->videoQueue = new SplQueue;
         // Not saved by older versions.
         $this->videoOnly ??= false;
-        $this->oggQueueSamples = 0;
-        foreach ($this->oggQueue as $packet) {
-            $this->oggQueueSamples += Ogg::packetDuration($packet);
-        }
         // Do NOT restart the reader here: its loop reads the call's state, which is only restored once
         // the whole call graph has finished deserializing. Starting it now could run it
         // mid-deserialization (if a nested resume suspends the fiber) and dereference not-yet-restored
@@ -323,6 +397,7 @@ final class DjLoop extends VoIPLoop
         $this->oggQueueSamples = 0;
         $this->webmAudioQueue = new SplQueue;
         $this->videoQueue = new SplQueue;
+        $this->previous = [];
         $this->packetDeferred?->complete(false);
         $this->packetDeferred = null;
     }
@@ -374,6 +449,7 @@ final class DjLoop extends VoIPLoop
         $this->inputFiles = [];
         $this->holdFiles = [];
         $this->playingHold = false;
+        $this->previous = [];
         $this->skip();
         $this->announceVideoStopped();
     }
@@ -467,10 +543,11 @@ final class DjLoop extends VoIPLoop
         if ($this->pause || $this->oggQueue->isEmpty()) {
             return null;
         }
+        /** @var array{data: string, position: ?list{int, int}, file: int} $packet */
         $packet = $this->oggQueue->dequeue();
-        $this->oggQueueSamples -= Ogg::packetDuration($packet);
+        $this->oggQueueSamples -= Ogg::packetDuration($packet['data']);
         $this->releaseReader();
-        return $packet;
+        return $packet['data'];
     }
 
     public function hasWebmAudio(): bool
@@ -488,9 +565,10 @@ final class DjLoop extends VoIPLoop
         if ($this->webmAudioQueue->isEmpty()) {
             return null;
         }
-        /** @var array{data: string, timestamp: int, file: int} $frame */
+        /** @var array{data: string, timestamp: int, position: ?list{int, int}, file: int} $frame */
         $frame = $this->webmAudioQueue->dequeue();
-        $this->setPlaybackPosition((int) ($frame['timestamp'] * 1000 / self::AUDIO_CLOCK_RATE));
+        $this->markPlayed('audio', $frame);
+        $this->setPlaybackPosition((int) ($frame['timestamp'] * 1000 / self::AUDIO_CLOCK_RATE), $frame['file']);
         $this->releaseReader();
         return $frame;
     }
@@ -503,8 +581,9 @@ final class DjLoop extends VoIPLoop
         if ($this->videoQueue->isEmpty()) {
             return null;
         }
-        /** @var array{data: string, timestamp: int, keyframe: bool, file: int} $frame */
+        /** @var array{data: string, timestamp: int, keyframe: bool, position: ?list{int, int}, file: int} $frame */
         $frame = $this->videoQueue->dequeue();
+        $this->markPlayed('video', $frame);
         $this->releaseReader();
         return $frame;
     }
@@ -512,6 +591,43 @@ final class DjLoop extends VoIPLoop
     public function hasVideo(): bool
     {
         return !$this->videoQueue->isEmpty();
+    }
+
+    /**
+     * Record that a frame of the current file was played.
+     *
+     * @param 'audio'|'video' $kind
+     * @param array{position: ?list{int, int}, file: int, ...} $frame
+     */
+    private function markPlayed(string $kind, array $frame): void
+    {
+        if ($frame['position'] !== null) {
+            $this->playedPositions[$frame['file']][$kind] = $frame['position'];
+        }
+    }
+
+    /**
+     * The position of the first queued frame of a file, i.e. the first one that was not played yet.
+     *
+     * @param int $generation The {@see self::$generation} of the file.
+     *
+     * @return ?list{int, int}
+     */
+    private function firstUnplayedPosition(int $generation): ?array
+    {
+        $first = null;
+        foreach ([$this->oggQueue, $this->webmAudioQueue, $this->videoQueue] as $queue) {
+            foreach ($queue as $frame) {
+                if ($frame['position'] !== null && $frame['file'] === $generation) {
+                    if ($first === null || $frame['position'] < $first) {
+                        $first = $frame['position'];
+                    }
+                    // The rest of the queue comes after it.
+                    break;
+                }
+            }
+        }
+        return $first;
     }
 
     /**
@@ -543,10 +659,15 @@ final class DjLoop extends VoIPLoop
 
     /**
      * Report how far playback has progressed, in milliseconds.
+     *
+     * @param ?int $file The `file` of the frame that was played: the playback of the frames of a
+     *                   previous file doesn't count for the current one.
      */
-    public function setPlaybackPosition(int $milliseconds): void
+    public function setPlaybackPosition(int $milliseconds, ?int $file = null): void
     {
-        $this->playbackMs = max($this->playbackMs, $milliseconds);
+        if ($file === null || $file === $this->generation) {
+            $this->playbackMs = max($this->playbackMs, $milliseconds);
+        }
         $this->releaseReader();
     }
 
@@ -598,7 +719,18 @@ final class DjLoop extends VoIPLoop
                     Tools::sleep(0.1);
                     continue;
                 }
+                $generation = $this->generation + 1;
                 $played = $this->streamCurrentFile();
+                // Keep the files while their frames are queued, to resume them if the session is saved before they are played.
+                $this->previous = array_values(array_filter(
+                    $this->previous,
+                    fn (array $previous): bool => $this->firstUnplayedPosition($previous['generation']) !== null,
+                ));
+                if ($this->currentResumable && $this->generation === $generation) {
+                    $this->previous[] = $this->fileState();
+                }
+                // Only the played positions of those files are still needed.
+                $this->playedPositions = array_intersect_key($this->playedPositions, array_flip(array_column($this->previous, 'generation')));
                 $this->currentFile = null;
                 $this->currentKind = null;
                 $this->currentDesc = null;
@@ -647,6 +779,7 @@ final class DjLoop extends VoIPLoop
             $this->resumeUnitOffset = -1;
             $this->resumeTracks = [];
             $this->resumeTimestampScale = 0;
+            $this->resumePlayed = [];
             $this->bufferedUntilMs = 0;
             $this->playbackMs = 0;
             $this->currentKind = null;
@@ -796,10 +929,13 @@ final class DjLoop extends VoIPLoop
                 $skip--;
                 continue;
             }
-            $this->oggQueue->enqueue($packet);
+            $this->oggQueue->enqueue([
+                'data' => $packet,
+                'position' => $this->trackResume($unit),
+                'file' => $generation,
+            ]);
             $samples = Ogg::packetDuration($packet);
             $this->oggQueueSamples += $samples;
-            $this->trackResume($unit);
             $this->bufferedUntilMs += intdiv($samples, 48);
             $this->wakePacketWaiters();
             $this->throttle($generation, $cancellation);
@@ -840,8 +976,13 @@ final class DjLoop extends VoIPLoop
                 continue;
             }
             // Dropped frames are counted too, as the skip above counts all frames of the unit.
-            $this->trackResume($unit);
-            if ($this->pushFrame($frame)) {
+            $position = $this->trackResume($unit);
+            $played = $this->resumePlayed[isset(self::AUDIO_CODECS[$frame['codec']]) ? 'audio' : 'video'] ?? null;
+            if ($resuming && $position !== null && $played !== null && $position <= $played) {
+                // Played before the restart, while frames of the other kind before it weren't.
+                continue;
+            }
+            if ($this->pushFrame($frame, $position)) {
                 $this->wakePacketWaiters();
                 $this->throttle($generation, $cancellation);
             }
@@ -852,8 +993,9 @@ final class DjLoop extends VoIPLoop
      * Enqueue one demuxed WebM frame; returns whether it was kept (an untransmittable frame is not).
      *
      * @param array{track: int, codec: string, type: int, data: string, timestamp: int, keyframe: bool} $frame
+     * @param ?list{int, int} $position
      */
-    private function pushFrame(array $frame): bool
+    private function pushFrame(array $frame, ?array $position): bool
     {
         $timestampMs = $frame['timestamp'];
         $this->bufferedUntilMs = max($this->bufferedUntilMs, $timestampMs);
@@ -865,6 +1007,7 @@ final class DjLoop extends VoIPLoop
             $this->webmAudioQueue->enqueue([
                 'data' => $frame['data'],
                 'timestamp' => (int) ($timestampMs * self::AUDIO_CLOCK_RATE / 1000),
+                'position' => $position,
                 'file' => $this->generation,
             ]);
             return true;
@@ -886,6 +1029,7 @@ final class DjLoop extends VoIPLoop
             'data' => $this->framing?->convert($frame['data'], $frame['keyframe']) ?? $frame['data'],
             'timestamp' => (int) ($timestampMs * self::VIDEO_CLOCK_RATE / 1000),
             'keyframe' => $frame['keyframe'],
+            'position' => $position,
             'file' => $this->generation,
         ]);
         return true;
@@ -894,19 +1038,25 @@ final class DjLoop extends VoIPLoop
     /**
      * Record the resume point right after the frame that was just produced.
      *
+     * @return ?list{int, int} The position of the frame: the byte offset of its unit (OGG page / MKV
+     *                         cluster) and how many frames of the unit come before it, i.e. the resume
+     *                         point right before it. Null if the file can't be resumed.
+     *
      * @psalm-external-mutation-free
      */
-    private function trackResume(int $unit): void
+    private function trackResume(int $unit): ?array
     {
         if (!$this->currentResumable) {
-            return;
+            return null;
         }
         if ($unit !== $this->resumeUnitOffset) {
             $this->resumeUnitOffset = $unit;
             $this->resumeSkip = 0;
         }
+        $position = [$unit, $this->resumeSkip];
         $this->resumeSkip++;
         $this->resumeOffset = $unit;
+        return $position;
     }
 
     /**
@@ -914,7 +1064,7 @@ final class DjLoop extends VoIPLoop
      */
     private function throttle(int $generation, ?Cancellation $cancellation): void
     {
-        while ($this->bufferedAheadMs() >= self::BUFFER_AHEAD_MS) {
+        while ($this->bufferedAheadMs() > $this->instance->getVoIPSettings()->getPlaybackLookahead()) {
             if ($generation !== $this->generation || $this->instance->isCallEnded()) {
                 return;
             }

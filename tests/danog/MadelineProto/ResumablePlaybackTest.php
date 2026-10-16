@@ -25,6 +25,7 @@ use Amp\ByteStream\ReadableStreamIteratorAggregate;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Closure;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\ResumableStream;
@@ -69,6 +70,45 @@ final class ResumablePlaybackTest extends TestCase
             );
         }
         return self::element("\x18\x53\x80\x67", $info.$tracks.$clusters);
+    }
+
+    /**
+     * Build a Matroska file with one VP8 track and one OPUS track, with a video and an audio frame per cluster, a second apart.
+     */
+    private static function buildAudioVideoFile(): string
+    {
+        $video = self::element("\xD7", "\x01")            // TrackNumber = 1
+            .self::element("\x83", "\x01")                // TrackType = video
+            .self::element("\x86", 'V_VP8');               // CodecID
+        $audio = self::element("\xD7", "\x02")            // TrackNumber = 2
+            .self::element("\x83", "\x02")                // TrackType = audio
+            .self::element("\x86", 'A_OPUS');              // CodecID
+        $tracks = self::element("\x16\x54\xAE\x6B", self::element("\xAE", $video).self::element("\xAE", $audio));
+        $info = self::element("\x15\x49\xA9\x66", self::element("\x2A\xD7\xB1", "\x0F\x42\x40"));
+        $clusters = '';
+        for ($x = 0; $x < self::FRAMES; $x++) {
+            $clusters .= self::element(
+                "\x1F\x43\xB6\x75",
+                self::element("\xE7", pack('n', $x * 1000))
+                .self::element("\xA3", "\x81".pack('n', 0)."\x80"."FRAME$x")
+                .self::element("\xA3", "\x82".pack('n', 0)."\x80"."AUDIO$x")
+            );
+        }
+        return self::element("\x18\x53\x80\x67", $info.$tracks.$clusters);
+    }
+
+    /**
+     * Take every audio frame currently queued.
+     *
+     * @return list<string>
+     */
+    private static function pullAllAudio(DjLoop $dj): array
+    {
+        $frames = [];
+        while (($frame = $dj->pullWebmAudio()) !== null) {
+            $frames[] = $frame['data'];
+        }
+        return $frames;
     }
 
     /**
@@ -292,12 +332,115 @@ final class ResumablePlaybackTest extends TestCase
         $dj = self::restart($dj);
         $dj->setPlaybackPosition(PHP_INT_MAX);
         delay(0.1);
-        // Only the frames that were already queued are played.
+        // Nothing more is played.
         $played = [...$played, ...self::pullAll($dj)];
         self::assertSame(\array_slice(self::expected(), 0, \count($played)), $played);
         self::assertLessThan(self::FRAMES, \count($played));
         self::assertNull($dj->getCurrent());
         $dj->discard();
+    }
+
+    public function testQueuedFramesAreNotSavedButPlayedAfterARestart(): void
+    {
+        // A file, saved as its path (a stream would save its contents).
+        $path = tempnam(sys_get_temp_dir(), 'madeline-dj-');
+        file_put_contents($path, self::buildFile());
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play(new LocalFile($path));
+        for ($x = 0; $x < 50 && !$dj->hasVideo(); $x++) {
+            delay(0.1);
+        }
+        // Play only some of the queued frames.
+        $played = [$dj->pullVideo()['data'] ?? null];
+        self::assertSame(['FRAME0'], $played);
+
+        $serialized = serialize($dj);
+        self::assertStringNotContainsString('FRAME1', $serialized, 'The queued frames were saved');
+        $dj->discard();
+        $dj = unserialize($serialized);
+        $dj->resumeReader();
+        for ($x = 0; $x < 10 && \count($played) < self::FRAMES; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.1);
+            $played = [...$played, ...self::pullAll($dj)];
+        }
+
+        self::assertSame(self::expected(), $played);
+        $dj->discard();
+        unlink($path);
+    }
+
+    public function testInterleavedAudioAndVideoArePlayedOnceAfterARestart(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play(new ChunkedResumableStream(self::buildAudioVideoFile(), 7));
+        delay(0.1);
+        // The video is played ahead of the audio: the restart resumes from the first audio frame that was not played.
+        $video = self::pullAll($dj);
+        $audio = array_filter([$dj->pullWebmAudio()['data'] ?? null]);
+        self::assertNotEmpty($video);
+        self::assertSame(['AUDIO0'], $audio);
+
+        $dj = self::restart($dj);
+        for ($x = 0; $x < 10 && (\count($video) < self::FRAMES || \count($audio) < self::FRAMES); $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.1);
+            $video = [...$video, ...self::pullAll($dj)];
+            $audio = [...$audio, ...self::pullAllAudio($dj)];
+        }
+
+        // No frame is played twice, or skipped.
+        self::assertSame(self::expected(), $video);
+        self::assertSame(array_map(static fn (int $x) => "AUDIO$x", range(0, self::FRAMES - 1)), $audio);
+        $dj->discard();
+    }
+
+    public function testTheEndOfThePreviousFileIsPlayedAfterARestart(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $dj->play(new ChunkedResumableStream(self::buildFile(), 7));
+        $dj->play(new ChunkedResumableStream(self::buildFile(), 7));
+        // Let the reader get to the second file, while the frames of the first one are still queued.
+        for ($x = 0; $x < 3; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.05);
+        }
+        $played = [$dj->pullVideo()['data'] ?? null];
+        self::assertSame(['FRAME0'], $played);
+
+        $dj = self::restart($dj);
+        for ($x = 0; $x < 20 && \count($played) < 2 * self::FRAMES; $x++) {
+            $dj->setPlaybackPosition(PHP_INT_MAX);
+            delay(0.1);
+            $played = [...$played, ...self::pullAll($dj)];
+        }
+
+        self::assertSame([...self::expected(), ...self::expected()], $played);
+        $dj->discard();
+    }
+
+    public function testWithoutLookaheadOnlyTheNextFrameIsRead(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall(lookahead: 0));
+        $dj->play(new ChunkedResumableStream(self::buildFile(), 7));
+        $played = [];
+        for ($x = 0; $x < 100 && \count($played) < self::FRAMES; $x++) {
+            delay(0.02);
+            $queued = [];
+            while (($frame = $dj->pullVideo()) !== null) {
+                $queued[] = $frame;
+            }
+            // The frame being played, and the next one.
+            self::assertLessThanOrEqual(2, \count($queued), 'Frames were read ahead');
+            foreach ($queued as $frame) {
+                $played[] = $frame['data'];
+                // Played, as the video track would report.
+                $dj->setPlaybackPosition((int) ($frame['timestamp'] * 1000 / DjLoop::VIDEO_CLOCK_RATE), $frame['file']);
+            }
+        }
+        $dj->discard();
+
+        self::assertSame(self::expected(), $played);
     }
 
     public function testALoopFromAnOlderSessionCanBeSavedAgain(): void
@@ -322,6 +465,10 @@ final class ResumablePlaybackTest extends TestCase
  */
 final class ResumablePlaybackTestCall implements CallControllerInterface
 {
+    public function __construct(private readonly int $lookahead = 2000)
+    {
+    }
+
     public function log(string $message, int $level = Logger::NOTICE): void
     {
     }
@@ -329,6 +476,12 @@ final class ResumablePlaybackTestCall implements CallControllerInterface
     public function isCallEnded(): bool
     {
         return false;
+    }
+
+    public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
+    {
+        // By default, read ahead, so that frames are queued.
+        return (new \danog\MadelineProto\Settings\VoIP)->setPlaybackLookahead($this->lookahead);
     }
 
     public function __toString(): string

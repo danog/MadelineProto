@@ -274,7 +274,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         }
         $this->prevSourceTimestamp = $frame['timestamp'];
         $this->source->setPlaybackPosition(
-            (int) (($frame['timestamp'] - $this->baseTimestamp) * 1000 / DjLoop::VIDEO_CLOCK_RATE)
+            (int) ($frame['timestamp'] * 1000 / DjLoop::VIDEO_CLOCK_RATE),
+            $frame['file'],
         );
         // Pull and hold the next frame right away so its own presentation time paces us.
         $this->nextDue = $now;

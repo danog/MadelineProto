@@ -149,6 +149,12 @@ final class PlaybackLoopTestCall implements CallControllerInterface
         return $this->ended;
     }
 
+    public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
+    {
+        // Read ahead, so that frames are queued.
+        return (new \danog\MadelineProto\Settings\VoIP)->setPlaybackLookahead(2000);
+    }
+
     public function __toString(): string
     {
         return 'test call';

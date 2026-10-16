@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Settings\VoIP;
 use Stringable;
 
 /**
@@ -38,4 +39,10 @@ interface CallControllerInterface extends Stringable
      * @psalm-impure
      */
     public function isCallEnded(): bool;
+
+    /**
+     * The VoIP settings.
+     * @psalm-mutation-free
+     */
+    public function getVoIPSettings(): VoIP;
 }

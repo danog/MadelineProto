@@ -264,6 +264,12 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         return $this->joined;
     }
 
+    #[\Override]
+    public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
+    {
+        return $this->API->getSettings()->getVoip();
+    }
+
     /**
      * Whether we left (or discarded) the conference for good: the playback machinery stops then, but
      * not while we are merely between a drop and the automatic re-join.
