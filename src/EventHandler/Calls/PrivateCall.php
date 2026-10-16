@@ -164,7 +164,8 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     /**
      * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
      *
-     * A WebM/Matroska file with VP8, VP9 or H.264 video has its video transmitted too; any other
+     * A WebM/Matroska file with VP8, VP9, H.264, H.265 or AV1 video (if the other party's app supports
+     * it) has its video transmitted too; any other
      * file (or a raw audio stream) is played as audio only. The file is demuxed in pure PHP and its
      * frames are sent as-is where possible, so no transcoding (and thus no FFI extension) is
      * required for pre-encoded WebM/OGG-OPUS input.

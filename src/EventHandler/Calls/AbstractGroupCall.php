@@ -438,7 +438,7 @@ abstract class AbstractGroupCall extends Update implements MultiCall
     /**
      * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
      *
-     * A WebM/Matroska file with VP8, VP9 or H.264 video has its video transmitted too; any other
+     * A WebM/Matroska file with VP8, VP9, H.264 or H.265 video has its video transmitted too; any other
      * file (or a raw audio stream) is played as audio only. Frames are demuxed in pure PHP and sent
      * as-is where possible, so no transcoding (and thus no FFI extension) is required for
      * pre-encoded WebM/OGG-OPUS input.

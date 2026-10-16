@@ -48,7 +48,7 @@ if (!$me['bot']) {
 
     // Video call someone, playing a WebM video (works on webhosts, NO ffmpeg needed!)
     // See https://docs.madelineproto.xyz/docs/CALLS.html for group calls, livestreams, recording and more.
-    //$MadelineProto->requestCall('@username', video: true)->play(new \danog\MadelineProto\RemoteUrl('https://paste.daniil.it/oncall.webm'));
+    $MadelineProto->requestCall('@username', video: true)->play(new \danog\MadelineProto\RemoteUrl('https://paste.daniil.it/oncall.webm'));
 }
 $MadelineProto->echo('OK, done!');
 ```
@@ -1091,7 +1091,7 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiStatusGroups.html" name="messages.getEmojiStatusGroups">Represents a list of emoji categories, to be used when selecting custom emojis to set as custom emoji status: messages.getEmojiStatusGroups</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiProfilePhotoGroups.html" name="messages.getEmojiProfilePhotoGroups">Represents a list of emoji categories, to be used when selecting custom emojis to set as profile picture: messages.getEmojiProfilePhotoGroups</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiGroups.html" name="messages.getEmojiGroups">Represents a list of emoji categories: messages.getEmojiGroups</a>
-    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#requestCall" name="requestCall">Request VoIP call: requestCall</a>
+    * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#requestCall" name="requestCall">Request a one-to-one voice or video call: requestCall</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.requestFirebaseSms.html" name="auth.requestFirebaseSms">Request an SMS code via Firebase: auth.requestFirebaseSms</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/auth.requestPasswordRecovery.html" name="auth.requestPasswordRecovery">Request recovery code of a 2FA password, only for accounts with a recovery email configured: auth.requestPasswordRecovery</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#requestSecretChat" name="requestSecretChat">Request secret chat: requestSecretChat</a>

@@ -128,12 +128,6 @@ final class Ogg
     public const STATE_STREAMING = 3;
     public const STATE_END = 4;
 
-    private int $currentDuration = 0;
-    /**
-     * Current OPUS payload.
-     */
-    private string $opusPayload = '';
-
     /**
      * OGG Stream count.
      */
@@ -219,145 +213,55 @@ final class Ogg
         );
         $it = $this->read();
         $it->current();
+        if (!$this->resuming && !isset($this->comments)) {
+            throw new Exception('Not an OGG OPUS file!');
+        }
         $this->opusPackets = $it;
     }
 
     /**
-     * Read OPUS length.
-     */
-    private function readLen(string $content, int &$offset): int
-    {
-        $len = \ord($content[$offset++]);
-        if ($len > 251) {
-            $len += \ord($content[$offset++]) << 2;
-        }
-        return $len;
-    }
-    /**
-     * OPUS state machine.
+     * Get the duration of an OPUS packet, in 48kHz samples (0 if the packet is malformed).
      *
-     * @psalm-suppress InvalidArrayOffset
+     * The duration is read from the TOC byte (and, for packets with an arbitrary number of frames,
+     * from the frame count byte) of the packet, see [RFC 6716 §3.1](https://www.rfc-editor.org/rfc/rfc6716#section-3.1).
+     *
+     * @psalm-pure
+     */
+    public static function packetDuration(string $packet): int
+    {
+        if ($packet === '') {
+            return 0;
+        }
+        $toc = \ord($packet[0]);
+        $config = $toc >> 3;
+        // SILK-only: 10, 20, 40, 60ms; hybrid: 10, 20ms; CELT-only: 2.5, 5, 10, 20ms.
+        $frameSamples = match (true) {
+            $config < 12 => [480, 960, 1920, 2880][$config % 4],
+            $config < 16 => [480, 960][$config % 2],
+            default => [120, 240, 480, 960][$config % 4],
+        };
+        $frames = match ($toc & 3) {
+            0 => 1,
+            1, 2 => 2,
+            default => isset($packet[1]) ? \ord($packet[1]) & 0x3F : 0,
+        };
+        $duration = $frames * $frameSamples;
+        // A packet can't be longer than 120ms.
+        return $duration <= 5760 ? $duration : 0;
+    }
+
+    /**
+     * Get the OPUS packets of a complete OGG packet.
+     *
+     * Every OGG packet holds exactly one OPUS packet, which is passed through as-is.
      */
     private function opusStateMachine(string $content): \Generator
     {
-        $curStream = 0;
-        $offset = 0;
-        $len = \strlen($content);
-        while ($offset < $len) {
-            $selfDelimited = $curStream++ < $this->streamCount - 1;
-            $sizes = [];
-
-            $preOffset = $offset;
-
-            $toc = \ord($content[$offset++]);
-            $stereo = $toc & 4;
-            $conf = $toc >> 3;
-            $c = $toc & 3;
-
-            if ($conf < 12) {
-                $frameDuration = $conf % 4;
-                if ($frameDuration === 0) {
-                    $frameDuration = 10000;
-                } else {
-                    $frameDuration *= 20000;
-                }
-            } elseif ($conf < 16) {
-                $frameDuration = 2**($conf % 2) * 10000;
-            } else {
-                $frameDuration = 2**($conf % 4) * 2500;
-            }
-
-            $paddingLen = 0;
-            if ($c === 0) {
-                // Exactly 1 frame
-                $sizes []= $selfDelimited
-                    ? $this->readLen($content, $offset)
-                    : $len - $offset;
-            } elseif ($c === 1) {
-                // Exactly 2 frames, equal size
-                $size = $selfDelimited
-                    ? $this->readLen($content, $offset)
-                    : ($len - $offset)/2;
-                $sizes []= $size;
-                $sizes []= $size;
-            } elseif ($c === 2) {
-                // Exactly 2 frames, different size
-                $size = $this->readLen($content, $offset);
-                $sizes []= $size;
-                $sizes []= $selfDelimited
-                    ? $this->readLen($content, $offset)
-                    : $len - ($offset + $size);
-            } else {
-                // Arbitrary number of frames
-                $ch = \ord($content[$offset++]);
-                $count = $ch & 0x3F;
-                $vbr = $ch & 0x80;
-                $padding = $ch & 0x40;
-                if ($padding) {
-                    $paddingLen = $padding = \ord($content[$offset++]);
-                    while ($padding === 255) {
-                        $padding = \ord($content[$offset++]);
-                        $paddingLen += $padding - 1;
-                    }
-                }
-                if ($vbr) {
-                    if (!$selfDelimited) {
-                        $count -= 1;
-                    }
-                    for ($x = 0; $x < $count; $x++) {
-                        $sizes[]= $this->readLen($content, $offset);
-                    }
-                    if (!$selfDelimited) {
-                        $sizes []= ($len - ($offset + $padding));
-                    }
-                } else { // CBR
-                    $size = $selfDelimited
-                        ? $this->readLen($content, $offset)
-                        : ($len - ($offset + $padding)) / $count;
-                    array_push($sizes, ...array_fill(0, $count, $size));
-                }
-            }
-
-            $totalDuration = \count($sizes) * $frameDuration;
-            if (!$selfDelimited && $totalDuration + $this->currentDuration <= 60_000) {
-                $this->currentDuration += $totalDuration;
-                $sum = array_sum($sizes);
-                /** @psalm-suppress InvalidArgument */
-                $this->opusPayload .= substr($content, $preOffset, (int) (($offset - $preOffset) + $sum + $paddingLen));
-                if ($this->currentDuration === 60_000) {
-                    if (($s = \strlen($this->opusPayload)) > 1024) {
-                        throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
-                    }
-                    yield $this->opusPayload;
-                    $this->opusPayload = '';
-                    $this->currentDuration = 0;
-                }
-                $offset += $sum;
-                $offset += $paddingLen;
-                continue;
-            }
-
-            foreach ($sizes as $size) {
-                $this->opusPayload .= \chr($toc & ~3);
-                $this->opusPayload .= substr($content, $offset, $size);
-                $offset += $size;
-                $this->currentDuration += $frameDuration;
-                if ($this->currentDuration >= 60_000) {
-                    if ($this->currentDuration > 60_000) {
-                        throw new AssertionError("Emitting packet with duration of {$this->currentDuration} microseconds but need 60000 microseconds, please reconvert the OGG file with a proper frame size.", Logger::WARNING);
-                    }
-                    if (\strlen($this->opusPayload) !== \strlen($content)) {
-                        throw new AssertionError();
-                    }
-                    if (($s = \strlen($this->opusPayload)) > 1024) {
-                        throw new AssertionError("Encountered a packet with size $s > 1024, please convert the audio files using Ogg::convert to avoid issues with packet size!");
-                    }
-                    yield $this->opusPayload;
-                    $this->opusPayload = '';
-                    $this->currentDuration = 0;
-                }
-            }
-            $offset += $paddingLen;
+        if ($this->streamCount !== 1) {
+            throw new AssertionError("Multistream (surround) OGG OPUS files are not supported, please convert them to mono or stereo!");
+        }
+        if (self::packetDuration($content) !== 0) {
+            yield $content;
         }
     }
 

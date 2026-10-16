@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Tgcalls;
 use Amp\Pipeline\DisposedException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\Ogg;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
@@ -29,24 +30,25 @@ use function Amp\delay;
 /**
  * An outgoing audio track that emits the pre-encoded OPUS packets produced by a {@see DjLoop}.
  *
- * MadelineProto stores and generates audio as 60ms mono 48kHz OGG OPUS packets, which is exactly
- * what both the tgcalls one-to-one peer and the Telegram group call SFU expect: the packets are
- * therefore passed through to the RTP sender without a decode/encode round trip, which also means
- * that no codec library (and therefore no FFI) is ever needed for playback.
+ * The OPUS packets of OGG and WebM files are exactly what both the tgcalls one-to-one peer and the
+ * Telegram group call SFU expect: they are therefore passed through to the RTP sender without a
+ * decode/encode round trip, which also means that no codec library (and therefore no FFI) is ever
+ * needed for playback.
  *
  * The track runs a background producer task that pushes the frames into its own {@see Queue},
  * which the RTP sender drains reactively through {@see parent::getConsumer()}: the old polling
  * contract, in which the sender repeatedly called {@see self::receiveData()}, is gone. Pacing
- * happens inside the producer by returning `null` (i.e. not pushing) until the next 60ms frame is
- * due.
+ * happens inside the producer by returning `null` (i.e. not pushing) until the next frame is due:
+ * an OGG packet lasts as long as its TOC byte says ({@see Ogg::packetDuration()}), a WebM frame until
+ * the timestamp of the next one.
  *
  * @internal
  */
 final class OpusPlaybackTrack extends MediaStreamTrack
 {
-    /** Duration of a single MadelineProto OPUS frame, in seconds. */
+    /** Duration of the frame grid kept while silent, in seconds. */
     public const FRAME_DURATION = 0.06;
-    /** Number of 48kHz samples in a single MadelineProto OPUS frame. */
+    /** Number of 48kHz samples in a frame of the grid kept while silent. */
     public const FRAME_SAMPLES = 2880;
     /** OPUS always uses a 48kHz clock rate on the wire. */
     public const CLOCK_RATE = 48000;
@@ -233,8 +235,9 @@ final class OpusPlaybackTrack extends MediaStreamTrack
 
         $packet = new EncodedPacket($opus, $this->timestamp, audioLevel: self::AUDIO_LEVEL_DBOV);
 
-        $this->nextFrame += self::FRAME_DURATION;
-        $this->timestamp += self::FRAME_SAMPLES;
+        $samples = Ogg::packetDuration($opus);
+        $this->nextFrame += $samples / self::CLOCK_RATE;
+        $this->timestamp += $samples;
         $this->nextDue = $this->nextFrame;
 
         return $packet;

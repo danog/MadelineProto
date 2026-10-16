@@ -54,8 +54,10 @@ use Webrtc\Codecs\Codec;
  * - A WebM/Matroska file (it begins with the EBML header) is demuxed by {@see Matroska}: its already
  *   encoded video and OPUS audio frames are handed to the RTP senders untouched, keeping the
  *   timestamps they had in the file, which is what keeps the two in sync.
- * - A native MadelineProto OGG OPUS file is demuxed by {@see Ogg} and played as-is; anything else is
- *   converted to OGG OPUS on the fly by ffmpeg.
+ * - An OGG OPUS file is demuxed by {@see Ogg}: its packets are handed to the tracks untouched, each
+ *   paced by its own duration. Anything else is converted to OGG OPUS on the fly by ffmpeg.
+ *   The legacy libtgvoip engine can only send 60ms packets, so for it ({@see self::setFixedOggGrid()})
+ *   only MadelineProto's own OGG OPUS files are played as-is, and the others are converted too.
  *
  * Nothing is decoded or re-encoded for pre-encoded input, so playback needs no codec library (and
  * therefore no FFI). Frames are **streamed**, not buffered whole: the reader keeps only about
@@ -104,9 +106,6 @@ final class DjLoop extends VoIPLoop
     /** How far ahead of playback the reader is allowed to buffer, in milliseconds. */
     private const BUFFER_AHEAD_MS = 2000;
 
-    /** Duration of one MadelineProto OGG OPUS frame, in milliseconds. */
-    private const OGG_FRAME_MS = 60;
-
     /* -------------------------------------------------------------------- *
      *  Playlist.
      * -------------------------------------------------------------------- */
@@ -123,8 +122,12 @@ final class DjLoop extends VoIPLoop
      *  Bounded look-ahead queues (serializable), drained by the tracks.
      * -------------------------------------------------------------------- */
 
-    /** @var SplQueue<string> OPUS packets of an OGG file, played on the fixed 60ms grid. */
+    /** @var SplQueue<string> OPUS packets of an OGG file. */
     private SplQueue $oggQueue;
+    /** Total duration of the packets in {@see self::$oggQueue}, in 48kHz samples. */
+    private int $oggQueueSamples = 0;
+    /** Whether OGG files must be MadelineProto's own 60ms ones, others being converted (for the legacy libtgvoip engine). */
+    private bool $fixedOggGrid = false;
     /**
      * @var SplQueue<array{data: string, timestamp: int, file: int}> OPUS frames of a WebM file (48kHz ts).
      *
@@ -252,6 +255,7 @@ final class DjLoop extends VoIPLoop
             'holdIndex' => $this->holdIndex,
             'playingHold' => $this->playingHold,
             'oggQueue' => $this->oggQueue,
+            'fixedOggGrid' => $this->fixedOggGrid,
             'webmAudioQueue' => $this->webmAudioQueue,
             'videoQueue' => $this->videoQueue,
             'currentFile' => $currentFile,
@@ -287,6 +291,10 @@ final class DjLoop extends VoIPLoop
         $this->oggQueue ??= new SplQueue;
         $this->webmAudioQueue ??= new SplQueue;
         $this->videoQueue ??= new SplQueue;
+        $this->oggQueueSamples = 0;
+        foreach ($this->oggQueue as $packet) {
+            $this->oggQueueSamples += Ogg::packetDuration($packet);
+        }
         // Do NOT restart the reader here: its loop reads the call's state, which is only restored once
         // the whole call graph has finished deserializing. Starting it now could run it
         // mid-deserialization (if a nested resume suspends the fiber) and dereference not-yet-restored
@@ -310,6 +318,7 @@ final class DjLoop extends VoIPLoop
         $this->generation++;
         $this->readerCancel?->cancel();
         $this->oggQueue = new SplQueue;
+        $this->oggQueueSamples = 0;
         $this->webmAudioQueue = new SplQueue;
         $this->videoQueue = new SplQueue;
         $this->packetDeferred?->complete(false);
@@ -418,7 +427,16 @@ final class DjLoop extends VoIPLoop
      * ==================================================================== */
 
     /**
-     * Pull the next OGG-grid OPUS packet, waiting for one if the playlist is not exhausted.
+     * Only play MadelineProto's own OGG OPUS files as-is, converting the others: for the legacy
+     * libtgvoip engine, which can only send 60ms packets.
+     */
+    public function setFixedOggGrid(): void
+    {
+        $this->fixedOggGrid = true;
+    }
+
+    /**
+     * Pull the next OPUS packet of an OGG file, waiting for one if the playlist is not exhausted.
      */
     public function pullPacket(): ?string
     {
@@ -438,7 +456,7 @@ final class DjLoop extends VoIPLoop
     }
 
     /**
-     * Pull the next OGG-grid OPUS packet if one is immediately available.
+     * Pull the next OPUS packet of an OGG file if one is immediately available.
      *
      * Used by the WebRTC playback track, which is polled from a callback that must never suspend.
      */
@@ -448,6 +466,7 @@ final class DjLoop extends VoIPLoop
             return null;
         }
         $packet = $this->oggQueue->dequeue();
+        $this->oggQueueSamples -= Ogg::packetDuration($packet);
         $this->releaseReader();
         return $packet;
     }
@@ -707,7 +726,8 @@ final class DjLoop extends VoIPLoop
                 }
             }
             if (str_starts_with($first, self::OGG_MAGIC)) {
-                return ['ogg', $source, false];
+                // A stream can't be probed for MadelineProto's own encoding.
+                return ['ogg', $source, $this->fixedOggGrid];
             }
             return ['ogg', $source, true];
         }
@@ -723,13 +743,13 @@ final class DjLoop extends VoIPLoop
         }
         try {
             $ogg = new Ogg($file, $cancellation);
-            if (\in_array('MADELINE_ENCODER_V=1', $ogg->comments, true)) {
+            if (!$this->fixedOggGrid || \in_array('MADELINE_ENCODER_V=1', $ogg->comments, true)) {
                 return ['ogg', $file, false];
             }
         } catch (CancelledException $e) {
             throw $e;
         } catch (Throwable) {
-            // Not a native OGG OPUS file.
+            // Not an OGG OPUS file.
         }
         return ['ogg', $file, true];
     }
@@ -746,7 +766,9 @@ final class DjLoop extends VoIPLoop
             $ogg = new Ogg($file, $cancellation, $this->resumeOffset);
         } elseif ($convert) {
             if (!Tools::canConvertOgg()) {
-                throw new AssertionError('The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!');
+                throw new AssertionError($this->fixedOggGrid
+                    ? 'The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!'
+                    : 'The passed file is not a WebM/Matroska or OGG OPUS file, please convert it (see https://docs.madelineproto.xyz/docs/CALLS.html#supported-formats) or install FFI and ffmpeg to perform realtime conversion!');
             }
             // Convert to OGG OPUS on the fly; the resulting pipe is not seekable, so it is not resumable.
             $pipe = new Pipe(4096);
@@ -773,8 +795,10 @@ final class DjLoop extends VoIPLoop
                 continue;
             }
             $this->oggQueue->enqueue($packet);
+            $samples = Ogg::packetDuration($packet);
+            $this->oggQueueSamples += $samples;
             $this->trackResume($unit);
-            $this->bufferedUntilMs += self::OGG_FRAME_MS;
+            $this->bufferedUntilMs += intdiv($samples, 48);
             $this->wakePacketWaiters();
             $this->throttle($generation, $cancellation);
         }
@@ -906,7 +930,7 @@ final class DjLoop extends VoIPLoop
         if ($this->currentKind === 'matroska') {
             return $this->bufferedUntilMs - $this->playbackMs;
         }
-        return $this->oggQueue->count() * self::OGG_FRAME_MS;
+        return intdiv($this->oggQueueSamples, 48);
     }
 
     /** Release the reader from back-pressure once a track has drained a queue. */

@@ -359,6 +359,7 @@ final class PrivateCallController implements CallControllerInterface
         }
         if ($version->isLegacy()) {
             $this->log("Starting the libtgvoip engine of $this using protocol {$version->value}", Logger::NOTICE);
+            $this->diskJockey->setFixedOggGrid();
             $this->legacyController = new LegacyController(
                 $this,
                 $this->authKey,

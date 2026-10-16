@@ -132,7 +132,7 @@ trait Handler
      * participant. Others join it with {@see self::joinConferenceCall()} using the returned call id.
      *
      * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
+     * Uses the `sodium` and `openssl` PHP extensions if available, for speed.
      *
      * @param bool $muted Whether to join muted.
      */
@@ -147,7 +147,7 @@ trait Handler
      * Join an existing end-to-end encrypted conference call.
      *
      * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
+     * Uses the `sodium` and `openssl` PHP extensions if available, for speed.
      *
      * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
      * @param bool  $muted Whether to join muted.
@@ -191,7 +191,7 @@ trait Handler
      */
     public function isConferenceCallJoined(int $id): bool
     {
-        return $this->conferenceCalls[$id]?->isJoined() ?? false;
+        return ($this->conferenceCalls[$id] ?? null)?->isJoined() ?? false;
     }
 
     /**
@@ -201,7 +201,8 @@ trait Handler
      */
     public function leaveConferenceCall(int $id): void
     {
-        $this->getConferenceCallController($id)->leave();
+        // Already left (and forgotten), if unknown.
+        ($this->conferenceCalls[$id] ?? null)?->leave();
     }
 
     /**

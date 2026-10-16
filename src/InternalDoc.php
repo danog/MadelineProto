@@ -460,7 +460,7 @@ abstract class InternalDoc
      * participant. Others join it with {@see self::joinConferenceCall()} using the returned call id.
      *
      * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
+     * Uses the `sodium` and `openssl` PHP extensions if available, for speed.
      *
      * @param bool $muted Whether to join muted.
      */
@@ -1759,7 +1759,7 @@ abstract class InternalDoc
      * Join an existing end-to-end encrypted conference call.
      *
      * See [end-to-end encrypted group calls »](https://core.telegram.org/api/end-to-end/group-calls).
-     * Requires the `sodium` and `openssl` PHP extensions.
+     * Uses the `sodium` and `openssl` PHP extensions if available, for speed.
      *
      * @param array $call  The `groupCall` (or `inputGroupCall`) of the conference to join.
      * @param bool  $muted Whether to join muted.
