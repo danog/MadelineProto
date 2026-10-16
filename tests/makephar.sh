@@ -228,4 +228,16 @@ gh release upload "$CI_COMMIT_TAG" "madeline.php"
 gh release edit --prerelease=false "$CI_COMMIT_TAG"
 gh release edit --latest=true "$CI_COMMIT_TAG"
 
+# Send the phar to the @madelineprotophar channel, with a link to the changelog.
+if [ "$PHAR_BOT_TOKEN" != "" ]; then
+    curl --fail --silent --show-error \
+        -F chat_id=@madelineprotophar \
+        -F document=@madeline81.phar \
+        -F caption="MadelineProto $CI_COMMIT_TAG
+
+Changelog: https://github.com/danog/MadelineProto/releases/tag/$CI_COMMIT_TAG" \
+        "https://api.telegram.org/bot$PHAR_BOT_TOKEN/sendDocument" > /dev/null \
+        || echo "Could not send the phar to @madelineprotophar!"
+fi
+
 

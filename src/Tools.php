@@ -692,53 +692,70 @@ abstract class Tools extends AsyncTools
     {
         $buffer = '';
         if ($stream instanceof LocalFile) {
-            $stream = openFile($stream->file, 'r');
+            $file = openFile($stream->file, 'r');
             if ($offset !== 0) {
-                $stream->seek($offset);
+                $file->seek($offset);
             }
-            return static fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
-        }
-        if ($stream instanceof RemoteUrl) {
-            self::$client ??= HttpClientBuilder::buildDefault();
-            $request = new Request($stream->url);
-            $request->setTransferTimeout(INF);
-            $request->setInactivityTimeout(INF);
-            if ($offset !== 0) {
-                $request->setHeader('Range', "bytes={$offset}-");
-            }
-            $stream = self::$client->request(
-                $request,
-                $cancellation
-            )->getBody();
-        } elseif ($offset !== 0) {
-            if ($stream instanceof ResumableDownloadStream) {
-                $stream->skip($offset);
-            } elseif ($stream instanceof ResumableStream) {
-                $buffer = self::skipStream($stream, $offset, $cancellation);
-            } else {
-                throw new Exception('Cannot resume a raw stream from a byte offset: it is not seekable.');
-            }
-        }
-        return static function (int $len) use (&$buffer, $stream, $cancellation): ?string {
-            if ($buffer === null) {
-                return null;
-            }
-            do {
-                if (\strlen($buffer) >= $len) {
-                    $piece = substr($buffer, 0, $len);
-                    $buffer = substr($buffer, $len);
-                    return $piece;
+            $read = static fn (): ?string => $file->read(cancellation: $cancellation, length: self::READ_AHEAD_LENGTH);
+        } else {
+            if ($stream instanceof RemoteUrl) {
+                self::$client ??= HttpClientBuilder::buildDefault();
+                $request = new Request($stream->url);
+                $request->setTransferTimeout(INF);
+                $request->setInactivityTimeout(INF);
+                if ($offset !== 0) {
+                    $request->setHeader('Range', "bytes={$offset}-");
                 }
+                $stream = self::$client->request(
+                    $request,
+                    $cancellation
+                )->getBody();
+            } elseif ($offset !== 0) {
+                if ($stream instanceof ResumableDownloadStream) {
+                    $stream->skip($offset);
+                } elseif ($stream instanceof ResumableStream) {
+                    $buffer = self::skipStream($stream, $offset, $cancellation) ?? '';
+                } else {
+                    throw new Exception('Cannot resume a raw stream from a byte offset: it is not seekable.');
+                }
+            }
+            $read = static function () use ($stream, $cancellation): ?string {
                 $chunk = $stream->read($cancellation);
                 if ($chunk === null) {
-                    $buffer = null;
                     $stream->close();
-                    return null;
+                }
+                return $chunk;
+            };
+        }
+        // Demuxers read a few bytes at a time: read ahead, and hand out the buffer from a position
+        // instead of cutting it (which would copy it) on every read.
+        $position = 0;
+        $eof = false;
+        return static function (int $len) use (&$buffer, &$position, &$eof, $read): ?string {
+            while (!$eof && \strlen($buffer) - $position < $len) {
+                $chunk = $read();
+                if ($chunk === null) {
+                    $eof = true;
+                    break;
+                }
+                if ($position > self::READ_AHEAD_LENGTH) {
+                    $buffer = substr($buffer, $position);
+                    $position = 0;
                 }
                 $buffer .= $chunk;
-            } while (true);
+            }
+            if ($position >= \strlen($buffer)) {
+                return null;
+            }
+            // Fewer bytes than requested only at the end of the stream.
+            $piece = substr($buffer, $position, $len);
+            $position += \strlen($piece);
+            return $piece;
         };
     }
+
+    /** How much is read ahead by {@see self::openBuffered()}, in bytes. */
+    private const READ_AHEAD_LENGTH = 128 * 1024;
 
     /**
      * Read and discard the next bytes of a stream.

@@ -430,7 +430,43 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public static function giveInstanceBySession(string $session): MTProto
     {
-        return self::$references[$session];
+        if (isset(self::$references[$session])) {
+            return self::$references[$session];
+        }
+        // Created by a session that was moved (before the names it had were saved, see self::$sessionNames):
+        // it's the only one, if only one is running.
+        $instances = [];
+        foreach (self::$references as $instance) {
+            $instances[spl_object_id($instance)] = $instance;
+        }
+        if (\count($instances) === 1) {
+            return reset($instances);
+        }
+        throw new Exception("The session $session is not running!");
+    }
+
+    /**
+     * The names of the session, i.e. the paths it was loaded from: objects created by this instance (and
+     * saved in the session) refer to it by the name it had when they were created, see {@see self::giveInstanceBySession()}.
+     *
+     * @var list<string>
+     */
+    private array $sessionNames = [];
+
+    /**
+     * Make this instance available by its session name, and by the names the session had before it was moved.
+     */
+    private function reference(): void
+    {
+        $name = $this->getSessionName();
+        self::$references[$name] = $this;
+        if (!\in_array($name, $this->sessionNames, true)) {
+            $this->sessionNames[] = $name;
+        }
+        foreach ($this->sessionNames as $previous) {
+            // Unless another session was loaded from there.
+            self::$references[$previous] ??= $this;
+        }
     }
 
     /** @internal */
@@ -548,7 +584,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         if ($wrapper) {
             $this->wrapper = $wrapper;
-            self::$references[$this->getSessionName()] = $this;
+            $this->reference();
         }
         $q = new SplQueue;
         $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
@@ -779,6 +815,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'sponsoredMessages',
 
             'tmpDbPrefix',
+            'sessionNames',
 
             // Misc caching
             'searchingRightPts',
@@ -1218,7 +1255,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         // Set API wrapper
         $this->wrapper = $wrapper;
         // Set reference to itself
-        self::$references[$this->getSessionName()] = $this;
+        $this->reference();
 
         $deferred = new DeferredFuture;
         $this->initPromise = $deferred->getFuture();
@@ -1329,8 +1366,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
         $this->logger->logger('Will unreference instance');
-        if (isset($this->wrapper) && isset(self::$references[$this->getSessionName()])) {
-            unset(self::$references[$this->getSessionName()]);
+        foreach (self::$references as $name => $instance) {
+            if ($instance === $this) {
+                unset(self::$references[$name]);
+            }
         }
         $this->stopLoops();
         if (isset($this->seqUpdater)) {
