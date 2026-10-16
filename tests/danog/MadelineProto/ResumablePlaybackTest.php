@@ -299,6 +299,22 @@ final class ResumablePlaybackTest extends TestCase
         self::assertNull($dj->getCurrent());
         $dj->discard();
     }
+
+    public function testALoopFromAnOlderSessionCanBeSavedAgain(): void
+    {
+        $dj = new DjLoop(new ResumablePlaybackTestCall);
+        $data = $dj->__serialize();
+        $dj->discard();
+        // Older versions didn't save these.
+        unset($data['videoOnly'], $data['fixedOggGrid']);
+
+        $old = (new \ReflectionClass(DjLoop::class))->newInstanceWithoutConstructor();
+        $old->__unserialize($data);
+
+        $restored = unserialize(serialize($old));
+        self::assertInstanceOf(DjLoop::class, $restored);
+        $restored->discard();
+    }
 }
 
 /**

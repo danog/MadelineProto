@@ -291,6 +291,8 @@ final class DjLoop extends VoIPLoop
         $this->oggQueue ??= new SplQueue;
         $this->webmAudioQueue ??= new SplQueue;
         $this->videoQueue ??= new SplQueue;
+        // Not saved by older versions.
+        $this->videoOnly ??= false;
         $this->oggQueueSamples = 0;
         foreach ($this->oggQueue as $packet) {
             $this->oggQueueSamples += Ogg::packetDuration($packet);
