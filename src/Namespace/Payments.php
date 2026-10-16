@@ -905,4 +905,108 @@ interface Payments
      * @psalm-impure
      */
     public function craftStarGift(array $stargift = [], ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'payments.currencyRates', rates: list<array{_: 'currencyRate', rate: float, currency: string}>} @see https://docs.madelineproto.xyz/API_docs/types/payments.CurrencyRates.html
+     * @psalm-impure
+     */
+    public function getCurrencyRates(?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $crypto_currency 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return list<array{_: 'onrampProviderInfo', supports_base_currencies: bool, supports_limits: bool, supports_quote: bool, id: string, name: string, crypto_currencies: list<string>}> Array of  @see https://docs.madelineproto.xyz/API_docs/types/OnrampProviderInfo.html
+     * @psalm-impure
+     */
+    public function getOnrampProviders(string|null $crypto_currency = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $provider 
+     * @param string $crypto_currency 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return list<string> 
+     * @psalm-impure
+     */
+    public function getOnrampBaseCurrencies(string|null $provider = '', string|null $crypto_currency = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $provider 
+     * @param string $crypto_currency 
+     * @param string $base_currency 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'onrampAvailability', allowed: bool, buy_allowed: bool, country_code: string, state?: string, methods: list<array{_: 'onrampMethodAvailability', available: bool, payment_method: string}>} @see https://docs.madelineproto.xyz/API_docs/types/OnrampAvailability.html
+     * @psalm-impure
+     */
+    public function getOnrampAvailability(string|null $provider = '', string|null $crypto_currency = '', string|null $base_currency = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $provider 
+     * @param string $crypto_currency 
+     * @param string $base_currency 
+     * @param string $payment_method 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'onrampLimits', base_currency: string, base_min_amount: string, base_max_amount: string, crypto_min_amount: string, crypto_max_amount: string, payment_method: string} @see https://docs.madelineproto.xyz/API_docs/types/OnrampLimits.html
+     * @psalm-impure
+     */
+    public function getOnrampLimits(string|null $provider = '', string|null $crypto_currency = '', string|null $base_currency = '', string|null $payment_method = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $provider 
+     * @param string $crypto_currency 
+     * @param string $base_currency 
+     * @param string $base_amount 
+     * @param string $crypto_amount 
+     * @param string $payment_method 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'onrampQuote', base_currency: string, base_amount: string, crypto_currency: string, crypto_amount: string, crypto_price: string, fee_amount: string, extra_fee_amount: string, network_fee_amount: string, total_amount: string, payment_method: string, expires_date: int} @see https://docs.madelineproto.xyz/API_docs/types/OnrampQuote.html
+     * @psalm-impure
+     */
+    public function getOnrampQuote(string|null $provider = '', string|null $crypto_currency = '', string|null $base_currency = '', string|null $base_amount = null, string|null $crypto_amount = null, string|null $payment_method = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param string $provider 
+     * @param string $crypto_currency 
+     * @param string $address 
+     * @param string $payment_method 
+     * @param string $base_currency 
+     * @param string $base_amount 
+     * @param string $memo 
+     * @param string $theme 
+     * @param string $success_return_url 
+     * @param string $fail_return_url 
+     * @param string $crypto_amount 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'onrampSession', provider: string, session_id: string, url: string, expires_date: int} @see https://docs.madelineproto.xyz/API_docs/types/OnrampSession.html
+     * @psalm-impure
+     */
+    public function createOnrampSession(string|null $provider = '', string|null $crypto_currency = '', string|null $address = '', string|null $payment_method = null, string|null $base_currency = null, string|null $base_amount = null, string|null $memo = null, string|null $theme = null, string|null $success_return_url = null, string|null $fail_return_url = null, string|null $crypto_amount = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 }

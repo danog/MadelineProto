@@ -213,6 +213,7 @@ messageActionPollDeleteAnswer#399674dc answer:PollAnswer = MessageAction;
 messageActionManagedBotCreated#16605e3e bot_id:long = MessageAction;
 messageActionChangeCommunity#5d20bae8 flags:# community_id:flags.0?long = MessageAction;
 messageActionChatJoinedViaCommunity#4a8bfe80 community_id:long = MessageAction;
+messageActionGramTransfer#9329ea33 flags:# amount:long peer_address:string transaction_id:string comment:flags.0?string = MessageAction;
 
 dialog#fc89f7f3 flags:# pinned:flags.2?true unread_mark:flags.3?true view_forum_as_messages:flags.6?true peer:Peer top_message:int read_inbox_max_id:int read_outbox_max_id:int unread_count:int unread_mentions_count:int unread_reactions_count:int unread_poll_votes_count:int notify_settings:PeerNotifySettings pts:flags.0?int draft:flags.1?DraftMessage folder_id:flags.4?int ttl_period:flags.5?int = Dialog;
 dialogFolder#71bd134c flags:# pinned:flags.2?true folder:Folder peer:Peer top_message:int unread_muted_peers_count:int unread_unmuted_peers_count:int unread_muted_messages_count:int unread_unmuted_messages_count:int = Dialog;
@@ -267,7 +268,7 @@ inputReportReasonFake#f5ddd6e7 = ReportReason;
 inputReportReasonIllegalDrugs#a8eb2be = ReportReason;
 inputReportReasonPersonalDetails#9ec7863d = ReportReason;
 
-userFull#6cbe645 flags:# blocked:flags.0?true phone_calls_available:flags.4?true phone_calls_private:flags.5?true can_pin_message:flags.7?true has_scheduled:flags.12?true video_calls_available:flags.13?true voice_messages_forbidden:flags.20?true translations_disabled:flags.23?true stories_pinned_available:flags.26?true blocked_my_stories_from:flags.27?true wallpaper_overridden:flags.28?true contact_require_premium:flags.29?true read_dates_private:flags.30?true flags2:# sponsored_enabled:flags2.7?true can_view_revenue:flags2.9?true bot_can_manage_emoji_status:flags2.10?true display_gifts_button:flags2.16?true noforwards_my_enabled:flags2.23?true noforwards_peer_enabled:flags2.24?true unofficial_security_risk:flags2.26?true id:long about:flags.1?string settings:PeerSettings personal_photo:flags.21?Photo profile_photo:flags.2?Photo fallback_photo:flags.22?Photo notify_settings:PeerNotifySettings bot_info:flags.3?BotInfo pinned_msg_id:flags.6?int common_chats_count:int folder_id:flags.11?int ttl_period:flags.14?int theme:flags.15?ChatTheme private_forward_name:flags.16?string bot_group_admin_rights:flags.17?ChatAdminRights bot_broadcast_admin_rights:flags.18?ChatAdminRights wallpaper:flags.24?WallPaper stories:flags.25?PeerStories business_work_hours:flags2.0?BusinessWorkHours business_location:flags2.1?BusinessLocation business_greeting_message:flags2.2?BusinessGreetingMessage business_away_message:flags2.3?BusinessAwayMessage business_intro:flags2.4?BusinessIntro birthday:flags2.5?Birthday personal_channel_id:flags2.6?long personal_channel_message:flags2.6?int stargifts_count:flags2.8?int starref_program:flags2.11?StarRefProgram bot_verification:flags2.12?BotVerification send_paid_messages_stars:flags2.14?long disallowed_gifts:flags2.15?DisallowedGiftsSettings stars_rating:flags2.17?StarsRating stars_my_pending_rating:flags2.18?StarsRating stars_my_pending_rating_date:flags2.18?int main_tab:flags2.20?ProfileTab saved_music:flags2.21?Document note:flags2.22?TextWithEntities bot_manager_id:flags2.25?long = UserFull;
+userFull#7fe738c4 flags:# blocked:flags.0?true phone_calls_available:flags.4?true phone_calls_private:flags.5?true can_pin_message:flags.7?true has_scheduled:flags.12?true video_calls_available:flags.13?true voice_messages_forbidden:flags.20?true translations_disabled:flags.23?true stories_pinned_available:flags.26?true blocked_my_stories_from:flags.27?true wallpaper_overridden:flags.28?true contact_require_premium:flags.29?true read_dates_private:flags.30?true flags2:# sponsored_enabled:flags2.7?true can_view_revenue:flags2.9?true bot_can_manage_emoji_status:flags2.10?true display_gifts_button:flags2.16?true noforwards_my_enabled:flags2.23?true noforwards_peer_enabled:flags2.24?true unofficial_security_risk:flags2.26?true id:long about:flags.1?string settings:PeerSettings personal_photo:flags.21?Photo profile_photo:flags.2?Photo fallback_photo:flags.22?Photo notify_settings:PeerNotifySettings bot_info:flags.3?BotInfo pinned_msg_id:flags.6?int common_chats_count:int folder_id:flags.11?int ttl_period:flags.14?int theme:flags.15?ChatTheme private_forward_name:flags.16?string bot_group_admin_rights:flags.17?ChatAdminRights bot_broadcast_admin_rights:flags.18?ChatAdminRights wallpaper:flags.24?WallPaper stories:flags.25?PeerStories business_work_hours:flags2.0?BusinessWorkHours business_location:flags2.1?BusinessLocation business_greeting_message:flags2.2?BusinessGreetingMessage business_away_message:flags2.3?BusinessAwayMessage business_intro:flags2.4?BusinessIntro birthday:flags2.5?Birthday personal_channel_id:flags2.6?long personal_channel_message:flags2.6?int stargifts_count:flags2.8?int starref_program:flags2.11?StarRefProgram bot_verification:flags2.12?BotVerification send_paid_messages_stars:flags2.14?long disallowed_gifts:flags2.15?DisallowedGiftsSettings stars_rating:flags2.17?StarsRating stars_my_pending_rating:flags2.18?StarsRating stars_my_pending_rating_date:flags2.18?int main_tab:flags2.20?ProfileTab saved_music:flags2.21?Document note:flags2.22?TextWithEntities bot_manager_id:flags2.25?long gram_address:flags2.27?string = UserFull;
 
 contact#145ade0b user_id:long mutual:Bool = Contact;
 
@@ -483,6 +484,7 @@ updateDeleteEphemeralMessages#56dbfcf8 peer:Peer ids:Vector<int> = Update;
 updateEditEphemeralMessage#4bbb8f01 message:EphemeralMessage = Update;
 updateEphemeralBotCallbackQuery#7c1079d6 flags:# query_id:long user_id:long peer:flags.0?Peer msg_id:int data:bytes chat_instance:flags.1?long message:EphemeralMessage = Update;
 updateBotStarsSubscription#6c0d8e23 flags:# canceled:flags.0?true payment_failed:flags.1?true restored:flags.2?true user_id:long payload:bytes qts:int = Update;
+updateWalletState#6ac3f2aa state:WalletState = Update;
 
 updates.state#a56c2a3e pts:int qts:int date:int seq:int unread_count:int = updates.State;
 
@@ -2007,9 +2009,9 @@ starsTonAmount#74aee3e0 amount:long = StarsAmount;
 messages.foundStickersNotModified#6010c534 flags:# next_offset:flags.0?int = messages.FoundStickers;
 messages.foundStickers#82c9e290 flags:# next_offset:flags.0?int hash:long stickers:Vector<Document> = messages.FoundStickers;
 
-botVerifierSettings#b0cd6617 flags:# can_modify_custom_description:flags.1?true icon:long company:string custom_description:flags.0?string = BotVerifierSettings;
+botVerifierSettings#a12aefff flags:# can_modify_custom_description:flags.1?true icon:long company:string custom_description:flags.0?TextWithEntities = BotVerifierSettings;
 
-botVerification#f93cd45c bot_id:long icon:long description:string = BotVerification;
+botVerification#f72e0ed9 bot_id:long icon:long description:TextWithEntities = BotVerification;
 
 starGiftAttributeModel#565251e2 flags:# crafted:flags.0?true name:string document:Document rarity:StarGiftAttributeRarity = StarGiftAttribute;
 starGiftAttributePattern#4e7085ea name:string document:Document rarity:StarGiftAttributeRarity = StarGiftAttribute;
@@ -2272,6 +2274,48 @@ ephemeral.welcomeMessagesNotModified#59ffdb31 = ephemeral.WelcomeMessages;
 ephemeral.welcomeMessages#104fc872 hash:long messages:Vector<EphemeralMessage> = ephemeral.WelcomeMessages;
 
 auth.firebasePnvIntent#df5ac00c nonce:string digital_credential_payload:string = auth.FirebasePnvIntent;
+
+currencyRate#30d9743c currency:string rate:double = CurrencyRate;
+
+payments.currencyRates#bbcce4c2 rates:Vector<CurrencyRate> = payments.CurrencyRates;
+
+toncenter.apiResponse#ac8dfe19 response:DataJSON = toncenter.ApiResponse;
+
+toncenter.streamingUrl#19887601 url:string expires:int = toncenter.StreamingUrl;
+
+onrampMethodAvailability#9ec8c6a8 flags:# available:flags.0?true payment_method:string = OnrampMethodAvailability;
+
+onrampProviderInfo#dc27582 flags:# supports_base_currencies:flags.0?true supports_limits:flags.1?true supports_quote:flags.2?true id:string name:string crypto_currencies:Vector<string> = OnrampProviderInfo;
+
+onrampAvailability#f9c84973 flags:# allowed:flags.0?true buy_allowed:flags.1?true country_code:string state:flags.2?string methods:Vector<OnrampMethodAvailability> = OnrampAvailability;
+
+onrampLimits#7be2677e base_currency:string base_min_amount:string base_max_amount:string crypto_min_amount:string crypto_max_amount:string payment_method:string = OnrampLimits;
+
+onrampQuote#7a8011e9 base_currency:string base_amount:string crypto_currency:string crypto_amount:string crypto_price:string fee_amount:string extra_fee_amount:string network_fee_amount:string total_amount:string payment_method:string expires_date:int = OnrampQuote;
+
+onrampSession#d1e42e24 provider:string session_id:string url:string expires_date:int = OnrampSession;
+
+walletStateEmpty#9cb9b2ec flags:# creating:flags.0?true = WalletState;
+walletState#95c5346b flags:# backup_enabled:flags.0?true can_export_phrase:flags.1?true can_enable_backup:flags.2?true address:string public_key:bytes balance:long = WalletState;
+
+walletUserAddress#1ce00108 user_id:long address:string = WalletUserAddress;
+
+walletTransactionPeerUser#d4ea706d flags:# user_id:long address:string domain:flags.0?string = WalletTransactionPeer;
+walletTransactionPeerAddress#62cc1bc flags:# address:string domain:flags.0?string = WalletTransactionPeer;
+walletTransactionPeerUnsupported#728bed5a = WalletTransactionPeer;
+
+walletTransaction#6f9986a1 flags:# incoming:flags.0?true failed:flags.2?true key_change:flags.5?true id:string amount:long fee:long date:int peer:WalletTransactionPeer comment:flags.3?string tx_hash:flags.4?string = WalletTransaction;
+
+wallet.transactions#4322d5a5 flags:# balance:long transactions:Vector<WalletTransaction> next_offset:flags.0?string chats:Vector<Chat> users:Vector<User> = wallet.Transactions;
+
+wallet.secretPhraseParts#e6d0ef01 token:string dcs:Vector<int> = wallet.SecretPhraseParts;
+
+wallet.encryptedSecretPhrasePart#18e82537 data:bytes = wallet.EncryptedSecretPhrasePart;
+
+wallet.holderDc#f9d612ef dc:int public_key:bytes = wallet.HolderDc;
+
+inputWalletNew#63a440dc = InputWalletReplacement;
+inputWalletImported#330c560c public_key:bytes = InputWalletReplacement;
 
 ---functions---
 
@@ -2875,7 +2919,7 @@ bots.toggleUserEmojiStatusPermission#6de6392 bot:InputUser enabled:Bool = Bool;
 bots.checkDownloadFileParams#50077589 bot:InputUser file_name:string url:string = Bool;
 bots.getAdminedBots#b0711d83 = Vector<User>;
 bots.updateStarRefProgram#778b5ab3 flags:# bot:InputUser commission_permille:int duration_months:flags.0?int = StarRefProgram;
-bots.setCustomVerification#8b89dfbd flags:# enabled:flags.1?true bot:flags.0?InputUser peer:InputPeer custom_description:flags.2?string = Bool;
+bots.setCustomVerification#f4946757 flags:# enabled:flags.1?true bot:flags.0?InputUser peer:InputPeer custom_description:flags.2?TextWithEntities = Bool;
 bots.getBotRecommendations#a1b70815 bot:InputUser = users.Users;
 bots.checkUsername#87f2219b username:string = Bool;
 bots.createBot#e5b17f2b flags:# via_deeplink:flags.0?true name:string username:string manager_id:InputUser = User;
@@ -2951,6 +2995,13 @@ payments.sendStarGiftOffer#8fb86b41 flags:# peer:InputPeer slug:string price:Sta
 payments.getStarGiftUpgradeAttributes#6d038b58 gift_id:long = payments.StarGiftUpgradeAttributes;
 payments.getCraftStarGifts#fd05dd00 gift_id:long offset:string limit:int = payments.SavedStarGifts;
 payments.craftStarGift#b0f9684f stargift:Vector<InputSavedStarGift> = Updates;
+payments.getCurrencyRates#d35983e8 = payments.CurrencyRates;
+payments.getOnrampProviders#3f3e00dc flags:# crypto_currency:flags.0?string = Vector<OnrampProviderInfo>;
+payments.getOnrampBaseCurrencies#1c8bedf3 provider:string crypto_currency:string = Vector<string>;
+payments.getOnrampAvailability#2ec29951 flags:# provider:string crypto_currency:string base_currency:flags.0?string = OnrampAvailability;
+payments.getOnrampLimits#80e851fd flags:# provider:string crypto_currency:string base_currency:string payment_method:flags.0?string = OnrampLimits;
+payments.getOnrampQuote#e06645fa flags:# provider:string crypto_currency:string base_currency:string base_amount:flags.0?string crypto_amount:flags.1?string payment_method:flags.2?string = OnrampQuote;
+payments.createOnrampSession#a2197cf6 flags:# provider:string crypto_currency:string address:string payment_method:flags.0?string base_currency:flags.1?string base_amount:flags.2?string memo:flags.3?string theme:flags.4?string success_return_url:flags.5?string fail_return_url:flags.6?string crypto_amount:flags.7?string = OnrampSession;
 
 stickers.createStickerSet#9021ab67 flags:# masks:flags.0?true emojis:flags.5?true text_color:flags.6?true user_id:InputUser title:string short_name:string thumb:flags.2?InputDocument stickers:Vector<InputStickerSetItem> software:flags.3?string = messages.StickerSet;
 stickers.removeStickerFromSet#f7760f51 sticker:InputDocument = messages.StickerSet;
@@ -3114,4 +3165,17 @@ ephemeral.deleteWelcomeMessage#e882a9e1 peer:InputPeer id:int = Bool;
 ephemeral.deleteAllWelcomeMessages#734f9721 peer:InputPeer = Bool;
 ephemeral.getWelcomeMessages#db9ac18d peer:InputPeer hash:long = ephemeral.WelcomeMessages;
 
-// LAYER 229
+toncenter.performApiRequest#8d7bdd61 flags:# post:flags.0?true endpoint:string query:flags.1?string payload:flags.2?string = toncenter.ApiResponse;
+toncenter.getStreamingUrl#cdaf63c7 = toncenter.StreamingUrl;
+
+wallet.getState#ab83b33a = WalletState;
+wallet.getUserAddresses#1ddd6c11 flags:# force:flags.0?true id:Vector<InputUser> = Vector<WalletUserAddress>;
+wallet.getTransactions#a8830a83 flags:# inbound:flags.0?true outbound:flags.1?true offset:string limit:int = wallet.Transactions;
+wallet.exportSecretPhrase#9077c9ac flags:# password:flags.0?InputCheckPasswordSRP = wallet.SecretPhraseParts;
+wallet.fetchEncryptedSecretPhrasePart#f53925cf token:string public_key:bytes = wallet.EncryptedSecretPhrasePart;
+wallet.replaceWallet#d8c72eec flags:# wallet:InputWalletReplacement password:flags.0?InputCheckPasswordSRP = WalletState;
+wallet.disableBackup#199e1f1 flags:# password:flags.0?InputCheckPasswordSRP = WalletState;
+wallet.getBackupHolderDcs#d179d494 = Vector<wallet.HolderDc>;
+wallet.enableBackup#81a2b0f3 flags:# parts:Vector<bytes> password:flags.0?InputCheckPasswordSRP = WalletState;
+
+// LAYER 231

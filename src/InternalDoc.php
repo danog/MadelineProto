@@ -110,6 +110,10 @@ abstract class InternalDoc
     public $communities;
     /** @var \danog\MadelineProto\Namespace\Ephemeral $ephemeral */
     public $ephemeral;
+    /** @var \danog\MadelineProto\Namespace\Toncenter $toncenter */
+    public $toncenter;
+    /** @var \danog\MadelineProto\Namespace\Wallet $wallet */
+    public $wallet;
 
     /**
      * Export APIFactory instance with the specified namespace.
@@ -167,6 +171,10 @@ abstract class InternalDoc
         $this->communities->setWrapper($this->wrapper);
         $this->ephemeral ??= new \danog\MadelineProto\Namespace\AbstractAPI('ephemeral');
         $this->ephemeral->setWrapper($this->wrapper);
+        $this->toncenter ??= new \danog\MadelineProto\Namespace\AbstractAPI('toncenter');
+        $this->toncenter->setWrapper($this->wrapper);
+        $this->wallet ??= new \danog\MadelineProto\Namespace\AbstractAPI('wallet');
+        $this->wallet->setWrapper($this->wrapper);
     }
     /**
          * Convert MTProto parameters to bot API parameters.

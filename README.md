@@ -1392,7 +1392,14 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleDecode" name="rleDecode">null-byte RLE decode: rleDecode</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleEncode" name="rleEncode">null-byte RLE encode: rleEncode</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.craftStarGift.html" name="payments.craftStarGift">payments.craftStarGift</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.createOnrampSession.html" name="payments.createOnrampSession">payments.createOnrampSession</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getCraftStarGifts.html" name="payments.getCraftStarGifts">payments.getCraftStarGifts</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getCurrencyRates.html" name="payments.getCurrencyRates">payments.getCurrencyRates</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getOnrampAvailability.html" name="payments.getOnrampAvailability">payments.getOnrampAvailability</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getOnrampBaseCurrencies.html" name="payments.getOnrampBaseCurrencies">payments.getOnrampBaseCurrencies</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getOnrampLimits.html" name="payments.getOnrampLimits">payments.getOnrampLimits</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getOnrampProviders.html" name="payments.getOnrampProviders">payments.getOnrampProviders</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getOnrampQuote.html" name="payments.getOnrampQuote">payments.getOnrampQuote</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarGiftActiveAuctions.html" name="payments.getStarGiftActiveAuctions">payments.getStarGiftActiveAuctions</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarGiftAuctionAcquiredGifts.html" name="payments.getStarGiftAuctionAcquiredGifts">payments.getStarGiftAuctionAcquiredGifts</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/payments.getStarGiftAuctionState.html" name="payments.getStarGiftAuctionState">payments.getStarGiftAuctionState</a>
@@ -1407,7 +1414,18 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/phone.sendGroupCallMessage.html" name="phone.sendGroupCallMessage">phone.sendGroupCallMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stats.getPollStats.html" name="stats.getPollStats">stats.getPollStats</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/stories.startLive.html" name="stories.startLive">stories.startLive</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/toncenter.getStreamingUrl.html" name="toncenter.getStreamingUrl">toncenter.getStreamingUrl</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/toncenter.performApiRequest.html" name="toncenter.performApiRequest">toncenter.performApiRequest</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/users.suggestBirthday.html" name="users.suggestBirthday">users.suggestBirthday</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.disableBackup.html" name="wallet.disableBackup">wallet.disableBackup</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.enableBackup.html" name="wallet.enableBackup">wallet.enableBackup</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.exportSecretPhrase.html" name="wallet.exportSecretPhrase">wallet.exportSecretPhrase</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.fetchEncryptedSecretPhrasePart.html" name="wallet.fetchEncryptedSecretPhrasePart">wallet.fetchEncryptedSecretPhrasePart</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.getBackupHolderDcs.html" name="wallet.getBackupHolderDcs">wallet.getBackupHolderDcs</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.getState.html" name="wallet.getState">wallet.getState</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.getTransactions.html" name="wallet.getTransactions">wallet.getTransactions</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.getUserAddresses.html" name="wallet.getUserAddresses">wallet.getUserAddresses</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/wallet.replaceWallet.html" name="wallet.replaceWallet">wallet.replaceWallet</a>
 * [Contributing](https://docs.madelineproto.xyz/docs/CONTRIB.html) - You can contribute in various ways.
   * [Translation](https://docs.madelineproto.xyz/docs/CONTRIB.html#translation)
   * [Contribution guide](https://docs.madelineproto.xyz/docs/CONTRIB.html#contribution-guide)
