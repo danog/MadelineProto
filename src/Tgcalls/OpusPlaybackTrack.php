@@ -35,9 +35,9 @@ use function Amp\delay;
  * decode/encode round trip, which also means that no codec library (and therefore no FFI) is ever
  * needed for playback.
  *
- * The track runs a background producer task that pushes the frames into its own {@see Queue},
- * which the RTP sender drains reactively through {@see parent::getConsumer()}: the old polling
- * contract, in which the sender repeatedly called {@see self::receiveData()}, is gone. Pacing
+ * The track runs a background producer task that pushes the frames to the RTP sender, which sends
+ * them right away (see {@see parent::push()}): the old polling contract, in which the sender
+ * repeatedly called {@see self::receiveData()}, is gone. Pacing
  * happens inside the producer by returning `null` (i.e. not pushing) until the next frame is due:
  * an OGG packet lasts as long as its TOC byte says ({@see Ogg::packetDuration()}), a WebM frame until
  * the timestamp of the next one.
@@ -67,6 +67,8 @@ final class OpusPlaybackTrack extends MediaStreamTrack
      * moderate level describes it accurately.
      */
     private const AUDIO_LEVEL_DBOV = -20;
+    /** How late a frame may be released, in seconds, before the track resynchronizes instead of catching up. */
+    private const MAX_LATENESS = 1.0;
 
     /** Wall clock time at which the next frame is due. */
     private ?float $nextFrame = null;
@@ -74,6 +76,8 @@ final class OpusPlaybackTrack extends MediaStreamTrack
     private int $timestamp = 0;
     /** Wall clock time at which the producer should next attempt to emit a frame. */
     private ?float $nextDue = null;
+    /** Whether the frame to produce next isn't queued yet: the producer waits for it to be. */
+    private bool $starved = false;
 
     /** Wall clock time corresponding to the first WebM frame we released. */
     private ?float $webmStartedAt = null;
@@ -152,7 +156,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
                 $packet = $this->produce();
                 if ($packet !== null) {
                     try {
-                        $this->frameQueue->push($packet);
+                        $this->push($packet);
                     } catch (DisposedException|\Error $e) {
                         // The consumer (the RTP sender) went away — its connection was closed or
                         // replaced — while a frame was waiting to be taken: this track will never be
@@ -165,7 +169,12 @@ final class OpusPlaybackTrack extends MediaStreamTrack
                 // polling for work at a fixed interval.
                 $wait = ($this->nextDue ?? microtime(true)) - microtime(true);
                 if ($wait > 0) {
-                    delay($wait);
+                    if ($this->starved) {
+                        // Played as soon as it's queued, if it's late.
+                        $this->dj->awaitFrame($wait);
+                    } else {
+                        delay($wait);
+                    }
                 }
             }
         }
@@ -187,6 +196,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
      */
     private function produce(): ?EncodedPacket
     {
+        $this->starved = false;
         // Audio coming from a WebM file wins: it has to stay in sync with that file's video.
         if ($this->webmPending !== null
             || $this->dj->hasWebmAudio()
@@ -210,7 +220,7 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         } elseif ($now < $this->nextFrame) {
             $this->nextDue = $this->nextFrame;
             return null;
-        } elseif ($now - $this->nextFrame > 1.0) {
+        } elseif ($now - $this->nextFrame > self::MAX_LATENESS) {
             // We fell way behind (the process was suspended, or the call was just resumed):
             // resynchronize instead of bursting out a second of audio.
             $this->nextFrame = $now;
@@ -254,9 +264,10 @@ final class OpusPlaybackTrack extends MediaStreamTrack
         $frame = $this->webmPending ?? $this->dj->pullWebmAudio();
         $this->webmPending = null;
         if ($frame === null) {
-            // The file's audio queue momentarily ran dry. Once we have measured the file's own
-            // frame interval, retry at exactly that cadence so pacing follows the file's real
-            // emission rate; until the first two frames are seen, fall back to our 60ms frame grid.
+            // The file's audio queue momentarily ran dry: wait for the next frame to be queued. For
+            // at most the file's own frame interval, once we have measured it, to notice that it
+            // ended; until the first two frames are seen, for at most our 60ms frame grid.
+            $this->starved = true;
             $this->nextDue = microtime(true) + ($this->webmFrameInterval ?? self::FRAME_DURATION);
             return null;
         }
@@ -280,6 +291,11 @@ final class OpusPlaybackTrack extends MediaStreamTrack
             $this->webmPending = $frame;
             $this->nextDue = $this->webmStartedAt + $elapsed;
             return null;
+        }
+        if ($now - $this->webmStartedAt - $elapsed > self::MAX_LATENESS) {
+            // We fell way behind (nobody took the frames until the call connected, or the process was
+            // suspended): resynchronize instead of bursting out all of the audio we're late with.
+            $this->webmStartedAt = $now - $elapsed;
         }
 
         if ($this->muted) {

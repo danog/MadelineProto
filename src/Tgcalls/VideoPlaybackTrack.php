@@ -35,8 +35,7 @@ use function Amp\delay;
  * expects is settled by {@see GroupSdp}, from {@see DjLoop::getVideoCodec()}.
  *
  * As with {@see OpusPlaybackTrack}, a background producer task drains the source and pushes the
- * frames into the track's {@see Queue}, releasing them according to their own timestamps rather
- * than by sleeping.
+ * frames to the RTP sender, releasing them according to their own timestamps.
  *
  * @internal
  */
@@ -52,6 +51,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private const IDLE_POLL = 0.02;
     /** The frame interval assumed when a file ends before its cadence was measured. */
     private const DEFAULT_FRAME_INTERVAL = 1 / 30;
+    /** How late a frame may be released, in seconds, before the track resynchronizes instead of catching up. */
+    private const MAX_LATENESS = 1.0;
 
     /** Wall clock time corresponding to the first frame we released. */
     private ?float $startedAt = null;
@@ -71,6 +72,8 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private ?int $file = null;
     /** Wall clock time at which the producer should next attempt to emit a frame. */
     private ?float $nextDue = null;
+    /** Whether the frame to produce next isn't queued yet: the producer waits for it to be. */
+    private bool $starved = false;
 
     private bool $playing = false;
     /** Whether signaling has selected the codec that the current file contains. */
@@ -149,7 +152,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
                 $packet = $this->produce();
                 if ($packet !== null) {
                     try {
-                        $this->frameQueue->push($packet);
+                        $this->push($packet);
                     } catch (DisposedException|\Error $e) {
                         // The consumer (the RTP sender) went away — its connection was closed or
                         // replaced — while a frame was waiting to be taken: this track will never be
@@ -162,7 +165,12 @@ final class VideoPlaybackTrack extends MediaStreamTrack
                 // polling for work at a fixed interval.
                 $wait = ($this->nextDue ?? microtime(true)) - microtime(true);
                 if ($wait > 0) {
-                    delay($wait);
+                    if ($this->starved) {
+                        // Played as soon as it's queued, if it's late.
+                        $this->source->awaitFrame($wait);
+                    } else {
+                        delay($wait);
+                    }
                 }
             }
         }
@@ -222,6 +230,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
      */
     private function produce(): ?EncodedPacket
     {
+        $this->starved = false;
         if (!$this->transportReady) {
             $this->nextDue = microtime(true) + self::IDLE_POLL;
             return null;
@@ -232,10 +241,11 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             if ($this->playing && $this->source->isExhausted()) {
                 $this->finishFile();
             }
-            // The queue momentarily ran dry. If a file is mid-flight, wait exactly one of its own
-            // measured frame intervals so the retry tracks the file's real emission rate rather
-            // than a hardcoded cadence; if we are still buffering the first frames or sitting idle
-            // between files, there is no media rate to honor yet, so fall back to a plain poll.
+            // The queue momentarily ran dry: wait for the next frame to be queued. For at most one of
+            // the file's own frame intervals if a file is mid-flight, to notice that it ended; if
+            // we are still buffering the first frames or sitting idle between files, there is no
+            // media rate to honor yet, so fall back to a plain poll.
+            $this->starved = true;
             $this->nextDue = microtime(true) + ($this->frameInterval ?? self::IDLE_POLL);
             return null;
         }
@@ -260,6 +270,11 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             $this->pending = $frame;
             $this->nextDue = $due;
             return null;
+        }
+        if ($now - $due > self::MAX_LATENESS) {
+            // We fell way behind (nobody took the frames until the call connected, or the process was
+            // suspended): resynchronize instead of bursting out all of the video we're late with.
+            $this->startedAt = $now - $elapsed;
         }
 
         $timestamp = $this->timestampOffset + ($frame['timestamp'] - $this->baseTimestamp);

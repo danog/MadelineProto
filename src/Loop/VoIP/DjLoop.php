@@ -78,6 +78,12 @@ final class DjLoop extends VoIPLoop
     public const VIDEO_CLOCK_RATE = 90000;
     /** OPUS always uses a 48kHz RTP clock. */
     public const AUDIO_CLOCK_RATE = 48000;
+    /**
+     * How far ahead of the look-ahead the reader may go to find the next frame of a track that has
+     * none queued, see {@see self::throttle()}: muxers interleave the frames of the tracks of a file by
+     * timestamp, so that's enough for any file but badly interleaved ones.
+     */
+    private const MAX_INTERLEAVING_MS = 1000;
 
     /**
      * The video codecs we can transmit, as `Matroska CodecID => SDP encoding name`.
@@ -143,8 +149,12 @@ final class DjLoop extends VoIPLoop
 
     /** Completed by a track when it drains a queue, to release the reader from back-pressure. */
     private ?DeferredFuture $drainDeferred = null;
-    /** Awaited by the blocking {@see self::pullPacket()} until an OGG packet is available. */
+    /** Awaited by {@see self::pullPacket()} and {@see self::awaitFrame()} until a frame is queued. */
     private ?DeferredFuture $packetDeferred = null;
+    /** Whether the current WebM file has audio for the audio track, see {@see self::isStarving()}. */
+    private bool $currentHasAudio = false;
+    /** Whether the current WebM file has video for the video track, see {@see self::isStarving()}. */
+    private bool $currentHasVideo = false;
 
     /* -------------------------------------------------------------------- *
      *  Current file + its byte-offset resume state.
@@ -536,6 +546,23 @@ final class DjLoop extends VoIPLoop
             if (!$this->packetDeferred->getFuture()->await()) {
                 return null;
             }
+        }
+    }
+
+    /**
+     * Wait until a frame is queued, or for at most $timeout seconds: for a track whose queue ran dry.
+     */
+    public function awaitFrame(float $timeout): void
+    {
+        $this->packetDeferred ??= new DeferredFuture;
+        $future = $this->packetDeferred->getFuture();
+        $timeoutCancellation = new DeferredCancellation;
+        $timer = EventLoop::delay($timeout, static fn () => $timeoutCancellation->cancel());
+        try {
+            $future->await($timeoutCancellation->getCancellation());
+        } catch (CancelledException) {
+        } finally {
+            EventLoop::cancel($timer);
         }
     }
 
@@ -971,6 +998,15 @@ final class DjLoop extends VoIPLoop
             $this->resumeTimestampScale = $matroska->getTimestampScale();
             $this->selectTracks($matroska);
         }
+        $this->currentHasVideo = $this->videoCodec !== null;
+        $this->currentHasAudio = false;
+        if (!$this->videoOnly) {
+            foreach ($matroska->tracks as $track) {
+                if (isset(self::AUDIO_CODECS[$track['codec']])) {
+                    $this->currentHasAudio = true;
+                }
+            }
+        }
         $skip = $resuming ? $this->resumeSkip : 0;
         foreach ($matroska->frames as $frame) {
             if ($generation !== $this->generation) {
@@ -1067,10 +1103,17 @@ final class DjLoop extends VoIPLoop
 
     /**
      * Block the reader while the look-ahead buffer is full, so memory stays bounded.
+     *
+     * Never while a track has nothing to play, though: the next frame of every track must be read
+     * before it's due, whatever the look-ahead. Unless the file is badly interleaved (or one of its
+     * tracks ended early): then up to {@see self::MAX_INTERLEAVING_MS} more are read.
      */
     private function throttle(int $generation, ?Cancellation $cancellation): void
     {
-        while ($this->bufferedAheadMs() > $this->instance->getVoIPSettings()->getPlaybackLookahead()) {
+        $lookahead = $this->instance->getVoIPSettings()->getPlaybackLookahead();
+        while (($ahead = $this->bufferedAheadMs()) > $lookahead
+            && ($ahead > $lookahead + self::MAX_INTERLEAVING_MS || !$this->isStarving())
+        ) {
             if ($generation !== $this->generation || $this->instance->isCallEnded()) {
                 return;
             }
@@ -1081,6 +1124,18 @@ final class DjLoop extends VoIPLoop
                 return;
             }
         }
+    }
+
+    /**
+     * Whether a track has no frame queued, while the current file has frames for it.
+     */
+    private function isStarving(): bool
+    {
+        if ($this->currentKind === 'matroska') {
+            return ($this->currentHasAudio && $this->webmAudioQueue->isEmpty())
+                || ($this->currentHasVideo && $this->videoQueue->isEmpty());
+        }
+        return $this->oggQueue->isEmpty();
     }
 
     private function bufferedAheadMs(): int

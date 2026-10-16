@@ -49,17 +49,17 @@ final class PlaybackLoopTest extends TestCase
     }
 
     /** A Matroska file with a VP8 and an OPUS track, whose audio outlasts its video. */
-    private static function buildFile(): string
+    private static function buildFile(int $videoFrames = self::VIDEO_FRAMES, int $audioFrames = self::AUDIO_FRAMES): string
     {
         $video = self::element("\xD7", "\x01").self::element("\x83", "\x01").self::element("\x86", 'V_VP8');
         $audio = self::element("\xD7", "\x02").self::element("\x83", "\x02").self::element("\x86", 'A_OPUS');
         $tracks = self::element("\x16\x54\xAE\x6B", self::element("\xAE", $video).self::element("\xAE", $audio));
         $info = self::element("\x15\x49\xA9\x66", self::element("\x2A\xD7\xB1", "\x0F\x42\x40"));
         $blocks = [];
-        for ($x = 0; $x < self::VIDEO_FRAMES; $x++) {
+        for ($x = 0; $x < $videoFrames; $x++) {
             $blocks[] = [$x * 33, self::element("\xA3", "\x81".pack('n', $x * 33)."\x80"."VIDEO$x")];
         }
-        for ($x = 0; $x < self::AUDIO_FRAMES; $x++) {
+        for ($x = 0; $x < $audioFrames; $x++) {
             $blocks[] = [$x * 20, self::element("\xA3", "\x82".pack('n', $x * 20)."\x80"."AUDIO$x")];
         }
         usort($blocks, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
@@ -130,6 +130,96 @@ final class PlaybackLoopTest extends TestCase
         // in a burst (and then nothing), a stalled track sends nothing for a whole loop.
         self::assertEqualsWithDelta($loops * self::AUDIO_FRAMES, \count($audioTimestamps), 2 * self::AUDIO_FRAMES, 'audio packets');
         self::assertEqualsWithDelta($loops * self::VIDEO_FRAMES, \count($videoTimestamps), 2 * self::VIDEO_FRAMES, 'video packets');
+    }
+
+    /**
+     * Collect how late a track emits its packets: when it emits them, minus when they are due
+     * according to their timestamps, relative to the first one, in seconds.
+     *
+     * @return \Amp\Future<list<float>>
+     */
+    private static function collectLateness(MediaStreamTrack $track, int $clockRate): \Amp\Future
+    {
+        return async(static function () use ($track, $clockRate): array {
+            $lateness = [];
+            $first = null;
+            foreach ($track->getConsumer() as $packet) {
+                \assert($packet instanceof EncodedPacket);
+                $now = hrtime(true) / 1e9;
+                $first ??= [$now, $packet->getTimestamp()];
+                $lateness[] = $now - $first[0] - ($packet->getTimestamp() - $first[1]) / $clockRate;
+            }
+            return $lateness;
+        });
+    }
+
+    public function testATrackKeepsUpWithoutLookahead(): void
+    {
+        Magic::start(light: true);
+        $path = tempnam(sys_get_temp_dir(), 'pace').'.webm';
+        // 3 seconds.
+        file_put_contents($path, self::buildFile(90, 150));
+        try {
+            // Each frame is read only once the previous one of its track was played.
+            $call = new PlaybackLoopTestCall(lookahead: 0);
+            $dj = new DjLoop($call);
+            $audio = new OpusPlaybackTrack($dj, $call);
+            $video = new VideoPlaybackTrack($dj, $call);
+            $audioLateness = self::collectLateness($audio, DjLoop::AUDIO_CLOCK_RATE);
+            $videoLateness = self::collectLateness($video, DjLoop::VIDEO_CLOCK_RATE);
+            $dj->play(new LocalFile($path));
+
+            delay(3.5);
+            $call->ended = true;
+            $audio->stop();
+            $video->stop();
+            $dj->discard();
+
+            $audioLateness = $audioLateness->await();
+            $videoLateness = $videoLateness->await();
+        } finally {
+            unlink($path);
+        }
+        self::assertCount(150, $audioLateness, 'audio packets');
+        self::assertCount(90, $videoLateness, 'video packets');
+        // A track that has to wait for the reader to read its next frame, after it was due, falls
+        // behind a bit more with every frame: by the end of the file, it was seconds behind.
+        self::assertLessThan(0.2, max($audioLateness), 'how late the audio is played, at most');
+        self::assertLessThan(0.2, max($videoLateness), 'how late the video is played, at most');
+    }
+
+    public function testATrackConsumedLateDoesNotBurst(): void
+    {
+        Magic::start(light: true);
+        $path = tempnam(sys_get_temp_dir(), 'late').'.webm';
+        file_put_contents($path, self::buildFile(90, 150));
+        try {
+            $call = new PlaybackLoopTestCall(lookahead: 0);
+            $dj = new DjLoop($call);
+            $audio = new OpusPlaybackTrack($dj, $call);
+            $video = new VideoPlaybackTrack($dj, $call);
+            $dj->play(new LocalFile($path));
+            // As when the call connects, a while after the tracks started playing.
+            delay(1.5);
+            $start = hrtime(true) / 1e9;
+            $audioLateness = self::collectLateness($audio, DjLoop::AUDIO_CLOCK_RATE);
+            $videoLateness = self::collectLateness($video, DjLoop::VIDEO_CLOCK_RATE);
+
+            delay(1.0);
+            $call->ended = true;
+            $audio->stop();
+            $video->stop();
+            $dj->discard();
+
+            $audioLateness = $audioLateness->await();
+            $videoLateness = $videoLateness->await();
+        } finally {
+            unlink($path);
+        }
+        // The frames that were due while nobody took them are not sent all at once, but at their pace:
+        // about a second of frames in a second.
+        self::assertLessThan(60, \count($audioLateness), 'audio packets in the first second');
+        self::assertLessThan(36, \count($videoLateness), 'video packets in the first second');
     }
 
     /**
