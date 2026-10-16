@@ -46,9 +46,9 @@ if (!$me['bot']) {
         $MadelineProto->logger($e);
     }
 
-    // Video call someone, playing a WebM video (works on webhosts, NO ffmpeg needed!)
+    // Video call @magicalcrazypony, the MadelineProto video webradio, playing a WebM video (works on webhosts, NO ffmpeg needed!)
     // See https://docs.madelineproto.xyz/docs/CALLS.html for group calls, livestreams, recording and more.
-    $MadelineProto->requestCall('@username', video: true)->play(new \danog\MadelineProto\RemoteUrl('https://paste.daniil.it/oncall.webm'));
+    $MadelineProto->requestCall('@magicalcrazypony', video: true)->play(new \danog\MadelineProto\RemoteUrl('https://paste.daniil.it/oncall.webm'));
 }
 $MadelineProto->echo('OK, done!');
 ```
