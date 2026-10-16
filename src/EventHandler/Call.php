@@ -126,6 +126,8 @@ interface Call extends Stringable
     /**
      * Set the files to play, on loop, while the given stream's main playlist is empty.
      *
+     * A hold file being played is replaced right away by the new ones (or stopped, if none are passed).
+     *
      * @psalm-impure
      */
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static;

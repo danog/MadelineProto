@@ -131,6 +131,66 @@ final class PlaybackLoopTest extends TestCase
         self::assertEqualsWithDelta($loops * self::AUDIO_FRAMES, \count($audioTimestamps), 2 * self::AUDIO_FRAMES, 'audio packets');
         self::assertEqualsWithDelta($loops * self::VIDEO_FRAMES, \count($videoTimestamps), 2 * self::VIDEO_FRAMES, 'video packets');
     }
+
+    /**
+     * Wait for the DJ to play a file (null for nothing), for less than a file lasts.
+     */
+    private static function assertPlaying(DjLoop $dj, ?string $path, string $message): void
+    {
+        for ($x = 0; $x < 25; $x++) {
+            $current = $dj->getCurrent();
+            $current = $current instanceof LocalFile ? $current->file : $current;
+            if ($current === $path) {
+                break;
+            }
+            delay(0.01);
+        }
+        self::assertSame($path, $current, $message);
+    }
+
+    public function testNewHoldFilesReplaceThePlayingOne(): void
+    {
+        Magic::start(light: true);
+        $paths = [];
+        foreach (['a', 'b', 'c'] as $name) {
+            $paths[$name] = tempnam(sys_get_temp_dir(), 'hold').'.webm';
+            file_put_contents($paths[$name], self::buildFile());
+        }
+        try {
+            // No lookahead: the files are read as they are played.
+            $call = new PlaybackLoopTestCall(lookahead: 0);
+            $dj = new DjLoop($call);
+            $audio = new OpusPlaybackTrack($dj, $call);
+            $video = new VideoPlaybackTrack($dj, $call);
+            $audioTimestamps = self::collect($audio);
+            $videoTimestamps = self::collect($video);
+
+            $dj->playOnHold(new LocalFile($paths['a']));
+            self::assertPlaying($dj, $paths['a'], 'The hold file should play');
+            $dj->playOnHold(new LocalFile($paths['b']));
+            self::assertPlaying($dj, $paths['b'], 'The new hold file should replace the playing one');
+
+            $dj->play(new LocalFile($paths['c']));
+            self::assertPlaying($dj, $paths['c'], 'The playlist should interrupt the hold file');
+            $dj->playOnHold(new LocalFile($paths['a']));
+            delay(0.1);
+            self::assertPlaying($dj, $paths['c'], 'New hold files should not interrupt the playlist');
+            $dj->skip();
+            self::assertPlaying($dj, $paths['a'], 'The new hold file should play once the playlist is over');
+
+            $dj->playOnHold();
+            self::assertPlaying($dj, null, 'Removing the hold files should stop the playing one');
+
+            $call->ended = true;
+            $audio->stop();
+            $video->stop();
+            $dj->discard();
+            $audioTimestamps->await();
+            $videoTimestamps->await();
+        } finally {
+            array_map(unlink(...), $paths);
+        }
+    }
 }
 
 /**
@@ -139,6 +199,10 @@ final class PlaybackLoopTest extends TestCase
 final class PlaybackLoopTestCall implements CallControllerInterface
 {
     public bool $ended = false;
+
+    public function __construct(private readonly int $lookahead = 2000)
+    {
+    }
 
     public function log(string $message, int $level = Logger::NOTICE): void
     {
@@ -151,8 +215,8 @@ final class PlaybackLoopTestCall implements CallControllerInterface
 
     public function getVoIPSettings(): \danog\MadelineProto\Settings\VoIP
     {
-        // Read ahead, so that frames are queued.
-        return (new \danog\MadelineProto\Settings\VoIP)->setPlaybackLookahead(2000);
+        // Read ahead by default, so that frames are queued.
+        return (new \danog\MadelineProto\Settings\VoIP)->setPlaybackLookahead($this->lookahead);
     }
 
     public function __toString(): string

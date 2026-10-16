@@ -492,11 +492,17 @@ final class DjLoop extends VoIPLoop
     }
 
     /**
-     * Files to play on hold.
+     * Files to play on hold: they replace the hold file being played (if any) right away.
      */
     public function playOnHold(LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
         $this->holdFiles = array_map(self::snapshot(...), $files);
+        $this->holdIndex = 0;
+        if ($this->playingHold) {
+            $this->playingHold = false;
+            $this->skip();
+            return;
+        }
         $this->startReader();
     }
 
