@@ -1645,26 +1645,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                 }
             }
             $content['payloadTypes'] = $kept;
-            // We don't implement transport-cc (transport-wide congestion control) feedback. Leaving it
-            // in the answer makes modern peers (Telegram Android) drive their uplink congestion control
-            // off transport-cc, receive no such feedback from us, and throttle to the minimum bitrate
-            // ("weak signal", 320x180). Strip the transport-cc feedback type and its RTP extension so
-            // the peer falls back to REMB, which we do send.
-            foreach ($content['payloadTypes'] as &$payloadType) {
-                if (isset($payloadType['feedbackTypes']) && \is_array($payloadType['feedbackTypes'])) {
-                    $payloadType['feedbackTypes'] = array_values(array_filter(
-                        $payloadType['feedbackTypes'],
-                        static fn ($fb): bool => strtolower((string) ($fb['type'] ?? '')) !== 'transport-cc',
-                    ));
-                }
-            }
-            unset($payloadType);
-            if (isset($content['rtpExtensions']) && \is_array($content['rtpExtensions'])) {
-                $content['rtpExtensions'] = array_values(array_filter(
-                    $content['rtpExtensions'],
-                    static fn ($e): bool => !str_contains(strtolower((string) ($e['uri'] ?? '')), 'transport-wide-cc'),
-                ));
-            }
+            // We don't implement transport-cc feedback: see V2Sdp::withoutTransportCc().
+            $content = V2Sdp::withoutTransportCc($content);
         }
         unset($content);
 

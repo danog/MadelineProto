@@ -218,7 +218,25 @@ final class TgcallsSignalingTest extends TestCase
         $this->assertSame(48000, $opus['clockrate']);
         $this->assertSame(2, $opus['channels']);
         $this->assertSame(['minptime' => '10', 'useinbandfec' => '1'], $opus['parameters']);
-        $this->assertSame([['type' => 'transport-cc', 'subtype' => '']], $opus['feedbackTypes']);
+        // We don't send transport-cc feedback: the peer must not expect it.
+        $this->assertSame([], $opus['feedbackTypes']);
+
+        $this->assertSame(
+            [['id' => 1, 'uri' => 'urn:ietf:params:rtp-hdrext:ssrc-audio-level']],
+            $contents[0]['rtpExtensions']
+        );
+    }
+
+    public function testContentsFromOfferDoNotOfferTransportCc(): void
+    {
+        $offer = str_replace(
+            "a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n",
+            "a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=extmap:4 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\n",
+            self::OFFER,
+        );
+        $this->assertNotSame(self::OFFER, $offer);
+
+        $contents = V2Sdp::contentsFromOffer($offer);
 
         $this->assertSame(
             [['id' => 1, 'uri' => 'urn:ietf:params:rtp-hdrext:ssrc-audio-level']],
@@ -318,7 +336,8 @@ final class TgcallsSignalingTest extends TestCase
         $this->assertStringContainsString('a=recvonly', $audio);
         $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
         $this->assertStringContainsString('a=fmtp:111 minptime=10;useinbandfec=1', $audio);
-        $this->assertStringContainsString('a=rtcp-fb:111 transport-cc', $audio);
+        // Not negotiated: we don't send transport-cc feedback.
+        $this->assertStringNotContainsString('transport-cc', $audio);
         // The peer's answer echoes our SSRC, but that is not an SSRC the peer *sends* with.
         $this->assertStringNotContainsString('a=ssrc:', $audio);
 

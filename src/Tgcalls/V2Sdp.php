@@ -125,10 +125,43 @@ final class V2Sdp
             $include = !$outgoingOnly || self::isSending($section);
             $content = self::contentOfSection($section);
             if ($include) {
-                $result[] = $content;
+                $result[] = self::withoutTransportCc($content);
             }
         }
         return $result;
+    }
+
+    /**
+     * Remove transport-cc (transport-wide congestion control) from a `MediaContent`, offered or answered.
+     *
+     * We don't implement transport-cc feedback. Negotiating it makes modern peers (Telegram Android)
+     * drive their uplink congestion control off transport-cc, receive no such feedback from us, and
+     * throttle to the minimum bitrate ("weak signal", 320x180). Without its feedback type and RTP
+     * extension, the peer falls back to REMB, which we do send.
+     *
+     * @param array<array-key, mixed> $content
+     * @return array<array-key, mixed>
+     */
+    public static function withoutTransportCc(array $content): array
+    {
+        if (isset($content['payloadTypes']) && \is_array($content['payloadTypes'])) {
+            foreach ($content['payloadTypes'] as &$payloadType) {
+                if (\is_array($payloadType) && isset($payloadType['feedbackTypes']) && \is_array($payloadType['feedbackTypes'])) {
+                    $payloadType['feedbackTypes'] = array_values(array_filter(
+                        $payloadType['feedbackTypes'],
+                        static fn ($fb): bool => !\is_array($fb) || strtolower((string) ($fb['type'] ?? '')) !== 'transport-cc',
+                    ));
+                }
+            }
+            unset($payloadType);
+        }
+        if (isset($content['rtpExtensions']) && \is_array($content['rtpExtensions'])) {
+            $content['rtpExtensions'] = array_values(array_filter(
+                $content['rtpExtensions'],
+                static fn ($e): bool => !\is_array($e) || !str_contains(strtolower((string) ($e['uri'] ?? '')), 'transport-wide-cc'),
+            ));
+        }
+        return $content;
     }
 
     /**

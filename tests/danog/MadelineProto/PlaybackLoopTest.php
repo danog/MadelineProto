@@ -26,10 +26,11 @@ use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\OpusPlaybackTrack;
 use danog\MadelineProto\Tgcalls\VideoPlaybackTrack;
 use PHPUnit\Framework\TestCase;
+use Webrtc\AVCodec\Frame\FrameInterface;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\MediaStreamTrack\MediaStreamTrack;
+use Webrtc\RTP\MediaStreamTrack\MediaStreamTrackSink;
 
-use function Amp\async;
 use function Amp\delay;
 
 /**
@@ -68,21 +69,13 @@ final class PlaybackLoopTest extends TestCase
     }
 
     /**
-     * Collect the RTP timestamps a track emits until it is stopped.
-     *
-     * @return \Amp\Future<list<int>>
+     * Collect the packets a track emits, like an RTP sender would.
      */
-    private static function collect(MediaStreamTrack $track): \Amp\Future
+    private static function collect(MediaStreamTrack $track): PlaybackLoopTestSink
     {
-        return async(static function () use ($track): array {
-            $timestamps = [];
-            foreach ($track->getConsumer() as $packet) {
-                if ($packet instanceof EncodedPacket) {
-                    $timestamps[] = $packet->getTimestamp();
-                }
-            }
-            return $timestamps;
-        });
+        $sink = new PlaybackLoopTestSink;
+        $track->setSink($sink);
+        return $sink;
     }
 
     /** @param list<int> $timestamps */
@@ -117,8 +110,8 @@ final class PlaybackLoopTest extends TestCase
             $video->stop();
             $dj->discard();
 
-            $audioTimestamps = $audioTimestamps->await();
-            $videoTimestamps = $videoTimestamps->await();
+            $audioTimestamps = $audioTimestamps->timestamps();
+            $videoTimestamps = $videoTimestamps->timestamps();
         } finally {
             unlink($path);
         }
@@ -130,27 +123,6 @@ final class PlaybackLoopTest extends TestCase
         // in a burst (and then nothing), a stalled track sends nothing for a whole loop.
         self::assertEqualsWithDelta($loops * self::AUDIO_FRAMES, \count($audioTimestamps), 2 * self::AUDIO_FRAMES, 'audio packets');
         self::assertEqualsWithDelta($loops * self::VIDEO_FRAMES, \count($videoTimestamps), 2 * self::VIDEO_FRAMES, 'video packets');
-    }
-
-    /**
-     * Collect how late a track emits its packets: when it emits them, minus when they are due
-     * according to their timestamps, relative to the first one, in seconds.
-     *
-     * @return \Amp\Future<list<float>>
-     */
-    private static function collectLateness(MediaStreamTrack $track, int $clockRate): \Amp\Future
-    {
-        return async(static function () use ($track, $clockRate): array {
-            $lateness = [];
-            $first = null;
-            foreach ($track->getConsumer() as $packet) {
-                \assert($packet instanceof EncodedPacket);
-                $now = hrtime(true) / 1e9;
-                $first ??= [$now, $packet->getTimestamp()];
-                $lateness[] = $now - $first[0] - ($packet->getTimestamp() - $first[1]) / $clockRate;
-            }
-            return $lateness;
-        });
     }
 
     public function testATrackKeepsUpWithoutLookahead(): void
@@ -165,8 +137,8 @@ final class PlaybackLoopTest extends TestCase
             $dj = new DjLoop($call);
             $audio = new OpusPlaybackTrack($dj, $call);
             $video = new VideoPlaybackTrack($dj, $call);
-            $audioLateness = self::collectLateness($audio, DjLoop::AUDIO_CLOCK_RATE);
-            $videoLateness = self::collectLateness($video, DjLoop::VIDEO_CLOCK_RATE);
+            $audioLateness = self::collect($audio);
+            $videoLateness = self::collect($video);
             $dj->play(new LocalFile($path));
 
             delay(3.5);
@@ -175,8 +147,8 @@ final class PlaybackLoopTest extends TestCase
             $video->stop();
             $dj->discard();
 
-            $audioLateness = $audioLateness->await();
-            $videoLateness = $videoLateness->await();
+            $audioLateness = $audioLateness->lateness(DjLoop::AUDIO_CLOCK_RATE);
+            $videoLateness = $videoLateness->lateness(DjLoop::VIDEO_CLOCK_RATE);
         } finally {
             unlink($path);
         }
@@ -202,8 +174,8 @@ final class PlaybackLoopTest extends TestCase
             // As when the call connects, a while after the tracks started playing.
             delay(1.5);
             $start = hrtime(true) / 1e9;
-            $audioLateness = self::collectLateness($audio, DjLoop::AUDIO_CLOCK_RATE);
-            $videoLateness = self::collectLateness($video, DjLoop::VIDEO_CLOCK_RATE);
+            $audioLateness = self::collect($audio);
+            $videoLateness = self::collect($video);
 
             delay(1.0);
             $call->ended = true;
@@ -211,8 +183,8 @@ final class PlaybackLoopTest extends TestCase
             $video->stop();
             $dj->discard();
 
-            $audioLateness = $audioLateness->await();
-            $videoLateness = $videoLateness->await();
+            $audioLateness = $audioLateness->lateness(DjLoop::AUDIO_CLOCK_RATE);
+            $videoLateness = $videoLateness->lateness(DjLoop::VIDEO_CLOCK_RATE);
         } finally {
             unlink($path);
         }
@@ -275,8 +247,6 @@ final class PlaybackLoopTest extends TestCase
             $audio->stop();
             $video->stop();
             $dj->discard();
-            $audioTimestamps->await();
-            $videoTimestamps->await();
         } finally {
             array_map(unlink(...), $paths);
         }
@@ -312,5 +282,46 @@ final class PlaybackLoopTestCall implements CallControllerInterface
     public function __toString(): string
     {
         return 'test call';
+    }
+}
+
+/**
+ * Takes the packets of a track, like an RTP sender would.
+ *
+ * @internal
+ */
+final class PlaybackLoopTestSink implements MediaStreamTrackSink
+{
+    /** @var list<array{float, int}> When each packet was emitted, and its RTP timestamp. */
+    private array $packets = [];
+
+    public function onFrame(FrameInterface|EncodedPacket $frame): bool
+    {
+        \assert($frame instanceof EncodedPacket);
+        $this->packets[] = [hrtime(true) / 1e9, $frame->getTimestamp()];
+        return true;
+    }
+
+    /** @return list<int> */
+    public function timestamps(): array
+    {
+        return array_column($this->packets, 1);
+    }
+
+    /**
+     * How late each packet was emitted: when, minus when it was due according to its timestamp,
+     * relative to the first one, in seconds.
+     *
+     * @return list<float>
+     */
+    public function lateness(int $clockRate): array
+    {
+        $lateness = [];
+        $first = $this->packets[0] ?? null;
+        foreach ($this->packets as [$time, $timestamp]) {
+            \assert($first !== null);
+            $lateness[] = $time - $first[0] - ($timestamp - $first[1]) / $clockRate;
+        }
+        return $lateness;
     }
 }
