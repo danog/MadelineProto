@@ -36,7 +36,6 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Settings;
-use danog\MadelineProto\UploadResumeException;
 use Revolt\EventLoop;
 
 use function Amp\ByteStream\buffer;
@@ -166,15 +165,7 @@ switch ($spec['phase']) {
             $output(['sha256' => hash('sha256', $state['data'].buffer($stream))]);
         }
         if ($spec['kind'] === 'upload') {
-            $result = [];
-            try {
-                $result = $run();
-            } catch (UploadResumeException $e) {
-                $result['error'] = $e->getMessage();
-                // The next upload starts from scratch.
-                $result['retry'] = $run();
-            }
-            $output($result + ['log' => $logSince($logOffset)]);
+            $output($run() + ['log' => $logSince($logOffset)]);
         }
         // Resumed by the session when it starts.
         for ($x = 0; $x < 1200; $x++) {

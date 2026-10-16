@@ -32,7 +32,6 @@ use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Settings\Files as FilesSettings;
-use danog\MadelineProto\UploadResumeException;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
@@ -407,29 +406,6 @@ final class ResumableStreamTest extends MadelineTestCase
         self::assertSame(self::size(), $file['size']);
     }
 
-    /**
-     * Assert that resuming an upload fails because its source changed.
-     */
-    private static function assertResumeFails(callable $upload, string $fileName): void
-    {
-        $offset = self::logSize();
-        try {
-            $upload();
-            self::fail('The upload of a changed file was resumed');
-        } catch (UploadResumeException $e) {
-            self::assertStringContainsString('Could not resume the upload', $e->getMessage());
-        }
-        self::assertUploadResumed(self::logSince($offset), $fileName);
-    }
-
-    /**
-     * Assert that an upload started from scratch.
-     */
-    private static function assertUploadNotResumed(string $log, string $fileName): void
-    {
-        self::assertStringNotContainsString('Resuming upload of '.$fileName.':', $log, 'The upload was resumed');
-    }
-
     /** Where {@see self::serve()} stalls the first download of the file: after four parts. */
     private const STALL_AT = 4 * 512 * 1024;
 
@@ -472,8 +448,8 @@ final class ResumableStreamTest extends MadelineTestCase
 
             self::assertUploadResumed(self::logSince($offset), 'url.bin');
             self::assertSame(self::$data, self::download(self::uploadMedia($file)));
-            // Reopened at the start of the last uploaded part, which is read again to check it.
-            self::assertSame($ranges ? [null, 'bytes='.(3 * 512 * 1024).'-'] : [null], $requests);
+            // Reopened at the first part that wasn't uploaded.
+            self::assertSame($ranges ? [null, 'bytes='.self::STALL_AT.'-'] : [null], $requests);
         } finally {
             if (!$release->isComplete()) {
                 $release->complete();
@@ -497,83 +473,12 @@ final class ResumableStreamTest extends MadelineTestCase
             self::assertUploadResumed(self::logSince($offset), 'encrypted-url.bin');
             self::assertSame(self::size(), $file['size']);
             // Encryption resumes from the state saved after the fourth part.
-            self::assertSame([null, 'bytes='.(3 * 512 * 1024).'-'], $requests);
+            self::assertSame([null, 'bytes='.self::STALL_AT.'-'], $requests);
         } finally {
             if (!$release->isComplete()) {
                 $release->complete();
             }
             $server->stop();
-        }
-    }
-
-    /**
-     * @dataProvider rangeSupport
-     */
-    public function testAChangedUrlIsNotResumed(bool $ranges, bool $honorRanges): void
-    {
-        $content = self::$data;
-        $requests = [];
-        $release = new DeferredFuture;
-        [$server, $url] = self::serve($content, $ranges, $honorRanges, $requests, $release, self::STALL_AT);
-        try {
-            self::interruptAtTheStall(static fn (callable $cb, $cancellation) => self::$MadelineProto->upload(new RemoteUrl($url), 'changed-url.bin', $cb, cancellation: $cancellation), $release);
-            $content = self::change(self::$data);
-            self::assertResumeFails(static fn () => self::$MadelineProto->upload(new RemoteUrl($url), 'changed-url.bin'), 'changed-url.bin');
-
-            // The resume state was dropped.
-            $offset = self::logSize();
-            $file = self::$MadelineProto->upload(new RemoteUrl($url), 'changed-url.bin');
-            self::assertUploadNotResumed(self::logSince($offset), 'changed-url.bin');
-            self::assertSame($content, self::download(self::uploadMedia($file)));
-        } finally {
-            if (!$release->isComplete()) {
-                $release->complete();
-            }
-            $server->stop();
-        }
-    }
-
-    public static function fileUploads(): array
-    {
-        return [
-            // Read in any order: all uploaded parts are checked.
-            'plain' => [false],
-            // Read sequentially from the last saved encryption state: the parts that are read again are checked.
-            'encrypted' => [true],
-        ];
-    }
-
-    /**
-     * A file changed without changing its size and modification time.
-     *
-     * @dataProvider fileUploads
-     */
-    public function testAChangedFileIsNotResumed(bool $encrypted): void
-    {
-        $path = tempnam(sys_get_temp_dir(), 'madeline-changed-');
-        file_put_contents($path, self::$data);
-        $name = basename($path);
-        $upload = static fn (?callable $cb = null, $cancellation = null) => self::$MadelineProto->upload(new LocalFile($path), $name, $cb, $encrypted, $cancellation);
-        try {
-            self::interrupt($upload);
-            clearstatcache();
-            $mtime = filemtime($path);
-            $changed = self::change(self::$data);
-            file_put_contents($path, $changed);
-            touch($path, $mtime);
-            self::assertResumeFails($upload, $name);
-
-            // The resume state was dropped.
-            $offset = self::logSize();
-            $file = $upload();
-            self::assertUploadNotResumed(self::logSince($offset), $name);
-            if ($encrypted) {
-                self::assertSame(self::size(), $file['size']);
-            } else {
-                self::assertSame($changed, self::download(self::uploadMedia($file)));
-            }
-        } finally {
-            @unlink($path);
         }
     }
 
@@ -737,33 +642,6 @@ final class ResumableStreamTest extends MadelineTestCase
             self::assertStringNotContainsString('Resuming interrupted sendMedia call', self::logSince($offset));
         } finally {
             self::$MadelineProto->updateSettings((new FilesSettings)->setResumeInterruptedCalls(true));
-            if (!$release->isComplete()) {
-                $release->complete();
-            }
-            $server->stop();
-        }
-    }
-
-    public function testAChangedFileIsNotSentAfterARestart(): void
-    {
-        $content = self::$data;
-        $release = new DeferredFuture;
-        [$server, $url] = self::serve($content, release: $release, stallAt: self::STALL_AT);
-        try {
-            // Changed before the restart, so that the resumed send can only see the new contents.
-            [$offset] = self::sendAndRestart($url, 'Changed send '.bin2hex(random_bytes(8)), static function () use (&$content): void {
-                $content = self::change(self::$data);
-            });
-            $release->complete();
-
-            self::assertNotNull(
-                self::waitForLog($offset, '/Reporting: Could not resume interrupted sendMedia call, the file was not sent: .*Could not resume the upload of resumed\.bin/'),
-                'The failure was not reported'
-            );
-            $log = self::logSince($offset);
-            self::assertUploadResumed($log, 'resumed.bin');
-            self::assertStringNotContainsString('Resumed interrupted sendMedia call', $log);
-        } finally {
             if (!$release->isComplete()) {
                 $release->complete();
             }

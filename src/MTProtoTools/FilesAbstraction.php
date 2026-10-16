@@ -1460,8 +1460,8 @@ trait FilesAbstraction
             /** @psalm-suppress MixedArgument */
             return $this->sendMediaInternal(...$args);
         }
-        // Interrupted sends are resumed after a restart: choose the random ID beforehand,
-        // so that it's saved with the call, and the message isn't sent twice.
+        // Interrupted uploads are resumed after a restart, and then the message is sent: choose the random ID beforehand,
+        // so that it's saved with the call, and the message isn't sent twice if the session was saved before it was sent.
         $args['randomId'] = $randomId ?? Tools::randomInt();
         /** @psalm-suppress MixedArgument */
         return $this->makeResumableCall('sendMedia', 'sendMedia', $args, fn (array $args) => $this->sendMediaInternal(...$args));
@@ -1501,6 +1501,7 @@ trait FilesAbstraction
         ?Cancellation $cancellation,
         bool $uploadOnly,
         ?int $randomId = null,
+        ?string $resumableCall = null,
     ): Message|Media {
         if ($file instanceof Message) {
             $file = $file->media;
@@ -1877,7 +1878,7 @@ trait FilesAbstraction
         }
         $res = $this->wrapMessage($this->extractMessage($this->methodCallAsyncRead(
             'messages.sendMedia',
-            $params
+            [...$params, 'resumableCall' => $resumableCall]
         )));
         \assert($res !== null);
         return $res;

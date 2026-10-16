@@ -551,7 +551,12 @@ final class Connection
         if (!$message->hasSerializedBody()) {
             $body = $message->getBody();
             if ($message->isMethod) {
+                $resumableCall = $body['resumableCall'] ?? null;
                 $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
+                if ($resumableCall !== null) {
+                    // Its files were uploaded while serializing it.
+                    $this->API->resumableCallSent($resumableCall);
+                }
                 if ($message->takeoutId !== null) {
                     $body = $this->API->getTL()->serializeMethod(
                         'invokeWithTakeout',

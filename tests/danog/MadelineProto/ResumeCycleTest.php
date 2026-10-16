@@ -277,35 +277,6 @@ final class ResumeCycleTest extends MadelineTestCase
         self::assertSentOnce($result['log'], 'messages.sendMedia', $caption);
     }
 
-    public static function changedSources(): array
-    {
-        return [
-            'local file' => ['local', false],
-            'URL' => ['url', false],
-            'URL with ranges' => ['url', true],
-        ];
-    }
-
-    /**
-     * @dataProvider changedSources
-     */
-    public function testAChangedFileIsNotSentAfterACrash(string $source, bool $ranges): void
-    {
-        $result = self::fromSource($source, $ranges, ['kind' => 'send', 'caption' => 'Changed after a crash', 'fileName' => 'changed.bin'], self::changer($source));
-
-        self::assertUploadResumed($result['log'], 'changed.bin');
-        self::assertLogMatches('/Reporting: Could not resume interrupted sendMedia call, the file was not sent: .*Could not resume the upload of changed\.bin/', $result['log'], 'The failure was not reported');
-        self::assertLogMatches('/Resumed interrupted sendMedia call/', $result['log'], 'The changed file was sent', false);
-    }
-
-    public function testInterruptedSendsAreDroppedWhenDisabled(): void
-    {
-        $result = self::fromSource('local', false, ['kind' => 'send', 'caption' => 'Dropped after a crash', 'fileName' => 'dropped.bin'], resume: ['resumeCalls' => false]);
-
-        self::assertLogMatches('/Not resuming interrupted sendMedia call, resuming interrupted calls is disabled/', $result['log'], 'The call was not dropped');
-        self::assertLogMatches('/Resuming interrupted sendMedia call/', $result['log'], 'The call was resumed', false);
-    }
-
     /* -------------------------------------------------------------------- *
      *  Interrupted uploads, resumed when made again.
      * -------------------------------------------------------------------- */
@@ -337,62 +308,9 @@ final class ResumeCycleTest extends MadelineTestCase
             self::assertSame(hash('sha256', self::$data), $result['sha256']);
         }
         if ($source === 'url') {
-            // Reopened at the start of the last uploaded part, which is read again to check it.
-            self::assertSame($ranges ? [null, 'bytes='.(3 * 512 * 1024).'-'] : [null], $requests);
+            // Reopened at the first part that wasn't uploaded.
+            self::assertSame($ranges ? [null, 'bytes='.self::STALL_AT.'-'] : [null], $requests);
         }
-    }
-
-    public static function changedUploads(): array
-    {
-        $uploads = [];
-        foreach (self::changedSources() as $name => [$source, $ranges]) {
-            $uploads[$name] = [$source, $ranges, false];
-            $uploads["$name, encrypted"] = [$source, $ranges, true];
-        }
-        return $uploads;
-    }
-
-    /**
-     * @dataProvider changedUploads
-     */
-    public function testAChangedUploadIsNotResumedAfterACrash(string $source, bool $ranges, bool $encrypted): void
-    {
-        $result = self::fromSource($source, $ranges, ['kind' => 'upload', 'fileName' => 'changed-upload.bin', 'encrypted' => $encrypted], self::changer($source));
-
-        self::assertStringContainsString('Could not resume the upload of changed-upload.bin', $result['error']);
-        // Then uploaded from scratch.
-        if ($encrypted) {
-            self::assertSame(\strlen(self::$data), $result['retry']['size']);
-        } else {
-            self::assertSame(hash('sha256', self::change(self::$data)), $result['retry']['sha256']);
-        }
-    }
-
-    /**
-     * Change the file between the two processes, keeping its size, modification time and ETag.
-     */
-    private static function changer(string $source): \Closure
-    {
-        return static function () use ($source): void {
-            if ($source === 'local') {
-                $path = self::$dir.'/file.bin';
-                clearstatcache();
-                $mtime = filemtime($path);
-                file_put_contents($path, self::change(self::$data));
-                touch($path, $mtime);
-            } else {
-                self::$served = self::change(self::$data);
-            }
-        };
-    }
-
-    protected function tearDown(): void
-    {
-        // Restore the test file.
-        if (isset(self::$dir) && is_dir(self::$dir)) {
-            file_put_contents(self::$dir.'/file.bin', self::$data);
-        }
-        parent::tearDown();
     }
 
     /* -------------------------------------------------------------------- *

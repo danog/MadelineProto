@@ -34,17 +34,6 @@ use Psr\Log\NullLogger;
 trait ServesFiles
 {
     /**
-     * Change the first byte of each part of a file, keeping its size.
-     */
-    private static function change(string $data): string
-    {
-        for ($offset = 0; $offset < \strlen($data); $offset += 512 * 1024) {
-            $data[$offset] = \chr(\ord($data[$offset]) ^ 0xff);
-        }
-        return $data;
-    }
-
-    /**
      * Serve a file over HTTP from this process.
      *
      * The contents can be changed between requests, keeping the same ETag (as a server with a weak validator would).

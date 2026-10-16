@@ -38,12 +38,12 @@ use function Amp\async;
  * Resumes interrupted method calls that upload files.
  *
  * A method call that uploads a file from a source that survives a restart (a file, a URL, a Telegram
- * file or a resumable stream) is saved in the session until it completes: if the session is
+ * file or a resumable stream) is saved in the session until its files are uploaded: if the session is
  * restarted in the meantime, the call is made again, which resumes the interrupted upload and then
- * calls the method.
+ * calls the method. Once the method is sent, the call isn't resumed anymore.
  *
- * The random IDs of the call are chosen beforehand and saved with it, so that if the call actually
- * completed just before the restart, Telegram does not execute it twice.
+ * The random IDs of the call are chosen beforehand and saved with it, so that if the session was saved
+ * before the method was sent, and restarted after, Telegram does not execute it twice.
  *
  * @internal
  */
@@ -66,7 +66,7 @@ trait ResumableCalls
     private array $runningResumableCalls = [];
 
     /**
-     * Make a call, saving it until it completes if it uploads a file that survives a restart.
+     * Make a call, saving it until its method is sent if it uploads a file that survives a restart.
      *
      * The missing random IDs of the call are chosen and added to the arguments.
      *
@@ -76,6 +76,7 @@ trait ResumableCalls
      * Internal arguments:
      * - resumableCallId: identifies an API method call across restarts, chosen by IPC clients (sendMedia() calls are identified by their random ID).
      * - resumable: false for the calls made by a call that is already resumable.
+     * - resumableCall: ID of the resumable call sending the method, see resumableCallSent().
      *
      * @template T
      *
@@ -91,6 +92,7 @@ trait ResumableCalls
         if ($id === null) {
             return $call($args);
         }
+        $args['resumableCall'] = $id;
         if (isset($this->runningResumableCalls[$id])) {
             $this->logger->logger("Waiting for the same $method call, which is already running", Logger::NOTICE);
             /** @var T */
@@ -155,6 +157,16 @@ trait ResumableCalls
             $this->resumableCalls[$id] = ['kind' => $kind, 'method' => $method, 'args' => $serialized, 'time' => time()];
         }
         return $id;
+    }
+
+    /**
+     * Called when the method of a resumable call is sent, after its files were uploaded: from now on, it isn't resumed after a restart.
+     *
+     * @internal
+     */
+    public function resumableCallSent(string $id): void
+    {
+        unset($this->resumableCalls[$id]);
     }
 
     /**

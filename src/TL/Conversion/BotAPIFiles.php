@@ -23,6 +23,7 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoBig;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
@@ -61,6 +62,31 @@ trait BotAPIFiles
             'file_size' => $photoSize['size'] ?? (isset($photoSize['sizes']) ? end($photoSize['sizes']) : \strlen((string) $photoSize['bytes'])),
             'mime_type' => 'image/jpeg',
             'file_name' => isset($photoSize['location']) ? $photoSize['location']['volume_id'].'_'.$photoSize['location']['local_id'].'.jpg' : $photo['id'].'.jpg',
+        ];
+    }
+    /**
+     * Convert the profile photo of a peer (the big one, as downloaded by getDownloadInfo()) to a bot API file.
+     *
+     * @param array $peer User, chat or channel constructor, or updateUserPhoto
+     *
+     * @return array{file_id: string, file_unique_id: string}
+     */
+    private function profilePhotoToBotAPI(array $peer): array
+    {
+        $fileId = new FileId(
+            id: $peer['photo']['photo_id'],
+            type: FileIdType::PROFILE_PHOTO,
+            accessHash: 0,
+            dcId: $peer['photo']['dc_id'],
+            photoSizeSource: new PhotoSizeSourceDialogPhotoBig(
+                dialogId: $this->getIdInternal($peer) ?? 0,
+                dialogAccessHash: $peer['access_hash'] ?? 0,
+            ),
+        );
+
+        return [
+            'file_id' => (string) $fileId,
+            'file_unique_id' => $fileId->getUniqueBotAPI(),
         ];
     }
     /**

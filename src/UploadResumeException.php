@@ -19,9 +19,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 /**
- * Thrown when an interrupted upload can't be resumed, because its source changed since it was interrupted.
+ * Thrown when an interrupted upload can't be resumed, because its source ends before the offset to resume from.
  *
- * Finishing the upload would have produced a corrupted file, mixing parts of the old and of the new contents.
  * The resume state is dropped, so uploading the file again starts from scratch.
  */
 final class UploadResumeException extends Exception

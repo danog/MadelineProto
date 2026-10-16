@@ -27,6 +27,7 @@ use Amp\Future;
 use Amp\Http\Client\Request;
 use Amp\Ipc\Sync\ChannelException;
 use AssertionError;
+use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
@@ -323,7 +324,7 @@ trait Files
             $ige = IGE::getInstance($key, $state['ige_state'] ?? $iv);
             $seekable = false;
         }
-        /** @var array<int, string> Hash of the contents of the parts uploaded before the upload was interrupted. */
+        /** @var array<int, true> The parts uploaded before the upload was interrupted. */
         $uploaded = $state['parts'] ?? [];
         if (!$seekable) {
             // Sequential sources restart from the first missing part,
@@ -373,35 +374,8 @@ trait Files
                 $cb();
             }
         }
-        /** @var array<int, string> Hash of the contents of each part, until it is saved in the resume state. */
-        $partHashes = [];
-        $resuming = $state !== null;
-        /** Thrown if the source changed since the upload was interrupted. */
-        $resumeError = null;
-        // The parts that were already uploaded are read again only to check that the source didn't change.
-        $verify = static function (int $part_num, string $bytes) use ($resuming, $uploaded, $size, $part_size, $fileName, &$resumeError): string {
-            $hash = hash('xxh128', $bytes, true);
-            if (!$resuming) {
-                return $hash;
-            }
-            $name = $fileName ?: 'file';
-            $expected = min($part_size, $size - $part_num * $part_size);
-            if (\strlen($bytes) !== $expected) {
-                throw $resumeError = new UploadResumeException("Could not resume the upload of $name: part $part_num is ".\strlen($bytes)." bytes long instead of $expected, the file changed since the upload was interrupted");
-            }
-            if (isset($uploaded[$part_num]) && $uploaded[$part_num] !== $hash) {
-                throw $resumeError = new UploadResumeException("Could not resume the upload of $name: part $part_num changed since the upload was interrupted");
-            }
-            return $hash;
-        };
-        /** The last uploaded part before the first one we read, read again to check that the source didn't change. */
-        $seam = null;
         if (!$seekable) {
-            if ($resuming && $part_num > 0) {
-                $seam = $part_num - 1;
-                Assert::keyExists($uploaded, $seam);
-            }
-            $nextOffset = ($seam ?? $part_num) * $part_size;
+            $nextOffset = $part_num * $part_size;
             $callable = static function (int $offset, int $size, ?Cancellation $cancellation) use ($callable, &$nextOffset): string {
                 Assert::eq($offset, $nextOffset);
                 $nextOffset += $size;
@@ -409,18 +383,13 @@ trait Files
             };
         }
         $read = $callable;
-        $track = $stateKey !== null;
-        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $read, $ige, &$igeStates, $cancellation, $verify, $uploaded, $track, &$partHashes): array {
+        $callable = static function (int $part_num) use (&$totalSize, $size, $file_id, &$part_total_num, $part_size, $read, $ige, &$igeStates, $cancellation): array {
             $bytes = $read(
                 $part_num * $part_size,
                 $part_size,
                 $cancellation,
             );
             $cancellation?->throwIfRequested();
-            $hash = $verify($part_num, $bytes);
-            if ($track && !isset($uploaded[$part_num])) {
-                $partHashes[$part_num] = $hash;
-            }
             $totalSize += $bytesLen = \strlen($bytes);
             if ($size === 0) {
                 if ($bytesLen === 0) {
@@ -443,12 +412,8 @@ trait Files
         /** @var ?FloodPremiumWaitError */
         $floodWaitError = null;
         try {
-            if ($seam !== null) {
-                $verify($seam, $read($seam * $part_size, $part_size, $cancellation));
-            }
             while ($part_num < $part_total_num || !$size) {
                 if ($seekable && isset($uploaded[$part_num])) {
-                    $verify($part_num, $read($part_num * $part_size, $part_size, $cancellation));
                     $totalSize += min($part_size, $size - $part_num * $part_size);
                     $cb();
                     ++$part_num;
@@ -486,7 +451,7 @@ trait Files
                 }
                 // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
                 $writePromise = async($writeCb)->ignore();
-                EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError, $stateKey, &$igeStates, &$partHashes): void {
+                EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError, $stateKey, &$igeStates): void {
                     $d = new DeferredFuture;
                     // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
                     $resPromises[] = $d->getFuture()->ignore();
@@ -500,7 +465,7 @@ trait Files
                                 }
                                 // Got OK from server for chunk!
                                 if ($stateKey !== null) {
-                                    $this->markPartUploaded($stateKey, $part_num, $partHashes, $igeStates);
+                                    $this->markPartUploaded($stateKey, $part_num, $igeStates);
                                 }
                                 if ($size) {
                                     $cb();
@@ -544,16 +509,12 @@ trait Files
             if ($stateKey !== null) {
                 unset($this->resumableUploads[$stateKey]);
             }
-        } catch (Throwable $e) {
-            if ($resumeError === null && !$e instanceof UploadResumeException) {
-                throw $e;
-            }
+        } catch (UploadResumeException $e) {
             // Resuming again would fail the same way: the next upload of this file starts from scratch.
             if ($stateKey !== null) {
                 unset($this->resumableUploads[$stateKey]);
             }
-            // Not wrapped in the exceptions of the parallel parts.
-            throw $resumeError ?? $e;
+            throw $e;
         } finally {
             if ($stateKey !== null) {
                 unset($this->activeUploads[$stateKey]);
@@ -590,7 +551,7 @@ trait Files
     /**
      * State of interrupted uploads, to resume them.
      *
-     * @var array<string, array{file_id: string, part_size: int, parts: array<int, string>, time: int, key?: string, iv?: string, ige_part?: int, ige_state?: string}>
+     * @var array<string, array{file_id: string, part_size: int, parts: array<int, true>, time: int, key?: string, iv?: string, ige_part?: int, ige_state?: string}>
      */
     private array $resumableUploads = [];
 
@@ -623,20 +584,17 @@ trait Files
     }
 
     /**
-     * Record that a part was uploaded, with the hash of its contents, saving the encryption state if the uploaded prefix grew.
+     * Record that a part was uploaded, saving the encryption state if the uploaded prefix grew.
      *
-     * @param array<int, string> $partHashes Hash of the contents of each part
-     * @param array<int, string> $igeStates  Encryption state after each part
+     * @param array<int, string> $igeStates Encryption state after each part
      */
-    private function markPartUploaded(string $stateKey, int $part, array &$partHashes, array &$igeStates): void
+    private function markPartUploaded(string $stateKey, int $part, array &$igeStates): void
     {
-        $hash = $partHashes[$part];
-        unset($partHashes[$part]);
         if (!isset($this->resumableUploads[$stateKey])) {
             return;
         }
         $state = &$this->resumableUploads[$stateKey];
-        $state['parts'][$part] = $hash;
+        $state['parts'][$part] = true;
         $state['time'] = time();
         if (!isset($state['ige_part'])) {
             return;
@@ -656,6 +614,75 @@ trait Files
         }
     }
     /**
+     * Get the unique bot API file ID of a Telegram file, which doesn't change with its file reference.
+     *
+     * Returns null for files that aren't downloaded from Telegram.
+     */
+    private function getUniqueBotApiFileId(mixed $media): ?string
+    {
+        if ($media instanceof BotApiFileId) {
+            $media = $media->fileId;
+        }
+        if ($media instanceof Message) {
+            $media = $media->media;
+        }
+        if ($media instanceof Media) {
+            return $media->botApiFileUniqueId;
+        }
+        if (\is_string($media)) {
+            return FileId::fromBotAPI($media)->getUniqueBotAPI();
+        }
+        if (!\is_array($media)) {
+            return null;
+        }
+        if (!isset($media['_'])) {
+            $media = self::extractBotAPIFile($media) ?? $media;
+            if (isset($media['file_unique_id'])) {
+                return $media['file_unique_id'];
+            }
+            return isset($media['file_id']) ? FileId::fromBotAPI($media['file_id'])->getUniqueBotAPI() : null;
+        }
+        // The media that is downloaded, as in getDownloadInfo().
+        switch ($media['_']) {
+            case 'updateNewMessage':
+            case 'updateNewChannelMessage':
+            case 'updateEditMessage':
+            case 'updateEditChannelMessage':
+            case 'updateNewEncryptedMessage':
+                return $this->getUniqueBotApiFileId($media['message']);
+            case 'message':
+            case 'storyItem':
+                return $this->getUniqueBotApiFileId($media['media']);
+            case 'encryptedMessage':
+                if ($media['decrypted_message']['media']['_'] !== 'decryptedMessageMediaExternalDocument') {
+                    $media['decrypted_message']['media']['file'] = $media['file'];
+                }
+                return $this->getUniqueBotApiFileId($media['decrypted_message']['media']);
+            case 'wallPaper':
+                return $this->getUniqueBotApiFileId($media['document']);
+            case 'user':
+            case 'channel':
+            case 'chat':
+            case 'updateUserPhoto':
+                return $this->profilePhotoToBotAPI($media)['file_unique_id'];
+            case 'document':
+            case 'decryptedMessageMediaExternalDocument':
+                $media = ['_' => 'messageMediaDocument', 'ttl_seconds' => 0, 'document' => $media];
+                // no break
+            case 'photo':
+            case 'messageMediaPhoto':
+            case 'messageMediaDocument':
+            case 'decryptedMessageMediaPhoto':
+            case 'decryptedMessageMediaVideo':
+            case 'decryptedMessageMediaDocument':
+            case 'decryptedMessageMediaAudio':
+                return self::extractBotAPIFile($this->MTProtoToBotAPI($media))['file_unique_id'] ?? null;
+            default:
+                // Photo sizes are inlined, or downloaded as part of their photo.
+                return null;
+        }
+    }
+    /**
      * Reupload telegram file.
      *
      * @param mixed    $media     Telegram file
@@ -670,16 +697,16 @@ trait Files
             $cb = $media;
             $media = $media->getFile();
         }
+        $resumeKey = $this->getUniqueBotApiFileId($media);
         $media = ($this->getDownloadInfo($media));
         if (!isset($media['size'], $media['mime'])) {
             throw new Exception('Wrong file provided!');
         }
         $size = $media['size'];
         $mime = $media['mime'];
-        // Telegram files never change: identified without their file reference, which can be refreshed.
-        $location = $media['InputFileLocation'];
-        unset($location['file_reference']);
-        $resumeKey = 'tgfile:'.serialize([$location, $media['key_fingerprint'] ?? null]);
+        if ($resumeKey !== null) {
+            $resumeKey = 'tgfile:'.$resumeKey.':'.($media['key_fingerprint'] ?? '');
+        }
         $stateKey = $this->getUploadStateKey($resumeKey, $size, $encrypted);
         if ($stateKey !== null && isset($this->resumableUploads[$stateKey])) {
             // Resume an interrupted upload reading the file sequentially, skipping the parts that were already uploaded without downloading them.
