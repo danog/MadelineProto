@@ -232,7 +232,7 @@ gh release edit --latest=true "$CI_COMMIT_TAG"
 if [ "$PHAR_BOT_TOKEN" != "" ]; then
     curl --fail --silent --show-error \
         -F chat_id=@madelineprotophar \
-        -F document=@madeline81.phar \
+        -F "document=@madeline81.phar;filename=madeline-$CI_COMMIT_TAG.phar" \
         -F caption="MadelineProto $CI_COMMIT_TAG
 
 Changelog: https://github.com/danog/MadelineProto/releases/tag/$CI_COMMIT_TAG" \
