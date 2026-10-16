@@ -56,9 +56,8 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     public ?DiscardReason $discardReason = null;
     /**
      * If the call was upgraded to a [conference call »](https://core.telegram.org/api/group-calls#conference-calls),
-     * the [conference deep link »](https://core.telegram.org/api/links#conference-links) slug of the new conference.
-     *
-     * Conference calls are end-to-end encrypted and cannot be joined by MadelineProto yet.
+     * the [conference deep link »](https://core.telegram.org/api/links#conference-links) slug of the new conference,
+     * which can be joined with {@see \danog\MadelineProto\API::joinConferenceCallBySlug()}.
      */
     public ?string $conferenceSlug = null;
 
@@ -88,7 +87,7 @@ final class PrivateCall extends Update implements SimpleFilters, Call
     }
 
     /**
-     * Accept the incoming call.
+     * Accept the incoming call (for an outgoing call, which we are already in, only applies `$muted`).
      *
      * @param bool $muted Whether to accept with our own audio muted.
      */

@@ -241,7 +241,8 @@ final class PrivateCallController implements CallControllerInterface
     {
         $lock = $this->authMutex->acquire();
         try {
-            if ($this->callState === CallState::RUNNING || $this->callState === CallState::ENDED) {
+            // An outgoing call has nothing to accept: we are already in it.
+            if ($this->public->outgoing || $this->callState === CallState::RUNNING || $this->callState === CallState::ENDED) {
                 return $this;
             }
             Assert::eq($this->callState->name, CallState::INCOMING->name);

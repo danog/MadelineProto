@@ -59,7 +59,9 @@ trait AuthKeyHandler
     private array $callsByPeer = [];
     private array $pendingCalls = [];
     /**
-     * Request VoIP call.
+     * Request a one-to-one voice or video call.
+     *
+     * See [the call documentation »](https://docs.madelineproto.xyz/docs/CALLS.html) for how to play videos into it.
      *
      * @param mixed $user  User
      * @param bool  $video Whether to start a video call.

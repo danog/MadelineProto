@@ -287,8 +287,8 @@ class MyEventHandler extends SimpleEventHandler
         $reply->reply("Download link: ".$reply->media->getDownloadLink());
     }
 
-    // Plays a sound into a private call or a group call.
-    // The sound is read from a WebM file, demuxed in pure PHP and sent as-is, so neither ffmpeg nor the FFI extension is required.
+    // Plays a video into a private call or a group call (video chat), joining it.
+    // The video is read from a WebM file, demuxed in pure PHP and sent as-is, so neither ffmpeg nor the FFI extension is required.
     //
     // Fully works on webhosts!
     //
@@ -299,7 +299,7 @@ class MyEventHandler extends SimpleEventHandler
             $message->reply("Can't start a call: ".$whyNot->value);
             return;
         }
-        $message->requestCall()->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
+        $message->requestCall()->join()->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
     }
 
     // Plays incoming files into a Telegram call
@@ -314,7 +314,7 @@ class MyEventHandler extends SimpleEventHandler
         if (!$message->canRequestCall()) {
             return;
         }
-        $message->requestCall()->play($message->media->getStream());
+        $message->requestCall()->join()->play($message->media->getStream());
     }
 
     #[Handler]

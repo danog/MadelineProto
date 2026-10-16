@@ -45,6 +45,10 @@ if (!$me['bot']) {
     } catch (\danog\MadelineProto\RPCErrorException $e) {
         $MadelineProto->logger($e);
     }
+
+    // Video call someone, playing a WebM video (works on webhosts, NO ffmpeg needed!)
+    // See https://docs.madelineproto.xyz/docs/CALLS.html for group calls, livestreams, recording and more.
+    //$MadelineProto->requestCall('@username', video: true)->play(new \danog\MadelineProto\RemoteUrl('https://paste.daniil.it/oncall.webm'));
 }
 $MadelineProto->echo('OK, done!');
 ```
@@ -286,11 +290,24 @@ Some of MadelineProto's core components are also available as separate, standalo
   * [Getting the TL trace](https://docs.madelineproto.xyz/docs/EXCEPTIONS.html#getting-the-tl-trace)
 * [Avoiding FLOOD_WAITs](https://docs.madelineproto.xyz/docs/FLOOD_WAIT.html) - If you make too many requests to telegram, you might get FLOOD_WAITed for a while. To avoid these flood waits, you must calculate the flood wait rate.
 * [Logging](https://docs.madelineproto.xyz/docs/LOGGING.html) - MadelineProto provides a unified class for logging messages to the logging destination defined in settings.
-* [Telegram VoIP phone calls](https://docs.madelineproto.xyz/docs/CALLS.html) - MadelineProto provides an easy wrapper to work with phone calls.
+* [Telegram VoIP calls](https://docs.madelineproto.xyz/docs/CALLS.html) - MadelineProto can make and receive voice and video calls, stream and record video chats and livestreams, and take part in end-to-end encrypted conference calls.
+  * [Call types](https://docs.madelineproto.xyz/docs/CALLS.html#call-types)
   * [Requesting a call](https://docs.madelineproto.xyz/docs/CALLS.html#requesting-a-call)
-  * [Playing audio files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-audio-files)
-    * [Webhost support!](https://docs.madelineproto.xyz/docs/CALLS.html#webhost-support)
   * [Accepting calls](https://docs.madelineproto.xyz/docs/CALLS.html#accepting-calls)
+  * [Playing video files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-video-files)
+  * [Playing audio files](https://docs.madelineproto.xyz/docs/CALLS.html#playing-audio-files)
+  * [Supported formats](https://docs.madelineproto.xyz/docs/CALLS.html#supported-formats)
+  * [Playlists and screen sharing](https://docs.madelineproto.xyz/docs/CALLS.html#playlists-and-screen-sharing)
+  * [Recording calls](https://docs.madelineproto.xyz/docs/CALLS.html#recording-calls)
+  * [Group calls (video chats and livestreams)](https://docs.madelineproto.xyz/docs/CALLS.html#group-calls-video-chats-and-livestreams)
+    * [Livestreams, RTMP and stream mode](https://docs.madelineproto.xyz/docs/CALLS.html#livestreams-rtmp-and-stream-mode)
+    * [Live stories](https://docs.madelineproto.xyz/docs/CALLS.html#live-stories)
+  * [Conference calls](https://docs.madelineproto.xyz/docs/CALLS.html#conference-calls)
+  * [Restarts](https://docs.madelineproto.xyz/docs/CALLS.html#restarts)
+  * [PrivateCall](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Calls/PrivateCall.html): a one-to-one voice or video call (`danog\MadelineProto\VoIP` is an alias kept for backwards compatibility)
+  * [GroupCall](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Calls/GroupCall.html)
+  * [LiveStory](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Calls/LiveStory.html)
+  * [ConferenceCall](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Calls/ConferenceCall.html)
 * [Uploading and downloading files](https://docs.madelineproto.xyz/docs/FILES.html) - MadelineProto provides fully parallelized wrapper methods to upload and download files that support bot API file ids, direct upload by URL and file renaming.
   * [Bot API file IDs](https://docs.madelineproto.xyz/docs/FILES.html#bot-api-file-ids)
   * [Uploading & sending files](https://docs.madelineproto.xyz/docs/FILES.html#sending-files)
