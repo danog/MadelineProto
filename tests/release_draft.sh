@@ -8,6 +8,9 @@
 # - its notes (see tests/release_notes.sh), below what was written by hand, and its title (unless set by hand).
 #
 # Needs GITHUB_TOKEN, able to push to the main branch (a token of an admin: see the rulesets), and the tags.
+# Runs once the CI of a push succeeded, CI_SHA being the commit it succeeded on (see release-draft.yml):
+# nothing is done if something was pushed since, whose CI pushing the RELEASE constant would cancel (and
+# which updates the draft once it succeeds).
 # With DRY_RUN=1, prints what it would do instead.
 
 source tests/release_notes.sh
@@ -18,6 +21,11 @@ export GH_TOKEN="$GITHUB_TOKEN"
 
 git fetch -q --tags origin "$branch"
 git checkout -q -B "$branch" "origin/$branch"
+head=$(git rev-parse HEAD)
+if [ -n "$CI_SHA" ] && [ "$head" != "$CI_SHA" ]; then
+    echo "$branch moved since $CI_SHA, to $head: the draft is updated once its CI succeeds"
+    exit 0
+fi
 major=$(grep -o "RELEASE = '[0-9]\+" src/API.php | grep -o '[0-9]\+$')
 
 releases=$(gh api --paginate "repos/$repository/releases?per_page=100" | jq -s 'add')
@@ -59,7 +67,13 @@ elif ! grep -q "public const RELEASE = '$version';" src/API.php; then
     git config user.name "${GIT_NAME:-MadelineProto release}"
     git config user.email "${GIT_EMAIL:-release@madelineproto.xyz}"
     git commit -q -m "Bump the release version to $version" src/API.php
-    git push -q origin "$branch"
+    if ! git push -q origin "$branch"; then
+        if [ "$(git ls-remote origin "refs/heads/$branch" | cut -f1)" != "$head" ]; then
+            echo "$branch moved since $head: the draft is updated once its CI succeeds"
+            exit 0
+        fi
+        exit 1
+    fi
 fi
 
 title=$version

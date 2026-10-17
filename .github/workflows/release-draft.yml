@@ -5,7 +5,13 @@ name: Release draft
 # Disabled until the RELEASE_DRAFT variable of the repository is set to true.
 
 on:
-  push:
+  # Once the CI of a push to the main branch succeeded, rather than on the push: pushing the RELEASE constant
+  # would cancel the CI still running (see its concurrency).
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - v8
 
@@ -18,7 +24,7 @@ concurrency:
 
 jobs:
   draft:
-    if: vars.RELEASE_DRAFT == 'true'
+    if: vars.RELEASE_DRAFT == 'true' && github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
@@ -37,4 +43,6 @@ jobs:
           # Of an admin, to push the RELEASE constant to the main branch.
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+          # The commit the CI succeeded on.
+          CI_SHA: ${{ github.event.workflow_run.head_sha }}
         run: tests/test.sh release-draft
