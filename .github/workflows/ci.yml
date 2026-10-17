@@ -46,23 +46,25 @@ jobs:
           ARCH: ${{ matrix.arch }}
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker buildx build --platform "linux/$ARCH" . -f tests/dockerfiles/Dockerfile -t "danog/madelineproto:next-debian-$ARCH" --cache-from "danog/madelineproto:next-debian-$ARCH" --cache-to type=inline --push
+          # Without attestations: a plain image (rather than an index), for docker manifest in docker-merge.
+          docker buildx build --platform "linux/$ARCH" . -f tests/dockerfiles/Dockerfile -t "danog/madelineproto:next-debian-$ARCH" --cache-from "danog/madelineproto:next-debian-$ARCH" --cache-to type=inline --provenance=false --sbom=false --push
 
   docker-merge:
     needs: docker
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Push the multi-arch image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        # With docker manifest, which reads the images as the account logged in: docker buildx imagetools create
+        # read some of them anonymously, failing with the rate limit of anonymous pulls (429).
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          # All the tags at once: Docker Hub counts every read of a manifest against the pull rate limit, and
-          # creating them one at a time read the images of the architectures again for each one.
-          docker buildx imagetools create -t danog/madelineproto:debian -t danog/madelineproto:next -t danog/madelineproto:latest danog/madelineproto:next-debian-{arm,amd}64
+          for tag in debian next latest; do
+            docker manifest create "danog/madelineproto:$tag" danog/madelineproto:next-debian-{amd,arm}64
+            docker manifest push "danog/madelineproto:$tag"
+          done
 
   cs:
     needs: docker-merge
