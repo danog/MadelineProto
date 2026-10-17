@@ -25,6 +25,7 @@ use danog\BetterPrometheus\BetterCounter;
 use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\LinkedList;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -128,12 +129,15 @@ trait Session
             $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
             $this->new_incoming = $q;
         }
-        foreach ($this->new_outgoing as $msg) {
-            if ($msg->hasMsgId()) {
-                $msg->setMsgId(null);
-            }
-            if ($msg->hasSeqNo()) {
-                $msg->setSeqNo(null);
+        // The server only answers the requests sent in the current session: send those still waiting
+        // for an answer again in the new one (with new message IDs), or they are never answered.
+        // A container and the messages it carries are all listed: recall the containers first (which
+        // recalls their messages too), then the messages still listed, so that each is sent once.
+        foreach ([true, false] as $containers) {
+            foreach ($this->new_outgoing as $id => $msg) {
+                if ($msg instanceof Container === $containers && isset($this->new_outgoing[$id]) && !$msg->hasReply()) {
+                    $this->methodRecall($msg, forceDatacenter: $this->datacenter);
+                }
             }
         }
     }

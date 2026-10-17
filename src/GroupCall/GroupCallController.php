@@ -124,6 +124,9 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->joinMutex = new LocalMutex;
     }
 
+    /** Whether the call was restored from a session, and is yet to be resumed by {@see self::resumeAfterRestart()}. */
+    private bool $resumePending = false;
+
     /**
      * @psalm-mutation-free
      */
@@ -132,7 +135,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = get_object_vars($this);
         // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
         // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
-        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver']);
+        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver'], $result['resumePending']);
         return $result;
     }
 
@@ -153,35 +156,51 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->presentationDj !== null) {
             Assert::true($this->presentationDj->start());
         }
-        EventLoop::queue(function (): void {
-            if ($this->callState === GroupCallState::JOINING) {
-                // The process died in the middle of join(): its phone.joinGroupCall and the payload it
-                // carried are gone with it, and join() itself is a no-op while JOINING, so start over.
-                $this->log("Resumed $this in the middle of a join, joining again...", Logger::WARNING);
-                $this->rejoin();
-                return;
-            }
-            if ($this->callState !== GroupCallState::JOINED) {
-                return;
-            }
-            // The WebRTC connection restored itself and its transport to the SFU resumes on its own;
-            // now that the whole graph is back, resume the recorders (reopen their files, re-subscribe
-            // to their live tracks) and re-poll the participant list so received sources are in sync.
-            $this->log("Resumed $this after a restart of the process.");
-            // Restart the demuxers/readers too (DjLoop::__unserialize() deliberately leaves them dormant),
-            // or nothing is transmitted after a restart.
-            $this->diskJockey->resumeReader();
-            $this->presentationDj?->resumeReader();
-            $this->connection?->resume();
-            $this->presentationConnection?->resume();
-            if ($this->streamMode) {
-                // The stream receiver does not survive a restart (its recording does not either):
-                // follow the stream again from the live edge.
-                $this->streamReceiver = new StreamReceiver($this);
-                $this->streamReceiver->start($this->rtmpMode);
-            }
-            EventLoop::queue($this->refetch(...));
-        });
+        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
+        $this->resumePending = true;
+    }
+
+    /**
+     * Resume the call after the process restarted.
+     *
+     * Called by {@see MTProto::wakeup()} once the MTProto session is reset and connected, never from
+     * __unserialize(): resuming makes requests, and those sent before the session is reset are lost.
+     *
+     * @internal
+     */
+    public function resumeAfterRestart(): void
+    {
+        if (!$this->resumePending) {
+            return;
+        }
+        $this->resumePending = false;
+        if ($this->callState === GroupCallState::JOINING) {
+            // The process died in the middle of join(): its phone.joinGroupCall and the payload it
+            // carried are gone with it, and join() itself is a no-op while JOINING, so start over.
+            $this->log("Resumed $this in the middle of a join, joining again...", Logger::WARNING);
+            $this->rejoin();
+            return;
+        }
+        if ($this->callState !== GroupCallState::JOINED) {
+            return;
+        }
+        // The WebRTC connection restored itself and its transport to the SFU resumes on its own;
+        // now that the whole graph is back, resume the recorders (reopen their files, re-subscribe
+        // to their live tracks) and re-poll the participant list so received sources are in sync.
+        $this->log("Resumed $this after a restart of the process.");
+        // Restart the demuxers/readers too (DjLoop::__unserialize() deliberately leaves them dormant),
+        // or nothing is transmitted after a restart.
+        $this->diskJockey->resumeReader();
+        $this->presentationDj?->resumeReader();
+        $this->connection?->resume();
+        $this->presentationConnection?->resume();
+        if ($this->streamMode) {
+            // The stream receiver does not survive a restart (its recording does not either):
+            // follow the stream again from the live edge.
+            $this->streamReceiver = new StreamReceiver($this);
+            $this->streamReceiver->start($this->rtmpMode);
+        }
+        EventLoop::queue($this->refetch(...));
     }
 
     /**

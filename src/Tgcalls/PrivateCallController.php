@@ -129,6 +129,9 @@ final class PrivateCallController implements CallControllerInterface
         $this->authMutex = new LocalMutex;
     }
 
+    /** Whether the call was restored from a session, and is yet to be resumed by {@see self::resumeAfterRestart()}. */
+    private bool $resumePending = false;
+
     /**
      * @psalm-mutation-free
      */
@@ -144,9 +147,39 @@ final class PrivateCallController implements CallControllerInterface
         // The engines (WebRTC and libtgvoip alike) now serialize themselves and resume their
         // connections on wakeup, so they are kept. Only the mutex, which wraps a live suspension
         // queue, is dropped and recreated.
-        unset($result['authMutex']);
+        unset($result['authMutex'], $result['resumePending']);
 
         return $result;
+    }
+
+    /**
+     * Resume the call after the process restarted.
+     *
+     * Called by {@see MTProto::wakeup()} once the MTProto session is reset and connected, never from
+     * __unserialize(): by then the whole call graph is restored and callState is known-good, and the
+     * requests made while resuming are not lost to the reset of the session.
+     *
+     * @internal
+     */
+    public function resumeAfterRestart(): void
+    {
+        if (!$this->resumePending) {
+            return;
+        }
+        $this->resumePending = false;
+        if ($this->callState !== CallState::RUNNING) {
+            return;
+        }
+        // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own. Restart
+        // the demuxer/reader, the playback producers and the (file-backed) recorders, which were all
+        // left dormant during deserialization.
+        $this->diskJockey->resumeReader();
+        $this->tgcallsController?->resume();
+        // The legacy (libtgvoip) engine still re-arms its recorder from the remembered output.
+        if ($this->legacyController !== null) {
+            $this->applyPendingOutput();
+        }
+        $this->log("Resumed $this after a restart of the process.");
     }
     /**
      * Wakeup function.
@@ -159,7 +192,7 @@ final class PrivateCallController implements CallControllerInterface
         }
         // Defensively drop a call that came back without its full essential state (a half-constructed
         // call that slipped into the session): force it ENDED and start nothing. Because no subsystem
-        // starts async work during deserialization any more (that is all deferred to resume() below),
+        // starts async work during deserialization any more (that is all deferred to resumeAfterRestart()),
         // this is the single point that decides whether a restored call comes back to life at all.
         if (!isset($this->callState) || !isset($this->public) || !isset($this->call)
             || $this->callState === CallState::ENDED
@@ -172,24 +205,9 @@ final class PrivateCallController implements CallControllerInterface
         }
         $this->diskJockey ??= new DjLoop($this);
         Assert::true($this->diskJockey->start());
-        // Resume everything on the next tick — NEVER here: deserialization must stay synchronous, and
-        // resuming reopens files and starts loops (async). By the time this runs the whole call graph
-        // is restored and callState is known-good, so nothing dereferences half-restored state.
-        EventLoop::queue(function (): void {
-            if ($this->callState !== CallState::RUNNING) {
-                return;
-            }
-            // The WebRTC/libtgvoip engine restored itself and its transport resumes on its own. Restart
-            // the demuxer/reader, the playback producers and the (file-backed) recorders, which were all
-            // left dormant during deserialization.
-            $this->diskJockey->resumeReader();
-            $this->tgcallsController?->resume();
-            // The legacy (libtgvoip) engine still re-arms its recorder from the remembered output.
-            if ($this->legacyController !== null) {
-                $this->applyPendingOutput();
-            }
-            $this->log("Resumed $this after a restart of the process.");
-        });
+        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart():
+        // deserialization must stay synchronous, and resuming reopens files, starts loops and makes requests.
+        $this->resumePending = true;
     }
 
     /**

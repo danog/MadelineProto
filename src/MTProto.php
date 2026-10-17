@@ -1330,6 +1330,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
             if ($loggedIn) {
                 $this->resumeCalls();
+                // Resume the calls restored from the session only now that the MTProto session was reset
+                // and connected: resuming makes requests, and those sent before the reset are never answered.
+                foreach ([...$this->calls, ...$this->groupCalls, ...$this->conferenceCalls] as $call) {
+                    EventLoop::queue($call->resumeAfterRestart(...));
+                }
             }
 
             foreach ($this->calls as $id => $call) {
