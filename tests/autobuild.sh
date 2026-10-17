@@ -42,7 +42,10 @@ if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
     label=release:layer
 fi
 
-changed=""
+# The pull requests of this build, and their bodies, to link them to each other once all of them are submitted.
+urls=()
+bodies=()
+
 for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
     dir=${submodule%%:*}
     repository=${submodule#*:}
@@ -51,21 +54,41 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
         echo "Nothing changed in $repository"
         continue
     fi
-    submit_pr "$dir" "$repository" "$BRANCH" "$title" "The daily \`composer build\` of MadelineProto, see the pull request with the same title in danog/MadelineProto."
-    changed="$changed $repository"
+    body="The daily \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
+    submit_pr "$dir" "$repository" "$BRANCH" "$title" "$body"
+    urls+=("$PR_URL")
+    bodies+=("$body")
 done
+submodules=${#urls[@]}
 
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
-    exit 0
-fi
-body="The daily \`composer build\`."
-if [ "$changed" != "" ]; then
-    body="$body
+else
+    body="The daily \`composer build\`."
+    if [ "$submodules" -ne 0 ]; then
+        body="$body
 
-It points to the commits of the pull requests with the same title in:$changed. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
+It points to the commits of the other pull requests of this build. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
+    fi
+    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
+    urls+=("$PR_URL")
+    bodies+=("$body")
 fi
-submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
+
+if [ ${#urls[@]} -gt 1 ]; then
+    for i in "${!urls[@]}"; do
+        others=""
+        for j in "${!urls[@]}"; do
+            if [ "$i" -ne "$j" ]; then
+                others="$others
+- ${urls[$j]}"
+            fi
+        done
+        gh pr edit "${urls[$i]}" --body "$(pr_body "${bodies[$i]}
+
+The other pull requests of this build:$others")"
+    done
+fi
