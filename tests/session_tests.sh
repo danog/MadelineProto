@@ -12,13 +12,15 @@ for test in $(grep -l '@group session' tests/danog/MadelineProto/*Test.php); do
     if [ $status -eq 124 ] || [ $status -eq 137 ]; then
         echo "$test timed out!"
     fi
-    # Stop the IPC workers of the sessions, which outlive the tests: the next class would get a stuck one.
+    # Stop the IPC worker of the session of MadelineTestCase, which outlives the tests: the next class would get a
+    # stuck one. Only that one: locally, the other sessions in the repository may be in use.
     # With SIGTERM, which they handle saving the session.
-    if pkill -f "MadelineProto worker $PWD/"; then
-        for i in $(seq 60); do pgrep -f "MadelineProto worker $PWD/" >/dev/null || break; sleep 1; done
-        if pgrep -f "MadelineProto worker $PWD/" >/dev/null; then
-            echo "The workers didn't stop after $test:"
-            pgrep -af "MadelineProto worker $PWD/"
+    worker="MadelineProto worker $PWD/testing.madeline"
+    if pkill -f "$worker"; then
+        for i in $(seq 60); do pgrep -f "$worker" >/dev/null || break; sleep 1; done
+        if pgrep -f "$worker" >/dev/null; then
+            echo "The worker of testing.madeline didn't stop after $test:"
+            pgrep -af "$worker"
             status=1
         fi
     fi
