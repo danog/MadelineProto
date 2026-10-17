@@ -20,6 +20,10 @@ const CHAT_ID = 101374607; // @danogentili
 const MAX_LENGTH = 4096;
 // More fail with ENTITIES_TOO_LONG.
 const MAX_ENTITIES = 100;
+// The size of the entities is limited too (undocumented, "a limit on the total message entities size" according
+// to TDLib's developers): measured as the URLs plus about 40 bytes per entity, 11569 bytes were accepted and 11688
+// rejected (the changelog of 8.8.8). With a margin.
+const MAX_ENTITIES_SIZE = 10000;
 const ANNOUNCED = '<!-- announced -->';
 // How many of the messages were sent, if not all of them.
 const SENT = '/<!-- announced (\d+) messages -->\n?/';
@@ -119,13 +123,22 @@ foreach (preg_split('/\r?\n/', $changelog) as $line) {
     }
 }
 
-// Messages of at most MAX_LENGTH characters (as Telegram counts them) and MAX_ENTITIES entities, split between lines.
+/**
+ * The size of entities, as limited by MAX_ENTITIES_SIZE.
+ */
+function entitiesSize(array $entities): int
+{
+    return array_sum(array_map(static fn (array $entity): int => 40 + strlen($entity['url'] ?? ''), $entities));
+}
+
+// Messages of at most MAX_LENGTH characters (as Telegram counts them), MAX_ENTITIES entities and MAX_ENTITIES_SIZE,
+// split between lines.
 $messages = [];
 $current = '';
 foreach ($lines as $line) {
     $candidate = $current === '' ? $line : "$current\n$line";
     $entities = $current === '' ? null : Entities::fromMarkdown($candidate);
-    if ($entities !== null && (EntityTools::mbStrlen($entities->message) > MAX_LENGTH || count($entities->entities) > MAX_ENTITIES)) {
+    if ($entities !== null && (EntityTools::mbStrlen($entities->message) > MAX_LENGTH || count($entities->entities) > MAX_ENTITIES || entitiesSize($entities->entities) > MAX_ENTITIES_SIZE)) {
         $messages[] = $current;
         $candidate = $line;
     }
@@ -139,7 +152,7 @@ $body = rtrim(preg_replace(SENT, '', $body));
 foreach ($messages as $i => $message) {
     $entities = Entities::fromMarkdown(preg_replace("/\n{3,}/", "\n\n", $message));
     if ($dryRun) {
-        printf("--- message %d/%d: %d characters, %d entities%s\n", $i + 1, count($messages), EntityTools::mbStrlen($entities->message), count($entities->entities), $i < $sent ? ' (already sent)' : '');
+        printf("--- message %d/%d: %d characters, %d entities of size %d%s\n", $i + 1, count($messages), EntityTools::mbStrlen($entities->message), count($entities->entities), entitiesSize($entities->entities), $i < $sent ? ' (already sent)' : '');
         echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL;
         continue;
     }
