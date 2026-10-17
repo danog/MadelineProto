@@ -1379,6 +1379,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         }
         $this->stopLoops();
+        // Free the metrics port: when a new session is handed over to its IPC worker, the worker binds it.
+        if ($this->promServer) {
+            $promServer = $this->promServer;
+            $this->promServer = null;
+            try {
+                $promServer->stop();
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while stopping the metrics server: $e", Logger::ERROR);
+            }
+        }
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
