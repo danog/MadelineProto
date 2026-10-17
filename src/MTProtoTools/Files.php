@@ -1189,9 +1189,9 @@ trait Files
             case 'updateUserPhoto':
                 $res = ($this->getDownloadInfo($messageMedia['photo']));
                 if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
-                    // bot API file ID
+                    // bot API file ID: with the access hash of the peer, which may not be in the database.
                     $messageMedia['min'] = false;
-                    $peer = $this->genAll($messageMedia, \danog\MadelineProto\API::INFO_TYPE_ID);
+                    $peer = $this->genAll($messageMedia, \danog\MadelineProto\API::INFO_TYPE_PEER);
                 } else {
                     $peer = $this->getInfo($messageMedia, \danog\MadelineProto\API::INFO_TYPE_ID);
                 }
