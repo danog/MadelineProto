@@ -14,8 +14,57 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Not the builds of tags, which release.
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
 jobs:
+  # The image the other jobs run in, rebuilt when the main branch or a tag is pushed: they wait for it, and
+  # pull the new one.
+  docker:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/v8' || github.ref_type == 'tag')
+    strategy:
+      matrix:
+        include:
+          - image: ubuntu-latest
+            arch: amd64
+          - image: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push the image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker buildx build --platform "linux/$ARCH" . -f tests/dockerfiles/Dockerfile -t "danog/madelineproto:next-debian-$ARCH" --cache-from "danog/madelineproto:next-debian-$ARCH" --cache-to type=inline --push
+
+  docker-merge:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Push the multi-arch image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          for tag in debian next latest; do
+            docker buildx imagetools create -t "danog/madelineproto:$tag" danog/madelineproto:next-debian-{arm,amd}64
+          done
+
   cs:
+    needs: docker-merge
+    # Also when the image wasn't rebuilt.
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
@@ -32,8 +81,10 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: tests/test.sh cs
 
+  # The whole test suite, with the secrets: for pushes.
   test:
-    if: github.ref_type == 'tag'
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     # The user sessions must not be used by two jobs at once.
@@ -57,8 +108,10 @@ jobs:
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
+  # The tests that don't need any secret, for pull requests (which don't get them, if from forks).
   test_light:
-    if: github.ref_type != 'tag'
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
@@ -72,6 +125,8 @@ jobs:
         run: tests/test.sh phpunit-light
 
   handshake:
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
