@@ -1047,7 +1047,7 @@ trait Files
             if (isset($messageMedia['InputFileLocation'])) {
                 return $messageMedia;
             }
-            $messageMedia = $messageMedia['MessageMedia'] ?? $messageMedia['User'] ?? $messageMedia['Chat'];
+            $messageMedia = $messageMedia['MessageMedia'];
         }
         if (!isset($messageMedia['_'])) {
             if (!isset($messageMedia['InputFileLocation']) && !isset($messageMedia['file_id'])) {
@@ -1188,17 +1188,10 @@ trait Files
             case 'chat':
             case 'updateUserPhoto':
                 $res = ($this->getDownloadInfo($messageMedia['photo']));
-                if (\is_array($messageMedia) && ($messageMedia['min'] ?? false) && isset($messageMedia['access_hash'])) {
-                    // bot API file ID: with the access hash of the peer, which may not be in the database.
-                    $messageMedia['min'] = false;
-                    $peer = $this->genAll($messageMedia, \danog\MadelineProto\API::INFO_TYPE_PEER);
-                } else {
-                    $peer = $this->getInfo($messageMedia, \danog\MadelineProto\API::INFO_TYPE_ID);
-                }
                 $res['InputFileLocation'] = [
                     '_' => 'inputPeerPhotoFileLocation',
                     'big' => true,
-                    'peer' => $peer,
+                    'peer' => $this->getInfo($messageMedia, \danog\MadelineProto\API::INFO_TYPE_ID),
                     'photo_id' => $res['InputFileLocation']['photo_id'],
                 ];
                 $res['name'] = Tools::unpackSignedLongString($messageMedia['id']).'_'.($res['thumb_size'] ?? 'x').'_'.$messageMedia['photo']['dc_id'];
