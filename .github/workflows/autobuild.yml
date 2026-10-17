@@ -27,7 +27,10 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Get a token of the app
         id: app

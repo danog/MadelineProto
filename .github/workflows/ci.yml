@@ -21,7 +21,10 @@ jobs:
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - name: Check the code style and the generated docs
         env:
@@ -39,7 +42,10 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - name: Run the tests
         env:
@@ -57,7 +63,10 @@ jobs:
     container: danog/madelineproto:next
     steps:
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - name: Run the light tests
         run: tests/test.sh phpunit-light
@@ -67,7 +76,10 @@ jobs:
     container: danog/madelineproto:next
     steps:
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - name: Test the handshake
         run: tests/test.sh handshake
@@ -110,7 +122,10 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - name: Install git
-        run: apt-get update && apt-get install -y git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
       - name: Build, test and release the phar
         env:
