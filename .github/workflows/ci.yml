@@ -87,6 +87,8 @@ jobs:
     if: ${{ !failure() && !cancelled() && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
+    # Rather than the default 6 hours if a test hangs, holding the user sessions (the daily build waits for them).
+    timeout-minutes: 60
     # The user sessions must not be used by two jobs at once.
     concurrency:
       group: telegram-user-sessions

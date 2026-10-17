@@ -40,6 +40,7 @@ use function Amp\delay;
  * Needs USER_SESSION and PEER_USER_SESSION, the paths of two sessions of different user accounts without an event
  * handler: the first one calls the second one, which answers and records the call.
  *
+ * @group session
  * @internal
  */
 final class CallResumeTest extends TestCase

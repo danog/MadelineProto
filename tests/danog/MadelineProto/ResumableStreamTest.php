@@ -42,6 +42,7 @@ use function Amp\delay;
  *
  * The API instance is an IPC client, so streams, callbacks and cancellations all cross the IPC boundary.
  *
+ * @group session
  * @internal
  */
 final class ResumableStreamTest extends MadelineTestCase
