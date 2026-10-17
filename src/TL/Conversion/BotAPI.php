@@ -288,7 +288,10 @@ trait BotAPI
                             break;
                         case 'documentAttributeAudio':
                             $audio = $attribute;
-                            $type_name = $attribute['voice'] ? 'voice' :'audio';
+                            // Round videos may also have an audio attribute, with the waveform.
+                            if ($type_name !== 'video_note') {
+                                $type_name = $attribute['voice'] ? 'voice' :'audio';
+                            }
                             $res['duration'] = $attribute['duration'];
                             if (isset($attribute['performer'])) {
                                 $res['performer'] = $attribute['performer'];

@@ -168,6 +168,12 @@ trait Files
                 continue;
             }
             if ($t === 'documentAttributeAudio') {
+                // Round videos may also have an audio attribute, with the waveform.
+                foreach ($media['document']['attributes'] as $video) {
+                    if ($video['_'] === 'documentAttributeVideo' && ($video['round_message'] ?? false)) {
+                        continue 2;
+                    }
+                }
                 return $attr['voice']
                     ? new Voice($this, $media, $attr, $protected)
                     : new Audio($this, $media, $attr, $protected);
