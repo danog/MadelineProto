@@ -74,8 +74,9 @@ jobs:
     container:
       image: danog/madelineproto:next
       # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
-      # without the secrets: empty credentials would fail the job.
-      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || null }}
+      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
+      # so they get no credentials at all.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
@@ -148,8 +149,9 @@ jobs:
     container:
       image: danog/madelineproto:next
       # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
-      # without the secrets: empty credentials would fail the job.
-      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || null }}
+      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
+      # so they get no credentials at all.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
