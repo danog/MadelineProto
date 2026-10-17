@@ -729,6 +729,18 @@ trait Handler
     }
 
     /**
+     * Bot API ID of the peer a group call we are tracking belongs to, if known.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getGroupCallPeerId(int $id): ?int
+    {
+        return ($this->groupCalls[$id] ?? null)?->public->peerId;
+    }
+
+    /**
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
      * @return array<int, AbstractGroupCallParticipant>

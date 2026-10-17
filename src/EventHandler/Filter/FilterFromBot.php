@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Update;
 
 /**
@@ -40,6 +41,7 @@ final class FilterFromBot extends Filter
     #[\Override]
     public function apply(Update $update): bool
     {
-        return $update instanceof AbstractMessage && $this->API->isBot($update->senderId);
+        return ($update instanceof AbstractMessage && $this->API->isBot($update->senderId))
+            || ($update instanceof MultiCallMessage && $this->API->isBot($update->fromId));
     }
 }
