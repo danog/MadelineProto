@@ -13,9 +13,14 @@ for test in $(grep -l '@group session' tests/danog/MadelineProto/*Test.php); do
         echo "$test timed out!"
     fi
     # Stop the IPC workers of the sessions, which outlive the tests: the next class would get a stuck one.
+    # With SIGTERM, which they handle saving the session.
     if pkill -f "MadelineProto worker $PWD/"; then
-        for i in $(seq 30); do pgrep -f "MadelineProto worker $PWD/" >/dev/null || break; sleep 1; done
-        pkill -9 -f "MadelineProto worker $PWD/"
+        for i in $(seq 60); do pgrep -f "MadelineProto worker $PWD/" >/dev/null || break; sleep 1; done
+        if pgrep -f "MadelineProto worker $PWD/" >/dev/null; then
+            echo "The workers didn't stop after $test:"
+            pgrep -af "MadelineProto worker $PWD/"
+            status=1
+        fi
     fi
     if [ $status -ne 0 ]; then
         failed=1
