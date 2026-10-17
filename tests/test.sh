@@ -88,7 +88,8 @@ if [ "$1" == "phpunit" ]; then
     else
         [ $? -eq 2 ]
     fi
-    # The tests in the session group (using the accounts of the CI) one class at a time, the others in parallel.
+    # The tests in the session group (using the accounts of the CI) one class at a time (see tests/session_tests.sh),
+    # the others in parallel.
     composer test
     exit 0
 fi

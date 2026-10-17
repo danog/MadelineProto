@@ -147,7 +147,7 @@
         ],
         "test": [
             "@paratest",
-            "@paratest-session"
+            "@test-session"
         ],
         "test-light": [
             "@paratest-light"
@@ -159,7 +159,7 @@
         "file_ref_map": "php tools/gen_filerefmap.php",
         "docs-fix": "tools/fix_docs.sh",
         "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -v --exclude-group session",
-        "paratest-session": "@php -dzend.assertions=1 ./vendor/bin/paratest -v -p 1 --group session",
+        "test-session": "tests/session_tests.sh",
         "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -vc phpunit-light.xml --exclude-group session",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": [
