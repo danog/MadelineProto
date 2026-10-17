@@ -15,14 +15,8 @@ apt update
 
 apt-get install procps git unzip gh openssh-client rsync -y
 
-cd /tmp
-
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
-
-cd $OLDPWD
+# Composer comes with the image (tests/dockerfiles/Dockerfile): not downloaded from getcomposer.org, which failed
+# a run when it was unreachable.
 
 #php tests/jit.php
 

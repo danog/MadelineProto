@@ -3,10 +3,7 @@
 # Configure
 echo >> /usr/local/etc/php/php.ini
 echo 'phar.readonly = 0' >> /usr/local/etc/php/php.ini
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
+# Composer comes with the image (tests/dockerfiles/Dockerfile).
 
 apt-get update && apt-get install -y wget
 
