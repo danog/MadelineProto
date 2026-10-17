@@ -54,12 +54,14 @@ final class Button extends IpcCapable implements JsonSerializable
      */
     public function click(bool $donotwait = true)
     {
-        return match ($this->button['_']) {
+        // Since layer 229, what a button does is its type (a ButtonType or an InlineButtonType).
+        $type = $this->button['type'] ?? [];
+        return match ($this->button['_'].'/'.($type['_'] ?? '')) {
             default => false,
-            'keyboardButtonUrl' => $this->button['url'],
-            'keyboardButton' => $this->message->reply($this->label),
-            'keyboardButtonCallback' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'data' => $this->button['data']]),
-            'keyboardButtonGame' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'game' => true]),
+            'keyboardButton/buttonTypeDefault' => $this->message->reply($this->label),
+            'keyboardInlineButton/inlineButtonTypeUrl' => $type['url'],
+            'keyboardInlineButton/inlineButtonTypeCallback' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'data' => $type['data']]),
+            'keyboardInlineButton/inlineButtonTypeGame' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'game' => true]),
         };
     }
     /**

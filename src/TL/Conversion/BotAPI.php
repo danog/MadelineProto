@@ -42,16 +42,20 @@ trait BotAPI
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
     /**
-     * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
+     * Convert the rows of a bot API keyboard: keyboardButtonRow/keyboardButton with a ButtonType for reply
+     * keyboards, keyboardInlineButtonRow/keyboardInlineButton with an InlineButtonType for inline ones.
+     *
+     * @return list<array{_: string, buttons: list<array{_: string, text: string, type?: array, style?: array}>}>
      */
     private function parseButtons(array $rows, bool $inline): array
     {
         $newrows = [];
         $key = 0;
-        $button_key = 0;
         foreach ($rows as $row) {
             $newrows[$key] = ['_' => $inline ? 'keyboardInlineButtonRow' : 'keyboardButtonRow', 'buttons' => []];
+            $button_key = 0;
             foreach ($row as $button) {
+                $text = $button['text'];
                 $newrows[$key]['buttons'][$button_key] = [
                     '_' => $inline ? 'keyboardInlineButton' : 'keyboardButton',
                     'text' => $button['text'],
@@ -95,7 +99,9 @@ trait BotAPI
                     $button = $button['login_url'];
                     $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inputInlineButtonTypeUrlAuth';
                     $newrows[$key]['buttons'][$button_key]['type']['request_write_access'] = $button['request_write_access'] ?? false;
-                    $newrows[$key]['buttons'][$button_key]['type']['fwd_text'] = $button['forward_text'] ?? false;
+                    if (isset($button['forward_text'])) {
+                        $newrows[$key]['buttons'][$button_key]['type']['fwd_text'] = $button['forward_text'];
+                    }
                     $newrows[$key]['buttons'][$button_key]['type']['url'] = $button['url'];
                     if (isset($button['bot_username'])) {
                         $newrows[$key]['buttons'][$button_key]['type']['bot'] = $button['bot_username'];
@@ -137,7 +143,6 @@ trait BotAPI
                     }
                 } elseif (isset($button['callback_game'])) {
                     $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeGame';
-                    $newrows[$key]['buttons'][$button_key]['type']['text'] = $button['callback_game'];
                 } elseif (isset($button['request_contact']) && $button['request_contact']) {
                     $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeRequestPhone';
                 } elseif (isset($button['request_location']) && $button['request_location']) {
@@ -147,7 +152,13 @@ trait BotAPI
                     $newrows[$key]['buttons'][$button_key]['type']['copy_text'] = $button['copy_text']['text'];
                 } elseif (isset($button['request_poll'])) {
                     $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeRequestPoll';
-                    $newrows[$key]['buttons'][$button_key]['type']['quiz'] = ($button['request_poll']['type'] ?? null) === 'quiz';
+                    // Without a type, any poll can be created.
+                    if (isset($button['request_poll']['type'])) {
+                        $newrows[$key]['buttons'][$button_key]['type']['quiz'] = $button['request_poll']['type'] === 'quiz';
+                    }
+                }
+                if (!isset($newrows[$key]['buttons'][$button_key]['type'])) {
+                    throw new Exception("The inline keyboard button \"$text\" has no action (url, callback_data, ...)");
                 }
                 $button_key++;
             }
@@ -429,6 +440,7 @@ trait BotAPI
                     $result['send_message']['reply_markup'] = $this->parseReplyMarkup($result['send_message']['reply_markup']);
                 }
             }
+            unset($result);
         }
         if (isset($arguments['parse_mode'])) {
             $arguments = $this->parseMode($arguments);
