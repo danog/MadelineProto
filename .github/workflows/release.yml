@@ -34,7 +34,7 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          apt-get update && apt-get install -y git jq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
         with:
@@ -42,6 +42,11 @@ jobs:
           fetch-depth: 0
       - name: Generate the release notes
         run: tests/test.sh release-notes "$TAG"
+      - name: Send the phar to @madelineprotophar
+        if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
+        env:
+          PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
+        run: tests/send_phar.sh "$TAG"
       - name: Send the changelog to @danogentili
         if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
         env:

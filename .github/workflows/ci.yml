@@ -217,14 +217,14 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
           # Empty unless building a tag, like Woodpecker's.
           CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: /bin/bash -e tests/makephar.sh
-      # Released by makephar.sh, with the token of the job: its events don't run workflows, so run it.
+      # Released by makephar.sh, with the token of the job: its events don't run workflows, so run it, and wait for
+      # it, so that the release fails if it fails.
       - name: Announce the release
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
-        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref "$TAG" -f tag="$TAG"
+          GH_REPO: ${{ github.repository }}
+        run: tests/release_dispatch.sh "${{ github.ref_name }}"
