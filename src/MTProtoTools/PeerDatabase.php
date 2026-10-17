@@ -85,6 +85,9 @@ final class PeerDatabase implements TLCallback
         $this->decacheMutex = new LocalMutex;
         $this->mutex = new LocalKeyedMutex;
     }
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['db', 'fullDb', 'usernames', 'API', 'pendingDb', 'v', 'hasInfo'];
@@ -150,6 +153,12 @@ final class PeerDatabase implements TLCallback
                 EventLoop::queue($key < 0 ? $this->processChat(...) : $this->processUser(...), $key);
             }
         });
+    }
+
+    public function clearAll(): void
+    {
+        $this->db->clear();
+        $this->fullDb->clear();
     }
 
     public function getFull(int $id): ?array
@@ -267,11 +276,13 @@ final class PeerDatabase implements TLCallback
         }
         $new = $new ? self::getUsernames($new) : [];
         $old = $old ? self::getUsernames($old) : [];
-        $diffToRemove = array_diff($old, $new);
-        $diffToAdd = array_diff($new, $old);
-        if (!$diffToAdd && !$diffToRemove) {
-            return;
+        foreach ($old as $key => $username) {
+            if (!isset($this->usernames[$username])) {
+                unset($old[$key]);
+            }
         }
+        $diffToRemove = array_diff($old, $new);
+        $diffToAdd = array_diff($new, $diffToRemove);
         $lock = $this->decacheMutex->acquire();
         try {
             foreach ($diffToRemove as $username) {
@@ -417,6 +428,9 @@ final class PeerDatabase implements TLCallback
                     return;
                 }
             }
+
+            $this->recacheChatUsername($user['id'], $existingChat, $user);
+
             if ($existingChat != $user) {
                 $this->API->logger("Updated user {$user['id']}", Logger::ULTRA_VERBOSE);
                 if (($user['min'] ?? false) && !($existingChat['min'] ?? false)) {
@@ -523,7 +537,11 @@ final class PeerDatabase implements TLCallback
             if ($chat['_'] === 'channelEmpty') {
                 return;
             }
-            if ($chat['_'] !== 'channel' && $chat['_'] !== 'channelForbidden') {
+            if ($chat['_'] !== 'channel'
+                && $chat['_'] !== 'channelForbidden'
+                && $chat['_'] !== 'community'
+                && $chat['_'] !== 'communityForbidden'
+            ) {
                 throw new InvalidArgumentException('Invalid chat type '.$chat['_']);
             }
             $bot_api_id = $chat['id'];
@@ -552,6 +570,7 @@ final class PeerDatabase implements TLCallback
                     return;
                 }
             }
+            $this->recacheChatUsername($bot_api_id, $existingChat, $chat);
             if ($existingChat != $chat) {
                 $this->API->logger("Updated chat {$bot_api_id}", Logger::ULTRA_VERBOSE);
                 if (($chat['min'] ?? false) && $existingChat && !($existingChat['min'] ?? false)) {
@@ -606,30 +625,45 @@ final class PeerDatabase implements TLCallback
         ];
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
         return array_merge(
-            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden'], [$this->addChat(...)]),
+            array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden', 'community', 'communityForbidden'], [$this->addChat(...)]),
             array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
-            array_fill_keys(['chatFull', 'channelFull', 'userFull'], [$this->addFullChat(...)]),
+            array_fill_keys(['chatFull', 'channelFull', 'userFull', 'communityFull'], [$this->addFullChat(...)]),
         );
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
         return [];
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
@@ -637,6 +671,8 @@ final class PeerDatabase implements TLCallback
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getTypeMismatchCallbacks(): array
@@ -644,6 +680,9 @@ final class PeerDatabase implements TLCallback
         return [];
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo()
     {
         return ['PeerDatabase instance '.spl_object_hash($this)];

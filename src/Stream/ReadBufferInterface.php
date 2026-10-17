@@ -26,6 +26,7 @@ use Amp\Cancellation;
  * Read buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface ReadBufferInterface
 {
@@ -33,6 +34,7 @@ interface ReadBufferInterface
      * Read data asynchronously.
      *
      * @param int $length How much data to read
+     * @psalm-impure
      */
     public function bufferRead(int $length, ?Cancellation $cancellation = null): ?string;
 }

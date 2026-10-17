@@ -23,7 +23,11 @@ use danog\MadelineProto\EventHandler\ChatInvite;
  */
 final class ChatInvitePublicJoin extends ChatInvite
 {
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawChatInvite)
     {
     }

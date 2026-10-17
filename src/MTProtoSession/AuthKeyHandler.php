@@ -25,14 +25,12 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\PermAuthKey;
-use danog\MadelineProto\MTProto\TempAuthKey;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use danog\PrimeModule;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Throwable;
 
 use const PHP_EOL;
@@ -57,13 +55,11 @@ trait AuthKeyHandler
 {
     /**
      * Create authorization key.
-     *
-     * @return ($temp is false ? PermAuthKey : TempAuthKey)|null
      */
-    public function createAuthKey(bool $temp): PermAuthKey|TempAuthKey|null
+    public function createAuthKey(bool $temp): void
     {
         $expires_in = $temp ? MTProto::PFS_DURATION : -1;
-        $cdn = $this->isCDN();
+        $cdn = $this->shared->auth->isCdn;
         $test = $this->API->settings->getConnection()->getTestMode();
 
         for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
@@ -97,18 +93,19 @@ trait AuthKeyHandler
                  * ***********************************************************************
                  * Find our key in the server_public_key_fingerprints vector
                  */
-                foreach ($this->API->getRsaKeys($test, $cdn) as $curkey) {
-                    if (\in_array($curkey->fp, $ResPQ['server_public_key_fingerprints'], true)) {
-                        $key = $curkey;
-                    }
-                }
-                if (!isset($key)) {
+                $fps = $ResPQ['server_public_key_fingerprints'];
+
+                $key = $this->API->findRsaKey($fps, $test, $cdn);
+                if (!$key) {
                     if ($cdn) {
-                        $this->API->logger('Could not find required CDN public key, postponing CDN handshake...');
-                        return null;
+                        $this->API->getCdnConfig();
+                        $key = $this->API->findRsaKey($fps, $test, $cdn);
                     }
-                    throw new SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
+                    if (!$key) {
+                        throw new SecurityException("Couldn't find any of our keys in the server_public_key_fingerprints vector.");
+                    }
                 }
+
                 $pq_bytes = $ResPQ['pq'];
                 $server_nonce = $ResPQ['server_nonce'];
                 /*
@@ -169,13 +166,24 @@ trait AuthKeyHandler
                 }
                 $data_with_padding = $p_q_inner_data.Tools::random(192 - \strlen($p_q_inner_data));
                 $data_pad_reversed = strrev($data_with_padding);
-                do {
+
+                for ($tryInner = 0; $tryInner < 10; $tryInner++) {
                     $temp_key = Tools::random(32);
                     $data_with_hash = $data_pad_reversed.hash('sha256', $temp_key.$data_with_padding, true);
                     $aes_encrypted = Crypt::igeEncrypt($data_with_hash, $temp_key, str_repeat("\0", 32));
                     $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
                     $key_aes_encrypted_bigint = new BigInteger($temp_key_xor.$aes_encrypted, 256);
-                } while ($key_aes_encrypted_bigint->compare($key->n) >= 0);
+
+                    $ok = $key_aes_encrypted_bigint->compare($key->n) < 0;
+                    if ($ok) {
+                        break;
+                    }
+                }
+
+                if (!$ok) {
+                    throw new SecurityException('Failed to generate a valid payload within 10 attempts.');
+                }
+
                 $encrypted_data = $key->encrypt($key_aes_encrypted_bigint);
                 $this->API->logger('Starting Diffie Hellman key exchange', Logger::VERBOSE);
                 /*
@@ -247,7 +255,7 @@ trait AuthKeyHandler
                  *         int            $server_time
                  * ]
                  */
-                $server_DH_inner_data = $this->API->getTL()->deserialize($answer, ['type' => '']);
+                $server_DH_inner_data = $this->API->getTL()->deserialize($answer, ['type' => '', 'encrypted' => false, 'connection' => null]);
                 /*
                  * ***********************************************************************
                  * Do some checks
@@ -368,15 +376,16 @@ trait AuthKeyHandler
                                 throw new SecurityException('wrong new_nonce_hash1');
                             }
                             $this->API->logger('Diffie Hellman key exchange processed successfully!', Logger::VERBOSE);
-                            $key = $expires_in < 0 ? new PermAuthKey() : new TempAuthKey();
-                            if ($expires_in >= 0) {
-                                \assert($key instanceof TempAuthKey);
-                                $key->expires(time() + $expires_in);
+                            if ($temp) {
+                                $this->shared->auth->setTempAuthKey(
+                                    $auth_key_str,
+                                    substr($new_nonce, 0, 8) ^ substr($server_nonce, 0, 8)
+                                );
+                            } else {
+                                $this->shared->auth->setAuthKey($auth_key_str);
                             }
-                            $key->setServerSalt(substr($new_nonce, 0, 8) ^ substr($server_nonce, 0, 8));
-                            $key->setAuthKey($auth_key_str);
                             $this->API->logger('Auth key generated', Logger::NOTICE);
-                            return $key;
+                            return;
                         case 'dh_gen_retry':
                             if ($Set_client_DH_params_answer['new_nonce_hash2'] != $new_nonce_hash2) {
                                 throw new SecurityException('wrong new_nonce_hash_2');
@@ -396,7 +405,7 @@ trait AuthKeyHandler
                     }
                 }
             } catch (SecurityException|Exception|RPCErrorException $e) {
-                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e->getMessage().' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
+                $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.' in '.basename($e->getFile(), '.php').' on line '.$e->getLine().'. Retrying...', Logger::WARNING);
                 $this->reconnect();
             } catch (Throwable $e) {
                 $this->API->logger("An exception occurred while generating the authorization key in DC {$this->datacenter}: ".$e.PHP_EOL.' Retrying (try number '.$retry_id_total.')...', Logger::WARNING);
@@ -406,6 +415,5 @@ trait AuthKeyHandler
         if (!$cdn) {
             throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
         }
-        return null;
     }
 }

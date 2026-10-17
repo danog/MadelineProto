@@ -23,11 +23,11 @@ namespace danog\MadelineProto\Stream\Common;
 use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProtoTools\Crypt\AesCtr;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use phpseclib3\Crypt\AES;
 
 /**
  * AES CTR stream wrapper.
@@ -43,8 +43,8 @@ use phpseclib3\Crypt\AES;
  */
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    private $encrypt;
-    private $decrypt;
+    private AesCtr $encrypt;
+    private AesCtr $decrypt;
     private $stream;
     private $write_buffer;
     private $read_buffer;
@@ -59,18 +59,14 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->encrypt = new AES('ctr');
-        $this->encrypt->enableContinuousBuffer();
-        $this->encrypt->setKey($this->extra['encrypt']['key']);
-        $this->encrypt->setIV($this->extra['encrypt']['iv']);
-        $this->decrypt = new AES('ctr');
-        $this->decrypt->enableContinuousBuffer();
-        $this->decrypt->setKey($this->extra['decrypt']['key']);
-        $this->decrypt->setIV($this->extra['decrypt']['iv']);
+        $this->encrypt = new AesCtr($this->extra['encrypt']['key'], $this->extra['encrypt']['iv']);
+        $this->decrypt = new AesCtr($this->extra['decrypt']['key'], $this->extra['decrypt']['iv']);
         $this->stream = ($ctx->getStream($header));
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -81,6 +77,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -96,6 +94,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
@@ -105,16 +105,20 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * Decrypts read data asynchronously.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
-        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
+        return $this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
     }
     /**
      * Writes data to the stream.
      *
      * @param string $data Bytes to write.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function bufferWrite(string $data): void
@@ -130,12 +134,14 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-        $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
+        $this->write_buffer->bufferWrite($this->encrypt->encrypt($data));
     }
     /**
      * Set obfuscation keys/IVs.
      *
      * @param array $data Keys
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($data): void
@@ -144,6 +150,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -152,20 +160,31 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
-    public function getEncryptor(): AES
+    /**
+     * @psalm-mutation-free
+     */
+    public function getEncryptor(): AesCtr
     {
         return $this->encrypt;
     }
-    public function getDecryptor(): AES
+    /**
+     * @psalm-mutation-free
+     */
+    public function getDecryptor(): AesCtr
     {
         return $this->decrypt;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

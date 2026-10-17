@@ -12,7 +12,15 @@ function layerUpgrade(int $layer): void
     $doc = preg_replace('|here \(layer \d+\)|', "here (layer $layer)", $doc);
     file_put_contents('docs/docs/docs/USING_METHODS.md', $doc);
 
-    array_map(unlink::class, glob('src/*.tl'));
+    foreach (glob('src/*.tl') as $file) {
+        if (basename($file) === 'TL_file_ref_map_schema.tl') {
+            continue;
+        }
+        if (basename($file) === 'TL_file_ref_map_schema.json') {
+            continue;
+        }
+        unlink($file);
+    }
     foreach (['TL_mtproto_v1', "TL_telegram_v$layer", 'TL_secret'] as $schema) {
         copy("schemas/$schema.tl", "src/$schema.tl");
     }

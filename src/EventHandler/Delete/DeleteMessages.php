@@ -24,7 +24,11 @@ use danog\MadelineProto\MTProto;
  */
 final class DeleteMessages extends Delete
 {
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawDelete)
     {
         parent::__construct($API, $rawDelete);

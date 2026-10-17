@@ -19,6 +19,9 @@ namespace danog\MadelineProto;
 use ReflectionClass;
 use ReflectionProperty;
 
+/**
+ * @psalm-external-mutation-free
+ */
 abstract class SettingsAbstract
 {
     /**
@@ -27,6 +30,9 @@ abstract class SettingsAbstract
      */
     protected bool $changed = true;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __sleep()
     {
         $result = [];
@@ -39,6 +45,8 @@ abstract class SettingsAbstract
      * Merge with other settings instance.
      *
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function merge(self $other): void
     {
@@ -75,6 +83,8 @@ abstract class SettingsAbstract
      * Convert array of legacy array property names to new camel case names.
      *
      * @param array $properties Properties
+     *
+     * @psalm-pure
      */
     protected static function toCamel(array $properties): array
     {
@@ -98,7 +108,10 @@ abstract class SettingsAbstract
      * Apply changes.
      *
      * @internal
+     *
      * @return static
+     *
+     * @psalm-external-mutation-free
      */
     public function applyChanges(): self
     {

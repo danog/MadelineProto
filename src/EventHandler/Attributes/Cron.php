@@ -18,10 +18,17 @@ namespace danog\MadelineProto\EventHandler\Attributes;
 
 use Attribute;
 
-/** Attribute that enables periodic execution of a certain method. */
+/**
+ * Attribute that enables periodic execution of a certain method.
+ *
+ * @psalm-immutable
+ */
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Cron
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         public readonly float $period
     ) {

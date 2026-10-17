@@ -21,6 +21,9 @@ namespace danog\MadelineProto;
  */
 final class EventHandlerIssue
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Issue message */
         public readonly string $message,
@@ -33,6 +36,9 @@ final class EventHandlerIssue
     ) {
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __toString(): string
     {
         return sprintf(
@@ -47,6 +53,9 @@ final class EventHandlerIssue
         Logger::log((string) $this, $this->severe ? Logger::FATAL_ERROR : Logger::ERROR);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getHTML(): string
     {
         $issueStr = htmlentities((string) $this);
@@ -55,6 +64,9 @@ final class EventHandlerIssue
         return $warning;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function throw(): void
     {
         throw new Exception(message: (string) $this, file: $this->file, line: $this->line);

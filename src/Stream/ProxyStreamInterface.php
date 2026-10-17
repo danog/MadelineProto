@@ -26,6 +26,7 @@ namespace danog\MadelineProto\Stream;
  * @author Daniil Gentili <daniil@daniil.it>
  *
  * @template T
+ * @psalm-mutable
  */
 interface ProxyStreamInterface
 {
@@ -33,6 +34,7 @@ interface ProxyStreamInterface
      * Set extra proxy data.
      *
      * @param T $extra Proxy data
+     * @psalm-impure
      */
     public function setExtra($extra): void;
 }

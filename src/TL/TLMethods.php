@@ -29,6 +29,9 @@ final class TLMethods
     public array $by_id = [];
     public array $by_method = [];
     public array $method_namespace = [];
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['by_id', 'by_method', 'method_namespace'];
@@ -40,7 +43,12 @@ final class TLMethods
             'type' => $json_dict['type'],
             'params' => $json_dict['params'],
             'flags' => [],
-            'encrypted' => $scheme_type !== 'mtproto',
+            'encrypted' => $scheme_type !== 'mtproto'
+                || $json_dict['method'] === 'ping_delay_disconnect'
+                || $json_dict['method'] === 'ping'
+                || $json_dict['method'] === 'destroy_session'
+                || $json_dict['method'] === 'rpc_drop_answer'
+                || $json_dict['method'] === 'get_future_salts',
         ];
         if (preg_match('/^(v|V)ector\\<(.*)\\>$/', $json_dict['type'], $matches)) {
             $this->by_id[$json_dict['id']]['type'] = $matches[1] === 'v' ? 'vector' : 'Vector t';
@@ -53,6 +61,9 @@ final class TLMethods
         }
         $this->parseParams($json_dict['id'], false, $json_dict['method']);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findById(string $id)
     {
         if (isset($this->by_id[$id])) {
@@ -62,6 +73,9 @@ final class TLMethods
         }
         return false;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findByMethod(string $method_name)
     {
         if (isset($this->by_method[$method_name])) {

@@ -49,6 +49,8 @@ final class IntermediatePaddedStream implements BufferedStreamInterface, MTProto
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -83,6 +85,8 @@ final class IntermediatePaddedStream implements BufferedStreamInterface, MTProto
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -91,12 +95,17 @@ final class IntermediatePaddedStream implements BufferedStreamInterface, MTProto
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

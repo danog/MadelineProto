@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\WrappedFuture;
 
@@ -42,7 +43,16 @@ trait CallHandler
      */
     public function methodCallAsyncRead(string $method, array $args, ?int $datacenter = null)
     {
-        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
+        if (isset($args['specialMethodType']) && $args['specialMethodType'] === SpecialMethodType::USER_RELATED) {
+            $datacenter = $this->loginState->getState()->authorizedDc;
+        }
+        // Calls uploading files are resumed if interrupted by a restart.
+        return $this->makeResumableCall(
+            'method',
+            $method,
+            $args,
+            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+        );
     }
     /**
      * Call method and make sure it is asynchronously sent.

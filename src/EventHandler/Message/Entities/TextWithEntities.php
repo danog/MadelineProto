@@ -24,6 +24,9 @@ use ReflectionProperty;
 
 final class TextWithEntities implements JsonSerializable
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Text */
         public readonly string $text,

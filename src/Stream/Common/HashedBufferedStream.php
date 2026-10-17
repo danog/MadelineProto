@@ -50,6 +50,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     private $rev = false;
     /**
      * Enable read hashing.
+     *
+     * @psalm-external-mutation-free
      */
     public function startReadHash(): void
     {
@@ -59,6 +61,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      * Check the read hash after N bytes are read.
      *
      * @param int $after The number of bytes to read before checking the hash
+     *
+     * @psalm-external-mutation-free
      */
     public function checkReadHash(int $after): void
     {
@@ -66,6 +70,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Stop read hashing and get final hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function getReadHash(): string
     {
@@ -80,6 +86,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Check if we are read hashing.
+     *
+     * @psalm-mutation-free
      */
     public function hasReadHash(): bool
     {
@@ -87,6 +95,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Enable write hashing.
+     *
+     * @psalm-external-mutation-free
      */
     public function startWriteHash(): void
     {
@@ -96,6 +106,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      * Write the write hash after N bytes are read.
      *
      * @param int $after The number of bytes to read before writing the hash
+     *
+     * @psalm-external-mutation-free
      */
     public function checkWriteHash(int $after): void
     {
@@ -103,6 +115,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Stop write hashing and get final hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function getWriteHash(): string
     {
@@ -117,6 +131,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Check if we are write hashing.
+     *
+     * @psalm-mutation-free
      */
     public function hasWriteHash(): bool
     {
@@ -126,6 +142,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      * Set the hash algorithm.
      *
      * @param string $hash Algorithm name
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($hash): void
@@ -156,6 +174,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -166,6 +186,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
@@ -180,6 +202,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -249,6 +273,8 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -257,12 +283,17 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

@@ -27,6 +27,8 @@ abstract class PluginEventHandler extends SimpleEventHandler
 {
     /**
      * Plugins can require other plugins ONLY with the getPlugins() method.
+     *
+     * @psalm-pure
      */
     #[\Override]
     final public static function getPluginPaths(): string|array|null
@@ -35,6 +37,8 @@ abstract class PluginEventHandler extends SimpleEventHandler
     }
     /**
      * Whether the plugin is enabled.
+     *
+     * @psalm-pure
      */
     public function isPluginEnabled(): bool
     {

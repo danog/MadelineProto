@@ -26,7 +26,11 @@ abstract class GameQuery extends CallbackQuery
     /** Short name of a Game to be returned, serves as the unique identifier for the game */
     public readonly string $gameShortName;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);

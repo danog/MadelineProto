@@ -218,7 +218,9 @@ trait Start
                 try {
                     $qr = $this->qrLogin();
                     if (isset($_GET['waitQrCodeOrLogin'])) {
-                        $qr = $qr?->waitForLoginOrQrCodeExpiration(Tools::getTimeoutCancellation(5.0));
+                        $qr = $qr?->waitForLoginOrQrCodeExpiration(
+                            Tools::getTimeoutCancellation(5.0, "Timeout while waiting for QR code or login")
+                        );
                     }
                 } catch (CancelledException) {
                     $qr = $this->qrLogin();

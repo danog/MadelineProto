@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows messages from the bot admin or outgoing messages */
+/** @psalm-mutable */
 interface FromAdminOrOutgoing
 {
 }

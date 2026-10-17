@@ -178,6 +178,8 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     }
     /**
      * Sets proxy data.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($extra): void
@@ -200,6 +202,9 @@ final class HttpProxy implements RawProxyStreamInterface, BufferedProxyStreamInt
     {
         return $this->stream;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

@@ -161,6 +161,9 @@ final class ProcessRunner extends RunnerAbstract
             Logger::log("Got final message from worker: $lastLine");
         }
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     private static function locateBinary(): string
     {
         $executable = strncasecmp(PHP_OS, 'WIN', 3) === 0 ? 'php.exe' : 'php';
@@ -183,6 +186,8 @@ final class ProcessRunner extends RunnerAbstract
      * Format PHP options.
      *
      * @return list<string>
+     *
+     * @psalm-pure
      */
     private static function formatOptions(array $options): array
     {

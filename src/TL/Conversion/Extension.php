@@ -32,6 +32,8 @@ abstract class Extension
      *
      * @param string $extension File extension
      * @param string $default   Default mime type
+     *
+     * @psalm-pure
      */
     public static function getMimeFromExtension(string $extension, string $default): string
     {
@@ -45,6 +47,8 @@ abstract class Extension
      * Get extension from mime type.
      *
      * @param string $mime MIME type
+     *
+     * @psalm-external-mutation-free
      */
     public static function getExtensionFromMime(string $mime): string
     {
@@ -55,6 +59,8 @@ abstract class Extension
      *
      * @param mixed  $location File location
      * @param string $default  Default extension
+     *
+     * @psalm-pure
      */
     public static function getExtensionFromLocation(mixed $location, string $default): string
     {

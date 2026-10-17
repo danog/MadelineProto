@@ -27,6 +27,9 @@ use ReflectionProperty;
  */
 abstract class ChatInvite implements JsonSerializable
 {
+    /**
+     * @psalm-pure
+     */
     public static function fromRawChatInvite(array $rawChatInvite): self
     {
         return match ($rawChatInvite['_']) {

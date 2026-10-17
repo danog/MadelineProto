@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
@@ -30,6 +31,9 @@ final class FilterTextCaseInsensitive extends Filter
 {
     private readonly string $content;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         string $content,
     ) {
@@ -37,10 +41,14 @@ final class FilterTextCaseInsensitive extends Filter
         $this->content = mb_strtolower($content);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && mb_strtolower($update->message) === $this->content) ||
-            ($update instanceof Story && mb_strtolower($update->caption) === $this->content);
+            ($update instanceof Story && mb_strtolower($update->caption) === $this->content) ||
+            ($update instanceof MultiCallMessage && mb_strtolower($update->message->text) === $this->content);
     }
 }

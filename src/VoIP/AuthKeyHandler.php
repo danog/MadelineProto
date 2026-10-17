@@ -25,16 +25,19 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
+use danog\MadelineProto\CallStream;
+use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
+use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\Ogg;
+use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\Tools;
-use danog\MadelineProto\VoIP;
-use danog\MadelineProto\VoIPController;
-use phpseclib3\Math\BigInteger;
+use danog\MadelineProto\Tgcalls\PrivateCallController;
+use phpseclib4\Math\BigInteger;
 use Throwable;
 
 use const STR_PAD_LEFT;
@@ -45,21 +48,25 @@ use const STR_PAD_LEFT;
  * https://core.telegram.org/mtproto/auth_key
  * https://core.telegram.org/mtproto/samples-auth_key
  *
+ * @psalm-import-type StreamMask from \danog\MadelineProto\CallStream
  * @internal
  */
 trait AuthKeyHandler
 {
-    /** @var array<int, VoIPController> */
+    /** @var array<int, PrivateCallController> */
     private array $calls = [];
-    /** @var array<int, VoIPController> */
+    /** @var array<int, PrivateCallController> */
     private array $callsByPeer = [];
     private array $pendingCalls = [];
     /**
-     * Request VoIP call.
+     * Request a one-to-one voice or video call.
      *
-     * @param mixed $user User
+     * See [the call documentation »](https://docs.madelineproto.xyz/docs/CALLS.html) for how to play videos into it.
+     *
+     * @param mixed $user  User
+     * @param bool  $video Whether to start a video call.
      */
-    public function requestCall(mixed $user): VoIP
+    public function requestCall(mixed $user, bool $video = false): PrivateCall
     {
         $user = ($this->getInfo($user));
         if ($user['type'] !== 'user') {
@@ -81,13 +88,14 @@ trait AuthKeyHandler
             $g_a = $dh_config['g']->powMod($a, $dh_config['p']);
             Crypt::checkG($g_a, $dh_config['p']);
             $res = $this->methodCallAsyncRead('phone.requestCall', [
+                'video' => $video,
                 'user_id' => $user,
                 'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
-                'protocol' => VoIPController::CALL_PROTOCOL,
+                'protocol' => PrivateCallController::CALL_PROTOCOL,
             ])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-            $this->calls[$res['id']] = $controller = new VoIPController($this, $res);
+            $this->calls[$res['id']] = $controller = new PrivateCallController($this, $res);
             $this->callsByPeer[$controller->public->otherID] = $controller;
             unset($this->pendingCalls[$user]);
             $deferred->complete($controller->public);
@@ -98,7 +106,11 @@ trait AuthKeyHandler
         return $deferred->getFuture()->await();
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
     public function cleanupCall(int $id): void
     {
         if (isset($this->calls[$id])) {
@@ -113,6 +125,8 @@ trait AuthKeyHandler
      * @internal
      *
      * @return ?list{string, string, string, string}
+     *
+     * @psalm-mutation-free
      */
     public function getCallVisualization(int $id): ?array
     {
@@ -139,9 +153,30 @@ trait AuthKeyHandler
     }
 
     /**
-     * Get the phone call with the specified user ID.
+     * Upgrade a one-to-one call to an [end-to-end encrypted conference call »](https://core.telegram.org/api/group-calls#conference-calls):
+     * create a conference, invite the other party to it, and discard the one-to-one call pointing them
+     * to the conference (`phoneCallDiscardReasonMigrateConferenceCall`).
+     *
+     * @param int  $id    ID of the one-to-one call.
+     * @param bool $muted Whether to join the conference muted.
      */
-    public function getCallByPeer(int $userId): ?VoIP
+    public function migrateCallToConference(int $id, bool $muted = false): ConferenceCall
+    {
+        $call = $this->calls[$id] ?? throw new AssertionError('Unknown call!');
+        $conference = $this->createConferenceCall($muted);
+        $link = $conference->exportInvite();
+        $slug = substr($link, (int) strrpos($link, '/') + 1);
+        $conference->invite($call->public->otherID);
+        $call->discard(DiscardReason::MIGRATE_CONFERENCE_CALL, conferenceSlug: $slug);
+        return $conference;
+    }
+
+    /**
+     * Get the phone call with the specified user ID.
+     *
+     * @psalm-mutation-free
+     */
+    public function getCallByPeer(int $userId): ?PrivateCall
     {
         return ($this->callsByPeer[$userId] ?? null)?->public;
     }
@@ -149,17 +184,19 @@ trait AuthKeyHandler
     /**
      * Get all pending and running calls, indexed by user ID.
      *
-     * @return array<int, VoIP>
+     * @return array<int, PrivateCall>
      */
     public function getAllCalls(): array
     {
-        return array_map(static fn (VoIPController $v): VoIP => $v->public, $this->callsByPeer);
+        return array_map(static fn (PrivateCallController $v): PrivateCall => $v->public, $this->callsByPeer);
     }
 
     /**
      * Get phone call information.
+     *
+     * @psalm-mutation-free
      */
-    public function getCall(int $id): ?VoIP
+    public function getCall(int $id): ?PrivateCall
     {
         return ($this->calls[$id] ?? null)?->public;
     }
@@ -167,26 +204,37 @@ trait AuthKeyHandler
     /**
      * Play file in call.
      */
-    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function callPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!Tools::canConvertOgg()) {
-            if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
-                Ogg::validateOgg($file);
-            } else {
-                throw new AssertionError("The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!");
-            }
-        }
-        ($this->calls[$id] ?? null)?->play($file);
+        ($this->calls[$id] ?? null)?->play($file, $dest);
     }
 
     /**
-     * Set output file or stream for incoming OPUS audio packets in a call.
+     * Record the incoming media of a call into one file (or stream) with a fixed set of tracks, see
+     * {@see \danog\MadelineProto\EventHandler\Calls\PrivateCall::setOutput()}.
      *
-     * Will write an OGG OPUS stream to the specified file or stream.
+     * @param ?StreamMask $streams The streams to record, as a bitmask of {@see CallStream} flags, or null for every available one.
+     *
+     * @return StreamMask The streams the other party currently sends, as a bitmask of {@see CallStream} flags (0 while unknown).
      */
-    public function callSetOutput(int $id, LocalFile|WritableStream $file): void
+    public function callSetOutput(int $id, LocalFile|WritableStream $file, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        ($this->calls[$id] ?? null)?->setOutput($file);
+        if (!isset($this->calls[$id])) {
+            throw new AssertionError('Unknown call!');
+        }
+        return $this->calls[$id]->setOutput($file, $format, $streams);
+    }
+
+    /**
+     * Record the incoming media of a call into a directory, one numbered file per combination of
+     * streams the other party sends, see {@see \danog\MadelineProto\EventHandler\Calls\PrivateCall::setOutputFolder()}.
+     */
+    public function callSetOutputFolder(int $id, LocalDirectory $dir, ?RecordingFormat $format = null): void
+    {
+        if (!isset($this->calls[$id])) {
+            throw new AssertionError('Unknown call!');
+        }
+        $this->calls[$id]->setOutputFolder($dir, $format);
     }
 
     /**
@@ -194,12 +242,12 @@ trait AuthKeyHandler
      *
      * @internal
      */
-    public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file): void
+    public function callPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
         if (!isset($this->calls[$id])) {
             return;
         }
-        $this->callPlay($id, $file);
+        $this->callPlay($id, $file, $dest);
         if ($file instanceof ReadableStream) {
             $deferred = new DeferredFuture;
             $file->onClose($deferred->complete(...));
@@ -210,58 +258,55 @@ trait AuthKeyHandler
     /**
      * When called, skips to the next file in the playlist.
      */
-    public function skipPlay(int $id): void
+    public function skipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        ($this->calls[$id] ?? null)?->skip();
+        ($this->calls[$id] ?? null)?->skip($dest);
     }
 
     /**
      * Stops playing all files in the call, clears the main and the hold playlist.
      */
-    public function stopPlay(int $id): void
+    public function stopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        ($this->calls[$id] ?? null)?->stop();
+        ($this->calls[$id] ?? null)?->stop($dest);
     }
 
     /**
      * Pauses playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
-    public function pausePlay(int $id): void
+    public function pausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        ($this->calls[$id] ?? null)?->pause();
+        ($this->calls[$id] ?? null)?->pause($dest);
     }
 
     /**
      * Resumes playback of the current audio file in the call.
+     *
+     * @psalm-external-mutation-free
      */
-    public function resumePlay(int $id): void
+    public function resumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        ($this->calls[$id] ?? null)?->resume();
+        ($this->calls[$id] ?? null)?->resume($dest);
     }
 
     /**
      * Whether the currently playing audio file is paused.
+     *
+     * @psalm-mutation-free
      */
-    public function isPlayPaused(int $id): bool
+    public function isPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
     {
-        return ($this->calls[$id] ?? null)?->isPaused() ?? false;
+        return ($this->calls[$id] ?? null)?->isPaused($dest) ?? false;
     }
 
     /**
      * Play files on hold in call.
      */
-    public function callPlayOnHold(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function callPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        if (!Tools::canConvertOgg()) {
-            foreach ($files as $file) {
-                if ($file instanceof LocalFile || $file instanceof RemoteUrl) {
-                    Ogg::validateOgg($file);
-                } else {
-                    throw new AssertionError("The passed file was not generated by MadelineProto or @libtgvoipbot, please pre-convert it using @libtgvoip bot or install FFI and ffmpeg to perform realtime conversion!");
-                }
-            }
-        }
-        ($this->calls[$id] ?? null)?->playOnHold(...$files);
+        ($this->calls[$id] ?? null)?->playOnHold($dest, ...$files);
     }
 
     /**
@@ -269,36 +314,93 @@ trait AuthKeyHandler
      *
      * @internal
      */
-    public function callPlayOnHoldBlocking(int $id, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    public function callPlayOnHoldBlocking(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
         if (!isset($this->calls[$id])) {
             return;
         }
-        $this->callPlayOnHold($id, ...$files);
-        foreach ($files as $file) {
-            if ($file instanceof ReadableStream) {
-                $deferred = new DeferredFuture;
-                $file->onClose($deferred->complete(...));
-                $deferred->getFuture()->await();
-            }
-        }
+        $this->callPlayOnHold($id, $dest, ...$files);
     }
 
     /**
      * Get the file that is currently being played.
      *
      * Will return a string with the object ID of the stream if we're currently playing a stream, otherwise returns the related LocalFile or RemoteUrl.
+     *
+     * @psalm-mutation-free
      */
-    public function callGetCurrent(int $id): RemoteUrl|LocalFile|string|null
+    public function callGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
-        return ($this->calls[$id] ?? null)?->getCurrent();
+        return ($this->calls[$id] ?? null)?->getCurrent($dest);
     }
 
     /**
      * Get call state.
+     *
+     * @psalm-mutation-free
      */
     public function getCallState(int $id): ?CallState
     {
         return ($this->calls[$id] ?? null)?->getCallState();
+    }
+
+    /**
+     * Mute or unmute our own audio stream in a call.
+     */
+    public function setCallMuted(int $id, bool $muted = true): void
+    {
+        ($this->calls[$id] ?? null)?->setMuted($muted);
+    }
+
+    /**
+     * Whether our own audio stream is muted in a call.
+     *
+     * @psalm-mutation-free
+     */
+    public function isCallMuted(int $id): bool
+    {
+        return ($this->calls[$id] ?? null)?->isMuted() ?? true;
+    }
+
+    /**
+     * Start sharing a screen in a call.
+     *
+     * @internal
+     */
+    public function enableCallPresentation(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->enablePresentation();
+    }
+
+    /**
+     * Stop sharing the screen in a call.
+     *
+     * @internal
+     */
+    public function disableCallPresentation(int $id): void
+    {
+        ($this->calls[$id] ?? null)?->disablePresentation();
+    }
+
+    /**
+     * Whether a screencast is currently being transmitted in a call.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function isCallSharingScreen(int $id): bool
+    {
+        return ($this->calls[$id] ?? null)?->isSharingScreen() ?? false;
+    }
+
+    /**
+     * Get the media state of the other party of a call, as reported by their client.
+     *
+     * @psalm-mutation-free
+     */
+    public function getCallRemoteMediaState(int $id): ?MediaState
+    {
+        return ($this->calls[$id] ?? null)?->getRemoteMediaState();
     }
 }

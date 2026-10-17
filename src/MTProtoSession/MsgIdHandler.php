@@ -41,6 +41,8 @@ final class MsgIdHandler
      * Constructor.
      *
      * @param Connection $session Session
+     *
+     * @psalm-mutation-free
      */
     public function __construct(Connection $session)
     {
@@ -125,6 +127,8 @@ final class MsgIdHandler
      * Get maximum message ID.
      *
      * @param boolean $incoming Incoming or outgoing message ID
+     *
+     * @psalm-mutation-free
      */
     public function getMaxId(bool $incoming)
     {

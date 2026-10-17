@@ -39,6 +39,8 @@ abstract class StrTools extends Extension
      * Get Telegram UTF-8 length of string.
      *
      * @param string $text Text
+     *
+     * @psalm-pure
      */
     public static function mbStrlen(string $text): int
     {
@@ -50,6 +52,8 @@ abstract class StrTools extends Extension
      * @param string   $text   Text to substring
      * @param integer  $offset Offset
      * @param null|int $length Length
+     *
+     * @psalm-pure
      */
     public static function mbSubstr(string $text, int $offset, ?int $length = null): string
     {
@@ -58,9 +62,12 @@ abstract class StrTools extends Extension
     /**
      * Telegram UTF-8 multibyte split.
      *
-     * @param  string        $text   Text
-     * @param  integer       $length Length
+     * @param string        $text   Text
+     * @param integer       $length Length
+     *
      * @return array<string>
+     *
+     * @psalm-pure
      */
     public static function mbStrSplit(string $text, int $length): array
     {
@@ -91,6 +98,8 @@ abstract class StrTools extends Extension
      * @see https://docs.madelineproto.xyz/API_docs/methods/messages.sendMessage.html#usage-of-parse_mode
      *
      * @return TextEntities Object containing message and entities
+     *
+     * @psalm-mutation-free
      */
     public static function markdownToMessageEntities(string $markdown): TextEntities
     {
@@ -116,6 +125,8 @@ abstract class StrTools extends Extension
      * Convert to camelCase.
      *
      * @param string $input String
+     *
+     * @psalm-pure
      */
     public static function toCamelCase(string $input): string
     {
@@ -139,6 +150,8 @@ abstract class StrTools extends Extension
      * Escape string for MadelineProto's HTML entity converter.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     public static function htmlEscape(string $what): string
     {
@@ -148,6 +161,8 @@ abstract class StrTools extends Extension
      * Escape string for markdown.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     public static function markdownEscape(string $what): string
     {
@@ -157,6 +172,8 @@ abstract class StrTools extends Extension
      * Escape string for markdown codeblock.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     public static function markdownCodeblockEscape(string $what): string
     {
@@ -166,6 +183,8 @@ abstract class StrTools extends Extension
      * Escape string for markdown code section.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     public static function markdownCodeEscape(string $what): string
     {
@@ -175,6 +194,8 @@ abstract class StrTools extends Extension
      * Escape string for URL.
      *
      * @param string $what String to escape
+     *
+     * @psalm-pure
      */
     public static function markdownUrlEscape(string $what): string
     {
@@ -186,6 +207,8 @@ abstract class StrTools extends Extension
      * @internal
      *
      * @param string $type String to escape
+     *
+     * @psalm-pure
      */
     public static function typeEscape(string $type): string
     {
@@ -198,6 +221,8 @@ abstract class StrTools extends Extension
      * @internal
      *
      * @param string $method Method name
+     *
+     * @psalm-pure
      */
     public static function methodEscape(string $method): string
     {
@@ -207,6 +232,8 @@ abstract class StrTools extends Extension
      * Strip markdown tags.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public static function toString(string $markdown): string
     {

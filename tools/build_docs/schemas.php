@@ -13,22 +13,34 @@ function loadSchemas(): array
     $stored = trim(@file_get_contents(getcwd().'/schemas/last'));
     $page = 1;
     $had = [];
+    // The layer of the newest schema: layer numbers aren't monotonic (tdesktop went from layer 230 to 231 and back).
+    $current = null;
     $client = HttpClientBuilder::buildDefault();
     do {
-        $res = $client->request(new Request("https://api.github.com/repos/telegramdesktop/tdesktop/commits?path=Telegram/SourceFiles/mtproto/scheme/api.tl&per_page=100&page=$page"))->getBody()->buffer();
+        $request = new Request("https://api.github.com/repos/telegramdesktop/tdesktop/commits?path=Telegram/SourceFiles/mtproto/scheme/api.tl&per_page=100&page=$page");
+        // Unauthenticated, the API allows 60 requests per hour per IP, shared by all of the jobs of a CI provider.
+        if ($token = getenv('GITHUB_TOKEN')) {
+            $request->setHeader('Authorization', "Bearer $token");
+        }
+        $res = $client->request($request)->getBody()->buffer();
         foreach (json_decode($res, true) as $idx => $commit) {
             $hash = $commit['sha'];
             if ($page === 1 && $idx === 0) {
                 file_put_contents(getcwd().'/schemas/last', $hash);
             }
+            $last = $hash === $stored && $current !== null
+                ? ''
+                : file_get_contents("https://raw.githubusercontent.com/telegramdesktop/tdesktop/$hash/Telegram/SourceFiles/mtproto/scheme/api.tl");
+            if (preg_match("|// Layer (\d+)|i", $last, $matches)) {
+                $current ??= (int) $matches[1];
+            }
             if ($hash === $stored) {
                 break 2;
             }
-            $last = file_get_contents("https://raw.githubusercontent.com/telegramdesktop/tdesktop/$hash/Telegram/SourceFiles/mtproto/scheme/api.tl");
-            if (!preg_match("|// Layer (\d+)|i", $last, $matches)) {
+            if (!$matches) {
                 continue;
             }
-            $layer = $matches[1];
+            $layer = (int) $matches[1];
             if (isset($had[$layer])) {
                 continue;
             }
@@ -38,6 +50,17 @@ function loadSchemas(): array
         }
         $page++;
     } while (true);
+
+    // The schemas of the layers above the current one were abandoned, never served by Telegram.
+    foreach (glob(getcwd().'/schemas/TL_telegram_v*') as $file) {
+        if ($current !== null
+            && preg_match("/telegram_v(\d+)/", $file, $matches)
+            && (int) $matches[1] > $current
+        ) {
+            echo "Removing $file, above the current layer $current".PHP_EOL;
+            unlink($file);
+        }
+    }
 
     $res = [];
     foreach (glob(getcwd().'/schemas/TL_telegram_*') as $file) {

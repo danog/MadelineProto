@@ -107,12 +107,13 @@ trait Events
         }
         $this->getUpdatesQueue->clear();
         $this->getUpdatesQueueKey = 0;
-        $this->startUpdateSystem();
     }
     /**
      * Check if a certain event handler plugin is installed.
      *
      * @param class-string<EventHandler> $class
+     *
+     * @psalm-mutation-free
      */
     final public function hasPlugin(string $class): bool
     {
@@ -124,8 +125,10 @@ trait Events
      * @template T as EventHandler
      *
      * @param class-string<T> $class
-     *
+
      * return T|null
+     *
+     * @psalm-mutation-free
      */
     final public function getPlugin(string $class): PluginEventHandler|EventHandlerProxy|null
     {
@@ -152,6 +155,8 @@ trait Events
      * @param class-string<T>|null $class
      *
      * @return T|EventHandlerProxy|__PHP_Incomplete_Class|null
+     *
+     * @psalm-mutation-free
      */
     public function getEventHandler(?string $class = null): EventHandler|EventHandlerProxy|__PHP_Incomplete_Class|null
     {
@@ -163,7 +168,11 @@ trait Events
         }
         return $this->event_handler_instance;
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function getEventHandlerClass(): ?string
     {
         return $this->event_handler_instance !== null
@@ -172,12 +181,18 @@ trait Events
     }
     /**
      * Check if an event handler instance is present.
+     *
+     * @psalm-mutation-free
      */
     public function hasEventHandler(): bool
     {
         return isset($this->event_handler_instance);
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function callPluginMethod(?string $class, string $method, array $args): mixed
     {
         $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
@@ -189,19 +204,31 @@ trait Events
         $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
         $obj->$property = $value;
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function getPluginProperty(?string $class, string $property): mixed
     {
         $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
         return $obj->$property;
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function issetPluginProperty(?string $class, string $property): bool
     {
         $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];
         return isset($obj->$property);
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function unsetPluginProperty(?string $class, string $property): void
     {
         $obj = $class === null ? $this->event_handler_instance : $this->pluginInstances[$class];

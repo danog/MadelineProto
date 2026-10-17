@@ -59,6 +59,8 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
@@ -67,6 +69,8 @@ final class SimpleBufferedRawStream extends BufferedRawStream implements Buffere
     }
     /**
      * Get class name.
+     *
+     * @psalm-pure
      */
     #[\Override]
     public static function getName(): string

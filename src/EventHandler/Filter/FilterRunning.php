@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIP\CallState;
 
 /**
@@ -27,9 +27,12 @@ use danog\MadelineProto\VoIP\CallState;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterRunning extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
-        return $update instanceof VoIP && $update->getCallState() === CallState::RUNNING;
+        return $update instanceof PrivateCall && $update->getCallState() === CallState::RUNNING;
     }
 }

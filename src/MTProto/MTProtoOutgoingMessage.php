@@ -24,11 +24,12 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
+use Closure;
 use danog\MadelineProto\Connection;
-use danog\MadelineProto\Exception;
 use Revolt\EventLoop;
 use Throwable;
 
+use function Amp\async;
 use function time;
 
 /**
@@ -38,22 +39,26 @@ use function time;
  */
 class MTProtoOutgoingMessage extends MTProtoMessage
 {
+    public self|LinkedList $next;
+    public self|LinkedList $prev;
+    protected ?Container $container = null;
+
     /**
      * The message was created.
      */
-    public const STATE_PENDING = 0;
+    private const STATE_PENDING = 0;
     /**
      * The message was sent.
      */
-    public const STATE_SENT = 1;
+    private const STATE_SENT = 1;
     /**
      * The message was acked.
      */
-    public const STATE_ACKED = 2;
+    private const STATE_ACKED = 2;
     /**
      * We got a reply to the message.
      */
-    public const STATE_REPLIED = self::STATE_ACKED | 4;
+    private const STATE_REPLIED = self::STATE_ACKED | 4;
 
     /**
      * State of message.
@@ -75,11 +80,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     private ?string $serializedBody = null;
 
     /**
-     * Whether we should refresh references upon serialization of this message.
-     */
-    private bool $refreshReferences = false;
-
-    /**
      * When was this message sent.
      */
     private ?int $sent = null;
@@ -89,10 +89,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     private int $tries = 0;
 
-    /**
-     * Whether this message is related to a user, as in getting a successful reply means we have auth.
-     */
-    public readonly bool $userRelated;
+    private ?string $checkTimer = null;
+    private readonly ?string $cancelSubscription;
 
     /**
      * Create outgoing message.
@@ -104,21 +102,15 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * @param boolean                 $unencrypted Is this an unencrypted message?
      */
     public function __construct(
-        private readonly Connection $connection,
+        public Connection $connection,
         private ?array $body,
         public readonly string $constructor,
         public readonly string $type,
         public readonly bool $isMethod,
         public readonly bool $unencrypted,
+        public ?SpecialMethodType $specialMethodType,
+        public readonly ?Cancellation $cancellation,
         public readonly ?string $subtype = null,
-        /**
-         * Whether this message is related to a file upload, as in getting a redirect should redirect to a media server.
-         */
-        public readonly bool $fileRelated = false,
-        /**
-         * Previous queued message.
-         */
-        public readonly ?self $previousQueuedMessage = null,
         /**
          * Custom flood wait limit for this message.
          */
@@ -126,44 +118,61 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly ?int $takeoutId = null,
         public readonly ?string $businessConnectionId = null,
         private ?DeferredFuture $resultDeferred = null,
-        public readonly ?Cancellation $cancellation = null
     ) {
-        $this->userRelated = $constructor === 'users.getUsers' && $body === ['id' => [['_' => 'inputUserSelf']]] || $constructor === 'auth.exportAuthorization' || $constructor === 'updates.getDifference';
-
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
 
-        $cancellation?->subscribe(function (CancelledException $e): void {
-            if ($this->hasReply()) {
+        $weak = \WeakReference::create($this);
+        $this->cancelSubscription = $cancellation?->subscribe(static function (CancelledException $e) use ($weak): void {
+            $self = $weak->get();
+            if ($self == null || $self->hasReply()) {
                 return;
             }
-            if (!$this->wasSent()) {
-                $this->reply(static fn () => throw $e);
+            if (!$self->wasSent()) {
+                $self->reply(static fn () => throw $e);
                 return;
             }
-            $this->reply(static fn () => throw $e);
+            $self->reply(static fn () => throw $e);
 
-            $this->connection->requestResponse?->inc([
-                'method' => $this->constructor,
+            $self->connection->requestResponse?->inc([
+                'method' => $self->constructor,
                 'error_message' => 'Request Timeout',
                 'error_code' => '408',
             ]);
 
-            if ($this->hasMsgId()) {
-                $this->connection->API->logger("Cancelling $this...");
-                $this->connection->API->logger($this->connection->methodCallAsyncRead(
-                    'rpc_drop_answer',
-                    ['req_msg_id' => $this->getMsgId()]
-                ));
+            if ($self->hasMsgId() && $self->constructor !== 'rpc_drop_answer') {
+                $self->connection->API->logger("Cancelling $self...");
+                try {
+                    $self->connection->API->logger($self->connection->methodCallAsyncRead(
+                        'rpc_drop_answer',
+                        ['req_msg_id' => $self->getMsgId()]
+                    ));
+                } catch (CancelledException) {
+                }
             }
         });
     }
 
     /**
-     * Whether cancellation is requested.
+     * @psalm-mutation-free
      */
-    public function isCancellationRequested(): bool
+    #[\Override]
+    public function __debugInfo(): array
     {
-        return $this->cancellation?->isRequested() ?? false;
+        if (!isset($this->next)) {
+            $next = null;
+        } elseif ($this->next instanceof MTProtoOutgoingMessage) {
+            $next = $this->next;
+        } else {
+            $next = 'head|tail';
+        }
+        if (!isset($this->prev)) {
+            $prev = null;
+        } elseif ($this->prev instanceof MTProtoOutgoingMessage) {
+            $prev = $this->prev;
+        } else {
+            $prev = 'head|tail';
+        }
+        return [(string) $this, 'objId' => spl_object_id($this), 'prev' => $prev, 'next' => $next];
     }
 
     /**
@@ -179,20 +188,88 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Signal that the message was sent.
      */
-    public function sent(): void
+    public function sent(bool $pending = true): void
     {
+        if ($pending) {
+            if ($this->unencrypted) {
+                $this->connection->unencrypted_new_outgoing[$this->getMsgId()] = $this;
+            } else {
+                $this->connection->new_outgoing[$this->getMsgId()] = $this;
+            }
+        }
         if ($this->sent === null && $this->isMethod) {
             $this->connection->inFlightGauge?->inc([
                 'method' => $this->constructor,
             ]);
         }
         $this->state |= self::STATE_SENT;
+        if (!$this instanceof Container) {
+            $this->unlink();
+        }
         $this->sent = hrtime(true);
+        if ($this->contentRelated && $pending) {
+            $self = \WeakReference::create($this);
+            $this->checkTimer = EventLoop::delay(
+                $this->connection->API->getSettings()->getConnection()->getTimeout(),
+                static function () use ($self): void {
+                    $self->get()?->check();
+                }
+            );
+        }
         if (isset($this->sendDeferred)) {
             $sendDeferred = $this->sendDeferred;
             $this->sendDeferred = null;
             $sendDeferred->complete();
         }
+    }
+    public function unlink(): void
+    {
+        if (isset($this->next)) {
+            $this->next->prev = $this->prev;
+            $this->prev->next = $this->next;
+            unset($this->next, $this->prev);
+
+            if ($this->unencrypted) {
+                unset($this->connection->unencryptedPendingOutgoing->check_queue[$this]);
+            } elseif ($this->specialMethodType === SpecialMethodType::UNAUTHED_METHOD) {
+                unset($this->connection->uninitedPendingOutgoing->check_queue[$this]);
+            } else {
+                unset($this->connection->mainPendingOutgoing->check_queue[$this]);
+            }
+            $this->connection->pendingOutgoingGauge?->dec();
+        }
+        if ($this->checkTimer !== null) {
+            EventLoop::cancel($this->checkTimer);
+            $this->checkTimer = null;
+        }
+    }
+    private function check(): void
+    {
+        if ($this->state & self::STATE_REPLIED) {
+            return;
+        }
+        $shared = $this->connection->getShared();
+        $settings = $shared->getSettings();
+        $timeout = $settings->getTimeout();
+        $self = \WeakReference::create($this);
+        $this->checkTimer = EventLoop::delay(
+            $timeout,
+            static function () use ($self): void {
+                $self->get()?->check();
+            }
+        );
+
+        if ($this->msgId === null) {
+            return;
+        }
+        if ($this->unencrypted) {
+            $this->connection->unencryptedPendingOutgoing->check_queue[$this] = true;
+        } elseif ($this->specialMethodType === SpecialMethodType::UNAUTHED_METHOD) {
+            $this->connection->uninitedPendingOutgoing->check_queue[$this] = true;
+        } else {
+            $this->connection->mainPendingOutgoing->check_queue[$this] = true;
+        }
+        $this->connection->flush(true);
     }
     /**
      * Set reply to message.
@@ -206,8 +283,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             // It can happen, no big deal
             return;
         }
-        if (!($this->state & self::STATE_SENT)) {
-            $this->sent();
+        $this->sent(false);
+        if ($this->checkTimer !== null) {
+            EventLoop::cancel($this->checkTimer);
+            $this->checkTimer = null;
         }
 
         if ($this->isMethod) {
@@ -221,11 +300,26 @@ class MTProtoOutgoingMessage extends MTProtoMessage
                 );
             }
         }
+        if ($this->msgId !== null) {
+            if ($this->unencrypted) {
+                unset($this->connection->unencrypted_new_outgoing[$this->msgId]);
+            } else {
+                unset($this->connection->new_outgoing[$this->msgId]);
+            }
+        }
+        if ($this->container !== null) {
+            if ($this->unencrypted) {
+                unset($this->connection->unencrypted_new_outgoing[$this->container->msgId]);
+            } else {
+                unset($this->connection->new_outgoing[$this->container->msgId]);
+            }
+        }
 
         $this->serializedBody = null;
         $this->body = null;
 
         $this->state |= self::STATE_REPLIED;
+        $this->cancellation?->unsubscribe($this->cancelSubscription);
         if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors
             $promise = $this->resultDeferred;
             $this->resultDeferred = null;
@@ -239,15 +333,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function ack(): void
     {
         $this->state |= self::STATE_ACKED;
-    }
-    /**
-     * Get state of message.
-     *
-     * @return self::STATE_*
-     */
-    public function getState(): int
-    {
-        return $this->state;
+        if (!$this->resultDeferred) {
+            $this->reply(null);
+        }
     }
 
     /**
@@ -260,6 +348,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Get message body or empty array.
+     *
+     * @psalm-mutation-free
      */
     public function getBodyOrEmpty(): array
     {
@@ -267,6 +357,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if we have a body.
+     *
+     * @psalm-mutation-free
      */
     public function hasBody(): bool
     {
@@ -282,6 +374,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if we have a serialized body.
+     *
+     * @psalm-mutation-free
      */
     public function hasSerializedBody(): bool
     {
@@ -297,17 +391,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
-     * Get whether we should refresh references upon serialization of this message.
-     */
-    public function shouldRefreshReferences(): bool
-    {
-        return $this->refreshReferences;
-    }
-
-    /**
      * Set serialized body.
      *
      * @param string $serializedBody Serialized body.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSerializedBody(string $serializedBody): self
     {
@@ -316,16 +404,17 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         return $this;
     }
 
-    /**
-     * Set whether we should refresh references upon serialization of this message.
-     *
-     * @param bool $refreshReferences Whether we should refresh references upon serialization of this message.
-     */
-    public function setRefreshReferences(bool $refreshReferences): self
+    public function refreshReferences(): Future
     {
-        $this->refreshReferences = $refreshReferences;
+        $this->serializedBody = null;
+        // To avoid endless loops
+        $this->specialMethodType = SpecialMethodType::FILEREF_RELATED;
 
-        return $this;
+        return async(function (): ?Closure {
+            $this->connection->API->referenceDatabase->refreshNextEnable();
+            $this->connection->API->getTL()->serializeMethod($this->constructor, $this->body);
+            return $this->connection->API->referenceDatabase->refreshNextDisable();
+        });
     }
 
     /**
@@ -338,6 +427,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Check if the message was sent.
+     *
+     * @psalm-mutation-free
      */
     public function wasSent(): bool
     {
@@ -345,27 +436,17 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
     /**
      * Check if the message has a reply.
+     *
+     * @psalm-mutation-free
      */
     public function hasReply(): bool
     {
         return (bool) ($this->state & self::STATE_REPLIED);
     }
     /**
-     * Check if can garbage collect this message.
-     */
-    #[\Override]
-    public function canGarbageCollect(): bool
-    {
-        if ($this->state & self::STATE_REPLIED) {
-            return true;
-        }
-        if (!$this->hasPromise()) {
-            return true;
-        }
-        return false;
-    }
-    /**
      * For logging.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {
@@ -387,18 +468,19 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     /**
      * Wait for message to be sent.
      *
+     * Completes immediately if the message was already sent, or replied to (for example, if it was cancelled before being sent).
+     *
      * @return Future<null>
      */
     public function getSendPromise(): Future
     {
-        if (!$this->sendDeferred) {
-            throw new Exception("Message was already sent, can't get send promise!");
-        }
-        return $this->sendDeferred->getFuture();
+        return $this->sendDeferred?->getFuture() ?? Future::complete();
     }
 
     /**
      * Check if we have a promise.
+     *
+     * @psalm-mutation-free
      */
     public function hasPromise(): bool
     {
@@ -407,6 +489,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Get the promise.
+     *
+     * @psalm-mutation-free
      */
     public function getResultPromise(): Future
     {
@@ -416,6 +500,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     /**
      * Reset sent time to trigger resending.
+     *
+     * @psalm-external-mutation-free
      */
     public function resetSent(): self
     {
@@ -428,6 +514,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Set when was this message sent.
      *
      * @param int $sent When was this message sent.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSent(int $sent): self
     {

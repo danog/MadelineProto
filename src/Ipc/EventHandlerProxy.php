@@ -21,12 +21,18 @@ namespace danog\MadelineProto\Ipc;
  */
 final class EventHandlerProxy extends IpcCapable
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         protected readonly ?string $__plugin,
         Client $API
     ) {
         parent::__construct($API);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __call(string $name, array $arguments): mixed
     {
         return $this->getClient()->callPluginMethod(
@@ -35,6 +41,9 @@ final class EventHandlerProxy extends IpcCapable
             $arguments
         );
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __get(string $name): mixed
     {
         return $this->getClient()->getPluginProperty($this->__plugin, $name);
@@ -43,10 +52,16 @@ final class EventHandlerProxy extends IpcCapable
     {
         $this->getClient()->setPluginProperty($this->__plugin, $name, $value);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __isset(string $name): bool
     {
         return $this->getClient()->issetPluginProperty($this->__plugin, $name);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __unset(string $name): void
     {
         $this->getClient()->unsetPluginProperty($this->__plugin, $name);

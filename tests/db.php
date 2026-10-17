@@ -27,8 +27,8 @@ $MadelineProto = new API(__DIR__.'/../testing.madeline');
 
 $map = [
     'memory' => new Memory,
-    'mysql' => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProto')->setPassword('test'),
-    'postgres' => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProto')->setPassword('test'),
+    'mysql' => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
+    'postgres' => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
     'redis' => (new Redis)->setUri('redis://redis'),
 ];
 

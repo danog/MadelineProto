@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Represents an ended call */
+/** @psalm-mutable */
 interface Ended
 {
 }

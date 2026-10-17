@@ -1,0 +1,712 @@
+{
+    "constructors": [
+        {
+            "id": "-1132882121",
+            "predicate": "boolFalse",
+            "params": [],
+            "type": "Bool"
+        },
+        {
+            "id": "-1720552011",
+            "predicate": "boolTrue",
+            "params": [],
+            "type": "Bool"
+        },
+        {
+            "id": "1072550713",
+            "predicate": "true",
+            "params": [],
+            "type": "True"
+        },
+        {
+            "id": "481674261",
+            "predicate": "vector",
+            "params": [],
+            "type": "Vector t"
+        },
+        {
+            "id": "1923715664",
+            "predicate": "fileReferenceMap",
+            "params": [
+                {
+                    "name": "layer",
+                    "type": "int"
+                },
+                {
+                    "name": "db_schema",
+                    "type": "string"
+                },
+                {
+                    "name": "db_schema_json",
+                    "type": "string"
+                },
+                {
+                    "name": "traversers_incoming",
+                    "type": "Vector<TraverserIncoming>"
+                },
+                {
+                    "name": "traversers_outgoing",
+                    "type": "Vector<TraverserOutgoing>"
+                },
+                {
+                    "name": "refresh_actions",
+                    "type": "Vector<RefreshAction>"
+                },
+                {
+                    "name": "skipped_incoming_sources",
+                    "type": "Vector<SkippedSource>"
+                }
+            ],
+            "type": "FileReferenceMap"
+        },
+        {
+            "id": "1645615975",
+            "predicate": "traverseParam",
+            "params": [
+                {
+                    "name": "flags",
+                    "type": "#"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "is_flag",
+                    "type": "flags.0?true"
+                },
+                {
+                    "name": "is_vector",
+                    "type": "flags.1?true"
+                },
+                {
+                    "name": "type",
+                    "type": "string"
+                }
+            ],
+            "type": "TraverseParam"
+        },
+        {
+            "id": "-39194058",
+            "predicate": "traverseMethodResult",
+            "params": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "push_sources",
+                    "type": "Vector<Source>"
+                },
+                {
+                    "name": "is_needed_parent",
+                    "type": "Bool"
+                }
+            ],
+            "type": "TraverserIncoming"
+        },
+        {
+            "id": "1850540214",
+            "predicate": "traverseIncomingConstructor",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "predicate",
+                    "type": "string"
+                },
+                {
+                    "name": "params",
+                    "type": "Vector<TraverseParam>"
+                },
+                {
+                    "name": "push_sources",
+                    "type": "Vector<Source>"
+                },
+                {
+                    "name": "is_needed_parent",
+                    "type": "Bool"
+                }
+            ],
+            "type": "TraverserIncoming"
+        },
+        {
+            "id": "-1798547003",
+            "predicate": "traverseCommitSourceLocation",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "predicate",
+                    "type": "string"
+                },
+                {
+                    "name": "push_sources",
+                    "type": "Vector<Source>"
+                },
+                {
+                    "name": "stored_constructor",
+                    "type": "string"
+                }
+            ],
+            "type": "TraverserIncoming"
+        },
+        {
+            "id": "-566509478",
+            "predicate": "predicate",
+            "params": [
+                {
+                    "name": "predicate",
+                    "type": "string"
+                },
+                {
+                    "name": "is_constructor",
+                    "type": "Bool"
+                }
+            ],
+            "type": "Predicate"
+        },
+        {
+            "id": "1321497882",
+            "predicate": "source",
+            "params": [
+                {
+                    "name": "flags",
+                    "type": "#"
+                },
+                {
+                    "name": "predicate",
+                    "type": "Predicate"
+                },
+                {
+                    "name": "stored_constructor",
+                    "type": "string"
+                },
+                {
+                    "name": "stored_params",
+                    "type": "Vector<FieldExtractor>"
+                },
+                {
+                    "name": "skipped_flags",
+                    "type": "Vector<string>"
+                },
+                {
+                    "name": "needs_parent",
+                    "type": "flags.3?Predicate"
+                },
+                {
+                    "name": "needs_not_parents",
+                    "type": "Vector<Predicate>"
+                }
+            ],
+            "type": "Source"
+        },
+        {
+            "id": "1069875821",
+            "predicate": "traverseOutgoingConstructor",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "predicate",
+                    "type": "string"
+                },
+                {
+                    "name": "params",
+                    "type": "Vector<TraverseParam>"
+                }
+            ],
+            "type": "TraverserOutgoing"
+        },
+        {
+            "id": "53213533",
+            "predicate": "traverseSwapLocation",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "predicate",
+                    "type": "string"
+                },
+                {
+                    "name": "stored_constructor",
+                    "type": "string"
+                }
+            ],
+            "type": "TraverserOutgoing"
+        },
+        {
+            "id": "-1840974405",
+            "predicate": "traverseMethodCall",
+            "params": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "params",
+                    "type": "Vector<TraverseParam>"
+                }
+            ],
+            "type": "TraverserOutgoing"
+        },
+        {
+            "id": "726941551",
+            "predicate": "skippedSource",
+            "params": [
+                {
+                    "name": "predicate",
+                    "type": "Predicate"
+                },
+                {
+                    "name": "why",
+                    "type": "string"
+                }
+            ],
+            "type": "SkippedSource"
+        },
+        {
+            "id": "-723429751",
+            "predicate": "refreshAction",
+            "params": [
+                {
+                    "name": "stored_constructor",
+                    "type": "string"
+                },
+                {
+                    "name": "action",
+                    "type": "ActionOp"
+                }
+            ],
+            "type": "RefreshAction"
+        },
+        {
+            "id": "-1395010097",
+            "predicate": "paramNotFlag",
+            "params": [],
+            "type": "ParamFlag"
+        },
+        {
+            "id": "-117530642",
+            "predicate": "paramIsFlagAbortIfEmpty",
+            "params": [],
+            "type": "ParamFlag"
+        },
+        {
+            "id": "539719585",
+            "predicate": "paramIsFlagFallback",
+            "params": [
+                {
+                    "name": "fallback",
+                    "type": "TypedOp"
+                }
+            ],
+            "type": "ParamFlag"
+        },
+        {
+            "id": "499573117",
+            "predicate": "paramIsFlagPassthrough",
+            "params": [],
+            "type": "ParamFlag"
+        },
+        {
+            "id": "429985727",
+            "predicate": "pathPart",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "constructor",
+                    "type": "string"
+                },
+                {
+                    "name": "param",
+                    "type": "string"
+                },
+                {
+                    "name": "param_type",
+                    "type": "string"
+                },
+                {
+                    "name": "flag",
+                    "type": "ParamFlag"
+                }
+            ],
+            "type": "PathPart"
+        },
+        {
+            "id": "204834466",
+            "predicate": "path",
+            "params": [
+                {
+                    "name": "parts",
+                    "type": "Vector<PathPart>"
+                }
+            ],
+            "type": "Path"
+        },
+        {
+            "id": "1492203140",
+            "predicate": "pathParent",
+            "params": [
+                {
+                    "name": "parts",
+                    "type": "Vector<PathPart>"
+                }
+            ],
+            "type": "Path"
+        },
+        {
+            "id": "1913034057",
+            "predicate": "extractAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "916294932",
+            "predicate": "extractInputStickerSetFromDocumentAttributesAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "-1050160016",
+            "predicate": "extractInputStickerSetFromStickerSetAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "2100494748",
+            "predicate": "extractPeerIdFromPeerAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "-1524969548",
+            "predicate": "extractPeerIdFromInputPeerAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "1450556567",
+            "predicate": "extractChannelIdFromChannelAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "-1235065330",
+            "predicate": "extractChannelIdFromInputChannelAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "1199107171",
+            "predicate": "extractUserIdFromUserAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "1998629422",
+            "predicate": "extractUserIdFromInputUserAndStore",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "Path"
+                },
+                {
+                    "name": "to",
+                    "type": "string"
+                }
+            ],
+            "type": "FieldExtractor"
+        },
+        {
+            "id": "-1023462525",
+            "predicate": "callOp",
+            "params": [
+                {
+                    "name": "method",
+                    "type": "string"
+                },
+                {
+                    "name": "args",
+                    "type": "Vector<TypedOpArg>"
+                }
+            ],
+            "type": "ActionOp"
+        },
+        {
+            "id": "-1918582098",
+            "predicate": "getMessageOp",
+            "params": [
+                {
+                    "name": "peer",
+                    "type": "TypedOp"
+                },
+                {
+                    "name": "id",
+                    "type": "TypedOp"
+                },
+                {
+                    "name": "quick_reply_shortcut_id",
+                    "type": "TypedOp"
+                }
+            ],
+            "type": "ActionOp"
+        },
+        {
+            "id": "975777986",
+            "predicate": "typedOpArg",
+            "params": [
+                {
+                    "name": "key",
+                    "type": "string"
+                },
+                {
+                    "name": "value",
+                    "type": "TypedOp"
+                }
+            ],
+            "type": "TypedOpArg"
+        },
+        {
+            "id": "1885016300",
+            "predicate": "typedOp",
+            "params": [
+                {
+                    "name": "type",
+                    "type": "string"
+                },
+                {
+                    "name": "op",
+                    "type": "TypedOpOp"
+                }
+            ],
+            "type": "TypedOp"
+        },
+        {
+            "id": "-191938161",
+            "predicate": "copyOp",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "string"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "1018459441",
+            "predicate": "getInputChannelByIdOp",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "string"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-1058127066",
+            "predicate": "getInputUserByIdOp",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "string"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "427898704",
+            "predicate": "getInputPeerByIdOp",
+            "params": [
+                {
+                    "name": "from",
+                    "type": "string"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "276794762",
+            "predicate": "constructorOp",
+            "params": [
+                {
+                    "name": "constructor",
+                    "type": "string"
+                },
+                {
+                    "name": "args",
+                    "type": "Vector<TypedOpArg>"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-117731470",
+            "predicate": "vectorOp",
+            "params": [
+                {
+                    "name": "values",
+                    "type": "Vector<TypedOp>"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-872759684",
+            "predicate": "intLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "int"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-796160710",
+            "predicate": "longLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "long"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "727116430",
+            "predicate": "stringLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "string"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-38562396",
+            "predicate": "bytesLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "bytes"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "937457937",
+            "predicate": "boolLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "Bool"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "911336383",
+            "predicate": "doubleLiteralOp",
+            "params": [
+                {
+                    "name": "value",
+                    "type": "double"
+                }
+            ],
+            "type": "TypedOpOp"
+        },
+        {
+            "id": "-1907387896",
+            "predicate": "themeFormatLiteralOp",
+            "params": [],
+            "type": "TypedOpOp"
+        }
+    ],
+    "methods": []
+}

@@ -35,6 +35,12 @@ enum DiscardReason: string implements JsonSerializable
     case HANGUP = 'phoneCallDiscardReasonHangup';
     /** The phone call was discarded because the user is busy in another call */
     case BUSY = 'phoneCallDiscardReasonBusy';
+    /**
+     * The phone call was upgraded to a [conference call »](https://core.telegram.org/api/group-calls#conference-calls).
+     *
+     * Do not pass this reason manually, use `VoIP::migrateToConference()` instead.
+     */
+    case MIGRATE_CONFERENCE_CALL = 'phoneCallDiscardReasonMigrateConferenceCall';
 
     /** @internal */
     #[\Override]

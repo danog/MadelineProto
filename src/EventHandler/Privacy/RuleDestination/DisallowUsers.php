@@ -26,7 +26,11 @@ final class DisallowUsers extends RuleDestination
     /** Allowed users */
     public readonly array $users;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawUsers)
     {
         $this->users = $rawUsers['users'];

@@ -61,6 +61,7 @@ if ($loader) {
             'PhabelVendor\\Monolog\\Test\\TestCase',
             'PhabelVendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CompilerPassInterface',
             'PhabelVendor\\Symfony\\Component\\String\\Slugger\\AsciiSlugger',
+            'Webmozart\\Assert\\PsalmPlugin',
         ], true)) {
             continue;
         }

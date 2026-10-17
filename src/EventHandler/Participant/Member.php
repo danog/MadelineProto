@@ -29,7 +29,11 @@ final class Member extends Participant
     /** Date joined */
     public readonly int $date;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         array $rawParticipant
     ) {

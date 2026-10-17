@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only forwarded messages */
+/** @psalm-mutable */
 interface IsForwarded
 {
 }

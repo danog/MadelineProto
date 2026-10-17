@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+use danog\MadelineProto\Connection;
+
 /**
  * Incoming message.
  *
@@ -69,9 +71,16 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      *
      * @param array   $content       Content
      * @param boolean $fromContainer Whether this message was in a container
+     *
+     * @psalm-mutation-free
      */
-    public function __construct(array $content, int $msgId, public readonly bool $unencrypted, public readonly bool $fromContainer = false)
-    {
+    public function __construct(
+        private readonly Connection $connection,
+        array $content,
+        int $msgId,
+        public readonly bool $unencrypted,
+        public readonly bool $fromContainer,
+    ) {
         $this->content = $content;
         $this->msgId = $msgId;
 
@@ -85,6 +94,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get my message ID.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMsgId(): int
@@ -105,6 +116,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      * Get log line.
      *
      * @param int $dc DC ID
+     *
+     * @psalm-mutation-free
      */
     public function log(int $dc): string
     {
@@ -116,6 +129,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get message type.
+     *
+     * @psalm-mutation-free
      */
     public function getPredicate(): string
     {
@@ -124,6 +139,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
 
     /**
      * Get message type.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {
@@ -135,6 +152,10 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      */
     public function ack(): void
     {
+        if ($this->contentRelated && !($this->state & self::STATE_ACKED)) {
+            // I let the server know that I received its message
+            $this->connection->ack_queue []= $this->msgId;
+        }
         $this->state |= self::STATE_ACKED;
     }
     /**
@@ -142,6 +163,7 @@ final class MTProtoIncomingMessage extends MTProtoMessage
      */
     public function read(): array
     {
+        $this->ack();
         $this->state |= self::STATE_READ;
         $content = $this->content;
         $this->content = ['_' => $content['_']];
@@ -149,16 +171,9 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     }
 
     /**
-     * Check if this message can be garbage collected.
-     */
-    #[\Override]
-    public function canGarbageCollect(): bool
-    {
-        return (bool) ($this->state & self::STATE_READ);
-    }
-
-    /**
      * Get ID of message to which this message replies.
+     *
+     * @psalm-mutation-free
      */
     public function getRequestId(): int
     {

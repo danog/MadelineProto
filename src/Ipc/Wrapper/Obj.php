@@ -30,6 +30,8 @@ abstract class Obj
      * Constructor.
      *
      * @param array<string, int> $methods
+     *
+     * @psalm-mutation-free
      */
     public function __construct(private ClientAbstract $wrapper, private array $methods)
     {
@@ -40,5 +42,17 @@ abstract class Obj
     public function __call(string $name, array $arguments = []): mixed
     {
         return $this->wrapper->__call($this->methods[$name], $arguments);
+    }
+
+    /**
+     * Get the ID of the callback of a method.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getMethodId(string $name): int
+    {
+        return $this->methods[$name];
     }
 }

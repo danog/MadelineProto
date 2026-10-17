@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
@@ -28,16 +29,23 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterTextStarts extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         private readonly string $content
     ) {
         Assert::notEmpty($content);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_starts_with($update->message, $this->content)) ||
-            ($update instanceof Story && str_starts_with($update->caption, $this->content));
+            ($update instanceof Story && str_starts_with($update->caption, $this->content)) ||
+            ($update instanceof MultiCallMessage && str_starts_with($update->message->text, $this->content));
     }
 }

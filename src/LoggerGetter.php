@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 /** @internal */
+/** @psalm-mutable */
 interface LoggerGetter
 {
+    /** @psalm-impure */
     public function getLogger(): Logger;
 }

@@ -34,6 +34,9 @@ use ReflectionProperty;
  */
 abstract class RuleDestination implements JsonSerializable
 {
+    /**
+     * @psalm-pure
+     */
     public static function fromRawRule(array $rawRule): RuleDestination
     {
         return match ($rawRule['_']) {

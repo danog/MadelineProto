@@ -89,6 +89,8 @@ trait FileServer
 
     /**
      * Internal endpoint used by the download server.
+     *
+     * @psalm-external-mutation-free
      */
     public static function processDownloadServerPing(string $path, string $payload): void
     {

@@ -41,10 +41,16 @@ final class FilterBotCommand extends Filter
         }
         return new FiltersOr(...$filters);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly string $command)
     {
     }
 
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

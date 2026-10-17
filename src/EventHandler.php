@@ -40,9 +40,11 @@ use ReflectionMethod;
 use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
+use function Amp\async;
 use function Amp\File\isDirectory;
 use function Amp\File\isFile;
 use function Amp\File\listFiles;
+use function Amp\Future\await;
 
 /**
  * Event handler.
@@ -54,7 +56,11 @@ abstract class EventHandler extends AbstractAPI
         LegacyMigrator::saveDbProperties as private privateInternalSaveDbProperties;
     }
 
-    /** @internal Do not use manually. */
+    /**
+     * @internal Do not use manually.
+     *
+     * @psalm-mutation-free
+     */
     final private function __construct()
     {
         // Dummy code that is NEVER executed, needed to avoid issues during Psalm analysis.
@@ -112,6 +118,17 @@ abstract class EventHandler extends AbstractAPI
     {
         $this->privateInternalSaveDbProperties();
     }
+    /**
+     * @internal Do not use manually.
+     */
+    final public function internalClearDbProperties(): void
+    {
+        $f = [];
+        foreach ($this->properties as $property) {
+            $f []= async($property->clear(...));
+        }
+        await($f);
+    }
 
     private static bool $includingPlugins = false;
     /**
@@ -166,7 +183,11 @@ abstract class EventHandler extends AbstractAPI
         $API->botLogin($token);
         $API->startAndLoopInternal(static::class);
     }
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-pure
+     */
     #[\Override]
     final protected function reconnectFull(): bool
     {
@@ -231,7 +252,9 @@ abstract class EventHandler extends AbstractAPI
                 return [[], []];
             }
 
-            $constructors = $this->getTL()->getConstructors();
+            $API = $this->wrapper->getAPI();
+            \assert($API !== null);
+            $constructors = $API->getTL()->getConstructors();
             $methods = [];
             $handlers = [];
             $has_any = false;
@@ -247,6 +270,7 @@ abstract class EventHandler extends AbstractAPI
                     ($constructor = $constructors->findByPredicate($method_name)) && $constructor['type'] === 'Update'
                 )
                     || $method_name === 'updateBroadcastProgress'
+                    || $method_name === 'updateCallStreams'
                     || $method_name === 'updateNewOutgoingEncryptedMessage'
                 ) {
                     $methods[$method_name] = [
@@ -282,9 +306,17 @@ abstract class EventHandler extends AbstractAPI
                 } else {
                     $filter = $filter->newInstance();
                 }
+                $reflParams = $methodRefl->getParameters();
+                if (\count($reflParams) === 0) {
+                    throw new AssertionError("Handler method $method must have at least one parameter!");
+                }
+                $t = $reflParams[0]->getType();
+                if ($t === null) {
+                    throw new AssertionError("First parameter of handler method $method must have a typehint!");
+                }
                 $filter = new FiltersAnd(
                     $filter,
-                    Filter::fromReflectionType($methodRefl->getParameters()[0]->getType())
+                    Filter::fromReflectionType($t)
                 );
                 $filter = $filter->initialize($this);
                 if (!$this instanceof SimpleEventHandler) {
@@ -346,6 +378,8 @@ abstract class EventHandler extends AbstractAPI
      * Obtain a PeriodicLoop instance created by the Cron attribute.
      *
      * @param string $name Method name
+     *
+     * @psalm-mutation-free
      */
     final public function getPeriodicLoop(string $name): ?PeriodicLoop
     {
@@ -374,6 +408,8 @@ abstract class EventHandler extends AbstractAPI
      * Get peers where to send error reports.
      *
      * @return string|int|array<string|int>
+     *
+     * @psalm-pure
      */
     public function getReportPeers()
     {
@@ -385,6 +421,8 @@ abstract class EventHandler extends AbstractAPI
      * Plugin filenames end with Plugin.php, and will be included automatically.
      *
      * @return non-empty-string|non-empty-list<non-empty-string>|null
+     *
+     * @psalm-pure
      */
     public static function getPluginPaths(): string|array|null
     {
@@ -394,6 +432,8 @@ abstract class EventHandler extends AbstractAPI
      * Obtain a list of plugin event handlers to use, in addition with those found by getPluginPath.
      *
      * @return array<class-string<EventHandler>>
+     *
+     * @psalm-pure
      */
     public static function getPlugins(): array
     {

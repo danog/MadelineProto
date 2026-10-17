@@ -27,6 +27,9 @@ final class Online extends Status
     /** Time to expiration of the current online status */
     public readonly int $expires;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rowUserStatus)
     {
         parent::__construct($API, $rowUserStatus);

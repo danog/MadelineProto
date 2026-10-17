@@ -36,6 +36,8 @@ final class PermAuthKey extends AuthKey
      * Constructor function.
      *
      * @param array $old Old auth key array
+     *
+     * @psalm-mutation-free
      */
     public function __construct(array $old = [])
     {
@@ -56,6 +58,8 @@ final class PermAuthKey extends AuthKey
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function authorized(bool $authorized): void
@@ -64,6 +68,8 @@ final class PermAuthKey extends AuthKey
     }
     /**
      * JSON serialization function.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function jsonSerialize(): array
@@ -72,6 +78,8 @@ final class PermAuthKey extends AuthKey
     }
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {

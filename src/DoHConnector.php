@@ -44,6 +44,9 @@ use function Amp\Socket\Internal\parseUri;
 /** @internal */
 final class DoHConnector implements SocketConnector
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)
     {
     }
@@ -120,7 +123,7 @@ final class DoHConnector implements SocketConnector
                 $watcher = EventLoop::onWritable($socket, $deferred->complete(...));
                 $id = $token->subscribe($deferred->error(...));
                 try {
-                    $deferred->getFuture()->await(Tools::getTimeoutCancellation($timeout));
+                    $deferred->getFuture()->await(Tools::getTimeoutCancellation($timeout, "Timeout while connecting to $uri"));
                 } catch (CancelledException $e) {
                     if (!$e->getPrevious() instanceof DnsTimeoutException) {
                         throw $e;

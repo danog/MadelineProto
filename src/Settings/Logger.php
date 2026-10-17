@@ -64,6 +64,9 @@ final class Logger extends SettingsAbstract
         $this->extra = Magic::$script_cwd.'/MadelineProto.log';
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __sleep()
     {
@@ -97,6 +100,8 @@ final class Logger extends SettingsAbstract
      * Get $type Logger type.
      *
      * @return MadelineProtoLogger::LOGGER_*
+     *
+     * @psalm-mutation-free
      */
     public function getType(): int
     {
@@ -107,6 +112,8 @@ final class Logger extends SettingsAbstract
      * Set $type Logger type.
      *
      * @param MadelineProtoLogger::LOGGER_* $type $type Logger type.
+     *
+     * @psalm-external-mutation-free
      */
     public function setType(int $type): self
     {
@@ -158,6 +165,8 @@ final class Logger extends SettingsAbstract
      * Set logging level.
      *
      * @param MadelineProtoLogger::LEVEL_* $level Logging level.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLevel(int $level): self
     {
@@ -178,6 +187,8 @@ final class Logger extends SettingsAbstract
      * Set maximum filesize for logger, in case of file logging.
      *
      * @param int $maxSize Maximum filesize for logger, in case of file logging.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMaxSize(int $maxSize): self
     {

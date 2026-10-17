@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allow only currently running calls */
+/** @psalm-mutable */
 interface Running
 {
 }

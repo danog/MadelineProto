@@ -23,12 +23,18 @@ use danog\MadelineProto\EventHandler\Action;
  */
 final class UploadAudio extends Action
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** @var ?int Progress percentage */
         public readonly ?int $progress
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toRawAction(): array
     {

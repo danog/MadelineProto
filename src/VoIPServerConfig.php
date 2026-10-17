@@ -25,6 +25,8 @@ if (class_exists(VoIPServerConfig::class)) {
  * Manages storage of VoIP server config.
  *
  * @internal
+ *
+ * @psalm-external-mutation-free
  */
 final class VoIPServerConfig
 {
@@ -42,6 +44,8 @@ final class VoIPServerConfig
      * Update shared call settings.
      *
      * @param array $config The settings
+     *
+     * @psalm-external-mutation-free
      */
     public static function update(array $config): void
     {
@@ -51,6 +55,8 @@ final class VoIPServerConfig
      * Get shared call settings.
      *
      * @return array The settings
+     *
+     * @psalm-external-mutation-free
      */
     public static function get(): array
     {
@@ -60,6 +66,8 @@ final class VoIPServerConfig
      * Update default shared call settings.
      *
      * @param array $configDefault The settings
+     *
+     * @psalm-external-mutation-free
      */
     public static function updateDefault(array $configDefault): void
     {
@@ -69,6 +77,8 @@ final class VoIPServerConfig
      * Get default shared call settings.
      *
      * @return array The settings
+     *
+     * @psalm-external-mutation-free
      */
     public static function getDefault(): array
     {
@@ -76,6 +86,8 @@ final class VoIPServerConfig
     }
     /**
      * Get final settings.
+     *
+     * @psalm-external-mutation-free
      */
     public static function getFinal(): array
     {

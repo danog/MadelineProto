@@ -25,6 +25,17 @@ use danog\MadelineProto\EventHandler\Message\Service\DialogScreenshotTaken;
 final class PrivateMessage extends AbstractPrivateMessage
 {
     /**
+     * ID of the other user in this private chat.
+     *
+     * @psalm-mutation-free
+     */
+    #[\Override]
+    protected function getCallPeer(): int
+    {
+        return $this->chatId;
+    }
+
+    /**
      * @inheritDoc
      */
     #[\Override]

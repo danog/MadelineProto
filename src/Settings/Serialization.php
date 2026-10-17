@@ -20,6 +20,8 @@ use danog\MadelineProto\SettingsAbstract;
 
 /**
  * Serialization settings.
+ *
+ * @psalm-external-mutation-free
  */
 final class Serialization extends SettingsAbstract
 {
@@ -40,6 +42,8 @@ final class Serialization extends SettingsAbstract
      * Set serialization interval, in seconds.
      *
      * @param int $interval Serialization interval, in seconds (minimum 10 seconds).
+     *
+     * @psalm-external-mutation-free
      */
     public function setInterval(int $interval): self
     {

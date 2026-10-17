@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL;
 
+use danog\MadelineProto\Connection;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 
 /**
@@ -28,10 +29,11 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
  *
  * @psalm-type TBeforeConstructorSerialization=Closure(array): mixed
  * @psalm-type TBeforeConstructorDeserialization=Closure(string): void
- * @psalm-type TAfterConstructorDeserialization=Closure(array): void
+ * @psalm-type TAfterConstructorDeserialization=Closure(array, Connection): void
  * @psalm-type TTypeMismatch=Closure(array): mixed
  *
  * @internal Interface for managing TL serialization callbacks.
+ * @psalm-mutable
  */
 interface TLCallback
 {
@@ -41,6 +43,7 @@ interface TLCallback
      * Pass only the method name, will return void
      *
      * @return array<string, list<TBeforeMethodResponseDeserialization>>
+     * @psalm-impure
      */
     public function getMethodBeforeResponseDeserializationCallbacks(): array;
     /**
@@ -49,6 +52,7 @@ interface TLCallback
      * Pass the method name and response, will return void
      *
      * @return array<string, list<TAfterMethodResponseDeserialization>>
+     * @psalm-impure
      */
     public function getMethodAfterResponseDeserializationCallbacks(): array;
     /**
@@ -57,6 +61,7 @@ interface TLCallback
      * Passed the constructor, will return a modified version.
      *
      * @return array<string, TBeforeConstructorSerialization>
+     * @psalm-impure
      */
     public function getConstructorBeforeSerializationCallbacks(): array;
     /**
@@ -65,6 +70,7 @@ interface TLCallback
      * Pass only the constructor name, will return void
      *
      * @return array<string, list<TBeforeConstructorDeserialization>>
+     * @psalm-impure
      */
     public function getConstructorBeforeDeserializationCallbacks(): array;
     /**
@@ -73,6 +79,7 @@ interface TLCallback
      * Pass the deserialized constructor, will return void
      *
      * @return array<string, list<TAfterConstructorDeserialization>>
+     * @psalm-impure
      */
     public function getConstructorAfterDeserializationCallbacks(): array;
     /**
@@ -82,6 +89,7 @@ interface TLCallback
      * will try to convert it to an constructor of the proper type.
      *
      * @return array<string, TTypeMismatch>
+     * @psalm-impure
      */
     public function getTypeMismatchCallbacks(): array;
 }

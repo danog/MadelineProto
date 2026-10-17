@@ -92,6 +92,9 @@ final class TL implements TLInterface
      * API instance.
      */
     private ?MTProto $API = null;
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return [
@@ -106,6 +109,8 @@ final class TL implements TLInterface
      * Constructor function.
      *
      * @param MTProto $API API instance
+     *
+     * @psalm-mutation-free
      */
     public function __construct(?MTProto $API = null)
     {
@@ -160,7 +165,7 @@ final class TL implements TLInterface
      */
     public function init(TLSchema $files, array $objects = []): void
     {
-        $this->API?->logger?->logger('Loading TL schemes...', Logger::VERBOSE);
+        //$this->API?->logger?->logger('Loading TL schemes...', Logger::VERBOSE);
         $this->updateCallbacks($objects);
         $this->constructors = new TLConstructors();
         $this->methods = new TLMethods();
@@ -171,7 +176,7 @@ final class TL implements TLInterface
             'secret' => $files->getSecretSchema(),
             ...$files->getOther(),
         ]) as $scheme_type => $file) {
-            $this->API?->logger?->logger(sprintf(Lang::$current_lang['file_parsing'], basename($file)), Logger::VERBOSE);
+            //$this->API?->logger?->logger(sprintf(Lang::$current_lang['file_parsing'], basename($file)), Logger::VERBOSE);
             $filec = file_get_contents(Tools::absolute($file));
             $TL_dict = json_decode($filec, true);
             if ($TL_dict === null) {
@@ -195,14 +200,14 @@ final class TL implements TLInterface
             if (empty($TL_dict) || empty($TL_dict['constructors']) || !isset($TL_dict['methods'])) {
                 throw new Exception(Lang::$current_lang['src_file_invalid'].$file);
             }
-            $this->API?->logger?->logger('Translating objects...', Logger::ULTRA_VERBOSE);
+            //$this->API?->logger?->logger('Translating objects...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['constructors'] as $elem) {
                 if ($scheme_type === 'secret') {
                     $this->secretLayer = max($this->secretLayer, $elem['layer']);
                 }
                 $this->constructors->add($elem, $scheme_type);
             }
-            $this->API?->logger?->logger('Translating methods...', Logger::ULTRA_VERBOSE);
+            //$this->API?->logger?->logger('Translating methods...', Logger::ULTRA_VERBOSE);
             foreach ($TL_dict['methods'] as $elem) {
                 $this->methods->add($elem, $scheme_type);
                 if ($scheme_type === 'secret') {
@@ -242,6 +247,8 @@ final class TL implements TLInterface
      *      constructors: list<array{id: numeric-string, predicate: string, params: list<array{name: string, type: string}>, type: string, layer?: int}>,
      *      methods: list<array{id: numeric-string, method: string, params: list<array{name: string, type: string}>, type: string, layer?: int}>
      * }
+     *
+     * @psalm-external-mutation-free
      */
     public function toJson(string $filec, ?string $scheme_type = null): array
     {
@@ -372,6 +379,8 @@ final class TL implements TLInterface
     }
     /**
      * Get TL namespaces.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMethodNamespaces(): array
@@ -385,6 +394,8 @@ final class TL implements TLInterface
     }
     /**
      * Get namespaced methods (method => namespace).
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getMethodsNamespaced(): array
@@ -429,6 +440,8 @@ final class TL implements TLInterface
      * Deserialize bool.
      *
      * @param string $id Constructor ID
+     *
+     * @psalm-external-mutation-free
      */
     private function deserializeBool(string $id): bool
     {
@@ -616,6 +629,8 @@ final class TL implements TLInterface
         }
         if ($type['type'] === 'InputMessage' && !\is_array($object)) {
             $object = ['_' => 'inputMessageID', 'id' => $object];
+        } elseif ($type['type'] === 'TextWithEntities' && !\is_array($object)) {
+            $object = ['_' => 'textWithEntities', 'text' => $object];
         } elseif (isset($this->typeMismatch[$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
             $object = $this->typeMismatch[$type['type']]($object);
             if (!isset($object['_'])) {
@@ -669,6 +684,16 @@ final class TL implements TLInterface
         return $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
     }
     /**
+     * Whether a `DataJSON` argument was already passed as a dataJSON constructor, instead of as the
+     * decoded value we would have to encode ourselves.
+     *
+     * @psalm-pure
+     */
+    private static function isDataJSON(mixed $value): bool
+    {
+        return \is_array($value) && ($value['_'] ?? null) === 'dataJSON';
+    }
+    /**
      * Serialize parameters.
      *
      * @param array   $tl    TL object definition
@@ -678,7 +703,10 @@ final class TL implements TLInterface
     private function serializeParams(array $tl, array|Button $arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
-        $arguments = $this->API->botAPIToMTProto($arguments instanceof Button ? $arguments->jsonSerialize() : $arguments);
+        $arguments = $arguments instanceof Button ? $arguments->jsonSerialize() : $arguments;
+        // The bot-API argument conversion is only relevant to the full API; a schema-only TL instance
+        // (e.g. the E2E conference block codec) has no API and serializes already-MTProto arguments.
+        $arguments = $this->API?->botAPIToMTProto($arguments) ?? $arguments;
         foreach ($tl['flags'] as [
             'flag' => $flag,
             'name' => $name,
@@ -772,9 +800,16 @@ final class TL implements TLInterface
                     case '#':
                         $value = 0;
                         break;
+                    case 'strlong':
+                        $value = str_repeat("\0", 8);
+                        break;
                     default:
                         if ($this->API->getSettings()->getSchema()->getFuzzMode()) {
-                            $value = ['_' => $this->constructors->findByType($type)['predicate']];
+                            $value = $this->constructors->findByType($type);
+                            if ($value === false) {
+                                throw new Exception(sprintf(Lang::$current_lang['type_extract_error'], $type));
+                            }
+                            $value = ['_' => $value['predicate']];
                         } else {
                             throw new Exception(Lang::$current_lang['params_missing'].' '.$name);
                         }
@@ -782,12 +817,14 @@ final class TL implements TLInterface
             } else {
                 $value = $arguments[$name];
             }
-            if (\in_array($type, ['DataJSON', '%DataJSON'], true)) {
+            if (\in_array($type, ['DataJSON', '%DataJSON'], true) && !self::isDataJSON($value)) {
                 $value = ['_' => 'dataJSON', 'data' => json_encode($value)];
             }
             if (isset($current_argument['subtype']) && \in_array($current_argument['subtype'], ['DataJSON', '%DataJSON'], true)) {
                 array_walk($value, static function (&$arg): void {
-                    $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
+                    if (!self::isDataJSON($arg)) {
+                        $arg = ['_' => 'dataJSON', 'data' => json_encode($arg)];
+                    }
                 });
             }
             if ($type === 'InputFile' && (!\is_array($value) || !(isset($value['_']) && $this->constructors->findByPredicate($value['_'])['type'] === 'InputFile'))) {
@@ -813,7 +850,7 @@ final class TL implements TLInterface
      * @param array           $type   Type identifier
      */
     #[\Override]
-    public function getLength($stream, array $type = ['type' => '']): int
+    public function getLength($stream, array $type = ['type' => '', 'connection' => null, 'encrypted' => false]): int
     {
         if (\is_string($stream)) {
             $res = fopen('php://memory', 'rw+b');
@@ -855,6 +892,8 @@ final class TL implements TLInterface
      * Compresses a waveform.
      *
      * @internal Don't use this manually, just pass an array of integers to $attribute['waveform'].
+     *
+     * @psalm-external-mutation-free
      */
     public static function compressWaveform(array $x): string
     {
@@ -960,10 +999,10 @@ final class TL implements TLInterface
                             gzdecode(
                                 (string) $this->deserialize(
                                     $stream,
-                                    ['type' => 'bytes', 'connection' => $type['connection']],
+                                    ['type' => 'bytes', 'connection' => $type['connection'], 'encrypted' => $type['encrypted']],
                                 ),
                             ),
-                            ['type' => '', 'connection' => $type['connection']],
+                            ['type' => '', 'connection' => $type['connection'], 'encrypted' => $type['encrypted']],
                         );
                     case 'Vector t':
                     case 'vector':
@@ -1005,18 +1044,20 @@ final class TL implements TLInterface
             if (!isset($type['subtype'])) {
                 $type['subtype'] = '';
             }
-            return $this->deserialize(
-                gzdecode(
-                    (string) $this->deserialize(
-                        $stream,
-                        ['type' => 'bytes'],
-                    ),
+            $x = gzdecode(
+                (string) $this->deserialize(
+                    $stream,
+                    ['type' => 'bytes'],
                 ),
-                ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype']],
+            );
+            return $this->deserialize(
+                $x,
+                ['type' => '', 'connection' => $type['connection'], 'subtype' => $type['subtype'], 'encrypted' => $type['encrypted']],
             );
         }
         if ($constructorData['type'] === 'Vector t') {
             $constructorData['connection'] = $type['connection'];
+            $constructorData['encrypted'] = $type['encrypted'];
             $constructorData['subtype'] = $type['subtype'] ?? '';
             $constructorData['type'] = 'vector';
             return $this->deserialize($stream, $constructorData);
@@ -1028,7 +1069,7 @@ final class TL implements TLInterface
             return false;
         }
         $x = ['_' => $constructorData['predicate']];
-        if (isset($this->beforeConstructorDeserialization[$x['_']])) {
+        if ($type['encrypted'] && isset($this->beforeConstructorDeserialization[$x['_']])) {
             foreach ($this->beforeConstructorDeserialization[$x['_']] as $callback) {
                 $callback($x['_']);
             }
@@ -1045,19 +1086,18 @@ final class TL implements TLInterface
                         }
                 }
             }
-            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && isset($type['connection']->outgoing_messages[$x['req_msg_id']])) {
+            if ($x['_'] === 'rpc_result' && $arg['name'] === 'result' && $type['encrypted'] && isset($type['connection']->new_outgoing[$x['req_msg_id']])) {
                 /** @var MTProtoOutgoingMessage */
-                $message = $type['connection']->outgoing_messages[$x['req_msg_id']];
+                $message = $type['connection']->new_outgoing[$x['req_msg_id']];
                 foreach ($this->beforeMethodResponseDeserialization[$message->constructor] ?? [] as $callback) {
-                    $callback($type['connection']->outgoing_messages[$x['req_msg_id']]->constructor);
+                    $callback($message->constructor);
                 }
                 if ($message->subtype) {
                     $arg['subtype'] = $message->subtype;
                 }
             }
-            if (isset($type['connection'])) {
-                $arg['connection'] = $type['connection'];
-            }
+            $arg['connection'] = $type['connection'];
+            $arg['encrypted'] = $type['encrypted'];
             $x[$arg['name']] = $this->deserialize($stream, $arg);
             if ($arg['name'] === 'chat_id' && $arg['type'] === 'long') {
                 $x['chat_id'] = -$x['chat_id'];
@@ -1068,7 +1108,13 @@ final class TL implements TLInterface
         }
 
         if (isset($x['channel_id'])) {
-            $x['channel_id'] = Magic::ZERO_CHANNEL_ID - $x['channel_id'];
+            $x['channel_id'] = $x['channel_id'] > Magic::MAX_CHANNEL_ID
+                ? DialogId::fromMonoforumId($x['channel_id'])
+                : DialogId::fromSupergroupOrChannelId($x['channel_id']);
+        } elseif (isset($x['community_id'])) {
+            $x['community_id'] = $x['community_id'] > Magic::MAX_CHANNEL_ID
+                ? DialogId::fromMonoforumId($x['community_id'])
+                : DialogId::fromSupergroupOrChannelId($x['community_id']);
         } elseif (isset($x['random_bytes'])) {
             if (\strlen((string) $x['random_bytes']) < 15) {
                 throw new SecurityException('Random_bytes is too small!');
@@ -1077,8 +1123,23 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'channel'
             || $x['_'] === 'channelForbidden'
             || $x['_'] === 'channelFull'
+            || $x['_'] === 'communityFull'
+            || $x['_'] === 'community'
+            || $x['_'] === 'communityForbidden'
         ) {
-            $x['id'] = DialogId::fromSupergroupOrChannelId($x['id']);
+            $x['id'] = $x['id'] > Magic::MAX_CHANNEL_ID
+                ? DialogId::fromMonoforumId($x['id'])
+                : DialogId::fromSupergroupOrChannelId($x['id']);
+            if (isset($x['linked_monoforum_id'])) {
+                $x['linked_monoforum_id'] = $x['linked_monoforum_id'] > Magic::MAX_CHANNEL_ID
+                    ? DialogId::fromMonoforumId($x['linked_monoforum_id'])
+                    : DialogId::fromSupergroupOrChannelId($x['linked_monoforum_id']);
+            }
+            if (isset($x['linked_community_id'])) {
+                $x['linked_community_id'] = $x['linked_community_id'] > Magic::MAX_CHANNEL_ID
+                    ? DialogId::fromMonoforumId($x['linked_community_id'])
+                    : DialogId::fromSupergroupOrChannelId($x['linked_community_id']);
+            }
         } elseif ($x['_'] === 'chat'
             || $x['_'] === 'chatForbidden'
             || $x['_'] === 'chatFull'
@@ -1104,25 +1165,22 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'photoStrippedSize') {
             $x['inflated'] = new Types\Bytes(Tools::inflateStripped((string) $x['bytes']));
         }
-        if (isset($this->afterConstructorDeserialization[$x['_']])) {
-            foreach ($this->afterConstructorDeserialization[$x['_']] as $callback) {
-                $callback($x);
-            }
-        } elseif ($x['_'] === 'rpc_result'
-            && isset($type['connection']->outgoing_messages[$x['req_msg_id']])
-            && isset($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->constructor])) {
-            foreach ($this->afterMethodResponseDeserialization[$type['connection']->outgoing_messages[$x['req_msg_id']]->constructor] as $callback) {
-                $callback($type['connection']->outgoing_messages[$x['req_msg_id']], $x['result']);
+        if ($type['encrypted']) {
+            if (isset($this->afterConstructorDeserialization[$x['_']])) {
+                foreach ($this->afterConstructorDeserialization[$x['_']] as $callback) {
+                    $callback($x, $type['connection']);
+                }
+            } elseif ($x['_'] === 'rpc_result'
+                && isset($type['connection']->new_outgoing[$x['req_msg_id']])
+                && isset($this->afterMethodResponseDeserialization[$type['connection']->new_outgoing[$x['req_msg_id']]->constructor])) {
+                $msg = $type['connection']->new_outgoing[$x['req_msg_id']];
+                foreach ($this->afterMethodResponseDeserialization[$msg->constructor] as $callback) {
+                    $callback($msg, $x['result']);
+                }
             }
         }
         /** @psalm-suppress InvalidArgument */
-        if ($x['_'] === 'message' && isset($x['reply_markup']['rows'])) {
-            foreach ($x['reply_markup']['rows'] as $key => $row) {
-                foreach ($row['buttons'] as $bkey => $button) {
-                    $x['reply_markup']['rows'][$key]['buttons'][$bkey] = new Types\Button($this->API, $x, $button);
-                }
-            }
-        } elseif ($x['_'] === 'peerUser') {
+        if ($x['_'] === 'peerUser') {
             $x = $x['user_id'];
         } elseif ($x['_'] === 'peerChat') {
             $x = $x['chat_id'];
@@ -1133,6 +1191,9 @@ final class TL implements TLInterface
         } elseif ($x['_'] === 'channel'
             || $x['_'] === 'channelForbidden'
             || $x['_'] === 'channelFull'
+            || $x['_'] === 'communityFull'
+            || $x['_'] === 'community'
+            || $x['_'] === 'communityForbidden'
         ) {
             unset($x['flags'], $x['flags2'], $x['access_hash']);
         } elseif ($x['_'] === 'chat'

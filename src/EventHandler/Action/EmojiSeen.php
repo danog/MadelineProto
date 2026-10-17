@@ -23,12 +23,18 @@ use danog\MadelineProto\EventHandler\Action;
  */
 final class EmojiSeen extends Action
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** @var string Emoji */
         public readonly string $emoticon
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toRawAction(): array
     {

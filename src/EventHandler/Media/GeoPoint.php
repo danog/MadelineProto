@@ -18,6 +18,9 @@ final class GeoPoint implements JsonSerializable
     /** @var int The estimated horizontal accuracy of the location, in meters; as defined by the sender. */
     public readonly ?int $accuracyRadius;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawGeoPoint)
     {
         $this->long = $rawGeoPoint['long'];
@@ -26,7 +29,11 @@ final class GeoPoint implements JsonSerializable
         $this->accuracyRadius = $rawGeoPoint['accuracy_radius'] ?? null;
     }
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function jsonSerialize(): mixed
     {

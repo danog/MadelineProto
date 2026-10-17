@@ -29,6 +29,9 @@ final class TLConstructors
     public array $by_id = [];
     public array $by_predicate_and_layer = [];
     public array $layers = [];
+    /**
+     * @psalm-pure
+     */
     public function __sleep()
     {
         return ['by_predicate_and_layer', 'by_id', 'layers'];
@@ -56,6 +59,9 @@ final class TLConstructors
         $this->by_predicate_and_layer[$predicate.$json_dict['layer']] = $json_dict['id'];
         $this->parseParams($json_dict['id'], $scheme_type === 'mtproto', $json_dict['predicate']);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findByType(string $type)
     {
         foreach ($this->by_id as $id => $constructor) {
@@ -66,6 +72,9 @@ final class TLConstructors
         }
         return false;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function findByPredicate(string $predicate, int $layer = -1)
     {
         if ($layer !== -1) {
@@ -99,6 +108,8 @@ final class TLConstructors
      * Find constructor by ID.
      *
      * @param string $id Constructor ID
+     *
+     * @psalm-mutation-free
      */
     public function findById(string $id): array|false
     {

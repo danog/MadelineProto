@@ -96,13 +96,12 @@ trait Loop
      */
     public function loop()
     {
-        if (!$this->authorized) {
+        if (!$this->getAuthorization()) {
             $this->logger->logger('Not authorized, not starting event loop', Logger::FATAL_ERROR);
             return false;
         }
         $this->logger->logger('Starting event loop');
         $this->initSelfRestart();
-        $this->startUpdateSystem();
         $this->logger->logger('Started update loop', Logger::NOTICE);
         $this->stopDeferred ??= new DeferredFuture;
         $this->stopDeferred->getFuture()->await();

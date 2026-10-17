@@ -68,66 +68,98 @@ use Revolt\EventLoop;
 final class DataCenter
 {
     /**
+     * @deprecated
+     * @var array<int, DataCenterConnection>
+     */
+    private array $sockets = [];
+
+    /**
      * All socket connections to DCs.
      *
      * @var array<int, DataCenterConnection>
      */
-    private array $sockets = [];
+    private array $list = [];
     /**
      * Current DC ID.
      */
     public int $currentDatacenter = 1;
-    /**
-     * Main instance.
-     */
-    private MTProto $API;
     private DoHWrapper $dohWrapper;
 
     private LocalKeyedMutex $connectMutex;
     /**
      * Constructor function.
      */
-    public function __construct(MTProto $API)
+    public function __construct(private readonly MTProto $API)
+    {
+        $this->__wakeup();
+    }
+
+    /**
+     * @psalm-pure
+     */
+    public function __sleep()
+    {
+        return ['API', 'list', 'currentDatacenter'];
+    }
+
+    public function __wakeup(): void
     {
         $this->connectMutex = new LocalKeyedMutex;
-        $this->API = $API;
         if ($this->getSettings()->hasChanged()) {
             unset($this->dohWrapper);
         }
-        $this->dohWrapper ??= new DoHWrapper($API);
+        $this->dohWrapper ??= new DoHWrapper($this->API);
         if ($this->getSettings()->hasChanged()) {
-            foreach ($this->sockets as $dc => $socket) {
+            foreach ($this->list as $dc => $socket) {
                 if (\is_string($dc)) {
                     continue;
                 }
-                $socket->setExtra($this->API, $dc, $this->generateContexts($dc));
+                $socket->setCtx($this->generateContexts($dc));
                 $socket->reconnect();
             }
             $this->getSettings()->applyChanges();
         }
     }
-
-    public function __sleep()
+    /**
+     * @return array<int, DataCenterConnection>
+     */
+    public function getLegacy(): array
     {
-        return isset($this->API) ? ['sockets', 'currentDatacenter', 'API'] : ['sockets', 'currentDatacenter'];
+        return $this->sockets;
     }
+
+    /**
+     * @psalm-pure
+     */
     public static function isTest(int $dc): bool
     {
         return abs($dc) > 10000;
     }
+    /**
+     * @psalm-pure
+     */
     public static function isMedia(int $dc): bool
     {
         return $dc < 0;
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function getSettings(): \danog\MadelineProto\Settings\Connection
     {
         return $this->API->getSettings()->getConnection();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getHTTPClient(): HttpClient
     {
         return $this->dohWrapper->HTTPClient;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getDNSClient(): DnsResolver
     {
         return $this->dohWrapper->DoHClient;
@@ -139,6 +171,8 @@ final class DataCenter
      * @throws \Error If an invalid option has been passed.
      *
      * @internal
+     *
+     * @psalm-pure
      */
     private static function normalizeBindToOption(?string $bindTo = null): ?string
     {
@@ -327,7 +361,6 @@ final class DataCenter
                         }
                         $ctx = (new ConnectionContext())
                             ->setDc($dc_number)
-                            ->setCdn($this->API->isCdn($dc_number))
                             ->setSocketContext($context)
                             ->setUri($uri)
                             ->setIpv6($ipv6 === 'ipv6');
@@ -376,32 +409,36 @@ final class DataCenter
      *
      * @param int $dc DC ID
      */
-    public function getDataCenterConnection(int $dc): DataCenterConnection
+    public function getDataCenterConnection(int $dc, ?DataCenterConnection $legacy = null): DataCenterConnection
     {
-        if (!isset($this->sockets[$dc]) || !$this->sockets[$dc]->hasCtx()) {
+        if (!isset($this->list[$dc]) || !$this->list[$dc]->hasCtx()) {
             $this->API->logger("Acquiring connect lock for $dc!", Logger::VERBOSE);
             $lock = $this->connectMutex->acquire((string) $dc);
             try {
-                if (isset($this->sockets[$dc]) && $this->sockets[$dc]->hasCtx()) {
-                    return $this->sockets[$dc];
+                if (isset($this->list[$dc]) && $this->list[$dc]->hasCtx()) {
+                    return $this->list[$dc];
                 }
                 $ctxs = $this->generateContexts($dc);
 
                 $this->API->logger("Connecting to DC {$dc}", Logger::WARNING);
-                $this->sockets[$dc] ??= new DataCenterConnection();
-                $this->sockets[$dc]->setExtra($this->API, $dc, $ctxs);
-                $this->sockets[$dc]->connect();
+                $this->list[$dc] ??= new DataCenterConnection($this->API, $dc, $legacy);
+                if ($legacy) {
+                    $this->list[$dc]->importFromLegacy($legacy);
+                }
+                $this->list[$dc]->setCtx($ctxs);
+                $this->list[$dc]->connect();
+                $this->list[$dc]->auth->connectionState->wakeup();
             } finally {
                 EventLoop::queue($lock->release(...));
             }
         }
-        return $this->sockets[$dc];
+        return $this->list[$dc];
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function has(int $dc): bool
     {
-        if (isset($this->sockets[$dc])) {
-            return true;
-        }
         $test = $this->getSettings()->getTestMode() ? 'test' : 'main';
         $ipv6 = $this->getSettings()->getIpv6() ? 'ipv6' : 'ipv4';
         return isset($this->API->dcList[$test][$ipv6][$dc]);
@@ -413,6 +450,6 @@ final class DataCenter
      */
     public function getDataCenterConnections(): array
     {
-        return $this->sockets;
+        return $this->list;
     }
 }

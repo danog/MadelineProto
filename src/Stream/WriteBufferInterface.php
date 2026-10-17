@@ -24,6 +24,7 @@ namespace danog\MadelineProto\Stream;
  * Write buffer interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface WriteBufferInterface
 {
@@ -31,6 +32,7 @@ interface WriteBufferInterface
      * Write data asynchronously.
      *
      * @param string $data Data to write
+     * @psalm-impure
      */
     public function bufferWrite(string $data): void;
 }

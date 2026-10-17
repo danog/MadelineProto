@@ -18,8 +18,9 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Update;
-use danog\MadelineProto\VoIP;
 use danog\MadelineProto\VoIP\CallState;
 
 /**
@@ -28,10 +29,14 @@ use danog\MadelineProto\VoIP\CallState;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterIncoming extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof AbstractMessage && !$update->out)
-            || ($update instanceof VoIP && $update->getCallState() === CallState::INCOMING);
+            || ($update instanceof MultiCallMessage && !$update->out)
+            || ($update instanceof PrivateCall && $update->getCallState() === CallState::INCOMING);
     }
 }

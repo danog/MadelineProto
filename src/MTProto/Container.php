@@ -30,27 +30,19 @@ use danog\MadelineProto\Connection;
 final class Container extends MTProtoOutgoingMessage
 {
     /**
-     * Message IDs.
-     *
-     * @var list<int>
-     */
-    private array $ids = [];
-
-    /**
      * Constructor.
      *
-     * @param list<int> $ids
+     * @param list<MTProtoOutgoingMessage> $msgs
+     * @param list<int> $acks
      */
-    public function __construct(Connection $connection, array $ids)
-    {
-        $this->ids = $ids;
-        parent::__construct($connection, [], 'msg_container', '', false, false);
-    }
-    /**
-     * Get message IDs.
-     */
-    public function getIds(): array
-    {
-        return $this->ids;
+    public function __construct(
+        Connection $connection,
+        public readonly array $msgs,
+        public readonly array $acks,
+    ) {
+        parent::__construct($connection, [], 'msg_container', '', false, false, null, null);
+        foreach ($msgs as $msg) {
+            $msg->container = $this;
+        }
     }
 }

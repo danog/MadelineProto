@@ -33,21 +33,25 @@ trait Reliable
 {
     /**
      * Called when receiving a new_msg_detailed_info.
+     *
+     * @psalm-mutation-free
      */
     public function onNewMsgDetailedInfo(array $content): void
     {
-        if (isset($this->incoming_messages[$content['answer_msg_id']])) {
-            $this->ackIncomingMessage($this->incoming_messages[$content['answer_msg_id']]);
+        /*if (isset($this->incoming_messages[$content['answer_msg_id']])) {
+            $this->incoming_messages[$content['answer_msg_id']]->ack();
         } else {
             EventLoop::queue($this->objectCall(...), 'msg_resend_req', ['msg_ids' => [$content['answer_msg_id']]]);
-        }
+        }*/
     }
     /**
      * Called when receiving a msg_detailed_info.
+     *
+     * @psalm-mutation-free
      */
     public function onMsgDetailedInfo(array $content): void
     {
-        if (isset($this->outgoing_messages[$content['msg_id']])) {
+        if (isset($this->new_outgoing[$content['msg_id']])) {
             $this->onNewMsgDetailedInfo($content);
         }
     }
@@ -58,13 +62,15 @@ trait Reliable
     {
         $ok = true;
         foreach ($content['msg_ids'] as $msg_id) {
-            if (!isset($this->outgoing_messages[$msg_id]) || isset($this->incoming_messages[$msg_id])) {
+            if (!isset($this->new_outgoing[$msg_id])) {
                 $ok = false;
             }
         }
         if ($ok) {
             foreach ($content['msg_ids'] as $msg_id) {
-                $this->methodRecall($msg_id);
+                if (isset($this->new_outgoing[$msg_id])) {
+                    $this->methodRecall($this->new_outgoing[$msg_id]);
+                }
             }
         } else {
             $this->sendMsgsStateInfo($content['msg_ids'], $current_msg_id);
@@ -72,6 +78,8 @@ trait Reliable
     }
     /**
      * Called when receiving a msg_resend_ans_req.
+     *
+     * @psalm-mutation-free
      */
     public function onMsgResendAnsReq(array $content, int $current_msg_id): void
     {
@@ -99,10 +107,12 @@ trait Reliable
      *
      * @param array $msg_ids    Message IDs to send info about
      * @param int   $req_msg_id Message ID of msgs_state_req that initiated this
+     *
+     * @psalm-mutation-free
      */
     public function sendMsgsStateInfo(array $msg_ids, int $req_msg_id): void
     {
-        $this->API->logger('Sending state info for '.\count($msg_ids).' message IDs');
+        /*$this->API->logger('Sending state info for '.\count($msg_ids).' message IDs');
         $info = '';
         foreach ($msg_ids as $msg_id) {
             $cur_info = 0;
@@ -124,6 +134,6 @@ trait Reliable
             }
             $info .= \chr($cur_info);
         }
-        EventLoop::queue($this->objectCall(...), 'msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info]);
+        EventLoop::queue($this->objectCall(...), 'msgs_state_info', ['req_msg_id' => $req_msg_id, 'info' => $info]);*/
     }
 }

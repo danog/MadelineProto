@@ -7,6 +7,9 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class CustomEmoji extends MessageEntity
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Offset of message entity within message (in UTF-16 code units) */
         public readonly int $offset,
@@ -19,11 +22,17 @@ final class CustomEmoji extends MessageEntity
     ) {
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toBotAPI(): array
     {
         return ['type' => 'custom_emoji', 'offset' => $this->offset, 'length' => $this->length, 'custom_emoji_id' => $this->documentId];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toMTProto(): array
     {

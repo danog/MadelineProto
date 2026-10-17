@@ -44,6 +44,9 @@ use Webmozart\Assert\Assert;
 final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
 {
     private Socket|ReadableStream|null $stream = null;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct()
     {
     }
@@ -56,6 +59,9 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
@@ -107,17 +113,26 @@ final class PremadeStream implements RawStreamInterface, ProxyStreamInterface
     {
         $this->disconnect();
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function getSocket(): Socket
     {
         Assert::true($this->stream instanceof Socket);
         return $this->stream;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function setExtra(mixed $extra): void
     {
         $this->stream = $extra;
     }
+    /**
+     * @psalm-pure
+     */
     public static function getName(): string
     {
         return self::class;

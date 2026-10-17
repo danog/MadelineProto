@@ -25,6 +25,9 @@ use Exception;
 /** @internal */
 final class BroadcastCancelledException extends Exception
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct()
     {
         parent::__construct();

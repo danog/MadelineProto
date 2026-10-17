@@ -1,5 +1,0 @@
-{
-    "require": {
-        "leproxy/leproxy": "dev-main"
-    }
-}

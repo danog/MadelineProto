@@ -19,7 +19,7 @@ namespace danog\MadelineProto\MTProtoTools;
 use Amp\Cancellation;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Logger;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 
 /**
  * @property DataCenter $datacenter

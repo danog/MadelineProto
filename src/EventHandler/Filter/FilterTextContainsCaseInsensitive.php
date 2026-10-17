@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
@@ -30,16 +31,23 @@ final class FilterTextContainsCaseInsensitive extends Filter
 {
     private readonly string $content;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         string $content,
     ) {
         Assert::notEmpty($content);
         $this->content = mb_strtolower($content);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_contains(mb_strtolower($update->message), $this->content)) ||
-            ($update instanceof Story && str_contains(mb_strtolower($update->caption), $this->content));
+            ($update instanceof Story && str_contains(mb_strtolower($update->caption), $this->content)) ||
+            ($update instanceof MultiCallMessage && str_contains(mb_strtolower($update->message->text), $this->content));
     }
 }

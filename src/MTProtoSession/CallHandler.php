@@ -20,13 +20,20 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoSession;
 
+use Amp\CompositeCancellation;
 use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
+use Amp\TimeoutCancellation;
+use Closure;
 use danog\MadelineProto\DataCenterConnection;
-use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\Container;
+use danog\MadelineProto\MTProto\LinkedList;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\TL\Exception;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
 
@@ -37,7 +44,10 @@ use function Amp\Future\await;
  * Manages method and object calls.
  *
  *
+ * @property LinkedList $mainPendingOutgoing
+ * @property LinkedList $uninitedPendingOutgoing
  * @property DataCenterConnection $shared
+ * @property MTProto $API
  * @internal
  */
 trait CallHandler
@@ -45,39 +55,55 @@ trait CallHandler
     /**
      * Recall method.
      */
-    public function methodRecall(int $message_id, ?int $datacenter = null): void
+    public function methodRecall(MTProtoOutgoingMessage $request, ?int $forceDatacenter = null, float|Future|null $defer = null): void
     {
-        if ($datacenter === $this->datacenter) {
-            $datacenter = null;
+        $id = $request->getMsgId();
+        if ($request->unencrypted) {
+            unset($this->unencrypted_new_outgoing[$id]);
+        } else {
+            unset($this->new_outgoing[$id]);
         }
-        $message = $this->outgoing_messages[$message_id] ?? null;
-        $message_ids = $message instanceof Container
-            ? $message->getIds()
-            : [$message_id];
-        foreach ($message_ids as $message_id) {
-            if (isset($this->outgoing_messages[$message_id])
-                && !$this->outgoing_messages[$message_id]->canGarbageCollect()) {
-                if ($datacenter) {
-                    /** @var MTProtoOutgoingMessage */
-                    $message = $this->outgoing_messages[$message_id];
-                    $this->gotResponseForOutgoingMessage($message);
-                    $message->setMsgId(null);
-                    $message->setSeqNo(null);
-                    EventLoop::queue(function () use ($datacenter, $message): void {
-                        $this->API->datacenter->waitGetConnection($datacenter)
-                            ->sendMessage($message);
-                    });
-                } else {
-                    /** @var MTProtoOutgoingMessage */
-                    $message = $this->outgoing_messages[$message_id];
-                    if (!$message->hasSeqNo()) {
-                        $this->gotResponseForOutgoingMessage($message);
-                    }
-                    EventLoop::queue($this->sendMessage(...), $message);
-                }
-            } else {
-                $this->API->logger('Could not resend '.($this->outgoing_messages[$message_id] ?? $message_id));
+        if ($request instanceof Container) {
+            $this->ack_queue = array_merge($request->acks, $this->ack_queue);
+            foreach ($request->msgs as $msg) {
+                $this->methodRecall($msg, $forceDatacenter, $defer);
             }
+            return;
+        }
+        if ($request->cancellation?->isRequested()) {
+            return;
+        }
+        if (\is_float($defer)) {
+            $d = new DeferredFuture;
+            $id = EventLoop::delay($defer, $d->complete(...));
+            $request->cancellation?->subscribe(static fn () => EventLoop::cancel($id));
+            $defer = $d->getFuture();
+        }
+        $request->unlink();
+        if ($defer) {
+            $defer->catch($request->reply(...));
+            $defer->map(function ($result) use ($request, $forceDatacenter): void {
+                if ($result instanceof Closure) {
+                    $request->reply($result);
+                } else {
+                    $this->methodRecall($request, $forceDatacenter);
+                }
+            });
+            return;
+        }
+        $datacenter = $forceDatacenter ?? $this->datacenter;
+        if ($forceDatacenter !== null) {
+            /** @var MTProtoOutgoingMessage */
+            $request->setMsgId(null);
+            $request->setSeqNo(null);
+        }
+        if ($datacenter === $this->datacenter) {
+            EventLoop::queue($this->sendMessage(...), $request);
+        } else {
+            EventLoop::queue(function () use ($datacenter, $request): void {
+                $this->API->datacenter->waitGetConnection($datacenter)
+                    ->sendMessage($request);
+            });
         }
     }
     /**
@@ -88,10 +114,38 @@ trait CallHandler
      */
     public function methodCallAsyncRead(string $method, array $args)
     {
+        if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
+            $peer = $args['peer'];
+            $args = $this->API->splitToChunks($args);
+            $promises = [];
+            $queueId = $method.' '.$this->API->getId($peer);
+
+            $promises = [];
+            foreach ($args as $k => $sub) {
+                if ($k > 0 && isset($sub['random_id']) && \is_int($sub['random_id'])) {
+                    // Each message needs its own random ID, derived from the one of the call so that it's the same if the call is made again.
+                    $sub['random_id'] = Tools::unpackSignedLong(substr(hash('sha256', pack('q', $sub['random_id']).pack('V', $k), true), 0, 8));
+                }
+                $sub['queueId'] = $queueId;
+                $sub = $this->API->botAPIToMTProto($sub);
+                $this->methodAbstractions($method, $sub);
+                $promises[] = async($this->methodCallAsyncRead(...), $method, $sub);
+            }
+
+            return await($promises);
+        }
+
+        $queueId = $args['queueId'] ?? null;
+        if ($queueId !== null) {
+            $_ = $this->abstractionQueueMutex->acquire($queueId);
+        }
+
         $readFuture = $this->methodCallAsyncWrite($method, $args);
         return $readFuture->await();
     }
+
     private LocalKeyedMutex $abstractionQueueMutex;
+    private ?float $drop = null;
     /**
      * Call method and make sure it is asynchronously sent (generator).
      *
@@ -105,45 +159,14 @@ trait CallHandler
         if (isset($args['id']) && \is_array($args['id']) && isset($args['id']['_']) && isset($args['id']['dc_id']) && ($args['id']['_'] === 'inputBotInlineMessageID' || $args['id']['_'] === 'inputBotInlineMessageID64') && $this->datacenter != $args['id']['dc_id']) {
             return $this->API->methodCallAsyncWrite($method, $args, $args['id']['dc_id']);
         }
-        $file = \in_array($method, ['upload.saveFilePart', 'upload.saveBigFilePart', 'upload.getFile', 'upload.getCdnFile'], true);
-        if ($file && !$this->isMedia() && $this->API->datacenter->has(-$this->datacenter)) {
+        $special = $args['specialMethodType'] ?? null;
+        if ($special === SpecialMethodType::FILE_RELATED
+            && !$this->shared->auth->isMedia
+            && !$this->shared->auth->isCdn
+            && $this->API->datacenter->has(-$this->datacenter)
+        ) {
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
-        }
-
-        if (isset($args['message']) && \is_string($args['message']) && mb_strlen($args['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max'] && mb_strlen($this->API->parseMode($args)['message'], 'UTF-8') > ($this->API->getConfig())['message_length_max']) {
-            $peer = $args['peer'];
-            $args = $this->API->splitToChunks($args);
-            $promises = [];
-            $queueId = $method.' '.$this->API->getId($peer);
-
-            $promises = [];
-            foreach ($args as $sub) {
-                $sub['queueId'] = $queueId;
-                $sub = $this->API->botAPIToMTProto($sub);
-                $this->methodAbstractions($method, $sub);
-                $promises[] = async($this->methodCallAsyncWrite(...), $method, $sub);
-            }
-
-            return new WrappedFuture(async(static fn () => array_map(
-                static fn (WrappedFuture $f) => $f->await(),
-                await($promises)
-            )));
-        }
-
-        $queueId = $args['queueId'] ?? null;
-        $prev = null;
-        $lock = null;
-        if ($queueId !== null) {
-            $lock = $this->abstractionQueueMutex->acquire($queueId);
-            if (isset($this->callQueue[$queueId])
-                && !($prev = $this->callQueue[$queueId])->hasReply()
-            ) {
-                $this->API->logger("$method to queue with ID $queueId", Logger::ULTRA_VERBOSE);
-            } else {
-                $prev = null;
-                $this->API->logger("$method is the first in the queue with ID $queueId", Logger::ULTRA_VERBOSE);
-            }
         }
 
         $args = $this->API->botAPIToMTProto($args);
@@ -152,7 +175,13 @@ trait CallHandler
         $this->methodAbstractions($method, $args);
         if (\in_array($method, ['messages.sendEncrypted', 'messages.sendEncryptedFile', 'messages.sendEncryptedService'], true)) {
             $args['method'] = $method;
-            $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
+            if (isset($args['peer'])) {
+                $args = $this->API->getSecretChatController($args['peer'])->encryptSecretMessage($args, $response->getFuture());
+            } else {
+                if (!$this->API->getSettings()->getSchema()->getFuzzMode()) {
+                    throw new Exception('No peer specified for encrypted message!');
+                }
+            }
         }
 
         $methodInfo = $this->API->getTL()->getMethods()->findByMethod($method);
@@ -160,44 +189,49 @@ trait CallHandler
             throw new Exception("Could not find method $method!");
         }
         $encrypted = $methodInfo['encrypted'];
-        if (!$encrypted && $this->shared->hasTempAuthKey()) {
-            $encrypted = true;
-        }
+        $timeout = new TimeoutCancellation(
+            $args['timeout'] ?? ($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout()),
+            "Timeout while waiting for $method"
+        );
+        $cancellation = $cancellation !== null
+            ? new CompositeCancellation($cancellation, $timeout)
+            : $timeout;
         $message = new MTProtoOutgoingMessage(
             connection: $this,
             body: $args,
             constructor: $method,
             type: $methodInfo['type'],
             subtype: $methodInfo['subtype'] ?? null,
+            specialMethodType: $special,
             isMethod: true,
             unencrypted: !$encrypted,
-            fileRelated: $file,
-            previousQueuedMessage: $prev,
             floodWaitLimit: $args['floodWaitLimit'] ?? null,
             resultDeferred: $response,
             cancellation: $cancellation,
             takeoutId: $args['takeoutId'] ?? null,
             businessConnectionId: $args['businessConnectionId'] ?? null,
         );
-        if ($queueId !== null) {
-            $this->callQueue[$queueId] = $message;
-            $lock->release();
-        }
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);
         }
         $this->sendMessage($message);
-        $this->checker->resume();
+        $message->getSendPromise()->await($cancellation);
         return new WrappedFuture($response->getFuture());
     }
     /**
-     * Send object and make sure it is asynchronously sent (generator).
+     * Send object.
      *
      * @param string $object Object name
      * @param array  $args   Arguments
      */
-    public function objectCall(string $object, array $args, ?DeferredFuture $promise = null): void
+    public function objectCallAsync(string $object, array $args, ?DeferredFuture $promise = null): void
     {
+        $cancellation = $args['cancellation'] ?? null;
+        $cancellation?->throwIfRequested();
+        $timeout = new TimeoutCancellation($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout());
+        $cancellation = $cancellation !== null
+            ? new CompositeCancellation($cancellation, $timeout)
+            : $timeout;
         $this->sendMessage(
             new MTProtoOutgoingMessage(
                 connection: $this,
@@ -206,7 +240,9 @@ trait CallHandler
                 type: '',
                 isMethod: false,
                 unencrypted: false,
-                resultDeferred: $promise
+                specialMethodType: null,
+                resultDeferred: $promise,
+                cancellation: $cancellation,
             ),
         );
     }

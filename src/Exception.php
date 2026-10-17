@@ -32,6 +32,9 @@ use const PHP_SAPI;
 class Exception extends \Exception
 {
     use TL\PrettyException;
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __toString(): string
     {
         return $this->file === 'MadelineProto' ? $this->message : '\\danog\\MadelineProto\\Exception'.($this->message !== '' ? ': ' : '').$this->message.' in '.$this->file.':'.$this->line.PHP_EOL.Magic::$revision.PHP_EOL.'TL Trace:'.PHP_EOL.$this->getTLTrace();
@@ -82,7 +85,7 @@ class Exception extends \Exception
      */
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
-        $errfileReplaced = preg_replace('/phabel-transpiler\d+\./', '', $errfile ?? '');
+        $errfileReplaced = $errfile ?? '';
         // If error is suppressed with @, don't throw an exception
         if (error_reporting() === 0
             || strpos($errstr, 'headers already sent')
@@ -93,6 +96,7 @@ class Exception extends \Exception
                 str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'amphp'.DIRECTORY_SEPARATOR)
                 || str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'league'.DIRECTORY_SEPARATOR)
                 || str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'phpseclib'.DIRECTORY_SEPARATOR)
+                || str_contains($errfileReplaced, DIRECTORY_SEPARATOR.'symfony'.DIRECTORY_SEPARATOR)
             )
         ) {
             return false;

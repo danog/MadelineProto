@@ -26,6 +26,8 @@ final class TextEntities
 {
     /**
      * Creates an Entities container using a message and a list of entities.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         /** Converted message */
@@ -42,6 +44,8 @@ final class TextEntities
      * Manually convert markdown to a message and a set of entities.
      *
      * @return self Object containing message and entities
+     *
+     * @psalm-mutation-free
      */
     public static function fromMarkdown(string $markdown): self
     {

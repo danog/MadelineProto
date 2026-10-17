@@ -16,12 +16,10 @@
 
 namespace danog\MadelineProto\EventHandler\Message;
 
-use AssertionError;
 use danog\DialogId\DialogId;
-use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\GroupOrChannelMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicCreated;
 use danog\MadelineProto\EventHandler\Message\Service\DialogTopicEdited;
-use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Topic\IconColor;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
@@ -29,28 +27,8 @@ use Webmozart\Assert\InvalidArgumentException;
 /**
  * Represents an incoming or outgoing group message.
  */
-class GroupMessage extends Message
+class GroupMessage extends GroupOrChannelMessage
 {
-    /**
-     * Get info about a [channel/supergroup](https://core.telegram.org/api/channel) participant.
-     *
-     * @param  string|integer|null $member Participant to get info about; can be empty or null to get info about the sender of the message.
-     * @throws AssertionError
-     */
-    public function getMember(string|int|null $member = null): Participant
-    {
-        $client = $this->getClient();
-        $member ??= $this->senderId;
-        $result = $client->methodCallAsyncRead(
-            'channels.getParticipant',
-            [
-                'channel' => $this->chatId,
-                'participant' => $member,
-            ]
-        )['participant'];
-        return Participant::fromRawParticipant($result);
-    }
-
     /**
      * Hide the participants list in a [supergroup](https://core.telegram.org/api/channel).
      * The supergroup must have at least `hidden_members_group_size_min` participants in order to use this method, as specified by the [client configuration parameters »](https://core.telegram.org/api/config#client-configuration).
@@ -59,7 +37,7 @@ class GroupMessage extends Message
      */
     public function hideMembers(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleParticipantsHidden',
             [
@@ -77,7 +55,7 @@ class GroupMessage extends Message
      */
     public function unhideMembers(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleParticipantsHidden',
             [
@@ -94,7 +72,7 @@ class GroupMessage extends Message
      */
     public function hideHistory(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.togglePreHistoryHidden',
             [
@@ -111,7 +89,7 @@ class GroupMessage extends Message
      */
     public function unhideHistory(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.togglePreHistoryHidden',
             [
@@ -235,7 +213,7 @@ class GroupMessage extends Message
      */
     public function deleteUserMessages(string|int|null $member = null): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $member ??= $this->senderId;
         $this->getClient()->methodCallAsyncRead(
             'channels.deleteParticipantHistory',
@@ -274,7 +252,7 @@ class GroupMessage extends Message
      */
     public function enableAntiSpam(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleAntiSpam',
             [
@@ -291,7 +269,7 @@ class GroupMessage extends Message
      */
     public function disableAntiSpam(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleAntiSpam',
             [
@@ -347,7 +325,7 @@ class GroupMessage extends Message
      */
     public function createTopic(string $title, IconColor|int $icon = IconColor::NONE): DialogTopicCreated
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         if (!$this->topicId) {
             $this->enableTopics();
         }
@@ -375,7 +353,7 @@ class GroupMessage extends Message
      */
     public function editTopic(string $title, int $icon = 0, ?int $topicId = null): DialogTopicEdited
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $topicId ??= $this->topicId;
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
@@ -399,7 +377,7 @@ class GroupMessage extends Message
      */
     public function openTopic(?int $topicId = null): DialogTopicEdited
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $topicId ??= $this->topicId;
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
@@ -422,7 +400,7 @@ class GroupMessage extends Message
      */
     public function closeTopic(?int $topicId = null): DialogTopicEdited
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $topicId ??= $this->topicId;
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
@@ -445,7 +423,7 @@ class GroupMessage extends Message
      */
     public function deleteTopic(?int $topicId = null): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $topicId ??= $this->topicId;
         Assert::notNull($topicId, "No topic ID was provided!");
         $this->getClient()->methodCallAsyncRead(
@@ -465,7 +443,7 @@ class GroupMessage extends Message
      */
     public function enableSlowMode(int $seconds): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         Assert::false($seconds === 0);
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleSlowMode',
@@ -483,7 +461,7 @@ class GroupMessage extends Message
      */
     public function disableSlowMode(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleSlowMode',
             [
@@ -494,42 +472,12 @@ class GroupMessage extends Message
     }
 
     /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
-     *
-     */
-    public function enableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
-                'enabled' => true,
-            ]
-        );
-    }
-
-    /**
-     * Enable or disable [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) on a chat.
-     *
-     */
-    public function disableProtection(): void
-    {
-        $this->getClient()->methodCallAsyncRead(
-            'messages.toggleNoForwards',
-            [
-                'peer' => $this->chatId,
-                'enabled' => false,
-            ]
-        );
-    }
-
-    /**
      * Enable to all users [should join a discussion group in order to comment on a post »](https://core.telegram.org/api/discussion#requiring-users-to-join-the-group).
      *
      */
     public function enableJoinToComment(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleJoinToSend',
             [
@@ -545,7 +493,7 @@ class GroupMessage extends Message
      */
     public function disableJoinToComment(): void
     {
-        Assert::true(DialogId::isSupergroupOrChannel($this->chatId));
+        Assert::true(DialogId::isSupergroupOrChannelOrMonoforum($this->chatId));
         $this->getClient()->methodCallAsyncRead(
             'channels.toggleJoinToSend',
             [

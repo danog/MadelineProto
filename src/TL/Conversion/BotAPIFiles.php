@@ -23,9 +23,11 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhoto;
+use danog\Decoder\PhotoSizeSource\PhotoSizeSourceDialogPhotoBig;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceLegacy;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Lang;
 
@@ -64,6 +66,31 @@ trait BotAPIFiles
         ];
     }
     /**
+     * Convert the profile photo of a peer (the big one, as downloaded by getDownloadInfo()) to a bot API file.
+     *
+     * @param array $peer User, chat or channel constructor, or updateUserPhoto
+     *
+     * @return array{file_id: string, file_unique_id: string}
+     */
+    private function profilePhotoToBotAPI(array $peer): array
+    {
+        $fileId = new FileId(
+            id: $peer['photo']['photo_id'],
+            type: FileIdType::PROFILE_PHOTO,
+            accessHash: 0,
+            dcId: $peer['photo']['dc_id'],
+            photoSizeSource: new PhotoSizeSourceDialogPhotoBig(
+                dialogId: $this->getIdInternal($peer) ?? 0,
+                dialogAccessHash: $peer['access_hash'] ?? 0,
+            ),
+        );
+
+        return [
+            'file_id' => (string) $fileId,
+            'file_unique_id' => $fileId->getUniqueBotAPI(),
+        ];
+    }
+    /**
      * Unpack bot API file ID.
      *
      * @param  string $fileId Bot API file ID
@@ -85,45 +112,28 @@ trait BotAPIFiles
                 /**
                  * @var PhotoSizeSourceDialogPhoto $photoSize
                  */
-                if ($photoSize->dialogId < 0) {
-                    $res['Chat'] = [
-                        '_' => $photoSize->dialogId < -1000000000000 ? 'channel' : 'chat',
-                        'id' => $photoSize->dialogId,
-                        'access_hash' => $photoSize->dialogAccessHash,
-                        'photo' => [
-                            '_' => 'chatPhoto',
-                            'dc_id' => $fileId->dcId,
-                            'photo_id' => $fileId->id,
-                        ],
-                        'min' => true,
-                    ];
-                    if ($fileId->volumeId) {
-                        $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
-                            '_' => 'fileLocationToBeDeprecated',
-                            'volume_id' => $fileId->volumeId,
-                            'local_id' => $fileId->localId,
-                        ];
-                    }
-                    return $res;
+                $dialogId = $photoSize->dialogId;
+                $photo = ['dc_id' => $fileId->dcId, 'photo_id' => $fileId->id];
+                if (DialogId::isUser($dialogId)) {
+                    $res['User'] = ['_' => 'user', 'id' => $dialogId, 'access_hash' => $photoSize->dialogAccessHash, 'photo' => ['_' => 'userProfilePhoto'] + $photo, 'min' => true];
+                    $peer = ['_' => 'inputPeerUser', 'user_id' => $dialogId, 'access_hash' => $photoSize->dialogAccessHash];
+                } elseif (DialogId::isChat($dialogId)) {
+                    $res['Chat'] = ['_' => 'chat', 'id' => $dialogId, 'photo' => ['_' => 'chatPhoto'] + $photo, 'min' => true];
+                    $peer = ['_' => 'inputPeerChat', 'chat_id' => DialogId::toChatId($dialogId)];
+                } else {
+                    $res['Chat'] = ['_' => 'channel', 'id' => $dialogId, 'access_hash' => $photoSize->dialogAccessHash, 'photo' => ['_' => 'chatPhoto'] + $photo, 'min' => true];
+                    $peer = ['_' => 'inputPeerChannel', 'channel_id' => DialogId::toSupergroupOrChannelId($dialogId), 'access_hash' => $photoSize->dialogAccessHash];
                 }
-                $res['User'] = [
-                    '_' => 'user',
-                    'id' => $photoSize->dialogId,
-                    'access_hash' => $photoSize->dialogAccessHash,
-                    'photo' => [
-                        '_' => 'userProfilePhoto',
-                        'dc_id' => $fileId->dcId,
-                        'photo_id' => $fileId->id,
-                    ],
-                    'min' => true,
+                // With the access hash of the file ID: the peer may not be in the database.
+                $res['InputFileLocation'] = [
+                    '_' => 'inputPeerPhotoFileLocation',
+                    'big' => !$photoSize->isSmallDialogPhoto(),
+                    'peer' => $peer,
+                    'photo_id' => $fileId->id,
                 ];
-                if ($fileId->localId !== null) {
-                    $res['photo'][$photoSize->isSmallDialogPhoto() ? 'photo_small' : 'photo_big'] = [
-                        '_' => 'fileLocationToBeDeprecated',
-                        'volume_id' => $fileId->volumeId,
-                        'local_id' => $fileId->localId,
-                    ];
-                }
+                $res['name'] = $dialogId.'_'.($photoSize->isSmallDialogPhoto() ? 'small' : 'big').'_'.$fileId->dcId;
+                $res['ext'] = '.jpg';
+                $res['mime'] = 'image/jpeg';
                 return $res;
             case FileIdType::THUMBNAIL:
                 /**

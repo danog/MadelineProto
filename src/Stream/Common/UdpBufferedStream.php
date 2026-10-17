@@ -123,6 +123,8 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): WriteBufferInterface
@@ -133,6 +135,8 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
             private string $data = '';
             /**
              * Constructor function.
+             *
+             * @psalm-mutation-free
              */
             public function __construct(private readonly int $length, string $append, private readonly RawStreamInterface $stream)
             {
@@ -172,6 +176,9 @@ final class UdpBufferedStream extends DefaultStream implements BufferedStreamInt
             }
         };
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

@@ -18,6 +18,7 @@
  */
 
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
@@ -57,6 +58,37 @@ class SecretHandler extends SimpleEventHandler
     public function onStart(): void
     {
     }
+    /**
+     * Join the group call of a group or channel, and stream a video file into it.
+     *
+     * Send /joinGroupCall in a group that has an active video chat. The media is read from a.mkv,
+     * a WebM/Matroska file holding VP8 video and OPUS audio: MadelineProto demuxes it in pure PHP
+     * and sends the frames as-is, so neither ffmpeg nor the FFI extension is required.
+     */
+    #[Handler]
+    public function hjoinGroupCall(Incoming&Message $update): void
+    {
+        if ($update->message !== '/joinGroupCall') {
+            return;
+        }
+
+        $call = $this->getGroupCall($update->chatId);
+        if ($call === null) {
+            $update->reply('There is no active group call in this chat!');
+            return;
+        }
+
+        $file = new LocalFile(__DIR__.'/a.mkv');
+        if (!file_exists($file->file)) {
+            $update->reply('a.mkv is missing, cannot stream anything.');
+            return;
+        }
+
+        $call->join();
+        $call->playVideo($file);
+        $update->reply("Joined {$call} and started streaming a.mkv!");
+    }
+
     /**
      * Handle updates from users.
      */

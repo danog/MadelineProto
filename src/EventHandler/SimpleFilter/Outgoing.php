@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Represents an outgoing message */
+/** @psalm-mutable */
 interface Outgoing
 {
 }

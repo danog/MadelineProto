@@ -26,6 +26,9 @@ use ReflectionProperty;
 final class PaymentCharge implements JsonSerializable
 {
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Telegram payment identifier */
         public readonly string $id,

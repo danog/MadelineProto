@@ -131,12 +131,14 @@ final class SessionPaths
     {
         if (file_exists($this->sessionDirectoryPath)) {
             foreach (scandir($this->sessionDirectoryPath) as $f) {
-                if ($f === '.' || $f === '..') {
+                if ($f === '.' || $f === '..' || !str_ends_with($f, '.php')) {
                     continue;
                 }
-                unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
+                try {
+                    unlink($this->sessionDirectoryPath.DIRECTORY_SEPARATOR.$f);
+                } catch (\Throwable) {
+                }
             }
-            rmdir($this->sessionDirectoryPath);
         }
     }
     /**
@@ -162,9 +164,32 @@ final class SessionPaths
                 $object,
             );
 
+            // The rename only replaces the old file atomically if the new data is on disk first:
+            // otherwise a crash can persist the rename and the file size but not the data,
+            // leaving a session made of zeroes (seen on f2fs, which unlike ext4 doesn't flush
+            // the data of a file renamed over another one).
+            // The directory isn't fsynced: that only makes the rename itself durable, and on
+            // f2fs it costs a checkpoint of the whole filesystem on every save.
+            self::fsync("$path.temp.php");
             move("$path.temp.php", $path);
         } finally {
             $unlock();
+        }
+    }
+
+    /**
+     * Flush a file to disk.
+     */
+    private static function fsync(string $path): void
+    {
+        $f = @fopen($path, 'r+');
+        if ($f === false) {
+            return;
+        }
+        try {
+            @fsync($f);
+        } finally {
+            fclose($f);
         }
     }
 

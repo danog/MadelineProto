@@ -36,6 +36,7 @@ use Countable;
 use danog\DialogId\DialogId;
 use Fiber;
 use PhpParser\Node\Arg;
+use PhpParser\Node\DeclareItem;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\New_;
@@ -48,13 +49,11 @@ use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\DeclareDeclare;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\ParserFactory;
-use phpseclib3\Crypt\Random;
 use ReflectionClass;
 use Traversable;
 
@@ -156,6 +155,9 @@ abstract class Tools extends AsyncTools
         array_walk($input, $cb);
         return $input;
     }
+    /**
+     * @psalm-pure
+     */
     private static function uRShift(int $a, int $b): int
     {
         if($b == 0) {
@@ -169,6 +171,8 @@ abstract class Tools extends AsyncTools
      * Returns a vector hash.
      *
      * @param array<string|int> $longs IDs
+     *
+     * @psalm-external-mutation-free
      */
     public static function genVectorHash(array $longs): string
     {
@@ -203,7 +207,7 @@ abstract class Tools extends AsyncTools
      */
     public static function random(int $length): string
     {
-        return $length === 0 ? '' : Random::string($length);
+        return $length === 0 ? '' : random_bytes($length);
     }
     /**
      * Positive modulo
@@ -211,6 +215,8 @@ abstract class Tools extends AsyncTools
      *
      * @param int $a A
      * @param int $b B
+     *
+     * @psalm-pure
      */
     public static function posmod(int $a, int $b): int
     {
@@ -221,6 +227,8 @@ abstract class Tools extends AsyncTools
      * Unpack base256 signed int.
      *
      * @param string $value base256 int
+     *
+     * @psalm-external-mutation-free
      */
     public static function unpackSignedInt(string $value): int
     {
@@ -233,6 +241,8 @@ abstract class Tools extends AsyncTools
      * Unpack base256 signed long.
      *
      * @param string $value base256 long
+     *
+     * @psalm-external-mutation-free
      */
     public static function unpackSignedLong(string $value): int
     {
@@ -245,6 +255,8 @@ abstract class Tools extends AsyncTools
      * Unpack base256 signed long to string.
      *
      * @param string|int|array $value base256 long
+     *
+     * @psalm-external-mutation-free
      */
     public static function unpackSignedLongString(string|int|array $value): string
     {
@@ -263,6 +275,8 @@ abstract class Tools extends AsyncTools
      * Convert integer to base256 signed int.
      *
      * @param integer $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     public static function packSignedInt(int $value): string
     {
@@ -279,6 +293,8 @@ abstract class Tools extends AsyncTools
      * Convert integer to base256 long.
      *
      * @param int $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     public static function packSignedLong(int $value): string
     {
@@ -288,6 +304,8 @@ abstract class Tools extends AsyncTools
      * Convert value to unsigned base256 int.
      *
      * @param int $value Value
+     *
+     * @psalm-external-mutation-free
      */
     public static function packUnsignedInt(int $value): string
     {
@@ -303,6 +321,8 @@ abstract class Tools extends AsyncTools
      * Convert double to binary version.
      *
      * @param float $value Value to convert
+     *
+     * @psalm-external-mutation-free
      */
     public static function packDouble(float $value): string
     {
@@ -316,6 +336,8 @@ abstract class Tools extends AsyncTools
      * Unpack binary double.
      *
      * @param string $value Value to unpack
+     *
+     * @psalm-external-mutation-free
      */
     public static function unpackDouble(string $value): float
     {
@@ -328,6 +350,8 @@ abstract class Tools extends AsyncTools
      * Check if is array or similar (traversable && countable && arrayAccess).
      *
      * @param mixed $var Value to check
+     *
+     * @psalm-pure
      */
     public static function isArrayOrAlike(mixed $var): bool
     {
@@ -337,6 +361,8 @@ abstract class Tools extends AsyncTools
      * Create array.
      *
      * @param mixed ...$params Params
+     *
+     * @psalm-pure
      */
     public static function arr(mixed ...$params): array
     {
@@ -346,6 +372,8 @@ abstract class Tools extends AsyncTools
      * base64URL decode.
      *
      * @param string $data Data to decode
+     *
+     * @psalm-pure
      */
     public static function base64urlDecode(string $data): string
     {
@@ -355,6 +383,8 @@ abstract class Tools extends AsyncTools
      * Base64URL encode.
      *
      * @param string $data Data to encode
+     *
+     * @psalm-pure
      */
     public static function base64urlEncode(string $data): string
     {
@@ -364,6 +394,8 @@ abstract class Tools extends AsyncTools
      * null-byte RLE decode.
      *
      * @param string $string Data to decode
+     *
+     * @psalm-pure
      */
     public static function rleDecode(string $string): string
     {
@@ -386,6 +418,8 @@ abstract class Tools extends AsyncTools
      * null-byte RLE encode.
      *
      * @param string $string Data to encode
+     *
+     * @psalm-pure
      */
     public static function rleEncode(string $string): string
     {
@@ -446,6 +480,8 @@ abstract class Tools extends AsyncTools
      * Inflate stripped photosize to full JPG payload.
      *
      * @param string $stripped Stripped photosize
+     *
+     * @psalm-pure
      */
     public static function inflateStripped(string $stripped): string
     {
@@ -485,6 +521,8 @@ abstract class Tools extends AsyncTools
      * @param array<array{w: int, h: int, type: string, ...}> $sizes
      *
      * @internal
+     *
+     * @psalm-pure
      */
     public static function maxSize(array $sizes): array
     {
@@ -516,8 +554,12 @@ abstract class Tools extends AsyncTools
      * Get final element of array.
      *
      * @template T
-     * @param  array<T> $what Array
+     *
+     * @param array<T> $what Array
+     *
      * @return T
+     *
+     * @psalm-pure
      */
     public static function end(array $what): mixed
     {
@@ -525,6 +567,8 @@ abstract class Tools extends AsyncTools
     }
     /**
      * Whether this is altervista.
+     *
+     * @psalm-external-mutation-free
      */
     public static function isAltervista(): bool
     {
@@ -586,7 +630,10 @@ abstract class Tools extends AsyncTools
      * Parse t.me link.
      *
      * @internal
+     *
      * @return array{0: bool, 1: string|int}|null
+     *
+     * @psalm-pure
      */
     public static function parseLink(string $link): array|null
     {
@@ -630,46 +677,100 @@ abstract class Tools extends AsyncTools
     }
     private static ?HttpClient $client = null;
     /**
-     * Provide a buffered reader for a file, URL or amp stream.
+     * Provide a buffered reader for a file, URL or amp stream, optionally starting at a byte offset.
+     *
+     * The `$offset` makes a demuxer resumable across a serialize/unserialize cycle: a `LocalFile` is
+     * seeked and a `RemoteUrl` is fetched with a `Range` request. A {@see ResumableStream} is skipped
+     * forward from its current position (without downloading the skipped part, for a
+     * {@see ResumableDownloadStream}). Any other {@see ReadableStream} cannot be seeked, so a non-zero
+     * offset on one is rejected.
      *
      * @return Closure(int): ?string
      */
-    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null): Closure
+    public static function openBuffered(LocalFile|RemoteUrl|ReadableStream $stream, ?Cancellation $cancellation = null, int $offset = 0): Closure
     {
-        if ($stream instanceof LocalFile) {
-            $stream = openFile($stream->file, 'r');
-            return static fn (int $len): ?string => $stream->read(cancellation: $cancellation, length: $len);
-        }
-        if ($stream instanceof RemoteUrl) {
-            self::$client ??= HttpClientBuilder::buildDefault();
-            $request = new Request($stream->url);
-            $request->setTransferTimeout(INF);
-            $request->setInactivityTimeout(INF);
-            $stream = self::$client->request(
-                $request,
-                $cancellation
-            )->getBody();
-        }
         $buffer = '';
-        return static function (int $len) use (&$buffer, $stream, $cancellation): ?string {
-            if ($buffer === null) {
-                return null;
+        if ($stream instanceof LocalFile) {
+            $file = openFile($stream->file, 'r');
+            if ($offset !== 0) {
+                $file->seek($offset);
             }
-            do {
-                if (\strlen($buffer) >= $len) {
-                    $piece = substr($buffer, 0, $len);
-                    $buffer = substr($buffer, $len);
-                    return $piece;
+            $read = static fn (): ?string => $file->read(cancellation: $cancellation, length: self::READ_AHEAD_LENGTH);
+        } else {
+            if ($stream instanceof RemoteUrl) {
+                self::$client ??= HttpClientBuilder::buildDefault();
+                $request = new Request($stream->url);
+                $request->setTransferTimeout(INF);
+                $request->setInactivityTimeout(INF);
+                if ($offset !== 0) {
+                    $request->setHeader('Range', "bytes={$offset}-");
                 }
+                $stream = self::$client->request(
+                    $request,
+                    $cancellation
+                )->getBody();
+            } elseif ($offset !== 0) {
+                if ($stream instanceof ResumableDownloadStream) {
+                    $stream->skip($offset);
+                } elseif ($stream instanceof ResumableStream) {
+                    $buffer = self::skipStream($stream, $offset, $cancellation) ?? '';
+                } else {
+                    throw new Exception('Cannot resume a raw stream from a byte offset: it is not seekable.');
+                }
+            }
+            $read = static function () use ($stream, $cancellation): ?string {
                 $chunk = $stream->read($cancellation);
                 if ($chunk === null) {
-                    $buffer = null;
                     $stream->close();
-                    return null;
+                }
+                return $chunk;
+            };
+        }
+        // Demuxers read a few bytes at a time: read ahead, and hand out the buffer from a position
+        // instead of cutting it (which would copy it) on every read.
+        $position = 0;
+        $eof = false;
+        return static function (int $len) use (&$buffer, &$position, &$eof, $read): ?string {
+            while (!$eof && \strlen($buffer) - $position < $len) {
+                $chunk = $read();
+                if ($chunk === null) {
+                    $eof = true;
+                    break;
+                }
+                if ($position > self::READ_AHEAD_LENGTH) {
+                    $buffer = substr($buffer, $position);
+                    $position = 0;
                 }
                 $buffer .= $chunk;
-            } while (true);
+            }
+            if ($position >= \strlen($buffer)) {
+                return null;
+            }
+            // Fewer bytes than requested only at the end of the stream.
+            $piece = substr($buffer, $position, $len);
+            $position += \strlen($piece);
+            return $piece;
         };
+    }
+
+    /** How much is read ahead by {@see self::openBuffered()}, in bytes. */
+    private const READ_AHEAD_LENGTH = 128 * 1024;
+
+    /**
+     * Read and discard the next bytes of a stream.
+     *
+     * @return ?string What was read past the skipped bytes, null if the stream ended first.
+     */
+    private static function skipStream(ReadableStream $stream, int $bytes, ?Cancellation $cancellation): ?string
+    {
+        while (($chunk = $stream->read($cancellation)) !== null) {
+            $len = \strlen($chunk);
+            if ($len >= $bytes) {
+                return substr($chunk, $bytes);
+            }
+            $bytes -= $len;
+        }
+        return null;
     }
 
     private const BLOCKING_FUNCTIONS = [
@@ -746,8 +847,8 @@ abstract class Tools extends AsyncTools
             }
         }
 
-        /** @var DeclareDeclare|null $declare */
-        $declare = $finder->findFirstInstanceOf($code, DeclareDeclare::class);
+        /** @var DeclareItem|null $declare */
+        $declare = $finder->findFirstInstanceOf($code, DeclareItem::class);
         if ($declare === null
             || $declare->key->name !== 'strict_types'
             || !$declare->value instanceof LNumber

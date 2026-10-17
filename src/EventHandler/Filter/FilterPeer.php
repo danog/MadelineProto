@@ -20,6 +20,7 @@ use Attribute;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallMessage;
 use danog\MadelineProto\EventHandler\Channel\ChannelParticipant;
 use danog\MadelineProto\EventHandler\Channel\MessageForwards;
 use danog\MadelineProto\EventHandler\Channel\MessageViewsChanged;
@@ -47,6 +48,9 @@ use danog\MadelineProto\EventHandler\User\Username;
 final class FilterPeer extends Filter
 {
     private readonly int $peerResolved;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(private readonly string|int $peer)
     {
     }
@@ -57,11 +61,15 @@ final class FilterPeer extends Filter
         $this->peerResolved = $API->getId($this->peer);
         return $this;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && $update->chatId === $this->peerResolved) ||
             ($update instanceof AbstractStory && $update->senderId === $this->peerResolved) ||
+            ($update instanceof AbstractGroupCallMessage && $update->peerId === $this->peerResolved) ||
             ($update instanceof StoryReaction && $update->senderId === $this->peerResolved) ||
             ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) ||
             ($update instanceof InlineQuery && $update->userId === $this->peerResolved) ||

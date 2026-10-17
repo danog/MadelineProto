@@ -55,6 +55,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Async chunked read.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function read(?Cancellation $cancellation = null): ?string
@@ -68,6 +70,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Async write.
      *
      * @param string $data Data to write
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function write(string $data): void
@@ -121,6 +125,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -170,6 +176,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
      * Async write.
      *
      * @param string $data Data to write
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function bufferWrite(string $data): void
@@ -202,6 +210,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -210,6 +220,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
@@ -218,6 +230,8 @@ class BufferedRawStream implements BufferedStreamInterface, BufferInterface, Raw
     }
     /**
      * Get class name.
+     *
+     * @psalm-pure
      */
     #[\Override]
     public static function getName(): string

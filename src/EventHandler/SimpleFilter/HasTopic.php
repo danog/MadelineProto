@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allow only messages coming from groups that has topics (Supergroups only). */
+/** @psalm-mutable */
 interface HasTopic
 {
 }

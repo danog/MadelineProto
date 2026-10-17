@@ -34,6 +34,9 @@ final class LightState
      */
     private ?string $eventHandler = null;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API)
     {
         if ($API->hasEventHandler()) {

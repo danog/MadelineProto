@@ -27,11 +27,17 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterButtonQueryData extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         private readonly string $content
     ) {
         Assert::notEmpty($content);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

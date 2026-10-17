@@ -33,7 +33,11 @@ final class BotStopped extends Update
     /** The user ID */
     public readonly int $userId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawBotStopped)
     {
         parent::__construct($API);

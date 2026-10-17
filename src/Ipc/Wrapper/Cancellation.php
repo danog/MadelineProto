@@ -41,6 +41,18 @@ final class Cancellation implements AmpCancellation
     }
 
     /**
+     * Get what to send back to the client in place of this cancellation.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getReference(): CancellationReference
+    {
+        return new CancellationReference($this->inner->getMethodId('wait'));
+    }
+
+    /**
      * Subscribes a new handler to be invoked on a cancellation request.
      *
      * This handler might be invoked immediately in case the cancellation has already been requested. Any unhandled
@@ -63,6 +75,8 @@ final class Cancellation implements AmpCancellation
      * Unsubscribes a previously registered handler.
      *
      * The handler will no longer be called as long as this method isn't invoked from a subscribed callback.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function unsubscribe(string $id): void
@@ -73,6 +87,8 @@ final class Cancellation implements AmpCancellation
 
     /**
      * Returns whether cancellation has been requested yet.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function isRequested(): bool
@@ -84,6 +100,8 @@ final class Cancellation implements AmpCancellation
      * Throws the `CancelledException` if cancellation has been requested, otherwise does nothing.
      *
      * @throws CancelledException
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function throwIfRequested(): void
@@ -91,6 +109,9 @@ final class Cancellation implements AmpCancellation
         $this->inner->throwIfRequested();
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function __destruct()
     {
         foreach ($this->handlers as $handler => $_) {

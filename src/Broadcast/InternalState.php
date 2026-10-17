@@ -59,6 +59,9 @@ final class InternalState
         $this->cancellation = new DeferredCancellation;
         $this->resume();
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
@@ -150,6 +153,7 @@ final class InternalState
                         'chat' => $this->filter->allowGroups,
                         'supergroup' => $this->filter->allowGroups,
                         'channel' => $this->filter->allowChannels,
+                        'community' => false,
                     }) {
                         return false;
                     }
@@ -219,6 +223,9 @@ final class InternalState
         }
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function getStatus(): Status
     {
         return match ($this->status) {
@@ -230,6 +237,9 @@ final class InternalState
             StatusInternal::CANCELLED => Status::CANCELLED,
         };
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function getProgress(): Progress
     {
         return new Progress(

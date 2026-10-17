@@ -20,60 +20,32 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\TL\Types;
 
-use ArrayAccess;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use JsonSerializable;
 
 /**
  * Clickable button.
- *
- * @implements ArrayAccess<array-key, mixed>
  */
-final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
+final class Button extends IpcCapable implements JsonSerializable
 {
     /** Button label */
     public readonly string $label;
-    /**
-     * Button data.
-     *
-     * @var array<array-key, mixed>
-     */
-    protected array $button = [];
-    /**
-     * Message ID.
-     */
-    protected int $id;
-    /**
-     * Peer ID.
-     *
-     */
-    protected array|int $peer;
     /**
      * Constructor function.
      *
      * @internal
      *
-     * @param MTProto $API     API instance
-     * @param array   $message Message
-     * @param array   $button  Button info
+     * @psalm-mutation-free
      */
-    public function __construct(MTProto $API, array $message, array $button)
-    {
+    public function __construct(
+        MTProto $API,
+        protected readonly Message $message,
+        protected readonly array $button
+    ) {
         parent::__construct($API);
-        if (!isset($message['from_id']) // No other option
-            // It's a channel/chat, 100% what we need
-            || $message['peer_id'] < 0
-            // It is a user, and it's not ourselves
-            || $message['peer_id'] !== $API->authorization['user']['id']
-        ) {
-            $this->peer = $message['peer_id'];
-        } else {
-            $this->peer = $message['from_id'];
-        }
         $this->label = $button['text'];
-        $this->button = $button;
-        $this->id = $message['id'];
     }
     /**
      * Click on button.
@@ -82,18 +54,13 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
      */
     public function click(bool $donotwait = true)
     {
-        switch ($this->button['_']) {
-            default:
-                return false;
-            case 'keyboardButtonUrl':
-                return $this->button['url'];
-            case 'keyboardButton':
-                return $this->getClient()->clickInternal($donotwait, 'messages.sendMessage', ['peer' => $this->peer, 'message' => $this->button['text'], 'reply_to_msg_id' => $this->id]);
-            case 'keyboardButtonCallback':
-                return $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'data' => $this->button['data']]);
-            case 'keyboardButtonGame':
-                return $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->peer, 'msg_id' => $this->id, 'game' => true]);
-        }
+        return match ($this->button['_']) {
+            default => false,
+            'keyboardButtonUrl' => $this->button['url'],
+            'keyboardButton' => $this->message->reply($this->label),
+            'keyboardButtonCallback' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'data' => $this->button['data']]),
+            'keyboardButtonGame' => $this->getClient()->clickInternal($donotwait, 'messages.getBotCallbackAnswer', ['peer' => $this->message->chatId, 'msg_id' => $this->message->id, 'game' => true]),
+        };
     }
     /**
      * Serialize button.
@@ -102,50 +69,5 @@ final class Button extends IpcCapable implements JsonSerializable, ArrayAccess
     public function jsonSerialize(): array
     {
         return $this->button;
-    }
-    /**
-     * Set button info.
-     *
-     * @param mixed $name  Offset
-     * @param mixed $value Value
-     */
-    #[\Override]
-    public function offsetSet(mixed $name, mixed $value): void
-    {
-        if ($name === null) {
-            $this->button[] = $value;
-        } else {
-            $this->button[$name] = $value;
-        }
-    }
-    /**
-     * Get button info.
-     *
-     * @param mixed $name Field name
-     */
-    #[\Override]
-    public function offsetGet(mixed $name): mixed
-    {
-        return $this->button[$name];
-    }
-    /**
-     * Unset button info.
-     *
-     * @param mixed $name Offset
-     */
-    #[\Override]
-    public function offsetUnset(mixed $name): void
-    {
-        unset($this->button[$name]);
-    }
-    /**
-     * Check if button field exists.
-     *
-     * @param mixed $name Offset
-     */
-    #[\Override]
-    public function offsetExists(mixed $name): bool
-    {
-        return isset($this->button[$name]);
     }
 }

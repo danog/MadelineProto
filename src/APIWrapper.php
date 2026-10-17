@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
-use Amp\Cancellation;
-use Amp\TimeoutCancellation;
 use danog\MadelineProto\Ipc\Client;
 
 final class APIWrapper
@@ -31,11 +29,16 @@ final class APIWrapper
 
     /**
      * API wrapper.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(
         private SessionPaths $session,
     ) {
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setSession(SessionPaths $session): void
     {
         $this->session = $session;
@@ -45,11 +48,17 @@ final class APIWrapper
     {
         return $this->webApiTemplate;
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     public function setWebApiTemplate(string $template): void
     {
         $this->webApiTemplate = $template;
     }
 
+    /**
+     * @psalm-external-mutation-free
+     */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
         ($this->API->logger ?? Logger::$default)->logger($param, $level, $file);
@@ -62,6 +71,8 @@ final class APIWrapper
 
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -76,19 +87,12 @@ final class APIWrapper
         return $this->API;
     }
 
-    private ?int $drop = null;
-    /**
-     * @internal
-     */
-    public function getRpcDropCancellation(): Cancellation
-    {
-        return new TimeoutCancellation($this->drop ??= $this->getAPI()->getSettings()->getRpc()->getRpcDropTimeout());
-    }
-
     /**
      * Get IPC path.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function getIpcPath(): string
     {
@@ -98,19 +102,21 @@ final class APIWrapper
     /**
      * Serialize session.
      */
-    public function serialize(): bool
+    public function serialize(): void
     {
         if ($this->API === null) {
-            return false;
+            return;
         }
         if ($this->API instanceof Client) {
-            return false;
+            return;
         }
         $this->API->waitForInit();
         $API = $this->API;
 
-        if ($API->authorized === API::LOGGED_OUT) {
-            return false;
+        if ($API->getAuthorization() === API::LOGGED_OUT) {
+            $API->deleteSession();
+            $this->session->delete();
+            return;
         }
 
         $this->session->serialize(
@@ -123,7 +129,6 @@ final class APIWrapper
         if (!Magic::$suspendPeriodicLogging) {
             Logger::log('Saved session!');
         }
-        return true;
     }
 
     /**

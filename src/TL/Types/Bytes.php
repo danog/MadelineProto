@@ -37,12 +37,16 @@ final class Bytes implements JsonSerializable, ArrayAccess
      * Constructor function.
      *
      * @param string $bytes Contents
+     *
+     * @psalm-mutation-free
      */
     public function __construct(private readonly string $bytes)
     {
     }
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -57,6 +61,8 @@ final class Bytes implements JsonSerializable, ArrayAccess
     }
     /**
      * Obtain values for JSON-encoding.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function jsonSerialize(): array
@@ -68,6 +74,8 @@ final class Bytes implements JsonSerializable, ArrayAccess
      *
      * @param integer|null $offset Offset
      * @param string       $value  Char
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
@@ -77,8 +85,11 @@ final class Bytes implements JsonSerializable, ArrayAccess
     /**
      * Get char at offset.
      *
-     * @param  integer $offset Name
+     * @param integer $offset Name
+     *
      * @return string
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function offsetGet(mixed $offset): mixed
@@ -89,6 +100,8 @@ final class Bytes implements JsonSerializable, ArrayAccess
      * Unset char at offset.
      *
      * @param integer $offset Offset
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function offsetUnset(mixed $offset): void
@@ -99,6 +112,8 @@ final class Bytes implements JsonSerializable, ArrayAccess
      * Check if char at offset exists.
      *
      * @param integer $offset Offset
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function offsetExists(mixed $offset): bool

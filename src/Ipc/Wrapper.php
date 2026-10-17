@@ -19,10 +19,12 @@ namespace danog\MadelineProto\Ipc;
 use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
+use danog\MadelineProto\Ipc\Wrapper\CancellationReference;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
 use danog\MadelineProto\Ipc\Wrapper\Obj;
 use danog\MadelineProto\Ipc\Wrapper\ReadableStream;
@@ -57,6 +59,16 @@ final class Wrapper extends ClientAbstract
      * @var array<callable>
      */
     private array $callbacks = [];
+    /**
+     * Wrapped cancellations, stopped when the connection is closed.
+     *
+     * @var list<WrappedCancellation>
+     */
+    private array $cancellations = [];
+    /**
+     * Whether the callback connection was closed.
+     */
+    private bool $disconnected = false;
     /**
      * Callbacks IDs.
      *
@@ -95,6 +107,8 @@ final class Wrapper extends ClientAbstract
     }
     /**
      * Serialization function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {
@@ -110,7 +124,13 @@ final class Wrapper extends ClientAbstract
     {
         if (\is_object($callback) && $wrapObjects) {
             if ($callback instanceof Cancellation) {
+                if ($callback->isRequested()) {
+                    // The IPC server only learns about cancellations asynchronously: don't even start the call.
+                    $this->disconnect();
+                    $callback->throwIfRequested();
+                }
                 $callback = new WrappedCancellation($callback);
+                $this->cancellations[] = $callback;
             }
             if ($callback instanceof FileCallbackInterface) {
                 $file = $callback->getFile();
@@ -149,6 +169,8 @@ final class Wrapper extends ClientAbstract
     }
     /**
      * Get copy of data.
+     *
+     * @psalm-pure
      */
     private static function copy($data)
     {
@@ -166,6 +188,10 @@ final class Wrapper extends ClientAbstract
                 EventLoop::queue($this->clientRequest(...), $id++, $payload);
             }
         } finally {
+            $this->disconnected = true;
+            foreach ($this->cancellations as $cancellation) {
+                $cancellation->disconnect();
+            }
             EventLoop::queue($this->server->disconnect(...), "exiting receiverLoop");
         }
     }
@@ -179,10 +205,27 @@ final class Wrapper extends ClientAbstract
     private function clientRequest(int $id, array $payload): void
     {
         try {
-            $result = $this->callbacks[$payload[0]](...$payload[1]);
+            /** @var list<mixed> */
+            $args = $payload[1];
+            /** @var mixed $arg */
+            foreach ($args as &$arg) {
+                if ($arg instanceof CancellationReference) {
+                    $callback = $this->callbacks[$arg->id] ?? null;
+                    $arg = \is_array($callback) && $callback[0] instanceof WrappedCancellation
+                        ? $callback[0]->getCancellation()
+                        : null;
+                }
+            }
+            unset($arg);
+            $result = $this->callbacks[$payload[0]](...$args);
+        } catch (CancelledException $e) {
+            $result = new ExitFailure($e);
         } catch (Throwable $e) {
             $this->logger->logger("Got error while calling reverse IPC method: $e", Logger::ERROR);
             $result = new ExitFailure($e);
+        }
+        if ($this->disconnected) {
+            return;
         }
         try {
             $this->server->send([$id, $result]);
@@ -195,6 +238,29 @@ final class Wrapper extends ClientAbstract
             }
         }
     }
+    /**
+     * Call a callback of the client.
+     *
+     * @param string|int    $function  Callback ID
+     * @param array|Wrapper $arguments Arguments
+     */
+    #[\Override]
+    public function __call(string|int $function, array|Wrapper $arguments)
+    {
+        if (\is_array($arguments)) {
+            /** @var mixed $argument */
+            foreach ($arguments as &$argument) {
+                if ($argument instanceof WrapperCancellation) {
+                    // Proxies of the client's cancellations can't be serialized:
+                    // the client resolves the reference to the original cancellation.
+                    $argument = $argument->getReference();
+                }
+            }
+            unset($argument);
+        }
+        return parent::__call($function, $arguments);
+    }
+
     /**
      * Get remote socket ID.
      *

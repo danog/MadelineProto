@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler;
 use AssertionError;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\TL\Types\Button;
 
 /**
@@ -26,18 +27,27 @@ use danog\MadelineProto\TL\Types\Button;
  */
 abstract class Keyboard
 {
+    /** @var non-empty-list<non-empty-list<Button>> */
+    public readonly array $buttons;
+
     /** @internal */
-    protected function __construct(
-        /** @var non-empty-list<non-empty-list<Button>> */
-        public readonly array $buttons
-    ) {
+    protected function __construct(MTProto $API, Message $message, array $buttons)
+    {
+        foreach ($buttons as &$row) {
+            $row = $row['buttons'];
+            foreach ($row as &$button) {
+                $button = new Button($API, $message, $button);
+            } unset($button);
+        } unset($row);
+        $this->buttons = $buttons;
     }
 
-    public static function fromRawReplyMarkup(array $rawReplyMarkup): ?self
+    /** @internal */
+    public static function fromRawReplyMarkup(MTProto $API, Message $message, array $rawReplyMarkup): ?self
     {
         return match ($rawReplyMarkup['_']) {
-            'replyKeyboardMarkup' => new ReplyKeyboard(array_column($rawReplyMarkup['rows'], 'buttons')),
-            'replyInlineMarkup' => new InlineKeyboard(array_column($rawReplyMarkup['rows'], 'buttons')),
+            'replyKeyboardMarkup' => new ReplyKeyboard($API, $message, $rawReplyMarkup['rows']),
+            'replyInlineMarkup' => new InlineKeyboard($API, $message, $rawReplyMarkup['rows']),
             default => null
         };
     }

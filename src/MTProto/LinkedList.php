@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+use WeakMap;
+
 /**
  * @internal
  */
@@ -31,12 +33,26 @@ final class LinkedList
 
     public MTProtoOutgoingMessage|LinkedList $prev;
 
+    /**
+     * Check queue.
+     *
+     * @var WeakMap<MTProtoOutgoingMessage, true>
+     */
+    public WeakMap $check_queue;
+
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct()
     {
         $this->next = $this;
         $this->prev = $this;
+        $this->check_queue = new WeakMap();
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function isEmpty(): bool
     {
         return $this->next === $this;
@@ -49,6 +65,9 @@ final class LinkedList
         $this->next->prev = $message;
         $this->next = $message;
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function peek(): ?MTProtoOutgoingMessage
     {
         if ($this->prev === $this) {
@@ -57,6 +76,9 @@ final class LinkedList
         return $this->prev;
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __debugInfo(): array
     {
         if (!isset($this->next)) {

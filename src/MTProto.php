@@ -51,12 +51,15 @@ use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
+use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\MTProto\LoginState;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\MTProtoTools\AuthKeyHandler;
 use danog\MadelineProto\MTProtoTools\CallHandler;
 use danog\MadelineProto\MTProtoTools\CombinedUpdatesState;
@@ -67,7 +70,9 @@ use danog\MadelineProto\MTProtoTools\PeerDatabase;
 use danog\MadelineProto\MTProtoTools\PeerHandler;
 use danog\MadelineProto\MTProtoTools\ReferenceDatabase;
 use danog\MadelineProto\MTProtoTools\ResponseInfo;
+use danog\MadelineProto\MTProtoTools\ResumableCalls;
 use danog\MadelineProto\MTProtoTools\UpdateHandler;
+use danog\MadelineProto\Reactive\Publisher;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
@@ -125,6 +130,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     use BotAPIFiles;
     use TD;
     use \danog\MadelineProto\VoIP\AuthKeyHandler;
+    use \danog\MadelineProto\GroupCall\Handler;
     use Ads;
     use Button;
     use DialogHandler;
@@ -137,6 +143,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         LegacyMigrator::saveDbProperties as private internalSaveDbProperties;
     }
     use Broadcast;
+    use ResumableCalls;
     private const MAX_ENTITY_LENGTH = 100;
     private const MAX_ENTITY_SIZE = 8110;
     /** @internal */
@@ -147,7 +154,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @internal
      * @var array
      */
-    public const BAD_MSG_ERROR_CODES = [16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the correct msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)', 17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)', 18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)', 19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)', 20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not', 32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)', 33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)', 34 => 'an even msg_seqno expected (irrelevant message), but odd received', 35 => 'odd msg_seqno expected (relevant message), but even received', 48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)', 64 => 'invalid container'];
+    public const BAD_MSG_ERROR_CODES = [
+        16 => 'msg_id too low (most likely, client time is wrong; it would be worthwhile to synchronize it using msg_id notifications and re-send the original message with the correct msg_id or wrap it in a container with a new msg_id if the original message had waited too long on the client to be transmitted)',
+        17 => 'msg_id too high (similar to the previous case, the client time has to be synchronized, and the message re-sent with the correct msg_id)',
+        18 => 'incorrect two lower order msg_id bits (the server expects client message msg_id to be divisible by 4)',
+        19 => 'container msg_id is the same as msg_id of a previously received message (this must never happen)',
+        20 => 'message too old, and it cannot be verified whether the server has received a message with this msg_id or not',
+        32 => 'msg_seqno too low (the server has already received a message with a lower msg_id but with either a higher or an equal and odd seqno)',
+        33 => 'msg_seqno too high (similarly, there is a message with a higher msg_id but with either a lower or an equal and odd seqno)',
+        34 => 'an even msg_seqno expected (irrelevant message), but odd received',
+        35 => 'odd msg_seqno expected (relevant message), but even received',
+        48 => 'incorrect server salt (in this case, the bad_server_salt response is received with the correct salt, and the message is to be re-sent with it)',
+        64 => 'invalid container',
+    ];
     /**
      * Localized message info flags.
      *
@@ -208,30 +227,27 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Whether we're authorized.
      *
-     * @var API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT
+     * @var Publisher<LoginState>
      */
-    public int $authorized = API::NOT_LOGGED_IN;
-    /**
-     * Main authorized DC ID.
-     */
-    public ?int $authorized_dc = null;
+    public Publisher $loginState;
     /**
      * RSA keys.
      *
      * @var array<RSA>
      */
-    private array $rsa_keys = [];
+    private array $rsaKeys = [];
     /**
      * RSA keys.
      *
      * @var array<RSA>
      */
-    private array $test_rsa_keys = [];
+    private array $testRsaKeys = [];
     /**
      * CDN RSA keys.
      *
+     * @var array<RSA>
      */
-    private array $cdn_rsa_keys = [];
+    private array $cdnRsaKeys = [];
     /**
      * Diffie-hellman config.
      *
@@ -296,10 +312,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      */
     public PeerDatabase $peerDatabase;
-    /**
-     * Phone config loop.
-     */
-    public ?PeriodicLoopInternal $phoneConfigLoop = null;
     /**
      * Config loop.
      */
@@ -413,10 +425,72 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns an instance of a client by session name.
      *
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public static function giveInstanceBySession(string $session): MTProto
     {
-        return self::$references[$session];
+        if (isset(self::$references[$session])) {
+            return self::$references[$session];
+        }
+        // Created by a session that was moved (before the names it had were saved, see self::$sessionNames):
+        // it's the only one, if only one is running.
+        $instances = [];
+        foreach (self::$references as $instance) {
+            $instances[spl_object_id($instance)] = $instance;
+        }
+        if (\count($instances) === 1) {
+            return reset($instances);
+        }
+        throw new Exception("The session $session is not running!");
+    }
+
+    /**
+     * The names of the session, i.e. the paths it was loaded from: objects created by this instance (and
+     * saved in the session) refer to it by the name it had when they were created, see {@see self::giveInstanceBySession()}.
+     *
+     * @var list<string>
+     */
+    private array $sessionNames = [];
+
+    /**
+     * Make this instance available by its session name, and by the names the session had before it was moved.
+     */
+    private function reference(): void
+    {
+        $name = $this->getSessionName();
+        self::$references[$name] = $this;
+        if (!\in_array($name, $this->sessionNames, true)) {
+            $this->sessionNames[] = $name;
+        }
+        foreach ($this->sessionNames as $previous) {
+            // Unless another session was loaded from there.
+            self::$references[$previous] ??= $this;
+        }
+    }
+
+    /** @internal */
+    public function deleteSession(): void
+    {
+        $this->getDbAutoProperties();
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (!isset($this->sessionDb) || $this->sessionDb instanceof MemoryArray) {
+            return;
+        }
+
+        $db = [async($this->sessionDb->clear(...))];
+        if ($this->referenceDatabase) {
+            $db []= async($this->referenceDatabase->clear(...));
+        }
+        $db []= async($this->minDatabase->clear(...));
+        $db []= async($this->peerDatabase->clearAll(...));
+        foreach ($this->properties as $property) {
+            $db []= async($property->clear(...));
+        }
+        if (isset($this->event_handler_instance)) {
+            $db []= async($this->event_handler_instance->internalClearDbProperties(...));
+        }
+        await($db);
     }
 
     /**
@@ -453,17 +527,26 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
     /**
      * @internal
-     * @return array<RSA>
+     *
+     * @psalm-mutation-free
      */
-    public function getRsaKeys(bool $test, bool $cdn): array
+    public function findRsaKey(array $fps, bool $test, bool $cdn): ?RSA
     {
         if ($cdn) {
-            return $this->cdn_rsa_keys;
+            $list = $this->cdnRsaKeys;
+        } elseif ($test) {
+            $list = $this->testRsaKeys;
+        } else {
+            $list = $this->rsaKeys;
         }
-        if ($test) {
-            return $this->test_rsa_keys;
+
+        foreach ($list as $curkey) {
+            if (\in_array($curkey->fp, $fps, true)) {
+                return $curkey;
+            }
         }
-        return $this->rsa_keys;
+
+        return null;
     }
     /**
      * Serialize all instances.
@@ -482,9 +565,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (self::$references) {
             Logger::log('Prompting final serialization (SHUTDOWN)...');
             foreach (self::$references as $instance) {
-                if ($instance->authorized === API::LOGGED_OUT) {
-                    continue;
-                }
                 $instance->wrapper->serialize();
             }
             Logger::log('Done final serialization (SHUTDOWN)!');
@@ -492,6 +572,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     private ?Future $initPromise = null;
+    private ?Future $authFuture = null;
 
     /**
      * Constructor function.
@@ -503,11 +584,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         if ($wrapper) {
             $this->wrapper = $wrapper;
-            self::$references[$this->getSessionName()] = $this;
+            $this->reference();
         }
         $q = new SplQueue;
         $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
         $this->updateQueue ??= $q;
+        $this->loginState = new Publisher(new LoginState(API::NOT_LOGGED_IN, null));
 
         $initDeferred = new DeferredFuture;
         $this->initPromise = $initDeferred->getFuture();
@@ -542,6 +624,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
+     *
+     * @psalm-external-mutation-free
      */
     public function getPromGauge(string $namespace, string $name, string $help, array $labels = []): ?BetterGauge
     {
@@ -562,6 +646,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Returns null if prometheus stats are disabled.
      *
      * @param array<string, string> $labels
+     *
+     * @psalm-external-mutation-free
      */
     public function getPromCounter(string $namespace, string $name, string $help, array $labels = []): ?BetterCounter
     {
@@ -583,6 +669,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $quantiles
+     *
+     * @psalm-external-mutation-free
      */
     public function getPromSummary(string $namespace, string $name, string $help, array $labels = [], int $maxAgeSeconds = 600, ?array $quantiles = null): ?BetterSummary
     {
@@ -606,6 +694,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      * @param array<string, string> $labels
      * @param ?non-empty-list<float> $buckets
+     *
+     * @psalm-external-mutation-free
      */
     public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [], ?array $buckets = null): ?BetterHistogram
     {
@@ -635,15 +725,15 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
         // Load rsa keys
-        $this->rsa_keys = [];
+        $this->rsaKeys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
             $key = RSA::load($this->TL, $key);
-            $this->rsa_keys[$key->fp] = $key;
+            $this->rsaKeys[$key->fp] = $key;
         }
-        $this->test_rsa_keys = [];
+        $this->testRsaKeys = [];
         foreach ($this->settings->getConnection()->getTestRSAKeys() as $key) {
             $key = RSA::load($this->TL, $key);
-            $this->test_rsa_keys[$key->fp] = $key;
+            $this->testRsaKeys[$key->fp] = $key;
         }
         // (re)-initialize TL
         $callbacks = [$this, $this->peerDatabase];
@@ -657,7 +747,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->startLoops();
         $this->datacenter->currentDatacenter = $this->settings->getConnection()->getTestMode() ? 10002 : 2;
         $this->getConfig();
-        $this->startUpdateSystem(true);
         $this->v = API::RELEASE;
 
         $this->settings->applyChanges();
@@ -673,6 +762,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Returns the session name.
+     *
+     * @psalm-mutation-free
      */
     public function getSessionName(): string
     {
@@ -681,7 +772,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
     private ?string $tmpDbPrefix = null;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-external-mutation-free
+     */
     public function getDbPrefix(): string
     {
         $prefix = null;
@@ -705,9 +800,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Sleep function.
      *
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function __sleep(): array
     {
+        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         return [
             // Databases
             'referenceDatabase',
@@ -717,6 +815,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'sponsoredMessages',
 
             'tmpDbPrefix',
+            'sessionNames',
 
             // Misc caching
             'searchingRightPts',
@@ -754,12 +853,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Authorization state
             'authorization',
-            'authorized',
-            'authorized_dc',
+            'loginState',
 
             // Authorization cache
-            'rsa_keys',
-            'test_rsa_keys',
+            'rsaKeys',
+            'testRsaKeys',
+            'cdnRsaKeys',
             'dh_config',
 
             // Update state
@@ -780,8 +879,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             // Report URI
             'reportDest',
 
+            // Interrupted uploads, and the calls that made them
+            'resumableUploads',
+            'resumableCalls',
+
             'calls',
             'callsByPeer',
+            'groupCalls',
+            'conferenceCalls',
             'snitch',
 
             'seqUpdater',
@@ -796,6 +901,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @param mixed  $param Parameter
      * @param int    $level Logging level
      * @param string $file  File where the message originated
+     *
+     * @psalm-external-mutation-free
      */
     public function logger(mixed $param, int $level = Logger::NOTICE, string $file = ''): void
     {
@@ -806,6 +913,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get TL namespaces.
+     *
+     * @psalm-mutation-free
      */
     public function getMethodNamespaces(): array
     {
@@ -813,6 +922,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get namespaced methods (method => namespace).
+     *
+     * @psalm-mutation-free
      */
     public function getMethodsNamespaced(): array
     {
@@ -820,6 +931,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get TL serializer.
+     *
+     * @internal
      */
     public function getTL(): TLInterface
     {
@@ -835,6 +948,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get PSR logger.
+     *
+     * @psalm-mutation-free
      */
     public function getPsrLogger(): LoggerInterface
     {
@@ -842,6 +957,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Get async HTTP client.
+     *
+     * @psalm-mutation-free
      */
     public function getHTTPClient(): HttpClient
     {
@@ -850,6 +967,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
     /**
      * Get async DNS client.
+     *
+     * @psalm-mutation-free
      */
     public function getDNSClient(): DnsResolver
     {
@@ -868,6 +987,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Get main DC ID.
      *
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public function getDataCenterId(): int|string
     {
@@ -890,11 +1011,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private function startLoops(): void
     {
         $this->serializeLoop ??= new PeriodicLoopInternal($this, $this->serialize(...), 'serialize', $this->settings->getSerialization()->getInterval());
-        $this->phoneConfigLoop ??= new PeriodicLoopInternal($this, $this->getPhoneConfig(...), 'phone config', 3600);
         $this->configLoop ??= new PeriodicLoopInternal($this, $this->getConfig(...), 'config', 3600);
 
         $this->serializeLoop->start();
-        $this->phoneConfigLoop->start();
         $this->configLoop->start();
         try {
             $this->ipcServer->start();
@@ -913,10 +1032,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->serializeLoop) {
             $this->serializeLoop->stop();
             $this->serializeLoop = null;
-        }
-        if ($this->phoneConfigLoop) {
-            $this->phoneConfigLoop->stop();
-            $this->phoneConfigLoop = null;
         }
         if ($this->configLoop) {
             $this->configLoop->stop();
@@ -944,6 +1059,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
             }
         }
+        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
         $info?->set(1, [
             'php_version' => PHP_VERSION,
@@ -962,6 +1078,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             );
             $this->promServer->expose($endpoint);
             $this->promServer->start(new class($this) implements RequestHandler {
+                /**
+                 * @psalm-mutation-free
+                 */
                 public function __construct(
                     private readonly MTProto $API
                 ) {
@@ -1006,6 +1125,21 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $q->setIteratorMode(SplQueue::IT_MODE_DELETE);
             $this->updateQueue = $q;
         }
+        if (isset($this->datacenter)) {
+            $legacy = $this->datacenter->getLegacy();
+            if ($legacy) {
+                $currentDatacenter = $this->datacenter->currentDatacenter;
+                $this->datacenter = new DataCenter($this);
+                $this->datacenter->currentDatacenter = $currentDatacenter;
+                foreach ($legacy as $dc => $socket) {
+                    if ($dc > 0) {
+                        $this->datacenter->getDataCenterConnection($dc, $socket);
+                    }
+                }
+            }
+        } else {
+            $this->datacenter = new DataCenter($this);
+        }
 
         if (isset($this->channels_state)) {
             $this->updateState = new CombinedUpdatesState;
@@ -1031,10 +1165,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->acceptChatMutex ??= new LocalKeyedMutex;
         $this->confirmChatMutex ??= new LocalKeyedMutex;
         $this->updateState ??= new CombinedUpdatesState;
-        $this->datacenter ??= new DataCenter($this);
         $this->snitch ??= new Snitch;
-
-        $this->datacenter->__construct($this);
 
         $this->referenceDatabase ??= new ReferenceDatabase($this);
         $this->minDatabase ??= new MinDatabase($this);
@@ -1054,10 +1185,18 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->updateState->get(FeedLoop::GENERIC);
         foreach ($this->updateState->get() as $state) {
             $channelId = $state->channelId;
-            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
-            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
+            $feeder = $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
+            $updater = $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
+
+            $this->loginState->subscribe($feeder);
+            $this->loginState->subscribe($updater);
         }
         $this->seqUpdater ??= new SeqLoop($this);
+        $this->loginState->subscribe($this->seqUpdater);
+
+        foreach ($this->secretChats as $chat) {
+            $chat->wakeupFeedLoop();
+        }
     }
 
     /** @internal */
@@ -1079,14 +1218,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private function upgradeMadelineProto(): void
     {
         $this->logger->logger(Lang::$current_lang['serialization_ofd'], Logger::WARNING);
-        foreach ($this->datacenter->getDataCenterConnections() as $dc_id => $socket) {
-            if ($this->authorized === API::LOGGED_IN && \is_int($dc_id) && $socket->hasPermAuthKey() && $socket->hasTempAuthKey()) {
-                $socket->bind();
-                $socket->authorized(true);
-            }
-        }
         $this->settings->setSchema(new TLSchema);
 
+        $this->cleanupProperties();
         $this->resetMTProtoSession("upgrading madelineproto", true, true);
         $this->config = ['expires' => -1];
         $this->dh_config = ['version' => 0];
@@ -1123,7 +1257,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         // Set API wrapper
         $this->wrapper = $wrapper;
         // Set reference to itself
-        self::$references[$this->getSessionName()] = $this;
+        $this->reference();
 
         $deferred = new DeferredFuture;
         $this->initPromise = $deferred->getFuture();
@@ -1168,9 +1302,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if ($this->settings->getDb()->getEnableMinDb() && !($this->authorization['user']['bot'] ?? false)) {
                 $callbacks[] = $this->minDatabase;
             }
+
+            $this->loginState->wakeup();
+
             // Connect to all DCs, start internal loops
+            $loggedIn = false;
             if ($this->fullGetSelf()) {
-                $this->authorized = API::LOGGED_IN;
+                $loggedIn = true;
                 $this->setupLogger();
                 $this->startLoops();
                 $this->getCdnConfig();
@@ -1181,16 +1319,24 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             if ($this->event_handler && class_exists($this->event_handler) && is_subclass_of($this->event_handler, EventHandler::class)) {
                 $this->setEventHandler($this->event_handler);
             }
-            $this->startUpdateSystem(true);
-            $this->cacheFullDialogs();
-            if ($this->authorized === API::LOGGED_IN) {
-                $this->logger->logger("Obtaining updates after deserialization...", Logger::NOTICE);
-                $this->updaters[UpdateLoop::GENERIC]->resume();
+
+            if ($this->event_handler_instance instanceof EventHandler
+                && $f = $this->event_handler_instance->waitForInternalStart()
+            ) {
+                $this->handlePostponedUpdates($f);
             }
-            $this->updaters[UpdateLoop::GENERIC]->start();
+            $this->cacheFullDialogs();
 
             foreach ($this->broadcasts as $broadcast) {
                 $broadcast->resume();
+            }
+            if ($loggedIn) {
+                $this->resumeCalls();
+                // Resume the calls restored from the session only now that the MTProto session was reset
+                // and connected: resuming makes requests, and those sent before the reset are never answered.
+                foreach ([...$this->calls, ...$this->groupCalls, ...$this->conferenceCalls] as $call) {
+                    EventLoop::queue($call->resumeAfterRestart(...));
+                }
             }
 
             foreach ($this->calls as $id => $call) {
@@ -1198,6 +1344,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                     $this->cleanupCall($id);
                 } elseif ($call->getCallState() === CallState::REQUESTED && time() - $call->public->date > 5*60) {
                     EventLoop::queue($call->discard(...));
+                }
+            }
+
+            foreach ($this->groupCalls as $id => $groupCall) {
+                if ($groupCall->getCallState() === GroupCallState::LEFT) {
+                    $this->cleanupGroupCall($id);
                 }
             }
         } catch (Throwable $e) {
@@ -1221,17 +1373,27 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->logger = new Logger(new \danog\MadelineProto\Settings\Logger);
         }
         $this->logger->logger('Will unreference instance');
-        if (isset($this->wrapper) && isset(self::$references[$this->getSessionName()])) {
-            unset(self::$references[$this->getSessionName()]);
+        foreach (self::$references as $name => $instance) {
+            if ($instance === $this) {
+                unset(self::$references[$name]);
+            }
         }
         $this->stopLoops();
+        // Free the metrics port: when a new session is handed over to its IPC worker, the worker binds it.
+        if ($this->promServer) {
+            $promServer = $this->promServer;
+            $this->promServer = null;
+            try {
+                $promServer->stop();
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while stopping the metrics server: $e", Logger::ERROR);
+            }
+        }
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
         if (isset($this->updateState)) {
-            $channelIds = array_keys($this->updateState->get());
-            sort($channelIds);
-            foreach ($channelIds as $channelId) {
+            foreach ($this->updateState->get() as $channelId => $_) {
                 if (isset($this->feeders[$channelId])) {
                     $this->feeders[$channelId]->stop();
                 }
@@ -1246,9 +1408,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         }
         $this->logger->logger('Unreferenced instance');
-        if ($this->authorized === API::LOGGED_OUT) {
-            $this->wrapper->getSession()->delete();
-        }
     }
     /** @internal */
     public function isCdn(int $dc): bool
@@ -1268,6 +1427,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     * @param API::NOT_LOGGED_IN|API::WAITING_*|API::LOGGED_IN|API::LOGGED_OUT $state
+     */
+    public function setLoginState(int $state): void
+    {
+        $this->loginState->publish($this->loginState->getState()->setState($state));
+    }
+    /**
+     * @internal
      */
     public function isInited(): bool
     {
@@ -1282,6 +1449,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Whether we're an IPC client instance.
+     *
+     * @psalm-pure
      */
     public function isIpc(): bool
     {
@@ -1289,6 +1458,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Whether we're an IPC server process (as opposed to an event handler).
+     *
+     * @psalm-external-mutation-free
      */
     public function isIpcWorker(): bool
     {
@@ -1341,6 +1512,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         // Setup logger
         if ($this->settings->getLogger()->hasChanged() || !isset($this->logger)) {
             $this->setupLogger();
+        }
+
+        if ($this->settings->getSchema()->getFuzzMode()) {
+            RPCErrorException::$errorMethodMap = [];
+            RPCErrorException::$descriptions = [];
         }
 
         if ($this->settings->getDb()->hasChanged()) {
@@ -1411,7 +1587,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $socket->resetSession("resetMTProtoSession: $why");
             }
             if ($auth_key) {
-                $socket->setTempAuthKey(null);
+                $socket->auth->setTempAuthKey(null, null);
             }
         }
     }
@@ -1442,65 +1618,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         }
         $this->updateState = $new;
-        $this->startUpdateSystem();
-    }
-    /**
-     * Start the update system.
-     *
-     * @param boolean $anyway Force start update system?
-     * @internal
-     */
-    public function startUpdateSystem(bool $anyway = false): void
-    {
-        if (!$this->isInited() && !$anyway) {
-            $this->logger('Not starting update system');
-            return;
-        }
-        $this->logger('Starting update system');
-        $this->updateState->get(FeedLoop::GENERIC);
-        $channelIds = array_keys($this->updateState->get());
-        foreach ($channelIds as $channelId) {
-            $this->feeders[$channelId] ??= new FeedLoop($this, $channelId);
-            $this->updaters[$channelId] ??= new UpdateLoop($this, $channelId);
-            $this->feeders[$channelId]->start();
-            if (isset($this->feeders[$channelId])) {
-                $this->feeders[$channelId]->resume();
-            }
-            $this->updaters[$channelId]->start();
-            if (isset($this->updaters[$channelId])) {
-                $this->updaters[$channelId]->resume();
-            }
-        }
-        $this->seqUpdater->start();
-        $this->seqUpdater->resume();
-        foreach ($this->secretChats as $chat) {
-            $chat->startFeedLoop();
-        }
 
-        if ($this->event_handler_instance instanceof EventHandler
-            && $f = $this->event_handler_instance->waitForInternalStart()
-        ) {
-            $f->map(function (): void {
-                foreach ($this->updateQueue as $update) {
-                    $this->handleUpdate($update);
-                }
-            });
-        }
-    }
-    /**
-     * Store shared phone config.
-     *
-     * @param mixed $watcherId Watcher ID
-     * @internal
-     */
-    public function getPhoneConfig(mixed $watcherId = null): void
-    {
-        if ($this->authorized === API::LOGGED_IN
-            && class_exists(VoIPServerConfigInternal::class)
-            && !$this->authorization['user']['bot']
-            && $this->datacenter->getDataCenterConnection($this->authorized_dc)->hasTempAuthKey()) {
-            $this->logger->logger('Fetching phone config...');
-            VoIPServerConfig::updateDefault($this->methodCallAsyncRead('phone.getCallConfig', []));
+        foreach ($channelIds as $channelId) {
+            if (isset($this->feeders[$channelId])) {
+                $this->feeders[$channelId]->start();
+            }
+            if (isset($this->updaters[$channelId])) {
+                $this->updaters[$channelId]->start();
+            }
         }
     }
     /**
@@ -1509,9 +1634,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function getCdnConfig(): void
     {
         try {
-            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], $this->authorized_dc))['public_keys'] as $curkey) {
+            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], $this->loginState->getState()->authorizedDc))['public_keys'] as $curkey) {
                 $curkey = RSA::load($this->TL, $curkey['public_key']);
-                $this->cdn_rsa_keys[$curkey->fp] = $curkey;
+                $this->cdnRsaKeys[$curkey->fp] = $curkey;
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
@@ -1541,6 +1666,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Parse cached config.
+     *
+     * @psalm-external-mutation-free
      */
     private function parseConfig(): void
     {
@@ -1554,6 +1681,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Whether we're currently connected to the test DCs.
      *
      * @return boolean
+     *
+     * @psalm-mutation-free
      */
     public function isTestMode(): bool
     {
@@ -1563,6 +1692,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Parse DC options from config.
      *
      * @param array $dc_options DC options
+     *
+     * @psalm-external-mutation-free
      */
     private function parseDcOptions(array $dc_options): void
     {
@@ -1590,6 +1721,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Get info about the logged-in user, cached.
      *
      * Use fullGetSelf to bypass the cache.
+     *
+     * @psalm-mutation-free
      */
     public function getSelf(): array|false
     {
@@ -1597,13 +1730,20 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Returns whether the current user is a bot.
+     *
+     * @psalm-mutation-free
      */
     public function isSelfBot(): bool
     {
+        if ($this->loginState->getState()->state !== API::LOGGED_IN) {
+            throw new Exception('Not logged in!');
+        }
         return $this->authorization['user']['bot'];
     }
     /**
      * Returns whether the current user is a user.
+     *
+     * @psalm-mutation-free
      */
     public function isSelfUser(): bool
     {
@@ -1611,6 +1751,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Returns whether the current user is a premium user, cached.
+     *
+     * @psalm-mutation-free
      */
     public function isPremium(): bool
     {
@@ -1622,7 +1764,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function fullGetSelf(): array|false
     {
         try {
-            $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']]]))[0]];
+            $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']], 'specialMethodType' => SpecialMethodType::USER_RELATED]))[0]];
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;
@@ -1633,17 +1775,21 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Get authorization info.
      *
      * @return \danog\MadelineProto\API::NOT_LOGGED_IN|\danog\MadelineProto\API::WAITING_CODE|\danog\MadelineProto\API::WAITING_SIGNUP|\danog\MadelineProto\API::WAITING_PASSWORD|\danog\MadelineProto\API::LOGGED_IN|API::LOGGED_OUT
+     *
+     * @psalm-mutation-free
      */
     public function getAuthorization(): int
     {
-        return $this->authorized;
+        return $this->loginState->getState()->state;
     }
     /**
      * Get current password hint.
+     *
+     * @psalm-mutation-free
      */
     public function getHint(): string
     {
-        if ($this->authorized !== API::WAITING_PASSWORD) {
+        if ($this->loginState->getState()->state !== API::WAITING_PASSWORD) {
             throw new Exception('Not waiting for the password!');
         }
         Assert::string($this->authorization['hint']);
@@ -1663,6 +1809,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private array $admins = [];
     /**
      * Check if has report peers.
+     *
+     * @psalm-mutation-free
      */
     public function hasReportPeers(): bool
     {
@@ -1670,6 +1818,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * Check if has admins.
+     *
+     * @psalm-mutation-free
      */
     public function hasAdmins(): bool
     {
@@ -1877,10 +2027,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
 
         $this->reportCache ??= new LocalCache();
-        if ($this->reportCache->get($message)) {
+        $key = hash('xxh128', $message);
+        if ($this->reportCache->get($key)) {
             return;
         }
-        $this->reportCache->set($message, true, 60);
+        $this->reportCache->set($key, true, 60);
 
         $this->reportMutex ??= new LocalMutex;
         $lock = $this->reportMutex->acquire();
@@ -1987,6 +2138,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
@@ -1995,6 +2148,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
@@ -2003,6 +2158,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function populateSupportUser(array $support): void
     {
@@ -2010,13 +2167,27 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-external-mutation-free
      */
     public function populateConfig(array $config): void
     {
         $this->config = $config;
     }
+    /** @internal */
+    public function handleAuthorization(array $authorization, Connection $connection): void
+    {
+        $this->authFuture = $f = async($this->processAuthorization(...), $authorization, $connection->getDatacenter());
+        $f->finally(function () use ($f): void {
+            if ($f === $this->authFuture) {
+                $this->authFuture = null;
+            }
+        });
+    }
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
@@ -2024,10 +2195,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return [
             'help.support' => [$this->populateSupportUser(...)],
             'config' => [$this->populateConfig(...)],
+            'auth.authorization' => [$this->handleAuthorization(...)],
         ];
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
@@ -2036,6 +2210,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
@@ -2044,6 +2220,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getTypeMismatchCallbacks(): array
@@ -2078,12 +2256,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return ['_' => 'inputDialogPeer', 'peer' => $this->getInputPeer($id)];
     }
     /** @internal */
+    public function getPassword(): array
+    {
+        return $this->methodCallAsyncRead('account.getPassword', ['specialMethodType' => SpecialMethodType::USER_RELATED]);
+    }
+    /** @internal */
     public function getPasswordSRP(string $password): array
     {
-        return (new PasswordCalculator($this->methodCallAsyncRead('account.getPassword', [], $this->authorized_dc)))->getCheckPassword($password);
+        return (new PasswordCalculator($this->getPassword()))->getCheckPassword($password);
     }
     /**
      * Get debug information for var_dump.
+     *
+     * @psalm-mutation-free
      */
     public function __debugInfo(): array
     {

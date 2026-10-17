@@ -119,12 +119,17 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getSocket(): Socket
     {
         throw new AssertionError("Unreachable!");
     }
+    /**
+     * @psalm-external-mutation-free
+     */
     #[\Override]
     public function setExtra($extra): void
     {
@@ -132,6 +137,9 @@ class WsStream implements RawStreamInterface, ProxyStreamInterface
             $this->connector = $extra;
         }
     }
+    /**
+     * @psalm-pure
+     */
     public static function getName(): string
     {
         return self::class;

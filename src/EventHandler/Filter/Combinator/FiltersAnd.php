@@ -31,6 +31,9 @@ final class FiltersAnd extends Filter
 {
     /** @var array<Filter> */
     private readonly array $filters;
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(Filter ...$filters)
     {
         Assert::notEmpty($filters);

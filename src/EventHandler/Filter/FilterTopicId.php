@@ -28,11 +28,17 @@ use Webmozart\Assert\Assert;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterTopicId extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         private readonly int $topicId
     ) {
         Assert::greaterThan($topicId, 0);
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

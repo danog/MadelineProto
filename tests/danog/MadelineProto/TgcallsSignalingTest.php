@@ -1,0 +1,566 @@
+<?php declare(strict_types=1);
+
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2025 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
+
+namespace danog\MadelineProto\Test;
+
+use danog\MadelineProto\Tgcalls\EncryptedConnection;
+use danog\MadelineProto\Tgcalls\GroupSdp;
+use danog\MadelineProto\Tgcalls\SctpSignalingObserver;
+use danog\MadelineProto\Tgcalls\SignalingSctpTransport;
+use danog\MadelineProto\Tgcalls\SignalingServiceObserver;
+use danog\MadelineProto\Tgcalls\V2Sdp;
+use danog\MadelineProto\VoIP\SignalingProtocolVersion;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Tests the tgcalls signaling layer: version negotiation, packet encryption and the translation
+ * between tgcalls' structured media descriptions and SDP.
+ *
+ * @internal
+ */
+use function Amp\delay;
+
+final class TgcallsSignalingTest extends TestCase
+{
+    /**
+     * A representative offer, of the shape the local peer connection produces.
+     */
+    private const OFFER = "v=0\r\n"
+        ."o=- 1 1 IN IP4 0.0.0.0\r\n"
+        ."s=-\r\n"
+        ."t=0 0\r\n"
+        ."a=group:BUNDLE 0 1\r\n"
+        ."m=audio 9 UDP/TLS/RTP/SAVPF 111\r\n"
+        ."c=IN IP4 0.0.0.0\r\n"
+        ."a=sendrecv\r\n"
+        ."a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n"
+        ."a=mid:0\r\n"
+        ."a=rtcp-mux\r\n"
+        ."a=ssrc:12345 cname:test\r\n"
+        ."a=rtpmap:111 opus/48000/2\r\n"
+        ."a=fmtp:111 minptime=10;useinbandfec=1\r\n"
+        ."a=rtcp-fb:111 transport-cc\r\n"
+        ."a=ice-ufrag:LOCALUF\r\n"
+        ."a=ice-pwd:LOCALPWD0000000000000000\r\n"
+        ."a=fingerprint:sha-256 AA:BB:CC\r\n"
+        ."a=setup:actpass\r\n"
+        ."m=video 9 UDP/TLS/RTP/SAVPF 96\r\n"
+        ."c=IN IP4 0.0.0.0\r\n"
+        ."a=sendrecv\r\n"
+        ."a=mid:1\r\n"
+        ."a=rtcp-mux\r\n"
+        ."a=ssrc:67890 cname:test\r\n"
+        ."a=rtpmap:96 VP8/90000\r\n"
+        ."a=ice-ufrag:LOCALUF\r\n"
+        ."a=ice-pwd:LOCALPWD0000000000000000\r\n"
+        ."a=fingerprint:sha-256 AA:BB:CC\r\n"
+        ."a=setup:actpass\r\n";
+
+    // ------------------------------------------------------------ version negotiation
+
+    /**
+     * @return list<array{list<string>, ?string, bool}>
+     */
+    public static function provideVersions(): array
+    {
+        return [
+            'telegram web only' => [['13.0.0'], '13.0.0', false],
+            'reference impl' => [['11.0.0', '10.0.0'], '11.0.0', false],
+            'sdp only' => [['10.0.0'], '10.0.0', false],
+            'v2 impl' => [['9.0.0', '7.0.0'], '9.0.0', false],
+            'libtgvoip only' => [['2.4.4', '2.7.7'], '2.7.7', true],
+            // The newest version wins whenever the peer offers a choice.
+            'everything' => [['2.4.4', '2.7.7', '7.0.0', '10.0.0', '13.0.0'], '13.0.0', false],
+            'nothing advertised' => [[], '2.4.4', true],
+            'nothing in common' => [['99.0.0'], null, false],
+        ];
+    }
+
+    /**
+     * @param list<string> $advertised
+     *
+     * @dataProvider provideVersions
+     */
+    public function testVersionNegotiation(array $advertised, ?string $expected, bool $legacy): void
+    {
+        $version = SignalingProtocolVersion::fromProtocol(['library_versions' => $advertised]);
+
+        $this->assertSame($expected, $version?->value);
+        if ($version !== null) {
+            $this->assertSame($legacy, $version->isLegacy());
+        }
+    }
+
+    /**
+     * Every version we advertise must actually be implemented, or peers will pick one we cannot
+     * speak and the call will connect but carry no media.
+     */
+    public function testAdvertisedVersionsAreAllImplemented(): void
+    {
+        $this->assertNotEmpty(SignalingProtocolVersion::supported());
+        foreach (SignalingProtocolVersion::supported() as $version) {
+            $this->assertTrue(
+                SignalingProtocolVersion::from($version)->isImplemented(),
+                "$version is advertised but not implemented"
+            );
+        }
+    }
+
+    /**
+     * The three protocol axes must match what each tgcalls implementation actually does.
+     */
+    public function testVersionTraits(): void
+    {
+        $sdp = SignalingProtocolVersion::V10;
+        $this->assertTrue($sdp->usesSdp());
+        $this->assertTrue($sdp->usesReliableFraming());
+        $this->assertFalse($sdp->supportsCompression());
+        $this->assertFalse($sdp->isLegacy());
+
+        $negotiate = SignalingProtocolVersion::V7;
+        $this->assertFalse($negotiate->usesSdp());
+        $this->assertFalse($negotiate->usesReliableFraming());
+
+        $web = SignalingProtocolVersion::V13;
+        $this->assertTrue($web->supportsCompression());
+        $this->assertTrue($web->usesSctp());
+    }
+
+    // ------------------------------------------------------------ signaling crypto
+
+    /**
+     * @return array{EncryptedConnection, EncryptedConnection}
+     */
+    private static function pair(): array
+    {
+        $key = random_bytes(256);
+        $noop = new class implements SignalingServiceObserver {
+            public function onServiceRequest(int $cause): void
+            {
+            }
+        };
+        return [
+            new EncryptedConnection($key, true, $noop),
+            new EncryptedConnection($key, false, $noop),
+        ];
+    }
+
+    public function testFramedSignalingRoundTrip(): void
+    {
+        [$caller, $callee] = self::pair();
+
+        $message = json_encode(['@type' => 'offer', 'sdp' => str_repeat('v=0', 50)]);
+        $packet = $caller->prepareForSendingRawMessage((string) $message, true);
+
+        $this->assertNotNull($packet);
+        $this->assertSame([$message], $callee->handleIncomingRawPacket($packet));
+        $this->assertSame([], $callee->handleIncomingRawPacket($packet), 'replays must be dropped');
+    }
+
+    /**
+     * The bare packet mode used by the newer protocol versions.
+     */
+    public function testRawSignalingRoundTrip(): void
+    {
+        [$caller, $callee] = self::pair();
+
+        $message = json_encode(['@type' => 'InitialSetup', 'ufrag' => 'abcd']);
+        $packet = $caller->encryptRawPacket((string) $message);
+
+        $this->assertStringNotContainsString('InitialSetup', $packet, 'the payload must be encrypted');
+        $this->assertSame($message, $callee->decryptRawPacket($packet));
+        $this->assertNull($callee->decryptRawPacket($packet), 'replays must be dropped');
+
+        $forged = $packet;
+        $forged[30] = \chr(\ord($forged[30]) ^ 0xFF);
+        $this->assertNull($callee->decryptRawPacket($forged), 'forgeries must be dropped');
+    }
+
+    /**
+     * The two directions use different keys, so a peer must not decrypt its own packets.
+     */
+    public function testDirectionsAreSeparate(): void
+    {
+        [$caller] = self::pair();
+
+        $packet = $caller->encryptRawPacket('hello');
+        $this->assertNull($caller->decryptRawPacket($packet));
+    }
+
+    // ------------------------------------------------------------ NegotiateChannels
+
+    public function testContentsFromOffer(): void
+    {
+        $contents = V2Sdp::contentsFromOffer(self::OFFER);
+
+        $this->assertCount(2, $contents);
+        $this->assertSame('audio', $contents[0]['type']);
+        $this->assertSame('12345', $contents[0]['ssrc']);
+        $this->assertSame('video', $contents[1]['type']);
+        $this->assertSame('67890', $contents[1]['ssrc']);
+
+        $opus = $contents[0]['payloadTypes'][0];
+        $this->assertSame(111, $opus['id']);
+        $this->assertSame('opus', $opus['name']);
+        $this->assertSame(48000, $opus['clockrate']);
+        $this->assertSame(2, $opus['channels']);
+        $this->assertSame(['minptime' => '10', 'useinbandfec' => '1'], $opus['parameters']);
+        // We don't send transport-cc feedback: the peer must not expect it.
+        $this->assertSame([], $opus['feedbackTypes']);
+
+        $this->assertSame(
+            [['id' => 1, 'uri' => 'urn:ietf:params:rtp-hdrext:ssrc-audio-level']],
+            $contents[0]['rtpExtensions']
+        );
+    }
+
+    public function testContentsFromOfferDoNotOfferTransportCc(): void
+    {
+        $offer = str_replace(
+            "a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n",
+            "a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=extmap:4 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\n",
+            self::OFFER,
+        );
+        $this->assertNotSame(self::OFFER, $offer);
+
+        $contents = V2Sdp::contentsFromOffer($offer);
+
+        $this->assertSame(
+            [['id' => 1, 'uri' => 'urn:ietf:params:rtp-hdrext:ssrc-audio-level']],
+            $contents[0]['rtpExtensions']
+        );
+    }
+
+    public function testContentsFromOfferCanSelectOutgoingChannels(): void
+    {
+        $offer = str_replace(
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=sendrecv",
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=recvonly",
+            self::OFFER,
+        );
+
+        $contents = V2Sdp::contentsFromOffer($offer, outgoingOnly: true);
+
+        $this->assertCount(1, $contents);
+        $this->assertSame('audio', $contents[0]['type']);
+    }
+
+    public function testInitialSetupFromDescription(): void
+    {
+        $setup = V2Sdp::initialSetupFromDescription(self::OFFER, 'active');
+
+        $this->assertSame('LOCALUF', $setup['ufrag']);
+        $this->assertSame('LOCALPWD0000000000000000', $setup['pwd']);
+        $this->assertSame(
+            [['hash' => 'sha-256', 'fingerprint' => 'AA:BB:CC', 'setup' => 'active']],
+            $setup['fingerprints']
+        );
+    }
+
+    private const PEER_SETUP = [
+        'ufrag' => 'PEERUF',
+        'pwd' => 'PEERPWD00000000000000000',
+        'fingerprints' => [['hash' => 'sha-256', 'fingerprint' => 'DD:EE:FF', 'setup' => 'actpass']],
+    ];
+
+    /** An offer with a third, receive-only m-line carrying one of the peer's channels (mid = its SSRC). */
+    private static function offerWithPeerChannel(): string
+    {
+        return self::OFFER
+            ."m=video 9 UDP/TLS/RTP/SAVPF 96\r\n"
+            ."c=IN IP4 0.0.0.0\r\n"
+            ."a=recvonly\r\n"
+            ."a=mid:55555\r\n"
+            ."a=rtcp-mux\r\n"
+            ."a=ssrc:24680 cname:test\r\n"
+            ."a=rtpmap:96 VP8/90000\r\n"
+            ."a=ice-ufrag:LOCALUF\r\n"
+            ."a=ice-pwd:LOCALPWD0000000000000000\r\n"
+            ."a=fingerprint:sha-256 AA:BB:CC\r\n"
+            ."a=setup:actpass\r\n";
+    }
+
+    /** The peer's own video channel, with its own payload type numbering and an RTX group. */
+    private static function peerVideoContent(): array
+    {
+        return [
+            'type' => 'video',
+            'ssrc' => '55555',
+            'ssrcGroups' => [['semantics' => 'FID', 'ssrcs' => ['55555', '55556']]],
+            'payloadTypes' => [
+                ['id' => 100, 'name' => 'VP8', 'clockrate' => 90000, 'channels' => 0, 'feedbackTypes' => [], 'parameters' => []],
+                ['id' => 101, 'name' => 'rtx', 'clockrate' => 90000, 'channels' => 0, 'feedbackTypes' => [], 'parameters' => ['apt' => '100']],
+            ],
+            'rtpExtensions' => [],
+        ];
+    }
+
+    /**
+     * The description synthesized from the peer's answer must carry its transport parameters and
+     * one m-line per section of our offer, aligned with it: the peer only *receives* on the channels
+     * we send (with the payload types it accepted), and it sends on the channel of its own.
+     */
+    public function testBuildRemoteDescription(): void
+    {
+        $answer = [];
+        foreach (V2Sdp::contentsFromOffer(self::OFFER) as $content) {
+            $answer[$content['ssrc']] = $content;
+        }
+
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, $answer, ['55555' => self::peerVideoContent()], true);
+
+        $this->assertStringContainsString('a=ice-ufrag:PEERUF', $sdp);
+        $this->assertStringContainsString('a=ice-pwd:PEERPWD00000000000000000', $sdp);
+        $this->assertStringContainsString('a=fingerprint:sha-256 DD:EE:FF', $sdp);
+        // An answer must commit to a concrete DTLS role.
+        $this->assertStringContainsString('a=setup:active', $sdp);
+        $this->assertStringNotContainsString('a=setup:actpass', $sdp);
+        // The m-line count must match the offer, or the mids stop lining up.
+        $this->assertSame(3, substr_count($sdp, "\r\nm="));
+        [$audio, $video, $peer] = self::sections($sdp);
+
+        $this->assertStringContainsString('a=mid:0', $audio);
+        $this->assertStringContainsString('a=recvonly', $audio);
+        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
+        $this->assertStringContainsString('a=fmtp:111 minptime=10;useinbandfec=1', $audio);
+        // Not negotiated: we don't send transport-cc feedback.
+        $this->assertStringNotContainsString('transport-cc', $audio);
+        // The peer's answer echoes our SSRC, but that is not an SSRC the peer *sends* with.
+        $this->assertStringNotContainsString('a=ssrc:', $audio);
+
+        $this->assertStringContainsString('a=mid:1', $video);
+        $this->assertStringContainsString('a=recvonly', $video);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
+
+        // The peer's channel keeps its own payload types and SSRCs (with the RTX group bound).
+        $this->assertStringContainsString('a=mid:55555', $peer);
+        $this->assertStringContainsString('a=sendonly', $peer);
+        $this->assertStringContainsString('a=rtpmap:100 VP8/90000', $peer);
+        $this->assertStringContainsString('a=fmtp:101 apt=100', $peer);
+        $this->assertStringContainsString('a=ssrc-group:FID 55555 55556', $peer);
+        $this->assertStringContainsString('a=ssrc:55555 cname:tgcalls55555', $peer);
+        $this->assertStringContainsString('a=ssrc:55556 cname:tgcalls55555', $peer);
+        $this->assertStringNotContainsString('a=ssrc:24680', $peer);
+    }
+
+    public function testBuildRemoteDescriptionRejectsIncompleteSetup(): void
+    {
+        $this->expectExceptionMessage('ICE credentials');
+        V2Sdp::buildRemoteDescription(self::OFFER, ['ufrag' => '', 'pwd' => ''], [], [], true);
+    }
+
+    /**
+     * An inactive section of our offer (a stopped screencast, a withdrawn peer channel) is rejected
+     * by the peer's answer: retained to preserve its index, without codecs or a transport.
+     */
+    public function testBuildRemoteDescriptionRejectsInactiveMedia(): void
+    {
+        $offer = str_replace("a=mid:1\r\n", "a=mid:1\r\n", str_replace(
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=sendrecv",
+            "m=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 0.0.0.0\r\na=inactive",
+            self::OFFER,
+        ));
+        $answer = ['12345' => V2Sdp::contentsFromOffer($offer)[0]];
+
+        $sdp = V2Sdp::buildRemoteDescription($offer, self::PEER_SETUP, $answer, [], true);
+        [, $video] = self::sections($sdp);
+
+        $this->assertStringStartsWith('m=video 0 UDP/TLS/RTP/SAVPF 96', $video);
+        $this->assertStringContainsString('a=inactive', $video);
+        $this->assertStringNotContainsString('a=rtcp-mux', $video);
+        $this->assertStringNotContainsString('a=ice-ufrag:', $video);
+        $this->assertStringNotContainsString('a=fingerprint:', $video);
+        $this->assertStringNotContainsString('a=rtpmap:', $video);
+    }
+
+    /**
+     * A channel we send that the peer's message does not mention stays ours: the peer's *offer*
+     * only lists the peer's channels, and must never switch off what we transmit (nor swap our
+     * payload type numbers for the peer's).
+     */
+    public function testBuildRemoteOfferKeepsOurChannelsActive(): void
+    {
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, [], ['55555' => self::peerVideoContent()], false);
+        [$audio, $video, $peer] = self::sections($sdp);
+
+        $this->assertStringContainsString('a=setup:actpass', $sdp);
+        foreach ([$audio, $video] as $ours) {
+            $this->assertStringStartsWith('m=', $ours);
+            $this->assertStringContainsString(' 9 UDP/TLS/RTP/SAVPF', $ours);
+            $this->assertStringContainsString('a=recvonly', $ours);
+            $this->assertStringContainsString('a=ice-ufrag:PEERUF', $ours);
+        }
+        $this->assertStringContainsString('a=rtpmap:111 opus/48000/2', $audio);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $video);
+        $this->assertStringContainsString('a=sendonly', $peer);
+        $this->assertStringContainsString('a=rtpmap:100 VP8/90000', $peer);
+    }
+
+    /**
+     * A section that carries neither a channel of ours nor one of the peer's is kept inactive but
+     * reusable in an offer, matching tgcalls' persistent channel ordering.
+     */
+    public function testBuildRemoteOfferKeepsUnusedMediaReusable(): void
+    {
+        $sdp = V2Sdp::buildRemoteDescription(self::offerWithPeerChannel(), self::PEER_SETUP, [], [], false);
+        [, , $peer] = self::sections($sdp);
+
+        $this->assertStringStartsWith('m=video 9 UDP/TLS/RTP/SAVPF 96', $peer);
+        $this->assertStringContainsString('a=inactive', $peer);
+        $this->assertStringContainsString('a=rtpmap:96 VP8/90000', $peer);
+        $this->assertStringContainsString('a=ice-ufrag:PEERUF', $peer);
+    }
+
+    public function testUseSsrcAsMidHonoursExplicitMids(): void
+    {
+        $sdp = V2Sdp::useSsrcAsMid(self::offerWithPeerChannel(), [2 => '77777']);
+
+        // The test offer's BUNDLE group only lists the first two sections.
+        $this->assertStringContainsString('a=group:BUNDLE 12345 67890', $sdp);
+        $this->assertStringContainsString('a=mid:12345', $sdp);
+        $this->assertStringContainsString('a=mid:67890', $sdp);
+        $this->assertStringContainsString('a=mid:77777', $sdp);
+        $this->assertStringNotContainsString('a=mid:55555', $sdp);
+        $this->assertSame([null, '12345', '67890', '77777'], [null, ...V2Sdp::mids($sdp)]);
+    }
+
+    /**
+     * @return list<string> The media sections of an SDP, in order.
+     */
+    private static function sections(string $sdp): array
+    {
+        $parts = preg_split('/(?=m=)/', $sdp) ?: [];
+        array_shift($parts);
+        return $parts;
+    }
+
+    // ------------------------------------------------------------ SCTP-framed signaling
+
+    /**
+     * Wire two associations back to back and pump packets between them.
+     *
+     */
+    private static function pump(
+        SignalingSctpTransport $a,
+        SignalingSctpTransport $b,
+        array &$aOut,
+        array &$bOut
+    ): void {
+        for ($i = 0; $i < 60; $i++) {
+            // The SCTP transport queues its sends onto the event loop rather than emitting
+            // them inline, so the loop needs a turn before anything shows up in the buffers.
+            delay(0);
+
+            $moved = false;
+            while ($aOut !== []) {
+                $b->receive((string) array_shift($aOut));
+                $moved = true;
+            }
+            while ($bOut !== []) {
+                $a->receive((string) array_shift($bOut));
+                $moved = true;
+            }
+            if (!$moved) {
+                return;
+            }
+        }
+    }
+
+    public function testSctpSignalingCarriesMessagesBothWays(): void
+    {
+        $a = self::sctpObserver();
+        $b = self::sctpObserver();
+
+        $caller = new SignalingSctpTransport(true, $a);
+        $callee = new SignalingSctpTransport(false, $b);
+
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertTrue($caller->isEstablished(), 'the caller established the association');
+        $this->assertTrue($callee->isEstablished(), 'the callee established the association');
+
+        $caller->send('MESSAGE-FROM-CALLER');
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertSame(['MESSAGE-FROM-CALLER'], $b->got);
+
+        $callee->send('MESSAGE-FROM-CALLEE');
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertSame(['MESSAGE-FROM-CALLEE'], $a->got);
+
+        // A message larger than one SCTP packet must be fragmented and reassembled.
+        $large = str_repeat('X', 5000);
+        $caller->send($large);
+        self::pump($caller, $callee, $a->out, $b->out);
+        $this->assertContains($large, $b->got, 'a fragmented message must arrive intact');
+    }
+
+    /**
+     * A capturing {@see SctpSignalingObserver} stub: outgoing packets land in `out`, reassembled
+     * incoming messages in `got`.
+     */
+    private static function sctpObserver(): SctpSignalingObserver
+    {
+        return new class implements SctpSignalingObserver {
+            /** @var list<string> */
+            public array $out = [];
+            /** @var list<string> */
+            public array $got = [];
+            public function deliverSignalingPacket(string $packet): void
+            {
+                $this->out[] = $packet;
+            }
+            public function onSignalingMessageData(string $message): void
+            {
+                $this->got[] = $message;
+            }
+        };
+    }
+
+    /**
+     * Messages queued before the association is up must not be lost.
+     */
+    public function testSctpSignalingQueuesUntilEstablished(): void
+    {
+        $a = self::sctpObserver();
+        $b = self::sctpObserver();
+
+        $caller = new SignalingSctpTransport(true, $a);
+        // Send before anything has been exchanged with the peer.
+        $caller->send('EARLY-MESSAGE');
+
+        $callee = new SignalingSctpTransport(false, $b);
+
+        self::pump($caller, $callee, $a->out, $b->out);
+        $caller->send('LATER-MESSAGE');
+        self::pump($caller, $callee, $a->out, $b->out);
+
+        $this->assertSame(['EARLY-MESSAGE', 'LATER-MESSAGE'], $b->got, 'nothing may be dropped or reordered');
+    }
+
+    // ------------------------------------------------------------ SSRC conversion
+
+    public function testSsrcSignConversionRoundTrips(): void
+    {
+        foreach ([0, 1, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFF] as $unsigned) {
+            $this->assertSame(
+                $unsigned,
+                GroupSdp::toUnsignedSsrc(GroupSdp::toSignedSsrc($unsigned)),
+                "SSRC $unsigned must survive the round trip"
+            );
+        }
+        $this->assertSame(-1, GroupSdp::toSignedSsrc(0xFFFFFFFF));
+        $this->assertSame(0x7FFFFFFF, GroupSdp::toSignedSsrc(0x7FFFFFFF));
+    }
+}

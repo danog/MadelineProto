@@ -34,6 +34,9 @@ use Throwable;
  */
 trait BotAPI
 {
+    /**
+     * @psalm-pure
+     */
     private function htmlEntityDecode(string $stuff): string
     {
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
@@ -50,6 +53,21 @@ trait BotAPI
             $newrows[$key] = ['_' => 'keyboardButtonRow', 'buttons' => []];
             foreach ($row as $button) {
                 $newrows[$key]['buttons'][$button_key] = ['_' => 'keyboardButton', 'text' => $button['text']];
+                if (isset($button['style']) || isset($button['icon_custom_emoji_id'])) {
+                    $newrows[$key]['buttons'][$button_key]['style']['_'] = 'keyboardButtonStyle';
+                    $bgKey = match ($button['style'] ?? null) {
+                        'primary' => 'bg_primary',
+                        'danger'  => 'bg_danger',
+                        'success' => 'bg_success',
+                        default   => null,
+                    };
+                    if ($bgKey !== null) {
+                        $newrows[$key]['buttons'][$button_key]['style'][$bgKey] = true;
+                    }
+                    if (isset($button['icon_custom_emoji_id'])) {
+                        $newrows[$key]['buttons'][$button_key]['style']['icon'] = $button['icon_custom_emoji_id'];
+                    }
+                }
                 if (isset($button['url'])) {
                     if (str_starts_with($button['url'], 'tg://user?id=')) {
                         $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUserProfile';
@@ -82,7 +100,15 @@ trait BotAPI
                         : 'keyboardButtonSimpleWebView';
                     $newrows[$key]['buttons'][$button_key]['url'] = $button['web_app']['url'];
                 } elseif (isset($button['switch_inline_query'])) {
-                    $button = $button['switch_inline_query'];
+                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
+                    $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
+                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query'];
+                } elseif (isset($button['switch_inline_query_current_chat'])) {
+                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
+                    $newrows[$key]['buttons'][$button_key]['same_peer'] = true;
+                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'] ?? '';
+                } elseif (isset($button['switch_inline_query_chosen_chat'])) {
+                    $button = $button['switch_inline_query_chosen_chat'];
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
                     $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
                     $newrows[$key]['buttons'][$button_key]['query'] = $button['query'] ?? '';
@@ -100,11 +126,9 @@ trait BotAPI
                     if ($button['allow_channel_chats'] ?? false) {
                         $peer_types []= ['_' => 'inlineQueryPeerTypeBroadcast'];
                     }
-                    $newrows[$key]['buttons'][$button_key]['peer_types'] = $peer_types;
-                } elseif (isset($button['switch_inline_query_current_chat'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = true;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'] ?? '';
+                    if (!empty($peer_types)) {
+                        $newrows[$key]['buttons'][$button_key]['peer_types'] = $peer_types;
+                    }
                 } elseif (isset($button['callback_game'])) {
                     $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonGame';
                     $newrows[$key]['buttons'][$button_key]['text'] = $button['callback_game'];
@@ -264,7 +288,10 @@ trait BotAPI
                             break;
                         case 'documentAttributeAudio':
                             $audio = $attribute;
-                            $type_name = $attribute['voice'] ? 'voice' :'audio';
+                            // Round videos may also have an audio attribute, with the waveform.
+                            if ($type_name !== 'video_note') {
+                                $type_name = $attribute['voice'] ? 'voice' :'audio';
+                            }
                             $res['duration'] = $attribute['duration'];
                             if (isset($attribute['performer'])) {
                                 $res['performer'] = $attribute['performer'];
@@ -364,6 +391,8 @@ trait BotAPI
     }
     /**
      * @internal
+     *
+     * @psalm-mutation-free
      */
     public static function MTProtoEntityToBotAPI(array $data): array
     {

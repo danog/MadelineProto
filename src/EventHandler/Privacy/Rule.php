@@ -41,6 +41,8 @@ enum Rule: string implements JsonSerializable
     case VOICE_MESSAGES = 'privacyKeyVoiceMessages';
     /** Whether the user can see our bio. */
     case ABOUT = 'privacyKeyAbout';
+    /** Whether the user can send us messages without paying. */
+    case MESSAGES_WITHOUT_PAYING = 'privacyKeyNoPaidMessages';
 
     /** @internal */
     #[\Override]

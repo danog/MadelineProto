@@ -42,10 +42,14 @@ trait Methods
     private array $human_docs_methods;
     public function mkMethods(): void
     {
-        static $bots;
-        if (!$bots) {
-            $bots = json_decode(file_get_contents('https://raw.githubusercontent.com/danog/rpc-db/master/bot.json'), true)['result'];
+        static $core;
+        if (!$core) {
+            $core = json_decode(file_get_contents('https://raw.githubusercontent.com/danog/rpc-db/master/core.json'), true);
         }
+        $bot_only = $core['bot_only'];
+        $user_only = $core['user_only'];
+        $business = $core['business_supported'];
+
         static $errors;
         if (!$errors) {
             $errors = json_decode(file_get_contents('https://rpc.madelineproto.xyz/v4.json'), true);
@@ -247,11 +251,14 @@ trait Methods
             $return = '### Return type: ['.self::markdownEscape($type).'](/API_docs/types/'.$php_type.'.md)
 
 ';
-            $bot = !\in_array($method, $bots, true);
+            $canBeUsedByBots = !\in_array($method, $user_only, true);
+            $canBeUsedByUsers = !\in_array($method, $bot_only, true);
+            $supportsBusiness = \in_array($method, $business, true);
             $example = '';
             if (!isset($this->settings['td'])) {
-                $example .= "### Can userbots use this method: **YES**\n\n";
-                $example .= '### Can bots use this method: **'.($bot ? 'YES' : 'NO')."**\n\n\n";
+                $example .= '### Can users use this method: **'.($canBeUsedByUsers ? 'YES' : 'NO')."**\n\n\n";
+                $example .= '### Can bots use this method: **'.($canBeUsedByBots ? 'YES' : 'NO')."**\n\n\n";
+                $example .= '### Can bots use this method over a business connection with the `businessConnectionId` flag: **'.($supportsBusiness ? 'YES' : 'NO')."**\n\n\n";
                 $example .= str_replace('[]', '', $this->template('method-example', str_replace('.', '_', $type), $phpMethod, $params, $method, $lua_params));
                 if ($hasreplymarkup) {
                     $example .= $this->template('reply_markup');
@@ -280,6 +287,7 @@ trait Methods
         $this->logger->logger('Generating methods index...', Logger::NOTICE);
         $reflection = new ReflectionClass(API::class);
         /** @psalm-suppress UndefinedClass */
+
         $phpdoc = PhpDoc::fromNamespace(\danog\MadelineProto::class);
         $phpdoc->resolveAliases();
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {

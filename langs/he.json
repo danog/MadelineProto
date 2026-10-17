@@ -152,11 +152,11 @@
     "do_not_use_yield": "MadelineProto 8 אינו דורש או תומך בשימוש בתשואה בפונקציות אסינכרון, עליך להסיר את כל מילות המפתח של תשואה ששימשו בעבר עבור קריאות פונקציות אסינכרון",
     "account_banned": "!!!!!!! אזהרה!!!!!!!\nמערכת מניעת הצפות של טלגרם השעתה את החשבון הזה.\nכדי להמשיך, נדרש אימות ידני.\nשלח אימייל לכתובת recover@telegram.org, בבקשה לבטל את החסימה של מספר הטלפון %s, ותאר בקצרה מה תעשה עם מספר הטלפון הזה.\nלאחר מכן התחבר שוב.\nאם מחקת את החשבון הזה בכוונה, התעלם מהודעה זו.",
     "windows_warning": "למשתמשי Windows: נא לעבור ללינוקס אם זה נכשל. אתה יכול גם לנסות לשנות את הגדרות חומת האש כדי לאפשר לכל תהליכי PHP ליצור שקעים (קל ב-100% פשוט לעבור ללינוקס, ב-Linux MadelineProto פשוט עובד מחוץ לקופסה, אין צורך בשינויים)",
-    "translate_madelineproto_cli": "ניתן לתרגם את MadelineProto בשפה שלך (התקדמות התרגום הנוכחית: %d%%), עבור אל https://weblate.madelineproto.xyz כדי לתרום עם התרגום!",
+    "translate_madelineproto_cli": "ניתן לתרגם את MadelineProto בשפה שלך (התקדמות התרגום הנוכחית: %d%%), עבור אל https://github.com/danog/MadelineProto/tree/v8/langs כדי לתרום עם התרגום!",
     "recommend_not_use_filesystem_function": "השימוש בפונקציה %s אינו מומלץ, מכיוון שגישה למערכת הקבצים במהלך טיפול בעדכונים תאט את הבוט שלך, אנא ראה https://docs.madelineproto.xyz/docs/UPDATES.html#avoiding-the-use-of-filesystem-functions עבור רשימה של דרכים חלופיות לאחסון נתונים שלא יאט את הבוט שלך!",
     "plugins_do_not_use_require": "מטעמי ביצועים, תוספים יכולים לכלול או לדרוש אוטומטית קבצים אחרים הנמצאים בתיקיית התוספים על ידי הפעלת הטעינה האוטומטית של PSR-4 (לא על ידי הפעלתם ידנית של require()'ing them).",
     "dl.php_check_logs_make_sure_session_running": "הבוט של MadelineProto EventHandler או שרת ה-IPC של MadelineProto אינם מקוונים, אנא בדוק יומנים וודא שלפחות אחד מהם פועל!",
     "invalid_dl.php_session": "%s אינו סקריפט הורדה חוקי מכיוון שמזהה ההפעלה שלו שונה (צפי %s, קיבל %s)",
     "dl.php_powered_by_madelineproto": "שרת הורדת קבצי Telegram (עד 4GB), מופעל על ידי <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>!<br>Click <a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">here</a> למידע נוסף על איך להגדיר שרת הורדת קבצים משלך בטלגרם!",
-    "translate_madelineproto_web": "ניתן לתרגם את MadelineProto בשפה שלך (התקדמות התרגום הנוכחית: %d%%), לחץ <a href=\"https://weblate.madelineproto.xyz\" target=\"_blank\">כאן כדי לתרום עם התרגום!</a>"
+    "translate_madelineproto_web": "ניתן לתרגם את MadelineProto בשפה שלך (התקדמות התרגום הנוכחית: %d%%), לחץ <a href=\"https://github.com/danog/MadelineProto/tree/v8/langs\" target=\"_blank\">כאן כדי לתרום עם התרגום!</a>"
 }

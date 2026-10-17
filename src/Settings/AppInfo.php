@@ -84,10 +84,18 @@ final class AppInfo extends SettingsAbstract
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $this->setLangCode(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
-        } elseif (isset($_SERVER['LANG'])) {
-            $this->setLangCode(explode('_', $_SERVER['LANG'])[0]);
+        // The primary subtag of the first language, which names the translations in langs/: "ckb" of
+        // "ckb-IQ,en;q=0.8", "zh" of "zh_CN.UTF-8".
+        $code = '';
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && \is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $code = preg_split('/[-_;,.\s]/', trim($_SERVER['HTTP_ACCEPT_LANGUAGE']), 2)[0];
+        } elseif (isset($_SERVER['LANG']) && \is_string($_SERVER['LANG'])) {
+            $code = preg_split('/[-_.@]/', $_SERVER['LANG'], 2)[0];
+        }
+        $code = strtolower($code);
+        // "C" and "POSIX" are the default locale, not a language.
+        if ($code !== '' && $code !== '*' && $code !== 'c' && $code !== 'posix') {
+            $this->setLangCode($code);
         }
         $this->init();
         $this->appVersion = \danog\MadelineProto\API::RELEASE;
@@ -110,6 +118,8 @@ final class AppInfo extends SettingsAbstract
 
     /**
      * Check if the settings have API ID/hash information.
+     *
+     * @psalm-mutation-free
      */
     public function hasApiInfo(): bool
     {
@@ -117,6 +127,8 @@ final class AppInfo extends SettingsAbstract
     }
     /**
      * Get API ID.
+     *
+     * @psalm-external-mutation-free
      */
     public function getApiId(): int
     {
@@ -130,6 +142,8 @@ final class AppInfo extends SettingsAbstract
      * Set API ID.
      *
      * @param int $apiId API ID.
+     *
+     * @psalm-external-mutation-free
      */
     public function setApiId(int $apiId): self
     {
@@ -139,6 +153,8 @@ final class AppInfo extends SettingsAbstract
 
     /**
      * Get API hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function getApiHash(): string
     {
@@ -152,6 +168,8 @@ final class AppInfo extends SettingsAbstract
      * Set API hash.
      *
      * @param string $apiHash API hash.
+     *
+     * @psalm-external-mutation-free
      */
     public function setApiHash(string $apiHash): self
     {
@@ -172,6 +190,8 @@ final class AppInfo extends SettingsAbstract
      * Set device model.
      *
      * @param string $deviceModel Device model.
+     *
+     * @psalm-external-mutation-free
      */
     public function setDeviceModel(string $deviceModel): self
     {
@@ -192,6 +212,8 @@ final class AppInfo extends SettingsAbstract
      * Set system version.
      *
      * @param string $systemVersion System version.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSystemVersion(string $systemVersion): self
     {
@@ -212,6 +234,8 @@ final class AppInfo extends SettingsAbstract
      * Set app version.
      *
      * @param string $appVersion App version.
+     *
+     * @psalm-external-mutation-free
      */
     public function setAppVersion(string $appVersion): self
     {
@@ -232,6 +256,8 @@ final class AppInfo extends SettingsAbstract
      * Set language code.
      *
      * @param string $langCode Language code.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLangCode(string $langCode): self
     {
@@ -258,6 +284,8 @@ final class AppInfo extends SettingsAbstract
      * Set system language code.
      *
      * @param string $langCode Language code.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSystemLangCode(string $langCode): self
     {
@@ -278,6 +306,8 @@ final class AppInfo extends SettingsAbstract
      * Set language pack.
      *
      * @param string $langPack Language pack.
+     *
+     * @psalm-external-mutation-free
      */
     public function setLangPack(string $langPack): self
     {
@@ -299,6 +329,8 @@ final class AppInfo extends SettingsAbstract
      * Set whether to show a prompt, asking to enter an API ID/API hash if none is provided.
      *
      * @param bool $showPrompt Whether to show a prompt, asking to enter an API ID/API hash if none is provided.
+     *
+     * @psalm-external-mutation-free
      */
     public function setShowPrompt(bool $showPrompt): static
     {

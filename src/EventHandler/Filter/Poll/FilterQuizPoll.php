@@ -28,6 +28,9 @@ use danog\MadelineProto\EventHandler\Update;
 #[Attribute(Attribute::TARGET_METHOD)]
 final class FilterQuizPoll extends Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {

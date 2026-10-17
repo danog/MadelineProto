@@ -46,6 +46,8 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -56,6 +58,8 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
      * Get write buffer asynchronously.
      *
      * @param int $length Length of data that is going to be written to the write buffer
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -95,6 +99,8 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -103,12 +109,17 @@ final class AbridgedStream implements BufferedStreamInterface, MTProtoBufferInte
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

@@ -48,6 +48,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      * Constructor function.
      *
      * @param array $old Old auth key array
+     *
+     * @psalm-mutation-free
      */
     public function __construct(array $old = [])
     {
@@ -63,6 +65,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      * Init or deinit connection for auth key.
      *
      * @param boolean $init Init or deinit
+     *
+     * @psalm-external-mutation-free
      */
     public function init(bool $init = true): void
     {
@@ -80,6 +84,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      *
      * @param PermAuthKey|null $bound Permanent auth key
      * @param bool             $pfs   Whether to bind using PFS
+     *
+     * @psalm-external-mutation-free
      */
     public function bind(?PermAuthKey $bound, bool $pfs = true): void
     {
@@ -92,6 +98,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if auth key is bound.
+     *
+     * @psalm-mutation-free
      */
     public function isBound(): bool
     {
@@ -99,6 +107,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Check if we are logged in.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function isAuthorized(): bool
@@ -109,6 +119,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      * Set the authorized boolean.
      *
      * @param boolean $authorized Whether we are authorized
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function authorized(bool $authorized): void
@@ -119,6 +131,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
      * Set expiration date of temporary auth key.
      *
      * @param integer $expires Expiration date
+     *
+     * @psalm-external-mutation-free
      */
     public function expires(int $expires): void
     {
@@ -133,6 +147,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * JSON serialization function.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function jsonSerialize(): array
@@ -141,6 +157,8 @@ final class TempAuthKey extends AuthKey implements JsonSerializable
     }
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {

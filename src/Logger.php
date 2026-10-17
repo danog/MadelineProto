@@ -136,6 +136,13 @@ final class Logger
      */
     public const ULTRA_VERBOSE = 5;
     /**
+     * Maximum length of a log entry, in bytes: longer ones (like exceptions whose message contains a
+     * huge query) only keep their beginning and their end.
+     *
+     * @internal
+     */
+    public const MAX_ENTRY_LENGTH = 64 * 1024;
+    /**
      * Verbose logging.
      *
      * @internal
@@ -398,6 +405,23 @@ final class Logger
         }
     }
     /**
+     * Truncate a string longer than the specified length (in bytes), keeping its beginning and its end.
+     *
+     * @internal
+     *
+     * @psalm-pure
+     */
+    public static function truncateEntry(string $string, int $length): string
+    {
+        $omitted = \strlen($string) - $length;
+        if ($omitted <= 0) {
+            return $string;
+        }
+        $half = intdiv($length, 2);
+        return substr($string, 0, $half)."\n[... $omitted bytes omitted ...]\n".substr($string, -$half);
+    }
+
+    /**
      * Log a message.
      *
      * @param mixed  $param Message to log
@@ -427,6 +451,7 @@ final class Logger
         } elseif (!\is_string($param)) {
             $param = json_encode($param, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         }
+        $param = self::truncateEntry($param, self::MAX_ENTRY_LENGTH);
         if (empty($file)) {
             $file = basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php');
         }

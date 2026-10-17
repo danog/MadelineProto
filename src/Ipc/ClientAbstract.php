@@ -21,13 +21,14 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Ipc;
 
 use Amp\DeferredFuture;
+use Amp\Future;
+use Amp\Ipc\Sync\ChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Serialization;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
-
-use function Amp\Ipc\connect;
 
 /**
  * IPC client.
@@ -40,6 +41,8 @@ abstract class ClientAbstract
      * IPC server socket.
      */
     protected ChannelledSocket $server;
+    protected ?Future $serverFuture = null;
+
     private int $id = 0;
     /**
      * Requests promise array.
@@ -56,6 +59,9 @@ abstract class ClientAbstract
      */
     public Logger $logger;
 
+    /**
+     * @psalm-mutation-free
+     */
     protected function __construct()
     {
     }
@@ -87,6 +93,7 @@ abstract class ClientAbstract
                     Logger::log("Got exception while receiving in IPC client: $e");
                 }
                 if (!$payload) {
+                    Logger::log("Disconnected from IPC server!");
                     break;
                 }
                 [$id, $payload] = $payload;
@@ -104,31 +111,74 @@ abstract class ClientAbstract
                 }
             }
             if ($this->run) {
-                $this->logger('Reconnecting to IPC server!');
-                try {
-                    $this->server->disconnect();
-                } catch (Throwable $e) {
-                }
                 if ($this instanceof Client) {
+                    $this->logger('Reconnecting to IPC server!');
+                    $f = new DeferredFuture;
+                    $this->serverFuture = $f->getFuture();
                     try {
-                        Server::startMe($this->session)->await();
-                        $this->server = connect($this->session->getIpcPath());
+                        $this->server->disconnect();
+                    } catch (Throwable $e) {
+                    }
+                    $requests = [];
+                    try {
+                        // Connect as soon as any server is listening, even if it was started by another process
+                        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session));
+                        if (!$server instanceof ChannelledSocket) {
+                            throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
+                        }
+                        $this->server = $server;
+                        $this->logger('Reconnected to IPC server!');
                         $requests = $this->requests;
                         $this->requests = [];
                         $this->id = 0;
-                        foreach ($requests as [$function, $arguments, $deferred]) {
+                        while ($requests) {
+                            [$function, $arguments, $deferred] = array_shift($requests);
+                            if ($arguments instanceof Wrapper) {
+                                // Its callbacks were connected to the previous server, which can't call them anymore.
+                                // (Interrupted uploads and sends are resumed by the server on its own.)
+                                $arguments->disconnect();
+                                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!"));
+                                continue;
+                            }
                             $id = $this->id++;
                             $this->requests[$id] = [$function, $arguments, $deferred];
                             $this->server->send([$function, $arguments]);
                         }
+                        $f->complete();
+                        $this->serverFuture = null;
+                        $this->logger('Resumed IPC queries!');
                     } catch (Throwable $e) {
-                        Logger::log("Got exception while reconnecting in IPC client: $e");
+                        $this->logger("Could not reconnect to IPC server: $e", Logger::FATAL_ERROR);
+                        // The requests that were not sent again yet are failed below, too
+                        /** @var array<int, list{string|int, array|Wrapper, DeferredFuture}> $requests */
+                        foreach ($requests as $request) {
+                            $this->requests[] = $request;
+                        }
+                        // Fail future calls, and pending calls below, instead of leaving them hanging
+                        $f->getFuture()->ignore();
+                        $f->error($e);
+                        $this->run = false;
                     }
                 } else {
-                    return;
+                    try {
+                        $this->server->disconnect();
+                    } catch (Throwable $e) {
+                    }
+                    break;
                 }
             }
         } while ($this->run);
+        $requests = $this->requests;
+        $this->requests = [];
+        foreach ($requests as [$function, , $deferred]) {
+            if (!$this->run && $this instanceof Wrapper) {
+                // Callback wrappers are closed once their IPC call returns: calls still pending at that point
+                // (late progress notifications, cancellation waits) belong to nobody, so they're dropped.
+                $deferred->complete(null);
+            } else {
+                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!"));
+            }
+        }
     }
     /**
      * Disconnect cleanly from main instance.
@@ -151,6 +201,12 @@ abstract class ClientAbstract
      */
     public function __call(string|int $function, array|Wrapper $arguments)
     {
+        if (!$this->run && $this instanceof Wrapper) {
+            // See loopInternal().
+            return null;
+        }
+        $this->serverFuture?->await();
+
         $deferred = new DeferredFuture;
         $id = $this->id++;
         $this->requests[$id] = [$function, $arguments, $deferred];

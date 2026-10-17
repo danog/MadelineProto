@@ -24,14 +24,25 @@ use danog\MadelineProto\MTProto;
  */
 final class DialogSetChatTheme extends ServiceMessage
 {
+    /** @var ?string The emoji that identifies a chat theme, can be null for unique gift-based themes */
+    public readonly ?string $emoticon;
+
+    /** @var ?array https://docs.madelineproto.xyz/API_docs/constructors/chatThemeUniqueGift.html */
+    public readonly ?array $uniqueGift;
+
     public function __construct(
         MTProto $API,
         array $rawMessage,
         array $info,
-
-        /** @var string The emoji that identifies a chat theme */
-        public readonly string $emoticon
+        array $theme,
     ) {
         parent::__construct($API, $rawMessage, $info);
+        $this->emoticon = $theme['emoticon'] ?? null;
+        // TODO: rm when all constructors are objects.
+        if ($theme['_'] === 'chatThemeUniqueGift') {
+            $this->uniqueGift = $theme;
+        } else {
+            $this->uniqueGift = null;
+        }
     }
 }

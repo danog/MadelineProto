@@ -73,8 +73,13 @@ use ReflectionUnionType;
 
 abstract class Filter
 {
+    /** @psalm-impure */
     abstract public function apply(Update $update): bool;
-    /** Run some initialization logic, optionally returning a new filter to replace the current one. */
+    /**
+     * Run some initialization logic, optionally returning a new filter to replace the current one.
+     *
+     * @psalm-mutation-free
+     */
     public function initialize(EventHandler $API): Filter
     {
         return $this;
@@ -132,9 +137,15 @@ abstract class Filter
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
                 default => is_subclass_of($type->getName(), Update::class)
                     ? new class($type->getName()) extends Filter {
+                        /**
+                         * @psalm-mutation-free
+                         */
                         public function __construct(private readonly string $class)
                         {
                         }
+                        /**
+                         * @psalm-mutation-free
+                         */
                         #[\Override]
                         public function apply(Update $update): bool
                         {

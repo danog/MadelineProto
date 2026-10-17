@@ -26,7 +26,11 @@ final class AllowChatParticipants extends RuleDestination
     /** Allowed chats */
     public readonly array $chats;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawUsers)
     {
         $this->chats = $rawUsers['chats'];

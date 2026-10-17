@@ -4,6 +4,6 @@ To contribute to this project simply fork it, make all improvements, commit chan
 
 If you have an issue, please *always* upload MadelineProto logs from when the error occurred to hastebin or similar websites.
 
-If you make breaking changes, make sure to increase the number returned by the getV function in MTProto.php.  
+To bump the layer to the latest one, clone the repo (with all submodules) and run `composer build`.  
 
 Bye :)

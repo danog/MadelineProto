@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto\EventHandler;
 
+use danog\MadelineProto\CallNotAllowedException;
+use danog\MadelineProto\EventHandler\Calls\CallDenialReason;
 use danog\MadelineProto\EventHandler\Keyboard\InlineKeyboard;
 use danog\MadelineProto\EventHandler\Keyboard\ReplyKeyboard;
 use danog\MadelineProto\EventHandler\Media\Audio;
@@ -189,23 +191,14 @@ abstract class Message extends AbstractMessage
             : null;
 
         $this->keyboard = isset($rawMessage['reply_markup'])
-            ? Keyboard::fromRawReplyMarkup($rawMessage['reply_markup'])
+            ? Keyboard::fromRawReplyMarkup($API, $this, $rawMessage['reply_markup'])
             : null;
 
         $this->poll = ($rawMessage['media']['_'] ?? '') === 'messageMediaPoll'
             ? AbstractPoll::fromRawPoll($rawMessage['media'])
             : null;
 
-        if ($this->commandType = CommandType::tryFrom($this->message[0] ?? '')) {
-            $space = strpos($this->message, ' ', 1) ?: \strlen($this->message);
-            $args = explode(' ', substr($this->message, $space+1));
-            $length = ($len = strpos($cmd = substr($this->message, 1, $space-1), "@")) ? $len : $space-1;
-            $this->command = substr($cmd, 0, $length);
-            $this->commandArgs = $args === [''] ? [] : $args;
-        } else {
-            $this->command = null;
-            $this->commandArgs = null;
-        }
+        [$this->commandType, $this->command, $this->commandArgs] = CommandType::parse($this->message);
 
         foreach ($rawMessage['reactions']['results'] ?? [] as $r) {
             if (isset($r['chosen_order'])) {
@@ -480,6 +473,7 @@ abstract class Message extends AbstractMessage
      * @param int|null   $scheduleDate Scheduled message date for scheduled messages
      * @param bool       $noWebpage    Disable webpage preview
      *
+     * @psalm-mutation-free
      */
     public function replyOrEdit(
         string    $message,
@@ -549,6 +543,46 @@ abstract class Message extends AbstractMessage
         $result = array_map($this->getClient()->wrapUpdate(...), $this->getClient()->extractUpdates($result));
         return array_values(array_filter($result));
     }
+
+    /**
+     * Get the call currently associated with this chat, if any.
+     *
+     * For private and secret chats this is the pending or running one-to-one call with the other user;
+     * for groups and channels, the currently active video chat or livestream.
+     *
+     * @psalm-impure
+     */
+    abstract public function getCall(): ?Call;
+
+    /**
+     * Whether {@see self::requestCall()} will succeed in this chat, i.e. there is already a call we can
+     * return, or our permissions (and the other party's privacy settings) allow us to start a new one.
+     *
+     * @psalm-impure
+     */
+    abstract public function canRequestCall(): bool;
+
+    /**
+     * Returns why we can't start a new call in this chat, or null if we can.
+     *
+     * Unlike {@see self::canRequestCall()}, this does not take into account an already existing call.
+     *
+     * @psalm-impure
+     */
+    abstract public function getCallDenialReason(): ?CallDenialReason;
+
+    /**
+     * Get the call currently associated with this chat, or start a new one if there is none.
+     *
+     * For private and secret chats this calls the other user;
+     * for groups and channels, this creates a video chat or livestream (use `join()` on the returned call to join it:
+     * `requestCall()->join()` works in every chat, as joining an outgoing one-to-one call does nothing).
+     *
+     * @throws CallNotAllowedException If there is no active call, and our permissions do not allow us to start one.
+     *
+     * @psalm-impure
+     */
+    abstract public function requestCall(): Call;
 
     protected readonly string $html;
     protected readonly string $htmlTelegram;

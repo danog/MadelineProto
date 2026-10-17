@@ -22,7 +22,6 @@ namespace danog\MadelineProto\Stream;
 
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
-use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
@@ -51,16 +50,6 @@ final class ConnectionContext
      *
      */
     private bool $test = false;
-    /**
-     * Whether to use media servers.
-     *
-     */
-    private bool $media = false;
-    /**
-     * Whether to use CDN servers.
-     *
-     */
-    private bool $cdn = false;
     /**
      * The connection URI.
      *
@@ -103,6 +92,8 @@ final class ConnectionContext
     private int $key = 0;
     /**
      * Set the socket context.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSocketContext(ConnectContext $socketContext): self
     {
@@ -127,6 +118,8 @@ final class ConnectionContext
     }
     /**
      * Get the URI as a string.
+     *
+     * @psalm-mutation-free
      */
     public function getStringUri(): string
     {
@@ -141,6 +134,8 @@ final class ConnectionContext
     }
     /**
      * Set the cancellation token.
+     *
+     * @psalm-external-mutation-free
      */
     public function setCancellation(Cancellation $cancellationToken): self
     {
@@ -156,18 +151,12 @@ final class ConnectionContext
     }
     /**
      * Return a clone of the current connection context.
+     *
+     * @psalm-mutation-free
      */
     public function clone(): self
     {
         return clone $this;
-    }
-    /**
-     * Set the CDN boolean.
-     */
-    public function setCDN(bool $cdn): self
-    {
-        $this->cdn = $cdn;
-        return $this;
     }
     /**
      * Whether this is a test connection.
@@ -175,20 +164,6 @@ final class ConnectionContext
     public function isTest(): bool
     {
         return $this->test;
-    }
-    /**
-     * Whether this is a media connection.
-     */
-    public function isMedia(): bool
-    {
-        return $this->media;
-    }
-    /**
-     * Whether this is a CDN connection.
-     */
-    public function isCDN(): bool
-    {
-        return $this->cdn;
     }
     /**
      * Whether this connection context will only be used by the DNS client.
@@ -199,6 +174,8 @@ final class ConnectionContext
     }
     /**
      * Whether this connection context will only be used by the DNS client.
+     *
+     * @psalm-external-mutation-free
      */
     public function setIsDns(bool $isDns): self
     {
@@ -207,6 +184,8 @@ final class ConnectionContext
     }
     /**
      * Set the secure boolean.
+     *
+     * @psalm-external-mutation-free
      */
     public function secure(bool $secure): self
     {
@@ -223,12 +202,11 @@ final class ConnectionContext
     /**
      * Set the DC ID.
      *
+     * @psalm-external-mutation-free
      */
     public function setDc(int $dc): self
     {
         $this->dc = $dc;
-        $this->media = DataCenter::isMedia($dc);
-        $this->test = DataCenter::isTest($dc);
         return $this;
     }
     /**
@@ -240,6 +218,8 @@ final class ConnectionContext
     }
     /**
      * Whether to use ipv6.
+     *
+     * @psalm-external-mutation-free
      */
     public function setIpv6(bool $ipv6): self
     {
@@ -257,6 +237,8 @@ final class ConnectionContext
      * Add a stream to the stream chain.
      *
      * @param class-string $streamName
+     *
+     * @psalm-external-mutation-free
      */
     public function addStream(string $streamName, $extra = null): self
     {
@@ -268,6 +250,8 @@ final class ConnectionContext
      * Check if connected via HTTP.
      *
      * @return boolean
+     *
+     * @psalm-mutation-free
      */
     public function isHttp(): bool
     {
@@ -277,6 +261,8 @@ final class ConnectionContext
      * Check if has stream within stream chain.
      *
      * @param string $stream Stream name
+     *
+     * @psalm-mutation-free
      */
     public function hasStreamName(string $stream): bool
     {
@@ -303,6 +289,7 @@ final class ConnectionContext
     /**
      * Get the inputClientProxy proxy MTProto object.
      *
+     * @psalm-mutation-free
      */
     public function getInputClientProxy(): array|null
     {
@@ -317,6 +304,8 @@ final class ConnectionContext
     }
     /**
      * Get a description "name" of the context.
+     *
+     * @psalm-mutation-free
      */
     public function getName(): string
     {
@@ -343,6 +332,8 @@ final class ConnectionContext
     }
     /**
      * Returns a representation of the context.
+     *
+     * @psalm-mutation-free
      */
     public function __toString(): string
     {

@@ -133,7 +133,7 @@ trait TD
                     case 'choose_forward_info':
                         if (isset($params['fwd_from'])) {
                             $newparams[$td] = ['_' => 'messageForwardedFromUser'];
-                            if (DialogId::isSupergroupOrChannel($params['fwd_from'])) {
+                            if (DialogId::isSupergroupOrChannelOrMonoforum($params['fwd_from'])) {
                                 $newparams[$td] = ['_' => 'messageForwardedPost', 'chat_id' => $params['fwd_from']];
                             }
                             $newparams[$td]['date'] = $params['fwd_from']['date'];
@@ -184,6 +184,8 @@ trait TD
      * Convert TD parameters to tdcli.
      *
      * @param mixed $params Parameters
+     *
+     * @psalm-mutation-free
      */
     public function tdToTdcli(mixed $params): array
     {

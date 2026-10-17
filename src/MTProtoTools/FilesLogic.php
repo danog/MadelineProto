@@ -31,6 +31,7 @@ use Amp\Http\Server\Request as ServerRequest;
 use Amp\Http\Server\Response;
 use Amp\Sync\LocalMutex;
 use Amp\Sync\Lock;
+use Closure;
 use danog\MadelineProto\API;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
@@ -41,8 +42,11 @@ use danog\MadelineProto\FileCallbackInterface;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\ResumableDownloadStream;
+use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
@@ -51,6 +55,7 @@ use danog\MadelineProto\Stream\StreamInterface;
 use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\UploadResumeException;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -62,6 +67,7 @@ use function Amp\ByteStream\buffer;
 use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\File\exists;
 
+use function Amp\File\getModificationTime;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
 
@@ -138,17 +144,27 @@ trait FilesLogic
     /**
      * Download file to an amphp stream, returning it.
      *
+     * The returned stream is resumable: it can be serialized, and once unserialized,
+     * reading continues from the end of the last chunk read before serialization.
+     * The progress callback and cancellation are not preserved by serialization.
+     *
      * @param mixed    $messageMedia File to download
      * @param callable $cb           Callback
      * @param int      $offset       Offset where to start downloading
      * @param int      $end          Offset where to end download
      */
-    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream
+    public function downloadToReturnedStream(mixed $messageMedia, ?callable $cb = null, int $offset = 0, int $end = -1, ?Cancellation $cancellation = null): ReadableStream&ResumableStream
     {
-        $pipe = new Pipe(1024*1024);
-        $sink = $pipe->getSink();
-        async($this->downloadToStream(...), $messageMedia, $sink, $cb, $offset, $end, $cancellation)->finally($sink->close(...));
-        return $pipe->getSource();
+        /** @var ?Closure(float, float, float): void */
+        $cb = $cb === null ? null : $cb(...);
+        return new ResumableDownloadStream(
+            $this,
+            $this->getDownloadInfo($messageMedia),
+            $cb,
+            $offset,
+            $end,
+            $cancellation,
+        );
     }
     /**
      * Download file to stream.
@@ -241,11 +257,11 @@ trait FilesLogic
             $pipe = new Pipe(1024 * 1024);
             [$start, $end] = $result->getServeRange();
             $f = async($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
+            $f->finally($pipe->getSink()->close(...));
             $body = $pipe->getSource();
         } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();
         }
-        $f->finally($pipe->getSink()->close(...));
 
         return new Response($result->getCode(), $result->getHeaders(), $body);
     }
@@ -324,9 +340,8 @@ trait FilesLogic
             return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof BotApiFileId) {
-            $info = $this->getDownloadInfo($file->fileId);
-            $info['size'] = $file->size;
-            return $this->uploadFromTgfile($info, $cb, $encrypted, $cancellation);
+            // Not its download info: the upload is resumed by its file ID.
+            return $this->uploadFromTgfile($file, $cb, $encrypted, $cancellation);
         }
         if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
             if (filter_var($file, FILTER_VALIDATE_URL)) {
@@ -377,6 +392,34 @@ trait FilesLogic
      */
     public function uploadFromStream(mixed $stream, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
+        return $this->uploadFromStreamInternal($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
+    }
+
+    /**
+     * Upload from callable, resuming interrupted uploads of the same file.
+     *
+     * Resuming only happens in the process owning the session: IPC clients send uploads of resumable
+     * sources to it as a whole (see {@see \danog\MadelineProto\Ipc\Client::upload()}).
+     */
+    private function uploadFromCallableResumable(callable $callable, int $size, ?string $mime, string $fileName, ?callable $cb, bool $seekable, bool $encrypted, ?Cancellation $cancellation, ?string $resumeKey): array
+    {
+        if ($this instanceof MTProto) {
+            /** @psalm-suppress InaccessibleMethod Same class */
+            return $this->uploadFromCallableInternal($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
+        }
+        return $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
+    }
+
+    /**
+     * Upload file from stream, resuming an interrupted upload of the same file if possible.
+     *
+     * Uploads of files and resumable streams are identified automatically.
+     *
+     * @param ?string                            $resumeKey Identifies the source of the file across restarts, see uploadFromCallable().
+     * @param (Closure(int): ?ReadableStream)|null $reopenAt  Reopens the source at a byte offset, to resume without reading what was already uploaded; returns null if it can't.
+     */
+    private function uploadFromStreamInternal(mixed $stream, int $size, ?string $mime, string $fileName, ?callable $cb, bool $encrypted, ?Cancellation $cancellation, ?string $resumeKey = null, ?Closure $reopenAt = null): array
+    {
         if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
             $cb = $stream;
             $stream = $stream->getFile();
@@ -387,6 +430,9 @@ trait FilesLogic
         if (!$stream instanceof ReadableStream) {
             throw new Exception('Invalid stream provided');
         }
+        if (!$size && $stream instanceof ResumableDownloadStream) {
+            $size = $stream->getRemainingSize() ?? 0;
+        }
         $seekable = false;
         if (method_exists($stream, 'seek')) {
             try {
@@ -395,7 +441,6 @@ trait FilesLogic
             } catch (StreamException $e) {
             }
         }
-        $created = false;
         if (!$size) {
             if ($seekable && method_exists($stream, 'tell')) {
                 $stream->seek(0, Whence::End);
@@ -405,6 +450,17 @@ trait FilesLogic
                 $stream = buffer($stream, $cancellation);
                 $size = \strlen($stream);
                 $stream = new ReadableBuffer($stream);
+            }
+        }
+        if ($resumeKey === null) {
+            if ($stream instanceof File) {
+                try {
+                    $resumeKey = 'file:'.$stream->getPath()."\0".getModificationTime($stream->getPath());
+                } catch (Throwable) {
+                }
+            } elseif ($stream instanceof ResumableStream) {
+                // Before anything is read from it.
+                $resumeKey = 'stream:'.serialize($stream);
             }
         }
         if ($stream instanceof File) {
@@ -419,6 +475,14 @@ trait FilesLogic
                             $stream->seek($offset);
                         }
                     } else {
+                        // When resuming an upload, the first parts were already uploaded.
+                        while ($nextOffset < $offset) {
+                            $skipped = $stream->read($cancellation, min($offset - $nextOffset, 1024 * 1024));
+                            if ($skipped === null) {
+                                throw new UploadResumeException("Could not resume the upload: the file ended at offset $nextOffset, before the offset $offset to resume from, it changed since the upload was interrupted");
+                            }
+                            $nextOffset += \strlen($skipped);
+                        }
                         Assert::eq($offset, $nextOffset);
                         $nextOffset += $size;
                     }
@@ -429,36 +493,60 @@ trait FilesLogic
                     EventLoop::queue($l->release(...));
                 }
             };
-        } else {
-            if (!$stream instanceof BufferedRawStream) {
+            return $this->uploadFromCallableResumable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation, $resumeKey);
+        }
+        /** @var ?BufferedRawStream */
+        $buffered = $stream instanceof BufferedRawStream ? $stream : null;
+        $created = false;
+        $nextOffset = 0;
+        $callable = static function (int $offset, int $size) use (&$stream, &$buffered, &$created, &$nextOffset, $reopenAt, $cancellation): string {
+            $skip = $offset - $nextOffset;
+            Assert::greaterThanEq($skip, 0);
+            if ($skip > 0 && $buffered === null) {
+                // Resuming an upload, the first parts were already uploaded: skip them without reading them, if possible.
+                if ($reopenAt !== null && ($reopened = $reopenAt($offset)) !== null) {
+                    $stream->close();
+                    $stream = $reopened;
+                    $skip = 0;
+                } elseif ($stream instanceof ResumableDownloadStream) {
+                    $stream->skip($skip);
+                    $skip = 0;
+                }
+            }
+            if ($buffered === null) {
                 $ctx = (new ConnectionContext())->addStream(PremadeStream::class, $stream)->addStream(SimpleBufferedRawStream::class);
-                $stream = ($ctx->getStream());
+                $buffered = $ctx->getStream();
+                \assert($buffered instanceof BufferedRawStream);
                 $created = true;
             }
-            $nextOffset = 0;
-            $callable = static function (int $offset, int $size) use ($stream, &$nextOffset, $cancellation): string {
-                if (!$stream instanceof BufferedRawStream) {
-                    throw new \InvalidArgumentException('Invalid stream type');
-                }
-                Assert::eq($offset, $nextOffset);
-                $nextOffset += $size;
-                $reader = $stream->getReadBuffer($l);
+            $nextOffset = $offset + $size;
+            $read = static function (int $size) use ($buffered, $cancellation): string {
+                $reader = $buffered->getReadBuffer($l);
                 try {
                     $result = $reader->bufferRead($size, $cancellation);
                 } catch (NothingInTheSocketException $e) {
-                    $reader = $stream->getReadBuffer($size);
+                    $reader = $buffered->getReadBuffer($size);
                     $result = $reader->bufferRead($size, $cancellation);
                 }
                 \assert($result !== null);
                 return $result;
             };
-            $seekable = false;
+            while ($skip > 0) {
+                $skipped = \strlen($read(min($skip, 1024 * 1024)));
+                if ($skipped === 0) {
+                    throw new UploadResumeException('Could not resume the upload: the stream ended at offset '.($offset - $skip).", before the offset $offset to resume from, it changed since the upload was interrupted");
+                }
+                $skip -= $skipped;
+            }
+            return $read($size);
+        };
+        try {
+            return $this->uploadFromCallableResumable($callable, $size, $mime, $fileName, $cb, false, $encrypted, $cancellation, $resumeKey);
+        } finally {
+            if ($created) {
+                /** @var StreamInterface $buffered */
+                $buffered->disconnect();
+            }
         }
-        $res = $this->uploadFromCallable($callable, $size, $mime, $fileName, $cb, $seekable, $encrypted, $cancellation);
-        if ($created) {
-            /** @var StreamInterface $stream */
-            $stream->disconnect();
-        }
-        return $res;
     }
 }

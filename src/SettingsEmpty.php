@@ -16,6 +16,9 @@
 
 namespace danog\MadelineProto;
 
+/**
+ * @psalm-external-mutation-free
+ */
 final class SettingsEmpty extends SettingsAbstract
 {
 }

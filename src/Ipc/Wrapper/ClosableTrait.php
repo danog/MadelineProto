@@ -54,6 +54,8 @@ trait ClosableTrait
      * Registers a callback that is invoked when this resource is closed.
      *
      * @param \Closure():void $onClose
+     *
+     * @psalm-external-mutation-free
      */
     public function onClose(\Closure $onClose): void
     {

@@ -71,6 +71,7 @@ abstract class AbstractAPI extends InternalDoc
             }
         }
     }
+    /** @psalm-impure */
     abstract protected function reconnectFull(): bool;
 
     protected function startAndLoopLogic(string $eventHandler, bool &$started): void
@@ -87,6 +88,8 @@ abstract class AbstractAPI extends InternalDoc
     }
     /**
      * Sleep function.
+     *
+     * @psalm-pure
      */
     public function __sleep(): array
     {

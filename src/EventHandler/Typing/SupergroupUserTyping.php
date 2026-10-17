@@ -30,7 +30,11 @@ final class SupergroupUserTyping extends Typing
     /** [Topic](https://core.telegram.org/api/threads) ID. */
     public readonly ?int $topicId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawTyping)
     {
         parent::__construct($API, $rawTyping);

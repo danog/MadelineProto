@@ -63,6 +63,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      * Set maximum connection limit.
      *
      * @param positive-int $maxConnections Maximum connection limit.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMaxConnections(int $maxConnections): static
     {
@@ -85,6 +87,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      * Set idle timeout.
      *
      * @param positive-int $idleTimeout Idle timeout.
+     *
+     * @psalm-external-mutation-free
      */
     public function setIdleTimeout(int $idleTimeout): static
     {
@@ -106,6 +110,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      * Set database name.
      *
      * @param string $database Database name.
+     *
+     * @psalm-external-mutation-free
      */
     public function setDatabase(string $database): static
     {
@@ -126,6 +132,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      * Set username.
      *
      * @param string $username Username.
+     *
+     * @psalm-external-mutation-free
      */
     public function setUsername(string $username): static
     {
@@ -147,6 +155,8 @@ abstract class SqlAbstract extends DriverDatabaseAbstract
      * Set database URI.
      *
      * @param string $uri Database URI.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setUri(string $uri): static

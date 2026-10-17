@@ -24,6 +24,7 @@ namespace danog\MadelineProto\Stream;
  * Buffered stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface BufferedStreamInterface extends StreamInterface
 {
@@ -31,22 +32,26 @@ interface BufferedStreamInterface extends StreamInterface
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
+     * @psalm-impure
      */
     public function getReadBuffer(?int &$length): ReadBufferInterface;
     /**
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
+     * @psalm-impure
      */
     public function getWriteBuffer(int $length, string $append = ''): WriteBufferInterface;
     /**
      * Get stream name.
      *
      * Is supposed to return __CLASS__
+     * @psalm-impure
      */
     public static function getName(): string;
     /**
      * Get underlying stream resource.
+     * @psalm-impure
      */
     public function getStream(): RawStreamInterface;
 }

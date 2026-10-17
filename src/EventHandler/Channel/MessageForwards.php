@@ -33,7 +33,11 @@ final class MessageForwards extends Update
     /** New forward counter */
     public readonly int $forwards;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawMessageViews)
     {
         parent::__construct($API);

@@ -33,13 +33,20 @@ abstract class Status extends Update
     /** User identifier */
     public readonly int $userId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rowUserStatus)
     {
         parent::__construct($API);
         $this->userId = $rowUserStatus['user_id'];
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function fromRawStatus(MTProto $API, array $rowUserStatus): ?Status
     {
         return match ($rowUserStatus['status']['_']) {

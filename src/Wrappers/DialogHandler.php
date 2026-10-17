@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Wrappers;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
@@ -71,6 +72,7 @@ trait DialogHandler
                         ...$this->botDialogsUpdatesState,
                         'pts_total_limit' => 2147483647,
                         'floodWaitLimit' => 86400,
+                        'specialMethodType' => SpecialMethodType::USER_RELATED,
                     ],
                 );
                 switch ($result['_']) {
@@ -109,7 +111,13 @@ trait DialogHandler
                 try {
                     $result = $this->methodCallAsyncRead(
                         'updates.getDifference',
-                        $state + ['cancellation' => Tools::getTimeoutCancellation(15.0), 'floodWaitLimit' => 86400]
+                        $state + [
+                            'cancellation' => Tools::getTimeoutCancellation(
+                                15.0,
+                                "Timeout while getting difference for searchRightPts"
+                            ),
+                            'floodWaitLimit' => 86400,
+                        ],
                     )['_'];
                 } catch (Throwable $e) {
                     $this->logger->logger("Got {$e->getMessage()} while getting difference, trying another PTS...");
@@ -157,7 +165,7 @@ trait DialogHandler
     private ?LocalMutex $cacheFullDialogsMutex = null;
     private function cacheFullDialogs(): bool
     {
-        if ($this->authorized === API::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup() && !$this->fetchedFullDialogs) {
+        if ($this->loginState->getState()->state === API::LOGGED_IN && !$this->authorization['user']['bot'] && $this->settings->getPeer()->getCacheAllPeersOnStartup() && !$this->fetchedFullDialogs) {
             $this->cacheFullDialogsMutex ??= new LocalMutex;
             $lock = $this->cacheFullDialogsMutex->acquire();
             try {
@@ -179,7 +187,7 @@ trait DialogHandler
     private function getFullDialogsInternal(bool $force): array
     {
         if ($this->authorization['user']['bot']) {
-            throw new Exception("You're logged in as a bot: please use getDialogs or getDialogsIds, instead.");
+            throw new Exception("You're logged in as a bot: please use getDialogsIds, instead.");
         }
         if ($force || !isset($this->dialog_params['offset_date']) || \is_null($this->dialog_params['offset_date']) || !isset($this->dialog_params['offset_id']) || \is_null($this->dialog_params['offset_id']) || !isset($this->dialog_params['offset_peer']) || \is_null($this->dialog_params['offset_peer']) || !isset($this->dialog_params['count']) || \is_null($this->dialog_params['count'])) {
             $this->dialog_params = ['limit' => 100, 'offset_date' => 0, 'offset_id' => 0, 'offset_peer' => ['_' => 'inputPeerEmpty'], 'count' => 0, 'hash' => 0];

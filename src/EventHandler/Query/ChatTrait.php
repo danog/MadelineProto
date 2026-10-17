@@ -32,7 +32,11 @@ trait ChatTrait
     /** Message ID */
     public readonly int $messageId;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawCallback)
     {
         parent::__construct($API, $rawCallback);
@@ -97,7 +101,7 @@ trait ChatTrait
     public function delete(bool $revoke = true): void
     {
         $this->getClient()->methodCallAsyncRead(
-            DialogId::isSupergroupOrChannel($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
+            DialogId::isSupergroupOrChannelOrMonoforum($this->chatId) ? 'channels.deleteMessages' : 'messages.deleteMessages',
             [
                 'channel' => $this->chatId,
                 'id' => [$this->messageId],

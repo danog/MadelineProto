@@ -39,7 +39,11 @@ final class Payment extends Update
     public readonly string $currency;
     /**Total amount in the smallest units of the currency (integer, not float/double). */
     public readonly int $totalAmount;
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawRequestedPayment)
     {
         parent::__construct($API);

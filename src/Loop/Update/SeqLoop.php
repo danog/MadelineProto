@@ -21,9 +21,13 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Update;
 
 use danog\Loop\Loop;
+use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\LoginState;
 use danog\MadelineProto\MTProtoTools\UpdatesState;
+use danog\MadelineProto\Reactive\SimpleSubscriber;
 
 use function Amp\delay;
 
@@ -33,10 +37,14 @@ use function Amp\delay;
  * @internal
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ *
+ * @implements SimpleSubscriber<LoginState>
  */
-final class SeqLoop extends Loop
+final class SeqLoop extends Loop implements SimpleSubscriber
 {
-    use InternalLoop;
+    use InternalLoop {
+        __construct as private init;
+    }
     /**
      * Incoming updates.
      */
@@ -53,9 +61,33 @@ final class SeqLoop extends Loop
      * State.
      */
     private ?UpdatesState $state = null;
+    private bool $mustPause;
+    /**
+     * Constructor.
+     */
+    public function __construct(MTProto $API)
+    {
+        $this->init($API);
+        $API->loginState->subscribe($this);
+    }
+    /**
+     * @psalm-pure
+     */
     public function __sleep(): array
     {
         return ['incomingUpdates', 'feeder', 'API', 'state'];
+    }
+    #[\Override]
+    public function onSimpleStateChange($state): void
+    {
+        $this->mustPause = $state->state !== API::LOGGED_IN;
+        if (!$this->mustPause) {
+            if ($this->isRunning()) {
+                $this->resume(true);
+            } else {
+                $this->start();
+            }
+        }
     }
     /**
      * Main loop.
@@ -63,7 +95,7 @@ final class SeqLoop extends Loop
     #[\Override]
     public function loop(): ?float
     {
-        if (!$this->isLoggedIn()) {
+        if ($this->mustPause) {
             return self::PAUSE;
         }
         $this->feeder = $this->API->feeders[FeedLoop::GENERIC];
@@ -119,6 +151,8 @@ final class SeqLoop extends Loop
     }
     /**
      * @param array<(array|mixed)> $updates
+     *
+     * @psalm-external-mutation-free
      */
     public function feed(array $updates): void
     {
@@ -134,11 +168,16 @@ final class SeqLoop extends Loop
     }
     /**
      * @param array<true> $wakeups
+     *
+     * @psalm-external-mutation-free
      */
     public function addPendingWakeups(array $wakeups): void
     {
         $this->pendingWakeups += $wakeups;
     }
+    /**
+     * @psalm-pure
+     */
     public function __toString(): string
     {
         return 'update seq loop';

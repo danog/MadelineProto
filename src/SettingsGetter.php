@@ -17,7 +17,9 @@
 namespace danog\MadelineProto;
 
 /** @internal */
+/** @psalm-mutable */
 interface SettingsGetter
 {
+    /** @psalm-impure */
     public function getSettings(): Settings;
 }

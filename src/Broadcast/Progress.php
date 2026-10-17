@@ -33,7 +33,11 @@ final class Progress extends Update implements JsonSerializable
      * Completion percentage.
      */
     public readonly int $percent;
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         MTProto $API,
         /** Broadcast ID */
@@ -52,6 +56,9 @@ final class Progress extends Update implements JsonSerializable
             ? 100
             : ($pendingCount ? (int) (($successCount+$failCount)*100/($successCount+$failCount+$pendingCount)) : 0);
     }
+    /**
+     * @psalm-mutation-free
+     */
     public function __toString(): string
     {
         return "Progress for {$this->broadcastId}: {$this->percent}%, status {$this->status->value}, sent to {$this->successCount} peers, failed sending to {$this->failCount} peers, {$this->pendingCount} peers left.";

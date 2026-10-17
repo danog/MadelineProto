@@ -49,6 +49,8 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     }
     /**
      * Async close.
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -89,6 +91,8 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     }
     /**
      * {@inheritdoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getSocket(): Socket
@@ -97,12 +101,17 @@ final class ADNLStream implements BufferedStreamInterface, MTProtoBufferInterfac
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getStream(): RawStreamInterface
     {
         return $this->stream;
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

@@ -43,7 +43,6 @@ final class Conversion
         }
         $settings = $settingsFull;
         $settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
-        $settings->getAuth()->setPfs(true);
         $MadelineProto = new API($session, $settings);
         /** @var APIWrapper */
         $wrapper = Tools::getVar($MadelineProto, 'wrapper');
@@ -126,6 +125,9 @@ final class Conversion
         return self::importAuthorization([$dc => $key], $dc, $new_session, $settings);
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function tdesktop_md5($data)
     {
         $result = '';

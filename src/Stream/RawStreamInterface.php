@@ -29,6 +29,7 @@ use Amp\Cancellation;
  * Raw stream interface.
  *
  * @author Daniil Gentili <daniil@daniil.it>
+ * @psalm-mutable
  */
 interface RawStreamInterface extends StreamInterface
 {
@@ -42,6 +43,7 @@ interface RawStreamInterface extends StreamInterface
      *
      * @throws PendingReadError Thrown if another read operation is still pending.
      * @throws StreamException  If the stream contains invalid data, e.g. invalid compression
+     * @psalm-impure
      */
     public function read(?Cancellation $cancellation = null): ?string;
     /**
@@ -51,6 +53,7 @@ interface RawStreamInterface extends StreamInterface
      *
      * @throws ClosedException If the stream has already been closed.
      * @throws StreamException If writing to the stream fails.
+     * @psalm-impure
      */
     public function write(string $bytes): void;
 }

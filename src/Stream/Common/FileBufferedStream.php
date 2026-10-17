@@ -80,6 +80,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     }
     /**
      * Async close.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function disconnect(): void
@@ -92,6 +94,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      * Get read buffer asynchronously.
      *
      * @param int $length Length of payload, as detected by this layer
+     *
+     * @psalm-mutation-free
      */
     #[\Override]
     public function getReadBuffer(?int &$length): \danog\MadelineProto\Stream\ReadBufferInterface
@@ -105,6 +109,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
      * Get write buffer asynchronously.
      *
      * @param int $length Total length of data that is going to be piped in the buffer
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function getWriteBuffer(int $length, string $append = ''): \danog\MadelineProto\Stream\WriteBufferInterface
@@ -148,6 +154,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     }
     /**
      * Set file handle.
+     *
+     * @psalm-external-mutation-free
      */
     #[\Override]
     public function setExtra($extra): void
@@ -156,6 +164,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getStream(): RawStreamInterface
@@ -164,6 +174,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     }
     /**
      * {@inheritDoc}
+     *
+     * @psalm-pure
      */
     #[\Override]
     public function getSocket(): Socket
@@ -172,6 +184,8 @@ final class FileBufferedStream implements BufferedStreamInterface, BufferInterfa
     }
     /**
      * Get class name.
+     *
+     * @psalm-pure
      */
     #[\Override]
     public static function getName(): string

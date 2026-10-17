@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\SimpleFilter;
 
 /** Allows only messages that contain a multiple poll */
+/** @psalm-mutable */
 interface HasMultiplePoll
 {
 }

@@ -24,17 +24,17 @@ use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Attributes\Cron;
 use danog\MadelineProto\EventHandler\Attributes\Handler;
+use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Filter\FilterText;
 use danog\MadelineProto\EventHandler\Filter\FilterTextCaseInsensitive;
+use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ChannelMessage;
-use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogPhotoChanged;
 use danog\MadelineProto\EventHandler\Plugin\RestartPlugin;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
-use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\Logger;
@@ -45,7 +45,6 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\SimpleEventHandler;
-use danog\MadelineProto\VoIP;
 
 use function Amp\Socket\SocketAddress\fromString;
 
@@ -61,6 +60,7 @@ if (class_exists(API::class)) {
     }
     require_once 'madeline.php';
 }
+
 /**
  * Event handler class.
  *
@@ -264,8 +264,9 @@ class MyEventHandler extends SimpleEventHandler
     {
         if ($message->photo) {
             $message->reply("Nice! Here's a download link for the photo: ".$message->photo->getDownloadLink());
+        } else {
+            $message->reply("Hmm, why did you delete the group photo?");
         }
-        // The group photo was deleted
     }
 
     /**
@@ -286,26 +287,40 @@ class MyEventHandler extends SimpleEventHandler
         $reply->reply("Download link: ".$reply->media->getDownloadLink());
     }
 
+    // Plays a video into a private call or a group call (video chat), joining it.
+    // The video is read from a WebM file, demuxed in pure PHP and sent as-is, so neither ffmpeg nor the FFI extension is required.
+    //
+    // Fully works on webhosts!
+    //
     #[FilterCommand('call')]
     public function callVoip(Incoming&Message $message): void
     {
-        $this->requestCall($message->senderId)->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
-    }
-
-    // Plays incoming audio files into a Telegram call
-    #[Handler]
-    public function playAudio(Incoming&PrivateMessage&HasAudio $message): void
-    {
-        if (!$this->isSelfUser()) {
+        if ($whyNot = $message->getCallDenialReason()) {
+            $message->reply("Can't start a call: ".$whyNot->value);
             return;
         }
-        $this->requestCall($message->senderId)->play($message->media->getStream());
+        $message->requestCall()->join()->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
+    }
+
+    // Plays incoming files into a Telegram call
+    #[Handler]
+    public function play(Incoming&Message $message): void
+    {
+        if (!$message->media instanceof Document
+            || !in_array($message->media->mimeType, ['audio/ogg', 'video/webm'], true)
+        ) {
+            return;
+        }
+        if (!$message->canRequestCall()) {
+            return;
+        }
+        $message->requestCall()->join()->play($message->media->getStream());
     }
 
     #[Handler]
-    public function handleIncomingCall(VoIP&Incoming $call): void
+    public function handleIncomingCall(PrivateCall&Incoming $call): void
     {
-        $call->accept()->play(new RemoteUrl('http://icestreaming.rai.it/1.mp3'));
+        $call->join()->play(new RemoteUrl('https://paste.daniil.it/oncall.webm'));
     }
 
     public static function getPluginPaths(): string|array|null

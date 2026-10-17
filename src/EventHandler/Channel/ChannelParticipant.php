@@ -51,6 +51,9 @@ final class ChannelParticipant extends Update
     /** Chat invite used to join the channel/supergroup */
     public readonly ?ChatInvite $inviteLink;
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(MTProto $API, array $rawChannelParticipant)
     {
         parent::__construct($API);

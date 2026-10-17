@@ -24,6 +24,7 @@ namespace danog\MadelineProto;
  * File callback interface.
  *
  * @template T
+ * @psalm-mutable
  */
 interface FileCallbackInterface
 {
@@ -31,6 +32,7 @@ interface FileCallbackInterface
      * Get file.
      *
      * @return T
+     * @psalm-impure
      */
     public function getFile(): mixed;
     /**
@@ -39,6 +41,7 @@ interface FileCallbackInterface
      * @param float $percent Percent
      * @param float $speed   Speed in mbps
      * @param float $time    Time
+     * @psalm-impure
      */
     public function __invoke(float $percent, float $speed, float $time);
 }

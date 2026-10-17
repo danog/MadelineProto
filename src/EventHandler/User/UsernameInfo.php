@@ -34,7 +34,11 @@ final class UsernameInfo implements JsonSerializable
     /** The username. */
     public readonly string $username;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawUserNames)
     {
         $this->bought = !$rawUserNames['editable'];

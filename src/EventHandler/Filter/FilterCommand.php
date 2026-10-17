@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use AssertionError;
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\CommandType;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
@@ -36,6 +37,8 @@ final class FilterCommand extends Filter
     /**
      * @param string            $command Command
      * @param list<CommandType> $types   Command types, if empty all command types are allowed.
+     *
+     * @psalm-mutation-free
      */
     public function __construct(private readonly string $command, array $types = [CommandType::BANG, CommandType::DOT, CommandType::SLASH])
     {
@@ -50,9 +53,12 @@ final class FilterCommand extends Filter
         }
         $this->commandTypes = $types;
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->command === $this->command && \in_array($update->commandType, $this->commandTypes, true);
+        return ($update instanceof Message || $update instanceof MultiCallMessage) && $update->command === $this->command && \in_array($update->commandType, $this->commandTypes, true);
     }
 }

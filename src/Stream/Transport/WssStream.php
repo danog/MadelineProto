@@ -39,6 +39,9 @@ final class WssStream extends WsStream
     {
         parent::connect($ctx->clone()->secure(true), $header);
     }
+    /**
+     * @psalm-pure
+     */
     #[\Override]
     public static function getName(): string
     {

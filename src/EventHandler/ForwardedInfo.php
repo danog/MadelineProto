@@ -18,10 +18,16 @@ namespace danog\MadelineProto\EventHandler;
 
 /**
  * Info about a forwarded message.
+ *
+ * @psalm-immutable
  */
 final class ForwardedInfo
 {
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** When was the message originally sent */
         public readonly int $date,

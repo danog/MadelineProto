@@ -48,7 +48,11 @@ final class PollAnswer implements JsonSerializable
     /** How many users voted for this option */
     public readonly ?int $voters;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawAnswer)
     {
         $this->text = $rawAnswer['text']['text'];

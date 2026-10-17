@@ -43,9 +43,4 @@ trait InternalLoop
     {
         $this->API = $API;
     }
-
-    public function isLoggedIn(): bool
-    {
-        return $this->API->getAuthorization() === API::LOGGED_IN;
-    }
 }

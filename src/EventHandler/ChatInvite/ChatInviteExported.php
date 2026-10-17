@@ -59,7 +59,11 @@ final class ChatInviteExported extends ChatInvite
     /** Custom description for the invite link, visible only to admins. */
     public readonly ?string $title;
 
-    /** @internal */
+    /**
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
     public function __construct(array $rawChatInvite)
     {
         $this->revoked = $rawChatInvite['revoked'] ?? false;

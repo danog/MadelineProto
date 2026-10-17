@@ -22,9 +22,14 @@ namespace danog\MadelineProto\Broadcast;
 
 /**
  * Broadcast filter.
+ *
+ * @psalm-immutable
  */
 final class Filter
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         public readonly bool $allowUsers,
         public readonly bool $allowBots,
@@ -36,6 +41,9 @@ final class Filter
         public readonly ?array $whitelist = null,
     ) {
     }
+    /**
+     * @psalm-pure
+     */
     public static function default(): self
     {
         return new self(true, true, true, true);

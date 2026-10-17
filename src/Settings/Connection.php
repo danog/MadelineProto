@@ -166,52 +166,54 @@ final class Connection extends SettingsAbstract
      *
      * Available MTProto transport protocols (smaller overhead is better):
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream`: Lightest protocol available
-     *   * Overhead: Very small
-     *   * Minimum envelope length: 1 byte (length)
-     *   * Maximum envelope length: 4 bytes (length)
+     * `\danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream`: Lightest protocol available
+     * Overhead: Very small
+     * Minimum envelope length: 1 byte (length)
+     * Maximum envelope length: 4 bytes (length)
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream`: I guess they like having multiple protocols
-     *   * Overhead: small
-     *   * Minimum envelope length: 4 bytes (length)
-     *   * Maximum envelope length: 4 bytes (length)
+     * `\danog\MadelineProto\Stream\MTProtoTransport\IntermediateStream`: I guess they like having multiple protocols
+     * Overhead: small
+     * Minimum envelope length: 4 bytes (length)
+     * Maximum envelope length: 4 bytes (length)
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream`: Padded version of the intermediate protocol, to use with obfuscation enabled to bypass ISP blocks
-     *   * Overhead: small-medium
-     *   * Minimum envelope length: random
-     *   * Maximum envelope length: random
+     * `\danog\MadelineProto\Stream\MTProtoTransport\IntermediatePaddedStream`: Padded version of the intermediate protocol, to use with obfuscation enabled to bypass ISP blocks
+     * Overhead: small-medium
+     * Minimum envelope length: random
+     * Maximum envelope length: random
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\FullStream`: The basic MTProto transport protocol
-     *   * Overhead: medium
-     *   * Minimum envelope length: 12 bytes (length+seqno+crc)
-     *   * Maximum envelope length: 12 bytes (length+seqno+crc)
-     *   * Pros:
-     *     * Initial integrity check with crc32
-     *     * Transport sequence number check
+     * `\danog\MadelineProto\Stream\MTProtoTransport\FullStream`: The basic MTProto transport protocol
+     * Overhead: medium
+     * Minimum envelope length: 12 bytes (length+seqno+crc)
+     * Maximum envelope length: 12 bytes (length+seqno+crc)
+     * Pros:
+     * Initial integrity check with crc32
+     * Transport sequence number check
      *
-     *   * Cons:
-     *     * Initial integrity check with crc32 is not that useful since the TCP protocol already uses it internally
-     *     * Transport sequence number check is also not that useful since transport sequence numbers are not encrypted and thus cannot be used to avoid replay attacks, and MadelineProto already uses MTProto sequence numbers and message ids for that.
+     * Cons:
+     * Initial integrity check with crc32 is not that useful since the TCP protocol already uses it internally
+     * Transport sequence number check is also not that useful since transport sequence numbers are not encrypted and thus cannot be used to avoid replay attacks, and MadelineProto already uses MTProto sequence numbers and message ids for that.
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\HttpStream`: MTProto over HTTP for browsers and webhosts
-     *   * Overhead: medium
-     *   * Pros:
-     *     * Can be used on restricted webhosts or browsers
-     *   * Cons:
-     *     * Very big envelope length
+     * `\danog\MadelineProto\Stream\MTProtoTransport\HttpStream`: MTProto over HTTP for browsers and webhosts
+     * Overhead: medium
+     * Pros:
+     * Can be used on restricted webhosts or browsers
+     * Cons:
+     * Very big envelope length
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\HttpsStream`: MTProto over HTTPS for browsers and webhosts, very secure
-     *   * Overhead: high
-     *   * Pros:
-     *     * Can be used on restricted webhosts or browsers
-     *     * Provides an additional layer of security by trasmitting data over TLS
-     *     * Integrity checks with HMAC built into TLS
-     *     * Sequence number checks built into TLS
-     *   * Cons:
-     *     * Very big envelope length
-     *     * Requires an additional round of encryption
+     * `\danog\MadelineProto\Stream\MTProtoTransport\HttpsStream`: MTProto over HTTPS for browsers and webhosts, very secure
+     * Overhead: high
+     * Pros:
+     * Can be used on restricted webhosts or browsers
+     * Provides an additional layer of security by trasmitting data over TLS
+     * Integrity checks with HMAC built into TLS
+     * Sequence number checks built into TLS
+     * Cons:
+     * Very big envelope length
+     * Requires an additional round of encryption
      *
      * @param class-string<MTProtoBufferInterface> $protocol Protocol identifier
+     *
+     * @psalm-external-mutation-free
      */
     public function setProtocol(string $protocol): self
     {
@@ -235,6 +237,8 @@ final class Connection extends SettingsAbstract
      * Set whether to use ipv6.
      *
      * @param bool $ipv6 Whether to use ipv6
+     *
+     * @psalm-external-mutation-free
      */
     public function setIpv6(bool $ipv6): self
     {
@@ -255,6 +259,8 @@ final class Connection extends SettingsAbstract
      * Set subdomains of web.telegram.org for https protocol.
      *
      * @param array $sslSubdomains Subdomains of web.telegram.org for https protocol.
+     *
+     * @psalm-external-mutation-free
      */
     public function setSslSubdomains(array $sslSubdomains): self
     {
@@ -275,6 +281,8 @@ final class Connection extends SettingsAbstract
      * Set maximum media socket count.
      *
      * @param int $maxMediaSocketCount Maximum media socket count.
+     *
+     * @psalm-external-mutation-free
      */
     public function setMaxMediaSocketCount(int $maxMediaSocketCount): self
     {
@@ -295,6 +303,8 @@ final class Connection extends SettingsAbstract
      * Set robin period (seconds).
      *
      * @param int $robinPeriod Robin period (seconds).
+     *
+     * @psalm-external-mutation-free
      */
     public function setRobinPeriod(int $robinPeriod): self
     {
@@ -316,12 +326,14 @@ final class Connection extends SettingsAbstract
     /**
      * Add proxy identifier to list, one of:.
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
-     * * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
-     * * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
+     * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
+     * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
+     * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
      *
      * @param class-string<StreamInterface> $proxy Proxy identifier
      * @param array                         $extra Extra
+     *
+     * @psalm-external-mutation-free
      */
     public function addProxy(string $proxy, array $extra = []): self
     {
@@ -341,13 +353,15 @@ final class Connection extends SettingsAbstract
      *
      * The key must be one of:
      *
-     * * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
-     * * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
-     * * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
+     * `\danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream::class`
+     * `\danog\MadelineProto\Stream\Proxy\HttpProxy::class`
+     * `\danog\MadelineProto\Stream\Proxy\SocksProxy::class`
      *
      * The value must be a list of extra (URI, username, password) for that proxy.
      *
      * @param array<class-string<StreamInterface>, list<array>> $proxies Proxies
+     *
+     * @psalm-external-mutation-free
      */
     public function setProxies(array $proxies): self
     {
@@ -361,6 +375,8 @@ final class Connection extends SettingsAbstract
     }
     /**
      * Clear proxies.
+     *
+     * @psalm-external-mutation-free
      */
     public function clearProxies(): self
     {
@@ -371,6 +387,8 @@ final class Connection extends SettingsAbstract
 
     /**
      * Remove specific proxy pair.
+     *
+     * @psalm-external-mutation-free
      */
     public function removeProxy(string $proxy, array $extra): self
     {
@@ -398,6 +416,8 @@ final class Connection extends SettingsAbstract
      * Set whether to use the obfuscated protocol: useful to bypass ISP blocks.
      *
      * @param bool $obfuscated Whether to use the obfuscated protocol.
+     *
+     * @psalm-external-mutation-free
      */
     public function setObfuscated(bool $obfuscated): self
     {
@@ -418,6 +438,8 @@ final class Connection extends SettingsAbstract
      * Set whether we're in test mode.
      *
      * @param bool $testMode Whether we're in test mode.
+     *
+     * @psalm-external-mutation-free
      */
     public function setTestMode(bool $testMode): self
     {
@@ -440,11 +462,13 @@ final class Connection extends SettingsAbstract
      * Sets the transport protocol to use when connecting to telegram.
      * Not supported by HTTP and HTTPS protocols, obfuscation must be enabled.
      *
-     * * `danog\MadelineProto\Stream\Transport`: Default TCP transport
-     * * `danog\MadelineProto\Stream\WsTransport`: Plain websocket transport
-     * * `danog\MadelineProto\Stream\WssTransport`: TLS websocket transport
+     * `danog\MadelineProto\Stream\Transport`: Default TCP transport
+     * `danog\MadelineProto\Stream\WsTransport`: Plain websocket transport
+     * `danog\MadelineProto\Stream\WssTransport`: TLS websocket transport
      *
      * @param class-string<RawStreamInterface> $transport Transport identifier.
+     *
+     * @psalm-external-mutation-free
      */
     public function setTransport(string $transport): self
     {
@@ -468,6 +492,8 @@ final class Connection extends SettingsAbstract
      * Set whether to retry connection.
      *
      * @param bool $retry Whether to retry connection.
+     *
+     * @psalm-external-mutation-free
      */
     public function setRetry(bool $retry): self
     {
@@ -488,6 +514,8 @@ final class Connection extends SettingsAbstract
      * Set connection timeout.
      *
      * @param float $timeout Connection timeout.
+     *
+     * @psalm-external-mutation-free
      */
     public function setTimeout(float $timeout): self
     {
@@ -508,6 +536,8 @@ final class Connection extends SettingsAbstract
      * Set ping interval.
      *
      * @param int $pingInterval Ping interval
+     *
+     * @psalm-external-mutation-free
      */
     public function setPingInterval(int $pingInterval): self
     {
@@ -528,6 +558,8 @@ final class Connection extends SettingsAbstract
      * Set whether to use DNS over HTTPS.
      *
      * @param bool $useDoH Whether to use DNS over HTTPS
+     *
+     * @psalm-external-mutation-free
      */
     public function setUseDoH(bool $useDoH): self
     {
@@ -548,6 +580,8 @@ final class Connection extends SettingsAbstract
      * Set bind on specific address and port.
      *
      * @param null|string $bindTo Bind on specific address and port.
+     *
+     * @psalm-external-mutation-free
      */
     public function setBindTo(?string $bindTo): self
     {
@@ -570,6 +604,7 @@ final class Connection extends SettingsAbstract
      *
      * @param array $rsaKeys RSA keys
      *
+     * @psalm-external-mutation-free
      */
     public function setRsaKeys(array $rsaKeys): self
     {
@@ -592,6 +627,7 @@ final class Connection extends SettingsAbstract
      *
      * @param array $testRsaKeys Test RSA keys
      *
+     * @psalm-external-mutation-free
      */
     public function setTestRsaKeys(array $testRsaKeys): self
     {

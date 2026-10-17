@@ -32,6 +32,9 @@ use ReflectionProperty;
  */
 abstract class Participant implements JsonSerializable
 {
+    /**
+     * @psalm-pure
+     */
     public static function fromRawParticipant(array $rawParticipant): self
     {
         return match ($rawParticipant['_']) {

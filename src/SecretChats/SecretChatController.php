@@ -38,7 +38,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Math\BigInteger;
 use Revolt\EventLoop;
 use Stringable;
 use Webmozart\Assert\Assert;
@@ -127,7 +127,6 @@ final class SecretChatController implements Stringable
         );
         $this->updated = $this->public->created;
         $this->feedLoop = new SecretFeedLoop($API, $this);
-        $this->feedLoop->start();
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
         $this->sentMutex = new LocalKeyedMutex;
@@ -146,11 +145,14 @@ final class SecretChatController implements Stringable
         );
     }
 
-    public function startFeedLoop(): void
+    public function wakeupFeedLoop(): void
     {
-        $this->feedLoop->start();
+        $this->API->loginState->subscribe($this->feedLoop);
     }
 
+    /**
+     * @psalm-mutation-free
+     */
     public function __serialize(): array
     {
         $vars = get_object_vars($this);
@@ -547,7 +549,7 @@ final class SecretChatController implements Stringable
                 $this->mtproto = 2;
             }
         }
-        $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '']);
+        $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'encrypted' => true, 'connection' => null]);
         $this->ttr--;
         if (($this->ttr <= 0 || time() - $this->updated > 7 * 24 * 60 * 60) && $this->rekeyState === RekeyState::IDLE) {
             $this->rekey();
@@ -710,10 +712,16 @@ final class SecretChatController implements Stringable
             yield from $queue;
         }
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function generateSecretInSeqNo(): int
     {
         return $this->remoteLayer > 8 ? $this->in_seq_no * 2 + $this->in_seq_no_base : -1;
     }
+    /**
+     * @psalm-mutation-free
+     */
     private function generateSecretOutSeqNo(): int
     {
         return $this->remoteLayer > 8 ? $this->out_seq_no * 2 + $this->out_seq_no_base : -1;
@@ -728,6 +736,9 @@ final class SecretChatController implements Stringable
         [$seq, $outgoing] = $result;
         return $outgoing ? $this->outgoing[$seq] : $this->incoming[$seq];
     }
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function __toString(): string
     {
