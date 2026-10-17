@@ -1,0 +1,78 @@
+name: Daily build
+
+# Runs composer build once a day, submitting what changed (usually, a new layer) as pull requests to
+# danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto: see tests/autobuild.sh.
+#
+# It pushes with the token of a GitHub App installed on the three repositories (contents and pull
+# requests: read and write), whose ID is the AUTOBUILD_APP_ID variable and private key the
+# AUTOBUILD_APP_PRIVATE_KEY secret: rulesets on their default branches let only the admins push to
+# them, so it can only open pull requests.
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # Until the app is set up.
+    if: vars.AUTOBUILD_APP_ID != ''
+    runs-on: ubuntu-latest
+    container: danog/madelineproto:next
+    # The user sessions must not be used by two jobs at once.
+    concurrency:
+      group: telegram-user-sessions
+      cancel-in-progress: false
+    steps:
+      - name: Install git
+        run: apt-get update && apt-get install -y git
+
+      - name: Get a token of the app
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.AUTOBUILD_APP_ID }}
+          private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: MadelineProto,MadelineProtoDocs,schemas
+
+      - name: Get the user of the app
+        id: user
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          apt-get install -y curl
+          id=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/users/$SLUG%5Bbot%5D" | php -r 'echo json_decode(stream_get_contents(STDIN))->id;')
+          echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=$id+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Build and submit the changes
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+          GIT_NAME: ${{ steps.user.outputs.name }}
+          GIT_EMAIL: ${{ steps.user.outputs.email }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          TEST_BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
+          USER_SESSION_AUTH: ${{ secrets.USER_SESSION_AUTH }}
+          TELERPC_AUTH_TOKEN: ${{ secrets.TELERPC_AUTH_TOKEN }}
+        run: tests/test.sh build
+
+      - name: Report the failure to @danogentili
+        if: failure()
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          php -r '
+            $context = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json", "content" => json_encode(["chat_id" => 101374607, "text" => "The daily composer build of MadelineProto failed: ".getenv("RUN_URL")])]]);
+            exit(file_get_contents("https://api.telegram.org/bot".getenv("BOT_TOKEN")."/sendMessage", false, $context) === false ? 1 : 0);
+          '

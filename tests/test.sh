@@ -45,6 +45,11 @@ if [ "$1" == "cs" ]; then
     exit 0
 fi
 
+if [ "$1" == "build" ]; then
+    tests/autobuild.sh
+    exit 0
+fi
+
 if [ "$1" == "handshake" ]; then
     php tests/handshake.php
     exit 0
