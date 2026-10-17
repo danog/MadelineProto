@@ -175,6 +175,9 @@ trait PeerHandler
     {
         if (\is_array($id)) {
             switch ($id['_']) {
+                case 'help.promoData':
+                    // Its peer is optional.
+                    return isset($id['peer']) ? $this->getIdInternal($id['peer']) : null;
                 case 'updateDialogPinned':
                 case 'updateDialogUnreadMark':
                 case 'updateNotifySettings':
@@ -192,7 +195,6 @@ trait PeerHandler
                 case 'dialog':
                 case 'dialogPeer':
                 case 'notifyPeer':
-                case 'help.proxyDataPromo':
                 case 'folderPeer':
                 case 'inputDialogPeer':
                 case 'inputNotifyPeer':
