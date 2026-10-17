@@ -5,7 +5,8 @@
  * it's fully released: see tests/release_notes.sh.
  *
  * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and BOT_TOKEN.
- * Does nothing if the release is still a draft or a pre-release, or was already announced.
+ * Does nothing if the release is still a draft or a pre-release, or was already announced; if it fails midway,
+ * running it again sends the rest (the messages sent are counted in the body of the release).
  *
  * With DRY_RUN=1, prints the messages instead (of any release, BOT_TOKEN is not needed).
  */
@@ -17,7 +18,11 @@ require __DIR__.'/../vendor/autoload.php';
 
 const CHAT_ID = 101374607; // @danogentili
 const MAX_LENGTH = 4096;
+// More fail with ENTITIES_TOO_LONG.
+const MAX_ENTITIES = 100;
 const ANNOUNCED = '<!-- announced -->';
+// How many of the messages were sent, if not all of them.
+const SENT = '/<!-- announced (\d+) messages -->\n?/';
 
 $tag = $argv[1] ?? '';
 $repository = getenv('GH_REPO') ?: 'danog/MadelineProto';
@@ -114,12 +119,13 @@ foreach (preg_split('/\r?\n/', $changelog) as $line) {
     }
 }
 
-// Messages of at most MAX_LENGTH characters (as Telegram counts them), split between lines.
+// Messages of at most MAX_LENGTH characters (as Telegram counts them) and MAX_ENTITIES entities, split between lines.
 $messages = [];
 $current = '';
 foreach ($lines as $line) {
     $candidate = $current === '' ? $line : "$current\n$line";
-    if ($current !== '' && EntityTools::mbStrlen(Entities::fromMarkdown($candidate)->message) > MAX_LENGTH) {
+    $entities = $current === '' ? null : Entities::fromMarkdown($candidate);
+    if ($entities !== null && (EntityTools::mbStrlen($entities->message) > MAX_LENGTH || \count($entities->entities) > MAX_ENTITIES)) {
         $messages[] = $current;
         $candidate = $line;
     }
@@ -127,10 +133,17 @@ foreach ($lines as $line) {
 }
 $messages[] = $current;
 
-foreach ($messages as $message) {
+// Sent by a previous run, which failed midway.
+$sent = preg_match(SENT, $body, $match) ? (int) $match[1] : 0;
+$body = rtrim(preg_replace(SENT, '', $body));
+foreach ($messages as $i => $message) {
     $entities = Entities::fromMarkdown(preg_replace("/\n{3,}/", "\n\n", $message));
     if ($dryRun) {
-        echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL, '---', PHP_EOL;
+        printf("--- message %d/%d: %d characters, %d entities%s\n", $i + 1, \count($messages), EntityTools::mbStrlen($entities->message), \count($entities->entities), $i < $sent ? ' (already sent)' : '');
+        echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL;
+        continue;
+    }
+    if ($i < $sent) {
         continue;
     }
     call('POST', "https://api.telegram.org/bot$botToken/sendMessage", [], [
@@ -139,9 +152,12 @@ foreach ($messages as $message) {
         'entities' => $entities->entities,
         'link_preview_options' => ['is_disabled' => true],
     ]);
+    if ($i + 1 < \count($messages)) {
+        github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n<!-- announced ".($i + 1)." messages -->\n"]);
+    }
 }
 if ($dryRun) {
     exit(0);
 }
-github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => rtrim($body)."\n".ANNOUNCED."\n"]);
-echo "Sent the changelog of $tag in ".count($messages).' message(s)'.PHP_EOL;
+github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n".ANNOUNCED."\n"]);
+echo "Sent the changelog of $tag in ".\count($messages).' message(s)'.($sent ? ", $sent of them by a previous run" : '').PHP_EOL;
