@@ -1054,8 +1054,10 @@ trait Handler
      */
     private function groupCallStreamDc(GroupCallController $controller): int
     {
-        $dc = $controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc;
-        if ($this->isTestMode() && $dc < 10_000) {
+        // The bare DC ID, as tdesktop takes it (BareDcId), whether the server sent it shifted or not,
+        // and whether it is the authorized DC, already in our numbering of the test DCs (10001-10003).
+        $dc = ($controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc) % 10_000;
+        if ($this->isTestMode()) {
             $dc += 10_000;
         }
         if ($this->datacenter->has(-$dc)) {
