@@ -32,27 +32,15 @@ php tests/ci_sessions.php --test user fuzz_user.madeline USER_SESSION_AUTH
 
 composer build
 
+source tests/submit_pr.sh
+
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
-
-# Commit the staged changes of a repository to the autobuild branch, opening a pull request if there's none.
-# Not called in a condition: there, errors would not stop the script.
-submit()
-{
-    local dir=$1 repository=$2 body=$3
-    git -C "$dir" status --short
-    git -C "$dir" checkout -q -B "$BRANCH"
-    git -C "$dir" commit -q -m "$title"
-    git -C "$dir" push -q --force origin "$BRANCH"
-    if [ "$(gh pr list --repo "$repository" --head "$BRANCH" --state open --json number --jq length)" == "0" ]; then
-        base=$(gh repo view "$repository" --json defaultBranchRef --jq .defaultBranchRef.name)
-        gh pr create --repo "$repository" --base "$base" --head "$BRANCH" --title "$title" --body "$body
-
-Built by $RUN_URL"
-    else
-        echo "Updated the pull request of $repository"
-    fi
-}
+# The release label of the pull request of MadelineProto, see .github/release.yml.
+label=release:internal
+if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
+    label=release:layer
+fi
 
 changed=""
 for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
@@ -63,7 +51,7 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
         echo "Nothing changed in $repository"
         continue
     fi
-    submit "$dir" "$repository" "The daily \`composer build\` of MadelineProto, see the pull request with the same title in danog/MadelineProto."
+    submit_pr "$dir" "$repository" "$BRANCH" "$title" "The daily \`composer build\` of MadelineProto, see the pull request with the same title in danog/MadelineProto."
     changed="$changed $repository"
 done
 
@@ -80,4 +68,4 @@ if [ "$changed" != "" ]; then
 
 It points to the commits of the pull requests with the same title in:$changed. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
 fi
-submit . danog/MadelineProto "$body"
+submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
