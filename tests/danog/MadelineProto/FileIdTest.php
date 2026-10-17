@@ -164,7 +164,6 @@ class FileIdTest extends MadelineTestCase
                 ]);
                 curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
                 $botResult = json_decode(curl_exec($handle), true);
-                curl_close($handle);
 
                 unlink(basename($url));
             } else {
