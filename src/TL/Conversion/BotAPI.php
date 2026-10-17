@@ -42,17 +42,27 @@ trait BotAPI
         return html_entity_decode(preg_replace('#< *br */? *>#', "\n", $stuff));
     }
     /**
-     * @return array<int|int, array{_: string, buttons: array<int|int, array{_: string, text: mixed, same_peer?: bool, query?: mixed, data?: mixed, url?: mixed}>}>
+     * Convert the rows of a bot API keyboard: keyboardButtonRow/keyboardButton with a ButtonType for reply
+     * keyboards, keyboardInlineButtonRow/keyboardInlineButton with an InlineButtonType for inline ones.
+     *
+     * @return list<array{_: string, buttons: list<array{_: string, text: string, type?: array, style?: array}>}>
      */
     private function parseButtons(array $rows, bool $inline): array
     {
         $newrows = [];
         $key = 0;
-        $button_key = 0;
         foreach ($rows as $row) {
-            $newrows[$key] = ['_' => 'keyboardButtonRow', 'buttons' => []];
+            $newrows[$key] = ['_' => $inline ? 'keyboardInlineButtonRow' : 'keyboardButtonRow', 'buttons' => []];
+            $button_key = 0;
             foreach ($row as $button) {
-                $newrows[$key]['buttons'][$button_key] = ['_' => 'keyboardButton', 'text' => $button['text']];
+                $text = $button['text'];
+                $newrows[$key]['buttons'][$button_key] = [
+                    '_' => $inline ? 'keyboardInlineButton' : 'keyboardButton',
+                    'text' => $button['text'],
+                ];
+                if (!$inline) {
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeDefault';
+                }
                 if (isset($button['style']) || isset($button['icon_custom_emoji_id'])) {
                     $newrows[$key]['buttons'][$button_key]['style']['_'] = 'keyboardButtonStyle';
                     $bgKey = match ($button['style'] ?? null) {
@@ -70,48 +80,50 @@ trait BotAPI
                 }
                 if (isset($button['url'])) {
                     if (str_starts_with($button['url'], 'tg://user?id=')) {
-                        $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUserProfile';
-                        $newrows[$key]['buttons'][$button_key]['user_id'] = str_replace(
+                        $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inputInlineButtonTypeUserProfile';
+                        $newrows[$key]['buttons'][$button_key]['type']['user_id'] = str_replace(
                             'tg://user?id=',
                             '',
                             $button['url']
                         );
                     } else {
-                        $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonUrl';
-                        $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
+                        $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeUrl';
+                        $newrows[$key]['buttons'][$button_key]['type']['url'] = $button['url'];
                     }
                 } elseif (isset($button['pay'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonBuy';
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeBuy';
                 } elseif (isset($button['callback_data'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonCallback';
-                    $newrows[$key]['buttons'][$button_key]['data'] = $button['callback_data'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeCallback';
+                    $newrows[$key]['buttons'][$button_key]['type']['data'] = (string) $button['callback_data'];
                 } elseif (isset($button['login_url'])) {
                     $button = $button['login_url'];
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'inputKeyboardButtonUrlAuth';
-                    $newrows[$key]['buttons'][$button_key]['request_write_access'] = $button['request_write_access'] ?? false;
-                    $newrows[$key]['buttons'][$button_key]['fwd_text'] = $button['forward_text'] ?? false;
-                    $newrows[$key]['buttons'][$button_key]['url'] = $button['url'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inputInlineButtonTypeUrlAuth';
+                    $newrows[$key]['buttons'][$button_key]['type']['request_write_access'] = $button['request_write_access'] ?? false;
+                    if (isset($button['forward_text'])) {
+                        $newrows[$key]['buttons'][$button_key]['type']['fwd_text'] = $button['forward_text'];
+                    }
+                    $newrows[$key]['buttons'][$button_key]['type']['url'] = $button['url'];
                     if (isset($button['bot_username'])) {
-                        $newrows[$key]['buttons'][$button_key]['bot'] = $button['bot_username'];
+                        $newrows[$key]['buttons'][$button_key]['type']['bot'] = $button['bot_username'];
                     }
                 } elseif (isset($button['web_app'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = $inline
-                        ? 'keyboardButtonWebView'
-                        : 'keyboardButtonSimpleWebView';
-                    $newrows[$key]['buttons'][$button_key]['url'] = $button['web_app']['url'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = $inline
+                        ? 'inlineButtonTypeWebView'
+                        : 'buttonTypeSimpleWebView';
+                    $newrows[$key]['buttons'][$button_key]['type']['url'] = $button['web_app']['url'];
                 } elseif (isset($button['switch_inline_query'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeSwitchInline';
+                    $newrows[$key]['buttons'][$button_key]['type']['same_peer'] = false;
+                    $newrows[$key]['buttons'][$button_key]['type']['query'] = $button['switch_inline_query'];
                 } elseif (isset($button['switch_inline_query_current_chat'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = true;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['switch_inline_query_current_chat'] ?? '';
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeSwitchInline';
+                    $newrows[$key]['buttons'][$button_key]['type']['same_peer'] = true;
+                    $newrows[$key]['buttons'][$button_key]['type']['query'] = $button['switch_inline_query_current_chat'] ?? '';
                 } elseif (isset($button['switch_inline_query_chosen_chat'])) {
                     $button = $button['switch_inline_query_chosen_chat'];
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonSwitchInline';
-                    $newrows[$key]['buttons'][$button_key]['same_peer'] = false;
-                    $newrows[$key]['buttons'][$button_key]['query'] = $button['query'] ?? '';
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeSwitchInline';
+                    $newrows[$key]['buttons'][$button_key]['type']['same_peer'] = false;
+                    $newrows[$key]['buttons'][$button_key]['type']['query'] = $button['query'] ?? '';
                     $peer_types = [];
                     if ($button['allow_user_chats'] ?? false) {
                         $peer_types []= ['_' => 'inlineQueryPeerTypePM'];
@@ -127,18 +139,26 @@ trait BotAPI
                         $peer_types []= ['_' => 'inlineQueryPeerTypeBroadcast'];
                     }
                     if (!empty($peer_types)) {
-                        $newrows[$key]['buttons'][$button_key]['peer_types'] = $peer_types;
+                        $newrows[$key]['buttons'][$button_key]['type']['peer_types'] = $peer_types;
                     }
                 } elseif (isset($button['callback_game'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonGame';
-                    $newrows[$key]['buttons'][$button_key]['text'] = $button['callback_game'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeGame';
                 } elseif (isset($button['request_contact']) && $button['request_contact']) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestPhone';
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeRequestPhone';
                 } elseif (isset($button['request_location']) && $button['request_location']) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonRequestGeoLocation';
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeRequestGeoLocation';
                 } elseif (isset($button['copy_text'])) {
-                    $newrows[$key]['buttons'][$button_key]['_'] = 'keyboardButtonCopy';
-                    $newrows[$key]['buttons'][$button_key]['copy_text'] = $button['copy_text']['text'];
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'inlineButtonTypeCopy';
+                    $newrows[$key]['buttons'][$button_key]['type']['copy_text'] = $button['copy_text']['text'];
+                } elseif (isset($button['request_poll'])) {
+                    $newrows[$key]['buttons'][$button_key]['type']['_'] = 'buttonTypeRequestPoll';
+                    // Without a type, any poll can be created.
+                    if (isset($button['request_poll']['type'])) {
+                        $newrows[$key]['buttons'][$button_key]['type']['quiz'] = $button['request_poll']['type'] === 'quiz';
+                    }
+                }
+                if (!isset($newrows[$key]['buttons'][$button_key]['type'])) {
+                    throw new Exception("The inline keyboard button \"$text\" has no action (url, callback_data, ...)");
                 }
                 $button_key++;
             }
@@ -413,6 +433,14 @@ trait BotAPI
         }
         if (isset($arguments['reply_markup'])) {
             $arguments['reply_markup'] = $this->parseReplyMarkup($arguments['reply_markup']);
+        }
+        if (isset($arguments['results']) && \is_array($arguments['results'])) {
+            foreach ($arguments['results'] as &$result) {
+                if (isset($result['send_message']['reply_markup'])) {
+                    $result['send_message']['reply_markup'] = $this->parseReplyMarkup($result['send_message']['reply_markup']);
+                }
+            }
+            unset($result);
         }
         if (isset($arguments['parse_mode'])) {
             $arguments = $this->parseMode($arguments);
