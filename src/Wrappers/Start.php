@@ -70,13 +70,14 @@ trait Start
                     $cancel = new CompositeCancellation($expire, $login);
 
                     try {
-                        $result = Tools::readLine(Lang::$current_lang['loginQr'].PHP_EOL.Lang::$current_lang['loginManual'], $cancel);
+                        // A phone number, or a bot token, censored after its colon.
+                        $result = Tools::readLine(Lang::$current_lang['loginQr'].PHP_EOL.Lang::$current_lang['loginManual'], $cancel, hideAfter: ':');
                         break;
                     } catch (CancelledException) {
                         if ($login->isRequested()) {
                             $stdout->write(PHP_EOL.PHP_EOL.Lang::$current_lang['loginQrCodeSuccessful'].PHP_EOL);
                             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+                                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint()), hidden: true));
                             }
                             $this->serialize();
                             return $this->fullGetSelf();
@@ -92,10 +93,10 @@ trait Start
                 }
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_CODE) {
-                $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode']));
+                $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode'], hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint()), hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
                 $this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName']));
@@ -211,7 +212,7 @@ trait Start
                 } else {
                     $title = str_replace(':', '', Lang::$current_lang['loginBot']);
                     $token = htmlentities(Lang::$current_lang['loginBotTokenWeb']);
-                    $form = "<input type='text' name='token' placeholder='$token' required/>";
+                    $form = "<input type='password' name='token' placeholder='$token' required/>";
                 }
             } elseif (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
                 header('Content-type: application/json');
@@ -271,7 +272,7 @@ trait Start
         } elseif ($auth === \danog\MadelineProto\API::WAITING_CODE) {
             $title = str_replace(':', '', Lang::$current_lang['loginUserCode']);
             $phone = htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
-            $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
+            $form = "<input type='password' name='phone_code' placeholder='$phone' required/>";
         } elseif ($auth === \danog\MadelineProto\API::WAITING_PASSWORD) {
             $title = Lang::$current_lang['loginUserPassWeb'];
             $hint = htmlentities(sprintf(

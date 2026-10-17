@@ -2089,11 +2089,15 @@ abstract class InternalDoc
     /**
      * Asynchronously read line.
      *
-     * @param string $prompt Prompt
+     * @param string  $prompt    Prompt
+     * @param bool    $hidden    Whether to hide what is typed (for tokens, passwords and codes), when reading from a terminal
+     * @param ?string $hideAfter Show what is typed until this character, censor what follows it with asterisks
+     *                           (for prompts that take either a phone number or a bot token, which contains a
+     *                           colon), when reading from a terminal
      */
-    final public static function readLine(string $prompt = '', ?\Amp\Cancellation $cancel = null): string
+    final public static function readLine(string $prompt = '', ?\Amp\Cancellation $cancel = null, bool $hidden = false, ?string $hideAfter = null): string
     {
-        return \danog\MadelineProto\AsyncTools::readLine($prompt, $cancel);
+        return \danog\MadelineProto\AsyncTools::readLine($prompt, $cancel, $hidden, $hideAfter);
     }
     /**
      * Refresh full peer cache for a certain peer.

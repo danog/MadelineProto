@@ -65,7 +65,7 @@ trait Start
             $stdout->write('4) '.Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
 
             $app['api_id'] = (int) Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']);
-            $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1']);
+            $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1'], hidden: true);
             return $app;
         }
         if (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
@@ -103,7 +103,7 @@ trait Start
         $title .= '<li>'.htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
         $title .= '</ol>';
         $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
-        $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
+        $form .= '<input type="password" name="api_hash" placeholder="API hash" required/>';
         getOutputBufferStream()->write(
             sprintf(
                 $settings->getTemplates()->getHtmlTemplate(),
