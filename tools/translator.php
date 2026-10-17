@@ -67,7 +67,7 @@ foreach (glob("langs/*.json") as $file) {
             unset($translation[$key]);
         }
     }
-    $percentages[$code] = intdiv(100 * \count($translation), \count($base));
+    $percentages[$code] = intdiv(100 * count($translation), count($base));
     $langs[$code] = array_merge($base, $translation);
     ksort($langs[$code]);
 }

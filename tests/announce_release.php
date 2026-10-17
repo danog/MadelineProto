@@ -125,7 +125,7 @@ $current = '';
 foreach ($lines as $line) {
     $candidate = $current === '' ? $line : "$current\n$line";
     $entities = $current === '' ? null : Entities::fromMarkdown($candidate);
-    if ($entities !== null && (EntityTools::mbStrlen($entities->message) > MAX_LENGTH || \count($entities->entities) > MAX_ENTITIES)) {
+    if ($entities !== null && (EntityTools::mbStrlen($entities->message) > MAX_LENGTH || count($entities->entities) > MAX_ENTITIES)) {
         $messages[] = $current;
         $candidate = $line;
     }
@@ -139,7 +139,7 @@ $body = rtrim(preg_replace(SENT, '', $body));
 foreach ($messages as $i => $message) {
     $entities = Entities::fromMarkdown(preg_replace("/\n{3,}/", "\n\n", $message));
     if ($dryRun) {
-        printf("--- message %d/%d: %d characters, %d entities%s\n", $i + 1, \count($messages), EntityTools::mbStrlen($entities->message), \count($entities->entities), $i < $sent ? ' (already sent)' : '');
+        printf("--- message %d/%d: %d characters, %d entities%s\n", $i + 1, count($messages), EntityTools::mbStrlen($entities->message), count($entities->entities), $i < $sent ? ' (already sent)' : '');
         echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL;
         continue;
     }
@@ -152,7 +152,7 @@ foreach ($messages as $i => $message) {
         'entities' => $entities->entities,
         'link_preview_options' => ['is_disabled' => true],
     ]);
-    if ($i + 1 < \count($messages)) {
+    if ($i + 1 < count($messages)) {
         github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n<!-- announced ".($i + 1)." messages -->\n"]);
     }
 }
@@ -160,4 +160,4 @@ if ($dryRun) {
     exit(0);
 }
 github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n".ANNOUNCED."\n"]);
-echo "Sent the changelog of $tag in ".\count($messages).' message(s)'.($sent ? ", $sent of them by a previous run" : '').PHP_EOL;
+echo "Sent the changelog of $tag in ".count($messages).' message(s)'.($sent ? ", $sent of them by a previous run" : '').PHP_EOL;
