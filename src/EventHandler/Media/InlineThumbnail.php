@@ -59,8 +59,13 @@ final class InlineThumbnail extends AbstractThumbnail
         $stripped = $rawSize['_'] === 'photoStrippedSize';
         $this->contents = $stripped ? Tools::inflateStripped($bytes) : $bytes;
         $this->payload = \chr($stripped ? self::FLAG_STRIPPED : 0).$rawSize['type'].$bytes;
-        if (!($rawSize['w'] ?? 0) || !($rawSize['h'] ?? 0)) {
-            [$rawSize['w'], $rawSize['h']] = @getimagesizefromstring($this->contents) ?: [0, 0];
+        if ($stripped && \strlen($bytes) >= 3 && \ord($bytes[0]) === 1) {
+            // In the header of stripped thumbnails, as read by Tools::inflateStripped().
+            $rawSize['w'] = \ord($bytes[2]);
+            $rawSize['h'] = \ord($bytes[1]);
+        } elseif (!($rawSize['w'] ?? 0) || !($rawSize['h'] ?? 0)) {
+            // From the header of the image, when the function is available (it may be disabled).
+            [$rawSize['w'], $rawSize['h']] = (\function_exists('getimagesizefromstring') ? @getimagesizefromstring($this->contents) : false) ?: [0, 0];
         }
         parent::__construct($API, $rawMedia, $rawSize, $protected);
     }
