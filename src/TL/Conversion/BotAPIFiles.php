@@ -29,6 +29,7 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\Media\InlineThumbnail;
 use danog\MadelineProto\Lang;
 
 /**
@@ -98,6 +99,10 @@ trait BotAPIFiles
      */
     public static function unpackFileId(string $fileId): array
     {
+        $inline = InlineThumbnail::unpackFileId($fileId);
+        if ($inline !== null) {
+            return $inline;
+        }
         $fileId = FileId::fromBotAPI($fileId);
 
         if (!\in_array($fileId->version, [2, 4], true)) {

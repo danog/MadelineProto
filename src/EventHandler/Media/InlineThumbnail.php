@@ -16,42 +16,142 @@
 
 namespace danog\MadelineProto\EventHandler\Media;
 
-use danog\MadelineProto\TL\Types\Bytes;
-use JsonSerializable;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
 
 /**
- * Represents a small thumbnail inlined in the media, which doesn't need to be downloaded.
+ * Represents a thumbnail inlined in a media (like the stripped preview of a photo, or the thumbnail of a secret chat media).
+ *
+ * It behaves like any other thumbnail, but it's downloaded from memory, without contacting Telegram:
+ * its file ID (accepted by every MadelineProto method, not by the bot API) carries the thumbnail itself.
  */
-final class InlineThumbnail implements JsonSerializable
+final class InlineThumbnail extends AbstractThumbnail
 {
-    /** Thumbnail width */
-    public readonly ?int $width;
+    /** @internal The type of the thumbnails of secret chat media, as in tdlib. */
+    public const SECRET_CHAT_TYPE = 't';
 
-    /** Thumbnail height */
-    public readonly ?int $height;
+    private const FILE_ID_PREFIX = 'inline:';
+    private const FLAG_STRIPPED = 1;
+
+    /** @internal The thumbnail itself */
+    protected readonly string $contents;
+
+    /** @internal What the file ID carries (stripped thumbnails are inflated when downloaded) */
+    private readonly string $payload;
 
     /** @internal */
     public function __construct(
-        /** Thumbnail type, see https://core.telegram.org/api/files#image-thumbnail-types (null for secret chat thumbnails) */
-        public readonly ?string $type,
-        /** Thumbnail contents (usually JPEG) */
-        public readonly Bytes $bytes,
-        ?int $width = null,
-        ?int $height = null,
+        MTProto $API,
+        array $rawMedia,
+        array $rawSize,
+        bool $protected,
     ) {
-        if ($width === null || $height === null) {
-            [$width, $height] = @getimagesizefromstring((string) $bytes) ?: [null, null];
+        $bytes = (string) $rawSize['bytes'];
+        $stripped = $rawSize['_'] === 'photoStrippedSize';
+        $this->contents = $stripped ? Tools::inflateStripped($bytes) : $bytes;
+        $this->payload = \chr($stripped ? self::FLAG_STRIPPED : 0).\chr(\strlen($rawSize['type'])).$rawSize['type'].$bytes;
+        if (!($rawSize['w'] ?? 0) || !($rawSize['h'] ?? 0)) {
+            [$rawSize['w'], $rawSize['h']] = @getimagesizefromstring($this->contents) ?: [0, 0];
         }
-        $this->width = $width;
-        $this->height = $height;
+        parent::__construct($API, $rawMedia, $rawSize, $protected);
+    }
+
+    #[\Override]
+    protected function extractFormat(array $rawMedia): array
+    {
+        return self::getFormat($this->contents);
+    }
+
+    #[\Override]
+    protected function extractDownloadInfo(MTProto $API, array $rawMedia): array
+    {
+        $id = ($rawMedia['photo'] ?? $rawMedia['document'] ?? $rawMedia['file'] ?? [])['id'] ?? null;
+        [$ext, $mime] = $this->extractFormat($rawMedia);
+        return [
+            'name' => ($id === null ? self::hash($this->contents) : Tools::unpackSignedLongString($id)).'_'.$this->type,
+            'ext' => $ext,
+            'mime' => $mime,
+            'size' => \strlen($this->contents),
+            'InputFileLocation' => [],
+        ];
+    }
+
+    #[\Override]
+    protected function extractBotApiFile(MTProto $API, array $rawMedia): array
+    {
+        return [
+            'file_id' => self::FILE_ID_PREFIX.Tools::base64urlEncode($this->payload),
+            'file_unique_id' => self::FILE_ID_PREFIX.self::hash($this->contents),
+        ];
+    }
+
+    #[\Override]
+    public function getDownloadInfo(): array
+    {
+        $result = parent::getDownloadInfo();
+        $result['data'] = $this->contents;
+        return $result;
+    }
+
+    /**
+     * Unpack the file ID of an inline thumbnail into its download info.
+     *
+     * @internal
+     *
+     * @return ?array{name: string, ext: string, mime: string, size: int, InputFileLocation: array, data: string}
+     */
+    public static function unpackFileId(string $fileId): ?array
+    {
+        if (!str_starts_with($fileId, self::FILE_ID_PREFIX)) {
+            return null;
+        }
+        $payload = Tools::base64urlDecode(substr($fileId, \strlen(self::FILE_ID_PREFIX)));
+        $type = substr($payload, 2, \ord($payload[1]));
+        $contents = substr($payload, 2 + \strlen($type));
+        if (\ord($payload[0]) & self::FLAG_STRIPPED) {
+            $contents = Tools::inflateStripped($contents);
+        }
+        [$ext, $mime] = self::getFormat($contents);
+        return [
+            'name' => self::hash($contents).'_'.$type,
+            'ext' => $ext,
+            'mime' => $mime,
+            'size' => \strlen($contents),
+            'InputFileLocation' => [],
+            'data' => $contents,
+        ];
+    }
+
+    /**
+     * Get the unique file ID of the file ID of an inline thumbnail.
+     *
+     * @internal
+     */
+    public static function getUniqueFileId(string $fileId): ?string
+    {
+        $info = self::unpackFileId($fileId);
+        return $info === null ? null : self::FILE_ID_PREFIX.self::hash($info['data']);
+    }
+
+    private static function hash(string $contents): string
+    {
+        return bin2hex(substr(hash('sha256', $contents, true), 0, 16));
+    }
+
+    /** @return array{string, string} */
+    private static function getFormat(string $contents): array
+    {
+        return substr($contents, 0, 4) === 'RIFF' && substr($contents, 8, 4) === 'WEBP'
+            ? ['.webp', 'image/webp']
+            : ['.jpg', 'image/jpeg'];
     }
 
     /** @internal */
     #[\Override]
     public function jsonSerialize(): mixed
     {
-        $v = get_object_vars($this);
-        $v['_'] = static::class;
+        $v = parent::jsonSerialize();
+        unset($v['contents']);
         return $v;
     }
 }

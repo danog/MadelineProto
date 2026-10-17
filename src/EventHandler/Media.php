@@ -25,7 +25,6 @@ use danog\MadelineProto\EventHandler\Media\VideoThumbnail;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ResumableStream;
-use danog\MadelineProto\TL\Types\Bytes;
 use danog\MadelineProto\Tools;
 use JsonSerializable;
 
@@ -53,11 +52,12 @@ abstract class Media extends IpcCapable implements JsonSerializable
     public readonly ?int $ttl;
 
     /**
-     * Thumbnails that can be downloaded, from the smallest to the biggest.
+     * Thumbnails, from the smallest to the biggest: for photos, the smaller sizes of the photo.
      *
-     * For photos, these are the smaller sizes of the photo.
+     * Includes the thumbnails inlined in the media (always the only thumbnail of secret chat media),
+     * which are downloaded from memory, without contacting Telegram.
      *
-     * @var list<Thumbnail>
+     * @var list<Thumbnail|InlineThumbnail>
      */
     public readonly array $thumbs;
 
@@ -67,9 +67,6 @@ abstract class Media extends IpcCapable implements JsonSerializable
      * @var list<VideoThumbnail>
      */
     public readonly array $videoThumbs;
-
-    /** Small inline thumbnail, sent along with the media: always the only thumbnail of secret chat media. */
-    public readonly ?InlineThumbnail $inlineThumb;
 
     /** Whether the media should be hidden behind a spoiler */
     public readonly bool $spoiler;
@@ -105,14 +102,18 @@ abstract class Media extends IpcCapable implements JsonSerializable
         if ($rawMedia['secret'] ?? false) {
             $rawMedia = $rawMedia['document'];
         }
+        $info = $this->extractDownloadInfo($API, $rawMedia);
         [
             'name' => $name,
             'ext' => $this->fileExt,
             'mime' => $this->mimeType,
             'size' => $this->size,
             'InputFileLocation' => $this->location
-        ] = $this->extractDownloadInfo($API, $rawMedia);
+        ] = $info;
         $this->fileName = $name.$this->fileExt;
+        $this->keyFingerprint = $info['key_fingerprint'] ?? null;
+        $this->key = isset($info['key']) ? (string) $info['key'] : null;
+        $this->iv = isset($info['iv']) ? (string) $info['iv'] : null;
 
         [
             'file_id' => $this->botApiFileId,
@@ -122,17 +123,14 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'] ?? $rawMedia)['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
-        $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
-        $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
-        $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
         $this->encrypted = isset($rawMedia['iv']);
-        [$this->thumbs, $this->videoThumbs, $this->inlineThumb] = $this->extractThumbs($API, $rawMedia);
+        [$this->thumbs, $this->videoThumbs] = $this->extractThumbs($API, $rawMedia);
     }
 
     /**
      * @internal
      *
-     * @return array{name: string, ext: string, mime: string, size: int, InputFileLocation: array}
+     * @return array{name: string, ext: string, mime: string, size: int, InputFileLocation: array, key_fingerprint?: int, key?: string, iv?: string}
      */
     protected function extractDownloadInfo(MTProto $API, array $rawMedia): array
     {
@@ -152,19 +150,22 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /**
      * @internal
      *
-     * @return array{list<Thumbnail>, list<VideoThumbnail>, ?InlineThumbnail}
+     * @return array{list<Thumbnail|InlineThumbnail>, list<VideoThumbnail>}
      */
     protected function extractThumbs(MTProto $API, array $rawMedia): array
     {
         if (isset($rawMedia['iv'])) {
             // Secret chat media only carries an inline JPEG thumbnail.
-            $thumb = (string) ($rawMedia['thumb'] ?? '');
-            return [[], [], $thumb === '' ? null : new InlineThumbnail(
-                null,
-                new Bytes($thumb),
-                $rawMedia['thumb_w'] ?? null,
-                $rawMedia['thumb_h'] ?? null,
-            )];
+            if ((string) ($rawMedia['thumb'] ?? '') === '') {
+                return [[], []];
+            }
+            return [[new InlineThumbnail($API, $rawMedia, [
+                '_' => 'photoCachedSize',
+                'type' => InlineThumbnail::SECRET_CHAT_TYPE,
+                'w' => $rawMedia['thumb_w'] ?? 0,
+                'h' => $rawMedia['thumb_h'] ?? 0,
+                'bytes' => $rawMedia['thumb'],
+            ], $this->protected)], []];
         }
         if (isset($rawMedia['photo'])) {
             $sizes = $rawMedia['photo']['sizes'];
@@ -181,7 +182,6 @@ abstract class Media extends IpcCapable implements JsonSerializable
         }
         $thumbs = [];
         $videoThumbs = [];
-        $inlineThumb = null;
         foreach ($sizes as $size) {
             switch ($size['_']) {
                 case 'photoSize':
@@ -191,10 +191,8 @@ abstract class Media extends IpcCapable implements JsonSerializable
                     }
                     break;
                 case 'photoStrippedSize':
-                    $inlineThumb = new InlineThumbnail($size['type'], new Bytes(Tools::inflateStripped((string) $size['bytes'])));
-                    break;
                 case 'photoCachedSize':
-                    $inlineThumb ??= new InlineThumbnail($size['type'], new Bytes((string) $size['bytes']), $size['w'], $size['h']);
+                    $thumbs[] = new InlineThumbnail($API, $rawMedia, $size, $this->protected);
                     break;
             }
         }
@@ -206,7 +204,7 @@ abstract class Media extends IpcCapable implements JsonSerializable
         $cmp = static fn (AbstractThumbnail $a, AbstractThumbnail $b): int => $a->width*$a->height <=> $b->width*$b->height;
         usort($thumbs, $cmp);
         usort($videoThumbs, $cmp);
-        return [$thumbs, $videoThumbs, $inlineThumb];
+        return [$thumbs, $videoThumbs];
     }
 
     /**

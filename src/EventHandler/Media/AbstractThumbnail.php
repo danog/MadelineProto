@@ -24,7 +24,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Tools;
 
 /**
- * Represents a downloadable thumbnail of a media, or a smaller size of a photo.
+ * Represents a thumbnail of a media, or a smaller size of a photo.
  */
 abstract class AbstractThumbnail extends Media
 {
@@ -95,6 +95,6 @@ abstract class AbstractThumbnail extends Media
     #[\Override]
     protected function extractThumbs(MTProto $API, array $rawMedia): array
     {
-        return [[], [], null];
+        return [[], []];
     }
 }
