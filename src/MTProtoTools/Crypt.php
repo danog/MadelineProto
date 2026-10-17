@@ -111,6 +111,11 @@ final class Crypt
      */
     public static function ctrEncrypt(string $message, string $key, string $iv): string
     {
+        if (Magic::$hasOpenssl) {
+            $result = openssl_encrypt($message, 'aes-'.(\strlen($key) * 8).'-ctr', $key, OPENSSL_RAW_DATA, $iv);
+            \assert($result !== false);
+            return $result;
+        }
         $cipher = new AES('ctr');
         $cipher->setKey($key);
         $cipher->setIV($iv);

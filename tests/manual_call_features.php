@@ -266,7 +266,7 @@ switch ($mode) {
         info('GroupCall implements Call+MultiCall: '.$impl(GroupCall::class, Call::class).' / '.$impl(GroupCall::class, MultiCall::class));
         info('ConferenceCall Call+MultiCall:       '.$impl(ConferenceCall::class, Call::class).' / '.$impl(ConferenceCall::class, MultiCall::class));
         info('VoIP is NOT MultiCall (1:1):         '.((new ReflectionClass(VoIP::class))->implementsInterface(MultiCall::class) ? 'NO ❌ (should not be)' : 'correct ✅'));
-        info('E2E crypto available:           '.(Crypto::available() ? 'yes ✅ ('.(extension_loaded('sodium') ? 'sodium' : 'phpseclib fallback').')' : 'NO ❌'));
+        info('E2E crypto available:           '.(Crypto::available() ? 'yes ✅ ('.Crypto::backend().')' : 'NO ❌'));
         fwrite(STDERR, "\n");
         info('Codec parameter derivation (feature #1):');
         reportDerivedCodec($video);
@@ -435,7 +435,7 @@ switch ($mode) {
         $m = modeInfo($media);
 
         box("TEST: E2E CONFERENCE CALL (creator) — $m[desc]");
-        info('End-to-end encrypted: the server/SFU only ever sees ciphertext. Crypto backend: '.(extension_loaded('sodium') ? 'sodium' : 'phpseclib fallback'));
+        info('End-to-end encrypted: the server/SFU only ever sees ciphertext. Crypto backend: '.Crypto::backend());
         if ($m['needsVideoFile']) {
             reportDerivedCodec($file);
         }
