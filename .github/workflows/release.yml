@@ -50,5 +50,5 @@ jobs:
       - name: Send the changelog to @danogentili
         if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
         env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: php tests/announce_release.php "$TAG"

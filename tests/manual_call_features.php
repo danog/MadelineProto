@@ -27,6 +27,8 @@
  *   group        | group <chat> audio| group <chat> video     | group <chat> screencast
  *   conference   | conference audio  | conference video       | conference screencast
  *              (E2E, end-to-end encrypted — the SFU only ever sees ciphertext)
+ *   livestream   | rtmp <chat> [file]: we publish an H.264 + AAC file over RTMP (no media modes)
+ *              and record what Telegram serves to the viewers
  *
  * For 1:1 and group calls the incoming media is also recorded (Matroska), as a check of the receive
  * path; for conference calls it prints the verification emojis and sends an encrypted in-call message.
@@ -39,6 +41,7 @@
  *   php tests/manual_call_features.php group <chat> <mode>   [file] [session]
  *   php tests/manual_call_features.php conference   <mode>   [file] [session]
  *   php tests/manual_call_features.php conference-join <link> <mode> [file] [session]
+ *   php tests/manual_call_features.php rtmp  <chat>          [file] [session]
  *
  * <mode> is one of: audio | video | screencast
  *
@@ -48,6 +51,8 @@
  *
  * Set CALL_TEST_LOG=<file> to get a verbose MadelineProto log of the call in that file.
  * Set CALL_TEST_NOTIFY=<user> to also send group call and conference invite links to that user via Telegram.
+ * Set CALL_TEST_RTMP_RESTART=1 to end the RTMP livestream of the chat and start a new one, instead of
+ * publishing to the running one.
  */
 
 use danog\DialogId\DialogId;
@@ -61,6 +66,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Matroska;
 use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\Mp4;
 use danog\MadelineProto\MultiCall;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
@@ -242,14 +248,16 @@ function hasVideoTrack(string $file): bool
     if (!is_file($file)) {
         return false;
     }
-    try {
-        $m = new Matroska(new LocalFile($file), null);
-    } catch (\Throwable) {
-        return false;
-    }
-    foreach ($m->tracks as $track) {
-        if (($track['type'] ?? 0) === Matroska::TRACK_TYPE_VIDEO && isset(VIDEO_CODECS[$track['codec']])) {
-            return true;
+    foreach ([Matroska::class, Mp4::class] as $demuxer) {
+        try {
+            $m = new $demuxer(new LocalFile($file), null);
+        } catch (\Throwable) {
+            continue;
+        }
+        foreach ($m->tracks as $track) {
+            if (($track['type'] ?? 0) === Matroska::TRACK_TYPE_VIDEO && isset(VIDEO_CODECS[$track['codec']])) {
+                return true;
+            }
         }
     }
     return false;
@@ -424,6 +432,68 @@ switch ($mode) {
         info('Expect <id>.<n>_<streams>.mkv files per participant who transmitted (excluding ourselves), one per change of what they sent.');
         break;
 
+    case 'rtmp':
+        $arg     = $argv[2] ?? null;
+        $file    = $argv[3] ?? (__DIR__.'/../new.mp4');
+        $session = $argv[4] ?? 'fuzz_user.madeline';
+        if ($arg === null) {
+            fwrite(STDERR, "Usage: php tests/manual_call_features.php rtmp <chat> [file] [session]\n");
+            exit(2);
+        }
+        $m = modeInfo('video');
+        $m['desc'] = 'an RTMP livestream (H.264 + AAC)';
+        $dir = __DIR__.'/../rtmp_recordings';
+
+        box('TEST: RTMP LIVESTREAM — we publish the file, Telegram transcodes and serves it to the viewers');
+        $API = startApi($session);
+        $existing = $API->getGroupCall($arg);
+        if ($existing !== null && !$existing->rtmpStream) {
+            info('⚠️  The chat has a video chat that is not an RTMP livestream: end it first.');
+            exit(1);
+        }
+        if ($existing !== null && getenv('CALL_TEST_RTMP_RESTART') === '1') {
+            info('Ending the running livestream, to start a new one (CALL_TEST_RTMP_RESTART=1).');
+            $API->discardGroupCall($existing->id);
+            $existing = null;
+        }
+        if ($existing !== null && $existing->getCallState() === GroupCallState::JOINED) {
+            $call = $existing;
+            info('Already joined — attaching. The recording of the livestream resumed in '.$dir);
+            if ($call->getCurrent($m['dest']) === null) {
+                info('Nothing is playing any more: starting the transmission again.');
+                transmit($call, $m, $file);
+            }
+        } else {
+            if ($existing === null) {
+                info('Starting an RTMP livestream (a basic group is migrated to a supergroup).');
+                $API->createGroupCall($arg, 'MadelineProto RTMP test', rtmpStream: true);
+            }
+            // Joining watches the livestream; what we play is published to it, as its admin.
+            /** @var GroupCall $call */
+            $call = $API->joinGroupCall($arg);
+            transmit($call, $m, $file);
+            info('Recording what Telegram serves to the viewers into '.$dir);
+            $call->setOutputFolder(new LocalDirectory($dir));
+        }
+        shareLink($API, 'RTMP livestream', groupCallLink($API, $call, $arg));
+        click('Open the livestream on another account: it shows the file (Telegram starts serving it ~10 s after the first frames). Ctrl-C detaches (we keep publishing).');
+
+        info('Monitoring. Ctrl-C detaches WITHOUT stopping; re-run to re-attach.');
+        $lastReport = 0.0;
+        // Not JOINED for a moment while rejoining.
+        while ($call->getCallState() !== GroupCallState::LEFT) {
+            if (microtime(true) - $lastReport > 10) {
+                $current = $call->getCurrent($m['dest']);
+                info('… publishing '.($current instanceof LocalFile ? basename($current->file) : (string) ($current ?? 'nothing')).'; what viewers get:');
+                inspect($dir);
+                $lastReport = microtime(true);
+            }
+            Tools::sleep(1.0);
+        }
+        box('RTMP RESULT: the livestream ended ('.$call->getCallState()->name.')');
+        inspect($dir);
+        break;
+
     case 'conference':
         $media   = $argv[2] ?? null;
         $file    = $argv[3] ?? (__DIR__.'/../new.webm');
@@ -498,6 +568,7 @@ switch ($mode) {
               php tests/manual_call_features.php group <chat> <mode> [file] [session]
               php tests/manual_call_features.php conference      <mode> [file] [session]
               php tests/manual_call_features.php conference-join <link> <mode> [file] [session]
+              php tests/manual_call_features.php rtmp  <chat>          [file] [session]
 
               <mode> = audio | video | screencast
 
@@ -505,7 +576,7 @@ switch ($mode) {
             prints verification emojis + sends an encrypted in-call message. Ctrl-C detaches without
             ending the call; re-run the same command to re-attach.
 
-            Defaults: file=new.webm, session=fuzz_user.madeline.
+            Defaults: file=new.webm (new.mp4 for rtmp), session=fuzz_user.madeline.
 
             TXT);
         break;

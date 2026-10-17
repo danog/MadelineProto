@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\Common\CtrStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -81,18 +82,39 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
-          if (!preg_match('/^[a-f0-9]+$/i', $extra['secret'])) {
-            $extra['secret'] = base64_decode($extra['secret']);
-          } else {
-            if (\strlen($extra['secret']) > 17) {
-                $extra['secret'] = hex2bin($extra['secret']);
-            }
-            if (\strlen($extra['secret']) == 17) {
-                $extra['secret'] = substr($extra['secret'], 1, 16);
-            }
-          }
+            $extra['secret'] = self::decodeSecret($extra['secret']);
         }
         $this->extra = $extra;
+    }
+
+    /**
+     * The 16-byte key of an MTProxy secret: raw, or hex or (URL-safe, as in proxy links) base64
+     * encoded, optionally with the dd prefix of padded intermediate secrets.
+     *
+     * @psalm-pure
+     */
+    private static function decodeSecret(string $secret): string
+    {
+        if (\strlen($secret) !== 16) {
+            $decoded = preg_match('/^(?:[a-f0-9]{2})+$/i', $secret)
+                ? hex2bin($secret)
+                : base64_decode(strtr($secret, '-_', '+/'), true);
+            if ($decoded === false) {
+                throw new Exception('The MTProxy secret is neither hex nor base64');
+            }
+            $secret = $decoded;
+        }
+        if (\strlen($secret) === 17 && $secret[0] === "\xdd") {
+            $secret = substr($secret, 1);
+        }
+        if (\strlen($secret) !== 16) {
+            throw new Exception(
+                ($secret[0] ?? '') === "\xee"
+                    ? 'MTProxy secrets for fake TLS (starting with ee) are not supported'
+                    : 'Invalid MTProxy secret: it must be 16 bytes long, or 17 starting with dd'
+            );
+        }
+        return $secret;
     }
     /**
      * @psalm-pure

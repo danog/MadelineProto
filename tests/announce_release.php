@@ -4,11 +4,12 @@
  * Send the changelog of a release to @danogentili on Telegram (without the diff of the layer, too big), once
  * it's fully released: see tests/release_notes.sh.
  *
- * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and BOT_TOKEN.
+ * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN
+ * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh).
  * Does nothing if the release is still a draft or a pre-release, or was already announced; if it fails midway,
  * running it again sends the rest (the messages sent are counted in the body of the release).
  *
- * With DRY_RUN=1, prints the messages instead (of any release, BOT_TOKEN is not needed).
+ * With DRY_RUN=1, prints the messages instead (of any release, PHAR_BOT_TOKEN is not needed).
  */
 
 use danog\TelegramEntities\Entities;
@@ -31,10 +32,10 @@ const SENT = '/<!-- announced (\d+) messages -->\n?/';
 $tag = $argv[1] ?? '';
 $repository = getenv('GH_REPO') ?: 'danog/MadelineProto';
 $token = getenv('GITHUB_TOKEN') ?: getenv('GH_TOKEN');
-$botToken = getenv('BOT_TOKEN');
+$botToken = getenv('PHAR_BOT_TOKEN');
 $dryRun = (bool) getenv('DRY_RUN');
 if ($tag === '' || !$token || (!$botToken && !$dryRun)) {
-    fwrite(STDERR, "Usage: GITHUB_TOKEN=... BOT_TOKEN=... php {$argv[0]} <tag>\n");
+    fwrite(STDERR, "Usage: GITHUB_TOKEN=... PHAR_BOT_TOKEN=... php {$argv[0]} <tag>\n");
     exit(1);
 }
 

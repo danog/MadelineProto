@@ -29,8 +29,9 @@ use Generator;
  *
  * Both fragmented files (`moov` with `mvex`, then `moof`+`mdat` pairs, as served for group calls in
  * [stream mode](https://core.telegram.org/api/group-calls#stream-mode) and by every live/DASH
- * encoder) and progressive files whose `moov` precedes the `mdat` are supported. Progressive files
- * with the `moov` at the end cannot be demuxed sequentially.
+ * encoder) and progressive files whose `moov` precedes the `mdat` are supported. A progressive file
+ * with the `moov` at the end (like the chunks of an RTMP livestream) is only supported if small: its
+ * `mdat` is buffered until the `moov` describes it.
  *
  * Supported codecs: H.264 (`avc1`/`avc3`), H.265 (`hvc1`/`hev1`), VP9 (`vp09`), AV1 (`av01`), AAC
  * (`mp4a`) and Opus (`Opus`). Video samples keep the length-prefixed NAL units of the file, which is
@@ -38,6 +39,12 @@ use Generator;
  */
 final class Mp4
 {
+    /** The error of a progressive file whose moov follows a big mdat, which can't be read sequentially. */
+    public const MOOV_AT_END = 'The moov box of the MP4 file is after its media data, so it can\'t be played while it\'s read: please move it to the start, e.g. with ffmpeg -i input -c copy -movflags +faststart output.mp4';
+
+    /** The largest mdat buffered until a following moov describes it. */
+    private const MAX_BUFFERED_MDAT = 16 << 20;
+
     public const TRACK_TYPE_VIDEO = Matroska::TRACK_TYPE_VIDEO;
     public const TRACK_TYPE_AUDIO = Matroska::TRACK_TYPE_AUDIO;
 
@@ -73,6 +80,14 @@ final class Mp4
      * @var array<int, array{codec: string, type: int, private: ?string, width: int, height: int, rate: int, channels: int, timescale: int}>
      */
     public array $tracks = [];
+
+    /** The timescale of the movie (mvhd), that of the durations of the edit lists. */
+    private int $movieTimescale = 1000;
+    /**
+     * @var array<int, int> What the edit list of each track adds to its timestamps (in its media
+     *                      timescale), by track ID: an initial delay, minus where its media starts.
+     */
+    private array $shifts = [];
 
     /** @var Closure(int): ?string Reads exactly the requested number of bytes, or null at EOF. */
     private Closure $read;
@@ -165,13 +180,30 @@ final class Mp4
         $moofStart = 0;
         /** @var array<int, array{offset: int, size: int, track: int, timestamp: int, keyframe: bool}> Samples described by the last moof, by absolute offset. */
         $pending = [];
+        $sawMoov = false;
+        /** @var list<array{int, string}> The mdats before the moov: their absolute offset and data. */
+        $early = [];
         while (($box = $this->nextBox()) !== null) {
             switch ($box['type']) {
                 case 'moov':
+                    $sawMoov = true;
                     $this->parseMoov($this->consume($box['size']), $progressive);
                     if ($progressive !== []) {
                         ksort($progressive);
                     }
+                    foreach ($early as [$dataStart, $data]) {
+                        foreach ($progressive as $offset => $sample) {
+                            if ($offset < $dataStart || $offset + $sample['size'] > $dataStart + \strlen($data)) {
+                                continue;
+                            }
+                            unset($progressive[$offset]);
+                            $frame = $this->frame($sample, substr($data, $offset - $dataStart, $sample['size']));
+                            if ($frame !== null) {
+                                yield $frame;
+                            }
+                        }
+                    }
+                    $early = [];
                     break;
                 case 'moof':
                     $moofStart = $box['start'];
@@ -183,6 +215,14 @@ final class Mp4
                     $samples = $pending !== [] ? $pending : $progressive;
                     $pending = [];
                     if ($samples === []) {
+                        if (!$sawMoov) {
+                            if ($box['size'] < 0 || $box['size'] > self::MAX_BUFFERED_MDAT) {
+                                // Rather than reading the whole file to find out.
+                                throw new Exception(self::MOOV_AT_END);
+                            }
+                            $early[] = [$dataStart, $this->consume($box['size'])];
+                            break;
+                        }
                         $this->skip($box['size']);
                         break;
                     }
@@ -195,20 +235,11 @@ final class Mp4
                             break; // belongs to a later mdat
                         }
                         $this->skip($offset - $this->position);
-                        $data = $this->consume($sample['size']);
-                        $track = $this->tracks[$sample['track']] ?? null;
-                        if ($track === null) {
-                            continue;
-                        }
-                        yield [
-                            'track' => $sample['track'],
-                            'codec' => $track['codec'],
-                            'type' => $track['type'],
-                            'data' => $data,
-                            'timestamp' => $sample['timestamp'],
-                            'keyframe' => $sample['keyframe'],
-                        ];
+                        $frame = $this->frame($sample, $this->consume($sample['size']));
                         unset($progressive[$offset]);
+                        if ($frame !== null) {
+                            yield $frame;
+                        }
                     }
                     if ($box['size'] >= 0) {
                         $this->skip($dataStart + $box['size'] - $this->position);
@@ -221,6 +252,29 @@ final class Mp4
                     $this->skip($box['size']);
             }
         }
+    }
+
+    /**
+     * The frame of a sample, null if it belongs to an unknown track.
+     *
+     * @param array{offset: int, size: int, track: int, timestamp: int, keyframe: bool} $sample
+     *
+     * @return ?array{track: int, codec: string, type: int, data: string, timestamp: int, keyframe: bool}
+     */
+    private function frame(array $sample, string $data): ?array
+    {
+        $track = $this->tracks[$sample['track']] ?? null;
+        if ($track === null) {
+            return null;
+        }
+        return [
+            'track' => $sample['track'],
+            'codec' => $track['codec'],
+            'type' => $track['type'],
+            'data' => $data,
+            'timestamp' => $sample['timestamp'],
+            'keyframe' => $sample['keyframe'],
+        ];
     }
 
     private function skip(int $length): void
@@ -242,7 +296,9 @@ final class Mp4
     private function parseMoov(string $moov, array &$progressive): void
     {
         foreach (self::children($moov) as [$type, $payload]) {
-            if ($type === 'trak') {
+            if ($type === 'mvhd') {
+                $this->movieTimescale = max(1, self::u32($payload, \ord($payload[0] ?? "\0") === 1 ? 20 : 12));
+            } elseif ($type === 'trak') {
                 $this->parseTrak($payload, $progressive);
             } elseif ($type === 'mvex') {
                 foreach (self::children($payload) as [$childType, $child]) {
@@ -269,8 +325,15 @@ final class Mp4
         $timescale = 1000;
         $handler = '';
         $stbl = null;
+        $elst = null;
         foreach (self::children($trak) as [$type, $payload]) {
-            if ($type === 'tkhd') {
+            if ($type === 'edts') {
+                foreach (self::children($payload) as [$editType, $edit]) {
+                    if ($editType === 'elst') {
+                        $elst = $edit;
+                    }
+                }
+            } elseif ($type === 'tkhd') {
                 $version = \ord($payload[0]);
                 $trackId = self::u32($payload, $version === 1 ? 20 : 12);
                 $width = self::u32($payload, \strlen($payload) - 8) >> 16;
@@ -324,9 +387,35 @@ final class Mp4
             'channels' => $entry['channels'],
             'timescale' => max(1, $timescale),
         ];
+        if ($elst !== null) {
+            $this->shifts[$trackId] = $this->editShift($elst, max(1, $timescale));
+        }
         if (isset($tables['stco']) || isset($tables['co64'])) {
             $this->parseSampleTables($trackId, $tables, $progressive);
         }
+    }
+
+    /**
+     * What an edit list adds to the timestamps of its track, in its media timescale: the duration of
+     * the empty edits it starts with (a delay), minus the media time of its first edit (where the
+     * presentation starts, e.g. after the delay of the B-frames). Later edits are not supported.
+     */
+    private function editShift(string $elst, int $timescale): int
+    {
+        $version = \ord($elst[0] ?? "\0");
+        $count = self::u32($elst, 4);
+        $entrySize = $version === 1 ? 20 : 12;
+        $delay = 0;
+        for ($i = 0, $pos = 8; $i < $count && $pos + $entrySize <= \strlen($elst); $i++, $pos += $entrySize) {
+            $duration = $version === 1 ? self::u64($elst, $pos) : self::u32($elst, $pos);
+            $mediaTime = $version === 1 ? self::u64($elst, $pos + 8) : self::s32($elst, $pos + 4);
+            if ($mediaTime === -1) {
+                $delay += intdiv($duration * $timescale, $this->movieTimescale);
+                continue;
+            }
+            return $delay - $mediaTime;
+        }
+        return $delay;
     }
 
     /**
@@ -490,6 +579,7 @@ final class Mp4
     private function parseSampleTables(int $trackId, array $tables, array &$progressive): void
     {
         $timescale = $this->tracks[$trackId]['timescale'];
+        $shift = $this->shifts[$trackId] ?? 0;
         // Chunk offsets.
         $chunkOffsets = [];
         if (isset($tables['co64'])) {
@@ -533,6 +623,19 @@ final class Mp4
                 }
             }
         }
+        // Composition offsets: the timestamps are presentation timestamps, like those of Matroska.
+        $compositionOffsets = [];
+        if (isset($tables['ctts'])) {
+            $signed = \ord($tables['ctts'][0]) === 1;
+            $count = self::u32($tables['ctts'], 4);
+            for ($i = 0; $i < $count; $i++) {
+                $n = self::u32($tables['ctts'], 8 + $i * 8);
+                $offset = $signed ? self::s32($tables['ctts'], 12 + $i * 8) : self::u32($tables['ctts'], 12 + $i * 8);
+                for ($j = 0; $j < $n; $j++) {
+                    $compositionOffsets[] = $offset;
+                }
+            }
+        }
         // Sync samples.
         $sync = null;
         if (isset($tables['stss'])) {
@@ -559,7 +662,7 @@ final class Mp4
                     'offset' => $offset,
                     'size' => $size,
                     'track' => $trackId,
-                    'timestamp' => intdiv($time * 1000, $timescale),
+                    'timestamp' => intdiv(max(0, $time + ($compositionOffsets[$sample] ?? 0) + $shift) * 1000, $timescale),
                     'keyframe' => $sync === null || isset($sync[$sample + 1]),
                 ];
                 $time += $durations[$sample] ?? 0;
@@ -630,6 +733,7 @@ final class Mp4
                 continue;
             }
             $timescale = $track['timescale'];
+            $shift = $this->shifts[$trackId] ?? 0;
             $time = $decodeTime;
             $offset = $baseOffset;
             foreach ($runs as $run) {
@@ -661,14 +765,17 @@ final class Mp4
                         $sampleFlags = self::u32($run, $pos);
                         $pos += 4;
                     }
+                    $compositionOffset = 0;
                     if ($flags & self::TRUN_SAMPLE_CTS) {
+                        // Signed in version 1.
+                        $compositionOffset = \ord($run[0]) === 1 ? self::s32($run, $pos) : self::u32($run, $pos);
                         $pos += 4;
                     }
                     $samples[$offset] = [
                         'offset' => $offset,
                         'size' => $size,
                         'track' => $trackId,
-                        'timestamp' => intdiv($time * 1000, $timescale),
+                        'timestamp' => intdiv(max(0, $time + $compositionOffset + $shift) * 1000, $timescale),
                         'keyframe' => ($sampleFlags & self::SAMPLE_NON_SYNC) === 0,
                     ];
                     $offset += $size;
