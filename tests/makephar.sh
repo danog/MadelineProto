@@ -212,12 +212,15 @@ cd "$madelinePath"
 
 if [ "$CI_COMMIT_TAG" == "7777" ]; then exit 0; fi
 
-cp "$input/madeline$php$branch.phar" "madeline81.phar"
+cp "$input/madeline$php$branch.phar" "madeline.phar"
+# The previous name, for the madeline.php files that only know it: until it isn't downloaded anymore.
+cp madeline.phar madeline81.phar
 git remote add hub https://github.com/danog/MadelineProto
 
 echo -n "$CI_COMMIT_TAG" > release
 cp tools/phar.php madeline.php
 
+gh release upload "$CI_COMMIT_TAG" "madeline.phar"
 gh release upload "$CI_COMMIT_TAG" "madeline81.phar"
 gh release upload "$CI_COMMIT_TAG" "release"
 gh release upload "$CI_COMMIT_TAG" "madeline.php"

@@ -24,11 +24,14 @@ if [ "$PHAR_BOT_TOKEN" == "" ]; then
 fi
 
 dir=$(mktemp -d)
-gh release download "$tag" --repo "$repository" --pattern madeline81.phar --dir "$dir"
+# madeline81.phar before 8.8.9.
+gh release download "$tag" --repo "$repository" --pattern madeline.phar --dir "$dir" \
+    || gh release download "$tag" --repo "$repository" --pattern madeline81.phar --dir "$dir"
+phar=$(ls "$dir"/madeline*.phar)
 # --form-string: with -F, a value starting with @ is the name of a file to upload ("@madelineprotophar").
 curl --fail-with-body --silent --show-error \
     --form-string chat_id=@madelineprotophar \
-    -F "document=@$dir/madeline81.phar;filename=madeline-$tag.phar" \
+    -F "document=@$phar;filename=madeline-$tag.phar" \
     --form-string caption="MadelineProto $tag
 
 Changelog: https://github.com/$repository/releases/tag/$tag" \
