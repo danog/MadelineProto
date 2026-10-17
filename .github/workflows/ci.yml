@@ -9,6 +9,7 @@ on:
       - '**'
     tags:
       - '*'
+  pull_request:
 
 permissions:
   contents: read
@@ -67,8 +68,10 @@ jobs:
 
   build:
     needs: [cs, test, test_light, handshake]
-    # Either test or test_light is skipped.
-    if: ${{ !failure() && !cancelled() }}
+    # Either test or test_light is skipped. Not for pull requests: it releases the tags, the secrets it
+    # tests with are not given to pull requests from forks, and the push of a branch of this
+    # repository already builds it.
+    if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     permissions:
