@@ -50,6 +50,7 @@ final class DeadConnectionTest extends TestCase
     /** @var list<array{Socket, Socket}> The connections proxied so far. */
     private array $connections = [];
     private string $dir;
+    private ?API $API = null;
 
     public function setUp(): void
     {
@@ -70,6 +71,10 @@ final class DeadConnectionTest extends TestCase
 
     public function tearDown(): void
     {
+        // Before removing its session: it is serialized when destroyed.
+        $this->API = null;
+        while (gc_collect_cycles());
+        API::finalize();
         if (isset($this->server)) {
             $this->server->close();
         }
@@ -142,15 +147,16 @@ final class DeadConnectionTest extends TestCase
 
     public function testADeadConnectionIsReplaced(): void
     {
-        // In this process, along with the proxy.
+        // In this process, along with the proxy. The log is not in the session directory: the instance is only
+        // destroyed (logging it) when the process exits.
         Magic::start(light: false);
         Magic::$isIpcWorker = true;
         $settings = new Settings;
         $settings->getAppInfo()->setApiId((int) getenv('API_ID'))->setApiHash(getenv('API_HASH'));
-        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra("{$this->dir}/MadelineProto.log")->setLevel(Logger::VERBOSE);
+        $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra(sys_get_temp_dir().'/madeline-dead-connection.log')->setLevel(Logger::VERBOSE);
         $settings->getConnection()->addProxy(SocksProxy::class, ['address' => '127.0.0.1', 'port' => $this->server->getAddress()->getPort()]);
         // No need to log in.
-        $API = new API("{$this->dir}/session.madeline", $settings);
+        $API = $this->API = new API("{$this->dir}/session.madeline", $settings);
         $API->help->getConfig();
         self::assertNotEmpty($this->connections, 'The connections go through the proxy');
 
