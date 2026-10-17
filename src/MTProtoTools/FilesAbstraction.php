@@ -1687,10 +1687,10 @@ trait FilesAbstraction
                     throw Exception::extension('gd');
                 }
                 [$thumb_width, $thumb_height] = getimagesizefromstring($thumb);
-            } elseif ($thumb === null && $file instanceof Media) {
-                $thumb = $file->thumb;
-                $thumb_width = $file->thumbWidth;
-                $thumb_height = $file->thumbHeight;
+            } elseif ($thumb === null && $file instanceof Media && $file->inlineThumb !== null) {
+                $thumb = $file->inlineThumb->bytes;
+                $thumb_width = $file->inlineThumb->width ?? 0;
+                $thumb_height = $file->inlineThumb->height ?? 0;
             }
 
             if (\is_string($thumb)) {

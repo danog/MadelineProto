@@ -145,9 +145,10 @@ trait BotAPIFiles
                     'access_hash' => $fileId->accessHash,
                     'file_reference' => $fileId->fileReference,
                     'thumb_size' => $photoSize->thumbType,
+                    'dc_id' => $fileId->dcId,
                 ];
                 $res['name'] = $fileId->id.'_'.$photoSize->thumbType;
-                $res['ext'] = 'jpg';
+                $res['ext'] = '.jpg';
                 $res['mime'] = 'image/jpeg';
                 $res['InputMedia'] = [
                     '_' => $photoSize->thumbFileType === FileIdType::THUMBNAIL ? 'inputMediaDocument' : 'inputMediaPhoto',

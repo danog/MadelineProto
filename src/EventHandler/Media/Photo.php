@@ -17,8 +17,8 @@
 namespace danog\MadelineProto\EventHandler\Media;
 
 use danog\MadelineProto\EventHandler\Media;
-
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Tools;
 
 /**
  * Represents a photo.
@@ -28,6 +28,12 @@ final class Photo extends Media
     /** @var bool If true; the current media has attached mask stickers. */
     public readonly bool $hasStickers;
 
+    /** Photo width */
+    public readonly int $width;
+
+    /** Photo height */
+    public readonly int $height;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -36,5 +42,8 @@ final class Photo extends Media
     ) {
         parent::__construct($API, $rawMedia, $protected);
         $this->hasStickers = $rawMedia['photo']['has_stickers'] ?? false;
+        $size = isset($rawMedia['photo']) ? Tools::maxSize($rawMedia['photo']['sizes']) : $rawMedia;
+        $this->width = $size['w'] ?? 0;
+        $this->height = $size['h'] ?? 0;
     }
 }
