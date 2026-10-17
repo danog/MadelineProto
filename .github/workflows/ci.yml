@@ -60,16 +60,20 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          for tag in debian next latest; do
-            docker buildx imagetools create -t "danog/madelineproto:$tag" danog/madelineproto:next-debian-{arm,amd}64
-          done
+          # All the tags at once: Docker Hub counts every read of a manifest against the pull rate limit, and
+          # creating them one at a time read the images of the architectures again for each one.
+          docker buildx imagetools create -t danog/madelineproto:debian -t danog/madelineproto:next -t danog/madelineproto:latest danog/madelineproto:next-debian-{arm,amd}64
 
   cs:
     needs: docker-merge
     # Also when the image wasn't rebuilt.
     if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
+      # without the secrets: empty credentials would fail the job.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || null }}
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
@@ -89,7 +93,13 @@ jobs:
     needs: docker-merge
     if: ${{ !failure() && !cancelled() && github.event_name == 'push' }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     # Rather than the default 6 hours if a test hangs, holding the user sessions (the daily build waits for them).
     timeout-minutes: 60
     # The user sessions must not be used by two jobs at once.
@@ -133,7 +143,11 @@ jobs:
     needs: docker-merge
     if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
+      # without the secrets: empty credentials would fail the job.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || null }}
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
@@ -151,7 +165,13 @@ jobs:
     # repository already builds it.
     if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     permissions:
       # To upload the phar to the release of a tag.
       contents: write
