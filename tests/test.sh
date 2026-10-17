@@ -56,8 +56,10 @@ if [ "$1" == "psalm" ]; then
 fi
 
 if [ "$1" == "phpunit" ]; then
-    #composer test
-    composer test-light
+    # The secret chat and call tests need two user sessions (skipped without), on the test servers: see tests/ci_sessions.php.
+    php tests/ci_sessions.php --test user "$PWD/ci_user.madeline" USER_SESSION_AUTH && export USER_SESSION="$PWD/ci_user.madeline" || [ $? -eq 2 ]
+    php tests/ci_sessions.php --test user "$PWD/ci_peer.madeline" PEER_USER_SESSION_AUTH && export PEER_USER_SESSION="$PWD/ci_peer.madeline" || [ $? -eq 2 ]
+    composer test
     exit 0
 fi
 

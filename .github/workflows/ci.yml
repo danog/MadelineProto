@@ -33,6 +33,10 @@ jobs:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
+    # The user sessions must not be used by two jobs at once.
+    concurrency:
+      group: telegram-user-sessions
+      cancel-in-progress: false
     steps:
       - name: Install git
         run: apt-get update && apt-get install -y git
@@ -43,6 +47,8 @@ jobs:
           API_HASH: ${{ secrets.API_HASH }}
           DEST: ${{ secrets.DEST }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          USER_SESSION_AUTH: ${{ secrets.USER_SESSION_AUTH }}
+          PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
   test_light:
