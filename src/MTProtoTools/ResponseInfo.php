@@ -128,7 +128,13 @@ final class ResponseInfo
         } elseif ($size > 0) {
             $this->headers['Content-Length'] = (string) $size;
         }
-        $this->headers['Content-Type'] = (string) $messageMedia['mime'];
+        $mime = self::normalizeMime((string) $messageMedia['mime']);
+        $this->headers['Content-Type'] = $mime;
+        // The MIME type and the name come from whoever sent the file on Telegram (or from the query string of the
+        // download script): a file opened as a page can't run scripts nor access the origin serving it, and the
+        // browser must not guess a more dangerous type.
+        $this->headers['Content-Security-Policy'] = 'sandbox';
+        $this->headers['X-Content-Type-Options'] = 'nosniff';
         $this->headers['Cache-Control'] = 'max-age=31556926';
         $this->headers['Content-Transfer-Encoding'] = 'Binary';
         $this->headers['Accept-Ranges'] = 'bytes';
@@ -140,11 +146,46 @@ final class ResponseInfo
                 $this->serveRange = [$seek_start, $seek_end + 1];
             }
 
+            // Only media is shown by the browser, the rest is downloaded (for the browsers ignoring the sandbox).
+            $disposition = self::isInlineSafe($mime) ? 'inline' : 'attachment';
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
-                $this->headers["Content-Disposition"] = "inline; filename=\"{$messageMedia['name']}{$messageMedia['ext']}\"";
+                $this->headers['Content-Disposition'] = $disposition.self::filenameParameters($messageMedia['name'].$messageMedia['ext']);
+            } elseif ($disposition === 'attachment') {
+                $this->headers['Content-Disposition'] = $disposition;
             }
         }
     }
+    /**
+     * A single type/subtype, lowercase and without parameters, or application/octet-stream: so that the browser
+     * can't read the type differently than isInlineSafe().
+     */
+    private static function normalizeMime(string $mime): string
+    {
+        $mime = strtolower(trim(explode(';', $mime, 2)[0]));
+        return preg_match('~^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$~D', $mime) ? $mime : 'application/octet-stream';
+    }
+
+    /**
+     * Whether the browser can show this (normalized) MIME type, rather than downloading it: media that can't run
+     * scripts (not SVG), and plain text.
+     */
+    private static function isInlineSafe(string $mime): bool
+    {
+        return $mime === 'text/plain'
+            || preg_match('~^(video|audio)/~', $mime)
+            || \in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif', 'image/bmp', 'image/apng', 'image/x-icon', 'image/vnd.microsoft.icon'], true);
+    }
+
+    /**
+     * The filename parameters of Content-Disposition: a quoted ASCII fallback without quotes, backslashes nor
+     * control characters, and the name itself encoded as in RFC 6266.
+     */
+    private static function filenameParameters(string $name): string
+    {
+        $ascii = preg_replace('/[^\x20-\x7e]|["\\\\]/', '_', $name);
+        return "; filename=\"$ascii\"; filename*=UTF-8''".rawurlencode($name);
+    }
+
     /**
      * Parse headers.
      *
