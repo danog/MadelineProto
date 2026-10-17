@@ -22,8 +22,12 @@ $logger = new Logger(new SettingsLogger);
 
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
-if ($argc !== 3) {
-    die("Usage: {$argv[0]} layernumberold layernumbernew\n");
+// --no-send: only print the diff, without sending it to @danogentili with the fuzz_bot.madeline session.
+$send = !\in_array('--no-send', $argv, true);
+$args = array_values(array_filter(\array_slice($argv, 1), static fn (string $arg): bool => $arg !== '--no-send'));
+if (\count($args) !== 2) {
+    fwrite(STDERR, "Usage: {$argv[0]} [--no-send] layernumberold layernumbernew\n");
+    exit(1);
 }
 /**
  * Get TL info of layer.
@@ -50,8 +54,8 @@ function getUrl($constructor, $type)
 
     return "[$constructor](https://docs.madelineproto.xyz/API_docs/$type/$orig.html)";
 }
-$old = getTL($argv[1]);
-$new = getTL($argv[2]);
+$old = getTL($args[0]);
+$new = getTL($args[1]);
 $res = '';
 
 foreach (['methods', 'constructors'] as $type) {
@@ -111,10 +115,13 @@ foreach (['methods', 'constructors'] as $type) {
     }
 }
 
+echo $res."\n\n";
+if (!$send) {
+    exit(0);
+}
+
 $bot = new \danog\MadelineProto\API('fuzz_bot.madeline');
 $bot->start();
-
-echo $res."\n\n";
 foreach (explode("\n\n", $res) as $chunk) {
     if (!$chunk || !trim(explode(':', $chunk)[1])) {
         continue;

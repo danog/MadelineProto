@@ -1,0 +1,49 @@
+name: Release
+
+# When a release is published, its notes are generated (see tests/release_notes.sh); once it's fully released
+# (not a pre-release anymore), its changelog is sent to @danogentili on Telegram (see tests/announce_release.php).
+# Both only once.
+
+on:
+  release:
+    types: [published, released]
+  # The CI releases the tags (they stop being pre-releases) with the token of its job, whose events don't run
+  # workflows: it runs this one instead.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag of the release
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container: danog/madelineproto:next
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v4
+        with:
+          # The tags, for the layer of the previous release.
+          fetch-depth: 0
+      - name: Generate the release notes
+        run: tests/test.sh release-notes "$TAG"
+      - name: Send the changelog to @danogentili
+        if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: php tests/announce_release.php "$TAG"

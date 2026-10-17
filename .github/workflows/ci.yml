@@ -150,6 +150,8 @@ jobs:
     permissions:
       # To upload the phar to the release of a tag.
       contents: write
+      # To run release.yml.
+      actions: write
     services:
       mariadb:
         image: mariadb
@@ -194,3 +196,10 @@ jobs:
           # Empty unless building a tag, like Woodpecker's.
           CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: /bin/bash -e tests/makephar.sh
+      # Released by makephar.sh, with the token of the job: its events don't run workflows, so run it.
+      - name: Announce the release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref "$TAG" -f tag="$TAG"

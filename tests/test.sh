@@ -45,6 +45,16 @@ if [ "$1" == "cs" ]; then
     exit 0
 fi
 
+if [ "$1" == "release-notes" ]; then
+    tests/release_notes.sh "$2"
+    exit 0
+fi
+
+if [ "$1" == "announce" ]; then
+    php tests/announce_release.php "$2"
+    exit 0
+fi
+
 if [ "$1" == "build" ]; then
     tests/autobuild.sh
     exit 0
