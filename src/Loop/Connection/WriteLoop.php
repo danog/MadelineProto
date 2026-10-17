@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Loop\Connection;
 
 use Amp\ByteStream\StreamException;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use danog\Loop\Loop;
 use danog\MadelineProto\Connection;
@@ -207,6 +208,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                 }
                 if ($msgIds) {
                     $this->API->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
+                    $stream = $this->connection->stream;
                     $this->connection->objectCallAsync('msgs_state_req', [
                         'msg_ids' => $msgIds,
                         'cancellation' => new \Amp\TimeoutCancellation(
@@ -214,11 +216,26 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                             "Timeout while waiting for msgs_state_req response on DC {$this->datacenter}"
                         ),
                     ], $deferred);
-                    $deferred->getFuture()->map(function (array|\Closure $result) use ($arr): void {
-                        try {
-                            if (\is_callable($result)) {
-                                throw $result();
+                    $deferred->getFuture()->map(function (array|\Closure $result) use ($arr, $stream): void {
+                        if (\is_callable($result)) {
+                            try {
+                                $result();
+                            } catch (CancelledException $e) {
+                                // The server always answers state requests right away: the connection is dead,
+                                // like a half-open TCP connection silently dropped along the way (by a NAT, for
+                                // example), on which nothing errors out and nothing ever arrives. Reconnect,
+                                // resending the pending messages, unless it was already replaced.
+                                if ($this->connection->stream === $stream && $stream !== null) {
+                                    $this->API->logger("Got no answer to the state request in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
+                                    $this->connection->reconnect();
+                                }
+                            } catch (\Throwable $e) {
+                                $this->API->logger("Got exception in check loop for DC {$this->datacenter}");
+                                $this->API->logger((string) $e);
                             }
+                            return;
+                        }
+                        try {
                             foreach (str_split($result['info']) as $key => $chr) {
                                 $message = $arr[$key];
                                 if ($message->hasReply()) {
