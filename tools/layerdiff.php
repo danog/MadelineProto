@@ -23,9 +23,9 @@ $logger = new Logger(new SettingsLogger);
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
 // --no-send: only print the diff, without sending it to @danogentili with the fuzz_bot.madeline session.
-$send = !\in_array('--no-send', $argv, true);
-$args = array_values(array_filter(\array_slice($argv, 1), static fn (string $arg): bool => $arg !== '--no-send'));
-if (\count($args) !== 2) {
+$send = !in_array('--no-send', $argv, true);
+$args = array_values(array_filter(array_slice($argv, 1), static fn (string $arg): bool => $arg !== '--no-send'));
+if (count($args) !== 2) {
     fwrite(STDERR, "Usage: {$argv[0]} [--no-send] layernumberold layernumbernew\n");
     exit(1);
 }
