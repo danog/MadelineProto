@@ -6,6 +6,7 @@ namespace danog\MadelineProto\Test;
 
 use CURLFile;
 use danog\Decoder\FileId;
+use danog\MadelineProto\EventHandler\Media\Photo;
 use Generator;
 
 use const CURLOPT_POST;
@@ -28,17 +29,6 @@ class FileIdTest extends MadelineTestCase
         $res = FileId::fromBotAPI($fileId);
         $res->fileReference = '';
         $res->version = 0;
-        return (string) $res;
-    }
-    /**
-     * Strip access hash (and possibly ID) from file ID.
-     *
-     * @param string $fileId File ID
-     */
-    public static function stripForChat(string $fileId): string
-    {
-        $res = FileId::fromBotAPI($fileId);
-        $res->accessHash = 0;
         return (string) $res;
     }
 
@@ -83,14 +73,11 @@ class FileIdTest extends MadelineTestCase
         if ($type === 'profile_photo') {
             $chat = self::$MadelineProto->getPwrChat($fullInfo['chat']);
             $this->assertArrayHasKey('photo', $chat);
-            $chat = $chat['photo'];
-            $this->assertArrayHasKey($fullInfo['type'].'_file_id', $chat);
-            $this->assertArrayHasKey($fullInfo['type'].'_file_unique_id', $chat);
-
-            $chat[$fullInfo['type'].'_file_id'] = self::stripForChat($chat[$fullInfo['type'].'_file_id']);
-
-            $this->assertFileIdEquals($fileIdStr, $chat[$fullInfo['type'].'_file_id']);
-            $this->assertEquals($uniqueFileIdStr, $chat[$fullInfo['type'].'_file_unique_id']);
+            $this->assertInstanceOf(Photo::class, $chat['photo']);
+            if ($fullInfo['type'] === 'big') {
+                // The photo, in its biggest size.
+                $this->assertEquals($uniqueFileIdStr, $chat['photo']->botApiFileUniqueId);
+            }
 
             $this->expectExceptionMessage("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
         }
