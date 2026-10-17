@@ -11,6 +11,8 @@ name: Daily build
 on:
   schedule:
     - cron: '17 3 * * *'
+  # From the Actions tab, or with gh workflow run autobuild.yml.
+  workflow_dispatch:
 
 permissions:
   contents: read

@@ -6,6 +6,8 @@ name: Docker image update
 on:
   schedule:
     - cron: '47 2 * * *'
+  # From the Actions tab, or with gh workflow run docker-update.yml.
+  workflow_dispatch:
 
 permissions:
   contents: read
