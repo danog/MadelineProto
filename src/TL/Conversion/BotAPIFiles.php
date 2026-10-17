@@ -99,9 +99,8 @@ trait BotAPIFiles
      */
     public static function unpackFileId(string $fileId): array
     {
-        $inline = InlineThumbnail::unpackFileId($fileId);
-        if ($inline !== null) {
-            return $inline;
+        if (InlineThumbnail::isFileId($fileId)) {
+            throw new Exception('The file ID of an inline thumbnail can only be used by the session that generated it');
         }
         $fileId = FileId::fromBotAPI($fileId);
 
