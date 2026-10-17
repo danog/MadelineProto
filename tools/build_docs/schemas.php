@@ -15,7 +15,12 @@ function loadSchemas(): array
     $had = [];
     $client = HttpClientBuilder::buildDefault();
     do {
-        $res = $client->request(new Request("https://api.github.com/repos/telegramdesktop/tdesktop/commits?path=Telegram/SourceFiles/mtproto/scheme/api.tl&per_page=100&page=$page"))->getBody()->buffer();
+        $request = new Request("https://api.github.com/repos/telegramdesktop/tdesktop/commits?path=Telegram/SourceFiles/mtproto/scheme/api.tl&per_page=100&page=$page");
+        // Unauthenticated, the API allows 60 requests per hour per IP, shared by all of the jobs of a CI provider.
+        if ($token = getenv('GITHUB_TOKEN')) {
+            $request->setHeader('Authorization', "Bearer $token");
+        }
+        $res = $client->request($request)->getBody()->buffer();
         foreach (json_decode($res, true) as $idx => $commit) {
             $hash = $commit['sha'];
             if ($page === 1 && $idx === 0) {

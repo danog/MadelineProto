@@ -157,3 +157,6 @@ dataset_info.json
 madeline_*.json
 pre.json
 
+
+# Left by tests/lock_setup.php
+woodpecker.lock
