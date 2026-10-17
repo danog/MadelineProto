@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;

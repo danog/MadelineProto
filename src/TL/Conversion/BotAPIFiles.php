@@ -29,6 +29,7 @@ use danog\Decoder\PhotoSizeSource\PhotoSizeSourceStickersetThumbnail;
 use danog\Decoder\PhotoSizeSource\PhotoSizeSourceThumbnail;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
+use danog\MadelineProto\EventHandler\Media\InlineThumbnail;
 use danog\MadelineProto\Lang;
 
 /**
@@ -98,6 +99,9 @@ trait BotAPIFiles
      */
     public static function unpackFileId(string $fileId): array
     {
+        if (InlineThumbnail::isFileId($fileId)) {
+            throw new Exception('The file ID of an inline thumbnail can only be used by the session that generated it');
+        }
         $fileId = FileId::fromBotAPI($fileId);
 
         if (!\in_array($fileId->version, [2, 4], true)) {
@@ -145,9 +149,10 @@ trait BotAPIFiles
                     'access_hash' => $fileId->accessHash,
                     'file_reference' => $fileId->fileReference,
                     'thumb_size' => $photoSize->thumbType,
+                    'dc_id' => $fileId->dcId,
                 ];
                 $res['name'] = $fileId->id.'_'.$photoSize->thumbType;
-                $res['ext'] = 'jpg';
+                $res['ext'] = '.jpg';
                 $res['mime'] = 'image/jpeg';
                 $res['InputMedia'] = [
                     '_' => $photoSize->thumbFileType === FileIdType::THUMBNAIL ? 'inputMediaDocument' : 'inputMediaPhoto',

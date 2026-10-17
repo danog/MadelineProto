@@ -881,6 +881,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Interrupted uploads, and the calls that made them
             'resumableUploads',
+            'inlineFileIdKey',
             'resumableCalls',
 
             'calls',
