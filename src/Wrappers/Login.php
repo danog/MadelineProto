@@ -269,6 +269,8 @@ trait Login
         $this->logger->logger(Lang::$current_lang['login_auth_key'], Logger::NOTICE);
 
         $this->datacenter = new DataCenter($this);
+        // Not the default DC 1, which doesn't exist on the test servers (whose DCs are 10001-10003).
+        $this->datacenter->currentDatacenter = $mainDcID;
         $auth_key = $authorization[$mainDcID];
         if (!\is_array($auth_key)) {
             $auth_key = ['auth_key' => $auth_key];
