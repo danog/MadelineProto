@@ -236,6 +236,9 @@ foreach ($layer['methods']->by_id as $constructor) {
     $unauthedNames []= $name;
 }
 
+// On the test servers, where the sessions of the CI are.
+$testMode = $user->getSettings()->getConnection()->getTestMode();
+
 $names = [];
 foreach ($layer['methods']->by_id as $constructor) {
     $name = $constructor['method'];
@@ -249,6 +252,7 @@ foreach ($layer['methods']->by_id as $constructor) {
         || $name === 'photos.updateProfilePhoto'
         || $name === 'photos.uploadProfilePhoto'
         || $name === 'payments.resolveStarGiftOffer' // tmp
+        || ($testMode && $name === 'contacts.getContactIDs') // Never answered on the test servers
         || !str_contains($name, '.')) {
         continue;
     }
