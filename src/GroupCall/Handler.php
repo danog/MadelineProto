@@ -19,6 +19,7 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
@@ -35,6 +36,7 @@ use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
@@ -107,6 +109,7 @@ trait Handler
         // saveUpdate, which starts tracking the new call. Look it up (fetching it if that update has
         // not landed yet) to return its handle.
         $inputCall = null;
+        $peerId = null;
         foreach ($updates['updates'] ?? [] as $update) {
             if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
                 $inputCall = [
@@ -114,11 +117,13 @@ trait Handler
                     'id' => $update['call']['id'],
                     'access_hash' => $update['call']['access_hash'],
                 ];
+                // Not necessarily $peer: starting an RTMP livestream migrates a basic group to a supergroup.
+                $peerId = isset($update['peer']) ? $this->getIdInternal($update['peer']) : null;
                 break;
             }
         }
         $controller = $inputCall !== null
-            ? $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))
+            ? $this->getGroupCallByInput($inputCall, $peerId ?? $this->migratedPeer($peer))
             : null;
         if ($controller === null) {
             throw new AssertionError('The server did not return the created group call!');
@@ -581,13 +586,54 @@ trait Handler
      */
     public function getGroupCall(string|int $peer): ?GroupCall
     {
-        $full = $this->getFullInfo($peer);
-        $inputCall = $full['full']['call'] ?? null;
-        if ($inputCall === null) {
-            return null;
-        }
-        $call = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))?->public;
+        $call = $this->currentGroupCall($peer)?->public;
         return $call instanceof GroupCall ? $call : null;
+    }
+
+    /**
+     * The group call currently active in a group or channel.
+     *
+     * The call of the full info of the chat is cached, and it may have ended since: then the full
+     * info is fetched again. A basic group migrated to a supergroup (e.g. by starting an RTMP
+     * livestream) is followed to the supergroup.
+     */
+    private function currentGroupCall(string|int $peer): ?GroupCallController
+    {
+        $peer = $this->migratedPeer($peer);
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            $inputCall = $this->getFullInfo($peer)['full']['call'] ?? null;
+            if ($inputCall === null) {
+                return null;
+            }
+            try {
+                $controller = $this->getGroupCallByInput($inputCall, $peer);
+                if ($controller !== null && !$controller->public->discarded) {
+                    return $controller;
+                }
+            } catch (RPCErrorException $e) {
+                // GROUPCALL_FORBIDDEN: the call has already ended.
+                if ($e->rpc !== 'GROUPCALL_FORBIDDEN' && $e->rpc !== 'GROUPCALL_INVALID') {
+                    throw $e;
+                }
+            }
+            $this->refreshFullPeerCache($peer);
+        }
+        return null;
+    }
+
+    /**
+     * The supergroup a basic group was migrated to, or the peer itself.
+     */
+    private function migratedPeer(string|int $peer): int
+    {
+        $id = $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_ID);
+        if (DialogId::isChat($id)) {
+            $migratedTo = $this->getInfo($id)['Chat']['migrated_to']['channel_id'] ?? null;
+            if ($migratedTo !== null) {
+                return (int) $migratedTo;
+            }
+        }
+        return $id;
     }
 
     /**
@@ -610,14 +656,9 @@ trait Handler
      */
     public function joinGroupCall(string|int $peer, bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): GroupCall
     {
-        $full = $this->getFullInfo($peer);
-        $inputCall = $full['full']['call'] ?? null;
-        if ($inputCall === null) {
-            throw new AssertionError('There is no active group call in this chat!');
-        }
-        $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer));
+        $controller = $this->currentGroupCall($peer);
         if ($controller === null) {
-            throw new AssertionError('Could not fetch the group call!');
+            throw new AssertionError('There is no active group call in this chat!');
         }
         $controller->join($muted, $joinAs, $inviteHash);
         \assert($controller->public instanceof GroupCall);
@@ -971,7 +1012,8 @@ trait Handler
      */
     public function getGroupCallStreamChannels(int $id): array
     {
-        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $this->getGroupCallController($id)->getInputCall()]);
+        $controller = $this->getGroupCallController($id);
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall()], $this->groupCallStreamDc($controller));
         $channels = [];
         foreach ($result['channels'] as $channel) {
             $channels[] = ['channel' => (int) $channel['channel'], 'scale' => (int) $channel['scale'], 'last_timestamp_ms' => (int) $channel['last_timestamp_ms']];
@@ -993,13 +1035,7 @@ trait Handler
             $location['video_channel'] = $videoChannel;
             $location['video_quality'] = $videoQuality ?? 0;
         }
-        $dc = $controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc;
-        if ($this->isTestMode() && $dc < 10_000) {
-            $dc += 10_000;
-        }
-        if ($this->datacenter->has(-$dc)) {
-            $dc = -$dc;
-        }
+        $dc = $this->groupCallStreamDc($controller);
         $result = $this->methodCallAsyncRead('upload.getFile', [
             'location' => $location,
             'offset' => 0,
@@ -1011,6 +1047,22 @@ trait Handler
             return null;
         }
         return (string) $result['bytes'];
+    }
+
+    /**
+     * The DC serving the chunks of a group call in stream mode (its stream_dc_id).
+     */
+    private function groupCallStreamDc(GroupCallController $controller): int
+    {
+        $dc = $controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc;
+        if ($this->isTestMode() && $dc < 10_000) {
+            $dc += 10_000;
+        }
+        if ($this->datacenter->has(-$dc)) {
+            // Its media-only connection: chunks are downloaded like files.
+            $dc = -$dc;
+        }
+        return $dc;
     }
 
     /**
