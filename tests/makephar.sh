@@ -144,24 +144,12 @@ n
 n
 "; } | tests/testing.php
 }
+# A new session of the bot, created by the MadelineProto under test (see tests/ci_sessions.php), with its exported
+# authorization: logging in with its token in every build gets FLOOD_WAITs.
 runTest()
 {
-    {
-        echo "$BOT_TOKEN
-n
-n
-n
-"; } | $p tests/testing.php
-}
-runTestOld()
-{
-    {
-        echo "b
-$BOT_TOKEN
-n
-n
-n
-"; } | $p tests/testing.php
+    php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH
+    runTestSimple
 }
 
 k

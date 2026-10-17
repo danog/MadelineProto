@@ -73,9 +73,10 @@ if [ "$1" == "phpunit" ]; then
     # The secret chat and call tests need two user sessions (skipped without), on the test servers: see tests/ci_sessions.php.
     php tests/ci_sessions.php --test user "$PWD/ci_user.madeline" USER_SESSION_AUTH && export USER_SESSION="$PWD/ci_user.madeline" || [ $? -eq 2 ]
     php tests/ci_sessions.php --test user "$PWD/ci_peer.madeline" PEER_USER_SESSION_AUTH && export PEER_USER_SESSION="$PWD/ci_peer.madeline" || [ $? -eq 2 ]
-    # The bot, on the main servers, logged in only once (logging in again and again gets FLOOD_WAITs): the session of
-    # MadelineTestCase, and a copy for the tests resuming after crashes (used as a template by EventHandlerStartTest).
-    if php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_TOKEN; then
+    # The bot, on the main servers, with its exported authorization (logging in with its token in every run gets
+    # FLOOD_WAITs, see tests/ci_sessions.php): the session of MadelineTestCase, and a copy for the tests resuming
+    # after crashes (used as a template by EventHandlerStartTest). BOT_TOKEN is only used for the bot API.
+    if php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH; then
         cp -a testing.madeline ci_bot.madeline
         rm -rf ci_bot.madeline/ipc ci_bot.madeline/callback.ipc
         export RESUME_CYCLE_SESSION="$PWD/ci_bot.madeline"

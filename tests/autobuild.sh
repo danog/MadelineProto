@@ -27,7 +27,7 @@ done
 
 # The user accounts of the CI, and the bots they interact with, are on the test servers.
 php tests/ci_sessions.php --test unauth fuzz_unauth.madeline
-php tests/ci_sessions.php --test bot fuzz_bot.madeline TEST_BOT_TOKEN
+php tests/ci_sessions.php --test bot-token fuzz_bot.madeline TEST_BOT_TOKEN
 php tests/ci_sessions.php --test user fuzz_user.madeline USER_SESSION_AUTH
 
 composer build

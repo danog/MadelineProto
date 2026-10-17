@@ -105,7 +105,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     # Rather than the default 6 hours if a test hangs, holding the user sessions (the daily build waits for them).
     timeout-minutes: 60
-    # The user sessions must not be used by two jobs at once.
+    # The user sessions (and the one of the bot) must not be used by two jobs at once.
     concurrency:
       group: telegram-user-sessions
       cancel-in-progress: false
@@ -121,7 +121,9 @@ jobs:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           DEST: ${{ secrets.DEST }}
+          # Only for the bot API: the bot logs in with BOT_SESSION_AUTH (see tests/ci_sessions.php).
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_SESSION_AUTH: ${{ secrets.BOT_SESSION_AUTH }}
           USER_SESSION_AUTH: ${{ secrets.USER_SESSION_AUTH }}
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
@@ -169,6 +171,10 @@ jobs:
     # repository already builds it.
     if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
+    # It tests the phar with the session of the bot, like the test job.
+    concurrency:
+      group: telegram-user-sessions
+      cancel-in-progress: false
     container:
       image: danog/madelineproto:next
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
@@ -218,7 +224,7 @@ jobs:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           DEST: ${{ secrets.DEST }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_SESSION_AUTH: ${{ secrets.BOT_SESSION_AUTH }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           # Empty unless building a tag, like Woodpecker's.
