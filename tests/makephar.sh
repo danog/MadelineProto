@@ -148,7 +148,8 @@ n
 # authorization: logging in with its token in every build gets FLOOD_WAITs.
 runTest()
 {
-    php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH
+    # Authorization 0: the session tests use the others, at once (see tests/session_tests.sh).
+    php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH 0
     runTestSimple
 }
 
