@@ -40,21 +40,24 @@ final class WebContextTest extends TestCase
     private const ROOT = __DIR__.'/../../..';
 
     /**
-     * The entry script can be requested by anyone: only request files that this user wrote and only it can read
-     * are run, once.
+     * The entry script can be requested by anyone: only request files that this user wrote and only it can read,
+     * in a directory only it can access, are run, once.
      */
     public function testTheRunnerOnlyRunsPrivateRequestsOnce(): void
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            self::markTestSkipped('Web contexts are not supported on Windows');
+        }
         self::assertFalse(WebContextRunner::run('../../etc/passwd'));
         self::assertFalse(WebContextRunner::run(bin2hex(random_bytes(16))), 'A missing request ran');
 
-        $dir = WebContextFactory::getDirectory(create: true);
-        self::assertNotNull($dir);
         $id = bin2hex(random_bytes(16));
-        $path = WebContextFactory::getRequestPath($dir, $id);
-        $marker = sys_get_temp_dir().'/madeline-parallel-marker-'.$id;
-        $script = sys_get_temp_dir().'/madeline-parallel-script-'.$id.'.php';
+        $dir = WebContextFactory::getDirectory($id);
+        $path = WebContextFactory::getRequestPath($id);
+        $marker = sys_get_temp_dir().'/madeline-webcontext-test-marker-'.$id;
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-script-'.$id.'.php';
         file_put_contents($script, '<?php touch('.var_export($marker, true).'); return static fn () => null;');
+        mkdir($dir, 0o700);
         try {
             file_put_contents($path, json_encode([
                 'uri' => sys_get_temp_dir().'/nonexistent',
@@ -63,12 +66,16 @@ final class WebContextTest extends TestCase
                 'cwd' => getcwd(),
                 'timeout' => 1,
             ]));
-            if (PHP_OS_FAMILY !== 'Windows') {
-                chmod($path, 0o644);
-                self::assertFalse(WebContextRunner::run($id), 'A request readable by others ran');
-                self::assertFileExists($path, 'A request readable by others was consumed');
-                chmod($path, 0o600);
-            }
+            chmod($path, 0o644);
+            self::assertFalse(WebContextRunner::run($id), 'A request readable by others ran');
+            self::assertFileExists($path, 'A request readable by others was consumed');
+            chmod($path, 0o600);
+
+            chmod($dir, 0o755);
+            self::assertFalse(WebContextRunner::run($id), 'A request in a directory accessible by others ran');
+            self::assertFileExists($path, 'A request in a directory accessible by others was consumed');
+            chmod($dir, 0o700);
+
             // Can't connect to the parent: consumed, but not run
             self::assertFalse(WebContextRunner::run($id));
             self::assertFileDoesNotExist($path);
@@ -76,6 +83,7 @@ final class WebContextTest extends TestCase
             self::assertFileDoesNotExist($marker);
         } finally {
             @unlink($path);
+            @rmdir($dir);
             @unlink($script);
             @unlink($marker);
         }
@@ -89,11 +97,14 @@ final class WebContextTest extends TestCase
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $port = (int) substr(strrchr(stream_socket_get_name($server, false), ':'), 1);
         fclose($server);
+        // Its own temporary directory, to check that nothing is left behind
+        $tmp = sys_get_temp_dir().'/madeline-webcontext-test-'.bin2hex(random_bytes(8));
+        mkdir($tmp, 0o700);
 
         $process = Process::start(
             // The context, its workers and the request that starts them each take a webserver worker
             [PHP_BINARY, '-d', 'opcache.enable_cli=0', '-S', "127.0.0.1:$port", '-t', self::ROOT],
-            environment: ['PHP_CLI_SERVER_WORKERS' => '6'] + getenv(),
+            environment: ['PHP_CLI_SERVER_WORKERS' => '6', 'TMPDIR' => $tmp] + getenv(),
         );
         $log = async(static fn () => buffer($process->getStdout()).buffer($process->getStderr()));
         try {
@@ -132,7 +143,7 @@ final class WebContextTest extends TestCase
             self::assertSame('Task 4 failed', $result['taskFailure']);
             self::assertTrue($result['shutdown']);
 
-            self::assertSame([], glob(WebContextFactory::getDirectory(create: false).'/*'), 'Request files or IPC endpoints were left behind');
+            self::assertSame([], glob("$tmp/madeline-parallel-*"), 'Request files or IPC endpoints were left behind');
         } catch (\Throwable $e) {
             $process->kill();
             fwrite(STDERR, "Webserver log:\n".$log->await());
@@ -140,6 +151,7 @@ final class WebContextTest extends TestCase
         } finally {
             $process->kill();
             $process->join();
+            exec('rm -rf '.escapeshellarg($tmp));
         }
     }
 }
