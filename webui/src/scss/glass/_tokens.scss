@@ -28,6 +28,12 @@
   --glass-sheen: rgba(255, 255, 255, .30);
   // the accent, as glass
   --glass-accent-alpha: .80;
+  // the buttons: clear glass tinted with the accent
+  --glass-button-alpha: .70;
+  --glass-button-edge: .75;
+  --glass-button-caustic: .16;
+  --glass-button-shadow: 0 10px 26px -14px rgba(48, 30, 140, .55);
+  --glass-button-text-shadow: 30, 18, 100;
 
   // the light field behind the glass
   --field-base: linear-gradient(160deg, #d9cfff 0%, #eae1ff 45%, #d3e2ff 100%);
@@ -57,6 +63,11 @@
   --glass-well-shadow: rgba(0, 0, 0, .35);
   --glass-sheen: rgba(190, 180, 255, .16);
   --glass-accent-alpha: .72;
+  --glass-button-alpha: .46;
+  --glass-button-edge: .40;
+  --glass-button-caustic: .16;
+  --glass-button-shadow: 0 12px 28px -14px rgba(0, 0, 0, .7);
+  --glass-button-text-shadow: 0, 0, 0;
 
   --field-base: linear-gradient(160deg, #0b0920 0%, #110c2c 50%, #070d24 100%);
   --field-1: rgba(98, 74, 255, .85);
@@ -80,6 +91,8 @@
   --glass-rim-fade: transparent;
   --glass-sheen: transparent;
   --glass-accent-alpha: 1;
+  --glass-button-alpha: 1;
+  --glass-button-caustic: 0;
 }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
