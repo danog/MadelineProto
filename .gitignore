@@ -160,3 +160,6 @@ pre.json
 
 # Left by tests/lock_setup.php
 woodpecker.lock
+
+# Web UI dependencies
+webui/node_modules/

@@ -32,6 +32,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: tests/test.sh cs
 
+  webui:
+    # Not in the container: it has no Node.js, the runner has.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the web UI, and check that its committed bundle is up to date
+        run: tests/webui.sh
+
   test:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -85,7 +96,7 @@ jobs:
         run: tests/test.sh handshake
 
   build:
-    needs: [cs, test, test_light, handshake]
+    needs: [cs, webui, test, test_light, handshake]
     # Either test or test_light is skipped. Not for pull requests: it releases the tags, the secrets it
     # tests with are not given to pull requests from forks, and the push of a branch of this
     # repository already builds it.

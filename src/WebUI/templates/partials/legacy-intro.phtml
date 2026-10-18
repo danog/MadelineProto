@@ -1,0 +1,17 @@
+<?php
+/**
+ * Title, lead, alerts and instructions of a page, for legacy sprintf templates.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+?>
+<?= $this->e($page->title) ?><br>
+<?php if ($page->lead !== ''): ?><?= $this->e($page->lead) ?><br><?php endif ?>
+<?php foreach ($page->alerts as $alert): ?>
+    <b><?= $this->e($alert->message) ?></b><br>
+    <?php if ($alert->code !== null): ?><code><?= $this->e($alert->code) ?></code><br><?php endif ?>
+<?php endforeach ?>
+<?php if ($page->instructions): ?>
+    <ol><?php foreach ($page->instructions as $instruction): ?><li><?= $this->e($instruction) ?></li><?php endforeach ?></ol>
+<?php endif ?>

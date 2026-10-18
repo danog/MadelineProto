@@ -30,6 +30,12 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WebUI\Alert;
+use danog\MadelineProto\WebUI\Field;
+use danog\MadelineProto\WebUI\FieldType;
+use danog\MadelineProto\WebUI\Page;
+use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\WebUI;
 
 use const PHP_SAPI;
 
@@ -103,198 +109,221 @@ trait Start
             $this->serialize();
             return $this->fullGetSelf();
         }
-        if ($this->getAuthorization() === API::NOT_LOGGED_IN) {
-            if (isset($_POST['phone_number'])) {
-                $this->webPhoneLogin();
-            } elseif (isset($_POST['token'])) {
-                $this->webBotLogin();
+        if (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
+            $this->webQrLogin();
+            die;
+        }
+        $auth = $this->getAuthorization();
+        $post = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
+        if ($auth === API::NOT_LOGGED_IN) {
+            $type = $_POST['type'] ?? (isset($_POST['token']) ? 'bot' : 'phone');
+            if ($type === 'bot' && isset($_POST['token'])) {
+                $this->webStep(fn () => $this->botLogin(trim((string) $_POST['token'])));
+            } elseif ($type === 'phone' && isset($_POST['phone_number'])) {
+                $this->webStep(fn () => $this->phoneLogin(trim((string) $_POST['phone_number'])));
             } else {
                 $this->webEcho();
             }
-        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_CODE) {
+        } elseif ($auth === API::WAITING_CODE) {
             if (isset($_POST['phone_code'])) {
-                $this->webCompletePhoneLogin();
+                $this->webStep(fn () => $this->completePhoneLogin(trim((string) $_POST['phone_code'])));
             } else {
-                $this->webEcho(Lang::$current_lang['loginNoCode']);
+                $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoCode']) : null);
             }
-        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
+        } elseif ($auth === API::WAITING_PASSWORD) {
             if (isset($_POST['password'])) {
-                $this->webComplete2faLogin();
+                $this->webStep(fn () => $this->complete2faLogin((string) $_POST['password']));
             } else {
-                $this->webEcho(Lang::$current_lang['loginUserPassWeb']);
+                $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoPass']) : null);
             }
-        } elseif ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
+        } elseif ($auth === API::WAITING_SIGNUP) {
             if (isset($_POST['first_name'])) {
-                $this->webCompleteSignup();
+                $this->webStep(fn () => $this->completeSignup(trim((string) $_POST['first_name']), trim((string) ($_POST['last_name'] ?? ''))));
             } else {
-                $this->webEcho(Lang::$current_lang['loginNoName']);
+                $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoName']) : null);
             }
         }
-        if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
+        if ($this->getAuthorization() === API::LOGGED_IN) {
             $this->serialize();
             return $this->fullGetSelf();
         }
         die;
     }
-    private function webPhoneLogin(): void
+    /**
+     * Run a login step submitted from the web UI, then show the next one.
+     *
+     * @param callable(): mixed $step
+     */
+    private function webStep(callable $step): void
     {
         try {
-            $this->phoneLogin($_POST['phone_number']);
+            $step();
+        } catch (RPCErrorException|Exception $e) {
+            $this->webEcho(Alert::error(sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))));
+            return;
+        }
+        if ($this->getAuthorization() === API::LOGGED_IN) {
+            // The script continues in this request: it must not run again after a redirect
+            return;
+        }
+        if (!WebUI::redirectToSelf()) {
             $this->webEcho();
-        } catch (RPCErrorException $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (Exception $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
         }
     }
-    private function webCompletePhoneLogin(): void
+    /**
+     * Answer the long polling requests of the QR code login panel.
+     */
+    private function webQrLogin(): void
     {
-        try {
-            $this->completePhoneLogin($_POST['phone_code']);
-            $this->webEcho();
-        } catch (RPCErrorException $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (Exception $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+        $result = ['logged_in' => true];
+        if ($this->getAuthorization() === API::NOT_LOGGED_IN) {
+            try {
+                $qr = $this->qrLogin();
+                if (isset($_GET['waitQrCodeOrLogin'])) {
+                    $qr = $qr?->waitForLoginOrQrCodeExpiration(
+                        Tools::getTimeoutCancellation(5.0, "Timeout while waiting for QR code or login")
+                    );
+                }
+            } catch (CancelledException) {
+                $qr = $this->qrLogin();
+            }
+            if ($qr) {
+                $result = [
+                    'logged_in' => false,
+                    'svg' => $qr->getQRSvg(400, 2),
+                ];
+            }
         }
-    }
-    private function webComplete2faLogin(): void
-    {
-        try {
-            $this->complete2faLogin($_POST['password']);
-            $this->webEcho();
-        } catch (RPCErrorException $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (Exception $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
+        // Otherwise, logged in (or waiting for the password): the page reloads
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            header('Cache-Control: no-store');
         }
-    }
-    private function webCompleteSignup(): void
-    {
-        try {
-            $this->completeSignup($_POST['first_name'], $_POST['last_name'] ?? '');
-            $this->webEcho();
-        } catch (RPCErrorException $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (Exception $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        }
-    }
-    private function webBotLogin(): void
-    {
-        try {
-            $this->botLogin($_POST['token']);
-            $this->webEcho();
-        } catch (RPCErrorException $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        } catch (Exception $e) {
-            $this->webEcho(sprintf(Lang::$current_lang['apiError'], $e->getMessage()));
-        }
+        getOutputBufferStream()->write(json_encode($result));
     }
 
     /**
-     * Echo page to console.
-     *
-     * @param string $message Error message
+     * Show the page of the current login step.
      */
-    private function webEcho(string $message = ''): void
+    private function webEcho(?Alert $alert = null): void
     {
-        $auth = $this->getAuthorization();
-        $form = null;
-        $trailer = '';
-        if ($auth === API::NOT_LOGGED_IN) {
-            if (isset($_POST['type'])) {
-                if ($_POST['type'] === 'phone') {
-                    $title = str_replace(':', '', Lang::$current_lang['loginUser']);
-                    $phone = htmlentities(Lang::$current_lang['loginUserPhoneWeb']);
-                    $form = "<input type='text' name='phone_number' placeholder='$phone' required/>";
-                } else {
-                    $title = str_replace(':', '', Lang::$current_lang['loginBot']);
-                    $token = htmlentities(Lang::$current_lang['loginBotTokenWeb']);
-                    $form = "<input type='text' name='token' placeholder='$token' required/>";
-                }
-            } elseif (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
-                header('Content-type: application/json');
-                try {
-                    $qr = $this->qrLogin();
-                    if (isset($_GET['waitQrCodeOrLogin'])) {
-                        $qr = $qr?->waitForLoginOrQrCodeExpiration(
-                            Tools::getTimeoutCancellation(5.0, "Timeout while waiting for QR code or login")
-                        );
-                    }
-                } catch (CancelledException) {
-                    $qr = $this->qrLogin();
-                }
-                if ($qr) {
-                    $result = [
-                        'logged_in' => false,
-                        'svg' => $qr->getQRSvg(400, 2),
-                    ];
-                } else {
-                    $result = [
-                        'logged_in' => true,
-                    ];
-                }
-                getOutputBufferStream()->write(json_encode($result));
-                return;
-            } else {
-                $title = Lang::$current_lang['loginChoosePromptWeb'];
-                $optionBot = htmlentities(Lang::$current_lang['loginOptionBot']);
-                $optionUser = htmlentities(Lang::$current_lang['loginOptionUser']);
-                \assert(isset($_SERVER['REQUEST_URI']));
-                $trailer = '
-                <div id="qr-code-container" style="display: none">
-                    <p>'.htmlentities(Lang::$current_lang['loginWebQr']).'</p>
-                    <div id="qr-code"></div>
-                </div>
-
-                <script>
-                function longPollQr(query) {
-                    var x = new XMLHttpRequest();
-                    x.onload = function() {
-                        var res = JSON.parse(this.responseText);
-                        if (res.logged_in) {
-                            window.location = window.location;
-                        } else {
-                            document.getElementById("qr-code-container").style = "";
-                            document.getElementById("qr-code").innerHTML = res.svg;
-                            longPollQr("waitQrCodeOrLogin");
-                        }
-                    };
-                    x.open("GET", "'.(explode('?', $_SERVER['REQUEST_URI'], 2)[0] ?? '').'?"+query, true);
-                    x.send();
-                }
-                longPollQr("getQrCode");
-                </script>';
-                $form = "<select name='type'><option value='phone'>$optionUser</option><option value='bot'>$optionBot</option></select>";
-            }
-        } elseif ($auth === \danog\MadelineProto\API::WAITING_CODE) {
-            $title = str_replace(':', '', Lang::$current_lang['loginUserCode']);
-            $phone = htmlentities(Lang::$current_lang['loginUserPhoneCodeWeb']);
-            $form = "<input type='text' name='phone_code' placeholder='$phone' required/>";
-        } elseif ($auth === \danog\MadelineProto\API::WAITING_PASSWORD) {
-            $title = Lang::$current_lang['loginUserPassWeb'];
-            $hint = htmlentities(sprintf(
-                Lang::$current_lang['loginUserPassHint'],
-                $this->getHint(),
-            ));
-            $form = "<input type='password' name='password' placeholder='$hint' required/>";
-        } elseif ($auth === \danog\MadelineProto\API::WAITING_SIGNUP) {
-            $title = Lang::$current_lang['signupWeb'];
-            $firstName = Lang::$current_lang['signupFirstNameWeb'];
-            $lastName = Lang::$current_lang['signupLastNameWeb'];
-            $form = "<input type='text' name='first_name' placeholder='$firstName' required/><input type='text' name='last_name' placeholder='$lastName'/>";
-        } else {
+        $page = $this->getWebLoginPage();
+        if ($page === null) {
             return;
         }
-        $title = htmlentities($title);
-        $message = htmlentities($message).MTProto::getWebWarnings();
-        getOutputBufferStream()->write(sprintf(
-            $this->getSettings()->getTemplates()->getHtmlTemplate(),
-            "$title<br><b>$message</b>",
-            $form,
-            Lang::$current_lang['go'],
-            $trailer
-        ));
+        if ($alert !== null) {
+            $page->addAlert($alert);
+        }
+        WebUI::write($this->getSettings()->getTemplates(), $page);
+    }
+
+    /**
+     * Get the page of the current login step.
+     */
+    private function getWebLoginPage(): ?Page
+    {
+        $alerts = MTProto::getWebAlerts();
+        switch ($this->getAuthorization()) {
+            case API::NOT_LOGGED_IN:
+                $type = ($_POST['type'] ?? 'phone') === 'bot' ? 'bot' : 'phone';
+                return new Page(
+                    title: Lang::$current_lang['loginTitleWeb'],
+                    lead: Lang::$current_lang['loginLeadWeb'],
+                    step: Step::ACCOUNT,
+                    fields: [
+                        new Field(
+                            name: 'type',
+                            label: Lang::$current_lang['loginTypeWeb'],
+                            type: FieldType::CHOICE,
+                            value: $type,
+                            options: [
+                                'phone' => Lang::$current_lang['loginOptionUser'],
+                                'bot' => Lang::$current_lang['loginOptionBot'],
+                            ],
+                        ),
+                        new Field(
+                            name: 'phone_number',
+                            label: Lang::$current_lang['loginUserPhoneWeb'],
+                            type: FieldType::PHONE,
+                            value: trim((string) ($_POST['phone_number'] ?? '')),
+                            placeholder: '+39 123 456 7890',
+                            hint: Lang::$current_lang['loginUserPhoneHintWeb'],
+                            showWhen: ['type', 'phone'],
+                            autofocus: $type === 'phone',
+                        ),
+                        new Field(
+                            name: 'token',
+                            label: Lang::$current_lang['loginBotTokenWeb'],
+                            placeholder: '123456789:AAE…',
+                            hint: Lang::$current_lang['loginBotTokenHintWeb'],
+                            showWhen: ['type', 'bot'],
+                            autofocus: $type === 'bot',
+                        ),
+                    ],
+                    submit: Lang::$current_lang['webContinue'],
+                    alerts: $alerts,
+                    qrEndpoint: WebUI::getSelfUrl(),
+                );
+            case API::WAITING_CODE:
+                return new Page(
+                    title: Lang::$current_lang['loginCodeTitleWeb'],
+                    lead: Lang::$current_lang['loginCodeLeadWeb'],
+                    step: Step::VERIFY,
+                    fields: [
+                        new Field(
+                            name: 'phone_code',
+                            label: Lang::$current_lang['loginUserPhoneCodeWeb'],
+                            type: FieldType::CODE,
+                            autofocus: true,
+                            maxLength: 12,
+                        ),
+                    ],
+                    submit: Lang::$current_lang['webLogin'],
+                    alerts: $alerts,
+                );
+            case API::WAITING_PASSWORD:
+                $hint = $this->getHint();
+                return new Page(
+                    title: Lang::$current_lang['loginPasswordTitleWeb'],
+                    lead: Lang::$current_lang['loginPasswordLeadWeb'],
+                    step: Step::VERIFY,
+                    fields: [
+                        new Field(
+                            name: 'password',
+                            label: Lang::$current_lang['loginPasswordLabelWeb'],
+                            type: FieldType::PASSWORD,
+                            hint: $hint === '' ? '' : sprintf(Lang::$current_lang['loginUserPassHint'], $hint),
+                            autofocus: true,
+                        ),
+                    ],
+                    submit: Lang::$current_lang['webLogin'],
+                    alerts: $alerts,
+                );
+            case API::WAITING_SIGNUP:
+                return new Page(
+                    title: Lang::$current_lang['signupTitleWeb'],
+                    lead: Lang::$current_lang['signupLeadWeb'],
+                    step: Step::VERIFY,
+                    fields: [
+                        new Field(
+                            name: 'first_name',
+                            label: Lang::$current_lang['signupFirstNameWeb'],
+                            value: trim((string) ($_POST['first_name'] ?? '')),
+                            autocomplete: 'given-name',
+                            autofocus: true,
+                        ),
+                        new Field(
+                            name: 'last_name',
+                            label: Lang::$current_lang['signupLastNameWeb'],
+                            value: trim((string) ($_POST['last_name'] ?? '')),
+                            required: false,
+                            autocomplete: 'family-name',
+                        ),
+                    ],
+                    submit: Lang::$current_lang['webContinue'],
+                    alerts: $alerts,
+                );
+        }
+        return null;
     }
 }

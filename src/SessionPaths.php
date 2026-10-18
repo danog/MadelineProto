@@ -77,6 +77,10 @@ final class SessionPaths
      */
     private string $ipcStatePath;
     /**
+     * Web API ID setup state path.
+     */
+    private string $apiSetupStatePath;
+    /**
      * Light state path.
      */
     private string $lightStatePath;
@@ -100,6 +104,7 @@ final class SessionPaths
         $this->ipcPath = $session.DIRECTORY_SEPARATOR."ipc";
         $this->ipcCallbackPath = $session.DIRECTORY_SEPARATOR."callback.ipc";
         $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
+        $this->apiSetupStatePath = $session.DIRECTORY_SEPARATOR."apiSetupState.php";
         if (!exists($session)) {
             createDirectory($session);
         }
@@ -319,5 +324,26 @@ final class SessionPaths
     public function getIpcCallbackPath(): string
     {
         return $this->ipcCallbackPath;
+    }
+
+    /**
+     * Get the state of the web API ID setup (the my.telegram.org login), kept between requests.
+     */
+    public function getApiSetupState(): ?MyTelegramOrgWrapper
+    {
+        $state = $this->unserialize($this->apiSetupStatePath);
+        return $state instanceof MyTelegramOrgWrapper ? $state : null;
+    }
+
+    /**
+     * Store the state of the web API ID setup, or delete it.
+     */
+    public function storeApiSetupState(?MyTelegramOrgWrapper $state): void
+    {
+        if ($state !== null) {
+            $this->serialize($state, $this->apiSetupStatePath);
+        } elseif (exists($this->apiSetupStatePath)) {
+            deleteFile($this->apiSetupStatePath);
+        }
     }
 }

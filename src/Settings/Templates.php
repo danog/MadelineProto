@@ -17,21 +17,90 @@
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\WebUI\TemplateEngine;
 
 /**
- * Web and CLI template settings for login.
+ * Web template settings for the login and status pages.
+ *
+ * The pages are rendered by native PHP templates (see {@see TemplateEngine}): to customize them, copy the
+ * templates you want to change from the builtin template directory ({@see TemplateEngine::BUILTIN_DIRECTORY})
+ * to a directory of yours, and add it with {@see self::addDirectory()}.
  *
  * @psalm-external-mutation-free
  */
 final class Templates extends SettingsAbstract
 {
     /**
-     * Web template used for querying app information.
+     * Default value of the legacy sprintf template.
      */
-    protected string $htmlTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
+    public const LEGACY_HTML_TEMPLATE = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
 
     /**
-     * Get web template used for querying app information.
+     * Legacy sprintf web template.
+     */
+    protected string $htmlTemplate = self::LEGACY_HTML_TEMPLATE;
+
+    /**
+     * Template directories, searched in order before the builtin one.
+     *
+     * @var list<string>
+     */
+    protected array $directories = [];
+
+    private ?TemplateEngine $engine = null;
+
+    /**
+     * Get the template directories, searched in order before the builtin one.
+     *
+     * @return list<string>
+     */
+    public function getDirectories(): array
+    {
+        return $this->directories;
+    }
+
+    /**
+     * Set the template directories, searched in order before the builtin one.
+     *
+     * A directory only needs to contain the templates it overrides.
+     *
+     * @param list<string> $directories Template directories
+     */
+    public function setDirectories(array $directories): self
+    {
+        $this->directories = array_values(array_map(Tools::absolute(...), $directories));
+        $this->engine = null;
+
+        return $this;
+    }
+
+    /**
+     * Add a template directory, searched before the ones that were already added and the builtin one.
+     *
+     * A directory only needs to contain the templates it overrides.
+     *
+     * @param string $directory Template directory
+     */
+    public function addDirectory(string $directory): self
+    {
+        return $this->setDirectories([$directory, ...$this->directories]);
+    }
+
+    /**
+     * Get the template engine.
+     *
+     * @internal
+     */
+    public function getEngine(): TemplateEngine
+    {
+        return $this->engine ??= new TemplateEngine($this->directories);
+    }
+
+    /**
+     * Get the legacy sprintf web template.
+     *
+     * @deprecated Use template directories instead, see {@see self::addDirectory()}.
      */
     public function getHtmlTemplate(): string
     {
@@ -39,16 +108,29 @@ final class Templates extends SettingsAbstract
     }
 
     /**
-     * Set web template used for querying app information.
+     * Set a legacy sprintf web template, used instead of the template directories.
      *
-     * @param string $htmlTemplate Web template used for querying app information.
+     * The template gets four strings: the title and messages, the form fields, the label of the submit button,
+     * and the trailing HTML (scripts and the QR code login panel).
      *
-     * @psalm-external-mutation-free
+     * @deprecated Use template directories instead, see {@see self::addDirectory()}.
+     *
+     * @param string $htmlTemplate Legacy sprintf web template.
      */
     public function setHtmlTemplate(string $htmlTemplate): self
     {
         $this->htmlTemplate = $htmlTemplate;
 
         return $this;
+    }
+
+    /**
+     * Whether a legacy sprintf web template was set.
+     *
+     * @internal
+     */
+    public function hasLegacyHtmlTemplate(): bool
+    {
+        return $this->htmlTemplate !== self::LEGACY_HTML_TEMPLATE;
     }
 }

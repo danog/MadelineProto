@@ -69,7 +69,7 @@ final class MyTelegramOrgWrapper
      */
     public function __sleep(): array
     {
-        return ['logged', 'hash', 'number', 'creation_hash', 'settings', 'async', 'jar'];
+        return ['logged', 'hash', 'number', 'creation_hash', 'settings', 'jar'];
     }
     /**
      * Constructor.
@@ -77,8 +77,9 @@ final class MyTelegramOrgWrapper
     public function __construct(SettingsAbstract $settings)
     {
         if (!$settings instanceof Settings) {
-            $settings = new Settings;
-            $settings->merge($this->settings);
+            $newSettings = new Settings;
+            $newSettings->merge($settings);
+            $settings = $newSettings;
         }
         $this->settings = $settings;
         $this->__wakeup();
@@ -88,9 +89,7 @@ final class MyTelegramOrgWrapper
      */
     public function __wakeup(): void
     {
-        if (!$this->jar || !$this->jar instanceof LocalCookieJar) {
-            $this->jar = new LocalCookieJar();
-        }
+        $this->jar ??= new LocalCookieJar();
         $this->datacenter = new DoHWrapper(
             new class($this->settings) implements
                 SettingsGetter,
@@ -107,59 +106,54 @@ final class MyTelegramOrgWrapper
                 {
                     return $this->settings;
                 }
-                /**
-                 * @psalm-mutation-free
-                 */
                 #[\Override]
                 public function getLogger(): Logger
                 {
-                    return $this->getLogger();
+                    return Logger::$default;
                 }
             },
             $this->jar
         );
     }
     /**
-     * Login.
+     * Get the phone number used to log in.
+     */
+    public function getPhoneNumber(): string
+    {
+        return $this->number;
+    }
+    /**
+     * Login: my.telegram.org sends a login code to the Telegram app of the account.
      *
      * @param string $number Phone number
      */
     public function login(string $number): void
     {
+        $this->logged = false;
         $this->number = $number;
-        $request = new Request(self::MY_TELEGRAM_URL.'/auth/send_password', 'POST');
-        $request->setBody(http_build_query(['phone' => $number]));
-        $request->setHeaders($this->getHeaders('origin'));
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
+        $result = $this->request('/auth/send_password', 'origin', ['phone' => $number]);
         $resulta = json_decode($result, true);
-        if (!isset($resulta['random_hash'])) {
-            throw new Exception($result);
+        if (!\is_array($resulta) || !isset($resulta['random_hash'])) {
+            throw new Exception(self::getError($result));
         }
         $this->hash = $resulta['random_hash'];
     }
     /**
      * Complete login.
      *
-     * @param string $password Password
+     * @param string $password The login code sent to the Telegram app
      */
-    public function completeLogin(string $password)
+    public function completeLogin(string $password): bool
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');
         }
-        $request = new Request(self::MY_TELEGRAM_URL.'/auth/login', 'POST');
-        $request->setBody(http_build_query(['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]));
-        $request->setHeaders($this->getHeaders('origin'));
-        $request->setHeader('user-agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
-        switch ($result) {
-            case 'true':
-                //Logger::log(['Login OK'], Logger::VERBOSE);
-                break;
-            default:
-                throw new Exception($result);
+        if ($this->hash === '') {
+            throw new Exception('Call login() first!');
+        }
+        $result = $this->request('/auth/login', 'origin', ['phone' => $this->number, 'random_hash' => $this->hash, 'password' => $password]);
+        if ($result !== 'true') {
+            throw new Exception(self::getError($result));
         }
         return $this->logged = true;
     }
@@ -173,91 +167,108 @@ final class MyTelegramOrgWrapper
     /**
      * Check if an app was already created.
      */
-    public function hasApp()
+    public function hasApp(): bool
     {
-        if (!$this->logged) {
-            throw new Exception('Not logged in!');
-        }
-        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
-        $title = explode('</title>', explode('<title>', $result)[1])[0];
-        switch ($title) {
-            case 'App configuration':
-                return true;
-            case 'Create new application':
-                $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
-                return false;
-        }
-        $this->logged = false;
-        throw new Exception($title);
+        return $this->parseApps($this->getAppsPage()) !== null;
     }
     /**
      * Get the currently created app.
+     *
+     * @return array{api_id: int, api_hash: string}
      */
-    public function getApp()
+    public function getApp(): array
     {
-        if (!$this->logged) {
-            throw new Exception('Not logged in!');
-        }
-        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
-        $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
-      <div class="col-md-7">
-        <span class="form-control input-xlarge uneditable-input" onclick="this.select();"><strong>', $result);
-        $asd = explode('</strong></span>', $cose[1]);
-        $api_id = $asd[0];
-        $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
-      <div class="col-md-7">
-        <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = explode('</span>', $cose[1]);
-        $api_hash = $asd[0];
-        return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
+        return $this->parseApps($this->getAppsPage()) ?? throw new Exception('No app was created yet!');
     }
     /**
      * Create an app.
      *
-     * @param array $settings App parameters
+     * Telegram does not allow creating apps from VPS, VPN and other datacenter IP ranges: the request is made
+     * from the IP of the machine running MadelineProto.
+     *
+     * @param array{app_title: string, app_shortname: string, app_url?: string, app_platform?: string, app_desc?: string} $settings App parameters
+     *
+     * @return array{api_id: int, api_hash: string}
      */
-    public function createApp(array $settings)
+    public function createApp(array $settings): array
+    {
+        if ($this->parseApps($this->getAppsPage()) !== null) {
+            throw new Exception('The app was already created!');
+        }
+        $result = $this->request('/apps/create', 'app', [
+            'hash' => $this->creation_hash,
+            'app_title' => $settings['app_title'],
+            'app_shortname' => $settings['app_shortname'],
+            'app_url' => $settings['app_url'] ?? '',
+            'app_platform' => $settings['app_platform'] ?? 'other',
+            'app_desc' => $settings['app_desc'] ?? '',
+        ]);
+        if (trim($result) !== '') {
+            throw new Exception(self::getError($result));
+        }
+        return $this->parseApps($this->getAppsPage()) ?? throw new Exception('App creation failed');
+    }
+    /**
+     * Get the apps page.
+     */
+    private function getAppsPage(): string
     {
         if (!$this->logged) {
             throw new Exception('Not logged in!');
         }
-        if ($this->hasApp()) {
-            throw new Exception('The app was already created!');
-        }
-        $request = new Request(self::MY_TELEGRAM_URL.'/apps/create', 'POST');
-        $request->setHeaders($this->getHeaders('app'));
-        $request->setBody(http_build_query(['hash' => $this->creation_hash, 'app_title' => $settings['app_title'], 'app_shortname' => $settings['app_shortname'], 'app_url' => $settings['app_url'], 'app_platform' => $settings['app_platform'], 'app_desc' => $settings['app_desc']]));
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
-        if ($result) {
-            throw new Exception(html_entity_decode($result));
-        }
-        $request = new Request(self::MY_TELEGRAM_URL.'/apps');
-        $request->setHeaders($this->getHeaders('refer'));
-        $response = $this->datacenter->HTTPClient->request($request);
-        $result = $response->getBody()->buffer();
-        $title = explode('</title>', explode('<title>', $result)[1])[0];
+        return $this->request('/apps', 'refer');
+    }
+    /**
+     * Parse the apps page: get the app, or store the creation hash if there is no app yet.
+     *
+     * @return ?array{api_id: int, api_hash: string}
+     */
+    private function parseApps(string $page): ?array
+    {
+        $title = preg_match('~<title>(.*?)</title>~s', $page, $matches) ? trim($matches[1]) : '';
         if ($title === 'Create new application') {
-            $this->creation_hash = explode('"/>', explode('<input type="hidden" name="hash" value="', $result)[1])[0];
-            throw new Exception('App creation failed');
+            if (!preg_match('~<input type="hidden" name="hash" value="([^"]+)"~', $page, $matches)) {
+                throw new Exception('Could not find the app creation hash!');
+            }
+            $this->creation_hash = $matches[1];
+            return null;
         }
-        $cose = explode('<label for="app_id" class="col-md-4 text-right control-label">App api_id:</label>
-      <div class="col-md-7">
-        <span class="form-control input-xlarge uneditable-input" onclick="this.select();"><strong>', $result);
-        $asd = explode('</strong></span>', $cose['1']);
-        $api_id = $asd['0'];
-        $cose = explode('<label for="app_hash" class="col-md-4 text-right control-label">App api_hash:</label>
-      <div class="col-md-7">
-        <span class="form-control input-xlarge uneditable-input" onclick="this.select();">', $result);
-        $asd = explode('</span>', $cose['1']);
-        $api_hash = $asd['0'];
-        return ['api_id' => (int) $api_id, 'api_hash' => $api_hash];
+        if ($title === 'App configuration'
+            && preg_match('~App api_id:</label>.*?<strong>\s*(\d+)\s*</strong>~s', $page, $id)
+            && preg_match('~App api_hash:</label>.*?<span[^>]*>\s*([a-f0-9]{32})\s*</span>~s', $page, $hash)
+        ) {
+            return ['api_id' => (int) $id[1], 'api_hash' => $hash[1]];
+        }
+        // Most likely, the login expired
+        $this->logged = false;
+        throw new Exception($title === '' ? 'Unexpected response from my.telegram.org' : $title);
+    }
+    /**
+     * Make a request to my.telegram.org.
+     *
+     * @param array<string, string> $body POST parameters, or empty for a GET request
+     */
+    private function request(string $path, string $httpType, array $body = []): string
+    {
+        $request = new Request(self::MY_TELEGRAM_URL.$path, $body ? 'POST' : 'GET');
+        $request->setHeaders($this->getHeaders($httpType));
+        if ($body) {
+            $request->setBody(http_build_query($body));
+        }
+        return $this->datacenter->HTTPClient->request($request)->getBody()->buffer();
+    }
+    /**
+     * Get a readable error from a response of my.telegram.org.
+     */
+    private static function getError(string $result): string
+    {
+        // Errors of the login endpoints: {"text": "...", "field": ...}
+        $json = json_decode($result, true);
+        if (\is_array($json) && isset($json['text']) && \is_string($json['text'])) {
+            $result = $json['text'];
+        }
+        $result = trim(html_entity_decode(strip_tags($result), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        return $result === '' ? 'Empty response from my.telegram.org' : $result;
     }
     /**
      * Function for generating curl request headers.

@@ -20,22 +20,36 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\ApiWrappers;
 
+use Amp\ByteStream\WritableStream;
+use Amp\Http\Client\HttpException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MyTelegramOrgWrapper;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WebUI\Action;
+use danog\MadelineProto\WebUI\Alert;
+use danog\MadelineProto\WebUI\Field;
+use danog\MadelineProto\WebUI\FieldType;
+use danog\MadelineProto\WebUI\Page;
+use danog\MadelineProto\WebUI\SafeHtml;
+use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\Template;
+use danog\MadelineProto\WebUI\WebUI;
 
 use const PHP_EOL;
 
 use const PHP_SAPI;
 
-use function Amp\ByteStream\getOutputBufferStream;
 use function Amp\ByteStream\getStdout;
 
 /**
- * Manages simple logging in and out.
+ * Gets the API ID and hash, manually or automatically from my.telegram.org.
+ *
+ * On the web, the my.telegram.org login spans multiple requests, made before the session exists: its state is
+ * kept in the session directory (see {@see \danog\MadelineProto\SessionPaths::getApiSetupState()}).
  *
  * @internal
  */
@@ -45,73 +59,321 @@ trait Start
      * Start API ID generation process.
      *
      * @param Settings $settings Settings
+     *
+     * @return ?array{api_id: int, api_hash: string} Null if a page was shown, and the request should end
      */
-    private function APIStart(Settings $settings)
+    private function APIStart(Settings $settings): ?array
     {
         if (Magic::$isIpcWorker) {
             throw new Exception('Not inited!');
         }
-        $app = [];
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            $stdout = getStdout();
-            $stdout->write(sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
-            $stdout->write('1) '.Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
-            $stdout->write('2) '.Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
-            $stdout->write('3) ');
-            foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
-                $stdout->write($k ? "    $key: " : "$key: ");
-                $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
-            }
-            $stdout->write('4) '.Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
-
-            $app['api_id'] = (int) Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']);
-            $app['api_hash'] = Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1']);
-            return $app;
+            return $this->APIStartCli($settings);
         }
-        if (isset($_POST['api_id']) && isset($_POST['api_hash'])) {
-            $app['api_id'] = (int) $_POST['api_id'];
-            $app['api_hash'] = $_POST['api_hash'];
-            return $app;
-        }
-        $this->webAPIEcho($settings);
-
-        return null;
+        return $this->APIStartWeb($settings);
     }
+
     /**
-     * Echo to browser.
-     *
-     * @param string $message Message to echo
+     * @return array{api_id: int, api_hash: string}
      */
-    private function webAPIEcho(Settings $settings, string $message = ''): void
+    private function APIStartCli(Settings $settings): array
     {
-        $message = htmlentities($message);
-        $title = MTProto::getWebWarnings();
-        $title .= htmlentities(Lang::$current_lang['apiManualWeb']);
-        $title .= "<br>";
-        $title .= sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html');
-        $title .= "<br><b>$message</b>";
-        $title .= '<ol>';
-        $title .= '<li>'.str_replace('https://my.telegram.org', '<a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>', htmlentities(Lang::$current_lang['apiManualInstructions0'])).'</li>';
-        $title .= '<li>'.htmlentities(Lang::$current_lang['apiManualInstructions1']).'</li>';
-        $title .= '<li><ul>';
-        foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
-            $title .= "<li>$key: ";
-            $title .= htmlentities(Lang::$current_lang["apiAppInstructionsManual$k"]);
-            $title .= '</li>';
+        $stdout = getStdout();
+        $stdout->write(sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
+        $stdout->write(Lang::$current_lang['apiChooseManualAuto'].PHP_EOL);
+        if (!str_contains(strtolower(Tools::readLine(Lang::$current_lang['apiChoosePrompt'])), 'm')) {
+            $app = $this->APIStartCliAuto($settings, $stdout);
+            if ($app !== null) {
+                return $app;
+            }
+            $stdout->write(Lang::$current_lang['apiAutoFallbackManual'].PHP_EOL.PHP_EOL);
         }
-        $title .= '</li></ul>';
-        $title .= '<li>'.htmlentities(Lang::$current_lang['apiManualInstructions2']).'</li>';
-        $title .= '</ol>';
-        $form = '<input type="string" name="api_id" placeholder="API ID" required/>';
-        $form .= '<input type="string" name="api_hash" placeholder="API hash" required/>';
-        getOutputBufferStream()->write(
-            sprintf(
-                $settings->getTemplates()->getHtmlTemplate(),
-                $title,
-                $form,
-                Lang::$current_lang['go'],
-                ''
-            )
+
+        $stdout->write('1) '.Lang::$current_lang['apiManualInstructions0'].PHP_EOL);
+        $stdout->write('2) '.Lang::$current_lang['apiManualInstructions1'].PHP_EOL);
+        $stdout->write('3) ');
+        foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
+            $stdout->write($k ? "    $key: " : "$key: ");
+            $stdout->write(Lang::$current_lang["apiAppInstructionsManual$k"].PHP_EOL);
+        }
+        $stdout->write('4) '.Lang::$current_lang['apiManualInstructions2'].PHP_EOL);
+
+        return [
+            'api_id' => (int) Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']),
+            'api_hash' => trim(Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1'])),
+        ];
+    }
+
+    /**
+     * Get the API ID and hash from my.telegram.org on the CLI.
+     *
+     * @return ?array{api_id: int, api_hash: string} Null if it failed, and the user should enter them manually
+     */
+    private function APIStartCliAuto(Settings $settings, WritableStream $stdout): ?array
+    {
+        try {
+            $wrapper = new MyTelegramOrgWrapper($settings);
+            $wrapper->login(trim(Tools::readLine(Lang::$current_lang['apiAutoPrompt0'])));
+            $wrapper->completeLogin(trim(Tools::readLine(Lang::$current_lang['apiAutoPrompt1'])));
+            if ($wrapper->hasApp()) {
+                return $wrapper->getApp();
+            }
+        } catch (Exception|HttpException $e) {
+            $stdout->write(PHP_EOL.Lang::$current_lang['apiAutoErrorTitle'].': '.$e->getMessage().PHP_EOL);
+            return null;
+        }
+        try {
+            return $wrapper->createApp([
+                'app_title' => Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto0']),
+                'app_shortname' => Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto1']),
+                'app_url' => Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto2']),
+                'app_platform' => 'other',
+                'app_desc' => Tools::readLine(Lang::$current_lang['apiAppInstructionsAuto4']),
+            ]);
+        } catch (Exception|HttpException $e) {
+            $stdout->write(PHP_EOL.self::getCreateAppErrorAlert($e)->toText().PHP_EOL);
+            return null;
+        }
+    }
+
+    /**
+     * @return ?array{api_id: int, api_hash: string}
+     */
+    private function APIStartWeb(Settings $settings): ?array
+    {
+        $templates = $settings->getTemplates();
+        $wrapper = $this->session->getApiSetupState();
+        $action = $_POST['api_setup'] ?? null;
+
+        if ($action === 'manual') {
+            $this->session->storeApiSetupState(null);
+            WebUI::write($templates, self::getManualApiPage());
+            return null;
+        }
+        if ($action === 'reset') {
+            // Actions submit the whole form, ignore its fields
+            $this->session->storeApiSetupState(null);
+            $wrapper = null;
+            $_POST = [];
+        }
+
+        if (isset($_POST['api_id'], $_POST['api_hash'])) {
+            $apiId = trim((string) $_POST['api_id']);
+            $apiHash = strtolower(trim((string) $_POST['api_hash']));
+            if (!ctype_digit($apiId) || (int) $apiId <= 0 || !preg_match('/^[a-f0-9]{32}$/', $apiHash)) {
+                WebUI::write($templates, self::getManualApiPage()->addAlert(Alert::error(Lang::$current_lang['apiInvalidWeb'])));
+                return null;
+            }
+            $this->session->storeApiSetupState(null);
+            return ['api_id' => (int) $apiId, 'api_hash' => $apiHash];
+        }
+
+        if ($wrapper === null) {
+            if (!isset($_POST['my_phone'])) {
+                WebUI::write($templates, self::getAutoApiPage());
+                return null;
+            }
+            $phone = trim((string) $_POST['my_phone']);
+            try {
+                $wrapper = new MyTelegramOrgWrapper($settings);
+                $wrapper->login($phone);
+            } catch (Exception|HttpException $e) {
+                WebUI::write($templates, self::getAutoApiPage($phone)->addAlert(self::getAutoErrorAlert($e)));
+                return null;
+            }
+            $this->session->storeApiSetupState($wrapper);
+            WebUI::redirectToSelf() || WebUI::write($templates, self::getCodeApiPage());
+            return null;
+        }
+
+        if (!$wrapper->loggedIn()) {
+            if (!isset($_POST['my_code'])) {
+                WebUI::write($templates, self::getCodeApiPage());
+                return null;
+            }
+            try {
+                $wrapper->completeLogin(trim((string) $_POST['my_code']));
+                if ($wrapper->hasApp()) {
+                    $this->session->storeApiSetupState(null);
+                    return $wrapper->getApp();
+                }
+            } catch (Exception|HttpException $e) {
+                $this->session->storeApiSetupState($wrapper);
+                WebUI::write($templates, self::getCodeApiPage()->addAlert(self::getAutoErrorAlert($e)));
+                return null;
+            }
+            // Logged in, with the creation hash of the app
+            $this->session->storeApiSetupState($wrapper);
+            WebUI::redirectToSelf() || WebUI::write($templates, self::getCreateApiPage());
+            return null;
+        }
+
+        if (!isset($_POST['app_title'], $_POST['app_shortname'])) {
+            WebUI::write($templates, self::getCreateApiPage());
+            return null;
+        }
+        $app = [
+            'app_title' => trim((string) $_POST['app_title']),
+            'app_shortname' => trim((string) $_POST['app_shortname']),
+            'app_url' => trim((string) ($_POST['app_url'] ?? '')),
+            'app_platform' => 'other',
+            'app_desc' => trim((string) ($_POST['app_desc'] ?? '')),
+        ];
+        try {
+            $result = $wrapper->createApp($app);
+        } catch (Exception|HttpException $e) {
+            // Retrying from the same IP is pointless if it's a datacenter IP: offer the manual setup
+            $this->session->storeApiSetupState(null);
+            WebUI::write($templates, self::getManualApiPage()->addAlert(self::getCreateAppErrorAlert($e)));
+            return null;
+        }
+        $this->session->storeApiSetupState(null);
+        return $result;
+    }
+
+    private static function getCreateAppErrorAlert(\Throwable $e): Alert
+    {
+        return Alert::error(
+            SafeHtml::linkify(rtrim($e->getMessage(), '.!').'. '.Lang::$current_lang['apiCreateVpsWarning']),
+            Lang::$current_lang['apiCreateErrorTitle'],
+        );
+    }
+
+    private static function getAutoErrorAlert(\Throwable $e): Alert
+    {
+        return Alert::error(
+            sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!')),
+            Lang::$current_lang['apiAutoErrorTitle'],
+        );
+    }
+
+    private static function getAutoApiPage(string $phone = ''): Page
+    {
+        return new Page(
+            title: Lang::$current_lang['apiSetupTitleWeb'],
+            lead: Lang::$current_lang['apiSetupLeadWeb'],
+            step: Step::APP,
+            fields: [
+                new Field(
+                    name: 'my_phone',
+                    label: Lang::$current_lang['loginUserPhoneWeb'],
+                    type: FieldType::PHONE,
+                    value: $phone,
+                    placeholder: '+39 123 456 7890',
+                    hint: Lang::$current_lang['apiAutoPhoneHintWeb'],
+                    autofocus: true,
+                ),
+            ],
+            submit: Lang::$current_lang['apiSendCodeWeb'],
+            alerts: MTProto::getWebAlerts(),
+            actions: [new Action(Lang::$current_lang['apiChooseManualWeb'], 'api_setup', 'manual')],
+        );
+    }
+
+    private static function getCodeApiPage(): Page
+    {
+        return new Page(
+            title: Lang::$current_lang['apiAutoCodeTitleWeb'],
+            lead: Lang::$current_lang['apiAutoCodeLeadWeb'],
+            step: Step::APP,
+            fields: [
+                // my.telegram.org codes are alphanumeric
+                new Field(
+                    name: 'my_code',
+                    label: Lang::$current_lang['apiAutoCodeLabelWeb'],
+                    autocomplete: 'one-time-code',
+                    autofocus: true,
+                ),
+            ],
+            submit: Lang::$current_lang['webContinue'],
+            alerts: MTProto::getWebAlerts(),
+            actions: [
+                new Action(Lang::$current_lang['apiStartOverWeb'], 'api_setup', 'reset'),
+                new Action(Lang::$current_lang['apiChooseManualWeb'], 'api_setup', 'manual'),
+            ],
+        );
+    }
+
+    private static function getCreateApiPage(): Page
+    {
+        return new Page(
+            title: Lang::$current_lang['apiCreateTitleWeb'],
+            lead: Lang::$current_lang['apiCreateLeadWeb'],
+            step: Step::APP,
+            fields: [
+                new Field(
+                    name: 'app_title',
+                    label: Lang::$current_lang['apiAppTitleLabelWeb'],
+                    value: (string) ($_POST['app_title'] ?? ''),
+                    hint: ucfirst(Lang::$current_lang['apiAppInstructionsManual0']),
+                    autofocus: true,
+                ),
+                new Field(
+                    name: 'app_shortname',
+                    label: Lang::$current_lang['apiAppShortNameLabelWeb'],
+                    value: (string) ($_POST['app_shortname'] ?? ''),
+                    hint: ucfirst(Lang::$current_lang['apiAppInstructionsManual1']),
+                    maxLength: 32,
+                ),
+                new Field(
+                    name: 'app_url',
+                    label: Lang::$current_lang['apiAppUrlLabelWeb'],
+                    value: (string) ($_POST['app_url'] ?? ''),
+                    hint: ucfirst(Lang::$current_lang['apiAppInstructionsManual2']),
+                    required: false,
+                ),
+                new Field(
+                    name: 'app_desc',
+                    label: Lang::$current_lang['apiAppDescLabelWeb'],
+                    type: FieldType::TEXTAREA,
+                    value: (string) ($_POST['app_desc'] ?? ''),
+                    required: false,
+                ),
+            ],
+            submit: Lang::$current_lang['apiCreateWeb'],
+            alerts: MTProto::getWebAlerts(),
+            actions: [
+                new Action(Lang::$current_lang['apiStartOverWeb'], 'api_setup', 'reset'),
+                new Action(Lang::$current_lang['apiChooseManualWeb'], 'api_setup', 'manual'),
+            ],
+        );
+    }
+
+    private static function getManualApiPage(): Page
+    {
+        $appFields = '';
+        foreach (['App title', 'Short name', 'URL', 'Platform', 'Description'] as $k => $key) {
+            $appFields .= '<li>'.SafeHtml::escape("$key: ".Lang::$current_lang["apiAppInstructionsManual$k"])->html.'</li>';
+        }
+        return new Page(
+            title: Lang::$current_lang['apiManualWeb'],
+            lead: new SafeHtml(sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html')),
+            step: Step::APP,
+            fields: [
+                new Field(
+                    name: 'api_id',
+                    label: 'API ID',
+                    value: trim((string) ($_POST['api_id'] ?? '')),
+                    placeholder: '1234567',
+                    autofocus: true,
+                ),
+                new Field(
+                    name: 'api_hash',
+                    label: 'API hash',
+                    value: trim((string) ($_POST['api_hash'] ?? '')),
+                    placeholder: '0123456789abcdef0123456789abcdef',
+                    maxLength: 32,
+                ),
+            ],
+            submit: Lang::$current_lang['apiSaveWeb'],
+            alerts: MTProto::getWebAlerts(),
+            actions: [new Action(Lang::$current_lang['apiChooseAutoWeb'], 'api_setup', 'reset')],
+            instructions: [
+                SafeHtml::linkify(Lang::$current_lang['apiManualInstructions0']),
+                Lang::$current_lang['apiManualInstructions1'],
+                new SafeHtml(SafeHtml::escape(Template::translate('apiAppWeb'))->html.":<ul>$appFields</ul>"),
+                Lang::$current_lang['apiManualInstructions2'],
+            ],
         );
     }
 }

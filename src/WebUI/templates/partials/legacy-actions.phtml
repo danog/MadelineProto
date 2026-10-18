@@ -1,0 +1,11 @@
+<?php
+/**
+ * Secondary actions as standalone forms, for legacy sprintf templates (which have their own form).
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+?>
+<?php foreach ($page->actions as $action): ?>
+    <form method="post"><button type="submit"<?= $this->attrs(['name' => $action->name, 'value' => $action->value]) ?>><?= $this->e($action->label) ?></button></form>
+<?php endforeach ?>

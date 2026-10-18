@@ -16,6 +16,8 @@
 
 namespace danog\MadelineProto;
 
+use danog\MadelineProto\WebUI\Alert;
+
 /**
  * Represents an event handler issue.
  */
@@ -56,6 +58,11 @@ final class EventHandlerIssue
     /**
      * @psalm-mutation-free
      */
+    public function getAlert(): Alert
+    {
+        return $this->severe ? Alert::error((string) $this) : Alert::warning((string) $this);
+    }
+
     public function getHTML(): string
     {
         $issueStr = htmlentities((string) $this);

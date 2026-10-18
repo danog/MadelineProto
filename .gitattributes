@@ -6,3 +6,5 @@ CHANGELOG.md export-ignore
 psalm-baseline.xml export-ignore
 langs/ export-ignore
 
+webui/ export-ignore
+src/WebUI/templates/assets/app.js linguist-generated

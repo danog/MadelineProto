@@ -1,0 +1,26 @@
+<?php
+/**
+ * QR code login panel: the script fetches the QR code from the endpoint and reloads the page once logged in.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+if ($page->qrEndpoint === null) {
+    return;
+}
+?>
+<section class="qr" data-qr-endpoint="<?= $this->e($page->qrEndpoint) ?>" aria-labelledby="qr-title" hidden>
+    <h2 id="qr-title"><?= $this->t('webQrTitle') ?></h2>
+    <div class="qr-frame">
+        <div class="qr-code" data-qr-code aria-label="<?= $this->t('webQrTitle') ?>" role="img"></div>
+    </div>
+    <p class="qr-status" data-qr-status aria-live="polite">
+        <span class="qr-pulse" aria-hidden="true"></span>
+        <span data-qr-status-text data-done-label="<?= $this->t('loginQrCodeSuccessful') ?>"><?= $this->t('webQrWaiting') ?></span>
+    </p>
+    <ol class="qr-steps">
+        <li><?= $this->t('loginWebQr1') ?></li>
+        <li><?= $this->t('loginWebQr2') ?></li>
+        <li><?= $this->t('loginWebQr3') ?></li>
+    </ol>
+</section>

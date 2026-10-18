@@ -83,6 +83,13 @@ use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\WebUI\Alert;
+use danog\MadelineProto\WebUI\AlertLevel;
+use danog\MadelineProto\WebUI\Page;
+use danog\MadelineProto\WebUI\SafeHtml;
+use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\TemplateEngine;
+use danog\MadelineProto\WebUI\WebUI;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -1829,62 +1836,75 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         Logger::log($message);
 
-        $warning = $this->getWebWarnings();
+        $page = new Page(
+            title: $message,
+            step: Step::DONE,
+            alerts: self::getWebAlerts(),
+        );
         if ($this->hasEventHandler()) {
+            $page->lead = Lang::$current_lang['webDoneLead'];
             if (!$this->hasReportPeers()) {
                 Logger::log('!!! '.Lang::$current_lang['noReportPeers'].' !!!', Logger::FATAL_ERROR);
                 Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
-                $warning .= "<h2 style='color:red;'>".htmlentities(Lang::$current_lang['noReportPeers'])."</h2>";
-                $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+                $page->addAlert(new Alert(
+                    AlertLevel::ERROR,
+                    Lang::$current_lang['noReportPeers'],
+                    code: "public function getReportPeers() { return '@yourtelegramusername'; }",
+                ));
             }
+            $classes = [];
             if ($this->event_handler_instance instanceof EventHandler) {
-                $issues = Tools::validateEventHandlerClass($this->event_handler_instance::class);
-                foreach ($issues as $issue) {
-                    $issue->log();
-                    $warning .= $issue->getHTML();
-                }
+                $classes[] = $this->event_handler_instance::class;
             }
             foreach ($this->pluginInstances as $class => $_) {
-                $issues = Tools::validateEventHandlerClass($class);
-                foreach ($issues as $issue) {
+                $classes[] = $class;
+            }
+            foreach ($classes as $class) {
+                foreach (Tools::validateEventHandlerClass($class) as $issue) {
                     $issue->log();
-                    $warning .= $issue->getHTML();
+                    $page->addAlert($issue->getAlert());
                 }
             }
         }
 
-        return "<html><body><h1>$message</h1>$warning</body></html>";
+        return WebUI::render($this->settings->getTemplates(), $page);
     }
     /**
      * Get various warnings to show to the user in the web UI.
+     *
+     * @return list<Alert>
      */
-    public static function getWebWarnings(): string
+    public static function getWebAlerts(): array
     {
         Magic::start(light: false);
-        $warning = '';
+        $alerts = [];
         if (API::RELEASE !== Magic::$latest_release) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(
+            $alerts[] = Alert::error(sprintf(
                 Lang::$current_lang['update_madelineproto'],
                 API::RELEASE,
                 Magic::$latest_release,
-            )).'</h2>';
+            ));
         }
         if (!Magic::$hasOpenssl) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
         }
         if (!\extension_loaded('gmp')) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
         }
         if (!\extension_loaded('uv')) {
-            $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
+            $alerts[] = Alert::info(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
         }
-        /*if (Magic::$hasBasedirLimitation) {
-            $warning .= "<p>".htmlentities(Lang::$current_lang['baseDirLimitation'])."</p>";
-        }*/
         if (Lang::$currentPercentage !== 100) {
-            $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
+            $alerts[] = Alert::info(new SafeHtml(sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
         }
-        return $warning;
+        return $alerts;
+    }
+    /**
+     * Get various warnings to show to the user in the web UI, as HTML.
+     */
+    public static function getWebWarnings(): string
+    {
+        return (new TemplateEngine)->render('partials/alerts', ['alerts' => self::getWebAlerts()]);
     }
 
     /** @internal */

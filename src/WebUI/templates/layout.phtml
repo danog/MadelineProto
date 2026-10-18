@@ -1,0 +1,31 @@
+<?php
+/**
+ * Base HTML document.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var string $title Page title
+ * @var string $lang  Language code
+ * @var string $dir   Text direction
+ *
+ * Sections: content, head (extra tags in <head>), scripts (extra tags at the end of <body>).
+ */
+?><!DOCTYPE html>
+<html<?= $this->attrs(['lang' => $lang ?? 'en', 'dir' => $dir ?? 'ltr']) ?>>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title><?= $this->e($title) ?> – MadelineProto</title>
+<link rel="icon" href="data:image/svg+xml,<?= $this->e(rawurlencode($this->getEngine()->asset('assets/mark.svg'))) ?>">
+<style><?= $this->asset('assets/madeline.css') ?></style>
+<?= $this->section('head') ?>
+</head>
+<body>
+<?= $this->section('content') ?>
+<?php if ($this->getEngine()->exists('assets/app.js')): ?>
+<script><?= $this->script('assets/app.js') ?></script>
+<?php endif ?>
+<?= $this->section('scripts') ?>
+</body>
+</html>
