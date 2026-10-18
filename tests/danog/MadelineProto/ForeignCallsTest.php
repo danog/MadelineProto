@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\DeferredFuture;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\GroupCall\GroupCallController;
@@ -218,6 +219,70 @@ final class ForeignCallsTest extends TestCase
             ]]);
             $this->assertNull($API->getCallState(1), "A $constructor created a call");
         }
+    }
+
+    private static function outgoingCall(string $constructor, int $id): array
+    {
+        return [
+            '_' => $constructor,
+            'id' => $id,
+            'access_hash' => 5678,
+            'date' => time(),
+            'admin_id' => self::SELF,
+            'participant_id' => self::OTHER,
+            'protocol' => PrivateCallController::CALL_PROTOCOL,
+        ];
+    }
+
+    public function testUpdatesBeforeRequestCallResultAreReplayed(): void
+    {
+        $API = self::client();
+        // A phone.requestCall in flight.
+        self::set($API, 'pendingCalls', [self::OTHER => (new DeferredFuture)->getFuture()]);
+
+        // The other party declines right away: the updates come before the result.
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallWaiting', 1)]);
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallDiscarded', 1)]);
+        // A call requested by another session of the account.
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallWaiting', 2)]);
+        $this->assertSame([], $API->getAllCalls());
+
+        // What requestCall() does with the result.
+        $call = $API->trackRequestedCall(self::outgoingCall('phoneCallWaiting', 1));
+        self::set($API, 'pendingCalls', []);
+        $API->dropPostponedCallUpdates();
+        $this->assertSame([1], array_keys(self::get($API, 'postponedCallUpdates')));
+        $this->assertSame(CallState::REQUESTED, $call->getCallState());
+
+        delay(0.01);
+        // Ended by the replayed discard, without echoing it.
+        $this->assertSame(CallState::ENDED, $call->getCallState());
+        $this->assertNull($API->getCallState(1));
+        $this->assertNull($API->getCallState(2));
+        $this->assertSame([], self::get($API, 'postponedCallUpdates'));
+    }
+
+    public function testUpdatesOfACallBeingReplayedArePostponedInOrder(): void
+    {
+        $API = self::client();
+        self::set($API, 'pendingCalls', [self::OTHER => (new DeferredFuture)->getFuture()]);
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallWaiting', 1)]);
+        $call = $API->trackRequestedCall(self::outgoingCall('phoneCallWaiting', 1));
+        self::set($API, 'pendingCalls', []);
+        $API->dropPostponedCallUpdates();
+
+        // Comes before the postponed phoneCallWaiting is replayed: applied after it.
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallDiscarded', 1)]);
+        $this->assertSame(CallState::REQUESTED, $call->getCallState());
+        $this->assertCount(2, self::get($API, 'postponedCallUpdates')[1]);
+
+        delay(0.01);
+        $this->assertSame(CallState::ENDED, $call->getCallState());
+        $this->assertSame([], self::get($API, 'postponedCallUpdates'));
+
+        // Not postponed any more.
+        $API->saveUpdate(['_' => 'updatePhoneCall', 'phone_call' => self::outgoingCall('phoneCallDiscarded', 1)]);
+        $this->assertSame([], self::get($API, 'postponedCallUpdates'));
     }
 
     public function testSecretChatAcceptedElsewhereIsDroppedWithoutRequests(): void

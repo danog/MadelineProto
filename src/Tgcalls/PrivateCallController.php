@@ -242,8 +242,9 @@ final class PrivateCallController implements CallControllerInterface
                 $this->log(sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
                 return true;
             } catch (CallAlreadyDeclinedError) {
+                // Already ended by the other party: nothing to discard.
                 $this->log(Lang::$current_lang['call_already_declined']);
-                $this->discard(DiscardReason::HANGUP);
+                $this->end();
                 return false;
             }
             \assert(isset($this->call['g_a']) && \is_string($this->call['g_a']));
