@@ -1,5 +1,5 @@
 #!/bin/sh
-# Standalone MadelineProto IPC server, see https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Ipc.html
+# Standalone MadelineProto IPC server, see https://docs.madelineproto.xyz/docs/IPC.html
 #
 # Usage: madeline-server [session], by default $MADELINE_SESSION or /data/session.madeline.
 #

@@ -242,6 +242,7 @@ $order = [
     'FEATURES',
     'REQUIREMENTS',
     'DOCKER',
+    'IPC',
     'METRICS',
     'INSTALLATION',
     'BROADCAST',

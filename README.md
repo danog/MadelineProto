@@ -100,7 +100,20 @@ Some of MadelineProto's core components are also available as separate, standalo
     * [CLI bot (recommended)](https://docs.madelineproto.xyz/docs/DOCKER.html#cli-bot-recommended)
     * [Databases on docker](https://docs.madelineproto.xyz/docs/DOCKER.html#databases-on-docker)
     * [Web docker](https://docs.madelineproto.xyz/docs/DOCKER.html#web-docker)
+    * [Standalone IPC server](https://docs.madelineproto.xyz/docs/DOCKER.html#standalone-ipc-server)
     * [Custom extensions](https://docs.madelineproto.xyz/docs/DOCKER.html#custom-extensions)
+* [IPC server](https://docs.madelineproto.xyz/docs/IPC.html) - Scripts that don't start an event handler talk to the session through an IPC server, which can also run on its own, locally or on another machine.
+  * [Standalone IPC server](https://docs.madelineproto.xyz/docs/IPC.html#standalone-ipc-server)
+    * [Starting the server](https://docs.madelineproto.xyz/docs/IPC.html#starting-the-server)
+    * [Logging in](https://docs.madelineproto.xyz/docs/IPC.html#logging-in)
+    * [Event handlers](https://docs.madelineproto.xyz/docs/IPC.html#event-handlers)
+  * [Connecting to a standalone IPC server](https://docs.madelineproto.xyz/docs/IPC.html#connecting-to-a-standalone-ipc-server)
+    * [On the same machine](https://docs.madelineproto.xyz/docs/IPC.html#on-the-same-machine)
+    * [Remote IPC servers](https://docs.madelineproto.xyz/docs/IPC.html#remote-ipc-servers)
+    * [Behind a reverse proxy](https://docs.madelineproto.xyz/docs/IPC.html#behind-a-reverse-proxy)
+    * [Files](https://docs.madelineproto.xyz/docs/IPC.html#files)
+  * [Docker](https://docs.madelineproto.xyz/docs/IPC.html#docker)
+  * [Security](https://docs.madelineproto.xyz/docs/IPC.html#security)
 * [Metrics](https://docs.madelineproto.xyz/docs/METRICS.html) - MadelineProto can expose many useful metrics, that can be visualized using the official MadelineProto Grafana dashboard.
 * [Installation](https://docs.madelineproto.xyz/docs/INSTALLATION.html) - There are various ways to install MadelineProto:
   * [Simple](https://docs.madelineproto.xyz/docs/INSTALLATION.html#simple)

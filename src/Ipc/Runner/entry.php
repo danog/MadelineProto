@@ -156,7 +156,7 @@ use Webmozart\Assert\Assert;
             }
         }
     } elseif (MADELINE_WORKER_TYPE === 'madeline-server') {
-        // Standalone IPC server (see the docs of Settings\Ipc): it never forks, and is configured with environment variables.
+        // Standalone IPC server, see https://docs.madelineproto.xyz/docs/IPC.html: it never forks, and is configured with environment variables.
         $session = MADELINE_WORKER_ARGS[0];
         // The phar changes the working directory to its own when run directly
         if (!str_starts_with($session, '/') && \PHP_OS_FAMILY !== 'Windows' && ($cwd = getenv('PWD'))) {

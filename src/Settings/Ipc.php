@@ -29,6 +29,7 @@ use danog\MadelineProto\SettingsAbstract;
  * The IPC server can also be started separately, locally or on another machine (for example in a docker container):
  * disable autostart to connect to the IPC server of the session folder only if it's already running, or set an
  * endpoint to connect to a remote IPC server, which listens on the TCP or HTTP endpoints set with setListen.
+ * See https://docs.madelineproto.xyz/docs/IPC.html for more info.
  *
  * Remote connections are authenticated and encrypted with a shared secret, which must be set on both sides.
  *
