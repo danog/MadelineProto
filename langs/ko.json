@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "잘못된 봇 토큰",
     "tweb.ACCESS_TOKEN_EXPIRED": "이 봇 토큰은 폐기되었습니다",
     "tweb.FIRSTNAME_INVALID": "잘못된 이름",
-    "tweb.LASTNAME_INVALID": "잘못된 성"
+    "tweb.LASTNAME_INVALID": "잘못된 성",
+    "tweb.Close": "닫기"
 }

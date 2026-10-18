@@ -8,6 +8,7 @@
  * (`lib/transport.ts`) instead of tweb's managers.
  */
 
+import {dismissNotices} from '@/stores/notices';
 import {Accessor, createContext, createRoot, createSignal, useContext} from 'solid-js';
 
 import {submitForm, reloadPage} from '@lib/transport';
@@ -103,6 +104,8 @@ export function matchCard(name: CardName): CardSpec | null {
 }
 
 export async function submitAuth(fields: Record<string, string>): Promise<Page | undefined> {
+  // the notices of the server were seen by then: the next pages go without them
+  dismissNotices();
   const result = await submitForm(fields);
   if('loggedIn' in result) {
     await toImAuth();

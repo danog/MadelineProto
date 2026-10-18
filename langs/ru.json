@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "Неверный токен бота",
     "tweb.ACCESS_TOKEN_EXPIRED": "Этот токен бота был отозван",
     "tweb.FIRSTNAME_INVALID": "Недопустимое имя",
-    "tweb.LASTNAME_INVALID": "Недопустимая фамилия"
+    "tweb.LASTNAME_INVALID": "Недопустимая фамилия",
+    "tweb.Close": "Закрыть"
 }

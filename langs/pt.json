@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "Token do bot inválido",
     "tweb.ACCESS_TOKEN_EXPIRED": "Este token do bot foi revogado",
     "tweb.FIRSTNAME_INVALID": "Nome inválido",
-    "tweb.LASTNAME_INVALID": "Sobrenome inválido"
+    "tweb.LASTNAME_INVALID": "Sobrenome inválido",
+    "tweb.Close": "Fechar"
 }

@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "Geçersiz bot token'ı",
     "tweb.ACCESS_TOKEN_EXPIRED": "Bu bot token'ı iptal edildi",
     "tweb.FIRSTNAME_INVALID": "Geçersiz ad",
-    "tweb.LASTNAME_INVALID": "Geçersiz soyad"
+    "tweb.LASTNAME_INVALID": "Geçersiz soyad",
+    "tweb.Close": "Kapat"
 }

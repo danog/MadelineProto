@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "Token del bot no válido",
     "tweb.ACCESS_TOKEN_EXPIRED": "Este token del bot ha sido revocado",
     "tweb.FIRSTNAME_INVALID": "Nombre no válido",
-    "tweb.LASTNAME_INVALID": "Apellidos no válidos"
+    "tweb.LASTNAME_INVALID": "Apellidos no válidos",
+    "tweb.Close": "Cerrar"
 }

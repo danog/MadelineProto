@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "机器人令牌无效",
     "tweb.ACCESS_TOKEN_EXPIRED": "此机器人令牌已被撤销",
     "tweb.FIRSTNAME_INVALID": "名字无效",
-    "tweb.LASTNAME_INVALID": "姓氏无效"
+    "tweb.LASTNAME_INVALID": "姓氏无效",
+    "tweb.Close": "关闭"
 }
