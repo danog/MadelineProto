@@ -89,7 +89,7 @@ $settings = (new Settings)
             ->setApiId((int) getenv('API_ID'))
             ->setApiHash(getenv('API_HASH'))
     )
-    // The media are sent concurrently: wait out the flood waits rather than failing.
+    // The media are uploaded concurrently: wait out the short flood waits rather than failing.
     ->setRpc((new RPC)->setFloodTimeout(120));
 
 /*
@@ -296,18 +296,22 @@ function eq(string $file, string $contents, string $type, string $subtype): void
     }
 }
 
-function sendMedia(API $MadelineProto, array $media, string $message, string $mention, mixed $peer, string $type): void
+/*
+ * The messages sent here go to TEST_DESTINATION_GROUPS: in the CI, from the production bot to @danogentili, five
+ * times per build (see tests/makephar.sh), at once with the session tests sending to DEST from the same bot. So
+ * messages are only sent where sending is what's tested (once per run, with the photo): the other ways of uploading
+ * each media are tested with messages.uploadMedia, which sends nothing.
+ */
+
+/**
+ * Upload a media in every way, without sending it, checking what's downloaded.
+ */
+function uploadMedia(API $MadelineProto, array $media, string $type): void
 {
     $medias = [
         'base' => $media,
     ];
     if (isset($media['file']) && is_string($media['file'])) {
-        $MadelineProto->sendDocument(
-            peer: $peer,
-            file: new ReadableBuffer(read($media['file'])),
-            callback: static fn ($v) => $MadelineProto->logger($v),
-            fileName: basename($media['file'])
-        );
         $medias['callback'] = array_merge(
             $media,
             ['file' => new FileCallback($media['file'], static fn ($v) => $MadelineProto->logger(...))]
@@ -327,42 +331,47 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
         );
     }
     foreach ($medias as $subtype => $m) {
-        $MadelineProto->logger("Sending $type $subtype");
-        $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $m, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
+        $MadelineProto->logger("Uploading $type $subtype");
+        $dl = $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $m]);
 
         $MadelineProto->logger("Downloading $type $subtype");
         $file = $MadelineProto->downloadToDir($dl, '/tmp');
         eq($file, $m['content'], $type, $subtype);
     }
-}
 
-function testMedia(API $MadelineProto, array $inputMedia, string $message, string $mention, mixed $peer, string $type): void
-{
-    if ($type !== 'sticker' && $type !== 'voice') {
-        $MadelineProto->logger("Sending multi $type");
-        $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
-            ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-            ['_' => 'inputSingleMedia', 'media' => $inputMedia, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
-        ]]);
-    }
-
-    sendMedia($MadelineProto, $inputMedia, $message, $mention, $peer, $type);
-
-    $MadelineProto->logger("Uploading $type");
-    $uploaded = $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
-
-    $MadelineProto->logger("Downloading $type");
-    $file = $MadelineProto->downloadToDir($uploaded, '/tmp');
-    eq($file, $inputMedia['content'], $type, "upload");
-
-    $MadelineProto->logger("Re-sending $type");
-    $inputMedia['file'] = $uploaded;
-
-    $dl = $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $inputMedia]);
+    $MadelineProto->logger("Re-uploading $type");
+    $media['file'] = $dl;
+    $dl = $MadelineProto->messages->uploadMedia(['peer' => '@me', 'media' => $media]);
 
     $MadelineProto->logger("Re-downloading $type");
     $file = $MadelineProto->downloadToDir($dl, '/tmp');
-    eq($file, $inputMedia['content'], $type, "re-upload");
+    eq($file, $media['content'], $type, "re-upload");
+}
+
+/**
+ * Send a media in the ways that send messages (an album, a message with a caption, sendDocument()), checking what's downloaded.
+ */
+function sendMedia(API $MadelineProto, array $media, string $message, string $mention, mixed $peer, string $type): void
+{
+    $MadelineProto->logger("Sending multi $type");
+    $MadelineProto->messages->sendMultiMedia(['peer' => $peer, 'multi_media' => [
+        ['_' => 'inputSingleMedia', 'media' => $media, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+        ['_' => 'inputSingleMedia', 'media' => $media, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown'],
+    ]]);
+
+    $MadelineProto->logger("Sending $type");
+    $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $media, 'message' => '['.$message.'](mention:'.$mention.')', 'parse_mode' => 'markdown']));
+
+    $MadelineProto->logger("Downloading sent $type");
+    $file = $MadelineProto->downloadToDir($dl, '/tmp');
+    eq($file, $media['content'], $type, 'sent');
+
+    $MadelineProto->sendDocument(
+        peer: $peer,
+        file: new ReadableBuffer(read($media['file'])),
+        callback: static fn ($v) => $MadelineProto->logger($v),
+        fileName: basename($media['file'])
+    );
 }
 
 if (getenv('ACTIONS_FORCE_PREVIOUS') && !getenv('ACTIONS_PHAR')) {
@@ -370,7 +379,9 @@ if (getenv('ACTIONS_FORCE_PREVIOUS') && !getenv('ACTIONS_PHAR')) {
     // and a photo, sent and downloaded (all of the media are tested with the new version).
     foreach ($peers as $peer) {
         $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message]);
-        testMedia($MadelineProto, $media['photo'], $message, $mention, $peer, 'photo');
+        $MadelineProto->logger('Sending photo');
+        $dl = $MadelineProto->extractMessage($MadelineProto->messages->sendMedia(['peer' => $peer, 'media' => $media['photo'], 'message' => $message]));
+        eq($MadelineProto->downloadToDir($dl, '/tmp'), $media['photo']['content'], 'photo', 'sent');
     }
     exit(0);
 }
@@ -379,18 +390,16 @@ foreach ($peers as $peer) {
     $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
     $MadelineProto->logger($sentMessage, Logger::NOTICE);
 
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => str_repeat('a', 4096*4)]);
+    // Too long for one message: split in two.
+    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => str_repeat('a', 4096 + 1)]);
     $MadelineProto->logger($sentMessage, \danog\MadelineProto\Logger::NOTICE);
 
-    // The media are independent: tested concurrently, through the IPC worker.
-    await(array_map(
-        // Called from strict code (async()): the user ID must be a string already.
-        static fn (string $type) => async(testMedia(...), $MadelineProto, $media[$type], $message, (string) $mention, $peer, $type),
-        array_keys($media),
-    ));
+    sendMedia($MadelineProto, $media['photo'], $message, (string) $mention, $peer, 'photo');
 }
 
-foreach (json_decode(getenv('TEST_DESTINATION_GROUPS'), true) as $peer) {
-    $sentMessage = $MadelineProto->messages->sendMessage(['peer' => $peer, 'message' => $message, 'entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => 0, 'length' => mb_strlen($message), 'user_id' => $mention]]]);
-    $MadelineProto->logger($sentMessage, Logger::NOTICE);
-}
+// The media are independent: tested concurrently, through the IPC worker.
+await(array_map(
+    // Called from strict code (async()): the type must be a string already.
+    static fn (string $type) => async(uploadMedia(...), $MadelineProto, $media[$type], $type),
+    array_keys($media),
+));

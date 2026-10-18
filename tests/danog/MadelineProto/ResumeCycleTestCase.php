@@ -121,15 +121,17 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
         $stderr = async(static fn () => buffer($process->getStderr()));
         $code = $process->join();
         $out = $stdout->await().$stderr->await();
-        if ($spec['phase'] === 'interrupt' && !file_exists($spec['result'])) {
+        // Not any exit without a result: a child that died for another reason (an uncaught exception) did not save the session.
+        self::assertFileExists($spec['result'], "The {$spec['phase']} phase failed (exit code $code): $out");
+        $result = json_decode((string) file_get_contents($spec['result']), true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($result);
+        if ($result === ['crashed' => true]) {
             // Killed itself after saving the session.
+            self::assertSame('interrupt', $spec['phase'], $out);
             self::assertNotSame(0, $code, $out);
             return null;
         }
         self::assertSame(0, $code, "The {$spec['phase']} phase failed: $out");
-        self::assertFileExists($spec['result'], $out);
-        $result = json_decode((string) file_get_contents($spec['result']), true, flags: JSON_THROW_ON_ERROR);
-        self::assertIsArray($result);
         return $result;
     }
 
@@ -160,7 +162,16 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
      */
     protected static function assertUploadResumed(string $log, string $fileName): void
     {
-        self::assertLogMatches('/Resuming upload of '.preg_quote($fileName, '/').': [1-9]\d* of \d+ parts were already uploaded/', $log, 'The upload was not resumed');
+        self::assertLogMatches('/Resuming upload of '.preg_quote($fileName, '/').': [1-9]\d* of \d+ parts were already uploaded/', $log, 'The upload was not resumed'.self::resumeLog($log));
+    }
+
+    /**
+     * What a child logged about resuming, for the message of a failed assertion (without dumping the whole log).
+     */
+    protected static function resumeLog(string $log): string
+    {
+        preg_match_all('/^.*(?:Resuming interrupted|Resuming upload of|Resumed interrupted|Could not resume interrupted|Not resuming interrupted|call had already completed).*$/m', $log, $matches);
+        return $matches[0] ? ":\n".implode("\n", $matches[0]) : ', nothing was logged about resuming';
     }
 
     /**
@@ -187,7 +198,7 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
      */
     protected static function assertSentOnce(string $log, string $method, string $caption): void
     {
-        self::assertLogMatches('/Resumed interrupted '.preg_quote($method, '/').' call \(message (\d+) in chat (-?\d+)\)/', $log, 'The call was not resumed');
+        self::assertLogMatches('/Resumed interrupted '.preg_quote($method, '/').' call \(message (\d+) in chat (-?\d+)\)/', $log, 'The call was not resumed'.self::resumeLog($log));
         preg_match('/Resumed interrupted '.preg_quote($method, '/').' call \(message (\d+) in chat (-?\d+)\)/', $log, $matches);
         $id = (int) $matches[1];
         $chat = (int) $matches[2];

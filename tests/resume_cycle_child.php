@@ -66,6 +66,15 @@ $output = static function (array $result) use ($spec): never {
 };
 
 /**
+ * Crash, saying so: a process that died for another reason (an uncaught exception) did not save the session.
+ */
+$crash = static function () use ($spec): never {
+    file_put_contents($spec['result'], json_encode(['crashed' => true], JSON_THROW_ON_ERROR));
+    posix_kill(getmypid(), 9);
+    exit(1);
+};
+
+/**
  * What was logged since the specified offset.
  */
 $logSince = static function (int $offset) use ($spec): string {
@@ -137,9 +146,9 @@ switch ($spec['phase']) {
             $stream = $source();
             $data = $stream->read().$stream->read();
             file_put_contents($spec['state'], serialize(['stream' => serialize($stream), 'data' => $data]));
-            posix_kill(getmypid(), 9);
+            $crash();
         }
-        EventLoop::queue(static function () use ($API, $logSince, $logOffset, $spec, &$progress): void {
+        EventLoop::queue(static function () use ($API, $logSince, $logOffset, $spec, $crash, &$progress): void {
             // Once the upload progress (reported to the callback, or logged without one) reached the threshold, and at least one part was uploaded.
             $threshold = $spec['threshold'] ?? 0;
             while (true) {
@@ -153,7 +162,7 @@ switch ($spec['phase']) {
                 delay(0.005);
             }
             (static fn (API $API) => $API->wrapper->serialize())->bindTo(null, API::class)($API);
-            posix_kill(getmypid(), 9);
+            $crash();
         });
         $run();
         $output(['completed' => true]);

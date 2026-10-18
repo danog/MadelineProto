@@ -8,6 +8,7 @@ use CURLFile;
 use danog\Decoder\FileId;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use Generator;
+use RuntimeException;
 
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
@@ -80,12 +81,24 @@ class FileIdTest extends MadelineTestCase
             }
 
             $this->expectExceptionMessage("Chat photo file IDs can't be reused to resend chat photos, please use getPwrChat()['photo'], instead");
+            // Throws before sending.
+            self::$MadelineProto->messages->sendMedia(peer: getenv('DEST'), media: $fileIdStr);
         }
-        $res = self::$MadelineProto->messages->sendMedia(
-            peer: getenv('DEST'),
-            media: $fileIdStr,
-        );
-        $res = self::$MadelineProto->MTProtoToBotAPI($res);
+        // Each file is sent once (see provideFileIdsAndType()): the other file IDs of the same file (the other sizes of
+        // a photo, the thumbnail of a document) are checked to be converted to the same input media.
+        $key = $type === 'thumbnail' ? $fullInfo[0] : $type;
+        $inputMedia = self::$MadelineProto->getFileInfo($fileIdStr)['InputMedia'];
+        unset($inputMedia['id']['file_reference']);
+        if (isset(self::$resent[$key])) {
+            [$res, $resentInputMedia] = self::$resent[$key];
+            $this->assertEquals($resentInputMedia, $inputMedia);
+        } else {
+            $res = self::$MadelineProto->MTProtoToBotAPI(self::$MadelineProto->messages->sendMedia(
+                peer: getenv('DEST'),
+                media: $fileIdStr,
+            ));
+            self::$resent[$key] = [$res, $inputMedia];
+        }
         if ($type === 'thumbnail') {
             $this->assertArrayHasKey($fullInfo[0], $res);
             $res = $res[$fullInfo[0]];
@@ -118,12 +131,32 @@ class FileIdTest extends MadelineTestCase
         }
     }
 
-    public function provideFileIdsAndType(): Generator
+    /**
+     * File IDs, from the bot API.
+     *
+     * The files are sent to DEST by the production bot, which the CI uses at once from many processes, all sending
+     * to DEST (see tests/session_tests.sh, tests/makephar.sh): computed once for both tests (PHPUnit calls the data
+     * provider of each), and testResendConvert() sends each file once, not each of its file IDs.
+     */
+    private static ?array $fileIds = null;
+
+    /**
+     * What testResendConvert() got sending each file, and its input media, by type.
+     *
+     * @var array<string, array{array, array}>
+     */
+    private static array $resent = [];
+
+    public function provideFileIdsAndType(): array
+    {
+        return self::$fileIds ??= iterator_to_array($this->generateFileIdsAndType(), false);
+    }
+
+    private function generateFileIdsAndType(): Generator
     {
         $dest = getenv('DEST');
-        $token = getenv('BOT_TOKEN');
         foreach ($this->provideChats() as $chat) {
-            $result = json_decode(file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'] ?? [];
+            $result = self::botApi('getChat', ['chat_id' => $chat])['photo'] ?? [];
             if (!$result) {
                 continue;
             }
@@ -141,22 +174,19 @@ class FileIdTest extends MadelineTestCase
             ];
         }
         foreach ($this->provideUrls() as $type => $url) {
+            $method = 'send'.str_replace('_', '', ucwords($type, '_'));
             if ($type === 'video_note') {
+                // Only uploaded, not by URL.
                 copy($url, basename($url));
-
-                $handle = curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
-                curl_setopt($handle, CURLOPT_POST, true);
-                curl_setopt($handle, CURLOPT_POSTFIELDS, [
-                    $type => new CURLFile(basename($url)),
-                ]);
-                curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-                $botResult = json_decode(curl_exec($handle), true);
-
-                unlink(basename($url));
+                try {
+                    $botResult = self::botApi($method, ['chat_id' => $dest, $type => new CURLFile(basename($url))]);
+                } finally {
+                    unlink(basename($url));
+                }
             } else {
-                $botResult = json_decode(file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true, flags: JSON_THROW_ON_ERROR);
+                $botResult = self::botApi($method, ['chat_id' => $dest, $type => $url]);
             }
-            $botResult = $botResult['result'][$type];
+            $botResult = $botResult[$type];
             if ($type !== 'photo') {
                 $botResult = [$botResult];
             }
@@ -177,7 +207,36 @@ class FileIdTest extends MadelineTestCase
                 }
             }
         }
-        return $result;
+    }
+
+    /**
+     * Call a method of the bot API with BOT_TOKEN, waiting out short flood waits (HTTP 429, with retry_after).
+     *
+     * @return mixed The result
+     */
+    private static function botApi(string $method, array $params): mixed
+    {
+        for ($attempt = 1; ; $attempt++) {
+            $handle = curl_init('https://api.telegram.org/bot'.getenv('BOT_TOKEN').'/'.$method);
+            curl_setopt($handle, CURLOPT_POST, true);
+            curl_setopt($handle, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            $body = curl_exec($handle);
+            if (!\is_string($body)) {
+                throw new RuntimeException("Bot API $method failed: ".curl_error($handle));
+            }
+            $response = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
+            if ($response['ok'] ?? false) {
+                return $response['result'];
+            }
+            $retryAfter = $response['parameters']['retry_after'] ?? null;
+            if (\is_int($retryAfter) && $retryAfter <= 60 && $attempt < 3) {
+                sleep($retryAfter);
+                continue;
+            }
+            // Without the URL, which has the token.
+            throw new RuntimeException("Bot API $method failed: $body");
+        }
     }
     public function provideChats(): array
     {

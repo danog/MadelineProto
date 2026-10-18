@@ -576,8 +576,10 @@ final class ResumableStreamTest extends MadelineTestCase
             } catch (ChannelException) {
             }
 
-            $matches = self::waitForLog($offset, '/Resumed interrupted sendMedia call \(message (\d+) in chat (-?\d+)\)/');
-            self::assertNotNull($matches, 'The send was not resumed');
+            // Or the reason why it couldn't be resumed (for example, a FLOOD_WAIT longer than the flood timeout).
+            $matches = self::waitForLog($offset, '/Resumed interrupted sendMedia call \(message (\d+) in chat (-?\d+)\)|Could not resume interrupted sendMedia call.*/');
+            self::assertNotNull($matches, 'The send was not resumed, and no error was logged');
+            self::assertArrayHasKey(2, $matches, "The send was not resumed: {$matches[0]}");
             self::assertUploadResumed(self::logSince($offset), 'resumed.bin');
             $id = (int) $matches[1];
             $chat = (int) $matches[2];
