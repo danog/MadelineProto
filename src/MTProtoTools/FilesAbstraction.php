@@ -1614,6 +1614,10 @@ trait FilesAbstraction
             if ($uploadOnly) {
                 throw new AssertionError("Cannot upload media without sending it when working with secret chats, use the send* variant instead!");
             }
+            // Like TDLib, send the plain caption in the media and its entities in the message, with an empty
+            // message text: receivers show message and caption joined, so neither may carry markup.
+            $parsed = self::parseMode(['message' => $caption, 'parse_mode' => $parseMode]);
+            $caption = $parsed['message'];
             $message = [
                 '_' => 'decryptedMessage',
                 'ttl' => $ttl,
@@ -1624,9 +1628,9 @@ trait FilesAbstraction
                 'update_stickersets_order' => $updateStickersetsOrder,
                 'reply_to_random_id' => $replyToMsgId,
                 'top_msg_id' => $topMsgId,
-                'message' => $caption,
+                'message' => '',
+                'entities' => ($parsed['entities'] ?? []) ?: null,
                 'reply_markup' => $replyMarkup,
-                'parse_mode' => $parseMode,
                 'schedule_date' => $scheduleDate,
                 'send_as' => $sendAs,
             ];
