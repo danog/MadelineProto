@@ -60,9 +60,11 @@ export default function SignQRCard(props: {spec: CardSpec, retryDelay?: number})
 
   /* ---------- paint QR ---------- */
 
+  /** Show a drawn QR code: the first one grows out of the preloader, the next ones replace the last one at once. */
   function revealCanvas(canvas: HTMLElement) {
     // ! costyl, but the library doesn't expose any events
     if(preloader) {
+      stickerHost.append(canvas);
       preloader.style.animation = 'hide-icon .4s forwards';
 
       canvas.style.display = 'none';
@@ -75,7 +77,9 @@ export default function SignQRCard(props: {spec: CardSpec, retryDelay?: number})
       }, 500);
       preloader = undefined;
     } else {
-      Array.from(stickerHost.children).slice(0, -1).forEach((el) => el.remove());
+      // in one step: with both codes in the slot while the new one is drawn, it was twice as high (the jump
+      // on a theme change)
+      stickerHost.replaceChildren(canvas);
     }
   }
 
@@ -83,14 +87,16 @@ export default function SignQRCard(props: {spec: CardSpec, retryDelay?: number})
   // when the theme changes
   async function paintQR(link: string) {
     const style = window.getComputedStyle(document.documentElement);
-    const surfaceColor = style.getPropertyValue('--light-filled-primary-color').trim();
+    // MadelineProto: a theme may draw the code on its own plate (--qr-background: transparent)
+    const surfaceColor = style.getPropertyValue('--qr-background').trim() || style.getPropertyValue('--light-filled-primary-color').trim();
     const textColor = style.getPropertyValue('--primary-text-color').trim();
     const primaryColor = style.getPropertyValue('--primary-color').trim();
 
     const {canvas} = await paintQrCode({
       data: link,
       size: QR_SIZE,
-      host: stickerHost,
+      // drawn out of the page, then shown in one step (revealCanvas)
+      host: document.createElement('div'),
       background: surfaceColor,
       foreground: textColor,
       logoColor: primaryColor,
@@ -108,9 +114,10 @@ export default function SignQRCard(props: {spec: CardSpec, retryDelay?: number})
     const img = document.createElement('img');
     img.classList.add(styles.qrCanvas);
     img.alt = '';
+    img.addEventListener('load', () => {
+      if(!stopped) revealCanvas(img);
+    }, {once: true});
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    stickerHost.append(img);
-    revealCanvas(img);
   }
 
   const onThemeChanged = () => {

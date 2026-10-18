@@ -28,6 +28,9 @@
   --glass-sheen: rgba(255, 255, 255, .30);
   // the accent, as glass
   --glass-accent-alpha: .80;
+  // the QR code: drawn on its glass plate
+  --qr-background: transparent;
+  --qr-plate: rgba(250, 248, 255, .9);
   // the buttons: clear glass tinted with the accent
   --glass-button-alpha: .70;
   --glass-button-edge: .75;
@@ -64,6 +67,7 @@
   --glass-sheen: rgba(190, 180, 255, .16);
   --glass-accent-alpha: .72;
   --glass-button-alpha: .46;
+  --qr-plate: rgba(20, 16, 42, .86);
   --glass-button-edge: .40;
   --glass-button-caustic: .16;
   --glass-button-shadow: 0 12px 28px -14px rgba(0, 0, 0, .7);
@@ -92,6 +96,7 @@
   --glass-sheen: transparent;
   --glass-accent-alpha: 1;
   --glass-button-alpha: 1;
+  --qr-plate: var(--surface-color);
   --glass-button-caustic: 0;
 }
 

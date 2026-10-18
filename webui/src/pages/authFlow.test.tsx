@@ -285,6 +285,28 @@ describe('QR code login', () => {
     expect(queries).toEqual(['getQrCode', 'waitQrCodeOrLogin', 'waitQrCodeOrLogin']);
   });
 
+  it('repaints for the other theme in place, without two codes in the slot at once', async() => {
+    qrServer([{logged_in: false, link: 'tg://login?token=one'}]);
+    mount('login.signIn');
+    clickButton(/Log in by QR Code/);
+    await waitFor(() => expect(document.querySelectorAll('#auth-pages canvas')).toHaveLength(1));
+    const slot = document.querySelector('#auth-pages canvas')!.parentElement!;
+    const first = slot.querySelector('canvas');
+
+    // the most canvases the slot ever holds while the code is repainted
+    let most = 0;
+    const observer = new MutationObserver(() => {
+      most = Math.max(most, slot.querySelectorAll('canvas').length);
+    });
+    observer.observe(slot, {childList: true});
+    window.dispatchEvent(new CustomEvent('madeline-theme-change'));
+    await waitFor(() => expect(painted).toEqual(['tg://login?token=one', 'tg://login?token=one']));
+    await waitFor(() => expect(slot.querySelector('canvas')).not.toBe(first));
+    observer.disconnect();
+    expect(slot.querySelectorAll('canvas')).toHaveLength(1);
+    expect(most).toBe(1);
+  });
+
   it('never reloads while a form is being submitted', async() => {
     let release: () => void;
     const pending = new Promise<void>((resolve) => release = resolve);

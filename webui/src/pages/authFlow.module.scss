@@ -663,12 +663,13 @@ $corner-button-size: 2.5rem;
   border: 1px solid var(--glass-well-border);
 }
 
-// The QR code sits on a plate of frosted accent glass.
+// The QR code is drawn on a plate of frosted glass, near opaque (scanners need the contrast): one surface,
+// rather than an opaque square of the code in a clear plate (--qr-background: transparent, see SignQRCard).
 .qrContainer {
   @include glass.pane(
-    $tint: rgba(var(--primary-color-rgb), .10),
-    $blur: var(--glass-blur-small),
-    $shadow: (inset 0 0 24px -8px rgba(var(--primary-color-rgb), .35))
+    $tint: var(--qr-plate),
+    $blur: var(--glass-blur),
+    $shadow: (0 10px 30px -14px rgba(var(--primary-color-rgb), .45))
   );
   position: relative;
   border-radius: 1.75rem;
