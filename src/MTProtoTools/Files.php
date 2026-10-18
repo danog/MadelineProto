@@ -365,20 +365,13 @@ trait Files
         $igeStates = [];
         //$ctx = \hash_init('md5');
         $promises = [];
-        $speed = 0;
-        $time = 0;
-        if ($size) {
-            $cb = static function () use ($cb, $part_total_num, &$speed, &$time): void {
-                static $cur = 0;
-                $cur++;
-                $cb($cur * 100 / $part_total_num, $speed, $time);
-            };
-        }
+        // Without a size, the progress is unknown until the upload ends.
+        $progress = $size ? new TransferProgress($cb, $part_total_num) : null;
         // Parts before the first one we read were already uploaded.
         $totalSize = min($part_num * $part_size, $size);
-        if ($size) {
+        if ($progress) {
             for ($x = 0; $x < $part_num; $x++) {
-                $cb();
+                $progress->partDone(0);
             }
         }
         if (!$seekable) {
@@ -422,7 +415,7 @@ trait Files
             while ($part_num < $part_total_num || !$size) {
                 if ($seekable && isset($uploaded[$part_num])) {
                     $totalSize += min($part_size, $size - $part_num * $part_size);
-                    $cb();
+                    $progress?->partDone(0);
                     ++$part_num;
                     continue;
                 }
@@ -443,7 +436,7 @@ trait Files
                     }
                     if (isset($uploaded[$part_num])) {
                         // Only read (and encrypted) to get to the next part.
-                        $cb();
+                        $progress?->partDone(0);
                         ++$part_num;
                         continue;
                     }
@@ -458,7 +451,7 @@ trait Files
                 }
                 // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
                 $writePromise = async($writeCb)->ignore();
-                EventLoop::queue(function () use ($writePromise, $cb, $part_num, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError, $stateKey, &$igeStates): void {
+                EventLoop::queue(function () use ($writePromise, $progress, $part_num, $part_size, $size, &$resPromises, $cancellation, $writeCb, &$datacenter, &$floodWaitError, $stateKey, &$igeStates): void {
                     $d = new DeferredFuture;
                     // Ignored: if the upload fails or is cancelled, the caller stops before awaiting it.
                     $resPromises[] = $d->getFuture()->ignore();
@@ -474,9 +467,7 @@ trait Files
                                 if ($stateKey !== null) {
                                     $this->markPartUploaded($stateKey, $part_num, $igeStates);
                                 }
-                                if ($size) {
-                                    $cb();
-                                }
+                                $progress?->partDone(min($part_size, $size - $part_num * $part_size));
                                 $d->complete();
                                 return;
                             } catch (FloodPremiumWaitError $e) {
@@ -1443,21 +1434,13 @@ trait Files
             return;
         }
         $count = \count($params);
-        $time = 0.0;
-        $speed = 0.0;
-        $origCb = $cb;
-        $cb = static function () use ($cb, $count, &$time, &$speed): void {
-            static $cur = 0.0;
-            $cur++;
-            $cb($cur * 100 / $count, $time, $speed);
-        };
         $cdn = false;
         if (isset($messageMedia['key']) && $params[0]['offset'] > 0) {
             // IGE decryption is chained: each block depends on the previous plaintext block,
             // so resuming requires decrypting everything before the first requested part.
             $this->logger->logger("Decrypting the first {$params[0]['offset']} bytes of an encrypted file to start downloading from offset $offset");
             $skip = static fn (string $payload): int => \strlen($payload);
-            $noop = static function (): void {
+            $noop = static function (int $bytes): void {
             };
             for ($x = 0; $x < $params[0]['offset']; $x += $part_size) {
                 $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $noop, ['offset' => $x, 'limit' => $part_size, 'part_start_at' => 0, 'part_end_at' => $part_size, 'previous_promise' => true], $skip, false, $cancellation);
@@ -1465,10 +1448,11 @@ trait Files
         }
         $params[0]['previous_promise'] = true;
         $start = microtime(true);
-        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $initParam = array_shift($params), $callable, $seekable, $cancellation);
+        $progress = new TransferProgress($cb, $count);
+        $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $progress->partDone(...), $initParam = array_shift($params), $callable, $seekable, $cancellation);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
             // Premature end for undefined length files
-            $origCb(100, 0, 0);
+            $cb(100, $progress->getSpeed(), $progress->getTime());
             return;
         }
         $parallel_chunks = $seekable ? $parallel_chunks : 2;
@@ -1476,10 +1460,10 @@ trait Files
             $previous_promise = true;
             $promises = [];
             $finished = false;
-            foreach ($params as $key => $param) {
+            foreach ($params as $param) {
                 $cancellation?->throwIfRequested();
                 $param['previous_promise'] = $previous_promise;
-                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $cb, $param, $callable, $seekable, $cancellation)->ignore();
+                $previous_promise = async($this->downloadPart(...), $messageMedia, $cdn, $datacenter, $old_dc, $ige, $progress->partDone(...), $param, $callable, $seekable, $cancellation)->ignore();
                 $previous_promise->map(static function (int $res) use (&$size, &$finished): void {
                     $size += $res;
                     if ($res === 0) {
@@ -1500,12 +1484,6 @@ trait Files
                         break;
                     }
                 }
-                if (!($key % $parallel_chunks)) {
-                    $time = microtime(true) - $start;
-                    $speed = (int) ($size * 8 / $time) / 1000000;
-                    $this->logger->logger("Partial download time: {$time}");
-                    $this->logger->logger("Partial download speed: {$speed} mbps");
-                }
             }
             if ($promises) {
                 await($promises, $cancellation);
@@ -1519,7 +1497,7 @@ trait Files
             $this->clearCdnHashes($messageMedia['file_token']);
         }
         if (!isset($messageMedia['size'])) {
-            $origCb(100.0, $time, $speed);
+            $cb(100.0, $speed, $time);
         }
     }
     /**
@@ -1530,7 +1508,7 @@ trait Files
      * @param int      $datacenter   DC ID
      * @param null|int $old_dc       Previous DC ID
      * @param IGE      $ige          IGE decryptor instance
-     * @param callable $cb           Status callback
+     * @param callable(int): void $cb Status callback, called with the number of bytes of the part once it is written
      * @param array    $offset       Offset
      * @param callable $callable     Chunk callback
      * @param boolean  $seekable     Whether the download file is seekable
@@ -1628,7 +1606,7 @@ trait Files
             if ($res instanceof Future) {
                 $res = $res->await($cancellation);
             }
-            $cb();
+            $cb($len);
             return $len;
         } while (true);
     }
