@@ -91,8 +91,8 @@ final class BusinessConnectionTest extends TestCase
         // In the qts sequence, then with qts 0.
         $this->assertFalse($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'conn', 'message' => $message, 'qts' => 5]));
         $this->assertTrue($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'conn', 'message' => $message, 'qts' => 0]));
-        // An edit, in the result of messages.editMessage, then in the qts sequence.
-        $edited = ['edit_date' => 1] + $message;
+        // An edit of a message of the user, in the result of messages.editMessage, then in the qts sequence.
+        $edited = ['edit_date' => 1, 'from_id' => self::OWNER] + $message;
         $this->assertFalse($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => '', 'message' => $edited, 'qts' => 0]));
         $this->assertTrue($connection->isDuplicate(['_' => 'updateBotEditBusinessMessage', 'connection_id' => 'conn', 'message' => $edited, 'qts' => 6]));
         // Another edit is not a duplicate.
