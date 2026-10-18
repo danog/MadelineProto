@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RestoresDeclaredProperties;
 
 /**
  * Represents an IPC-capable object.
@@ -27,6 +28,8 @@ use danog\MadelineProto\MTProto;
  */
 abstract class IpcCapable
 {
+    use RestoresDeclaredProperties;
+
     protected readonly string $session;
     private MTProto|Client|null $API;
 
@@ -51,6 +54,16 @@ abstract class IpcCapable
         $vars = get_object_vars($this);
         unset($vars['API']);
         return array_keys($vars);
+    }
+
+    /**
+     * Restore the properties listed by __sleep(), dropping the fields removed since the object was saved.
+     *
+     * @internal
+     */
+    final public function __unserialize(array $data): void
+    {
+        $this->restoreDeclaredProperties($data);
     }
 
     /**

@@ -36,6 +36,7 @@ use danog\MadelineProto\Stream\ContextIterator;
 use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
+use function Amp\delay;
 use function count;
 
 /**
@@ -266,12 +267,26 @@ final class DataCenterConnection implements SimpleSubscriber
             $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->datacenter);
             $authorized_socket =  $this->API->datacenter->getDataCenterConnection($authed);
             $authorized_socket->waitGetConnection();
-            $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
-                'auth.exportAuthorization',
-                ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
-            );
-            $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
-            $connection->methodCallAsyncRead('auth.importAuthorization', $e);
+            for ($attempt = 1; ; $attempt++) {
+                $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
+                    'auth.exportAuthorization',
+                    ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
+                );
+                $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
+                try {
+                    $connection->methodCallAsyncRead('auth.importAuthorization', $e);
+                    break;
+                } catch (RPCErrorException $error) {
+                    // A newer export of the same account (another process of the account copying its authorization
+                    // at the same time, for example) invalidates the exported bytes: export them again, after a
+                    // random delay, so that the processes don't keep invalidating each other's.
+                    if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt === 5) {
+                        throw $error;
+                    }
+                    $logger->logger("The exported authorization for DC {$this->datacenter} was invalidated, exporting it again", Logger::WARNING);
+                    delay(random_int(100, 2000) / 1000);
+                }
+            }
             $this->auth->authorize();
         }
 

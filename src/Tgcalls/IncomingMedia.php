@@ -25,6 +25,7 @@ use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
 use Webrtc\RTP\MediaStreamTrack\RemoteStreamTrack;
@@ -54,6 +55,7 @@ use function Amp\Future\awaitAll;
  */
 final class IncomingMedia implements RecordingObserver
 {
+    use RestoresDeclaredProperties;
     /** Every slot, as {@see CallStream} flags. */
     private const SLOTS = [CallStream::AUDIO, CallStream::VIDEO, CallStream::SCREEN];
     /** Granule increment assumed for an OPUS frame whose duration cannot be derived, and the longest one there is. */
@@ -146,10 +148,7 @@ final class IncomingMedia implements RecordingObserver
         // Synchronous state restoration only — no async work here (see resume()).
         $this->recorder = null;
         $this->opusRecorder = null;
-        /** @var mixed $value */
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         $this->audioConsumer = null;
         $this->videoConsumers = [];
         $this->drains = [];

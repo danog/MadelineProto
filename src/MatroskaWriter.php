@@ -38,6 +38,7 @@ use function Amp\File\openFile;
  */
 final class MatroskaWriter
 {
+    use RestoresDeclaredProperties;
     // EBML element IDs, on-disk form (with their length-descriptor bits).
     private const ID_EBML = "\x1A\x45\xDF\xA3";
     private const ID_SEGMENT = "\x18\x53\x80\x67";
@@ -146,9 +147,7 @@ final class MatroskaWriter
         // fiber, and suspending mid-deserialization lets other objects' resume tasks run before their
         // dependencies are restored, crashing the whole session resume). The file is reopened later by
         // {@see self::resume()}. Until then $out stays unset and every write guards on isset($this->out).
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
     }
 
     /**

@@ -36,6 +36,7 @@ use danog\MadelineProto\Matroska;
 use danog\MadelineProto\Mp4;
 use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\ResumableStream;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\H264Framing;
@@ -76,6 +77,7 @@ use Webrtc\Codecs\Codec;
  */
 final class DjLoop extends VoIPLoop
 {
+    use RestoresDeclaredProperties;
     /** VP8 and every other video codec on the wire use a 90kHz RTP clock. */
     public const VIDEO_CLOCK_RATE = 90000;
     /** OPUS always uses a 48kHz RTP clock. */
@@ -401,9 +403,7 @@ final class DjLoop extends VoIPLoop
 
     public function __unserialize(array $data): void
     {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         // Older versions saved the queued frames: they are dropped (along with at most a couple of seconds of playback).
         $this->oggQueue = new SplQueue;
         $this->oggQueueSamples = 0;

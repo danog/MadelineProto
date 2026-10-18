@@ -160,6 +160,8 @@ pre.json
 
 # Left by tests/lock_setup.php
 woodpecker.lock
+/ci-lanes/
+/paratest.log
 
 # Web UI dependencies
 webui/node_modules/

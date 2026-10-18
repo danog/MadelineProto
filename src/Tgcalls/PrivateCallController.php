@@ -39,6 +39,7 @@ use danog\MadelineProto\Ogg;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\RPCError\CallAlreadyAcceptedError;
 use danog\MadelineProto\RPCError\CallAlreadyDeclinedError;
 use danog\MadelineProto\SecurityException;
@@ -58,6 +59,7 @@ use Webmozart\Assert\Assert;
  */
 final class PrivateCallController implements CallControllerInterface
 {
+    use RestoresDeclaredProperties;
     /**
      * The [phoneCallProtocol](https://core.telegram.org/constructor/phoneCallProtocol) we advertise.
      *
@@ -187,15 +189,18 @@ final class PrivateCallController implements CallControllerInterface
     public function __unserialize(array $data): void
     {
         $this->authMutex = new LocalMutex;
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         // Defensively drop a call that came back without its full essential state (a half-constructed
         // call that slipped into the session): force it ENDED and start nothing. Because no subsystem
         // starts async work during deserialization any more (that is all deferred to resumeAfterRestart()),
         // this is the single point that decides whether a restored call comes back to life at all.
         if (!isset($this->callState) || !isset($this->public) || !isset($this->call)
             || $this->callState === CallState::ENDED
+            // A running call always has an engine (it is created in the same synchronous step that
+            // starts the call). One without comes from the releases that ran libtgvoip inside this
+            // class: its state (voipState, sockets, timestamps, packet queue...) has no counterpart in
+            // the engines and was just dropped, so the call cannot be resumed.
+            || ($this->callState === CallState::RUNNING && $this->tgcallsController === null && $this->legacyController === null)
         ) {
             $this->callState = CallState::ENDED;
             return;

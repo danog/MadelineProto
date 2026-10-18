@@ -8,7 +8,10 @@
  *                                                                    environment variable <variable>:
  *                                                                    "<DC>:<auth key, base64>", as exported by
  *                                                                    API::exportAuthorization().
- * php tests/ci_sessions.php [--test] bot <session> <variable>       The same, with the authorization of a bot.
+ * php tests/ci_sessions.php [--test] bot <session> <variable> [<n>] The same, with the authorization of a bot: the
+ *                                                                    variable can hold several, one per line, to use
+ *                                                                    them at once in different processes (the nth,
+ *                                                                    counting from 0; by default the first one).
  * php tests/ci_sessions.php [--test] bot-token <session> <variable> Log in as the bot whose token is in <variable>.
  * php tests/ci_sessions.php [--test] unauth <session>               Don't log in.
  *
@@ -43,7 +46,7 @@ $test = ($args[0] ?? null) === '--test';
 if ($test) {
     array_shift($args);
 }
-[$kind, $session, $variable] = $args + [null, null, null];
+[$kind, $session, $variable, $index] = $args + [null, null, null, '0'];
 if (!in_array($kind, ['user', 'bot', 'bot-token', 'unauth'], true) || $session === null || ($kind !== 'unauth' && $variable === null)) {
     fwrite(STDERR, "Usage: {$argv[0]} [--test] user|bot|bot-token|unauth <session> [<variable>]\n");
     exit(1);
@@ -65,7 +68,13 @@ $settings->getAppInfo()->setApiId((int) getenv('API_ID'))->setApiHash((string) g
 $settings->getConnection()->setTestMode($test);
 
 if ($kind === 'user' || $kind === 'bot') {
-    [$dc, $authKey] = explode(':', $value, 2);
+    // Every process using a session at the same time needs its own authorization: copies of a session share its
+    // auth key, and the responses go to the wrong process.
+    $authorizations = array_values(array_filter(array_map(trim(...), explode("\n", $value))));
+    if (!isset($authorizations[(int) $index])) {
+        throw new AssertionError("$variable holds ".count($authorizations)." authorizations, there is no authorization $index!");
+    }
+    [$dc, $authKey] = explode(':', $authorizations[(int) $index], 2);
     $API = Conversion::importAuthorization([(int) $dc => base64_decode($authKey, true)], (int) $dc, $session, $settings);
     if ($kind === 'user' ? !$API->isSelfUser() : !$API->isSelfBot()) {
         throw new AssertionError("$variable is not the authorization of a $kind!");

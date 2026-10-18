@@ -73,20 +73,20 @@ if [ "$1" == "phpunit" ]; then
     # The secret chat and call tests need two user sessions (skipped without), on the test servers: see tests/ci_sessions.php.
     php tests/ci_sessions.php --test user "$PWD/ci_user.madeline" USER_SESSION_AUTH && export USER_SESSION="$PWD/ci_user.madeline" || [ $? -eq 2 ]
     php tests/ci_sessions.php --test user "$PWD/ci_peer.madeline" PEER_USER_SESSION_AUTH && export PEER_USER_SESSION="$PWD/ci_peer.madeline" || [ $? -eq 2 ]
-    # The bot, on the main servers, with its exported authorization (logging in with its token in every run gets
-    # FLOOD_WAITs, see tests/ci_sessions.php): the session of MadelineTestCase, and a copy for the tests resuming
-    # after crashes (used as a template by EventHandlerStartTest). BOT_TOKEN is only used for the bot API.
-    if php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH; then
-        cp -a testing.madeline ci_bot.madeline
-        rm -rf ci_bot.madeline/ipc ci_bot.madeline/callback.ipc
-        export RESUME_CYCLE_SESSION="$PWD/ci_bot.madeline"
-    else
-        [ $? -eq 2 ]
-    fi
-    # The tests in the session group (using the accounts of the CI) one class at a time (see tests/session_tests.sh),
-    # the others in parallel.
-    composer test
-    exit 0
+    # The sessions of the bot, on the main servers, are created by tests/session_tests.sh, one per lane, from the
+    # authorizations in BOT_SESSION_AUTH (logging in with the token in every run gets FLOOD_WAITs, see
+    # tests/ci_sessions.php). BOT_TOKEN is only used for the bot API.
+    # The tests in the session group (using the accounts of the CI) in lanes, at once with the others (in parallel).
+    composer paratest > paratest.log 2>&1 &
+    paratest=$!
+    status=0
+    tests/session_tests.sh || status=1
+    wait $paratest || status=1
+    echo "=== Tests without the accounts of the CI"
+    # Blocking again, see tests/session_tests.sh.
+    php -r 'stream_set_blocking(STDOUT, true);'
+    cat paratest.log
+    exit $status
 fi
 
 if [ "$1" == "phpunit-light" ]; then
