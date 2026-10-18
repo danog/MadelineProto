@@ -17,8 +17,11 @@
 namespace danog\MadelineProto\EventHandler\Message;
 
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RichMessage\OutputConverter;
+use danog\MadelineProto\RichMessage\TextConverter;
+use danog\MadelineProto\StrTools;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
@@ -26,16 +29,41 @@ use ReflectionProperty;
 /**
  * A rich message: structured text made of blocks (headings, paragraphs, lists, tables, quotes, media, buttons and so on).
  *
- * Blocks and rich texts use the format of the [Bot API's RichBlock and RichText types](https://core.telegram.org/bots/api#richmessage), except that:
+ * Like a normal message, it has a plain text version ($message) with entities for styled text ($entities), its media ($media) and an HTML version (getHTML()).
+ *
+ * The blocks use the format of the [Bot API's RichBlock and RichText types](https://core.telegram.org/bots/api#richmessage), except that:
  * - The media of photo, video, animation, audio, voice_note and document blocks are MadelineProto Media objects.
  * - text_mention rich texts contain a user object with just the ID of the user.
  * - custom_emoji_id is an integer.
  * - thinking blocks and ton_address rich texts are kept (the Bot API returns unknown blocks and fails on TON addresses).
  *
- * The blocks can be sent again as-is with sendRichMessage (or editRich, replyRich and so on).
+ * The blocks can be sent again as-is with sendRichMessage (or editRich, replyRich and so on), and so can the whole object.
  */
 final class RichMessage implements JsonSerializable
 {
+    /**
+     * Plain text version of the rich message.
+     *
+     * Blocks are separated by newlines, list items are prefixed by their label, table cells are separated by tabs; media blocks are represented by their caption.
+     */
+    public readonly string $message;
+
+    /**
+     * [Entities](https://core.telegram.org/api/entities) for the styled text of $message.
+     *
+     * Besides the styles of the text, headings are bold, preformatted blocks and mathematical expressions are pre entities, quotes are block quotes, and expandable quotes and the contents of collapsed details blocks are collapsed block quotes.
+     *
+     * @var list<MessageEntity>
+     */
+    public readonly array $entities;
+
+    /**
+     * Media of the media blocks of the rich message, in order.
+     *
+     * @var list<Media>
+     */
+    public readonly array $media;
+
     /**
      * @param list<array> $blocks Blocks of the rich message, in Bot API RichBlock format
      * @param bool $rtl Whether the text is right-to-left
@@ -53,6 +81,7 @@ final class RichMessage implements JsonSerializable
         /** Whether this is just a part of the message (e.g. while a rich message draft is being streamed) */
         public readonly bool $part = false,
     ) {
+        [$this->message, $this->entities, $this->media] = TextConverter::convert($blocks);
     }
 
     /** @internal */
@@ -66,80 +95,25 @@ final class RichMessage implements JsonSerializable
         return new self($converted['blocks'], $converted['is_rtl'] ?? false, $converted['is_part'] ?? false);
     }
 
-    protected readonly string $text;
+    protected readonly string $html;
+    protected readonly string $htmlTelegram;
 
     /**
-     * Get a plain text version of the rich message.
-     *
-     * Blocks are separated by newlines, list items are prefixed by their label, table cells are separated by tabs; media blocks are represented by their caption.
+     * Get an HTML version of the rich message (of $message and $entities).
      *
      * @psalm-suppress InaccessibleProperty
+     *
+     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
      */
-    public function getText(): string
+    public function getHTML(bool $allowTelegramTags = false): string
     {
-        return $this->text ??= self::blocksToText($this->blocks);
-    }
-
-    /**
-     * @param list<array> $blocks
-     */
-    private static function blocksToText(array $blocks): string
-    {
-        $lines = [];
-        foreach ($blocks as $block) {
-            $text = match ($block['type']) {
-                'list' => implode("\n", array_map(
-                    static fn (array $item): string => $item['label'].' '.self::blocksToText($item['blocks']),
-                    $block['items'],
-                )),
-                'blockquote' => self::blocksToText($block['blocks']).(isset($block['credit']) ? "\n".self::richTextToText($block['credit']) : ''),
-                'expandable_blockquote', 'pullquote' => self::richTextToText($block['text']).(isset($block['credit']) ? "\n".self::richTextToText($block['credit']) : ''),
-                'details' => self::richTextToText($block['summary'])."\n".self::blocksToText($block['blocks']),
-                'collage', 'slideshow' => self::blocksToText($block['blocks']).(isset($block['caption']) ? "\n".self::captionToText($block['caption']) : ''),
-                'table' => (isset($block['caption']) ? self::richTextToText($block['caption'])."\n" : '').implode("\n", array_map(
-                    static fn (array $row): string => implode("\t", array_map(
-                        static fn (array $cell): string => isset($cell['text']) ? self::richTextToText($cell['text']) : '',
-                        $row,
-                    )),
-                    $block['cells'],
-                )),
-                'buttons' => implode(' ', array_map(static fn (array $button): string => self::richTextToText($button['text']), $block['buttons'])),
-                'mathematical_expression' => $block['expression'],
-                'divider', 'anchor', 'unknown', 'unsupported' => null,
-                default => isset($block['text'])
-                    ? self::richTextToText($block['text'])
-                    : (isset($block['caption']) ? self::captionToText($block['caption']) : null),
-            };
-            if ($text !== null && $text !== '') {
-                $lines[] = $text;
-            }
+        if (!$this->entities) {
+            return StrTools::htmlEscape($this->message);
         }
-        return implode("\n", $lines);
-    }
-
-    private static function captionToText(array $caption): string
-    {
-        return self::richTextToText($caption['text']).(isset($caption['credit']) ? "\n".self::richTextToText($caption['credit']) : '');
-    }
-
-    /**
-     * Get the plain text of a rich text in Bot API format.
-     */
-    private static function richTextToText(string|array $text): string
-    {
-        if (\is_string($text)) {
-            return $text;
+        if ($allowTelegramTags) {
+            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
         }
-        if (array_is_list($text)) {
-            return implode('', array_map(self::richTextToText(...), $text));
-        }
-        return match ($text['type']) {
-            'custom_emoji' => $text['alternative_text'],
-            'mathematical_expression' => $text['expression'],
-            'button' => self::richTextToText($text['button']['text']),
-            'anchor' => '',
-            default => self::richTextToText($text['text']),
-        };
+        return $this->html ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
     }
 
     /** @internal */
