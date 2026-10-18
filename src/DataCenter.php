@@ -32,6 +32,7 @@ use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FakeTlsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -278,8 +279,16 @@ final class DataCenter
         $proxyCombos = [];
         foreach ($settings->getProxies() as $proxy => $extras) {
             foreach ($extras as $extra) {
-                if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
-                    $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                if ($proxy === ObfuscatedStream::class && isset($extra['secret'])) {
+                    $secret = ObfuscatedStream::decodeSecret($extra['secret']);
+                    if ($secret['domain'] !== null) {
+                        // Fake TLS only carries the padded intermediate transport, as in TDLib.
+                        $proxyCombos []= [[DefaultStream::class, []], [BufferedRawStream::class, []], [FakeTlsStream::class, $extra], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                        continue;
+                    }
+                    if ($secret['padded']) {
+                        $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                    }
                 }
                 foreach ($combos as $orig) {
                     $combo = [];
