@@ -5,11 +5,13 @@ name: CI
 
 on:
   push:
-    # Not the branch of the pull requests of the daily build (see autobuild.yml): tested as pull requests, rather than
-    # with the whole test suite, whose job (waiting for the user sessions, held by the daily build that pushed it)
-    # would cancel the one of the main branch, GitHub only keeping one waiting job per concurrency group.
+    # Not the branch of the pull requests of the daily build (see autobuild.yml), nor Dependabot's: tested as pull
+    # requests, rather than with the whole test suite, whose job (waiting for the user sessions, held by the daily
+    # build that pushed it) would cancel the one of the main branch, GitHub only keeping one waiting job per
+    # concurrency group.
     branches-ignore:
       - autobuild
+      - 'dependabot/**'
     tags:
       - '*'
   pull_request:
