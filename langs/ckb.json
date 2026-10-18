@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "تۆکنی بۆت نادروستە",
     "tweb.ACCESS_TOKEN_EXPIRED": "ئەم تۆکنی بۆتە هەڵوەشێنراوەتەوە",
     "tweb.FIRSTNAME_INVALID": "ناوی یەکەم نادروستە",
-    "tweb.LASTNAME_INVALID": "ناوی کۆتایی نادروستە"
+    "tweb.LASTNAME_INVALID": "ناوی کۆتایی نادروستە",
+    "tweb.Close": "داخستن"
 }

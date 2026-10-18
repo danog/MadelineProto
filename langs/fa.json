@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "توکن ربات نامعتبر است",
     "tweb.ACCESS_TOKEN_EXPIRED": "این توکن ربات باطل شده است",
     "tweb.FIRSTNAME_INVALID": "نام نامعتبر است",
-    "tweb.LASTNAME_INVALID": "نام خانوادگی نامعتبر است"
+    "tweb.LASTNAME_INVALID": "نام خانوادگی نامعتبر است",
+    "tweb.Close": "بستن"
 }

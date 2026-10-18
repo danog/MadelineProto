@@ -270,5 +270,6 @@
     "tweb.ACCESS_TOKEN_INVALID": "अमान्य बॉट टोकन",
     "tweb.ACCESS_TOKEN_EXPIRED": "यह बॉट टोकन रद्द कर दिया गया है",
     "tweb.FIRSTNAME_INVALID": "अमान्य पहला नाम",
-    "tweb.LASTNAME_INVALID": "अमान्य उपनाम"
+    "tweb.LASTNAME_INVALID": "अमान्य उपनाम",
+    "tweb.Close": "बंद करें"
 }
