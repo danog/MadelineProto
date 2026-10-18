@@ -45,7 +45,11 @@ final class NewAuthKey implements SimpleSubscriber
     /** @var Publisher<ConnectionState> */
     public readonly Publisher $connectionState;
 
-    private ?int $authedDcId;
+    /**
+     * Set on construction too: the delivery of the login state can still be queued in the actor when the key
+     * is saved, and a saved queue is only drained by the next delivery.
+     */
+    private ?int $authedDcId = null;
 
     public function __construct(
         public readonly bool $isMedia,
@@ -65,7 +69,15 @@ final class NewAuthKey implements SimpleSubscriber
             Assert::true($isMedia);
             $mainKey->connectionState->subscribe($this);
         }
+        $this->authedDcId = self::getAuthedDcId($loginState->getState());
         $loginState->subscribe($this);
+    }
+
+    private static function getAuthedDcId(LoginState $state): ?int
+    {
+        return $state->state === API::LOGGED_IN
+            ? $state->authorizedDc
+            : null;
     }
 
     #[\Override]
@@ -87,9 +99,7 @@ final class NewAuthKey implements SimpleSubscriber
         }
 
         Assert::isInstanceOf($state, LoginState::class);
-        $this->authedDcId = $state->state === API::LOGGED_IN
-            ? $state->authorizedDc
-            : null;
+        $this->authedDcId = self::getAuthedDcId($state);
         if ($this->connectionState->getState() === ConnectionState::ENCRYPTED_NOT_AUTHED
             || $this->connectionState->getState() === ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN
         ) {
