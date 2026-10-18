@@ -258,7 +258,7 @@ final class DataCenterConnection implements SimpleSubscriber
                 ),
                 'specialMethodType' => SpecialMethodType::UNAUTHED_METHOD,
             ]);
-            $this->auth->init();
+            $this->auth->init($this->API->loginState->getState());
         } elseif ($state === ConnectionState::ENCRYPTED_NOT_AUTHED) {
             Assert::eq($this->API->loginState->getState()->state, API::LOGGED_IN);
             $authed = $this->API->loginState->getState()->authorizedDc;
