@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
+use danog\MadelineProto\EventHandler\Message\Entities\Bold;
+use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
+use danog\MadelineProto\EventHandler\Message\Entities\Italic;
+use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
+use danog\MadelineProto\EventHandler\Message\Entities\Pre;
+use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\ParseMode;
@@ -529,17 +537,73 @@ class RichMessageTest extends TestCase
         $this->assertSame([['type' => 'unknown']], $output['blocks']);
     }
 
-    public function testGetText(): void
+    public function testText(): void
     {
+        $photo = $this->createStub(Media::class);
         $message = new RichMessage([
             ['type' => 'heading', 'size' => 1, 'text' => 'Title'],
             ['type' => 'paragraph', 'text' => ['Hello ', ['type' => 'bold', 'text' => 'world'], ' ', ['type' => 'custom_emoji', 'custom_emoji_id' => 1, 'alternative_text' => '👍']]],
             ['type' => 'divider'],
             ['type' => 'list', 'items' => [['label' => '1.', 'blocks' => [['type' => 'paragraph', 'text' => 'one']]], ['label' => '2.', 'blocks' => [['type' => 'paragraph', 'text' => 'two']]]]],
             ['type' => 'table', 'cells' => [[['text' => 'a'], ['text' => 'b']], [[], ['text' => 'c']]]],
-            ['type' => 'photo', 'photo' => null, 'caption' => ['text' => 'A photo']],
+            ['type' => 'photo', 'photo' => $photo, 'caption' => ['text' => 'A photo']],
             ['type' => 'mathematical_expression', 'expression' => 'x^2'],
         ]);
-        $this->assertSame("Title\nHello world 👍\n1. one\n2. two\na\tb\n\tc\nA photo\nx^2", $message->getText());
+        $this->assertSame("Title\nHello world 👍\n1. one\n2. two\na\tb\n\tc\nA photo\nx^2", $message->message);
+        $this->assertEquals([
+            new Bold(0, 5),
+            new Bold(12, 5),
+            new CustomEmoji(18, 2, 1),
+            new Pre(50, 3, 'latex'),
+        ], $message->entities);
+        $this->assertSame([$photo], $message->media);
+    }
+
+    public function testEntitiesAndHtml(): void
+    {
+        $message = new RichMessage([
+            ['type' => 'paragraph', 'text' => ['a ', ['type' => 'bold', 'text' => 'b'], ' ', ['type' => 'url', 'text' => 'c', 'url' => 'https://x']]],
+            ['type' => 'pre', 'text' => 'x<y', 'language' => 'php'],
+            ['type' => 'expandable_blockquote', 'text' => 'q', 'credit' => 'me'],
+            ['type' => 'details', 'summary' => 'More', 'blocks' => [['type' => 'paragraph', 'text' => ['hidden ', ['type' => 'text_mention', 'text' => 'D', 'user' => ['id' => 5]]]]]],
+        ]);
+        $this->assertSame("a b c\nx<y\nq\nme\nMore\nhidden D", $message->message);
+        $this->assertEquals([
+            new Bold(2, 1),
+            new TextUrl(4, 1, 'https://x'),
+            new Pre(6, 3, 'php'),
+            new Blockquote(10, 4, true),
+            new Italic(12, 2),
+            new Bold(15, 4),
+            new Blockquote(20, 8, true),
+            new MentionName(27, 1, 5),
+        ], $message->entities);
+        $this->assertSame(
+            'a <b>b</b> <a href="https://x">c</a><br><pre><code class="language-php">x&lt;y</code></pre><br><blockquote expandable>q<br><i>me</i></blockquote><br><b>More</b><br><blockquote expandable>hidden <a href="tg://user?id=5">D</a></blockquote>',
+            $message->getHTML(true),
+        );
+        $this->assertSame(
+            'a <b>b</b> <a href="https://x">c</a><br><pre language="php">x&lt;y</pre><br><blockquote>q<br><i>me</i></blockquote><br><b>More</b><br><blockquote>hidden D</blockquote>',
+            $message->getHTML(),
+        );
+        $this->assertSame('a&lt;b', (new RichMessage([['type' => 'paragraph', 'text' => 'a<b']]))->getHTML());
+    }
+
+    /**
+     * RichMessage objects can be created with the shorthands of input blocks, to be sent.
+     */
+    public function testInputShorthands(): void
+    {
+        $message = new RichMessage([
+            ['type' => 'list', 'items' => [['text' => 'item']]],
+            ['type' => 'blockquote', 'text' => 'quote'],
+            ['type' => 'photo', 'photo' => 'file_id', 'caption' => 'caption'],
+            ['type' => 'paragraph', 'text' => ['type' => 'text_mention', 'text' => 'D', 'user_id' => 5]],
+            ['_' => 'pageBlockDivider'],
+            ['type' => 'paragraph', 'text' => ['a', ['_' => 'textPlain', 'text' => 'raw']]],
+        ]);
+        $this->assertSame("• item\nquote\ncaption\nD\na", $message->message);
+        $this->assertEquals([new Blockquote(7, 5), new MentionName(21, 1, 5)], $message->entities);
+        $this->assertSame([], $message->media);
     }
 }
