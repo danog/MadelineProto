@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Cached between runs (see the cache steps).
+  COMPOSER_CACHE_DIR: /github/home/composer-cache
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   # Not the builds of tags, which release.
@@ -82,9 +86,15 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Check the code style and the generated docs
         env:
           # For the GitHub API, which only allows 60 unauthenticated requests per hour per IP.
@@ -113,9 +123,15 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Run the tests
         env:
           API_ID: ${{ secrets.API_ID }}
@@ -138,9 +154,15 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Run the light tests
         run: tests/test.sh phpunit-light
 
@@ -158,22 +180,29 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Test the handshake
         run: tests/test.sh handshake
 
   build:
-    needs: [cs, test, test_light, handshake]
-    # Either test or test_light is skipped. Not for pull requests: it releases the tags, the secrets it
-    # tests with are not given to pull requests from forks, and the push of a branch of this
-    # repository already builds it.
+    # At once with the other tests: the release job publishes the phar once all of them passed. Not for pull
+    # requests: the secrets it tests with are not given to pull requests from forks, and the push of a branch of
+    # this repository already builds it.
+    needs: docker-merge
     if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
-    # It tests the phar with the session of the bot, like the test job.
+    # It tests the phar with the session of authorization 0 of the bot (see tests/session_tests.sh), which two
+    # builds must not use at once.
     concurrency:
-      group: telegram-user-sessions
+      group: telegram-phar-build
       cancel-in-progress: false
     container:
       image: danog/madelineproto:next
@@ -182,11 +211,6 @@ jobs:
       credentials:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    permissions:
-      # To upload the phar to the release of a tag.
-      contents: write
-      # To run release.yml.
-      actions: write
     services:
       mariadb:
         image: mariadb
@@ -216,10 +240,16 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
-      - name: Build, test and release the phar
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Build and test the phar
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
@@ -229,11 +259,40 @@ jobs:
           GH_REPO: ${{ github.repository }}
           # Empty unless building a tag, like Woodpecker's.
           CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          RELEASE_DIR: ${{ github.workspace }}/release-files
         run: /bin/bash -e tests/makephar.sh
-      # Released by makephar.sh, with the token of the job: its events don't run workflows, so run it, and wait for
-      # it, so that the release fails if it fails.
-      - name: Announce the release
+      - name: Keep the files of the release
         if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: release-files
+          if-no-files-found: error
+
+  release:
+    # Once every test passed. Either test or test_light is skipped.
+    needs: [cs, test, test_light, handshake, build]
+    if: ${{ !failure() && !cancelled() && github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    permissions:
+      # To upload the phar to the release of a tag.
+      contents: write
+      # To run release.yml.
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: release-files
+      - name: Release the phar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: tests/release_phar.sh "${{ github.ref_name }}" release-files
+      # Released with the token of the job: its events don't run workflows, so run it, and wait for it, so that the
+      # release fails if it fails.
+      - name: Announce the release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}

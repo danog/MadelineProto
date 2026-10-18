@@ -5,16 +5,14 @@ echo >> /usr/local/etc/php/php.ini
 echo 'phar.readonly = 0' >> /usr/local/etc/php/php.ini
 # Composer comes with the image (tests/dockerfiles/Dockerfile).
 
-apt-get update && apt-get install -y wget
-
-mkdir -p -m 755 /etc/apt/keyrings
-out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg
-cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
-chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-mkdir -p -m 755 /etc/apt/sources.list.d
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-apt update
-apt-get install procps git unzip gh openssh-client -y
+# The tools come with the image (tests/dockerfiles/Dockerfile): installed only if missing (an older image).
+missing=""
+for tool in pkill:procps git:git unzip:unzip ssh:openssh-client; do
+    command -v "${tool%%:*}" > /dev/null || missing="$missing ${tool#*:}"
+done
+if [ -n "$missing" ]; then
+    apt-get update && apt-get install -y $missing
+fi
 
 git config --global --add safe.directory $PWD
 
@@ -201,22 +199,11 @@ cd "$madelinePath"
 
 if [ "$CI_COMMIT_TAG" == "7777" ]; then exit 0; fi
 
-cp "$input/madeline$php$branch.phar" "madeline.phar"
+# The files of the release, published by tests/release_phar.sh once every test passed (the release job).
+out="${RELEASE_DIR:-$madelinePath/release-files}"
+mkdir -p "$out"
+cp "$input/madeline$php$branch.phar" "$out/madeline.phar"
 # The previous name, for the madeline.php files that only know it: until it isn't downloaded anymore.
-cp madeline.phar madeline81.phar
-git remote add hub https://github.com/danog/MadelineProto
-
-echo -n "$CI_COMMIT_TAG" > release
-cp tools/phar.php madeline.php
-
-gh release upload "$CI_COMMIT_TAG" "madeline.phar"
-gh release upload "$CI_COMMIT_TAG" "madeline81.phar"
-gh release upload "$CI_COMMIT_TAG" "release"
-gh release upload "$CI_COMMIT_TAG" "madeline.php"
-
-gh release edit --prerelease=false "$CI_COMMIT_TAG"
-gh release edit --latest=true "$CI_COMMIT_TAG"
-
-# Sent to @madelineprotophar by release.yml (tests/send_phar.sh), which the CI runs next.
-
-
+cp "$out/madeline.phar" "$out/madeline81.phar"
+echo -n "$CI_COMMIT_TAG" > "$out/release"
+cp tools/phar.php "$out/madeline.php"
