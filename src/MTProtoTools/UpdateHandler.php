@@ -1086,7 +1086,7 @@ trait UpdateHandler
         if (isset($body['reply_to'])) {
             $body['reply_to'] = self::inputReplyToHeader(
                 $body['reply_to'],
-                isset($body['reply_to']['top_msg_id']) && ($this->getInfo($body['peer'])['Chat']['forum'] ?? false),
+                isset($body['reply_to']['top_msg_id']) && $this->isForum($body['peer']),
                 fn (mixed $peer): int => $this->getInfo($peer, API::INFO_TYPE_ID),
             );
         }
