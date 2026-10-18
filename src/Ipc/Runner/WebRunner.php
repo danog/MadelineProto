@@ -16,7 +16,12 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
+use Amp\Future;
 use Amp\Parallel\Context\ContextException;
+use Amp\Socket\ClientTlsContext;
+use Amp\Socket\ConnectContext;
+use Amp\Socket\Socket;
+use Amp\TimeoutCancellation;
 use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
@@ -26,6 +31,10 @@ use Throwable;
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use const DIRECTORY_SEPARATOR;
 use const PHP_URL_PATH;
+
+use function Amp\async;
+use function Amp\Socket\connect;
+use function Amp\Socket\connectTls;
 
 /**
  * @internal
@@ -52,6 +61,25 @@ final class WebRunner extends RunnerAbstract
             return false;
         }
 
+        $params = [
+            'argv' => ['madeline-ipc', $session, $startupId],
+            'cwd' => Magic::getcwd(),
+            'MadelineSelfRestart' => 1,
+        ];
+        if (\function_exists('memprof_enabled') && memprof_enabled()) {
+            $params['MEMPROF_PROFILE'] = '1';
+        }
+
+        self::selfStart(self::getRunPath().'?'.http_build_query($params));
+
+        return true;
+    }
+
+    /**
+     * Get the URI path of the entry script ({@see entry.php}), to start workers with {@see selfStart()}.
+     */
+    public static function getRunPath(): string
+    {
         if (!self::$runPath) {
             $absoluteRootDir = self::getAbsoluteRootDir();
             $runPath = self::getScriptPath($absoluteRootDir);
@@ -66,18 +94,7 @@ final class WebRunner extends RunnerAbstract
             self::$runPath = str_replace('//', '/', self::$runPath);
         }
 
-        $params = [
-            'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => Magic::getcwd(),
-            'MadelineSelfRestart' => 1,
-        ];
-        if (\function_exists('memprof_enabled') && memprof_enabled()) {
-            $params['MEMPROF_PROFILE'] = '1';
-        }
-
-        self::selfStart(self::$runPath.'?'.http_build_query($params));
-
-        return true;
+        return self::$runPath;
     }
 
     private static ?string $absoluteRootDir = null;
@@ -112,24 +129,76 @@ final class WebRunner extends RunnerAbstract
         return self::$absoluteRootDir = substr($rootDir, 0, \strlen($rootDir)-\strlen($uriDir)).DIRECTORY_SEPARATOR;
     }
 
+    /**
+     * The endpoints where the webserver may be listening: the scheme and port of the current request first.
+     *
+     * @return list<array{'tcp'|'tls', int}>
+     */
+    private static function getSelfStartEndpoints(): array
+    {
+        $endpoints = [];
+        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
+            foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
+                $endpoints []= [$proto, $port];
+            }
+        }
+        return $endpoints;
+    }
+
+    /**
+     * Like {@see selfStart()}, without blocking the event loop.
+     *
+     * selfStart() connects with blocking sockets: a TLS handshake with the plain HTTP port is only answered once a
+     * worker of the webserver is free, which may never happen while the workers of the webserver are the contexts
+     * waiting for this process. The requests are sent in the background, on every endpoint, as by selfStart().
+     *
+     * @return list<Future<?Socket>> The connections of the requests: close them once the request was served.
+     */
+    public static function selfStartAsync(string $uri, float $timeout = 10): array
+    {
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
+        $host = $_SERVER['SERVER_NAME'];
+
+        $requests = [];
+        foreach (self::getSelfStartEndpoints() as [$proto, $port]) {
+            $requests []= async(static function () use ($proto, $host, $port, $payload, $timeout): ?Socket {
+                $context = (new ConnectContext)->withConnectTimeout($timeout);
+                try {
+                    $socket = $proto === 'tls'
+                        ? connectTls(
+                            "tcp://$host:$port",
+                            $context->withTlsContext(new ClientTlsContext($host)),
+                            new TimeoutCancellation($timeout),
+                        )
+                        : connect("tcp://$host:$port", $context);
+                    $socket->write($payload);
+                    Logger::log("Sent payload to $proto://$host:$port: $payload");
+                    return $socket;
+                } catch (Throwable $e) {
+                    Logger::log("Error while sending to $proto://$host:$port: $e");
+                    return null;
+                }
+            });
+        }
+        return $requests;
+    }
+
     public static function selfStart(string $uri): void
     {
         $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
 
-        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
-            foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
-                try {
-                    $address = $proto.'://'.$_SERVER['SERVER_NAME'];
-                    $res = fsockopen($address, (int) $port);
-                    Logger::log("Successfully connected to {$address}:{$port}!");
-                    Logger::log("Sending payload: $payload");
-                    // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
-                    // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-                    fwrite($res, $payload);
-                    self::$resources []= $res;
-                } catch (Throwable $e) {
-                    Logger::log("Error while sending to {$address}:{$port}: $e");
-                }
+        foreach (self::getSelfStartEndpoints() as [$proto, $port]) {
+            try {
+                $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                $res = fsockopen($address, (int) $port);
+                Logger::log("Successfully connected to {$address}:{$port}!");
+                Logger::log("Sending payload: $payload");
+                // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
+                // Blocking on purpose: this also runs in shutdown functions, where the event loop doesn't run
+                fwrite($res, $payload);
+                self::$resources []= $res;
+            } catch (Throwable $e) {
+                Logger::log("Error while sending to {$address}:{$port}: $e");
             }
         }
         if (!isset($res)) {

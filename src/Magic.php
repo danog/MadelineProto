@@ -25,6 +25,7 @@ use Amp\File\Driver\BlockingFilesystemDriver;
 use Amp\File\Driver\EioFilesystemDriver;
 use Amp\File\Driver\UvFilesystemDriver;
 use Amp\SignalException;
+use danog\MadelineProto\Parallel\WebContextFactory;
 use danog\MadelineProto\TL\Conversion\Extension;
 use phpseclib4\Math\BigInteger;
 use Revolt\EventLoop;
@@ -329,6 +330,8 @@ final class Magic
             self::$zerowebhost = isset($_SERVER['SERVER_ADMIN']) && strpos($_SERVER['SERVER_ADMIN'], '000webhost.io');
             self::$can_getmypid = !self::$altervista && !self::$zerowebhost;
             self::$revision = 'Revision: '.API::RELEASE;
+            // Processes can't be started on webhosts: start amphp/parallel contexts with requests to the webserver
+            WebContextFactory::install();
             self::$initedLight = true;
             if ($light) {
                 return;

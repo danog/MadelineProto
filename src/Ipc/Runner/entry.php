@@ -26,6 +26,7 @@ use danog\MadelineProto\Ipc\IpcState;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\Parallel\Internal\WebContextRunner;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
@@ -85,7 +86,10 @@ use Webmozart\Assert\Assert;
 
         include $autoloadPath;
     }
-    if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
+    if (MADELINE_WORKER_TYPE === 'madeline-parallel') {
+        // A context of amphp/parallel started by WebContextFactory
+        WebContextRunner::run((string) MADELINE_WORKER_ARGS[0]);
+    } elseif (MADELINE_WORKER_TYPE === 'madeline-ipc') {
         $session = MADELINE_WORKER_ARGS[0];
         if (!file_exists($session)) {
             trigger_error("IPC session $session does not exist!", E_USER_ERROR);
