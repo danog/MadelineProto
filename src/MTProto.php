@@ -124,11 +124,13 @@ use function time;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  *
+ * Dynamic properties are allowed only for unserialization: see __wakeup().
+ *
  * @internal
  */
+#[\AllowDynamicProperties]
 final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 {
-    use RestoresDeclaredProperties;
     use AuthKeyHandler;
     use CallHandler;
     use PeerHandler;
@@ -906,14 +908,26 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
-     * Restore the properties listed by __sleep(), dropping those removed since the session was saved
-     * (e.g. rsa_keys and test_rsa_keys, renamed to rsaKeys and testRsaKeys): the keys are refetched.
+     * Drop the properties removed since the session was saved (e.g. rsa_keys and test_rsa_keys, renamed to
+     * rsaKeys and testRsaKeys: the keys are refetched).
+     *
+     * Not with __unserialize(): PHP calls it once the whole session is unserialized, after the __wakeup() of the
+     * objects in it, which read the MTProto instance (DataCenter its settings, the databases its database settings,
+     * the secret chat loops its logger...): its properties must be assigned as they are unserialized, by the default
+     * unserialization, which recreates the removed ones as dynamic properties (allowed, see the class: else a
+     * deprecation). __sleep() lists the declared ones, so they're never saved again.
      *
      * @internal
      */
-    public function __unserialize(array $data): void
+    public function __wakeup(): void
     {
-        $this->restoreDeclaredProperties($data);
+        foreach (get_object_vars($this) as $name => $_) {
+            // A private property of a class that is no longer an ancestor keeps its mangled name ("\0Class\0name"),
+            // which can't be unset: unreachable by any code, it's dropped by the next save
+            if (!property_exists(self::class, (string) $name) && !str_starts_with((string) $name, "\0")) {
+                unset($this->{$name});
+            }
+        }
     }
 
     /**
