@@ -121,7 +121,11 @@ rm -rf vendor/danog/madelineproto/docs vendor/danog/madelineproto/vendor-bin
 mkdir -p vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
 cp vendor/danog/madelineproto/src/Ipc/Runner/entry.php vendor/danog/madelineproto/src/danog/MadelineProto/Ipc/Runner
 
-branch="-$BRANCH"
+# The name of the phar is also its alias (Phar::mapPhar), and the stub loads phar://<alias>/vendor/autoload.php:
+# it must differ between builds, or an opcache with validate_timestamps=0 (php-fpm) keeps serving the files of
+# the previous release under the same phar://<alias>/ paths after madeline.php loads the new phar.
+# Release builds check out a tag, so $BRANCH is always HEAD there.
+branch="-$COMMIT"
 cd $madelinePath
 
 db()

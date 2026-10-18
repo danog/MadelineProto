@@ -121,6 +121,10 @@ final class GarbageCollector
                         $unlock = Tools::flock(MADELINE_PHP.'.lock', LOCK_EX);
                         write(MADELINE_PHP.'.temp.php', $contents);
                         move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
+                        // With opcache.validate_timestamps=0 (php-fpm), the old loader would run until a restart
+                        if (\function_exists('opcache_invalidate')) {
+                            @opcache_invalidate(MADELINE_PHP, true);
+                        }
                         $unlock();
                     }
 
