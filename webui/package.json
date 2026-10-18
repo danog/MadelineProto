@@ -24,7 +24,7 @@
         "typescript": "7.0.2",
         "vite": "8.3.4",
         "vite-plugin-solid": "2.11.14",
-        "vitest": "5.0.3"
+        "vitest": "5.0.4"
     },
     "overrides": {
         "seroval": "1.6.8",
