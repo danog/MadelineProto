@@ -1273,6 +1273,8 @@ trait UpdateHandler
         if ($update['_'] === 'updatePhoneCall') {
             switch ($update['phone_call']['_']) {
                 case 'phoneCallRequested':
+                    // Ringing on every session of the account: only the one that accepts it will be in
+                    // it, see PrivateCallController::accept() and onDiscarded().
                     if (isset($this->calls[$update['phone_call']['id']])) {
                         return;
                     }
@@ -1284,16 +1286,11 @@ trait UpdateHandler
                     $update['phone_call'] = $controller->public;
                     break;
                 case 'phoneCallWaiting':
-                    if (isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
-                        $this,
-                        $update['phone_call']
-                    );
-                    $this->callsByPeer[$controller->public->otherID] = $controller;
-                    $update['phone_call'] = $controller->public;
-                    break;
+                    // The state of an outgoing call, which requestCall() tracks from the result of
+                    // phone.requestCall: any other one was requested by another session of the account
+                    // (as TDLib, only create calls from phoneCallRequested), and tracking it would
+                    // make this session confirm or discard a call it is not in.
+                    return;
                 case 'phoneCallAccepted':
                     if (!isset($this->calls[$update['phone_call']['id']])) {
                         return;
@@ -1364,8 +1361,10 @@ trait UpdateHandler
                         }
                         break;
                     case 'encryptedChatDiscarded':
+                        // Discarded by the other party, or accepted by another session of the account: forget it
+                        // without echoing a messages.discardEncryption, which is only for chats we close ourselves.
                         $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
-                        $this->discardSecretChat($update['chat']['id']);
+                        unset($this->secretChats[$update['chat']['id']], $this->temp_requested_secret_chats[$update['chat']['id']]);
                         break;
                     case 'encryptedChat':
                         $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);

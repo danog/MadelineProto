@@ -51,7 +51,6 @@ use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -887,6 +886,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'calls',
             'callsByPeer',
             'groupCalls',
+            'seenGroupCalls',
             'conferenceCalls',
             'snitch',
 
@@ -1331,6 +1331,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             foreach ($this->broadcasts as $broadcast) {
                 $broadcast->resume();
             }
+            // Before resuming anything, drop the calls this session is not in: the incoming calls it
+            // never answered (they may have been answered by another session of the account) and the
+            // group calls it did not join (older versions tracked every group call it got updates about).
+            $ringTimeout = intdiv((int) ($this->config['call_ring_timeout_ms'] ?? 90000), 1000);
+            foreach ($this->calls as $call) {
+                $call->forgetIfUnanswered($ringTimeout);
+            }
+            $this->dropUnjoinedGroupCalls();
             if ($loggedIn) {
                 $this->resumeCalls();
                 // Resume the calls restored from the session only now that the MTProto session was reset
@@ -1348,11 +1356,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 }
             }
 
-            foreach ($this->groupCalls as $id => $groupCall) {
-                if ($groupCall->getCallState() === GroupCallState::LEFT) {
-                    $this->cleanupGroupCall($id);
-                }
-            }
         } catch (Throwable $e) {
             try {
                 $this->report((string) $e);
