@@ -143,9 +143,35 @@ final class RemovedPropertiesTest extends TestCase
             "\0*\0removedProtected" => 1,
         ]));
         $this->assertInstanceOf(MTProto::class, $mtproto);
-        $this->assertClean($mtproto);
+        $this->assertSame([], $this->deprecations);
+        // The mangled properties that no longer exist (a private one of a class that is no longer an ancestor, a
+        // protected one) keep their mangled names, which no code can access, nor unset: they're dropped when the
+        // session is saved again (__sleep() lists the declared ones). The others are dropped at once.
+        $this->assertSame(["\0danog\\MadelineProto\\Removed\0x", "\0*\0removedProtected"], self::dynamicProperties($mtproto));
         $this->assertSame(['a' => 'b'], (new ReflectionProperty($class, 'rsaKeys'))->getValue($mtproto));
         $this->assertSame(123, (new ReflectionProperty($class, 'v'))->getValue($mtproto));
+    }
+
+    public function testTheObjectsOfTheSessionSeeItsPropertiesWhenTheyWakeUp(): void
+    {
+        // The objects in a session read the MTProto instance from their __wakeup() (DataCenter its settings, the
+        // databases its database settings...): its properties must be assigned by then, which an __unserialize()
+        // of MTProto doesn't do (PHP calls it after the __wakeup() of the objects in it).
+        $class = MTProto::class;
+        $v = "\0$class\0v";
+        $probe = ProbeWakeup::class;
+        $mtproto = unserialize(
+            'O:'.\strlen($class).':"'.$class.'":3:{'
+            .'s:'.\strlen($v).':"'.$v.'";i:123;'
+            .'s:5:"probe";O:'.\strlen($probe).':"'.$probe.'":1:{s:3:"api";r:1;}'
+            // removed since: a dynamic property, dropped
+            .'s:8:"rsa_keys";a:0:{}'
+            .'}'
+        );
+        $this->assertInstanceOf(MTProto::class, $mtproto);
+        $this->assertSame([123], ProbeWakeup::$seen);
+        $this->assertSame([], $this->deprecations);
+        $this->assertSame([], self::dynamicProperties($mtproto));
     }
 
     public function testSettingsDropRemovedSettingsAndStillWakeUp(): void
@@ -168,5 +194,18 @@ final class RemovedPropertiesTest extends TestCase
         $this->assertInstanceOf(PrivateCall::class, $update);
         $this->assertClean($update);
         $this->assertSame('session', (new ReflectionProperty(\danog\MadelineProto\Ipc\IpcCapable::class, 'session'))->getValue($update));
+    }
+}
+
+/** An object of a session reading the MTProto instance when it wakes up, like DataCenter. */
+final class ProbeWakeup
+{
+    /** @var list<mixed> */
+    public static array $seen = [];
+    public MTProto $api;
+
+    public function __wakeup(): void
+    {
+        self::$seen[] = (new ReflectionProperty(MTProto::class, 'v'))->getValue($this->api);
     }
 }
