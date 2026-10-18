@@ -83,6 +83,8 @@ if [ "$1" == "phpunit" ]; then
     tests/session_tests.sh || status=1
     wait $paratest || status=1
     echo "=== Tests without the accounts of the CI"
+    # Blocking again, see tests/session_tests.sh.
+    php -r 'stream_set_blocking(STDOUT, true);'
     cat paratest.log
     exit $status
 fi

@@ -97,6 +97,9 @@ for n in "${!lanes[@]}"; do
         run_lane "$n" "$classes" "$main" "$template" || failed=1
     fi
 done
+# The PHP processes leave the output non-blocking (a flag of the open file, shared by the processes writing to it): writing
+# the long logs then fails with EAGAIN ("Resource temporarily unavailable"), cutting them.
+php -r 'stream_set_blocking(STDOUT, true);'
 for n in "${!pids[@]}"; do
     wait "${pids[$n]}" || failed=1
     echo "=== Lane $n: ${lanes[$n]%%:*}"
