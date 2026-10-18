@@ -22,13 +22,15 @@ use Amp\Cancellation;
 use Amp\DeferredFuture;
 
 /**
+ * A fiber waiting for a state: ephemeral, it's never serialized (it isn't, itself: see __sleep()).
+ *
  * @template T
  *
  * @internal
  *
  * @implements Subscriber<T>
  */
-final class AsyncWaiter implements Subscriber
+final class AsyncWaiter implements Subscriber, EphemeralSubscriber
 {
     /** @var DeferredFuture<T> */
     private readonly DeferredFuture $future;

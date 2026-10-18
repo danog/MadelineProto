@@ -76,5 +76,8 @@ if ($kind === 'user' || $kind === 'bot') {
         $API->botLogin($value);
     }
 }
+// Before the session is saved: the versions up to 8.9.0 saved the waiters of the states of the connections that a GC
+// cycle didn't free yet, which threw once loaded (the previous version, in tests/makephar.sh).
+gc_collect_cycles();
 echo "Created $session".PHP_EOL;
 exit(0);
