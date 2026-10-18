@@ -29,6 +29,7 @@ use Amp\SignalException;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\Connector;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
@@ -187,7 +188,8 @@ final class API extends AbstractAPI
                 die;
             }
         }
-        $this->session = new SessionPaths($session);
+        // The session of a remote IPC server is stored remotely: the session name only identifies the client.
+        $this->session = new SessionPaths($session, create: Connector::getIpcSettings($settings)->getEndpoint() === null);
         $this->wrapper = new APIWrapper($this->session);
         $this->exportNamespaces();
 
@@ -248,8 +250,11 @@ final class API extends AbstractAPI
                     Tools::closeConnection($this->getWebMessage(Lang::$current_lang['botAlreadyRunning']));
                     return false;
                 }
-                $this->wrapper->logger('Restarting to full instance: stopping IPC server...');
-                $this->wrapper->getAPI()->stopIpcServer();
+                $standalone = !$this->wrapper->getAPI()->getConnector()->autostart;
+                if (!$standalone) {
+                    $this->wrapper->logger('Restarting to full instance: stopping IPC server...');
+                    $this->wrapper->getAPI()->stopIpcServer();
+                }
             } catch (SecurityException|SignalException $e) {
                 throw $e;
             } catch (Throwable $e) {
@@ -260,6 +265,9 @@ final class API extends AbstractAPI
                     }
                 }
                 $this->wrapper->logger("Restarting to full instance: error $e");
+            }
+            if ($standalone ?? false) {
+                throw new Exception('The IPC server of this session is not started automatically (see Settings\\Ipc::setAutostart and setEndpoint), so only the IPC server can load the session: start the event handler there.');
             }
             $this->wrapper->logger('Restarting to full instance: reconnecting...');
             $cancel = new DeferredFuture;
@@ -303,6 +311,12 @@ final class API extends AbstractAPI
      */
     protected function connectToMadelineProto(SettingsAbstract $settings, bool $forceFull = false, bool $tryReconnect = true): bool
     {
+        $connector = Connector::fromSettings($this->session, $settings);
+        if (!$connector->autostart && !$forceFull && !Magic::$isIpcWorker) {
+            // Never load the session in-process, nor start the IPC server: only connect to it.
+            $this->wrapper->setAPI(new Client($connector->connectWaiting(), $connector, Logger::$default));
+            return true;
+        }
         if ($settings instanceof SettingsIpc) {
             $forceFull = $forceFull || $settings->getSlow();
         } elseif ($settings instanceof Settings) {
@@ -345,7 +359,7 @@ final class API extends AbstractAPI
             throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
-            $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
+            $this->wrapper->setAPI(new Client($unserialized, $connector, Logger::$default));
             return true;
         } elseif ($unserialized) {
             // Success, full session

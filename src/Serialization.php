@@ -136,6 +136,8 @@ abstract class Serialization
         $canContinue = true;
         $ipcSocket = null;
         $alreadyServed = false;
+        /** @var ?Future<void> */
+        $lightStateRead = null;
         $cancelFull = static function () use (&$cancelFlock): void {
             if ($cancelFlock !== null) {
                 $copy = $cancelFlock;
@@ -144,8 +146,10 @@ abstract class Serialization
             }
         };
         if (!$forceFull) {
-            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$canContinue, &$ipcSocket, &$lightState): void {
-                EventLoop::queue(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$canContinue, &$ipcSocket, &$lightState, &$lightStateRead): void {
+                // Awaited before returning: a script that is done as soon as it's connected must not exit while
+                // the file is still being read (with the uv driver, its callbacks would run after the loop closed).
+                $lightStateRead = async(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
                     try {
                         $lightState = $session->getLightState();
                         if (!$lightState->canStartIpc()) {
@@ -206,6 +210,7 @@ abstract class Serialization
         } finally {
             $lockWait->cancel();
             EventLoop::cancel($warningId);
+            $lightStateRead?->await();
         }
 
         if (!$unlock) { // Canceled, don't have lock
@@ -235,15 +240,23 @@ abstract class Serialization
             if (!$class = $lightState->getEventHandler()) {
                 // Unlock and fork
                 $unlock();
-                $monitor = Server::startMe($session);
-                EventLoop::queue(static function () use ($cancelIpc, $monitor): void {
+                $stopMonitor = new DeferredCancellation;
+                $monitor = Server::startMe($session, $stopMonitor->getCancellation());
+                $forward = async(static function () use ($cancelIpc, $monitor): void {
                     try {
                         $cancelIpc->complete($monitor->await());
                     } catch (\Throwable $e) {
                         $cancelIpc->error($e);
                     }
                 });
-                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), waitStartup: true);
+                try {
+                    return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), waitStartup: true);
+                } finally {
+                    // Once connected (or not), stop monitoring the startup, and wait for the IPC state file to be
+                    // closed: a script that is done as soon as it's connected must not exit while reading it.
+                    $stopMonitor->cancel();
+                    $forward->await();
+                }
             } elseif (!class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();

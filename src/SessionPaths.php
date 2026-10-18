@@ -94,7 +94,7 @@ final class SessionPaths
      *
      * @param string $session Session name
      */
-    public function __construct(string $session)
+    public function __construct(string $session, bool $create = true)
     {
         $session = Tools::absolute($session);
         $this->sessionDirectoryPath = $session;
@@ -105,6 +105,9 @@ final class SessionPaths
         $this->ipcCallbackPath = $session.DIRECTORY_SEPARATOR."callback.ipc";
         $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
         $this->apiSetupStatePath = $session.DIRECTORY_SEPARATOR."apiSetupState.php";
+        if (!$create) {
+            return;
+        }
         if (!exists($session)) {
             createDirectory($session);
         }

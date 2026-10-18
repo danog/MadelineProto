@@ -618,6 +618,19 @@ abstract class Tools extends AsyncTools
         )->__invoke();
     }
     /**
+     * Make a file name chosen by someone else safe to join to a directory: no path separators, NUL bytes, nor
+     * relative path components.
+     *
+     * @internal
+     *
+     * @psalm-pure
+     */
+    public static function sanitizeFileName(string $name): string
+    {
+        $name = str_replace(['/', '\\', "\0"], '_', $name);
+        return $name === '.' || $name === '..' || $name === '' ? '_' : $name;
+    }
+    /**
      * Get absolute path to file, related to session path.
      *
      * @param string $file File

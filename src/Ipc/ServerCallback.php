@@ -23,6 +23,7 @@ namespace danog\MadelineProto\Ipc;
 use Amp\Ipc\IpcServer;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
 use danog\MadelineProto\SessionPaths;
 use Revolt\EventLoop;
 
@@ -42,7 +43,7 @@ final class ServerCallback extends AbstractServer
     /**
      * Timeout watcher list, indexed by socket ID.
      *
-     * @var array<int, ChannelledSocket>
+     * @var array<int, ChannelledSocket|EncryptedChannel>
      */
     private array $socketList = [];
     /**
@@ -62,10 +63,10 @@ final class ServerCallback extends AbstractServer
     /**
      * Client handler loop.
      *
-     * @param ChannelledSocket $socket Client
+     * @param ChannelledSocket|EncryptedChannel $socket Client
      */
     #[\Override]
-    protected function clientLoop(ChannelledSocket $socket): void
+    protected function clientLoop(ChannelledSocket|EncryptedChannel $socket): void
     {
         $id = $this->id++;
         $this->API->waitForInit();

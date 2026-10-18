@@ -1058,6 +1058,27 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
             $this->logger->logger("Error while starting IPC server: $e", Logger::FATAL_ERROR);
         }
+        $this->configureRemoteIpc();
+    }
+    /**
+     * Accept remote IPC connections according to the current settings.
+     */
+    private function configureRemoteIpc(): void
+    {
+        try {
+            $this->ipcServer?->configureRemote($this->settings->getIpc());
+        } catch (Throwable $e) {
+            // Don't store settings that can't be applied, or the IPC server would fail to start every time.
+            if ($this->ipcServer) {
+                // Keep a new secret even then: never go back to a secret that was changed.
+                [$listen] = $this->ipcServer->getRemoteConfiguration();
+                $this->settings->getIpc()->restore($listen);
+            }
+            if (Magic::$isIpcWorker) {
+                throw $e;
+            }
+            $this->logger->logger("Error while starting the remote IPC server: $e", Logger::FATAL_ERROR);
+        }
     }
     /**
      * Stop all internal loops.
@@ -1563,6 +1584,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $this->logger->logger("The prometheus settings have changed!", Logger::WARNING);
             $this->cleanupProperties();
             $this->settings->getMetrics()->applyChanges();
+        }
+        if ($this->settings->getIpc()->hasChanged()) {
+            // Otherwise, the settings are applied once the loops are started.
+            if ($this->serializeLoop !== null) {
+                $this->configureRemoteIpc();
+            }
+            $this->settings->getIpc()->applyChanges();
         }
         if ($this->settings->getSerialization()->hasChanged()) {
             $this->logger->logger("The serialization settings have changed!", Logger::WARNING);

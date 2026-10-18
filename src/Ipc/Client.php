@@ -29,6 +29,7 @@ use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MediaDestination;
@@ -47,6 +48,8 @@ use const FILTER_VALIDATE_URL;
 
 use function Amp\async;
 use function Amp\File\exists;
+use function Amp\File\getSize;
+use function Amp\File\openFile;
 
 /**
  * IPC client.
@@ -86,15 +89,19 @@ final class Client extends ClientAbstract
     /**
      * Constructor function.
      *
-     * @param SessionPaths $session Session paths
-     * @param Logger       $logger  Logger
+     * @param Connector $connector Connector to the IPC server
+     * @param Logger    $logger    Logger
      */
-    public function __construct(ChannelledSocket $server, SessionPaths $session, Logger $logger)
+    public function __construct(ChannelledSocket|EncryptedChannel $server, protected readonly Connector $connector, Logger $logger)
     {
         $this->logger = $logger;
         $this->server = $server;
-        $this->session = $session;
-        self::$instances[$session->getSessionDirectoryPath()] = $this;
+        $this->session = $connector->session;
+        $connector->setClient($this);
+        if ($server instanceof EncryptedChannel) {
+            $server->setOwner($this);
+        }
+        self::$instances[$this->session->getSessionDirectoryPath()] = $this;
         EventLoop::queue($this->loopInternal(...));
     }
 
@@ -114,7 +121,7 @@ final class Client extends ClientAbstract
                 }
             }
             if ($arg instanceof Cancellation) {
-                $wrapper = Wrapper::create($arguments, $this->session, $this->logger);
+                $wrapper = Wrapper::create($arguments, $this->connector, $this->logger);
                 $wrapper->wrap($arg);
                 unset($arg, $arguments);
                 $arguments = $wrapper;
@@ -123,6 +130,30 @@ final class Client extends ClientAbstract
         return parent::__call($function, $arguments);
     }
 
+    /** @internal */
+    public function getConnector(): Connector
+    {
+        return $this->connector;
+    }
+    /**
+     * Whether a file is on this machine, but the IPC server is on another one (so it can't open it, and it must
+     * be read or written through callbacks instead).
+     */
+    private function isClientFile(mixed $file): bool
+    {
+        if (!$this->connector->isRemote()) {
+            return false;
+        }
+        return $file instanceof LocalFile
+            || (\is_string($file) && !filter_var($file, FILTER_VALIDATE_URL) && exists(Tools::absolute($file)));
+    }
+    /**
+     * Open a file of this machine for a remote IPC server, which reads it through callbacks.
+     */
+    private function openClientFile(LocalFile|RemoteUrl|ReadableStream $file): LocalFile|RemoteUrl|ReadableStream
+    {
+        return $this->isClientFile($file) ? openFile(Tools::absolute($file->file), 'rb') : $file;
+    }
     /** @internal */
     public function getSession(): SessionPaths
     {
@@ -203,7 +234,7 @@ final class Client extends ClientAbstract
             $url = $url->getFile();
         }
         $params = [$url, $size, $fileName, &$cb, $encrypted, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         return $this->__call('uploadFromUrl', $wrapper);
@@ -228,7 +259,7 @@ final class Client extends ClientAbstract
 
             $file = $file->getFile();
         }
-        if (\is_resource($file) || ($file instanceof ReadableStream && !$file instanceof ResumableStream)) {
+        if (\is_resource($file) || ($file instanceof ReadableStream && !$file instanceof ResumableStream) || $this->isClientFile($file)) {
             /** @psalm-suppress MixedArgument */
             return $this->uploadLocally($file, $fileName, $cb, $encrypted, $cancellation);
         }
@@ -244,7 +275,7 @@ final class Client extends ClientAbstract
             /** @var array */
             return $this->__call('upload', $params);
         }
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         /** @var array */
@@ -291,7 +322,7 @@ final class Client extends ClientAbstract
         /** @var array<string, mixed> */
         $args = get_defined_vars();
         foreach ([$file, $thumb] as $f) {
-            if ($f instanceof ReadableStream && !$f instanceof ResumableStream) {
+            if (($f instanceof ReadableStream && !$f instanceof ResumableStream) || $this->isClientFile($f)) {
                 /** @psalm-suppress MixedArgument */
                 return $this->sendMediaLocally(...$args);
             }
@@ -314,7 +345,7 @@ final class Client extends ClientAbstract
         }
         $callback = &$args['callback'];
         $cancellation = &$args['cancellation'];
-        $wrapper = Wrapper::create($args, $this->session, $this->logger);
+        $wrapper = Wrapper::create($args, $this->connector, $this->logger);
         $wrapper->wrap($callback, false);
         $wrapper->wrap($cancellation);
         /** @var Message|Media */
@@ -351,7 +382,7 @@ final class Client extends ClientAbstract
             /** @var array */
             return $this->__call('uploadFromStream', $params);
         }
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         /** @var array */
@@ -437,6 +468,7 @@ final class Client extends ClientAbstract
      */
     private function callPlayInternal(string $prefix, int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest, bool $blocking): void
     {
+        $file = $this->openClientFile($file);
         // The IPC server might have a different working directory.
         if ($file instanceof LocalFile) {
             $file = new LocalFile(Tools::absolute($file->file));
@@ -446,7 +478,7 @@ final class Client extends ClientAbstract
             return;
         }
         $params = [$id, &$file, $dest];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($file, true);
         $this->__call($prefix.'PlayBlocking', $wrapper);
     }
@@ -461,6 +493,9 @@ final class Client extends ClientAbstract
             if ($file instanceof ReadableStream && !$file instanceof ResumableStream) {
                 // Hold files are played after this call returns, when the stream can't be read through IPC anymore.
                 throw new Exception('Only files, URLs and resumable streams can be played on hold through the IPC server: buffer other streams to a file first.');
+            }
+            if ($this->isClientFile($file)) {
+                throw new Exception('Files of this machine can\'t be played on hold by a remote IPC server: use URLs or files of the server.');
             }
             // The IPC server might have a different working directory.
             $params[] = $file instanceof LocalFile ? new LocalFile(Tools::absolute($file->file)) : $file;
@@ -489,7 +524,7 @@ final class Client extends ClientAbstract
             $callable = $callable->getFile();
         }
         $params = [&$callable, $size, $mime, $fileName, &$cb, $seekable, $encrypted, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($callable, false);
         $wrapper->wrap($cancellation);
@@ -509,7 +544,7 @@ final class Client extends ClientAbstract
             $media = $media->getFile();
         }
         $params = [$media, &$cb, $encrypted, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         return $this->__call('uploadFromTgfile', $wrapper);
@@ -541,7 +576,7 @@ final class Client extends ClientAbstract
         $args['resumableCallId'] ??= bin2hex(random_bytes(16));
         if (isset($args['cancellation']) && $args['cancellation'] instanceof Cancellation) {
             $params = [$method, &$args, $dcId];
-            $wrapper = Wrapper::create($params, $this->session, $this->logger);
+            $wrapper = Wrapper::create($params, $this->connector, $this->logger);
             $wrapper->wrap($args['cancellation']);
             return $this->__call('methodCallAsyncRead', $wrapper);
         }
@@ -560,8 +595,12 @@ final class Client extends ClientAbstract
             $cb = $dir;
             $dir = $dir->getFile();
         }
+        if ($this->connector->isRemote()) {
+            $messageMedia = $this->getDownloadInfo($messageMedia);
+            return $this->downloadToFile($messageMedia, $dir.'/'.Tools::sanitizeFileName($messageMedia['name'].$messageMedia['ext']), $cb, $cancellation);
+        }
         $params = [$messageMedia, $dir, &$cb, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         return $this->__call('downloadToDir', $wrapper);
@@ -579,8 +618,21 @@ final class Client extends ClientAbstract
             $cb = $file;
             $file = $file->getFile();
         }
+        if ($this->connector->isRemote()) {
+            // The file is written here, the IPC server is on another machine.
+            $file = Tools::absolute(preg_replace('|/+|', '/', $file));
+            // Like Files::downloadToFile, resume partial downloads.
+            $size = exists($file) ? getSize($file) : 0;
+            $stream = openFile($file, 'cb');
+            try {
+                $this->downloadToStream($messageMedia, $stream, $cb, $size, -1, $cancellation);
+            } finally {
+                $stream->close();
+            }
+            return $file;
+        }
         $params = [$messageMedia, $file, &$cb, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);
         return $this->__call('downloadToFile', $wrapper);
@@ -607,7 +659,7 @@ final class Client extends ClientAbstract
             $callable = $callable->getFile();
         }
         $params = [$messageMedia, &$callable, &$cb, $seekable, $offset, $end, $part_size, &$cancellation];
-        $wrapper = Wrapper::create($params, $this->session, $this->logger);
+        $wrapper = Wrapper::create($params, $this->connector, $this->logger);
         $wrapper->wrap($callable, false);
         $wrapper->wrap($cb, false);
         $wrapper->wrap($cancellation);

@@ -30,6 +30,13 @@ abstract class IpcCapable
 {
     use RestoresDeclaredProperties;
 
+    /**
+     * IPC client of this process that is unserializing a response of a remote IPC server, see EncryptedChannel.
+     *
+     * @internal
+     */
+    public static ?Client $remoteClient = null;
+
     protected readonly string $session;
     private MTProto|Client|null $API;
 
@@ -64,6 +71,10 @@ abstract class IpcCapable
     final public function __unserialize(array $data): void
     {
         $this->restoreDeclaredProperties($data);
+        if (self::$remoteClient !== null) {
+            // The session name is the one of the remote server, which doesn't identify the client of this process.
+            $this->API = self::$remoteClient;
+        }
     }
 
     /**

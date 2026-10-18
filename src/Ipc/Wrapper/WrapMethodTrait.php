@@ -26,7 +26,7 @@ trait WrapMethodTrait
     abstract public function __call($name, $args);
     public function wrap(...$args)
     {
-        $new = Wrapper::create($args, $this->session->getIpcCallbackPath(), $this->logger);
+        $new = Wrapper::create($args, $this->connector, $this->logger);
         foreach ($args as &$arg) {
             $new->wrap($arg);
         }

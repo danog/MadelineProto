@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\CompositeException;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -28,6 +30,9 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use danog\BetterPrometheus\BetterGauge;
 use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
+use danog\MadelineProto\Ipc\Remote\Handshake;
+use danog\MadelineProto\Ipc\Remote\Listener;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
@@ -95,6 +100,14 @@ abstract class AbstractServer extends Loop
      */
     private ServerCallback $callback;
     /**
+     * Listener of remote IPC connections.
+     */
+    private ?Listener $listener = null;
+    /**
+     * Secret of the listener of remote IPC connections.
+     */
+    private ?string $listenerSecret = null;
+    /**
      * Set IPC path.
      *
      * @param SessionPaths $session Session
@@ -112,13 +125,79 @@ abstract class AbstractServer extends Loop
         return $this instanceof ServerCallback ? parent::start() : $this->callback->start() && parent::start();
     }
     /**
+     * Start, restart or stop accepting remote IPC connections, according to the settings.
+     *
+     * Not done by start(): the IPC server is started before the settings passed to the constructor are applied.
+     */
+    public function configureRemote(Ipc $settings): void
+    {
+        \assert(!$this instanceof ServerCallback);
+        $endpoints = $settings->getListen();
+        $secret = $settings->getSecret();
+        $old = $this->listener;
+        $oldSecret = $this->listenerSecret;
+        if (($old?->endpoints ?? []) === $endpoints && $oldSecret === $secret) {
+            return;
+        }
+        if ($endpoints && $secret === null) {
+            throw new Exception('An IPC secret is required to accept remote IPC connections!');
+        }
+        // Before suspending (stopping an HTTP server does), so that concurrent calls don't close it again.
+        $this->listener = null;
+        $this->listenerSecret = null;
+        // Clients authenticated with a secret that was changed lose access.
+        $old?->close(disconnect: $oldSecret !== $secret);
+        if (!$endpoints) {
+            return;
+        }
+        try {
+            $this->listener = new Listener($secret, $endpoints, $this->acceptRemote(...), $this->API->getPsrLogger());
+            $this->listenerSecret = $secret;
+        } catch (Throwable $e) {
+            // Keep accepting connections where it worked, unless the secret was changed (maybe because it leaked).
+            if ($old !== null && $oldSecret !== null && $oldSecret === $secret) {
+                try {
+                    $this->listener = new Listener($oldSecret, $old->endpoints, $this->acceptRemote(...), $this->API->getPsrLogger());
+                    $this->listenerSecret = $oldSecret;
+                } catch (Throwable $e2) {
+                    Logger::log("Could not accept remote IPC connections on the previous endpoints, either: $e2", Logger::ERROR);
+                }
+            }
+            throw $e;
+        }
+    }
+    /**
+     * Get the endpoints and secret on which remote IPC connections are currently accepted.
+     *
+     * @return array{list<string>, ?string}
+     */
+    public function getRemoteConfiguration(): array
+    {
+        return [$this->listener?->endpoints ?? [], $this->listenerSecret];
+    }
+    /**
+     * Handle an authenticated remote IPC connection.
+     *
+     * @param Handshake::TYPE_* $type
+     */
+    private function acceptRemote(EncryptedChannel $channel, int $type): void
+    {
+        if ($type === Handshake::TYPE_CALLBACK) {
+            $this->callback->clientLoop($channel);
+        } else {
+            $this->clientLoop($channel);
+        }
+    }
+    /**
      * Start IPC server in background.
      *
-     * @param SessionPaths $session Session path
+     * @param SessionPaths $session      Session path
+     * @param ?Cancellation $cancellation Stops monitoring the startup (the future then resolves to false): cancel and
+     *                                    await it once connected, so that no read of the IPC state outlives the caller
      *
      * @return Future<bool|Throwable>
      */
-    public static function startMe(SessionPaths $session): Future
+    public static function startMe(SessionPaths $session, ?Cancellation $cancellation = null): Future
     {
         $id = Tools::randomInt(2000000000);
         $startTime = microtime(true);
@@ -129,7 +208,7 @@ abstract class AbstractServer extends Loop
             ProcessRunner::start((string) $session, $id);
             $started = true;
             WebRunner::start((string) $session, $id);
-            return async(self::monitor(...), $session, $id, $startTime, $started, null);
+            return async(self::monitor(...), $session, $id, $startTime, $started, null, $cancellation);
         } catch (Throwable $e) {
             Logger::log($e);
         }
@@ -146,20 +225,23 @@ abstract class AbstractServer extends Loop
                 $e = $e2;
             }
         }
-        return async(self::monitor(...), $session, $id, $startTime, $started, $e);
+        return async(self::monitor(...), $session, $id, $startTime, $started, $e, $cancellation);
     }
     /**
      * Monitor session.
      *
      * @param float $startTime When the server was started, to recognize servers started concurrently by other processes
      */
-    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e): bool|Throwable
+    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e, ?Cancellation $cancellation): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
         }
         $count = 0;
         while (true) {
+            if ($cancellation?->isRequested()) {
+                return false;
+            }
             $state = $session->getIpcState();
             if ($state && $state->getStartupId() === $id) {
                 if ($e = $state->getException()) {
@@ -184,10 +266,13 @@ abstract class AbstractServer extends Loop
                 // that will release it soon): that can take longer than any fixed timeout.
                 return new Exception("The IPC server didn't start within ".self::STARTUP_TIMEOUT." seconds, please check the logs!", previous: $e);
             }
-            delay(0.5);
+            try {
+                delay(0.5, cancellation: $cancellation);
+            } catch (CancelledException) {
+                return false;
+            }
             $count++;
         }
-        return false;
     }
     /**
      * Whether an IPC server listens on the socket of the session.
@@ -219,6 +304,9 @@ abstract class AbstractServer extends Loop
     #[\Override]
     final public function stop(): bool
     {
+        $this->listener?->close();
+        $this->listener = null;
+        $this->listenerSecret = null;
         $this->server->close();
         if (!$this instanceof ServerCallback) {
             $this->callback->server->close();
@@ -249,9 +337,9 @@ abstract class AbstractServer extends Loop
     /**
      * Client handler loop.
      *
-     * @param ChannelledSocket $socket Client
+     * @param ChannelledSocket|EncryptedChannel $socket Client
      */
-    protected function clientLoop(ChannelledSocket $socket): void
+    protected function clientLoop(ChannelledSocket|EncryptedChannel $socket): void
     {
         $this->API->waitForInit();
         $this->API->logger('Accepted IPC client connection!');
@@ -283,10 +371,10 @@ abstract class AbstractServer extends Loop
     /**
      * Handle client request.
      *
-     * @param ChannelledSocket                   $socket  Socket
+     * @param ChannelledSocket|EncryptedChannel  $socket  Socket
      * @param array{0: string, 1: array|Wrapper} $payload Payload
      */
-    private function clientRequest(ChannelledSocket $socket, int $id, array $payload): void
+    private function clientRequest(ChannelledSocket|EncryptedChannel $socket, int $id, array $payload): void
     {
         try {
             if ($payload[1] instanceof Wrapper) {

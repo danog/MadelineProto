@@ -1153,6 +1153,8 @@ trait Files
                     if (isset($audio['performer'])) {
                         $res['name'] .= ' - '.$audio['performer'];
                     }
+                    // Chosen by the sender: it must not be a path (see downloadToDir).
+                    $res['name'] = Tools::sanitizeFileName($res['name']);
                 }
                 if (!isset($res['ext']) || $res['ext'] === '') {
                     $res['ext'] = Tools::getExtensionFromLocation($res['InputFileLocation'], Tools::getExtensionFromMime($res['mime'] ?? 'image/jpeg'));
@@ -1273,6 +1275,8 @@ trait Files
                     if (isset($audio['performer'])) {
                         $res['name'] .= ' - '.$audio['performer'];
                     }
+                    // Chosen by the sender: it must not be a path (see downloadToDir).
+                    $res['name'] = Tools::sanitizeFileName($res['name']);
                 }
                 $res['InputFileLocation'] = ['_' => 'inputDocumentFileLocation', 'id' => $messageMedia['document']['id'], 'access_hash' => $messageMedia['document']['access_hash'], 'version' => $messageMedia['document']['version'] ?? 0, 'dc_id' => $messageMedia['document']['dc_id'], 'file_reference' => $this->referenceDatabase->getReference(ReferenceDatabase::DOCUMENT_LOCATION, $messageMedia['document'])];
                 if (!isset($res['ext']) || $res['ext'] === '') {
@@ -1307,7 +1311,7 @@ trait Files
             $dir = $dir->getFile();
         }
         $messageMedia = ($this->getDownloadInfo($messageMedia));
-        return $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb, $cancellation);
+        return $this->downloadToFile($messageMedia, $dir.'/'.Tools::sanitizeFileName($messageMedia['name'].$messageMedia['ext']), $cb, $cancellation);
     }
     /**
      * Download file.

@@ -1,0 +1,8 @@
+# Only what tests/dockerfiles/Dockerfile needs: the image is public, so never send sessions or secrets
+# of the checkout to the build.
+*
+!composer.json
+!LICENSE
+!src
+!tools/makephar.php
+!tests/dockerfiles

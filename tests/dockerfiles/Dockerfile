@@ -270,6 +270,11 @@ ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
 RUN php -v
 
+# MadelineProto itself, built from the sources of the image: bots can require
+# /usr/local/lib/madelineproto/madeline.phar, and madeline-server runs a standalone IPC server.
+COPY . /usr/src/madelineproto
+RUN /usr/src/madelineproto/tests/dockerfiles/build_phar.sh /usr/src/madelineproto && rm -rf /usr/src/madelineproto
+
 STOPSIGNAL SIGTERM
 
 WORKDIR /app
