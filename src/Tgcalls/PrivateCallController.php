@@ -272,12 +272,19 @@ final class PrivateCallController implements CallControllerInterface
 
             $this->log(sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig($cancellation);
+            if ($this->callState !== CallState::INCOMING) {
+                // Ended meanwhile: discarded, or expired, see expireAfterRestart().
+                return $this;
+            }
             $this->log('Generating b...', Logger::VERBOSE);
             $b = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));
             $g_b = $dh_config['g']->powMod($b, $dh_config['p']);
             Crypt::checkG($g_b, $dh_config['p']);
 
             $this->callState = CallState::ACCEPTED;
+            // Persisted along with the state: if the process restarts while phone.acceptCall is in flight,
+            // the server may still accept the call, and the phoneCall that follows completes it with b.
+            $this->call['b'] = $b;
             $this->diskJockey->start();
             try {
                 $this->API->methodCallAsyncRead('phone.acceptCall', [
@@ -301,7 +308,6 @@ final class PrivateCallController implements CallControllerInterface
                 $this->end();
                 return $this;
             }
-            $this->call['b'] = $b;
 
             return $this;
         } finally {
@@ -568,15 +574,61 @@ final class PrivateCallController implements CallControllerInterface
      */
     public function forgetIfUnanswered(int $ringTimeout): bool
     {
-        $unanswered = $this->callState === CallState::INCOMING
-            // Left behind by a failed phone.acceptCall of older versions.
-            || ($this->callState === CallState::ACCEPTED && !isset($this->call['b']));
-        if (!$unanswered || time() - $this->public->date <= $ringTimeout) {
+        if (!$this->isUnanswered() || time() - $this->public->date <= $ringTimeout) {
             return false;
         }
         $this->log("Forgetting $this, which was not answered by this session");
         $this->end();
         return true;
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
+    private function isUnanswered(): bool
+    {
+        return $this->callState === CallState::INCOMING
+            // Left behind by a failed phone.acceptCall of older versions (accept() now sets b first).
+            || ($this->callState === CallState::ACCEPTED && !isset($this->call['b']));
+    }
+
+    /**
+     * Expire a call restored from the session whose end we may have missed (the updates of a call are
+     * only sent to running sessions), without making any request before it times out, see
+     * {@see MTProto::wakeup()}.
+     *
+     * @internal
+     *
+     * @param int $ringTimeout    How long an incoming call rings at most, in seconds.
+     * @param int $receiveTimeout How long the key exchange of an accepted call takes at most, in seconds.
+     */
+    public function expireAfterRestart(int $ringTimeout, int $receiveTimeout): void
+    {
+        if ($this->forgetIfUnanswered($ringTimeout)) {
+            return;
+        }
+        if ($this->isUnanswered()) {
+            // Still ringing: forget it once it can no longer ring, unless we answer it.
+            $delay = max(0, $this->public->date + $ringTimeout - time()) + 1;
+            EventLoop::unreference(EventLoop::delay($delay, function () use ($ringTimeout): void {
+                $this->forgetIfUnanswered($ringTimeout);
+            }));
+        } elseif ($this->callState === CallState::ACCEPTED) {
+            // Restarted between our phone.acceptCall and the phoneCall that completes the key exchange,
+            // which may have been sent while we were not running: as TDLib, give up once
+            // call_receive_timeout_ms expires. We accepted the call: discard it.
+            EventLoop::unreference(EventLoop::delay($receiveTimeout, function (): void {
+                if ($this->callState !== CallState::ACCEPTED) {
+                    return;
+                }
+                $this->log("The key exchange of $this did not complete, discarding it", Logger::WARNING);
+                try {
+                    $this->discard(DiscardReason::DISCONNECTED);
+                } catch (Throwable $e) {
+                    $this->log("Could not discard $this: $e", Logger::ERROR);
+                }
+            }));
+        }
     }
 
     #[\Override]

@@ -204,6 +204,42 @@ final class ForeignCallsTest extends TestCase
         $this->assertSame(CallState::INCOMING, $API->getCallState(2));
     }
 
+    public function testRestoredRingingCallExpiresWithoutRequests(): void
+    {
+        $API = self::client();
+        // Still ringing on restore: its end (e.g. answered by another session meanwhile) may never reach us.
+        $ringing = self::restore(new PrivateCallController($API, self::incomingCall(1, time())));
+        self::set($API, 'calls', [1 => $ringing]);
+        $ringing->expireAfterRestart(0, 20);
+        $this->assertSame(CallState::INCOMING, $API->getCallState(1));
+
+        delay(1.5);
+        $this->assertNull($API->getCallState(1));
+        $this->assertSame(CallState::ENDED, $ringing->getCallState());
+    }
+
+    public function testCallRestoredDuringItsKeyExchangeIsKeptThenDiscarded(): void
+    {
+        $API = self::client();
+        // Restarted after our phone.acceptCall, before the phoneCall that completes the call.
+        $accepted = new PrivateCallController($API, self::incomingCall(1, time() - 86400));
+        self::set($accepted, 'callState', CallState::ACCEPTED);
+        $inputCall = self::get($accepted, 'call');
+        $inputCall['b'] = 2;
+        self::set($accepted, 'call', $inputCall);
+        $accepted = self::restore($accepted);
+        self::set($API, 'calls', [1 => $accepted]);
+
+        // We accepted it: not forgotten as unanswered, whatever its age.
+        $accepted->expireAfterRestart(90, 1);
+        $this->assertSame(CallState::ACCEPTED, $API->getCallState(1));
+
+        // Discarded once call_receive_timeout_ms expires (the request itself fails on this bare client).
+        delay(1.5);
+        $this->assertNull($API->getCallState(1));
+        $this->assertSame(CallState::ENDED, $accepted->getCallState());
+    }
+
     public function testOutgoingCallOfAnotherSessionIsIgnored(): void
     {
         $API = self::client();
