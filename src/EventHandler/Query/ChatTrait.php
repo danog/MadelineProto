@@ -19,9 +19,11 @@ namespace danog\MadelineProto\EventHandler\Query;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RichMessage\InputConverter;
 
 /** @internal */
 trait ChatTrait
@@ -73,6 +75,44 @@ trait ChatTrait
             ],
         );
         return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
+    }
+
+    /**
+     * Edit the message, replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
+     *
+     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param array|null               $replyMarkup  Reply markup for inline keyboards
+     * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
+     */
+    public function editRich(
+        string|array|RichMessage $message,
+        ParseMode $parseMode = ParseMode::MARKDOWN,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
+    ): Message {
+        $client = $this->getClient();
+        $result = $client->methodCallAsyncRead(
+            'messages.editMessage',
+            [
+                'peer' => $this->chatId,
+                'id' => $this->messageId,
+                'message' => '',
+                'rich_message' => $client->toInputRichMessage(
+                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+                    $this->chatId,
+                ),
+                'reply_markup' => $replyMarkup,
+                'schedule_date' => $scheduleDate,
+            ],
+        );
+        return $client->wrapMessage($client->extractMessage($result));
     }
 
     /**
