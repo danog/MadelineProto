@@ -355,7 +355,7 @@ abstract class EventHandler extends AbstractAPI
                 $refl = new ReflectionClass($class);
                 $plugin = $pluginsPrev[$class] ?? $pluginsNew[$class] ?? $refl->newInstanceWithoutConstructor();
                 $pluginsNew[$class] = $plugin;
-                [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [];
+                [$newMethods, $newHandlers] = $plugin->internalStart($MadelineProto, $pluginsPrev, $pluginsNew, false) ?? [[], []];
                 if (!$plugin->isPluginEnabled()) {
                     unset($pluginsNew[$class]);
                     continue;
