@@ -262,7 +262,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream      $file                   File to upload: can be a message to reuse media present in a message.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                             $caption                Caption of document
-     * @param ?callable(float, float, int)                                       $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                     $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                            $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                          $parseMode              Text parse mode for the caption
      * @param array|null                                                         $replyMarkup            Keyboard information.
@@ -331,7 +331,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
@@ -420,7 +420,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
@@ -487,7 +487,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $duration                Duration of the audio
      * @param string|null                                                   $title                   Title of the audio
@@ -560,7 +560,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param integer|null                                                  $duration                Duration of the voice
@@ -626,7 +626,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      *
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
      * @param array|null                                                    $replyMarkup            Keyboard information.
@@ -689,7 +689,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Please use named arguments to call this method.
      *
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param array|null                                                    $replyMarkup            Keyboard information.
      * @param integer|null                                                  $sendAs                 Peer to send the message as.

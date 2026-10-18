@@ -93,6 +93,7 @@ final class DataCenter
     public function __construct(private readonly MTProto $API)
     {
         $this->__wakeup();
+        $this->applySettings();
     }
 
     /**
@@ -103,23 +104,34 @@ final class DataCenter
         return ['API', 'list', 'currentDatacenter'];
     }
 
+    /**
+     * Runs during unserialize(), before MTProto itself is woken up: must not connect or log.
+     */
     public function __wakeup(): void
     {
         $this->connectMutex = new LocalKeyedMutex;
-        if ($this->getSettings()->hasChanged()) {
-            unset($this->dohWrapper);
+        $this->dohWrapper = new DoHWrapper($this->API);
+    }
+
+    /**
+     * Apply changed connection settings to the existing connections.
+     *
+     * @internal
+     */
+    public function applySettings(): void
+    {
+        if (!$this->getSettings()->hasChanged()) {
+            return;
         }
-        $this->dohWrapper ??= new DoHWrapper($this->API);
-        if ($this->getSettings()->hasChanged()) {
-            foreach ($this->list as $dc => $socket) {
-                if (\is_string($dc)) {
-                    continue;
-                }
-                $socket->setCtx($this->generateContexts($dc));
-                $socket->reconnect();
+        $this->dohWrapper = new DoHWrapper($this->API);
+        foreach ($this->list as $dc => $socket) {
+            if (\is_string($dc)) {
+                continue;
             }
-            $this->getSettings()->applyChanges();
+            $socket->setCtx($this->generateContexts($dc));
+            $socket->reconnect();
         }
+        $this->getSettings()->applyChanges();
     }
     /**
      * @return array<int, DataCenterConnection>
