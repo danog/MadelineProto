@@ -24,6 +24,7 @@ use AssertionError;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Action\Typing;
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogSetTTL;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Story\StoryDeleted;
@@ -254,6 +255,57 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         );
     }
 
+    /**
+     * Reply to the message with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
+     *
+     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param array|null               $replyMarkup  Keyboard information.
+     * @param integer|string|null      $sendAs       Peer to send the message as.
+     * @param integer|null             $scheduleDate Schedule date.
+     * @param boolean                  $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean                  $background   Send this message as background message
+     * @param boolean                  $clearDraft   Clears the draft field
+     * @param ?Cancellation            $cancellation Cancellation
+     */
+    public function replyRich(
+        string|array|RichMessage $message,
+        ParseMode $parseMode = ParseMode::MARKDOWN,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        ?Cancellation $cancellation = null
+    ): Message {
+        return $this->getClient()->sendRichMessage(
+            peer: $this->chatId,
+            message: $message,
+            parseMode: $parseMode,
+            media: $media,
+            rtl: $rtl,
+            noAutolink: $noAutolink,
+            replyToMsgId: $this->id,
+            topMsgId: $this->topicId === 1 ? null : $this->topicId,
+            replyMarkup: $replyMarkup,
+            sendAs: $sendAs,
+            scheduleDate: $scheduleDate,
+            silent: $silent,
+            noForwards: $noForwards,
+            background: $background,
+            clearDraft: $clearDraft,
+            cancellation: $cancellation,
+        );
+    }
     /**
      * Reply a document.
      *
@@ -791,6 +843,56 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         );
     }
 
+    /**
+     * Send a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to the chat of the message.
+     *
+     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param array|null               $replyMarkup  Keyboard information.
+     * @param integer|string|null      $sendAs       Peer to send the message as.
+     * @param integer|null             $scheduleDate Schedule date.
+     * @param boolean                  $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean                  $background   Send this message as background message
+     * @param boolean                  $clearDraft   Clears the draft field
+     * @param ?Cancellation            $cancellation Cancellation
+     */
+    public function sendRich(
+        string|array|RichMessage $message,
+        ParseMode $parseMode = ParseMode::MARKDOWN,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        ?Cancellation $cancellation = null
+    ): Message {
+        return $this->getClient()->sendRichMessage(
+            peer: $this->chatId,
+            message: $message,
+            parseMode: $parseMode,
+            media: $media,
+            rtl: $rtl,
+            noAutolink: $noAutolink,
+            topMsgId: $this->topicId === 1 ? null : $this->topicId,
+            replyMarkup: $replyMarkup,
+            sendAs: $sendAs,
+            scheduleDate: $scheduleDate,
+            silent: $silent,
+            noForwards: $noForwards,
+            background: $background,
+            clearDraft: $clearDraft,
+            cancellation: $cancellation,
+        );
+    }
     /**
      * Adds the user to the blacklist.
      *

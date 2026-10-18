@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\CompositeCancellation;
@@ -64,6 +65,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\Entities\TextWithEntities;
 use danog\MadelineProto\EventHandler\Message\GroupMessage;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Message\SecretMessage;
 use danog\MadelineProto\EventHandler\Message\Service\DialogBotAllowed;
 use danog\MadelineProto\EventHandler\Message\Service\DialogChannelCreated;
@@ -134,13 +136,16 @@ use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\EventHandler\Wallpaper;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResponseException;
+use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCError\MsgIdInvalidError;
@@ -149,6 +154,7 @@ use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tgcalls\PrivateCallController;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
 use danog\MadelineProto\VoIP\DiscardReason;
 use Revolt\EventLoop;
@@ -1010,6 +1016,212 @@ trait UpdateHandler
             $last = $new;
         }
         return $first;
+    }
+    /**
+     * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage): structured text made of blocks (headings, paragraphs, lists, tables, quotes, media, buttons and so on).
+     *
+     * The message can be passed as:
+     * - Markdown or HTML (depending on $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
+     * - A list of blocks, in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
+     * - A received RichMessage (`$message->richMessage`), to send it again.
+     * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
+     *
+     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`); files are uploaded as documents unless the type says otherwise.
+     *
+     * @param integer|string           $peer         Destination peer or username.
+     * @param string|array|RichMessage $message      Rich message to send
+     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID (1-64 characters among A-Z, a-z, 0-9, _ and -) to file, or a list of Bot API InputRichMessageMedia objects.
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param integer|null             $replyToMsgId ID of message to reply to.
+     * @param integer|null             $topMsgId     ID of thread where to send the message.
+     * @param array|null               $replyMarkup  Keyboard information.
+     * @param integer|string|null      $sendAs       Peer to send the message as.
+     * @param integer|null             $scheduleDate Schedule date.
+     * @param boolean                  $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean                  $background   Send this message as background message
+     * @param boolean                  $clearDraft   Clears the draft field
+     * @param ?Cancellation            $cancellation Cancellation
+     */
+    public function sendRichMessage(
+        int|string $peer,
+        string|array|RichMessage $message,
+        ParseMode $parseMode = ParseMode::MARKDOWN,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?int $replyToMsgId = null,
+        ?int $topMsgId = null,
+        ?array $replyMarkup = null,
+        int|string|null $sendAs = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        ?Cancellation $cancellation = null
+    ): Message {
+        $result = $this->methodCallAsyncRead(
+            'messages.sendMessage',
+            [
+                'peer' => $peer,
+                'message' => '',
+                'rich_message' => $this->toInputRichMessage(
+                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+                    $peer,
+                    cancellation: $cancellation,
+                ),
+                'reply_to' => $replyToMsgId !== null || $topMsgId !== null ? [
+                    '_' => 'inputReplyToMessage',
+                    'reply_to_msg_id' => $replyToMsgId,
+                    'top_msg_id' => $topMsgId,
+                ] : null,
+                'reply_markup' => $replyMarkup,
+                'send_as' => $sendAs,
+                'schedule_date' => $scheduleDate,
+                'silent' => $silent,
+                'noforwards' => $noForwards,
+                'background' => $background,
+                'clear_draft' => $clearDraft,
+                'cancellation' => $cancellation,
+            ]
+        );
+        return $this->wrapMessage($this->extractMessage($result));
+    }
+    /**
+     * Streams a partial [rich message](https://core.telegram.org/bots/api#sendrichmessagedraft) to a private chat while it is being generated (e.g. by an AI), see sendRichMessage for the supported formats.
+     *
+     * Call it again with the returned draft ID to update the draft, then send the complete message with sendRichMessage.
+     *
+     * Media must have already been uploaded (e.g. with uploadPhoto, uploadVideo, uploadDocument and so on).
+     *
+     * @param integer|string           $peer         Destination peer or username.
+     * @param string|array|RichMessage $message      Partial rich message
+     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file.
+     * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
+     * @param boolean                  $canStop      Whether the user can stop the generation of the message
+     * @param boolean                  $keepOnStop   Whether the draft should be kept if the user stops the generation
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param integer|null             $topMsgId     ID of thread where to send the draft.
+     * @param ?Cancellation            $cancellation Cancellation
+     *
+     * @return integer The draft ID, to pass to the next calls to update the draft.
+     */
+    public function sendRichMessageDraft(
+        int|string $peer,
+        string|array|RichMessage $message,
+        ParseMode $parseMode = ParseMode::MARKDOWN,
+        array $media = [],
+        ?int $draftId = null,
+        bool $canStop = false,
+        bool $keepOnStop = false,
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?int $topMsgId = null,
+        ?Cancellation $cancellation = null,
+    ): int {
+        $draftId ??= Tools::randomInt();
+        $this->methodCallAsyncRead(
+            'messages.setTyping',
+            [
+                'peer' => $peer,
+                'top_msg_id' => $topMsgId,
+                'action' => [
+                    '_' => 'inputSendMessageRichMessageDraftAction',
+                    'can_stop' => $canStop,
+                    'keep_on_stop' => $keepOnStop,
+                    'random_id' => $draftId,
+                    'rich_message' => $this->toInputRichMessage(
+                        InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+                        $peer,
+                        allowUploads: false,
+                        cancellation: $cancellation,
+                    ),
+                ],
+                'cancellation' => $cancellation,
+            ]
+        );
+        return $draftId;
+    }
+    /**
+     * Convert a rich message in Bot API format (or a received RichMessage) to an MTProto InputRichMessage, uploading its media if needed.
+     *
+     * @internal
+     *
+     * @param array|RichMessage   $message      Bot API InputRichMessage, received RichMessage, or MTProto InputRichMessage (returned as-is)
+     * @param integer|string|null $peer         Peer the rich message will be sent to, used to upload media
+     * @param boolean             $allowUploads Whether new files can be uploaded
+     */
+    public function toInputRichMessage(array|RichMessage $message, int|string|null $peer = null, bool $allowUploads = true, ?Cancellation $cancellation = null): array
+    {
+        return InputConverter::convert($message, function (string $type, mixed $media) use ($peer, $allowUploads, $cancellation): array {
+            $extra = [];
+            if (\is_array($media) && !isset($media['_'])) {
+                // Bot API InputMedia-like object
+                $extra = $media;
+                $media = $media['media'] ?? throw new Exception("The media of the $type must be specified");
+            }
+            if ($media === null) {
+                throw new Exception("The media of the $type must be specified");
+            }
+            if (\is_array($media) && \in_array($media['_'] ?? null, ['inputPhoto', 'inputDocument'], true)) {
+                return $media;
+            }
+            if (\is_string($media)) {
+                if (str_starts_with($media, 'attach://')) {
+                    throw new Exception("attach:// files aren't supported, pass a LocalFile, RemoteUrl or ReadableStream instead");
+                }
+                if (preg_match('~^https?://~i', $media)) {
+                    $media = new RemoteUrl($media);
+                }
+            }
+            if ($media instanceof LocalFile || $media instanceof RemoteUrl || $media instanceof ReadableStream) {
+                if (!$allowUploads) {
+                    throw new Exception("New files can't be uploaded with this method: upload them first with uploadPhoto, uploadVideo, uploadDocument and so on, and pass the returned Media objects");
+                }
+                $thumb = $extra['thumbnail'] ?? $extra['thumb'] ?? null;
+                if (\is_string($thumb) && preg_match('~^https?://~i', $thumb)) {
+                    $thumb = new RemoteUrl($thumb);
+                }
+                if (!($thumb instanceof LocalFile || $thumb instanceof RemoteUrl || $thumb instanceof ReadableStream)) {
+                    $thumb = null;
+                }
+                $duration = isset($extra['duration']) ? (int) $extra['duration'] : null;
+                $width = isset($extra['width']) ? (int) $extra['width'] : null;
+                $height = isset($extra['height']) ? (int) $extra['height'] : null;
+                $media = match ($type) {
+                    'photo', 'live_photo' => $this->uploadPhoto(file: $media, peer: $peer, cancellation: $cancellation),
+                    'video' => $this->uploadVideo(
+                        file: $media,
+                        thumb: $thumb,
+                        peer: $peer,
+                        supportsStreaming: (bool) ($extra['supports_streaming'] ?? true),
+                        duration: $duration,
+                        width: $width,
+                        height: $height,
+                        cancellation: $cancellation,
+                    ),
+                    'animation' => $this->uploadGif(file: $media, thumb: $thumb, peer: $peer, duration: $duration, width: $width, height: $height, cancellation: $cancellation),
+                    'audio' => $this->uploadAudio(
+                        file: $media,
+                        thumb: $thumb,
+                        peer: $peer,
+                        duration: $duration,
+                        title: isset($extra['title']) ? (string) $extra['title'] : null,
+                        performer: isset($extra['performer']) ? (string) $extra['performer'] : null,
+                        cancellation: $cancellation,
+                    ),
+                    'voice_note' => $this->uploadVoice(peer: $peer ?? 'me', file: $media, duration: $duration, cancellation: $cancellation),
+                    default => $this->uploadDocument(file: $media, thumb: $thumb, peer: $peer, cancellation: $cancellation),
+                };
+            }
+            $info = $this->getFileInfo($media);
+            return $info['InputPhoto'] ?? $info['InputDocument'] ?? throw new Exception("The specified $type can't be used in a rich message");
+        });
     }
     /**
      * Extract a message ID from an Updates constructor.
