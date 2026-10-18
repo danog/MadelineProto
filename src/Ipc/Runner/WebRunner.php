@@ -112,24 +112,50 @@ final class WebRunner extends RunnerAbstract
         return self::$absoluteRootDir = substr($rootDir, 0, \strlen($rootDir)-\strlen($uriDir)).DIRECTORY_SEPARATOR;
     }
 
+    /**
+     * Endpoints to send the request to: the port of the current request, with its own scheme, then the default
+     * port of each scheme (behind a reverse proxy, the port PHP sees may not be reachable).
+     *
+     * The port of the current request speaks only the scheme of the current request: TLS to a plain HTTP port
+     * (or plain HTTP to a TLS port) can't work.
+     *
+     * @internal
+     *
+     * @param array<string, mixed> $server $_SERVER
+     *
+     * @return list<array{'tcp'|'tls', int}>
+     */
+    public static function getEndpoints(array $server): array
+    {
+        $https = isset($server['HTTPS']) && $server['HTTPS'] !== '' && strtolower((string) $server['HTTPS']) !== 'off';
+        $endpoints = [[$https ? 'tls' : 'tcp', (int) ($server['SERVER_PORT'] ?? ($https ? 443 : 80))]];
+        foreach ($https ? [['tls', 443], ['tcp', 80]] : [['tcp', 80], ['tls', 443]] as $endpoint) {
+            if (!\in_array($endpoint, $endpoints, true)
+                // The port of the current request with the other scheme
+                && $endpoint[1] !== $endpoints[0][1]
+            ) {
+                $endpoints[] = $endpoint;
+            }
+        }
+        return $endpoints;
+    }
+
     public static function selfStart(string $uri): void
     {
         $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
 
-        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
-            foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
-                try {
-                    $address = $proto.'://'.$_SERVER['SERVER_NAME'];
-                    $res = fsockopen($address, (int) $port);
-                    Logger::log("Successfully connected to {$address}:{$port}!");
-                    Logger::log("Sending payload: $payload");
-                    // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
-                    // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-                    fwrite($res, $payload);
-                    self::$resources []= $res;
-                } catch (Throwable $e) {
-                    Logger::log("Error while sending to {$address}:{$port}: $e");
-                }
+        foreach (self::getEndpoints($_SERVER) as [$proto, $port]) {
+            try {
+                $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                $res = fsockopen($address, $port);
+                Logger::log("Successfully connected to {$address}:{$port}!");
+                Logger::log("Sending payload: $payload");
+                // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
+                // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
+                fwrite($res, $payload);
+                self::$resources []= $res;
+            } catch (Throwable $e) {
+                Logger::log("Error while sending to {$address}:{$port}: $e");
             }
         }
         if (!isset($res)) {
