@@ -124,6 +124,50 @@ final class Connection extends SettingsAbstract
     protected ?string $bindTo = null;
 
     /**
+     * Initial DC list, see setDcList().
+     */
+    protected array $dcList = [
+        'ipv4' => [
+            2 => [
+                'ip_address' => '149.154.167.51',
+                'port' => 443,
+                'tcpo_only' => false,
+            ],
+        ],
+        'ipv6' => [
+            2 => [
+                'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
+                'port' => 443,
+                'tcpo_only' => false,
+            ],
+        ],
+    ];
+    /**
+     * Initial test DC list, see setTestDcList().
+     */
+    protected array $testDcList = [
+        'ipv4' => [
+            10002 => [
+                'ip_address' => '149.154.167.40',
+                'port' => 443,
+                'tcpo_only' => false,
+            ],
+        ],
+        'ipv6' => [
+            10002 => [
+                'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
+                'port' => 443,
+                'tcpo_only' => false,
+            ],
+        ],
+    ];
+
+    /**
+     * Domain of the web servers for the https protocol and the TLS websocket transport.
+     */
+    protected string $sslDomain = 'web.telegram.org';
+
+    /**
      * Subdomains of web.telegram.org for https protocol.
      */
     protected array $sslSubdomains = [
@@ -248,6 +292,28 @@ final class Connection extends SettingsAbstract
     }
 
     /**
+     * Get the domain of the web servers for the https protocol and the TLS websocket transport.
+     */
+    public function getSslDomain(): string
+    {
+        return $this->sslDomain;
+    }
+
+    /**
+     * Set the domain of the web servers for the https protocol and the TLS websocket transport (web.telegram.org by default): DC N is reached at {subdomain of DC N}.{domain}, see setSslSubdomains().
+     *
+     * @param string $sslDomain Domain
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setSslDomain(string $sslDomain): self
+    {
+        $this->sslDomain = $sslDomain;
+
+        return $this;
+    }
+
+    /**
      * Get subdomains of web.telegram.org for https protocol.
      */
     public function getSslSubdomains(): array
@@ -257,6 +323,8 @@ final class Connection extends SettingsAbstract
 
     /**
      * Set subdomains of web.telegram.org for https protocol.
+     *
+     * An empty array disables the https protocol (also tried when the other connections fail, see setRetry()) and the TLS websocket transport: do that when connecting to a private server without web servers, see setDcList().
      *
      * @param array $sslSubdomains Subdomains of web.telegram.org for https protocol.
      *
@@ -588,6 +656,148 @@ final class Connection extends SettingsAbstract
         $this->bindTo = $bindTo;
 
         return $this;
+    }
+
+    /**
+     * Get the initial DC list.
+     *
+     * @return array{ipv4: array<int, array{ip_address: string, port: int, tcpo_only: bool}>, ipv6: array<int, array{ip_address: string, port: int, tcpo_only: bool}>}
+     */
+    public function getDcList(): array
+    {
+        return $this->dcList;
+    }
+
+    /**
+     * Set the initial DC list: the addresses MadelineProto connects to before getting the full DC list from the server (help.getConfig), which replaces it.
+     *
+     * Use it, along with setRsaKeys(), to connect to a private server (a teamgram-server deployment, for example): the DC list returned by its help.getConfig is then used.
+     * Also call setSslSubdomains([]) (or point setSslDomain() to its web servers), otherwise the https fallback connects to Telegram's web servers.
+     *
+     * The DC list is stored in the session: when this setting changes, the stored DC list is reset to it on the next start.
+     * The authorization keys of the session are kept, so use a new session to switch to another server.
+     *
+     * Format, by IP version and DC ID (negative for media DCs):
+     *
+     * ```php
+     * [
+     *     'ipv4' => [
+     *         2 => ['ip_address' => '192.0.2.1', 'port' => 443],
+     *     ],
+     *     'ipv6' => [
+     *         2 => ['ip_address' => '2001:db8::1', 'port' => 443],
+     *     ],
+     * ]
+     * ```
+     *
+     * The ipv6 list may be omitted (then don't enable setIpv6()), and each DC may also specify `'tcpo_only' => true` to only connect with the obfuscated protocol.
+     * The IPv4 addresses may also be hostnames.
+     * Before logging in, MadelineProto uses the first DC of the list (of the IP version chosen with setIpv6()).
+     *
+     * @param array<'ipv4'|'ipv6', array<int, array{ip_address: string, port: int, tcpo_only?: bool}>> $dcList DC list, the DC IDs must be between 1 and 10000.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setDcList(array $dcList): self
+    {
+        $this->dcList = self::normalizeDcList($dcList, false);
+
+        return $this;
+    }
+
+    /**
+     * Get the initial test DC list.
+     *
+     * @return array{ipv4: array<int, array{ip_address: string, port: int, tcpo_only: bool}>, ipv6: array<int, array{ip_address: string, port: int, tcpo_only: bool}>}
+     */
+    public function getTestDcList(): array
+    {
+        return $this->testDcList;
+    }
+
+    /**
+     * Set the initial test DC list, used in test mode (see setTestMode()), in the format of setDcList().
+     *
+     * MadelineProto numbers the test DCs from 10001 (DC 2 is 10002): in test mode, it adds 10000 to the IDs of the DCs returned by help.getConfig.
+     *
+     * @param array<'ipv4'|'ipv6', array<int, array{ip_address: string, port: int, tcpo_only?: bool}>> $testDcList Test DC list, the DC IDs must be above 10000.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setTestDcList(array $testDcList): self
+    {
+        $this->testDcList = self::normalizeDcList($testDcList, true);
+
+        return $this;
+    }
+
+    /**
+     * Get the ID of the DC used before logging in: the first one of the initial DC list of the current mode.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getDefaultDcId(): int
+    {
+        $list = $this->testMode ? $this->testDcList : $this->dcList;
+        [$preferred, $other] = $this->ipv6 ? ['ipv6', 'ipv4'] : ['ipv4', 'ipv6'];
+        return array_key_first($list[$preferred] ?: $list[$other]);
+    }
+
+    /**
+     * Validate a DC list, adding the default values.
+     *
+     * @psalm-pure
+     */
+    private static function normalizeDcList(array $dcList, bool $test): array
+    {
+        $kind = $test ? 'test DC list' : 'DC list';
+        if ($unknown = array_diff(array_keys($dcList), ['ipv4', 'ipv6'])) {
+            throw new Exception("Unknown keys in the $kind: ".implode(', ', $unknown).', only ipv4 and ipv6 are allowed!');
+        }
+        $result = [];
+        foreach (['ipv4', 'ipv6'] as $version) {
+            $result[$version] = [];
+            if (!\is_array($dcList[$version] ?? [])) {
+                throw new Exception("The $version list of the $kind must be an array!");
+            }
+            foreach ($dcList[$version] ?? [] as $id => $dc) {
+                if (!\is_int($id) || $id === 0 || ($test ? abs($id) <= 10000 : abs($id) > 10000)) {
+                    throw new Exception("Invalid DC ID $id in the $version list of the $kind: ".($test ? 'test DC IDs must be above 10000 (below -10000 for media DCs)' : 'DC IDs must be between 1 and 10000 (-1 and -10000 for media DCs)').'!');
+                }
+                if (!\is_array($dc)) {
+                    throw new Exception("DC $id of the $version list of the $kind must be an array!");
+                }
+                if ($unknown = array_diff(array_keys($dc), ['ip_address', 'port', 'tcpo_only'])) {
+                    throw new Exception("Unknown keys for DC $id of the $version list of the $kind: ".implode(', ', $unknown).', only ip_address, port and tcpo_only are allowed!');
+                }
+                $address = $dc['ip_address'] ?? null;
+                if (!\is_string($address) || !($version === 'ipv6'
+                    ? filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
+                    : filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) || filter_var($address, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME))
+                ) {
+                    throw new Exception("Invalid ip_address for DC $id of the $version list of the $kind: expected ".($version === 'ipv6' ? 'an IPv6 address' : 'an IPv4 address or a hostname').'!');
+                }
+                $port = $dc['port'] ?? null;
+                if (!\is_int($port) || $port < 1 || $port > 65535) {
+                    throw new Exception("Invalid port for DC $id of the $version list of the $kind!");
+                }
+                $tcpoOnly = $dc['tcpo_only'] ?? false;
+                if (!\is_bool($tcpoOnly)) {
+                    throw new Exception("Invalid tcpo_only for DC $id of the $version list of the $kind: expected a boolean!");
+                }
+                $result[$version][$id] = [
+                    'ip_address' => $address,
+                    'port' => $port,
+                    'tcpo_only' => $tcpoOnly,
+                ];
+            }
+        }
+        if (!$result['ipv4'] && !$result['ipv6']) {
+            throw new Exception("The $kind must contain at least one DC!");
+        }
+        return $result;
     }
 
     /**

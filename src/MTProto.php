@@ -374,56 +374,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private Snitch $snitch;
 
     /**
-     * DC list.
+     * DC list, by mode (test/main), IP version and DC ID: the initial DC list settings, replaced by the one returned by help.getConfig.
      */
-    public array $dcList = [
-        'test' => [
-            // Test datacenters
-            'ipv4' => [
-                // ipv4 addresses
-                10002 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.40',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-            'ipv6' => [
-                // ipv6 addresses
-                10002 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000e',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-        ],
-        'main' => [
-            // Main datacenters
-            'ipv4' => [
-                // ipv4 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '149.154.167.51',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-            'ipv6' => [
-                // ipv6 addresses
-                2 => [
-                    // The rest will be fetched using help.getConfig
-                    'ip_address' => '2001:067c:04e8:f002:0000:0000:0000:000a',
-                    'port' => 443,
-                    'media_only' => false,
-                    'tcpo_only' => false,
-                ],
-            ],
-        ],
-    ];
+    public array $dcList = [];
+    /**
+     * The initial DC list settings $dcList was last reset to, see resetDcList().
+     */
+    private ?array $initialDcList = null;
 
     /**
      * Nullcache array for storing main session file to DB.
@@ -745,6 +702,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $key = RSA::load($this->TL, $key);
             $this->testRsaKeys[$key->fp] = $key;
         }
+        $this->resetDcList();
         // (re)-initialize TL
         $callbacks = [$this, $this->peerDatabase];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -755,11 +713,28 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         $this->TL->init($this->settings->getSchema(), $callbacks);
         $this->startLoops();
-        $this->datacenter->currentDatacenter = $this->settings->getConnection()->getTestMode() ? 10002 : 2;
+        $this->datacenter->currentDatacenter = $this->settings->getConnection()->getDefaultDcId();
         $this->getConfig();
         $this->v = API::RELEASE;
 
         $this->settings->applyChanges();
+    }
+    /**
+     * Reset the DC list to the initial DC list settings, if they changed since it was last reset to them (or it never was: a new session).
+     *
+     * The DC list is stored in the session, where help.getConfig then replaces it: without this, a change to the
+     * settings would never reach an existing session.
+     */
+    private function resetDcList(): void
+    {
+        $connection = $this->settings->getConnection();
+        $initial = ['test' => $connection->getTestDcList(), 'main' => $connection->getDcList()];
+        if ($this->initialDcList === $initial) {
+            return;
+        }
+        $this->dcList = $this->initialDcList = $initial;
+        // Fetch the DC list of the (possibly different) servers again, instead of keeping using the initial one until the config expires
+        $this->config = ['expires' => -1];
     }
     /**
      * Get API wrapper.
@@ -857,6 +832,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'settings',
             'config',
             'dcList',
+            'initialDcList',
 
             // Authorization keys
             'datacenter',
