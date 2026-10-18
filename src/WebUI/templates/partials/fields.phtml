@@ -1,0 +1,63 @@
+<?php
+/**
+ * The fields of a form.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+use danog\MadelineProto\WebUI\FieldType;
+
+?>
+<?php foreach ($page->fields as $field): ?>
+    <?php
+    $id = 'f-'.preg_replace('/[^a-z0-9_-]/i', '-', $field->name);
+    $showWhen = $field->showWhen === null ? null : $field->showWhen[0].'='.$field->showWhen[1];
+    $hintId = $field->hint !== '' ? "$id-hint" : null;
+    ?>
+    <?php if ($field->type === FieldType::HIDDEN): ?>
+        <input type="hidden"<?= $this->attrs(['name' => $field->name, 'value' => $field->value]) ?>>
+    <?php elseif ($field->type === FieldType::CHOICE): ?>
+        <fieldset class="field choice"<?= $this->attrs(['data-show-when' => $showWhen]) ?>>
+            <legend><?= $this->e($field->label) ?></legend>
+            <div class="segmented">
+                <?php foreach ($field->options as $value => $label): ?>
+                    <label class="segment">
+                        <input type="radio"<?= $this->attrs([
+                            'name' => $field->name,
+                            'value' => (string) $value,
+                            'checked' => (string) $value === $field->value,
+                            'required' => $field->required,
+                        ]) ?>>
+                        <span><?= $this->e($label) ?></span>
+                    </label>
+                <?php endforeach ?>
+            </div>
+            <?php if ($hintId !== null): ?>
+                <p class="hint"><?= $this->e($field->hint) ?></p>
+            <?php endif ?>
+        </fieldset>
+    <?php else: ?>
+        <div class="field is-<?= $field->type->value ?>"<?= $this->attrs(['data-show-when' => $showWhen]) ?>>
+            <label for="<?= $this->e($id) ?>">
+                <?= $this->e($field->label) ?>
+                <?php if (!$field->required): ?>
+                    <span class="optional"><?= $this->t('webOptional') ?></span>
+                <?php endif ?>
+            </label>
+            <?php $attrs = $field->getInputAttributes($id) + ['aria-describedby' => $hintId] ?>
+            <?php if ($field->type === FieldType::TEXTAREA): ?>
+                <textarea rows="3"<?= $this->attrs($attrs) ?>><?= $this->e($field->value) ?></textarea>
+            <?php elseif ($field->type === FieldType::PASSWORD): ?>
+                <div class="reveal">
+                    <input<?= $this->attrs($attrs + ['value' => $field->value]) ?>>
+                    <button type="button" class="reveal-toggle" data-reveal="<?= $this->e($id) ?>" data-show-label="<?= $this->t('webShowPassword') ?>" data-hide-label="<?= $this->t('webHidePassword') ?>" hidden><?= $this->t('webShowPassword') ?></button>
+                </div>
+            <?php else: ?>
+                <input<?= $this->attrs($attrs + ['value' => $field->value]) ?>>
+            <?php endif ?>
+            <?php if ($hintId !== null): ?>
+                <p class="hint" id="<?= $this->e($hintId) ?>"><?= $this->e($field->hint) ?></p>
+            <?php endif ?>
+        </div>
+    <?php endif ?>
+<?php endforeach ?>

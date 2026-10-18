@@ -1,0 +1,164 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "sass:list";
+@use "sass:map";
+@use "sass:meta";
+
+// Interface animations have three levels (`liteMode.getAnimationLevel()`):
+// 0 — off; 1 — reduced: control feedback, fades and growth in place, nothing
+// travels; 2 — full.
+// The body carries `animation-level-0` when they are off, and otherwise every
+// level up to the current one (`animation-level-1`, plus `animation-level-2` at
+// full), so a level reads as "this one and up":
+//   animation-level(1) — reduced and full: fades, colours, control feedback,
+//     something growing or shrinking where it stands;
+//   animation-level(2) — full only: movement — transforms, positions;
+//   animation-level(0) — off only;
+//   animation-level-below(2) — off and reduced: where full-level movement has
+//     to be switched off;
+//   animation-level-only(1) — reduced alone, for a rule that would otherwise
+//     outweigh the one the off level has.
+// A transition that both moves and fades is written once, with
+// `animation-level-transition`: reduced gets what of it does not move.
+@mixin animation-level($level: 2) {
+  body.animation-level-#{$level} & {
+    @content;
+  }
+}
+
+@mixin animation-level-global($level: 2) {
+  :global(body.animation-level-#{$level}) & {
+    @content;
+  }
+}
+
+@mixin animation-level-below($level: 2) {
+  body:not(.animation-level-#{$level}) & {
+    @content;
+  }
+}
+
+@mixin animation-level-below-global($level: 2) {
+  :global(body:not(.animation-level-#{$level})) & {
+    @content;
+  }
+}
+
+@mixin animation-level-only($level) {
+  @if $level == 1 {
+    body.animation-level-1:not(.animation-level-2) & {
+      @content;
+    }
+  } @else {
+    body.animation-level-#{$level} & {
+      @content;
+    }
+  }
+}
+
+// what a transition may keep with reduced animations: what fades or recolours, and the size
+// of what grows or shrinks where it stands - a fade at a size that changes at once opens a
+// hole before it, or leaves one after. Anything else - a transform, a position, a padding
+// or a font size (they carry text along), `all`, a list that names no property - moves,
+// and changes at once there
+$animation-level-reduced: opacity visibility color background-color background border-color
+  border-top-color border-right-color border-bottom-color border-left-color outline-color
+  box-shadow fill stroke stroke-dasharray stroke-width filter backdrop-filter font-weight
+  width height min-width min-height max-width max-height flex-basis grid-template-rows
+  grid-template-columns margin margin-top margin-right margin-bottom margin-left margin-block
+  margin-inline margin-block-start margin-block-end margin-inline-start margin-inline-end;
+
+@function -animation-level-reduced($transitions) {
+  $kept: ();
+  @each $transition in $transitions {
+    $keeps: false;
+    @each $part in $transition {
+      @if meta.type-of($part) == 'string' and list.index($animation-level-reduced, $part) {
+        $keeps: true;
+      }
+    }
+
+    @if $keeps {
+      $kept: list.append($kept, $transition, $separator: comma);
+    }
+  }
+
+  @return $kept;
+}
+
+@mixin -animation-level-at($level, $global) {
+  @if $global {
+    @include animation-level-global($level) {
+      @content;
+    }
+  } @else {
+    @include animation-level($level) {
+      @content;
+    }
+  }
+}
+
+@mixin -transition($transitions, $important) {
+  @if $important {
+    transition: $transitions !important;
+  } @else {
+    transition: $transitions;
+  }
+}
+
+// One transition list for both levels that animate: full gets the whole of it,
+// reduced the part that does not move (nothing, if all of it moves). Keywords:
+// `$important`, and `$global` inside a CSS module.
+@mixin animation-level-transition($transitions...) {
+  $options: meta.keywords($transitions);
+  $important: map.get($options, 'important') == true;
+  $global: map.get($options, 'global') == true;
+  $kept: -animation-level-reduced($transitions);
+
+  @if list.length($kept) == list.length($transitions) {
+    @include -animation-level-at(1, $global) {
+      @include -transition($transitions, $important);
+    }
+  } @else {
+    @if list.length($kept) > 0 {
+      @include -animation-level-at(1, $global) {
+        @include -transition($kept, $important);
+      }
+    }
+
+    @include -animation-level-at(2, $global) {
+      @include -transition($transitions, $important);
+    }
+  }
+}
+
+// an icon swapped in or out of a button: it pops with full animations and fades with reduced ones
+@mixin -animation-level-icon($fade, $pop, $important) {
+  @include animation-level(1) {
+    @if $important {
+      animation: $fade .2s forwards ease-in-out !important;
+    } @else {
+      animation: $fade .2s forwards ease-in-out;
+    }
+  }
+
+  @include animation-level(2) {
+    @if $important {
+      animation: $pop .4s forwards ease-in-out !important;
+    } @else {
+      animation: $pop .4s forwards ease-in-out;
+    }
+  }
+}
+
+@mixin animation-level-icon-in($important: false) {
+  @include -animation-level-icon(fade-in-opacity, grow-icon, $important);
+}
+
+@mixin animation-level-icon-out($important: false) {
+  @include -animation-level-icon(fade-out-opacity, hide-icon, $important);
+}

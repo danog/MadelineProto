@@ -77,6 +77,10 @@ final class SessionPaths
      */
     private string $ipcStatePath;
     /**
+     * Web API ID setup state path.
+     */
+    private string $apiSetupStatePath;
+    /**
      * Light state path.
      */
     private string $lightStatePath;
@@ -100,6 +104,7 @@ final class SessionPaths
         $this->ipcPath = $session.DIRECTORY_SEPARATOR."ipc";
         $this->ipcCallbackPath = $session.DIRECTORY_SEPARATOR."callback.ipc";
         $this->ipcStatePath = $session.DIRECTORY_SEPARATOR."ipcState.php";
+        $this->apiSetupStatePath = $session.DIRECTORY_SEPARATOR."apiSetupState.php";
         if (!exists($session)) {
             createDirectory($session);
         }
@@ -342,5 +347,39 @@ final class SessionPaths
     public function getIpcCallbackPath(): string
     {
         return $this->ipcCallbackPath;
+    }
+
+    /**
+     * How long the state of the web API ID setup is kept, in seconds.
+     */
+    private const API_SETUP_STATE_TTL = 600;
+
+    /**
+     * Get the state of the web API ID setup (the my.telegram.org login), kept between requests.
+     *
+     * The state holds the cookies of the my.telegram.org login, and anyone opening the page can continue the
+     * setup: it expires after a few minutes, rather than staying in an abandoned session directory.
+     */
+    public function getApiSetupState(): ?MyTelegramOrgWrapper
+    {
+        clearstatcache(true, $this->apiSetupStatePath);
+        if (exists($this->apiSetupStatePath) && time() - (int) filemtime($this->apiSetupStatePath) > self::API_SETUP_STATE_TTL) {
+            $this->storeApiSetupState(null);
+            return null;
+        }
+        $state = $this->unserialize($this->apiSetupStatePath);
+        return $state instanceof MyTelegramOrgWrapper ? $state : null;
+    }
+
+    /**
+     * Store the state of the web API ID setup, or delete it.
+     */
+    public function storeApiSetupState(?MyTelegramOrgWrapper $state): void
+    {
+        if ($state !== null) {
+            $this->serialize($state, $this->apiSetupStatePath);
+        } elseif (exists($this->apiSetupStatePath)) {
+            deleteFile($this->apiSetupStatePath);
+        }
     }
 }

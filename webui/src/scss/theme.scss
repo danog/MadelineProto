@@ -1,0 +1,89 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * The day and night palettes of tweb's themeController (`colorMap`), as static CSS: tweb derives the
+ * accent's variants at runtime (`applyAppColor`), here Sass derives them once, the same way. The accent
+ * is the only thing changed: MadelineProto's purple instead of Telegram blue.
+ */
+
+@use "sass:color";
+@use "sass:math";
+@use "sass:string";
+
+// * The accent, defined once: every variant below is derived from it
+$accent-day: #5546d6;
+$accent-night: #8f84ff;
+
+@function -rgb($color) {
+  @return math.round(color.channel($color, "red", $space: rgb)) + ", " +
+    math.round(color.channel($color, "green", $space: rgb)) + ", " +
+    math.round(color.channel($color, "blue", $space: rgb));
+}
+
+// `applyAppColor`: the color, its rgb triplet, a translucent and an opaque light variant (alpha .08 over
+// the surface) and a dark one (lightness -8%)
+@mixin app-color($name, $color, $surface, $rgb: false, $light: false, $light-filled: false, $dark: false) {
+  --#{$name}: #{$color};
+  @if $rgb {
+    --#{$name}-rgb: #{string.unquote(-rgb($color))};
+  }
+  @if $light {
+    --light-#{$name}: #{rgba($color, .08)};
+  }
+  @if $light-filled {
+    --light-filled-#{$name}: #{color.mix($color, $surface, 8%)};
+  }
+  @if $dark {
+    --dark-#{$name}: #{color.adjust($color, $lightness: -8%, $space: hsl)};
+  }
+}
+
+@mixin palette($accent, $surface, $danger, $primary-text, $secondary-text, $background, $border, $secondary) {
+  @include app-color(primary-color, $accent, $surface, $rgb: true, $light: true, $light-filled: true, $dark: true);
+  --primary-button-color: #{$accent};
+  @include app-color(surface-color, $surface, $surface, $rgb: true);
+  @include app-color(danger-color, $danger, $surface, $rgb: true, $light: true);
+  --danger-button-color: #{$danger};
+  @include app-color(primary-text-color, $primary-text, $surface, $rgb: true);
+  @include app-color(secondary-text-color, $secondary-text, $surface, $rgb: true, $light: true, $light-filled: true);
+  --secondary-button-color: #{$secondary-text};
+  @include app-color(background-color, $background, $surface, $rgb: true);
+  @include app-color(body-background-color, $background, $surface, $rgb: true);
+  --border-color: #{$border};
+  --secondary-color: #{$secondary};
+  --link-color: #{$accent};
+  // the corner buttons (`service-plate`): a translucent plate of the accent
+  --message-highlighting-color: #{rgba($accent, .32)};
+  --message-highlighting-color-rgb: #{string.unquote(-rgb($accent))};
+  --message-highlighting-alpha: .32;
+}
+
+:root {
+  @include palette(
+    $accent: $accent-day,
+    $surface: #ffffff,
+    $danger: #df3f40,
+    $primary-text: #000000,
+    $secondary-text: #707579,
+    $background: #f4f4f5,
+    $border: #dfe1e5,
+    $secondary: #c4c9cc
+  );
+  color-scheme: light;
+}
+
+.night {
+  @include palette(
+    $accent: $accent-night,
+    $surface: #212121,
+    $danger: #ff595a,
+    $primary-text: #ffffff,
+    $secondary-text: #aaaaaa,
+    $background: #181818,
+    $border: #0f0f0f,
+    $secondary: #707579
+  );
+  color-scheme: dark;
+}

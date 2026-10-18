@@ -1,0 +1,131 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+// The block owns the rhythm between its own pieces, so the pieces themselves declare no
+// vertical margins — a caller is then free to set any margin on any of them without racing
+// this module's declarations through CSS-module load order.
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  // often a centred flex item, where `fit-content` would let long copy push past the popup
+  max-width: 100%;
+}
+
+.alignStart {
+  align-items: flex-start;
+
+  .title,
+  .subtitle {
+    text-align: start;
+    text-wrap: initial;
+  }
+}
+
+.onBackdrop {
+  position: relative;
+  color: #fff;
+
+  // positioned, so the copy paints in the same phase as the backdrop and, coming later
+  // in document order, above it
+  .sticker,
+  .title,
+  .subtitle {
+    position: relative;
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, .8);
+  }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  // its own stacking context, so what the child paints (a gift's pattern canvas lifts
+  // itself with a z-index) stays trapped below the copy instead of covering it
+  z-index: 0;
+  // it is this element that clips the painting — a gift's halo is absolute and would
+  // otherwise escape a static child's own `overflow: hidden`
+  overflow: hidden;
+  // one stretched cell, so a painted child fills the header whether or not it positions itself
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.marginTop {
+  margin-top: 1.5rem;
+}
+
+.marginBottom {
+  margin-bottom: 1rem;
+}
+
+.title,
+.subtitle {
+  padding-inline: 1rem;
+  text-align: center;
+  text-wrap: balance;
+  word-break: break-word;
+}
+
+.title {
+  margin-block: 0;
+  font-size: var(--font-size-24);
+  line-height: var(--line-height-24);
+  font-weight: var(--font-weight-bold);
+
+  &.title20 {
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-20);
+  }
+}
+
+.subtitle {
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-16);
+  // a line break belongs to the translated copy, never to the markup; other whitespace collapses
+  white-space: pre-line;
+
+  &.secondary {
+    color: var(--secondary-text-color);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-14);
+  }
+
+  &.danger {
+    color: var(--danger-color);
+  }
+}
+
+.sticker {
+  --sticker-size: 130px;
+  position: relative;
+  margin-inline: auto;
+  width: var(--sticker-size);
+  height: var(--sticker-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // an illustration handed in as a bare `<img>` has its own intrinsic size; the slot is what sizes it
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.lottie {
+  width: var(--size);
+  height: var(--size);
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+}

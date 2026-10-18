@@ -101,6 +101,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: tests/test.sh cs
 
+  # Not in the container: it has no Node.js, the runner has.
+  webui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the web UI, and check that its committed bundle is up to date
+        run: tests/webui.sh
+
   # The whole test suite, with the secrets: for pushes.
   test:
     needs: docker-merge
@@ -271,7 +282,7 @@ jobs:
 
   release:
     # Once every test passed. Either test or test_light is skipped.
-    needs: [cs, test, test_light, handshake, build]
+    needs: [cs, webui, test, test_light, handshake, build]
     if: ${{ !failure() && !cancelled() && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:

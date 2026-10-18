@@ -1,0 +1,34 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "sass:color";
+@use "../variables" as *;
+
+@mixin splitColor($property, $color, $light: true, $dark: true, $light-filled: false, $dark-filled: false, $rgb: false, $alpha: $hover-alpha) {
+  --#{$property}: #{$color};
+
+  $lightened: hover-color($color);
+  @if $light != false {
+    --light-#{$property}: #{$lightened};
+  }
+
+  @if $light-filled != false {
+    --light-filled-#{$property}: #{rgba-to-rgb($lightened, $light-filled)};
+  }
+
+  $darkened: color.adjust($color, $lightness: -$alpha * 100%);
+  @if $dark != false {
+    --dark-#{$property}: #{$darkened};
+  }
+
+  @if $dark-filled != false {
+    --dark-filled-#{$property}: #{rgba-to-rgb($darkened, $dark-filled)};
+  }
+
+  @if $rgb != false {
+    --#{$property}-rgb: #{color.channel($color, "red")}, #{color.channel($color, "green")}, #{color.channel($color, "blue")};
+  }
+}

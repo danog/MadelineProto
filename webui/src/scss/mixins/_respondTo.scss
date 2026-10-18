@@ -1,0 +1,39 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../variables" as *;
+
+@mixin respond-to($media) {
+  @if $media == handhelds {
+    @media only screen and (max-width: $small-screen) { @content; }
+    //@media only screen and (orientation: landscape) and (max-device-width: 896px) { @content; } // iPhone 11 Pro Max
+  } @else if $media == small-screens {
+    @media only screen and (min-width: $small-screen + 1) { @content; }
+  } @else if $media == large-screens {
+    @media only screen and (min-width: $large-screen + 1) { @content; }
+  } @else if $media == not-handhelds {
+    @media only screen and (min-width: $small-screen + 1) { @content; }
+  } @else if $media == not-large-screens {
+    @media only screen and (max-width: $large-screen) { @content; }
+  }
+
+  @else if $media == floating-left-sidebar {
+    @media only screen and (min-width: $small-screen + 1) and (max-width: $floating-left-sidebar) { @content; }
+  } @else if $media == until-floating-left-sidebar {
+    @media only screen and (max-width: $floating-left-sidebar) { @content; }
+  } @else if $media == no-floating-left-sidebar {
+    @media only screen and (min-width: $floating-left-sidebar + 1) { @content; }
+  }
+  // The right-sidebar `floats` threshold is dynamic (varies with the
+  // current left/right column widths and the folders-sidebar toggle), so
+  // it lives in JS as `body.right-column-floats`. Style rules that need
+  // it should select `body.right-column-floats &` / `body:not(.right-column-floats) &`
+  // instead of an @media query.
+
+  @else if $media == esg-top { // topbar + chat input + margin bottom + height of ESG 
+    @media only screen and (min-height: 570px) and (min-width: $small-screen + 1) { @content; }
+  }
+}

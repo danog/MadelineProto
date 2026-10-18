@@ -1,0 +1,115 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@mixin hover($color: null, $property: null, $use-transition: false) {
+  @if $color {
+    @if $color == filled-gray {
+      $color: var(--light-filled-secondary-text-color);
+    } @else if $color == gray {
+      $color: var(--light-secondary-text-color);
+    } @else if $color == blue or $color == primary {
+      $color: var(--light-primary-color);
+    } @else if $color == red {
+      $color: var(--light-danger-color);
+    }
+  }
+
+  html.no-touch &:hover,
+  html.no-touch &:active {
+    @if $property != null {
+      @if $use-transition {
+        transition: .2s #{$property};
+      }
+
+      #{$property}: $color;
+    }
+
+
+    @content;
+  }
+}
+
+@mixin hover-global($color: null, $property: null, $use-transition: false, $night: false) {
+  @if $color {
+    @if $color == filled-gray {
+      $color: var(--light-filled-secondary-text-color);
+    } @else if $color == gray {
+      $color: var(--light-secondary-text-color);
+    } @else if $color == blue or $color == primary {
+      $color: var(--light-primary-color);
+    } @else if $color == red {
+      $color: var(--light-danger-color);
+    }
+  }
+
+  @if $night {
+    :global(html.no-touch.night) &:hover,
+    :global(html.no-touch.night) &:active,
+    :global(html.no-touch) :global(.night) &:hover,
+    :global(html.no-touch) :global(.night) &:active {
+      @if $property != null {
+        @if $use-transition {
+          transition: .2s #{$property};
+        }
+
+        #{$property}: $color;
+      }
+
+
+      @content;
+    }
+  } @else {
+    :global(html.no-touch) &:hover,
+    :global(html.no-touch) &:active {
+      @if $property != null {
+        @if $use-transition {
+          transition: .2s #{$property};
+        }
+
+        #{$property}: $color;
+      }
+
+
+      @content;
+    }
+  }
+}
+
+@mixin hover-effect($color: gray, $use-transition: false) {
+  @include hover($color, color, $use-transition) {
+    @content;
+  }
+}
+
+@mixin hover-background-effect($color: gray, $use-transition: false) {
+  @include hover($color, background-color, $use-transition) {
+    @content;
+  }
+}
+
+@mixin btn-hoverable {
+  @include hover-background-effect();
+
+  &.primary,
+  &.blue,
+  &.active {
+    @include hover-background-effect(primary);
+  }
+
+  &.danger {
+    @include hover-background-effect(red);
+  }
+}
+
+// An `.active` icon button that must not go primary: it keeps the plain text color and marks itself
+// with the gray plate `.btn-menu-toggle.menu-open` uses, plus the plain gray hover instead of the
+// primary tint `btn-hoverable` gives anything `.active`.
+@mixin btn-icon-active-plate {
+  color: var(--primary-text-color);
+  background-color: var(--light-secondary-text-color);
+
+  @include hover-background-effect();
+}

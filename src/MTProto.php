@@ -84,6 +84,13 @@ use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\WebUI\Alert;
+use danog\MadelineProto\WebUI\AlertLevel;
+use danog\MadelineProto\WebUI\Page;
+use danog\MadelineProto\WebUI\SafeHtml;
+use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\TemplateEngine;
+use danog\MadelineProto\WebUI\WebUI;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -1824,6 +1831,32 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $hint;
     }
     /**
+     * Get what the web UI shows about the login in progress: the phone number, and the kind of code sent.
+     *
+     * Never the phone code hash, nor the code.
+     *
+     * @internal
+     *
+     * @return array{phoneNumber?: string, sentCode?: array{type: string, length: ?int, nextType: ?string, timeout: ?int}}
+     */
+    public function getWebLoginInfo(): array
+    {
+        $state = $this->loginState->getState()->state;
+        $info = [];
+        if (($state === API::WAITING_CODE || $state === API::WAITING_SIGNUP) && \is_string($this->authorization['phone_number'] ?? null)) {
+            $info['phoneNumber'] = $this->authorization['phone_number'];
+        }
+        if ($state === API::WAITING_CODE && \is_string($this->authorization['type']['_'] ?? null)) {
+            $info['sentCode'] = [
+                'type' => $this->authorization['type']['_'],
+                'length' => isset($this->authorization['type']['length']) ? (int) $this->authorization['type']['length'] : null,
+                'nextType' => $this->authorization['next_type']['_'] ?? null,
+                'timeout' => isset($this->authorization['timeout']) ? (int) $this->authorization['timeout'] : null,
+            ];
+        }
+        return $info;
+    }
+    /**
      * IDs of peers where to report errors.
      *
      * @var list<int>
@@ -1867,62 +1900,78 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         Logger::log($message);
 
-        $warning = $this->getWebWarnings();
+        $page = new Page(
+            title: $message,
+            view: 'status',
+            step: Step::DONE,
+            alerts: self::getWebAlerts(),
+        );
         if ($this->hasEventHandler()) {
+            $page->lead = Lang::$current_lang['webDoneLead'];
             if (!$this->hasReportPeers()) {
                 Logger::log('!!! '.Lang::$current_lang['noReportPeers'].' !!!', Logger::FATAL_ERROR);
                 Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
-                $warning .= "<h2 style='color:red;'>".htmlentities(Lang::$current_lang['noReportPeers'])."</h2>";
-                $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+                $page->addAlert(new Alert(
+                    AlertLevel::ERROR,
+                    Lang::$current_lang['noReportPeers'],
+                    code: "public function getReportPeers() { return '@yourtelegramusername'; }",
+                ));
             }
+            $classes = [];
             if ($this->event_handler_instance instanceof EventHandler) {
-                $issues = Tools::validateEventHandlerClass($this->event_handler_instance::class);
-                foreach ($issues as $issue) {
-                    $issue->log();
-                    $warning .= $issue->getHTML();
-                }
+                $classes[] = $this->event_handler_instance::class;
             }
             foreach ($this->pluginInstances as $class => $_) {
-                $issues = Tools::validateEventHandlerClass($class);
-                foreach ($issues as $issue) {
+                $classes[] = $class;
+            }
+            foreach ($classes as $class) {
+                foreach (Tools::validateEventHandlerClass($class) as $issue) {
                     $issue->log();
-                    $warning .= $issue->getHTML();
+                    $page->addAlert($issue->getAlert());
                 }
             }
         }
 
-        return "<html><body><h1>$message</h1>$warning</body></html>";
+        return WebUI::render($this->settings->getTemplates(), $page);
+    }
+    /**
+     * Get various warnings to show to the user in the web UI, as alerts.
+     *
+     * @internal
+     *
+     * @return list<Alert>
+     */
+    public static function getWebAlerts(): array
+    {
+        Magic::start(light: false);
+        $alerts = [];
+        if (API::RELEASE !== Magic::$latest_release) {
+            $alerts[] = Alert::error(sprintf(
+                Lang::$current_lang['update_madelineproto'],
+                API::RELEASE,
+                Magic::$latest_release,
+            ));
+        }
+        if (!Magic::$hasOpenssl) {
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
+        }
+        if (!\extension_loaded('gmp')) {
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
+        }
+        if (!\extension_loaded('uv')) {
+            $alerts[] = Alert::info(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
+        }
+        if (Lang::$currentPercentage !== 100) {
+            $alerts[] = Alert::info(new SafeHtml(sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
+        }
+        return $alerts;
     }
     /**
      * Get various warnings to show to the user in the web UI.
      */
     public static function getWebWarnings(): string
     {
-        Magic::start(light: false);
-        $warning = '';
-        if (API::RELEASE !== Magic::$latest_release) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(
-                Lang::$current_lang['update_madelineproto'],
-                API::RELEASE,
-                Magic::$latest_release,
-            )).'</h2>';
-        }
-        if (!Magic::$hasOpenssl) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
-        }
-        if (!\extension_loaded('gmp')) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
-        }
-        if (!\extension_loaded('uv')) {
-            $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
-        }
-        /*if (Magic::$hasBasedirLimitation) {
-            $warning .= "<p>".htmlentities(Lang::$current_lang['baseDirLimitation'])."</p>";
-        }*/
-        if (Lang::$currentPercentage !== 100) {
-            $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
-        }
-        return $warning;
+        return (new TemplateEngine)->render('partials/alerts', ['alerts' => self::getWebAlerts()]);
     }
 
     /** @internal */
