@@ -66,7 +66,24 @@ abstract class MessageEntity implements JsonSerializable
             'bank_card', 'messageEntityBankCard' => new BankCard($entity['offset'], $entity['length']),
             'spoiler', 'messageEntitySpoiler' => new Spoiler($entity['offset'], $entity['length']),
             'custom_emoji', 'messageEntityCustomEmoji' => new CustomEmoji($entity['offset'], $entity['length'], $entity['document_id'] ?? $entity['custom_emoji_id']),
-            default => throw new AssertionError("Unknown entity type: ".($entity['_'] ?? $entity['type']))
+            /** @psalm-suppress MixedArgument */
+            'date_time' => FormattedDate::fromBotAPIFormat($entity['offset'], $entity['length'], $entity['unix_time'], $entity['date_time_format'] ?? ''),
+            'messageEntityFormattedDate' => new FormattedDate(
+                $entity['offset'],
+                $entity['length'],
+                $entity['date'],
+                $entity['relative'] ?? false,
+                $entity['short_time'] ?? false,
+                $entity['long_time'] ?? false,
+                $entity['short_date'] ?? false,
+                $entity['long_date'] ?? false,
+                $entity['day_of_week'] ?? false,
+            ),
+            'unknown', 'messageEntityUnknown' => new Unknown($entity['offset'], $entity['length']),
+            // Entity types added in newer layers must not prevent wrapping the message they're in.
+            default => isset($entity['_']) && str_starts_with($entity['_'], 'messageEntity')
+                ? new Unknown($entity['offset'], $entity['length'], $entity)
+                : throw new AssertionError("Unknown entity type: ".($entity['_'] ?? $entity['type']))
         };
     }
 
