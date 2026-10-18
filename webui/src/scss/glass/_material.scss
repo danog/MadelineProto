@@ -10,6 +10,9 @@
  *
  * The tokens are CSS variables (see _tokens.scss), so the night palette and the accessibility fallbacks
  * (prefers-reduced-transparency, prefers-contrast) only redefine them.
+ *
+ * All of it applies under `html.glass` only: the glass can be switched off (components/liquidGlass.tsx), leaving
+ * tweb's look.
  */
 
 // A pane: tint, blur, rim, shadow. `$rim`: the pseudo-element drawing the specular rim (null for elements
@@ -56,13 +59,15 @@
 
 // The refraction, where supported: in plain stylesheets (`$global: false`) or in CSS modules.
 @mixin refract($blur: var(--glass-blur), $global: false) {
+  // :is() rather than a descendant selector: nested in `html.glass`, `html.glass-refraction &` would ask for an <html>
+  // in an <html>
   @if $global {
-    html.glass-refraction & {
+    &:is(html.glass-refraction *) {
       -webkit-backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
       backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
     }
   } @else {
-    :global(html.glass-refraction) & {
+    &:is(:global(html.glass-refraction) *) {
       -webkit-backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
       backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
     }

@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "このボットトークンは無効化されています",
     "tweb.FIRSTNAME_INVALID": "無効な名です",
     "tweb.LASTNAME_INVALID": "無効な姓です",
-    "tweb.Close": "閉じる"
+    "tweb.Close": "閉じる",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

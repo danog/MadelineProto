@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "تم إبطال توكن البوت هذا",
     "tweb.FIRSTNAME_INVALID": "الاسم الأول غير صالح",
     "tweb.LASTNAME_INVALID": "اسم العائلة غير صالح",
-    "tweb.Close": "إغلاق"
+    "tweb.Close": "إغلاق",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

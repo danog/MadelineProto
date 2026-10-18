@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Token bot này đã bị thu hồi",
     "tweb.FIRSTNAME_INVALID": "Tên không hợp lệ",
     "tweb.LASTNAME_INVALID": "Họ không hợp lệ",
-    "tweb.Close": "Đóng"
+    "tweb.Close": "Đóng",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

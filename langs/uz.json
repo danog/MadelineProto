@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Bu bot tokeni bekor qilingan",
     "tweb.FIRSTNAME_INVALID": "Ism notoʻgʻri",
     "tweb.LASTNAME_INVALID": "Familiya notoʻgʻri",
-    "tweb.Close": "Yopish"
+    "tweb.Close": "Yopish",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

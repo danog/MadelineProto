@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "טוקן הבוט הזה בוטל",
     "tweb.FIRSTNAME_INVALID": "שם פרטי לא תקין",
     "tweb.LASTNAME_INVALID": "שם משפחה לא תקין",
-    "tweb.Close": "סגירה"
+    "tweb.Close": "סגירה",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

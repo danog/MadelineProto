@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Token bot ini telah dicabut",
     "tweb.FIRSTNAME_INVALID": "Nama depan tidak valid",
     "tweb.LASTNAME_INVALID": "Nama belakang tidak valid",
-    "tweb.Close": "Tutup"
+    "tweb.Close": "Tutup",
+    "tweb.LiquidGlass": "Liquid Glass"
 }

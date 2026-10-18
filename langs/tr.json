@@ -271,5 +271,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Bu bot token'ı iptal edildi",
     "tweb.FIRSTNAME_INVALID": "Geçersiz ad",
     "tweb.LASTNAME_INVALID": "Geçersiz soyad",
-    "tweb.Close": "Kapat"
+    "tweb.Close": "Kapat",
+    "tweb.LiquidGlass": "Liquid Glass"
 }
