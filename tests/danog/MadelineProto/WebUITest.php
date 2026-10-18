@@ -50,13 +50,22 @@ final class WebUITest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (['partials/alerts.phtml', 'page.phtml', 'child.phtml', 'base.phtml'] as $file) {
+        foreach (['partials/alerts.phtml', 'page.phtml', 'child.phtml', 'base.phtml', 'assets/tweb/app.js', 'assets/secret.txt', 'assets/link.js', 'secret.js'] as $file) {
+            if (is_link("$this->dir/$file")) {
+                unlink("$this->dir/$file");
+                continue;
+            }
             if (file_exists("$this->dir/$file")) {
                 unlink("$this->dir/$file");
             }
         }
-        rmdir("$this->dir/partials");
+        foreach (['partials', 'assets/tweb', 'assets'] as $dir) {
+            if (is_dir("$this->dir/$dir")) {
+                rmdir("$this->dir/$dir");
+            }
+        }
         rmdir($this->dir);
+        unset($_GET[WebUI::ASSET_PARAMETER], $_SERVER['HTTP_X_MADELINEPROTO_WEBUI'], $_SERVER['HTTP_IF_NONE_MATCH']);
     }
 
     private static function loginPage(): Page
@@ -91,7 +100,7 @@ final class WebUITest extends TestCase
 
     public function testPageRendersTheFormAndTheState(): void
     {
-        $html = WebUI::render(new Templates, self::loginPage());
+        $html = WebUI::render($this->withApp(), self::loginPage());
         self::assertStringContainsString('<form method="post" class="form" data-madeline-form>', $html);
         self::assertStringContainsString('data-show-when="type=phone"', $html);
         // Without JavaScript all the conditional fields are shown: they can't be required
@@ -117,14 +126,89 @@ final class WebUITest extends TestCase
         self::assertSame('en', $state['lang']);
     }
 
-    public function testTheBundleIsInlinedWithoutClosingItsTag(): void
+    public function testInlinedScriptsCantCloseTheirTag(): void
     {
-        $html = WebUI::render(new Templates, self::loginPage());
-        $bundle = (new TemplateEngine)->asset('assets/app.js');
-        self::assertStringContainsString(Template::escapeScript($bundle), $html);
         self::assertSame('a<\/script><\!--b', Template::escapeScript('a</SCRIPT><!--b'));
-        // One closing tag per script: the state and the bundle
-        self::assertSame(2, substr_count($html, '</script>'));
+    }
+
+    /**
+     * A template directory with a web app bundle.
+     */
+    private function withApp(): Templates
+    {
+        mkdir("$this->dir/assets/tweb", 0o777, true);
+        file_put_contents("$this->dir/assets/tweb/app.js", 'console.log(1)');
+        return (new Templates)->addDirectory($this->dir);
+    }
+
+    public function testWithTheAppTheMarkupIsOnlyForBrowsersWithoutJavaScript(): void
+    {
+        $html = WebUI::render($this->withApp(), self::loginPage());
+        self::assertStringContainsString('<link id="madeline-app-css" rel="stylesheet" media="print" href="/?madelineAsset=assets/tweb/app.css">', $html);
+        self::assertStringContainsString('<div id="madeline-app"></div>', $html);
+        self::assertStringContainsString('<script defer src="/?madelineAsset=assets/tweb/app.js"></script>', $html);
+        // The markup and its stylesheet are in <noscript>
+        self::assertSame(1, preg_match('~<body>.*<noscript>(.*)</noscript>~s', $html, $noscript));
+        self::assertStringContainsString('<form method="post" class="form" data-madeline-form>', $noscript[1]);
+        self::assertSame(1, preg_match('~<noscript><style>~', $html));
+    }
+
+    public function testWithoutTheAppThereIsJustTheMarkup(): void
+    {
+        $templates = (new Templates)->addDirectory($this->dir);
+        if ($templates->getEngine()->exists('assets/tweb/app.js')) {
+            // The builtin bundle: render with only the custom directory's templates, through a fake engine
+            $html = (new TemplateEngine([$this->dir]))->render('page', ['page' => self::loginPage(), 'state' => '{}']);
+        } else {
+            $html = WebUI::render($templates, self::loginPage());
+        }
+        self::assertStringNotContainsString('<noscript>', $html);
+        self::assertStringContainsString('<form method="post" class="form" data-madeline-form>', $html);
+    }
+
+    public function testJsonRequestsGetTheState(): void
+    {
+        $_SERVER['HTTP_X_MADELINEPROTO_WEBUI'] = 'json';
+        self::assertFalse(WebUI::redirectToSelf());
+        $result = json_decode(self::capture(static fn () => WebUI::write(new Templates, self::loginPage())), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('Log in', $result['state']['page']['title']);
+        self::assertSame('/?madelineAsset=', $result['state']['assetUrl']);
+        self::assertSame(['loggedIn' => true], json_decode(self::capture(static fn () => self::assertTrue(WebUI::writeLoggedIn())), true));
+
+        unset($_SERVER['HTTP_X_MADELINEPROTO_WEBUI']);
+        self::assertFalse(WebUI::writeLoggedIn());
+    }
+
+    public function testAssetsAreServedFromTheTemplateDirectories(): void
+    {
+        $templates = $this->withApp();
+        self::assertFalse(WebUI::serveAsset($templates));
+
+        $_GET[WebUI::ASSET_PARAMETER] = 'assets/tweb/app.js';
+        self::assertSame('console.log(1)', self::capture(static fn () => self::assertTrue(WebUI::serveAsset($templates))));
+        $_GET[WebUI::ASSET_PARAMETER] = 'assets/mark.svg';
+        self::assertStringStartsWith('<svg', self::capture(static fn () => WebUI::serveAsset($templates)));
+
+        // Only assets, of known types, inside the template directories
+        file_put_contents("$this->dir/assets/secret.txt", 'secret');
+        file_put_contents("$this->dir/secret.js", 'secret');
+        // A symlink out of the assets
+        symlink("$this->dir/secret.js", "$this->dir/assets/link.js");
+        foreach (['page.phtml', 'assets/secret.txt', 'secret.js', 'assets/../secret.js', 'assets/../../../../etc/passwd', '/etc/passwd', 'assets/missing.js', 'assets/link.js'] as $path) {
+            $_GET[WebUI::ASSET_PARAMETER] = $path;
+            self::assertSame('Not found', self::capture(static fn () => self::assertTrue(WebUI::serveAsset($templates))), $path);
+        }
+    }
+
+    private static function capture(callable $callback): string
+    {
+        ob_start();
+        try {
+            $callback();
+        } finally {
+            $output = ob_get_clean();
+        }
+        return $output;
     }
 
     public function testStatusPageHasNoForm(): void

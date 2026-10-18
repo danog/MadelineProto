@@ -3,12 +3,18 @@
  * Base HTML document.
  *
  * @var \danog\MadelineProto\WebUI\Template $this
- * @var string $title Page title
- * @var string $lang  Language code
- * @var string $dir   Text direction
+ * @var string $title    Page title
+ * @var string $lang     Language code
+ * @var string $dir      Text direction
+ * @var string $assetUrl Prefix of the URLs of the assets (see WebUI::serveAsset())
  *
- * Sections: content, head (extra tags in <head>), scripts (extra tags at the end of <body>).
+ * Sections: content (the markup for browsers without JavaScript), app (the root of the web app, before it),
+ * head (extra tags in <head>), scripts (extra tags at the end of <body>).
+ *
+ * With JavaScript, the web app (assets/tweb/app.js) renders the page: its stylesheet is loaded as media="print",
+ * so that it doesn't apply to the markup for browsers without JavaScript, and the app enables it.
  */
+$hasApp = isset($assetUrl) && $this->getEngine()->exists('assets/tweb/app.js');
 ?><!DOCTYPE html>
 <html<?= $this->attrs(['lang' => $lang ?? 'en', 'dir' => $dir ?? 'ltr']) ?>>
 <head>
@@ -18,13 +24,21 @@
 <meta name="color-scheme" content="light dark">
 <title><?= $this->e($title) ?> – MadelineProto</title>
 <link rel="icon" href="data:image/svg+xml,<?= $this->e(rawurlencode($this->getEngine()->asset('assets/mark.svg'))) ?>">
+<?php if ($hasApp): ?>
+<link id="madeline-app-css" rel="stylesheet" media="print" href="<?= $this->e($assetUrl.'assets/tweb/app.css') ?>">
+<noscript><style><?= $this->asset('assets/madeline.css') ?></style></noscript>
+<?php else: ?>
 <style><?= $this->asset('assets/madeline.css') ?></style>
+<?php endif ?>
 <?= $this->section('head') ?>
 </head>
 <body>
+<?php if ($hasApp): ?>
+<?= $this->section('app') ?>
+<noscript><?= $this->section('content') ?></noscript>
+<script defer src="<?= $this->e($assetUrl.'assets/tweb/app.js') ?>"></script>
+<?php else: ?>
 <?= $this->section('content') ?>
-<?php if ($this->getEngine()->exists('assets/app.js')): ?>
-<script><?= $this->script('assets/app.js') ?></script>
 <?php endif ?>
 <?= $this->section('scripts') ?>
 </body>

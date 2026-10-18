@@ -1,0 +1,23 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "sass:meta";
+
+@mixin text-overflow($no-wrap: true) {
+  @if meta.type-of($no-wrap) == number {
+    display: -webkit-box;
+    -webkit-line-clamp: $no-wrap;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+  } @else if $no-wrap != false {
+    white-space: nowrap;
+  } @else {
+    word-break: break-word;
+  }
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

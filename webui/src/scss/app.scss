@@ -1,0 +1,16 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * Adapted for MadelineProto: the entry of the stylesheet (tweb: scss/style.scss), with only what the auth
+ * flow uses. The card modules (*.module.scss) are added by the components that import them.
+ */
+
+@use "fonts/roboto";
+@use "theme";
+@use "base";
+@use "partials/ripple";
+@use "partials/preloader";
+@use "partials/input";
+@use "partials/button";

@@ -1,0 +1,16 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+// A text link's plate (helpers/dom/linkPress.ts): rounded, around every line of the link, in the
+// link's own colour — the tint a held link's ripple fills it with; half of it while a menu opened
+// from the link is open.
+$link-plate-color: color-mix(in srgb, currentColor 20%, transparent);
+// on a service message's plate (white text over the wallpaper's tint) it darkens instead, as iOS
+// does: a white tint is lost there. Handed down as `--link-plate-color`
+$link-plate-service-color: rgba(0, 0, 0, .16);
+$link-plate-radius: .375em;
+// how far the plate reaches past the text at its sides
+$link-plate-bleed: .125rem;

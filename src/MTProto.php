@@ -1806,6 +1806,32 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $hint;
     }
     /**
+     * Get what the web UI shows about the login in progress: the phone number, and the kind of code sent.
+     *
+     * Never the phone code hash, nor the code.
+     *
+     * @internal
+     *
+     * @return array{phoneNumber?: string, sentCode?: array{type: string, length: ?int, nextType: ?string, timeout: ?int}}
+     */
+    public function getWebLoginInfo(): array
+    {
+        $state = $this->loginState->getState()->state;
+        $info = [];
+        if (($state === API::WAITING_CODE || $state === API::WAITING_SIGNUP) && \is_string($this->authorization['phone_number'] ?? null)) {
+            $info['phoneNumber'] = $this->authorization['phone_number'];
+        }
+        if ($state === API::WAITING_CODE && \is_string($this->authorization['type']['_'] ?? null)) {
+            $info['sentCode'] = [
+                'type' => $this->authorization['type']['_'],
+                'length' => isset($this->authorization['type']['length']) ? (int) $this->authorization['type']['length'] : null,
+                'nextType' => $this->authorization['next_type']['_'] ?? null,
+                'timeout' => isset($this->authorization['timeout']) ? (int) $this->authorization['timeout'] : null,
+            ];
+        }
+        return $info;
+    }
+    /**
      * IDs of peers where to report errors.
      *
      * @var list<int>
@@ -1851,6 +1877,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
         $page = new Page(
             title: $message,
+            view: 'status',
             step: Step::DONE,
             alerts: self::getWebAlerts(),
         );

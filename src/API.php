@@ -32,6 +32,8 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\Templates;
+use danog\MadelineProto\WebUI\WebUI;
 use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Throwable;
@@ -193,6 +195,17 @@ final class API extends AbstractAPI
     {
         Magic::start(light: true);
         $settings ??= new SettingsEmpty;
+        // The assets of the web UI (scripts, animations...), requested by its pages from this same script
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($_GET[WebUI::ASSET_PARAMETER])) {
+            $templates = match (true) {
+                $settings instanceof Settings => $settings->getTemplates(),
+                $settings instanceof Templates => $settings,
+                default => new Templates,
+            };
+            if (WebUI::serveAsset($templates)) {
+                die;
+            }
+        }
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this->session);
         $this->exportNamespaces();

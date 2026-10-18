@@ -1,0 +1,439 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * The parts of tweb's `scss/base.scss` the auth flow reads: the shared tokens, the day/night colors
+ * that aren't derived from the palette (`theme.scss`), the document rules, and the country picker.
+ */
+
+@use "sass:string";
+@use "shared" as *;
+
+// * what the stylesheets mirror with: `--reflect` multiplies a movement along the line, the origins
+// * name the inline sides of a transform
+@mixin direction-vars($dir) {
+  $start: left;
+  $end: right;
+  $reflect: 1;
+  @if $dir == rtl {
+    $start: right;
+    $end: left;
+    $reflect: -1;
+  }
+
+  --reflect: #{$reflect};
+  --transform-origin-inline-start: #{$start};
+  --transform-origin-inline-end: #{$end};
+  --transform-origin-left-center: #{$start} center;
+  --transform-origin-right-center: #{$end} center;
+}
+
+:root {
+  --vh: 1vh;
+  --100vh: calc(var(--vh) * 100);
+
+  --z-below: -1;
+  --hover-alpha: #{$hover-alpha};
+  --reflect: 1;
+
+  --transition-standard-easing: cubic-bezier(.4, .0, .2, 1);
+  --transition-standard-in-time: .3s;
+  --transition-standard-out-time: .25s;
+  --transform-origin-inline-start: left;
+  --transform-origin-inline-end: right;
+  --transform-origin-left-center: left center;
+  --transform-origin-right-center: right center;
+
+  &.is-rtl {
+    @include direction-vars(rtl);
+  }
+
+  --input-transition: .2s ease-out;
+  --input-placeholder-transition: .15s ease-out;
+  --line-height-24: 30px;
+  --line-height-20: 26px;
+  --line-height-18: 24px;
+  --line-height-16: 21px;
+  --line-height-15: 20px;
+  --line-height-14: 18px;
+  --line-height-13: 17px;
+  --line-height-12: 16px;
+  --line-height: 1.3125;
+  --font-size-24: 24px;
+  --font-size-20: 20px;
+  --font-size-18: 18px;
+  --font-size-16: 16px;
+  --font-size-15: 15px;
+  --font-size-14: 14px;
+  --font-size-13: 13px;
+  --font-size-12: 12px;
+  --font-size: var(--font-size-16);
+  --disabled-opacity: .3;
+  --menu-box-shadow: 0px 0px 10px var(--menu-box-shadow-color);
+  --font-regular: "Roboto", -apple-system, apple color emoji, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-monospace: 'Roboto Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-weight-bold: 500;
+  --font-weight-normal: 400;
+  --font-weight: var(--font-weight-normal);
+  --selection-background-color: rgba(var(--primary-color-rgb), .4);
+  --selection-color: inherit;
+  --white: #ffffff;
+
+  --ripple-duration: .7s;
+  --ripple-start-scale: 0;
+  --ripple-end-scale: 2;
+
+  @include respond-to(until-floating-left-sidebar) {
+    --ripple-duration: .4s;
+    --ripple-start-scale: .27;
+  }
+}
+
+:root {
+  // * Day theme
+  --scrollbar-color: rgba(0, 0, 0, .2);
+  --menu-box-shadow-color: rgba(0, 0, 0, .15);
+
+  --input-search-background-color: #fff;
+  --input-search-border-color: #dfe1e5;
+
+  --input-placeholder-color: #9BA0A5;
+
+  --original-ripple-color: rgba(0, 0, 0, #{$hover-alpha});
+  --ripple-color: var(--original-ripple-color);
+  // * Day theme end
+}
+
+.night {
+  // * Night theme
+  --scrollbar-color: rgba(255, 255, 255, .2);
+  --menu-box-shadow-color: rgba(0, 0, 0, .5);
+
+  --input-search-background-color: #181818;
+  --input-search-border-color: #2f2f2f;
+
+  --original-ripple-color: rgba(255, 255, 255, #{$hover-alpha});
+  --ripple-color: var(--original-ripple-color);
+  // * Night theme end
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; // + disable overscroll behavior on macOS
+}
+
+[dir="ltr"] {
+  @include direction-vars(ltr);
+}
+
+[dir="rtl"] {
+  @include direction-vars(rtl);
+}
+
+@supports(padding: string.unquote('max(0px)')) {
+  html {
+    padding: 0 string.unquote('min(16px, env(safe-area-inset-right))') 0 string.unquote('min(16px, env(safe-area-inset-left))');
+  }
+}
+
+html {
+  font-size: 16px;
+  overscroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+body {
+  background-color: var(--body-background-color);
+  color: var(--primary-text-color);
+  user-select: none;
+
+  transition: background-color 0.2s;
+}
+
+body.animation-level-1:not(.animation-level-2) {
+  --transition-standard-in-time: .2s;
+  --transition-standard-out-time: .15s;
+  --ripple-duration: .4s;
+}
+
+:root,
+body.animation-level-1:not(.animation-level-2) {
+  --transition-standard-in: var(--transition-standard-in-time) var(--transition-standard-easing);
+  --transition-standard-out: var(--transition-standard-out-time) var(--transition-standard-easing);
+}
+
+a {
+  color: var(--link-color);
+}
+
+button,
+input,
+optgroup,
+select,
+textarea,
+html {
+  font-family: var(--font-regular);
+}
+
+input,
+textarea,
+button,
+select,
+a,
+div {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+pre,
+code,
+kbd,
+samp {
+  font-family: var(--font-monospace);
+}
+
+::selection {
+  background-color: var(--selection-background-color);
+  color: var(--selection-color);
+}
+
+.whole {
+  min-height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-weight-bold);
+}
+
+h4 {
+  font-size: 2rem;
+  margin: 22px 0 14px;
+  line-height: 110%;
+
+  @include respond-to(handhelds) {
+    font-size: 20px;
+    margin: 2px 0 8px;
+  }
+}
+
+input,
+[contenteditable=true] {
+  caret-color: var(--primary-color);
+  color: var(--primary-text-color);
+  background-color: transparent;
+}
+
+input,
+textarea {
+	-webkit-appearance: none;
+  font-size: inherit;
+}
+
+// Possible fix Safari's password autocomplete
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  position: absolute;
+  right: 0;
+}
+
+input:-webkit-autofill::first-line {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+  font-size: 16px
+}
+
+.secondary {
+  color: var(--secondary-text-color);
+}
+
+.danger {
+  color: var(--danger-color) !important;
+
+  .c-ripple__circle {
+    background-color: var(--light-danger-color);
+  }
+}
+
+.blue,
+.primary {
+  color: var(--primary-color) !important;
+
+  .c-ripple__circle {
+    background-color: var(--light-primary-color);
+  }
+}
+
+.hide {
+  display: none !important;
+}
+
+.z-depth-3 {
+  box-shadow: var(--menu-box-shadow);
+}
+
+.select-wrapper {
+  max-height: 23.5rem;
+  position: absolute;
+  width: 100%;
+  top: calc(100% + .5rem);
+  left: 0;
+  overflow: hidden;
+  background-color: var(--surface-color);
+  z-index: 3;
+  border-radius: $border-radius-medium;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  transition: opacity .2s ease-out, transform .2s ease-out;
+  transform: scale(.95);
+  transform-origin: top center;
+  opacity: 0;
+
+  &.active {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  // reduced: it fades in where it stands
+  @include animation-level-below(2) {
+    transform: none;
+  }
+
+  @include animation-level(0) {
+    transition: none;
+  }
+
+  ul {
+    margin: .5rem 0;
+    padding: 0;
+  }
+
+  li {
+    align-items: center;
+    padding: 0 1rem;
+    justify-content: space-between;
+    height: 3rem;
+    cursor: pointer;
+
+    text-align: start;
+    display: grid;
+    grid-template-columns: calc(26px + 2rem) 1fr 80px;
+
+    @include hover-background-effect();
+  }
+
+  // +2 px bc of whitespace
+  .emoji {
+    height: 26px;
+    width: 26px;
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  // * the list scrolls by itself (tweb wraps it in its `Scrollable`)
+  .scrollable {
+    position: relative;
+    overflow-y: auto;
+    max-height: 23.5rem;
+    width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-color) transparent;
+  }
+}
+
+.phone-code {
+  color: $placeholder-color;
+  text-align: end;
+}
+
+.stealthy {
+  left: 0;
+  margin: 0;
+  max-height: 1px;
+  max-width: 1px;
+  opacity: 0;
+  outline: none;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+
+.text-center {
+  @include text-center();
+}
+
+.text-overflow-wrap {
+  overflow-wrap: anywhere;
+}
+
+// * the icons tweb draws with its icon font, here as inline SVG (`components/icon.tsx`)
+.tgico {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  vertical-align: middle;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes grow-icon {
+  0% {
+    transform: scale(.5);
+    opacity: .8;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes hide-icon {
+  from {
+    transform: scale(1);
+    opacity: .4;
+  }
+
+  to {
+    transform: scale(.5);
+    opacity: 0;
+  }
+}
