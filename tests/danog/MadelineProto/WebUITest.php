@@ -123,6 +123,16 @@ final class WebUITest extends TestCase
         self::assertSame(['html' => '<a href="https://my.telegram.org" target="_blank" rel="noopener noreferrer">https://my.telegram.org</a>.'], ['html' => substr($state['page']['alerts'][1]['message']['html'], 4)]);
         self::assertSame(['app', 'account', 'verify', 'done'], array_column($state['steps'], 'id'));
         self::assertSame('Show', $state['strings']['webShowPassword']);
+        // The strings of the web app, without their prefix in langs/*.json, in the language of the session
+        self::assertSame('Sign in to MadelineProto', $state['strings']['Login.Title']);
+        self::assertArrayNotHasKey('tweb.Login.Title', $state['strings']);
+        $english = Lang::$current_lang;
+        try {
+            Lang::$current_lang = ['tweb.Login.Title' => 'Accedi a MadelineProto'] + $english;
+            self::assertSame('Accedi a MadelineProto', WebUI::getStateArray(self::loginPage())['strings']['Login.Title']);
+        } finally {
+            Lang::$current_lang = $english;
+        }
         self::assertSame('en', $state['lang']);
     }
 
@@ -342,6 +352,43 @@ final class WebUITest extends TestCase
             </body></html>
             HTML;
         self::assertSame(['api_id' => 1234567, 'api_hash' => '0123456789abcdef0123456789abcdef'], $parse->invoke($wrapper, $app));
+
+        // The redesign of 2026: the hash is masked, its value in data-value; other forms have hashes and numbers
+        $app = <<<'HTML'
+            <html><head><title>App configuration</title></head><body>
+            <form id="fcm_delete_form" method="POST" action="/apps/fcm_service_account_delete">
+              <input type="hidden" name="hash" value="2cfd3bd905bad2857a"/>
+            </form>
+            <div class="head"><h1>My app</h1><p>Web · created 5 Apr 2025.</p></div>
+            <div class="card">
+              <h2>Credentials</h2>
+              <p class="sub">Keep api_hash private.</p>
+              <div class="creds">
+                <div class="cred">
+                  <div class="k">App api_id</div>
+                  <div class="v"><span class="vv">7654321</span>
+                    <span class="icon-btns"><button type="button" class="icon-btn" title="Copy" data-copy="7654321"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/></svg></button></span>
+                  </div>
+                </div>
+                <div class="cred">
+                  <div class="k">App api_hash <span class="badge grey">secret</span></div>
+                  <div class="v masked" id="api_hash_value" data-value="fedcba9876543210fedcba9876543210"><span class="vv">••••••••••••••••••••••••••••••••</span></div>
+                </div>
+              </div>
+            </div>
+            </body></html>
+            HTML;
+        self::assertSame(['api_id' => 7654321, 'api_hash' => 'fedcba9876543210fedcba9876543210'], $parse->invoke($wrapper, $app));
+
+        // An app page without the values: logged in, but unreadable
+        (fn () => $this->logged = true)->call($wrapper);
+        try {
+            $parse->invoke($wrapper, '<html><head><title>App configuration</title></head><body>New layout</body></html>');
+            self::fail('Expected an exception');
+        } catch (\danog\MadelineProto\Exception $e) {
+            self::assertStringContainsString('Could not find the API ID and hash', $e->getMessage());
+        }
+        self::assertTrue($wrapper->loggedIn());
     }
 
     public function testMyTelegramOrgErrorsAreReadable(): void

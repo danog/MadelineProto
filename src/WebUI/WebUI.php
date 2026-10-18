@@ -96,6 +96,13 @@ final class WebUI
         foreach (self::APP_STRINGS as $key) {
             $strings[$key] = Template::translate($key);
         }
+        // The strings of the web app (webui/src/lang.ts, tweb's keys), in the language of the session: the app
+        // has them in English, translated in langs/*.json as tweb.<key>
+        foreach (Lang::$current_lang as $key => $string) {
+            if (str_starts_with($key, 'tweb.')) {
+                $strings[substr($key, 5)] = $string;
+            }
+        }
         $steps = [];
         foreach (Step::cases() as $step) {
             $steps[] = ['id' => $step->value, 'label' => $step->getLabel()];

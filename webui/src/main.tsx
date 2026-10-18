@@ -16,6 +16,7 @@ import {render} from 'solid-js/web';
 import IS_TOUCH_SUPPORTED from '@environment/touchSupport';
 import {initTheme} from '@helpers/theme';
 import lottieLoader from '@lib/lottie/lottieLoader';
+import I18n from '@lib/langPack';
 import type {State} from '@/types';
 
 import {startAuth} from '@/pages/authFlow';
@@ -52,6 +53,8 @@ export function mount(root: HTMLElement, state: State) {
   initDocument();
   initTheme();
   lottieLoader.setAssetUrl(state.assetUrl ?? '');
+  // the strings of the session's language, before anything is rendered
+  I18n.applyStrings((state.strings ?? {}) as Record<string, unknown>, state.lang);
   if(state.lang) document.documentElement.lang = state.lang;
   if(state.dir) {
     document.documentElement.dir = state.dir;

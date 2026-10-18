@@ -135,7 +135,9 @@ export default class CountryInputField extends InputField {
           spanEmoji.textContent = emoji;
           li.append(spanEmoji);
 
-          const el = i18n(c.default_name as any);
+          // MadelineProto: the name in the language of the page (I18n.applyStrings), not a key of tweb's lang pack
+          const el = document.createElement('span');
+          el.textContent = c.name || c.default_name;
           el.dataset.defaultName = c.default_name;
           li.append(el);
 
@@ -318,8 +320,8 @@ export default class CountryInputField extends InputField {
     const phoneCode = phoneCodeEl?.textContent;
     const countryCode = phoneCode && phoneCode.replace(/\D/g, '');
 
-    this.value = i18n(defaultName as any);
     this.lastCountrySelected = countries.find((c) => c.default_name === defaultName);
+    this.value = this.lastCountrySelected?.name || defaultName;
     this.lastCountryCodeSelected = countryCode && this.lastCountrySelected.country_codes.find((_countryCode) => _countryCode.country_code === countryCode);
 
     this.options.onCountryChange?.(this.lastCountrySelected, this.lastCountryCodeSelected);
@@ -331,7 +333,7 @@ export default class CountryInputField extends InputField {
   }
 
   public override(country: HelpCountry, code: HelpCountryCode, countryName?: string) {
-    this.setValueSilently(country ? i18n(country.default_name as any) : countryName);
+    this.setValueSilently(country ? country.name || country.default_name : countryName);
     this.lastCountrySelected = country;
     this.lastCountryCodeSelected = code;
     this.options.onCountryChange?.(this.lastCountrySelected, this.lastCountryCodeSelected);
