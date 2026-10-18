@@ -800,11 +800,9 @@ trait UpdateHandler
                     $message['action']['currency'],
                     $message['action']['total_amount'],
                     $message['action']['payload'],
-                    isset($message['action']['info']) ? new PaymentRequestedInfo(
-                        $message['action']['info']['name'],
-                        $message['action']['info']['phone'],
-                        $message['action']['info']['email']
-                    ) : null,
+                    isset($message['action']['info'])
+                        ? PaymentRequestedInfo::fromRawInfo($message['action']['info'])
+                        : null,
                     $message['action']['shipping_option_id'] ?? null,
                     new PaymentCharge(
                         $message['action']['charge']['id'],

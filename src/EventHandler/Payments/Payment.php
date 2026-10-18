@@ -50,11 +50,9 @@ final class Payment extends Update
         $this->queryId = $rawRequestedPayment['query_id'];
         $this->userId = $rawRequestedPayment['user_id'];
         $this->payload = $rawRequestedPayment['payload'];
-        $this->info = isset($rawRequestedPayment['info']) ? new PaymentRequestedInfo(
-            $rawRequestedPayment['name'],
-            $rawRequestedPayment['phone'],
-            $rawRequestedPayment['email'],
-        ) : null;
+        $this->info = isset($rawRequestedPayment['info'])
+            ? PaymentRequestedInfo::fromRawInfo($rawRequestedPayment['info'])
+            : null;
         $this->shippingOptionId = $rawRequestedPayment['shipping_option_id'] ?? null;
         $this->currency = $rawRequestedPayment['currency'];
         $this->totalAmount = $rawRequestedPayment['total_amount'];
