@@ -56,6 +56,7 @@ use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
+use danog\MadelineProto\Ipc\Remote\Listener;
 use danog\MadelineProto\Ipc\Server;
 
 /** @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor */
