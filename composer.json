@@ -59,7 +59,7 @@
         "bacon/bacon-qr-code": "^3.1.1",
         "nikic/php-parser": "^5.9.0",
         "revolt/event-loop": "^1.0.9",
-        "danog/async-orm": "^1.1.4",
+        "danog/async-orm": "^1.1.5",
         "danog/telegram-entities": "^1.0.6",
         "danog/better-prometheus": "^0.1.1",
         "amphp/http-server": "^3.4.6",
@@ -67,7 +67,7 @@
         "symfony/polyfill-php83": "^1.41",
         "danog/php-rtc-av": "^1.1.11",
         "danog/php-rtc-codecs": "^1.1.19",
-        "danog/php-rtc-dtls": "^2.0.16",
+        "danog/php-rtc-dtls": "^2.0.19",
         "danog/php-rtc-ice": "^2.0.18",
         "danog/php-rtc-ntp": "^1.1.14",
         "danog/php-rtc-rtcp": "^1.1.11",
@@ -146,7 +146,8 @@
             "@test-light"
         ],
         "test": [
-            "@paratest"
+            "@paratest",
+            "@test-session"
         ],
         "test-light": [
             "@paratest-light"
@@ -157,8 +158,9 @@
         "fuzz": "php tools/fuzzer.php",
         "file_ref_map": "php tools/gen_filerefmap.php",
         "docs-fix": "tools/fix_docs.sh",
-        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -fv",
-        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -fvc phpunit-light.xml",
+        "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -v --exclude-group session",
+        "test-session": "tests/session_tests.sh",
+        "paratest-light": "@php -dzend.assertions=1 ./vendor/bin/paratest -vc phpunit-light.xml --exclude-group session",
         "bin": "echo 'bin not installed'",
         "post-install-cmd": [
             "@composer bin all install --ansi"

@@ -9,7 +9,6 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\PTSException;
 use danog\MadelineProto\RPCError\BusinessConnectionNotAllowedError;
 use danog\MadelineProto\RPCErrorException;
-use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
@@ -128,20 +127,24 @@ if ($auth) {
     echo "No TELERPC_AUTH_TOKEN set, not setting layer number".PHP_EOL;
 }
 
-$settings = new Settings;
-$settings->setSchema($schema);
-$settings->getLogger()->setLevel(Logger::ULTRA_VERBOSE);
+// Only the settings to change, not a whole Settings object: merging it would also reset the others to their
+// defaults, the test mode of the sessions (on the test servers) included.
+$loggerSettings = (new SettingsLogger)->setLevel(Logger::ULTRA_VERBOSE);
+$updateSettings = static function (API $API) use ($schema, $loggerSettings): void {
+    $API->updateSettings($schema);
+    $API->updateSettings($loggerSettings);
+};
 
 echo "Unauthed:".PHP_EOL;
 $unauthed = new \danog\MadelineProto\API('fuzz_unauth.madeline');
-$unauthed->updateSettings($settings);
+$updateSettings($unauthed);
 Assert::false($unauthed->getSelf(), "fuzz_unauth.madeline is authed!");
 $unauthed->restart();
 
 echo "Bot login:".PHP_EOL;
 $bot = new \danog\MadelineProto\API('fuzz_bot.madeline');
 $bot->start();
-$bot->updateSettings($settings);
+$updateSettings($bot);
 Assert::true($bot->isSelfBot(), "fuzz_bot.madeline is not a bot!");
 $u = $bot->getSelf()['username'];
 Assert::true($bot->getSelf()['bot_business'], "fuzz_bot.madeline ($u) is not a business bot, enable business mode in botfather!");
@@ -150,7 +153,7 @@ $bot->restart();
 echo "User login:".PHP_EOL;
 $user = new \danog\MadelineProto\API('fuzz_user.madeline');
 $user->start();
-$user->updateSettings($settings);
+$updateSettings($user);
 Assert::true($user->isSelfUser(), "fuzz_user.madeline is not a user!");
 $user->restart();
 
@@ -233,6 +236,9 @@ foreach ($layer['methods']->by_id as $constructor) {
     $unauthedNames []= $name;
 }
 
+// On the test servers, where the sessions of the CI are.
+$testMode = $user->getSettings()->getConnection()->getTestMode();
+
 $names = [];
 foreach ($layer['methods']->by_id as $constructor) {
     $name = $constructor['method'];
@@ -246,6 +252,7 @@ foreach ($layer['methods']->by_id as $constructor) {
         || $name === 'photos.updateProfilePhoto'
         || $name === 'photos.uploadProfilePhoto'
         || $name === 'payments.resolveStarGiftOffer' // tmp
+        || ($testMode && $name === 'contacts.getContactIDs') // Never answered on the test servers
         || !str_contains($name, '.')) {
         continue;
     }

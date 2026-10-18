@@ -857,13 +857,8 @@ trait UpdateHandler
                     $message,
                     $info,
                     new Wallpaper($this, $message['action']['wallpaper']),
-                ),
-                'messageActionSetSameChatWallPaper' => new DialogSetChatWallPaper(
-                    $this,
-                    $message,
-                    $info,
-                    new Wallpaper($this, $message['action']['wallpaper']),
-                    true
+                    $message['action']['same'] ?? false,
+                    $message['action']['for_both'] ?? false,
                 ),
                 'messageActionNoForwardsRequest' => new DialogNoForwardRequest(
                     $this,

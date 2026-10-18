@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
@@ -47,6 +48,7 @@ final class FilterTextStartsCaseInsensitive extends Filter
     public function apply(Update $update): bool
     {
         return ($update instanceof Message && str_starts_with(mb_strtolower($update->message), $this->content)) ||
-            ($update instanceof Story && str_starts_with(mb_strtolower($update->caption), $this->content));
+            ($update instanceof Story && str_starts_with(mb_strtolower($update->caption), $this->content)) ||
+            ($update instanceof MultiCallMessage && str_starts_with(mb_strtolower($update->message->text), $this->content));
     }
 }

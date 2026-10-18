@@ -22,13 +22,15 @@ use Amp\Cancellation;
 use Amp\DeferredFuture;
 
 /**
+ * A fiber waiting for a state: ephemeral, it's never serialized (it isn't, itself: see __sleep()).
+ *
  * @template T
  *
  * @internal
  *
  * @implements Subscriber<T>
  */
-final class AsyncWaiter implements Subscriber
+final class AsyncWaiter implements Subscriber, EphemeralSubscriber
 {
     /** @var DeferredFuture<T> */
     private readonly DeferredFuture $future;
@@ -51,7 +53,7 @@ final class AsyncWaiter implements Subscriber
     public function onAttach($initState): void
     {
         if ($initState === $this->waitFor) {
-            $this->future->complete();
+            $this->complete();
         }
     }
 
@@ -59,6 +61,14 @@ final class AsyncWaiter implements Subscriber
     public function onStateChange($prevState, $state): void
     {
         if ($state === $this->waitFor) {
+            $this->complete();
+        }
+    }
+
+    private function complete(): void
+    {
+        // The state can be reached again before the waiting fiber resumes and unsubscribes it.
+        if (!$this->future->isComplete()) {
             $this->future->complete();
         }
     }

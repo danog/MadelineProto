@@ -26,7 +26,7 @@ enum FieldType: string
     case TEXT = 'text';
     case PHONE = 'tel';
     case PASSWORD = 'password';
-    /** One-time login code. */
+    /** One-time login code, hidden like a password. */
     case CODE = 'code';
     case URL = 'url';
     case TEXTAREA = 'textarea';

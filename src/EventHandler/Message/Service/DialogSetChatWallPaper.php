@@ -34,7 +34,10 @@ final class DialogSetChatWallPaper extends ServiceMessage
         public readonly Wallpaper $wallpaper,
 
         /** @var bool Whether the user applied a wallpaper previously sent by the other user in a DialogSetChatWallPaper message. */
-        public readonly bool $same = false
+        public readonly bool $same = false,
+
+        /** @var bool Whether the wallpaper was set for both users of the private chat. */
+        public readonly bool $forBoth = false,
     ) {
         parent::__construct($API, $rawMessage, $info);
     }

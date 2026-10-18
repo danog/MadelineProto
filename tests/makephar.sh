@@ -3,10 +3,7 @@
 # Configure
 echo >> /usr/local/etc/php/php.ini
 echo 'phar.readonly = 0' >> /usr/local/etc/php/php.ini
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
+# Composer comes with the image (tests/dockerfiles/Dockerfile).
 
 apt-get update && apt-get install -y wget
 
@@ -147,24 +144,12 @@ n
 n
 "; } | tests/testing.php
 }
+# A new session of the bot, created by the MadelineProto under test (see tests/ci_sessions.php), with its exported
+# authorization: logging in with its token in every build gets FLOOD_WAITs.
 runTest()
 {
-    {
-        echo "$BOT_TOKEN
-n
-n
-n
-"; } | $p tests/testing.php
-}
-runTestOld()
-{
-    {
-        echo "b
-$BOT_TOKEN
-n
-n
-n
-"; } | $p tests/testing.php
+    php tests/ci_sessions.php bot "$PWD/testing.madeline" BOT_SESSION_AUTH
+    runTestSimple
 }
 
 k
@@ -215,12 +200,15 @@ cd "$madelinePath"
 
 if [ "$CI_COMMIT_TAG" == "7777" ]; then exit 0; fi
 
-cp "$input/madeline$php$branch.phar" "madeline81.phar"
+cp "$input/madeline$php$branch.phar" "madeline.phar"
+# The previous name, for the madeline.php files that only know it: until it isn't downloaded anymore.
+cp madeline.phar madeline81.phar
 git remote add hub https://github.com/danog/MadelineProto
 
 echo -n "$CI_COMMIT_TAG" > release
 cp tools/phar.php madeline.php
 
+gh release upload "$CI_COMMIT_TAG" "madeline.phar"
 gh release upload "$CI_COMMIT_TAG" "madeline81.phar"
 gh release upload "$CI_COMMIT_TAG" "release"
 gh release upload "$CI_COMMIT_TAG" "madeline.php"
@@ -228,16 +216,6 @@ gh release upload "$CI_COMMIT_TAG" "madeline.php"
 gh release edit --prerelease=false "$CI_COMMIT_TAG"
 gh release edit --latest=true "$CI_COMMIT_TAG"
 
-# Send the phar to the @madelineprotophar channel, with a link to the changelog.
-if [ "$PHAR_BOT_TOKEN" != "" ]; then
-    curl --fail --silent --show-error \
-        -F chat_id=@madelineprotophar \
-        -F "document=@madeline81.phar;filename=madeline-$CI_COMMIT_TAG.phar" \
-        -F caption="MadelineProto $CI_COMMIT_TAG
-
-Changelog: https://github.com/danog/MadelineProto/releases/tag/$CI_COMMIT_TAG" \
-        "https://api.telegram.org/bot$PHAR_BOT_TOKEN/sendDocument" > /dev/null \
-        || echo "Could not send the phar to @madelineprotophar!"
-fi
+# Sent to @madelineprotophar by release.yml (tests/send_phar.sh), which the CI runs next.
 
 

@@ -142,6 +142,29 @@ trait GroupMediaTrait
      * ------------------------------------------------------------------ */
 
     /**
+     * The disk jockey whose playback the main WebRTC connection transmits (overridden by the calls
+     * that transmit it otherwise).
+     */
+    private function connectionDj(): DjLoop
+    {
+        return $this->diskJockey;
+    }
+
+    /**
+     * Prepare to transmit what is played, or throw if it can't be (overridden by the calls that need to).
+     */
+    private function beforePlay(): void
+    {
+    }
+
+    /**
+     * Throw if the screen can't be shared (overridden by the calls that have such cases).
+     */
+    private function assertCanPresent(): void
+    {
+    }
+
+    /**
      * The disk jockey feeding a given destination: the main one for the camera, and the video-only
      * screen-share one for the presentation (joining the separate presentation connection on first
      * use). Screen-share is video-only, so it does not require OGG OPUS audio.
@@ -185,6 +208,7 @@ trait GroupMediaTrait
      */
     public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
+        $this->beforePlay();
         $this->dj($dest)->play($file);
         return $this;
     }
@@ -194,6 +218,7 @@ trait GroupMediaTrait
      */
     public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static
     {
+        $this->beforePlay();
         $this->dj($dest)->play($file);
         self::awaitStream($file);
         return $this;
@@ -206,6 +231,7 @@ trait GroupMediaTrait
      */
     public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static
     {
+        $this->beforePlay();
         $this->dj($dest)->playOnHold(...$files);
         return $this;
     }
@@ -289,6 +315,7 @@ trait GroupMediaTrait
         if ($this->presentationConnection !== null) {
             return $this;
         }
+        $this->assertCanPresent();
         if ($this->getCallState() !== GroupCallState::JOINED) {
             throw new \RuntimeException("Cannot share a screen before joining $this.");
         }
@@ -478,7 +505,7 @@ trait GroupMediaTrait
     private function replaceConnection(): GroupConnection
     {
         $this->detachConnection();
-        $connection = new GroupConnection($this, $this->diskJockey);
+        $connection = new GroupConnection($this, $this->connectionDj());
         $this->configureConnection($connection, false);
         $connection->adoptIncomingMedia($this->inheritedMedia);
         $this->inheritedMedia = [];

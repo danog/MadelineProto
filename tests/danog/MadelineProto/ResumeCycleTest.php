@@ -35,6 +35,7 @@ use function Amp\ByteStream\buffer;
  *
  * The session of the children is created with BOT_TOKEN, unless RESUME_CYCLE_SESSION is the path of an existing one.
  *
+ * @group session
  * @internal
  */
 final class ResumeCycleTest extends MadelineTestCase

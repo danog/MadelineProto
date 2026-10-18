@@ -20,6 +20,7 @@ use Amp\ByteStream\ReadableStream as ByteStreamReadableStream;
 use Amp\ByteStream\WritableStream as ByteStreamWritableStream;
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\Ipc\Sync\ChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
@@ -229,6 +230,13 @@ final class Wrapper extends ClientAbstract
         }
         try {
             $this->server->send([$id, $result]);
+        } catch (ChannelException $e) {
+            // The server closed the connection, as it does once the IPC call of the callbacks returned (the late
+            // progress notifications of an upload, for example), before receiverLoop() got to see it (receive()
+            // closes the socket, then sends the close request): nobody waits for the result anymore, see
+            // ClientAbstract::loopInternal().
+            $this->disconnected = true;
+            $this->logger->logger("Not sending the result of reverse method {$payload[0]}, the connection was closed: $e", Logger::VERBOSE);
         } catch (Throwable $e) {
             $this->logger->logger("Got error while trying to send result of reverse method {$payload[0]}: $e", Logger::ERROR);
             try {

@@ -159,7 +159,9 @@ final class GarbageCollector
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
         };
-        $cb();
+        // Not awaited: the startup doesn't wait for the release URL, which can take a while (three connection
+        // attempts) to fail when it can't be reached.
+        EventLoop::queue($cb);
         EventLoop::unreference($id = EventLoop::repeat(3600.0, $cb));
     }
 

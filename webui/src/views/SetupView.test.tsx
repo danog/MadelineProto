@@ -1,4 +1,5 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "../App";
 import { loginPage, state } from "../fixtures";
@@ -46,6 +47,7 @@ describe("SetupView", () => {
         const answer = stubQr();
         render(<App state={state(loginPage)} />);
         await screen.findByText("Log in with a QR code");
+        await userEvent.type(screen.getByLabelText("Phone number"), "+39 123 456 7890");
         const form = screen.getByLabelText("Phone number").closest("form")!;
         act(() => {
             form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));

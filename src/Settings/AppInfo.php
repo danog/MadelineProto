@@ -84,10 +84,18 @@ final class AppInfo extends SettingsAbstract
             $this->systemVersion = PHP_VERSION;
         }
         // Detect language
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $this->setLangCode(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
-        } elseif (isset($_SERVER['LANG'])) {
-            $this->setLangCode(explode('_', $_SERVER['LANG'])[0]);
+        // The primary subtag of the first language, which names the translations in langs/: "ckb" of
+        // "ckb-IQ,en;q=0.8", "zh" of "zh_CN.UTF-8".
+        $code = '';
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && \is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $code = preg_split('/[-_;,.\s]/', trim($_SERVER['HTTP_ACCEPT_LANGUAGE']), 2)[0];
+        } elseif (isset($_SERVER['LANG']) && \is_string($_SERVER['LANG'])) {
+            $code = preg_split('/[-_.@]/', $_SERVER['LANG'], 2)[0];
+        }
+        $code = strtolower($code);
+        // "C" and "POSIX" are the default locale, not a language.
+        if ($code !== '' && $code !== '*' && $code !== 'c' && $code !== 'posix') {
+            $this->setLangCode($code);
         }
         $this->init();
         $this->appVersion = \danog\MadelineProto\API::RELEASE;

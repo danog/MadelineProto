@@ -7,8 +7,26 @@ function fieldId(field: Field): string {
     return "f-" + field.name.replace(/[^a-z0-9_-]/gi, "-");
 }
 
+/** What the browser would complain about, in the words of the page: the form doesn't use its validation UI. */
+function validate(input: HTMLInputElement | HTMLTextAreaElement, t: (key: string) => string): string | null {
+    const value = input.value.trim();
+    if (input.required && value === "") {
+        return t("webFieldRequired");
+    }
+    if (input.type === "tel" && value !== "" && !/^\+?[\d\s().-]{5,}$/.test(value)) {
+        return t("webPhoneInvalid");
+    }
+    return null;
+}
+
+interface Described {
+    /** Ids of the error and of the hint, for aria-describedby. */
+    describedBy: string | undefined;
+    invalid: boolean;
+}
+
 /** The attributes of an input, matching Field::getInputAttributes() on the server. */
-function inputAttributes(field: Field, hintId: string | undefined): InputHTMLAttributes<HTMLInputElement> {
+function inputAttributes(field: Field, { describedBy, invalid }: Described): InputHTMLAttributes<HTMLInputElement> {
     return {
         id: fieldId(field),
         name: field.name,
@@ -16,7 +34,8 @@ function inputAttributes(field: Field, hintId: string | undefined): InputHTMLAtt
         required: field.required,
         autoFocus: field.autofocus,
         maxLength: field.maxLength ?? undefined,
-        "aria-describedby": hintId,
+        "aria-describedby": describedBy,
+        "aria-invalid": invalid || undefined,
         spellCheck: false,
         autoComplete:
             field.autocomplete ??
@@ -27,12 +46,12 @@ function inputAttributes(field: Field, hintId: string | undefined): InputHTMLAtt
     };
 }
 
-function PasswordInput({ field, hintId }: { field: Field; hintId: string | undefined }) {
+function PasswordInput({ field, described }: { field: Field; described: Described }) {
     const t = useStrings();
     const [revealed, setRevealed] = useState(false);
     return (
         <div className="reveal">
-            <input {...inputAttributes(field, hintId)} type={revealed ? "text" : "password"} defaultValue={field.value} />
+            <input {...inputAttributes(field, described)} type={revealed ? "text" : "password"} defaultValue={field.value} />
             <button type="button" className="reveal-toggle" aria-pressed={revealed} onClick={() => setRevealed(!revealed)}>
                 {t(revealed ? "webHidePassword" : "webShowPassword")}
             </button>
@@ -40,10 +59,15 @@ function PasswordInput({ field, hintId }: { field: Field; hintId: string | undef
     );
 }
 
-function FieldInput({ field }: { field: Field }) {
+function FieldInput({ field, error }: { field: Field; error: string | null }) {
     const t = useStrings();
     const id = fieldId(field);
     const hintId = isEmpty(field.hint) ? undefined : `${id}-hint`;
+    const errorId = error === null ? undefined : `${id}-error`;
+    const described: Described = {
+        describedBy: [errorId, hintId].filter((id) => id !== undefined).join(" ") || undefined,
+        invalid: error !== null,
+    };
     let input;
     switch (field.type) {
         case "textarea":
@@ -56,20 +80,21 @@ function FieldInput({ field }: { field: Field }) {
                     required={field.required}
                     autoFocus={field.autofocus}
                     maxLength={field.maxLength ?? undefined}
-                    aria-describedby={hintId}
+                    aria-describedby={described.describedBy}
+                    aria-invalid={described.invalid || undefined}
                     defaultValue={field.value}
                 />
             );
             break;
         case "password":
-            input = <PasswordInput field={field} hintId={hintId} />;
+            input = <PasswordInput field={field} described={described} />;
             break;
         case "code":
-            // Codes are often pasted with spaces or dashes
+            // Hidden like the other secrets typed in the login; codes are often pasted with spaces or dashes
             input = (
                 <input
-                    {...inputAttributes(field, hintId)}
-                    type="text"
+                    {...inputAttributes(field, described)}
+                    type="password"
                     defaultValue={field.value}
                     onInput={(event) => {
                         const input = event.currentTarget;
@@ -82,16 +107,21 @@ function FieldInput({ field }: { field: Field }) {
             );
             break;
         default:
-            input = <input {...inputAttributes(field, hintId)} type={field.type} defaultValue={field.value} />;
+            input = <input {...inputAttributes(field, described)} type={field.type} defaultValue={field.value} />;
     }
     return (
-        <div className={`field is-${field.type}`}>
+        <div className={`field is-${field.type}${error === null ? "" : " is-invalid"}`}>
             <label htmlFor={id}>
                 {field.label}
                 {!field.required && <span className="optional">{t("webOptional")}</span>}
             </label>
             {input}
-            {hintId !== undefined && <RichText as="p" className="hint" text={field.hint} />}
+            {errorId !== undefined && (
+                <p className="field-error" id={errorId}>
+                    {error}
+                </p>
+            )}
+            {hintId !== undefined && <RichText as="p" className="hint" text={field.hint} id={hintId} />}
         </div>
     );
 }
@@ -139,7 +169,9 @@ export function Form({
     const [choices, setChoices] = useState<Record<string, string>>(() =>
         Object.fromEntries(fields.filter((field) => field.type === "choice").map((field) => [field.name, field.value])),
     );
+    const t = useStrings();
     const [busy, setBusy] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
     // The state is only updated on the next render: a second click right after the first must see the submission
     const submitted = useRef(false);
     const [focusChoice, setFocusChoice] = useState<string | null>(null);
@@ -174,15 +206,54 @@ export function Form({
             event.preventDefault();
             return;
         }
+        const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null | undefined;
+        // Secondary actions (start over, enter manually...) skip the validation, like formnovalidate does
+        if (!submitter?.formNoValidate) {
+            const found: Record<string, string> = {};
+            let first: HTMLInputElement | HTMLTextAreaElement | null = null;
+            for (const element of Array.from(event.currentTarget.elements)) {
+                if (
+                    (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) &&
+                    !element.disabled &&
+                    element.type !== "hidden" &&
+                    element.type !== "radio"
+                ) {
+                    const error = validate(element, t);
+                    if (error !== null) {
+                        found[element.name] = error;
+                        first ??= element;
+                    }
+                }
+            }
+            setErrors(found);
+            if (first !== null) {
+                event.preventDefault();
+                first.focus();
+                return;
+            }
+        }
         submitted.current = true;
         onSubmitted?.();
-        const submitter = (event.nativeEvent as SubmitEvent).submitter;
         setBusy(submitter?.getAttribute("data-key") ?? "submit");
     };
 
     const visible = fields.filter((field) => field.showWhen === null || choices[field.showWhen[0]] === field.showWhen[1]);
     return (
-        <form method="post" className="form" onSubmit={onSubmit}>
+        <form
+            method="post"
+            className="form"
+            noValidate
+            onSubmit={onSubmit}
+            onInput={(event) => {
+                // Editing a field clears its error
+                const name = (event.target as HTMLInputElement).name;
+                if (name in errors) {
+                    const rest = { ...errors };
+                    delete rest[name];
+                    setErrors(rest);
+                }
+            }}
+        >
             {visible.map((field) =>
                 field.type === "hidden" ? (
                     <input key={field.name} type="hidden" name={field.name} value={field.value} />
@@ -197,7 +268,7 @@ export function Form({
                         }}
                     />
                 ) : (
-                    <FieldInput key={field.name} field={field} />
+                    <FieldInput key={field.name} field={field} error={errors[field.name] ?? null} />
                 ),
             )}
             <div className="form-actions">

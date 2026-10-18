@@ -51,7 +51,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.8.8';
+    public const RELEASE = '8.9.0';
     /**
      * We're not logged in.
      *
@@ -226,6 +226,8 @@ final class API extends AbstractAPI
             $appInfo->setApiId($app['api_id']);
             $appInfo->setApiHash($app['api_hash']);
         }
+        // Set without finishing the web setup (in the settings, for example): drop its my.telegram.org login
+        $this->session->storeApiSetupState(null);
         $this->wrapper->setAPI(new MTProto($settings, $this->wrapper));
         $this->wrapper->logger('Prompting initial serialization...');
         $this->wrapper->serialize();

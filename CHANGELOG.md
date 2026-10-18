@@ -49,7 +49,7 @@ This version introduces [plugins »](https://docs.madelineproto.xyz/docs/PLUGINS
 See the [following post](https://t.me/MadelineProto/630) for examples!
 
 Other features:
-- Thanks to the many translation contributors @ https://weblate.madelineproto.xyz/projects/madelineproto/, MadelineProto is now localized in Hebrew, Persian, Kurdish, Uzbek, Russian, French and Italian!
+- Thanks to the many translation contributors, MadelineProto is now localized in Hebrew, Persian, Kurdish, Uzbek, Russian, French and Italian!
 - Added simplified `sendMessage`, `sendDocument`, `sendPhoto` methods that return abstract [Message](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Message.html) objects with simplified properties and bound methods!
 - You can now use `Tools::callFork` to fork a new green thread!
 - You can now automatically pin messages broadcasted using `broadcastMessages`, `broadcastForwardMessages` by using the new `pin: true` parameter!

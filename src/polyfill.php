@@ -16,7 +16,6 @@ use danog\AsyncOrm\Internal\Driver\PostgresArray;
 use danog\AsyncOrm\Internal\Driver\RedisArray;
 use danog\MadelineProto\GroupCall\GroupCallController;
 use danog\MadelineProto\Tgcalls\PrivateCallController;
-use phpseclib4\Math\BigInteger;
 
 class_alias(MysqlArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\MysqlArray');
 class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\NullCache\\PostgresArray');
@@ -28,7 +27,7 @@ class_alias(PostgresArray::class, '\\danog\\MadelineProto\\Db\\PostgresArrayByte
 class_alias(RedisArray::class, '\\danog\\MadelineProto\\Db\\RedisArray');
 class_alias(CacheContainer::class, '\\danog\\MadelineProto\\Db\\CacheContainer');
 
-class_alias(BigInteger::class, '\\phpseclib3\\Math\\BigInteger');
+require __DIR__.'/polyfill_phpseclib3.php';
 
 class_alias(PrivateCallController::class, '\\danog\\MadelineProto\\VoIPController');
 

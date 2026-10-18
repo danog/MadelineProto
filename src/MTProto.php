@@ -888,6 +888,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Interrupted uploads, and the calls that made them
             'resumableUploads',
+            'inlineFileIdKey',
             'resumableCalls',
 
             'calls',
@@ -1386,6 +1387,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         }
         $this->stopLoops();
+        // Free the metrics port: when a new session is handed over to its IPC worker, the worker binds it.
+        if ($this->promServer) {
+            $promServer = $this->promServer;
+            $this->promServer = null;
+            try {
+                $promServer->stop();
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while stopping the metrics server: $e", Logger::ERROR);
+            }
+        }
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
@@ -1789,8 +1800,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->loginState->getState()->state !== API::WAITING_PASSWORD) {
             throw new Exception('Not waiting for the password!');
         }
-        Assert::string($this->authorization['hint']);
-        return $this->authorization['hint'];
+        // Optional: an empty string if the account has none.
+        $hint = $this->authorization['hint'] ?? '';
+        Assert::string($hint);
+        return $hint;
     }
     /**
      * IDs of peers where to report errors.

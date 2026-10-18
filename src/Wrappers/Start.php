@@ -76,13 +76,14 @@ trait Start
                     $cancel = new CompositeCancellation($expire, $login);
 
                     try {
-                        $result = Tools::readLine(Lang::$current_lang['loginQr'].PHP_EOL.Lang::$current_lang['loginManual'], $cancel);
+                        // A phone number, or a bot token, censored after its colon.
+                        $result = Tools::readLine(Lang::$current_lang['loginQr'].PHP_EOL.Lang::$current_lang['loginManual'], $cancel, hideAfter: ':');
                         break;
                     } catch (CancelledException) {
                         if ($login->isRequested()) {
                             $stdout->write(PHP_EOL.PHP_EOL.Lang::$current_lang['loginQrCodeSuccessful'].PHP_EOL);
                             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+                                $this->complete2faLogin(Tools::readLine($this->getPasswordPrompt(), hidden: true));
                             }
                             $this->serialize();
                             return $this->fullGetSelf();
@@ -98,10 +99,10 @@ trait Start
                 }
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_CODE) {
-                $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode']));
+                $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode'], hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint())));
+                $this->complete2faLogin(Tools::readLine($this->getPasswordPrompt(), hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
                 $this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName']));
@@ -254,7 +255,9 @@ trait Start
                         new Field(
                             name: 'token',
                             label: Lang::$current_lang['loginBotTokenWeb'],
+                            type: FieldType::PASSWORD,
                             placeholder: '123456789:AAE…',
+                            autocomplete: 'off',
                             hint: Lang::$current_lang['loginBotTokenHintWeb'],
                             showWhen: ['type', 'bot'],
                             autofocus: $type === 'bot',
@@ -325,5 +328,16 @@ trait Start
                 );
         }
         return null;
+    }
+
+    /**
+     * The CLI prompt of the 2FA password, with the hint of the account if it has one.
+     */
+    private function getPasswordPrompt(): string
+    {
+        $hint = $this->getHint();
+        return $hint === ''
+            ? Lang::$current_lang['loginUserPassWeb']
+            : sprintf(Lang::$current_lang['loginUserPass'], $hint);
     }
 }

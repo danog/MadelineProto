@@ -122,6 +122,7 @@ trait FilesLogic
                 $_SERVER['REQUEST_METHOD'],
                 $headers,
                 $messageMedia,
+                $this->getSettings()->getFiles()->getSandboxDownloads(),
             );
         } catch (Throwable $e) {
             $this->logger->logger("An error occurred inside of downloadToBrowser: $e", Logger::FATAL_ERROR);
@@ -250,6 +251,7 @@ trait FilesLogic
             $request->getMethod(),
             array_map(static fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
+            $this->getSettings()->getFiles()->getSandboxDownloads(),
         );
 
         $body = null;
@@ -340,9 +342,8 @@ trait FilesLogic
             return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof BotApiFileId) {
-            $info = $this->getDownloadInfo($file->fileId);
-            $info['size'] = $file->size;
-            return $this->uploadFromTgfile($info, $cb, $encrypted, $cancellation);
+            // Not its download info: the upload is resumed by its file ID.
+            return $this->uploadFromTgfile($file, $cb, $encrypted, $cancellation);
         }
         if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
             if (filter_var($file, FILTER_VALIDATE_URL)) {

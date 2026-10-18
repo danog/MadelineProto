@@ -71,6 +71,10 @@ final class Publisher
         /** @var WeakMap<BaseSubscriber<T>, Subscriber<T>>  */
         $this->subscribers = new WeakMap;
         foreach ($data['subscribers'] as [$subscriber, $v]) {
+            // Saved by versions that serialized the waiters (up to 8.8.9), without their state.
+            if ($subscriber instanceof EphemeralSubscriber) {
+                continue;
+            }
             $this->subscribers[$subscriber] = $v;
         }
     }
@@ -129,6 +133,11 @@ final class Publisher
         }
         $waiter = new AsyncWaiter($state);
         $this->subscribe($waiter);
-        $waiter->wait($cancellation);
+        try {
+            $waiter->wait($cancellation);
+        } finally {
+            // Otherwise it stays subscribed until a GC cycle frees it (its actor, the value of its entry, references it).
+            $this->unsubscribe($waiter);
+        }
     }
 }

@@ -40,6 +40,8 @@ final class WebUI
         'webOptional',
         'webShowPassword',
         'webHidePassword',
+        'webFieldRequired',
+        'webPhoneInvalid',
         'webQrTitle',
         'webQrWaiting',
         'loginQrCodeSuccessful',

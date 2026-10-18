@@ -36,6 +36,7 @@ use function Amp\delay;
  * Needs USER_SESSION and PEER_USER_SESSION, the paths of two sessions of different user accounts, without
  * an event handler: the first one starts a secret chat with the second one, which accepts it.
  *
+ * @group session
  * @internal
  */
 final class SecretChatResumeTest extends TestCase

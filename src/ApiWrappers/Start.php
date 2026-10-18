@@ -100,7 +100,7 @@ trait Start
 
         return [
             'api_id' => (int) Tools::readLine('5) '.Lang::$current_lang['apiManualPrompt0']),
-            'api_hash' => trim(Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1'])),
+            'api_hash' => trim(Tools::readLine('6) '.Lang::$current_lang['apiManualPrompt1'], hidden: true)),
         ];
     }
 
@@ -114,7 +114,7 @@ trait Start
         try {
             $wrapper = new MyTelegramOrgWrapper($settings);
             $wrapper->login(trim(Tools::readLine(Lang::$current_lang['apiAutoPrompt0'])));
-            $wrapper->completeLogin(trim(Tools::readLine(Lang::$current_lang['apiAutoPrompt1'])));
+            $wrapper->completeLogin(trim(Tools::readLine(Lang::$current_lang['apiAutoPrompt1'], hidden: true)));
             if ($wrapper->hasApp()) {
                 return $wrapper->getApp();
             }
@@ -286,6 +286,7 @@ trait Start
                 new Field(
                     name: 'my_code',
                     label: Lang::$current_lang['apiAutoCodeLabelWeb'],
+                    type: FieldType::PASSWORD,
                     autocomplete: 'one-time-code',
                     autofocus: true,
                 ),
@@ -365,7 +366,9 @@ trait Start
                 new Field(
                     name: 'api_hash',
                     label: 'API hash',
+                    type: FieldType::PASSWORD,
                     value: trim((string) ($_POST['api_hash'] ?? '')),
+                    autocomplete: 'off',
                     placeholder: '0123456789abcdef0123456789abcdef',
                     maxLength: 32,
                 ),

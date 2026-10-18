@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
 use danog\MadelineProto\Tgcalls\E2E\CallPacket;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceChain;
@@ -37,6 +38,12 @@ use Webrtc\RTP\Enum\MediaKind;
  */
 final class E2EConferenceTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        // For the constants, Magic::$fieldPrime among them.
+        Magic::start(light: false);
+    }
+
     /**
      * The chain constructor ids MadelineProto computes must match TDLib's (CRC32 of the same
      * definitions), or block hashing and signing break.

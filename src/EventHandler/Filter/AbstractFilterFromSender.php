@@ -20,6 +20,7 @@ use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\AbstractStory;
 use danog\MadelineProto\EventHandler\BotCommands;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\ChatInviteRequester\BotChatInviteRequest;
 use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
@@ -61,6 +62,7 @@ abstract class AbstractFilterFromSender extends Filter
     {
         return ($update instanceof AbstractMessage && $update->senderId === $this->peerResolved) ||
             ($update instanceof AbstractStory && $update->senderId === $this->peerResolved) ||
+            ($update instanceof MultiCallMessage && $update->fromId === $this->peerResolved) ||
             ($update instanceof StoryReaction && $update->senderId === $this->peerResolved) ||
             ($update instanceof ButtonQuery && $update->userId === $this->peerResolved) ||
             ($update instanceof InlineQuery && $update->userId === $this->peerResolved) ||

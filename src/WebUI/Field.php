@@ -75,7 +75,8 @@ final class Field implements JsonSerializable
     public function getInputAttributes(string $id): array
     {
         $type = match ($this->type) {
-            FieldType::CODE => 'text',
+            // Hidden like the other secrets typed in the login
+            FieldType::CODE => 'password',
             FieldType::TEXTAREA, FieldType::CHOICE => null,
             default => $this->type->value,
         };

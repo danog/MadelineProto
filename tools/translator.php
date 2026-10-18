@@ -1,11 +1,7 @@
 <?php declare(strict_types=1);
 
-/*
-`wget https://weblate.madelineproto.xyz/download/madelineproto/madelineproto/?format=zip -O langs.zip`;
-`unzip -o langs.zip`;
-`mv madelineproto/madelineproto/langs/* langs`;
-`rm -rf madelineproto langs.zip`;
-*/
+// Builds src/Lang.php from the translations in langs/ (en.json is the reference), and the translation progress
+// of each language: see the Translation section of docs/docs/docs/CONTRIB.md.
 
 $template = '<?php
 /**
@@ -42,23 +38,40 @@ final class Lang
     public static array $current_lang = %s;
 }';
 
-$base = json_decode(file_get_contents("langs/en.json"), true);
+$base = json_decode(file_get_contents("langs/en.json"), true, flags: JSON_THROW_ON_ERROR);
+
+/**
+ * The placeholders (they are sprintf formats) and the HTML tags of a string, which its translations must keep.
+ *
+ * @return list<string>
+ */
+$markup = static function (string $string): array {
+    // Without the space flag: a literal "100% easier" isn't a placeholder.
+    preg_match_all('/%(?:\d+\$)?[-+0#]*\d*(?:\.\d+)?[bcdeEfFgGosuxX%]|<[^>]*>/', $string, $matches);
+    // "</a >" is "</a>".
+    $markup = array_map(static fn (string $m): string => preg_replace('/\s+(?=>)|(?<=<)\s+/', '', preg_replace('/\s+/', ' ', $m)), $matches[0]);
+    sort($markup);
+    return $markup;
+};
 
 $langs = [];
 $percentages = [];
-
-$res = file_get_contents("https://weblate.madelineproto.xyz/api/projects/madelineproto/languages/");
-if ($res !== false) {
-    $res = json_decode($res, true);
-    foreach ($res as ['code' => $code, 'translated_percent' => $percent]) {
-        $percentages[$code] = (int) $percent;
+foreach (glob("langs/*.json") as $file) {
+    $code = basename($file, '.json');
+    $translation = json_decode(file_get_contents($file), true, flags: JSON_THROW_ON_ERROR);
+    foreach ($translation as $key => $string) {
+        if (!isset($base[$key]) || $string === '') {
+            unset($translation[$key]);
+        } elseif ($markup($string) !== $markup($base[$key])) {
+            fwrite(STDERR, "$file: the placeholders or tags of $key don't match en.json, using the English one".PHP_EOL);
+            unset($translation[$key]);
+        }
     }
-
-    foreach (glob("langs/*.json") as $lang) {
-        $code = basename($lang, '.json');
-        $langs[$code] = array_merge($base, json_decode(file_get_contents($lang), true));
-        ksort($langs[$code]);
-    }
-
-    file_put_contents('src/Lang.php', sprintf($template, var_export($percentages, true), var_export($langs, true), var_export($langs['en'], true)));
+    $percentages[$code] = intdiv(100 * count($translation), count($base));
+    $langs[$code] = array_merge($base, $translation);
+    ksort($langs[$code]);
 }
+ksort($percentages);
+ksort($langs);
+
+file_put_contents('src/Lang.php', sprintf($template, var_export($percentages, true), var_export($langs, true), var_export($langs['en'], true)));

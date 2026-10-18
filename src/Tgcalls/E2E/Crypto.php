@@ -51,6 +51,24 @@ final class Crypto
     }
 
     /**
+     * The implementation of the Curve25519 primitives: sodium, OpenSSL (PHP 8.4+) or, without either, phpseclib.
+     *
+     * @return 'sodium'|'openssl'|'phpseclib'
+     */
+    public static function backend(): string
+    {
+        return self::$backend
+            ?? (\extension_loaded('sodium') ? 'sodium' : (self::hasOpensslCurve25519() ? 'openssl' : 'phpseclib'));
+    }
+
+    /**
+     * The backend to use instead of the best available one: for tests.
+     *
+     * @var 'sodium'|'openssl'|'phpseclib'|null
+     */
+    public static ?string $backend = null;
+
+    /**
      * @psalm-mutation-free
      */
     private static function assertAvailable(): void
@@ -243,8 +261,13 @@ final class Crypto
     /** The 32-byte Ed25519 public key of a 32-byte seed. */
     public static function publicKey(string $seed): string
     {
-        if (\extension_loaded('sodium')) {
+        if (self::backend() === 'sodium') {
             return sodium_crypto_sign_publickey(sodium_crypto_sign_seed_keypair($seed));
+        }
+        if (self::backend() === 'openssl') {
+            $details = openssl_pkey_get_details(self::opensslKey(self::ED25519_PKCS8_PREFIX, $seed, true));
+            \assert($details !== false && isset($details['ed25519']['pub_key']));
+            return (string) $details['ed25519']['pub_key'];
         }
         $curve = new \phpseclib4\Crypt\EC\Curves\Ed25519();
         $point = $curve->multiplyPoint($curve->getBasePoint(), $curve->extractSecret($seed)['dA']);
@@ -254,8 +277,16 @@ final class Crypto
     /** Ed25519-sign a message with a 32-byte seed, returning the 64-byte signature. */
     public static function sign(string $seed, string $message): string
     {
-        if (\extension_loaded('sodium')) {
+        if (self::backend() === 'sodium') {
             return sodium_crypto_sign_detached($message, sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed)));
+        }
+        if (self::backend() === 'openssl') {
+            // Ed25519 hashes the message itself: no digest.
+            if (!openssl_sign($message, $signature, self::opensslKey(self::ED25519_PKCS8_PREFIX, $seed, true), 0)) {
+                throw new \RuntimeException('Ed25519 signing failed: '.(openssl_error_string() ?: 'unknown error'));
+            }
+            /** @var string $signature */
+            return $signature;
         }
         // phpseclib loads an Ed25519 private key from the 32-byte seed followed by its public key.
         return \phpseclib4\Crypt\EC::loadFormat('libsodium', $seed.self::publicKey($seed))->sign($message);
@@ -267,8 +298,16 @@ final class Crypto
         if (\strlen($signature) !== 64 || \strlen($publicKey) !== 32) {
             return false;
         }
-        if (\extension_loaded('sodium')) {
+        if (self::backend() === 'sodium') {
             return sodium_crypto_sign_verify_detached($signature, $message, $publicKey);
+        }
+        if (self::backend() === 'openssl') {
+            try {
+                return openssl_verify($message, $signature, self::opensslKey(self::ED25519_SPKI_PREFIX, $publicKey, false), 0) === 1;
+            } catch (\Throwable) {
+                // Not a valid point.
+                return false;
+            }
         }
         try {
             return \phpseclib4\Crypt\EC::loadFormat('libsodium', $publicKey)->verify($message, $signature);
@@ -287,12 +326,21 @@ final class Crypto
      */
     public static function computeSharedSecret(string $seed, string $peerPublicKey): string
     {
-        if (\extension_loaded('sodium')) {
+        if (self::backend() === 'sodium') {
             $secretKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
             $raw = sodium_crypto_scalarmult(
                 sodium_crypto_sign_ed25519_sk_to_curve25519($secretKey),
                 sodium_crypto_sign_ed25519_pk_to_curve25519($peerPublicKey)
             );
+        } elseif (self::backend() === 'openssl') {
+            $raw = openssl_pkey_derive(
+                self::opensslKey(self::X25519_SPKI_PREFIX, self::edPublicToX25519($peerPublicKey), false),
+                self::opensslKey(self::X25519_PKCS8_PREFIX, self::edSeedToX25519($seed), true),
+            );
+            if ($raw === false) {
+                // An all-zero shared secret (a low-order point), which sodium rejects too.
+                throw new \RuntimeException('X25519 failed: '.(openssl_error_string() ?: 'unknown error'));
+            }
         } else {
             $raw = self::x25519(self::edSeedToX25519($seed), self::edPublicToX25519($peerPublicKey));
         }
@@ -301,7 +349,41 @@ final class Crypto
     }
 
     /* ------------------------------------------------------------------ *
-     *  Pure-PHP X25519 fallback (RFC 7748 + Ed25519->Montgomery conversion), used without sodium.
+     *  OpenSSL Curve25519 (PHP 8.4+), used without sodium.
+     * ------------------------------------------------------------------ */
+
+    /** The PKCS#8 encoding of an Ed25519 seed, up to the seed. */
+    private const ED25519_PKCS8_PREFIX = "\x30\x2e\x02\x01\x00\x30\x05\x06\x03\x2b\x65\x70\x04\x22\x04\x20";
+    /** The SubjectPublicKeyInfo of an Ed25519 public key, up to the key. */
+    private const ED25519_SPKI_PREFIX = "\x30\x2a\x30\x05\x06\x03\x2b\x65\x70\x03\x21\x00";
+    /** The PKCS#8 encoding of an X25519 private key, up to the key. */
+    private const X25519_PKCS8_PREFIX = "\x30\x2e\x02\x01\x00\x30\x05\x06\x03\x2b\x65\x6e\x04\x22\x04\x20";
+    /** The SubjectPublicKeyInfo of an X25519 public key, up to the key. */
+    private const X25519_SPKI_PREFIX = "\x30\x2a\x30\x05\x06\x03\x2b\x65\x6e\x03\x21\x00";
+
+    private static function hasOpensslCurve25519(): bool
+    {
+        return \extension_loaded('openssl') && \defined('OPENSSL_KEYTYPE_ED25519');
+    }
+
+    /**
+     * Load a raw Curve25519 key into OpenSSL.
+     *
+     * @throws \RuntimeException If OpenSSL rejects it.
+     */
+    private static function opensslKey(string $prefix, string $raw, bool $private): \OpenSSLAsymmetricKey
+    {
+        $label = $private ? 'PRIVATE KEY' : 'PUBLIC KEY';
+        $pem = "-----BEGIN $label-----\n".base64_encode($prefix.$raw)."\n-----END $label-----\n";
+        $key = $private ? openssl_pkey_get_private($pem) : openssl_pkey_get_public($pem);
+        if ($key === false) {
+            throw new \RuntimeException('Invalid Curve25519 key: '.(openssl_error_string() ?: 'unknown error'));
+        }
+        return $key;
+    }
+
+    /* ------------------------------------------------------------------ *
+     *  Pure-PHP X25519 fallback (RFC 7748 + Ed25519->Montgomery conversion), used without sodium or OpenSSL.
      * ------------------------------------------------------------------ */
 
     /**

@@ -22,6 +22,8 @@
     --rail-faint: #9aa0c6;
     --rail-line: #353b6b;
     --focus: 0 0 0 3px color-mix(in srgb, var(--signal) 35%, transparent);
+    --qr-light: #ffffff;
+    --qr-dark: #1c2147;
 
     --font-display: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", system-ui, sans-serif;
     --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
@@ -54,6 +56,8 @@
         --rail-ink: #e4e6f5;
         --rail-faint: #8a90b8;
         --rail-line: #262b57;
+        --qr-light: #d3d6ea;
+        --qr-dark: #14172e;
         color-scheme: dark;
     }
 }
@@ -79,6 +83,8 @@
     --rail-ink: #e4e6f5;
     --rail-faint: #8a90b8;
     --rail-line: #262b57;
+    --qr-light: #d3d6ea;
+    --qr-dark: #14172e;
     color-scheme: dark;
 }
 
@@ -255,6 +261,12 @@ a:hover { color: var(--signal-hover); }
 }
 .optional { font-weight: 400; color: var(--ink-faint); margin-inline-start: 0.35rem; }
 .hint { margin: 0.4rem 0 0; font-size: 0.875rem; color: var(--ink-faint); }
+.field-error { margin: 0.4rem 0 0; font-size: 0.875rem; font-weight: 600; color: var(--err); }
+.field.is-invalid input:not([type="radio"]), .field.is-invalid textarea { border-color: var(--err); }
+.field.is-invalid input:not([type="radio"]):focus, .field.is-invalid textarea:focus {
+    border-color: var(--err);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--err) 30%, transparent);
+}
 input:not([type="radio"]), textarea {
     width: 100%;
     min-height: 3rem;
@@ -358,7 +370,7 @@ input:not([type="radio"]):focus, textarea:focus { outline: none; border-color: v
     animation: spin 0.8s linear infinite;
 }
 
-/* QR code login: the code always sits on white, phones can't scan it inverted */
+/* QR code login: always dark on light, phones often can't scan inverted codes; dimmed in dark mode */
 .qr {
     padding: 1.5rem;
     border: 1px solid var(--line);
@@ -370,7 +382,7 @@ input:not([type="radio"]):focus, textarea:focus { outline: none; border-color: v
     position: relative;
     padding: 0.85rem;
     border-radius: 14px;
-    background: #fff;
+    background: var(--qr-light);
     aspect-ratio: 1;
     --corner: var(--signal);
     background-image:
@@ -384,9 +396,12 @@ input:not([type="radio"]):focus, textarea:focus { outline: none; border-color: v
 }
 .qr-code { width: 100%; height: 100%; display: grid; place-items: center; }
 .qr-code svg { display: block; width: 100%; height: 100%; }
+/* The SVG of the QR code has a white background rect and black modules */
+.qr-code svg > rect { fill: var(--qr-light); }
+.qr-code svg path, .qr-code svg g { fill: var(--qr-dark); }
 .qr-code:empty {
     border-radius: 6px;
-    background: repeating-linear-gradient(45deg, #eef0f6 0 10px, #f7f8fb 10px 20px);
+    background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--qr-dark) 8%, var(--qr-light)) 0 10px, var(--qr-light) 10px 20px);
 }
 .qr-status {
     display: flex;

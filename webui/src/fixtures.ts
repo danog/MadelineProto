@@ -14,6 +14,8 @@ export const strings: State["strings"] = {
     webOptional: "optional",
     webShowPassword: "Show",
     webHidePassword: "Hide",
+    webFieldRequired: "Fill in this field.",
+    webPhoneInvalid: "Enter the phone number with its country code, like +39 123 456 7890.",
     webQrTitle: "Log in with a QR code",
     webQrWaiting: "Waiting for the scan…",
     loginQrCodeSuccessful: "QR code login successful!",

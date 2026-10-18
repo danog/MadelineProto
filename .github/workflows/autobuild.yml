@@ -5,12 +5,14 @@ name: Daily build
 #
 # It pushes with the token of a GitHub App installed on the three repositories (contents and pull
 # requests: read and write), whose ID is the AUTOBUILD_APP_ID variable and private key the
-# AUTOBUILD_APP_PRIVATE_KEY secret: rulesets on their default branches let only the admins push to
-# them, so it can only open pull requests.
+# AUTOBUILD_APP_PRIVATE_KEY secret: rulesets on their default branches require pull requests approved
+# by someone else (only the admins can bypass them), so it can only open pull requests, not merge them.
 
 on:
   schedule:
     - cron: '17 3 * * *'
+  # From the Actions tab, or with gh workflow run autobuild.yml.
+  workflow_dispatch:
 
 permissions:
   contents: read

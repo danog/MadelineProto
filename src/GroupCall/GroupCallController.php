@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Calls\LiveStoryParticipant;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpPublisher;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -92,6 +93,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     private bool $rtmpMode = false;
     /** Downloads and records the call's media chunks in stream mode. */
     private ?StreamReceiver $streamReceiver = null;
+    /** Publishes what we play to the RTMP livestream, see {@see self::beforePlay()}. */
+    private ?RtmpPublisher $rtmpPublisher = null;
+    /** Whether we publish what we play to the RTMP livestream (as one of its admins). */
+    private bool $publishing = false;
+    /** What the WebRTC connection of a join of an RTMP livestream transmits: nothing, see {@see self::connectionDj()}. */
+    private ?DjLoop $silentDj = null;
     /** Whether the SFU transport parameters of the current join were already applied. */
     private bool $connectionParamsApplied = false;
 
@@ -119,7 +126,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             'access_hash' => $call['access_hash'],
         ];
         $this->public = $liveStory ? new LiveStory($API, $call, $peerId) : new GroupCall($API, $call, $peerId);
-        $this->diskJockey = new DjLoop($this);
+        // What is played to an RTMP livestream is published as an RTMP encoder would: H.264 and AAC only.
+        $this->diskJockey = new DjLoop($this, rtmp: (bool) ($call['rtmp_stream'] ?? false));
         Assert::true($this->diskJockey->start());
         $this->joinMutex = new LocalMutex;
     }
@@ -135,7 +143,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = get_object_vars($this);
         // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
         // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
-        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver'], $result['resumePending']);
+        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver'], $result['rtmpPublisher'], $result['resumePending']);
         return $result;
     }
 
@@ -145,8 +153,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->checkWatcher = null;
         $this->gapWatcher = null;
         $this->streamReceiver = null;
+        $this->rtmpPublisher = null;
         foreach ($data as $key => $value) {
-            $this->{$key} = $value;
+            // Skip the state of properties removed since the call was persisted.
+            if (property_exists($this, $key)) {
+                $this->{$key} = $value;
+            }
         }
         if (!isset($this->API->logger)) {
             $this->API->setupLogger();
@@ -155,6 +167,9 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         Assert::true($this->diskJockey->start());
         if ($this->presentationDj !== null) {
             Assert::true($this->presentationDj->start());
+        }
+        if ($this->silentDj !== null) {
+            Assert::true($this->silentDj->start());
         }
         // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
         $this->resumePending = true;
@@ -174,6 +189,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             return;
         }
         $this->resumePending = false;
+        if ($this->publishing) {
+            // Publishing does not depend on being joined (as a viewer).
+            $this->log("Resumed publishing to $this after a restart of the process.");
+            $this->diskJockey->resumeReader();
+            $this->rtmpPublisher = $this->createPublisher(null);
+        }
         if ($this->callState === GroupCallState::JOINING) {
             // The process died in the middle of join(): its phone.joinGroupCall and the payload it
             // carried are gone with it, and join() itself is a no-op while JOINING, so start over.
@@ -307,7 +328,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             return;
         }
         $this->connectionParamsApplied = true;
-        $this->log("Join response of $this: ".json_encode($params), Logger::VERBOSE);
+        // The stream key of an RTMP livestream lets anyone publish to it: keep it out of the logs.
+        $this->log("Join response of $this: ".json_encode(isset($params['rtmp_stream_key']) ? ['rtmp_stream_key' => '<redacted>'] + $params : $params), Logger::VERBOSE);
         $parsed = GroupSdp::parseJoinResponse($params);
         $this->streamMode = $parsed['stream'];
         $this->rtmpMode = $parsed['rtmp'];
@@ -726,11 +748,99 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->stopChecking();
         $this->cancelGapRefetch();
         $this->diskJockey->discard();
+        $this->silentDj?->discard();
         $this->dropPresentation();
         $this->closeConnection();
         $this->streamReceiver?->stop();
         $this->streamReceiver = null;
+        $this->rtmpPublisher?->stop();
+        $this->rtmpPublisher = null;
+        $this->publishing = false;
         $this->API->cleanupGroupCall($this->public->id);
+    }
+
+    /**
+     * The disk jockey whose playback the WebRTC connection transmits. Joining an RTMP livestream
+     * switches to stream mode, where the connection is closed, but its tracks must never take the
+     * frames of the RTMP publisher meanwhile: they get a disk jockey that plays nothing.
+     */
+    private function connectionDj(): DjLoop
+    {
+        if (!($this->call['rtmp_stream'] ?? false)) {
+            return $this->diskJockey;
+        }
+        if ($this->silentDj === null) {
+            $this->silentDj = new DjLoop($this);
+            Assert::true($this->silentDj->start());
+        }
+        return $this->silentDj;
+    }
+
+    /**
+     * What is played to an RTMP livestream is published to it, as an RTMP encoder would: to the URL
+     * and with the key of [phone.getGroupCallStreamRtmpUrl](https://core.telegram.org/method/phone.getGroupCallStreamRtmpUrl),
+     * which only the admins of the group or channel can get. Joining the livestream only watches it.
+     */
+    private function beforePlay(): void
+    {
+        if (!($this->call['rtmp_stream'] ?? false) || $this->publishing) {
+            return;
+        }
+        if ($this->callState === GroupCallState::LEFT) {
+            // Nothing would stop the publisher.
+            throw new Exception("Cannot publish to $this: it was left");
+        }
+        if ($this->public->peerId === null) {
+            throw new Exception("Cannot publish to $this: unknown group or channel");
+        }
+        // Set first: a concurrent play() must not start a second publisher.
+        $this->publishing = true;
+        try {
+            $ingest = $this->API->getGroupCallStreamRtmpUrl($this->public->peerId, false, $this->public instanceof LiveStory);
+        } catch (RPCErrorException $e) {
+            $this->publishing = false;
+            throw new Exception("Cannot publish to the RTMP livestream $this ({$e->rpc}): only the admins of a group or channel can", 0, $e);
+        }
+        if ($this->publishing && $this->rtmpPublisher === null) {
+            $this->log("Publishing what is played to the RTMP livestream $this", Logger::NOTICE);
+            $this->rtmpPublisher = $this->createPublisher($ingest);
+        }
+    }
+
+    /**
+     * @param ?array{url: string, key: string} $ingest Where to publish the first time, if already known.
+     */
+    private function createPublisher(?array $ingest): RtmpPublisher
+    {
+        $peer = $this->public->peerId;
+        \assert($peer !== null);
+        $liveStory = $this->public instanceof LiveStory;
+        return new RtmpPublisher($this, $this->diskJockey, function (bool $revoke) use (&$ingest, $peer, $liveStory): array {
+            if ($ingest !== null && !$revoke) {
+                $first = $ingest;
+                $ingest = null;
+                return $first;
+            }
+            return $this->API->getGroupCallStreamRtmpUrl($peer, $revoke, $liveStory);
+        });
+    }
+
+    /**
+     * Whether we publish what we play to the RTMP livestream (as one of its admins).
+     */
+    public function isRtmpPublisher(): bool
+    {
+        return $this->publishing;
+    }
+
+    /**
+     * An RTMP livestream can't carry a screen share.
+     */
+    private function assertCanPresent(): void
+    {
+        if ($this->call['rtmp_stream'] ?? false) {
+            throw new Exception("$this is an RTMP livestream, which has no screen sharing: play the screen as the video of its files, instead");
+        }
     }
 
     /**

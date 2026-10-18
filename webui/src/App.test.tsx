@@ -64,8 +64,9 @@ describe("App", () => {
         expect(screen.getByRole("button", { name: "Hide" }).getAttribute("aria-pressed")).toBe("true");
     });
 
-    it("submits once", () => {
+    it("submits once", async () => {
         render(<App state={state(passwordPage)} />);
+        await userEvent.type(screen.getByLabelText("Password"), "hunter2");
         const form = screen.getByLabelText("Password").closest("form")!;
         const first = new Event("submit", { bubbles: true, cancelable: true });
         const second = new Event("submit", { bubbles: true, cancelable: true });
@@ -76,6 +77,55 @@ describe("App", () => {
         expect(first.defaultPrevented).toBe(false);
         expect(second.defaultPrevented).toBe(true);
         expect(screen.getByRole("button", { name: "Log in" }).getAttribute("aria-busy")).toBe("true");
+    });
+
+    it("shows its own validation errors, inline", async () => {
+        pendingFetch();
+        render(<App state={state(loginPage)} />);
+        const phone = screen.getByLabelText("Phone number") as HTMLInputElement;
+        const form = phone.closest("form")!;
+        expect(form.noValidate).toBe(true);
+
+        const empty = new Event("submit", { bubbles: true, cancelable: true });
+        act(() => {
+            form.dispatchEvent(empty);
+        });
+        expect(empty.defaultPrevented).toBe(true);
+        expect(screen.getByText("Fill in this field.").id).toBe("f-phone_number-error");
+        expect(phone.getAttribute("aria-invalid")).toBe("true");
+        expect(phone.getAttribute("aria-describedby")).toBe("f-phone_number-error f-phone_number-hint");
+        expect(document.activeElement).toBe(phone);
+        // Not busy: the form can be submitted again
+        expect(screen.getByRole("button", { name: "Continue" }).getAttribute("aria-busy")).toBeNull();
+
+        await userEvent.type(phone, "abc");
+        expect(screen.queryByText("Fill in this field.")).toBeNull();
+        expect(phone.getAttribute("aria-invalid")).toBeNull();
+
+        act(() => {
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+        });
+        expect(screen.getByText(/Enter the phone number with its country code/)).toBeTruthy();
+
+        await userEvent.clear(phone);
+        await userEvent.type(phone, "+39 123 456 7890");
+        const valid = new Event("submit", { bubbles: true, cancelable: true });
+        act(() => {
+            form.dispatchEvent(valid);
+        });
+        expect(valid.defaultPrevented).toBe(false);
+    });
+
+    it("doesn't validate the fields of the other choice", async () => {
+        pendingFetch();
+        render(<App state={state(loginPage)} />);
+        await userEvent.click(screen.getByLabelText("Bot"));
+        await userEvent.type(screen.getByLabelText("Bot token"), "123:abc");
+        const submit = new Event("submit", { bubbles: true, cancelable: true });
+        act(() => {
+            screen.getByLabelText("Bot token").closest("form")!.dispatchEvent(submit);
+        });
+        expect(submit.defaultPrevented).toBe(false);
     });
 
     it("renders secondary actions that skip validation", () => {
