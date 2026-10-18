@@ -34,6 +34,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
@@ -64,6 +65,7 @@ use Throwable;
  */
 final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, CallControllerInterface
 {
+    use RestoresDeclaredProperties;
     use GroupMediaTrait;
 
     /** Subchain ids: 0 = shared-state chain, 1 = commit-reveal verification broadcasts. */
@@ -175,9 +177,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     public function __unserialize(array $data): void
     {
         // Synchronous restoration only — no async work here (that goes in resume()).
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         // Sessions serialized before the packet counters were shared carry no state object.
         $this->cryptorState ??= new FrameCryptorState();
         $this->pollWatcher = null;

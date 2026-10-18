@@ -1,0 +1,20 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../scss/mixins" as *;
+
+.outer {
+  &.hasTransition {
+    // Do not change easing function here, some places need synced easings for animations to not be jerky
+    @include animation-level-global(1) {
+      transition: height 0.2s;
+    }
+  }
+
+  &.overflowHidden {
+    overflow: hidden;
+  }
+}

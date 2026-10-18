@@ -16,9 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Calls;
 
+use danog\MadelineProto\EventHandler\CommandType;
 use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\Entities\TextWithEntities;
+use danog\MadelineProto\EventHandler\SimpleFilters;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 
@@ -31,8 +33,11 @@ use danog\MadelineProto\MTProto;
  *
  * A reaction is a message whose text is a single emoji (with, for a custom emoji, one custom emoji
  * entity spanning it), see {@see self::isReaction()}.
+ *
+ * Like chat messages, in-call messages can be matched by the message filters (commands, text, regexes,
+ * sender, incoming/outgoing, peer).
  */
-abstract class MultiCallMessage extends Update
+abstract class MultiCallMessage extends Update implements SimpleFilters
 {
     /** ID of the call the message was sent in. */
     public readonly int $callId;
@@ -42,6 +47,28 @@ abstract class MultiCallMessage extends Update
     public readonly int $date;
     /** The text of the message (or the emoji of a reaction) with its entities. */
     public readonly TextWithEntities $message;
+    /** Whether we sent the message. */
+    public readonly bool $out;
+
+    /** Bot command (if present) */
+    public readonly ?string $command;
+    /** Bot command type (if present) */
+    public readonly ?CommandType $commandType;
+    /** @var list<string> Bot command arguments (if present) */
+    public readonly ?array $commandArgs;
+
+    /**
+     * @readonly
+     *
+     * @var list<string> Regex matches, if a filter regex is present
+     */
+    public ?array $matches = null;
+    /**
+     * @readonly
+     *
+     * @var array<array-key, array<array-key, list{string, int}|null|string>|mixed> Regex matches, if a filter multiple match regex is present
+     */
+    public ?array $matchesAll = null;
 
     /**
      * @internal
@@ -62,6 +89,9 @@ abstract class MultiCallMessage extends Update
             MessageEntity::fromRawEntities($message['message']['entities'] ?? []),
             null,
         );
+        $self = $API->getSelf();
+        $this->out = $self !== false && $this->fromId === $self['id'];
+        [$this->commandType, $this->command, $this->commandArgs] = CommandType::parse($this->message->text);
     }
 
     /**

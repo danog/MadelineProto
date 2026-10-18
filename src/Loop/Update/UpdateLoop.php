@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Loop\Update;
 
+use Amp\CancelledException;
 use Amp\TimeoutException;
 use danog\Loop\Loop;
 use danog\MadelineProto\API;
@@ -148,8 +149,12 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
                     unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
                     $this->API->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
                     return self::STOP;
-                } catch (TimeoutException) {
+                } catch (CancelledException $e) {
+                    if (!$e->getPrevious() instanceof TimeoutException) {
+                        throw $e;
+                    }
                     EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
+                    delay(1.0);
                     continue;
                 }
                 $timeout = min(self::DEFAULT_TIMEOUT, $difference['timeout'] ?? self::DEFAULT_TIMEOUT);
@@ -198,7 +203,10 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
                         break;
                     } catch (TimeoutError) {
                         delay(1.0);
-                    } catch (TimeoutException) {
+                    } catch (CancelledException $e) {
+                        if (!$e->getPrevious() instanceof TimeoutException) {
+                            throw $e;
+                        }
                         EventLoop::queue($this->API->report(...), "Network issues detected, please check logs!");
                     }
                 } while (true);
@@ -248,7 +256,7 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
         }
         $this->API->logger("Finished parsing updates in {$this}, now resuming feeders", Logger::ULTRA_VERBOSE);
         foreach ($result as $channelId => $_) {
-            $this->API->feeders[$channelId]?->resume();
+            ($this->API->feeders[$channelId] ?? null)?->resume();
         }
         $this->API->logger("Finished parsing updates in {$this}, pausing for $timeout seconds", Logger::ULTRA_VERBOSE);
 

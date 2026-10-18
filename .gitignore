@@ -160,3 +160,10 @@ pre.json
 
 # Left by tests/lock_setup.php
 woodpecker.lock
+/ci-lanes/
+/paratest.log
+
+# Web UI dependencies
+webui/node_modules/
+# the vendored code of the web UI (the "vendor" rule above is for Composer)
+!webui/src/vendor/

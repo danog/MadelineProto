@@ -1,0 +1,95 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../shared" as *;
+
+.rp {
+  position: relative;
+}
+
+.rp-overflow, 
+.btn-menu-toggle.rp, 
+.menu-horizontal-div-item.rp, 
+.btn-corner.rp,
+.pinned-container-wrapper.rp,
+.btn-control-small.rp
+/* , html.is-safari .c-ripple */ {
+  .c-ripple {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+
+    &__circle {
+      overflow: hidden;
+    }
+  }
+}
+
+/**
+ * Utility: Ripple
+ * --------------------------------------------------
+ */
+.c-ripple {
+  //display: none !important;
+  position: absolute;
+  inset: 0;
+  // pointer-events: none;
+
+  // ! with these rules ripple lags
+  /* width: 100%;
+  height: 100%; */
+  //overflow: hidden;
+  /* background: transparent;
+  border-radius: inherit; */
+
+  html.is-safari & {
+    -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%); // fix safari overflow
+    border-radius: inherit;
+  }
+
+  &__circle {
+    opacity: var(--ripple-max-opacity, 1);
+    background-color: var(--ripple-color);
+    display: block;
+    position: absolute;
+    transform: scale(0);
+    border-radius: 50%;
+    animation-name: ripple-effect;
+    animation-fill-mode: forwards;
+    animation-duration: var(--ripple-duration);
+    transition: calc(var(--ripple-duration) / 2) opacity, calc(var(--ripple-duration) / 2) background-color;
+    // transition: calc(var(--ripple-duration) / 2.5) opacity, calc(var(--ripple-duration) / 2) background-color;
+    pointer-events: none;
+
+    // * reduced animations: no wave spreading from the press, only the highlight it grows into -
+    // * there at once, fading in quickly and out as usual (animations off draw none at all)
+    @include animation-level-below(2) {
+      animation: none;
+      transform: scale(var(--ripple-end-scale));
+
+      &:not(.hiding) {
+        transition-duration: .1s;
+      }
+    }
+  }
+
+  &__circle.hiding, 
+  &__square.hiding {
+    opacity: 0;
+    // transition: calc(var(--ripple-duration) / 2) opacity, calc(var(--ripple-duration) / 2) background-color;
+  }
+}
+
+@keyframes ripple-effect {
+  from {
+    transform: scale(var(--ripple-start-scale));
+  }
+
+  to {
+    transform: scale(var(--ripple-end-scale));
+  }
+}

@@ -33,6 +33,7 @@ use function Amp\delay;
  *
  * The session is created with BOT_TOKEN, or copied from RESUME_CYCLE_SESSION if set.
  *
+ * @group session
  * @internal
  */
 final class EventHandlerStartTest extends TestCase

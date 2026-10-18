@@ -1,0 +1,33 @@
+{
+    "name": "@madelineproto/webui",
+    "private": true,
+    "description": "The web UI of MadelineProto, a port of the auth pages of tweb (Telegram Web K): built into src/WebUI/templates/assets/tweb/, which is committed.",
+    "license": "GPL-3.0-or-later",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc --noEmit && vite build",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "lottie-web": "5.13.0",
+        "qr-code-styling": "1.9.2",
+        "solid-js": "1.9.17",
+        "solid-transition-group": "0.3.0"
+    },
+    "devDependencies": {
+        "@solidjs/testing-library": "0.8.10",
+        "@types/node": "26.6.5",
+        "jsdom": "30.1.3",
+        "sass": "1.105.1",
+        "typescript": "7.0.2",
+        "vite": "8.3.4",
+        "vite-plugin-solid": "2.11.14",
+        "vitest": "5.0.4"
+    },
+    "overrides": {
+        "seroval": "1.6.8",
+        "seroval-plugins": "1.6.8"
+    }
+}

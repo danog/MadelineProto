@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableStream;
+use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\Future;
@@ -137,9 +139,13 @@ abstract class AsyncTools extends StrTools
     /**
      * Asynchronously read line.
      *
-     * @param string $prompt Prompt
+     * @param string  $prompt    Prompt
+     * @param bool    $hidden    Whether to hide what is typed (for tokens, passwords and codes), when reading from a terminal
+     * @param ?string $hideAfter Show what is typed until this character, censor what follows it with asterisks
+     *                           (for prompts that take either a phone number or a bot token, which contains a
+     *                           colon), when reading from a terminal
      */
-    public static function readLine(string $prompt = '', ?Cancellation $cancel = null): string
+    public static function readLine(string $prompt = '', ?Cancellation $cancel = null, bool $hidden = false, ?string $hideAfter = null): string
     {
         try {
             Magic::togglePeriodicLogging();
@@ -149,15 +155,146 @@ abstract class AsyncTools extends StrTools
                 $stdout->write($prompt);
             }
             static $lines = [''];
-            while (\count($lines) < 2 && ($chunk = $stdin->read($cancel)) !== null) {
-                $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
-                $lines[\count($lines) - 1] .= array_shift($chunk);
-                $lines = array_merge($lines, $chunk);
+            if (($hidden || $hideAfter !== null) && \count($lines) < 2 && \defined('STDIN') && stream_isatty(STDIN)) {
+                if (PHP_OS_FAMILY === 'Windows') {
+                    return self::readHiddenLineWindows($cancel, $hidden ? null : $hideAfter);
+                }
+                if (!$hidden && ($restoreTerminal = self::disableEcho('-icanon -echo min 1')) !== null) {
+                    try {
+                        return self::readLineHidingAfter($stdin, $stdout, $lines, $hideAfter, $cancel);
+                    } finally {
+                        $restoreTerminal();
+                    }
+                }
+                if ($hidden) {
+                    $restoreEcho = self::disableEcho('-echo');
+                }
+            }
+            try {
+                while (\count($lines) < 2 && ($chunk = $stdin->read($cancel)) !== null) {
+                    $chunk = explode("\n", str_replace(["\r", "\n\n"], "\n", $chunk));
+                    $lines[\count($lines) - 1] .= array_shift($chunk);
+                    $lines = array_merge($lines, $chunk);
+                }
+            } finally {
+                if (isset($restoreEcho)) {
+                    $restoreEcho();
+                    // The newline typed wasn't echoed either.
+                    $stdout->write(PHP_EOL);
+                }
             }
         } finally {
             Magic::togglePeriodicLogging();
         }
         return array_shift($lines) ?? '';
+    }
+
+    /**
+     * Read a line one character at a time, echoing it until $hideAfter and asterisks after it (Unix, in
+     * non-canonical mode, without echo).
+     *
+     * @param list<string> $lines Lines read but not returned yet (what follows the newline of a paste)
+     */
+    private static function readLineHidingAfter(ReadableStream $stdin, WritableStream $stdout, array &$lines, string $hideAfter, ?Cancellation $cancel): string
+    {
+        $line = $lines[0];
+        while (($chunk = $stdin->read($cancel)) !== null) {
+            // Escape sequences (arrows...) can't edit the line.
+            $chunk = preg_replace('/\e(\[[0-9;?]*[ -\/]*[@-~]|.)/s', '', $chunk);
+            foreach (preg_split('//u', $chunk, -1, PREG_SPLIT_NO_EMPTY) ?: str_split($chunk) as $i => $char) {
+                if ($char === "\r" || $char === "\n") {
+                    $stdout->write(PHP_EOL);
+                    // The rest of a paste, for the next reads.
+                    $rest = implode('', \array_slice(preg_split('//u', $chunk, -1, PREG_SPLIT_NO_EMPTY) ?: str_split($chunk), $i + 1));
+                    $rest = explode("\n", str_replace(["\r\n", "\r"], "\n", ltrim($rest, "\r\n")));
+                    $lines = $rest === [''] ? [''] : $rest;
+                    return $line;
+                }
+                if ($char === "\x7f" || $char === "\x08") {
+                    if ($line !== '') {
+                        $line = (string) preg_replace('/.$/su', '', $line);
+                        // Shown, or as an asterisk.
+                        $stdout->write("\x08 \x08");
+                    }
+                    continue;
+                }
+                if (\ord($char[0]) < 0x20) {
+                    continue;
+                }
+                $stdout->write(str_contains($line, $hideAfter) ? '*' : $char);
+                $line .= $char;
+            }
+        }
+        $lines = [''];
+        return $line;
+    }
+
+    /**
+     * Configure the terminal to stop echoing what is typed (Unix), returning the function that restores it.
+     *
+     * @param string $mode Settings for stty
+     *
+     * @return ?Closure(): void Null if the terminal can't be configured (stty unavailable)
+     */
+    private static function disableEcho(string $mode): ?Closure
+    {
+        if (!\function_exists('shell_exec')) {
+            return null;
+        }
+        $state = trim((string) @shell_exec('stty -g 2>/dev/null'));
+        if ($state === '') {
+            return null;
+        }
+        @shell_exec('stty '.$mode.' 2>/dev/null');
+        $restored = false;
+        $restore = static function () use ($state, &$restored): void {
+            if (!$restored) {
+                $restored = true;
+                @shell_exec('stty '.escapeshellarg($state).' 2>/dev/null');
+            }
+        };
+        // A signal (see Magic::start()) ends the script from the event loop, without running finally blocks.
+        register_shutdown_function($restore);
+        return $restore;
+    }
+
+    /**
+     * Read a line from the console without echoing it (Windows, which has no stty), or echoing it until $hideAfter
+     * and asterisks after it.
+     *
+     * PowerShell reads it from the console it inherits (echoing on its standard error, the console too); it's
+     * polled, so that the event loop keeps running, and terminated if the read is cancelled.
+     */
+    private static function readHiddenLineWindows(?Cancellation $cancel, ?string $hideAfter): string
+    {
+        $script = $hideAfter === null
+            ? '$s = Read-Host -AsSecureString; [Console]::Out.Write([Runtime.InteropServices.Marshal]::PtrToStringBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($s)))'
+            : '$h = '.var_export($hideAfter, true).'; $s = \'\'; while ($true) { $k = [Console]::ReadKey($true);'
+                .' if ($k.Key -eq \'Enter\') { [Console]::Error.WriteLine(); break }'
+                .' if ($k.Key -eq \'Backspace\') { if ($s.Length -gt 0) { $s = $s.Substring(0, $s.Length - 1); [Console]::Error.Write("`b `b") }; continue }'
+                .' if ([char]::IsControl($k.KeyChar)) { continue }'
+                .' if ($s.Contains($h)) { [Console]::Error.Write(\'*\') } else { [Console]::Error.Write($k.KeyChar) }; $s += $k.KeyChar }'
+                .' [Console]::Out.Write($s)';
+        $process = proc_open(
+            ['powershell', '-NoProfile', '-Command', $script],
+            [0 => STDIN, 1 => ['pipe', 'w'], 2 => STDERR],
+            $pipes,
+        );
+        if ($process === false) {
+            throw new Exception('Could not start powershell to read the hidden input');
+        }
+        try {
+            while (proc_get_status($process)['running']) {
+                delay(0.1, cancellation: $cancel);
+            }
+            return (string) stream_get_contents($pipes[1]);
+        } finally {
+            if (proc_get_status($process)['running']) {
+                proc_terminate($process);
+            }
+            fclose($pipes[1]);
+            proc_close($process);
+        }
     }
     /**
      * Asynchronously write to stdout/browser.

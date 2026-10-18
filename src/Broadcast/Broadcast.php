@@ -143,7 +143,7 @@ trait Broadcast
      */
     public function cancelBroadcast(int $id): void
     {
-        $this->broadcasts[$id]?->cancel();
+        ($this->broadcasts[$id] ?? null)?->cancel();
     }
 
     /**

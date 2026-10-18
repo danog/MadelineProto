@@ -19,6 +19,7 @@ namespace danog\MadelineProto\GroupCall;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use AssertionError;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCallParticipant;
@@ -30,11 +31,13 @@ use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\E2E\ConferenceCall;
 use Revolt\EventLoop;
@@ -50,8 +53,22 @@ use Revolt\EventLoop;
  */
 trait Handler
 {
-    /** @var array<int, GroupCallController> */
+    /** How many untracked group calls to remember, see {@see self::$seenGroupCalls}. */
+    private const SEEN_GROUP_CALLS_MAX = 1000;
+
+    /**
+     * The group calls this session joined, created, or looked up (never the ones it only gets updates
+     * about: those may be joined by another session of the same account).
+     *
+     * @var array<int, GroupCallController>
+     */
     private array $groupCalls = [];
+    /**
+     * The group calls we got updates about but do not track: ID => [access hash, peer ID, live story].
+     *
+     * @var array<int, array{int, ?int, bool}>
+     */
+    private array $seenGroupCalls = [];
     /** @var array<int, ConferenceCall> End-to-end encrypted conference calls, by call id. */
     private array $conferenceCalls = [];
 
@@ -103,10 +120,10 @@ trait Handler
             $params['schedule_date'] = $scheduleDate;
         }
         $updates = $this->methodCallAsyncRead('phone.createGroupCall', $params);
-        // The updateGroupCall in the response is dispatched to handleGroupCallUpdate through
-        // saveUpdate, which starts tracking the new call. Look it up (fetching it if that update has
-        // not landed yet) to return its handle.
+        // Start tracking the new call from the updateGroupCall in the response (handleGroupCallUpdate
+        // never starts tracking a call by itself, see there).
         $inputCall = null;
+        $peerId = null;
         foreach ($updates['updates'] ?? [] as $update) {
             if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
                 $inputCall = [
@@ -114,11 +131,13 @@ trait Handler
                     'id' => $update['call']['id'],
                     'access_hash' => $update['call']['access_hash'],
                 ];
+                // Not necessarily $peer: starting an RTMP livestream migrates a basic group to a supergroup.
+                $peerId = isset($update['peer']) ? $this->getIdInternal($update['peer']) : null;
                 break;
             }
         }
         $controller = $inputCall !== null
-            ? $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))
+            ? $this->getGroupCallByInput($inputCall, $peerId ?? $this->migratedPeer($peer))
             : null;
         if ($controller === null) {
             throw new AssertionError('The server did not return the created group call!');
@@ -581,13 +600,54 @@ trait Handler
      */
     public function getGroupCall(string|int $peer): ?GroupCall
     {
-        $full = $this->getFullInfo($peer);
-        $inputCall = $full['full']['call'] ?? null;
-        if ($inputCall === null) {
-            return null;
-        }
-        $call = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer))?->public;
+        $call = $this->currentGroupCall($peer)?->public;
         return $call instanceof GroupCall ? $call : null;
+    }
+
+    /**
+     * The group call currently active in a group or channel.
+     *
+     * The call of the full info of the chat is cached, and it may have ended since: then the full
+     * info is fetched again. A basic group migrated to a supergroup (e.g. by starting an RTMP
+     * livestream) is followed to the supergroup.
+     */
+    private function currentGroupCall(string|int $peer): ?GroupCallController
+    {
+        $peer = $this->migratedPeer($peer);
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            $inputCall = $this->getFullInfo($peer)['full']['call'] ?? null;
+            if ($inputCall === null) {
+                return null;
+            }
+            try {
+                $controller = $this->getGroupCallByInput($inputCall, $peer);
+                if ($controller !== null && !$controller->public->discarded) {
+                    return $controller;
+                }
+            } catch (RPCErrorException $e) {
+                // GROUPCALL_FORBIDDEN: the call has already ended.
+                if ($e->rpc !== 'GROUPCALL_FORBIDDEN' && $e->rpc !== 'GROUPCALL_INVALID') {
+                    throw $e;
+                }
+            }
+            $this->refreshFullPeerCache($peer);
+        }
+        return null;
+    }
+
+    /**
+     * The supergroup a basic group was migrated to, or the peer itself.
+     */
+    private function migratedPeer(string|int $peer): int
+    {
+        $id = $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_ID);
+        if (DialogId::isChat($id)) {
+            $migratedTo = $this->getInfo($id)['Chat']['migrated_to']['channel_id'] ?? null;
+            if ($migratedTo !== null) {
+                return (int) $migratedTo;
+            }
+        }
+        return $id;
     }
 
     /**
@@ -610,14 +670,9 @@ trait Handler
      */
     public function joinGroupCall(string|int $peer, bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): GroupCall
     {
-        $full = $this->getFullInfo($peer);
-        $inputCall = $full['full']['call'] ?? null;
-        if ($inputCall === null) {
-            throw new AssertionError('There is no active group call in this chat!');
-        }
-        $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer));
+        $controller = $this->currentGroupCall($peer);
         if ($controller === null) {
-            throw new AssertionError('Could not fetch the group call!');
+            throw new AssertionError('There is no active group call in this chat!');
         }
         $controller->join($muted, $joinAs, $inviteHash);
         \assert($controller->public instanceof GroupCall);
@@ -631,10 +686,7 @@ trait Handler
      */
     public function joinGroupCallById(int $id, bool $muted = false, string|int|null $joinAs = null, ?string $inviteHash = null): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->join($muted, $joinAs, $inviteHash);
+        $this->getGroupCallController($id)->join($muted, $joinAs, $inviteHash);
     }
 
     /**
@@ -688,10 +740,7 @@ trait Handler
      */
     public function leaveGroupCall(int $id): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->leave();
+        $this->getGroupCallController($id)->leave();
     }
 
     /**
@@ -699,10 +748,7 @@ trait Handler
      */
     public function discardGroupCall(int $id): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->discard();
+        $this->getGroupCallController($id)->discard();
     }
 
     /**
@@ -712,7 +758,10 @@ trait Handler
      */
     public function getGroupCallState(int $id): GroupCallState
     {
-        return ($this->groupCalls[$id] ?? null)?->getCallState() ?? GroupCallState::LEFT;
+        if (isset($this->groupCalls[$id])) {
+            return $this->groupCalls[$id]->getCallState();
+        }
+        return isset($this->seenGroupCalls[$id]) ? GroupCallState::NOT_JOINED : GroupCallState::LEFT;
     }
 
     /**
@@ -729,6 +778,18 @@ trait Handler
     }
 
     /**
+     * Bot API ID of the peer a group call we are tracking belongs to, if known.
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getGroupCallPeerId(int $id): ?int
+    {
+        return ($this->groupCalls[$id] ?? null)?->public->peerId;
+    }
+
+    /**
      * Get the participants of a group call, indexed by their bot API peer ID.
      *
      * @return array<int, AbstractGroupCallParticipant>
@@ -737,10 +798,7 @@ trait Handler
      */
     public function getGroupCallParticipants(int $id): array
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->getParticipants();
+        return $this->getGroupCallController($id)->getParticipants();
     }
 
     /**
@@ -748,10 +806,7 @@ trait Handler
      */
     public function setGroupCallMuted(int $id, bool $muted = true): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->setMuted($muted);
+        $this->getGroupCallController($id)->setMuted($muted);
     }
 
     /**
@@ -761,10 +816,7 @@ trait Handler
      */
     public function isGroupCallMuted(int $id): bool
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->isMuted();
+        return $this->getGroupCallController($id)->isMuted();
     }
 
     /**
@@ -772,10 +824,7 @@ trait Handler
      */
     public function setGroupCallTitle(int $id, string $title): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->setTitle($title);
+        $this->getGroupCallController($id)->setTitle($title);
     }
 
     /**
@@ -783,10 +832,7 @@ trait Handler
      */
     public function inviteToGroupCall(int $id, string|int ...$users): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->invite(...$users);
+        $this->getGroupCallController($id)->invite(...$users);
     }
 
     /**
@@ -796,10 +842,7 @@ trait Handler
      */
     public function exportGroupCallInvite(int $id, bool $canSelfUnmute = false): string
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->exportInvite($canSelfUnmute);
+        return $this->getGroupCallController($id)->exportInvite($canSelfUnmute);
     }
 
     /**
@@ -959,7 +1002,8 @@ trait Handler
      */
     public function getGroupCallStreamChannels(int $id): array
     {
-        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $this->getGroupCallController($id)->getInputCall()]);
+        $controller = $this->getGroupCallController($id);
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall()], $this->groupCallStreamDc($controller));
         $channels = [];
         foreach ($result['channels'] as $channel) {
             $channels[] = ['channel' => (int) $channel['channel'], 'scale' => (int) $channel['scale'], 'last_timestamp_ms' => (int) $channel['last_timestamp_ms']];
@@ -981,13 +1025,7 @@ trait Handler
             $location['video_channel'] = $videoChannel;
             $location['video_quality'] = $videoQuality ?? 0;
         }
-        $dc = $controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc;
-        if ($this->isTestMode() && $dc < 10_000) {
-            $dc += 10_000;
-        }
-        if ($this->datacenter->has(-$dc)) {
-            $dc = -$dc;
-        }
+        $dc = $this->groupCallStreamDc($controller);
         $result = $this->methodCallAsyncRead('upload.getFile', [
             'location' => $location,
             'offset' => 0,
@@ -1002,13 +1040,81 @@ trait Handler
     }
 
     /**
+     * The DC serving the chunks of a group call in stream mode (its stream_dc_id).
+     */
+    private function groupCallStreamDc(GroupCallController $controller): int
+    {
+        // The bare DC ID, as tdesktop takes it (BareDcId), whether the server sent it shifted or not,
+        // and whether it is the authorized DC, already in our numbering of the test DCs (10001-10003).
+        $dc = ($controller->public->streamDcId ?? $this->loginState->getState()->authorizedDc) % 10_000;
+        if ($this->isTestMode()) {
+            $dc += 10_000;
+        }
+        if ($this->datacenter->has(-$dc)) {
+            // Its media-only connection: chunks are downloaded like files.
+            $dc = -$dc;
+        }
+        return $dc;
+    }
+
+    /**
      * Resolve the controller of a group call we are tracking.
      *
      * @internal
      */
     private function getGroupCallController(int $id): GroupCallController
     {
-        return $this->groupCalls[$id] ?? throw new AssertionError('Unknown group call!');
+        if (isset($this->groupCalls[$id])) {
+            return $this->groupCalls[$id];
+        }
+        // A call we only saw in an update (or forgot on restart, see dropUnjoinedGroupCalls()):
+        // start tracking it now that it is used, from its access hash.
+        $seen = $this->seenGroupCalls[$id] ?? throw new AssertionError('Unknown group call!');
+        $controller = $this->getGroupCallByInput(
+            ['_' => 'inputGroupCall', 'id' => $id, 'access_hash' => $seen[0]],
+            $seen[1],
+            $seen[2],
+        );
+        if ($controller === null) {
+            unset($this->seenGroupCalls[$id]);
+            throw new AssertionError('The group call has ended!');
+        }
+        return $controller;
+    }
+
+    /**
+     * Remember the access hash of a group call we saw but do not track, see {@see self::getGroupCallController()}.
+     */
+    private function rememberGroupCall(int $id, int $accessHash, ?int $peerId, bool $liveStory): void
+    {
+        unset($this->seenGroupCalls[$id]);
+        $this->seenGroupCalls[$id] = [$accessHash, $peerId, $liveStory];
+        if (\count($this->seenGroupCalls) > self::SEEN_GROUP_CALLS_MAX) {
+            // Calls whose end we missed (it is only notified to running sessions): forget the oldest.
+            unset($this->seenGroupCalls[array_key_first($this->seenGroupCalls)]);
+        }
+    }
+
+    /**
+     * Stop tracking the group calls we are not in (nor publishing to), when resuming a session.
+     *
+     * A session only keeps (and resumes) the group calls it joined: trackers of calls it merely
+     * looked up, or that older versions created from every updateGroupCall (even for calls joined by
+     * another session of the same account), are dropped without any request. They are tracked again
+     * on first use, see {@see self::getGroupCallController()}.
+     *
+     * @internal
+     */
+    public function dropUnjoinedGroupCalls(): void
+    {
+        foreach ($this->groupCalls as $id => $groupCall) {
+            if ($groupCall->forgetIfUnjoined()) {
+                $public = $groupCall->public;
+                if (!$public->discarded) {
+                    $this->rememberGroupCall($id, $public->accessHash, $public->peerId, $public instanceof LiveStory);
+                }
+            }
+        }
     }
 
     /**
@@ -1125,10 +1231,7 @@ trait Handler
      */
     public function groupCallSetOutput(int $id, LocalFile|WritableStream $file, string|int|null $participant = null, ?RecordingFormat $format = null, ?int $streams = null): int
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->setOutput($file, $participant, $format, $streams);
+        return $this->getGroupCallController($id)->setOutput($file, $participant, $format, $streams);
     }
 
     /**
@@ -1138,10 +1241,7 @@ trait Handler
      */
     public function groupCallSetOutputFolder(int $id, LocalDirectory $dir, string|int|null $participant = null, ?RecordingFormat $format = null): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->setOutputFolder($dir, $participant, $format);
+        $this->getGroupCallController($id)->setOutputFolder($dir, $participant, $format);
     }
 
     /**
@@ -1151,10 +1251,7 @@ trait Handler
      */
     public function removeGroupCallParticipants(int $id, string|int ...$participants): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->removeParticipant(...$participants);
+        $this->getGroupCallController($id)->removeParticipant(...$participants);
     }
 
     /**
@@ -1176,10 +1273,7 @@ trait Handler
      */
     public function enableGroupCallPresentation(int $id): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->enablePresentation();
+        $this->getGroupCallController($id)->enablePresentation();
     }
 
     /**
@@ -1189,10 +1283,7 @@ trait Handler
      */
     public function disableGroupCallPresentation(int $id): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->disablePresentation();
+        $this->getGroupCallController($id)->disablePresentation();
     }
 
     /**
@@ -1200,10 +1291,7 @@ trait Handler
      */
     public function groupCallPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->play($file, $dest);
+        $this->getGroupCallController($id)->play($file, $dest);
     }
 
     /**
@@ -1213,10 +1301,7 @@ trait Handler
      */
     public function groupCallPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->playBlocking($file, $dest);
+        $this->getGroupCallController($id)->playBlocking($file, $dest);
     }
 
     /**
@@ -1224,10 +1309,7 @@ trait Handler
      */
     public function groupCallPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->playOnHold($dest, ...$files);
+        $this->getGroupCallController($id)->playOnHold($dest, ...$files);
     }
 
     /**
@@ -1235,10 +1317,7 @@ trait Handler
      */
     public function groupCallSkipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->skip($dest);
+        $this->getGroupCallController($id)->skip($dest);
     }
 
     /**
@@ -1246,10 +1325,7 @@ trait Handler
      */
     public function groupCallStopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->stop($dest);
+        $this->getGroupCallController($id)->stop($dest);
     }
 
     /**
@@ -1259,10 +1335,7 @@ trait Handler
      */
     public function groupCallPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->pause($dest);
+        $this->getGroupCallController($id)->pause($dest);
     }
 
     /**
@@ -1272,10 +1345,7 @@ trait Handler
      */
     public function groupCallResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        $this->groupCalls[$id]->resume($dest);
+        $this->getGroupCallController($id)->resume($dest);
     }
 
     /**
@@ -1285,10 +1355,7 @@ trait Handler
      */
     public function isGroupCallPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->isPaused($dest);
+        return $this->getGroupCallController($id)->isPaused($dest);
     }
 
     /**
@@ -1298,10 +1365,7 @@ trait Handler
      */
     public function groupCallGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
-        if (!isset($this->groupCalls[$id])) {
-            throw new AssertionError('Unknown group call!');
-        }
-        return $this->groupCalls[$id]->getCurrent($dest);
+        return $this->getGroupCallController($id)->getCurrent($dest);
     }
 
     /**
@@ -1320,18 +1384,20 @@ trait Handler
                     return;
                 }
                 if (!isset($this->groupCalls[$id])) {
-                    if ($call['_'] !== 'groupCall') {
-                        // A call we never tracked was just discarded: nothing to do.
-                        return;
+                    // Every member of a chat gets the updates of its group call, whether it is in it or
+                    // not, and so does every session of an account in it: never start tracking (let
+                    // alone resume) a call from its updates, or this session would own a controller
+                    // of a call joined by another session. Only remember how to track it on first use.
+                    if ($call['_'] !== 'groupCall' || ($call['conference'] ?? false)) {
+                        unset($this->seenGroupCalls[$id]);
+                    } else {
+                        $this->rememberGroupCall(
+                            $id,
+                            $call['access_hash'],
+                            isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
+                            (bool) ($update['live_story'] ?? false),
+                        );
                     }
-                    // Start tracking any group call we become aware of. The controller is built from
-                    // the full groupCall the update carries, so there is nothing to apply over it.
-                    $this->groupCalls[$id] = new GroupCallController(
-                        $this,
-                        $call,
-                        isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
-                        (bool) ($update['live_story'] ?? false),
-                    );
                     return;
                 }
                 // Deferred: applying an update may refetch the call or renegotiate the WebRTC
@@ -1350,7 +1416,7 @@ trait Handler
                     return;
                 }
                 if (!isset($this->groupCalls[$id])) {
-                    $this->logger->logger("Ignoring participants update for unknown group call $id");
+                    $this->logger->logger("Ignoring participants update for untracked group call $id", Logger::VERBOSE);
                     return;
                 }
                 EventLoop::queue(
@@ -1379,7 +1445,7 @@ trait Handler
                 $fromId = $this->getIdInternal($update['from_id']) ?? 0;
                 $encrypted = (string) $update['encrypted_message'];
                 EventLoop::queue(function () use ($id, $fromId, $encrypted, $update): void {
-                    $message = $this->conferenceCalls[$id]?->onEncryptedMessage($fromId, $encrypted);
+                    $message = ($this->conferenceCalls[$id] ?? null)?->onEncryptedMessage($fromId, $encrypted);
                     if ($message === null) {
                         return;
                     }

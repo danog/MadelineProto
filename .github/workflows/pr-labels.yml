@@ -1,0 +1,20 @@
+name: Pull request labels
+
+# Every pull request needs a release label, which sorts it in the release notes: see ../release.yml.
+
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mheap/github-action-required-labels@23e10fde7e062233401931a0eece796cd9bf3177 # v5
+        with:
+          mode: minimum
+          count: 1
+          labels: "release:fix, release:feature, release:layer, release:internal"

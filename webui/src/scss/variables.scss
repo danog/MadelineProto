@@ -1,0 +1,62 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * Adapted for MadelineProto.
+ */
+
+$placeholder-color: var(--input-label-color, #9e9e9e);
+$border-radius: 12px;
+$border-radius-medium: 16px;
+$border-radius-big: 24px;
+
+$hover-alpha: .08;
+
+//$small-screen: 720px;
+$small-screen: 600px;
+//$small-screen: 900px;
+$large-screen: 1680px;
+//$large-screen: 16800px;
+
+// The floating↔docked boundary — also the medium↔large line (ScreenSize): at/
+// below it the left sidebar floats as a drawer (medium); above it docks and the
+// chat sits beside it, clamped to the leftover width (updateColumnWidths.ts).
+$floating-left-sidebar: 925px;
+// Standard sidebar width — kept in sync with DEFAULT_COLUMN_WIDTH in
+// helpers/updateColumnWidths.ts (single source of truth for runtime widths).
+$default-column-width: 360px;
+// Max sidebar width — user can resize columns up to this; SCSS uses it for
+// thresholds (e.g. when the right column starts overlapping).
+$max-sidebar-width: 480px;
+
+$chat-input-inner-padding: .5rem;
+$chat-input-inner-padding-handhelds: .25rem;
+$btn-send-margin: .5rem;
+
+$use-acceleration: false;
+
+$input-border-radius: $border-radius-medium;
+$input-height: 3rem;
+
+$button-border-radius: $border-radius-medium;
+$button-height: 3rem;
+
+$section-rounded-border-radius: $border-radius-big;
+$section-rounded-padding: 1rem;
+
+$fonts-path: "@fonts" !default;
+// Roboto Serif (italic text and the serif style, ~290 KB) and Merriweather (rich headings, ~450 KB)
+// weigh more than what they set is worth for now: off, those styles take the app's own font
+// (`--font-serif` and `--font-heading` in base.scss)
+$serif-fonts: false !default;
+$tgico-font-family: "tgico" !default;
+$tgico-font-path: $fonts-path;
+
+$header-height: 3.5rem;
+$menu-height: 3rem;
+
+// A message's shade: its secondary color (what a bubble's --secondary-text-color is) mixed into its
+// background — a table's header cell, a plain rich button. A bubble sets both to its own; the
+// composer reads the chat's, so it matches an incoming bubble.
+$message-shade-color: color-mix(in srgb, var(--message-status-color) 10%, var(--message-background-color));

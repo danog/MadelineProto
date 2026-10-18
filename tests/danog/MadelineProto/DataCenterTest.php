@@ -43,9 +43,11 @@ final class DataCenterTest extends AsyncTestCase
         $settings->getAppInfo()
             ->setApiHash(getenv('API_HASH'))
             ->setApiId((int) getenv('API_ID'));
+        // Not MadelineProto.log: the worker of this session outlives the class, and truncated it (at 1 MB) while
+        // ResumableStreamTest checked what was logged there.
         $settings->getLogger()
             ->setType(Logger::FILE_LOGGER)
-            ->setExtra(__DIR__.'/../../MadelineProto.log')
+            ->setExtra(sys_get_temp_dir().'/MadelineProto-DataCenterTest.log')
             ->setLevel(Logger::ULTRA_VERBOSE);
         $settings->getConnection()
             ->setTestMode($test)

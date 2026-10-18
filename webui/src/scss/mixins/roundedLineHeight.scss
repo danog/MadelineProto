@@ -1,0 +1,17 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@mixin rounded-line-height() {
+  // Preserve the typographic ratio, but snap the resulting line box to a whole
+  // CSS pixel (16px -> 21px, 14px -> 18px). Older browsers keep the fallback.
+  line-height: 1.3125;
+  line-height: round(nearest, 1.3125em, 1px);
+}
+
+@mixin rounded-font-size($font-size) {
+  font-size: $font-size;
+  @include rounded-line-height();
+}

@@ -19,7 +19,9 @@ namespace danog\MadelineProto\Test;
 use Amp\DeferredFuture;
 use Amp\Ipc\Sync\ChannelException;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Connector;
+use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\Ipc\Remote\AuthenticationException;
 use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
 use danog\MadelineProto\Ipc\Remote\Handshake;
@@ -27,6 +29,7 @@ use danog\MadelineProto\Ipc\Remote\Listener;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Ipc;
+use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
@@ -184,6 +187,39 @@ final class RemoteIpcTest extends TestCase
         $this->assertNull($client->receive());
     }
 
+    /**
+     * File names chosen by the sender (audio titles) are joined to the directory of downloadToDir.
+     */
+    public function testDownloadNamesStayInTheDirectory(): void
+    {
+        $this->assertSame('.._.._etc_passwd - x', Tools::sanitizeFileName('../../etc/passwd - x'));
+        $this->assertSame('_', Tools::sanitizeFileName('..'));
+        $this->assertSame('a_b_c', Tools::sanitizeFileName("a\\b\0c"));
+    }
+
+    /**
+     * IPC-capable objects sent by a remote server carry its session name: they must be bound to the client that received them.
+     */
+    public function testIpcCapableObjectsAreBoundToTheReceivingClient(): void
+    {
+        [$client, $server] = self::pair();
+        $owner = (new \ReflectionClass(Client::class))->newInstanceWithoutConstructor();
+        $client->setOwner($owner);
+
+        $object = new RemoteIpcTestCapable;
+        (fn () => $this->session = '/data/session.madeline')->call($object);
+        $server->send($object);
+        $received = $client->receive();
+
+        $this->assertInstanceOf(RemoteIpcTestCapable::class, $received);
+        $this->assertSame($owner, \Closure::bind(fn () => $this->API, $received, IpcCapable::class)());
+        $this->assertNull(IpcCapable::$remoteClient);
+
+        // Not bound when unserialized elsewhere.
+        $plain = unserialize(serialize($object));
+        $this->assertFalse(\Closure::bind(fn () => isset($this->API), $plain, IpcCapable::class)());
+    }
+
     public function testSecretMinimumLength(): void
     {
         $this->expectException(Exception::class);
@@ -322,5 +358,15 @@ final class RemoteIpcTestWakeup
     public function __wakeup(): void
     {
         RemoteIpcTest::$unserialized = true;
+    }
+}
+
+/**
+ * @internal
+ */
+final class RemoteIpcTestCapable extends IpcCapable
+{
+    public function __construct()
+    {
     }
 }

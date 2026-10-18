@@ -24,6 +24,7 @@ use Amp\ByteStream\ReadableBuffer;
 use Amp\Cache\Cache;
 use Amp\Cache\LocalCache;
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Dns\DnsResolver;
 use Amp\Future;
@@ -51,7 +52,6 @@ use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -83,6 +83,13 @@ use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\TL\TLInterface;
 use danog\MadelineProto\TL\Types\LoginQrCode;
 use danog\MadelineProto\VoIP\CallState;
+use danog\MadelineProto\WebUI\Alert;
+use danog\MadelineProto\WebUI\AlertLevel;
+use danog\MadelineProto\WebUI\Page;
+use danog\MadelineProto\WebUI\SafeHtml;
+use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\TemplateEngine;
+use danog\MadelineProto\WebUI\WebUI;
 use danog\MadelineProto\Wrappers\Ads;
 use danog\MadelineProto\Wrappers\Button;
 use danog\MadelineProto\Wrappers\DialogHandler;
@@ -116,8 +123,11 @@ use function time;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  *
+ * Dynamic properties are allowed only for unserialization: see __wakeup().
+ *
  * @internal
  */
+#[\AllowDynamicProperties]
 final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 {
     use AuthKeyHandler;
@@ -881,11 +891,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Interrupted uploads, and the calls that made them
             'resumableUploads',
+            'inlineFileIdKey',
             'resumableCalls',
 
             'calls',
             'callsByPeer',
             'groupCalls',
+            'seenGroupCalls',
             'conferenceCalls',
             'snitch',
 
@@ -893,6 +905,29 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'updaters',
             'feeders',
         ];
+    }
+
+    /**
+     * Drop the properties removed since the session was saved (e.g. rsa_keys and test_rsa_keys, renamed to
+     * rsaKeys and testRsaKeys: the keys are refetched).
+     *
+     * Not with __unserialize(): PHP calls it once the whole session is unserialized, after the __wakeup() of the
+     * objects in it, which read the MTProto instance (DataCenter its settings, the databases its database settings,
+     * the secret chat loops its logger...): its properties must be assigned as they are unserialized, by the default
+     * unserialization, which recreates the removed ones as dynamic properties (allowed, see the class: else a
+     * deprecation). __sleep() lists the declared ones, so they're never saved again.
+     *
+     * @internal
+     */
+    public function __wakeup(): void
+    {
+        foreach (get_object_vars($this) as $name => $_) {
+            // A private property of a class that is no longer an ancestor keeps its mangled name ("\0Class\0name"),
+            // which can't be unset: unreachable by any code, it's dropped by the next save
+            if (!property_exists(self::class, (string) $name) && !str_starts_with((string) $name, "\0")) {
+                unset($this->{$name});
+            }
+        }
     }
 
     /**
@@ -1035,8 +1070,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         } catch (Throwable $e) {
             // Don't store settings that can't be applied, or the IPC server would fail to start every time.
             if ($this->ipcServer) {
-                [$listen, $secret] = $this->ipcServer->getRemoteConfiguration();
-                $this->settings->getIpc()->restore($listen, $secret);
+                // Keep a new secret even then: never go back to a secret that was changed.
+                [$listen] = $this->ipcServer->getRemoteConfiguration();
+                $this->settings->getIpc()->restore($listen);
             }
             if (Magic::$isIpcWorker) {
                 throw $e;
@@ -1251,13 +1287,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             } catch (RPCErrorException) {
             }
         }
-
-        if (isset($this->updates) && \is_array($this->updates)) {
-            foreach ($this->updates as $update) {
-                $this->updateQueue->enqueue($update);
-            }
-            unset($this->updates);
-        }
     }
     /**
      * Post-deserialization initialization function.
@@ -1325,6 +1354,18 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             $this->loginState->wakeup();
 
+            // Before anything can use the restored calls (the updates the loops started below fetch, the
+            // onStart of the event handler), drop the ones this session is not in, without requests: the
+            // incoming calls it never answered (they may have been answered by another session of the
+            // account) and the group calls it did not join (older versions tracked every group call it
+            // got updates about). The private calls whose end we may have missed expire later.
+            $ringTimeout = intdiv((int) ($this->config['call_ring_timeout_ms'] ?? 90000), 1000);
+            $receiveTimeout = intdiv((int) ($this->config['call_receive_timeout_ms'] ?? 20000), 1000);
+            foreach ($this->calls as $call) {
+                $call->expireAfterRestart($ringTimeout, $receiveTimeout);
+            }
+            $this->dropUnjoinedGroupCalls();
+
             // Connect to all DCs, start internal loops
             $loggedIn = false;
             if ($this->fullGetSelf()) {
@@ -1367,11 +1408,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 }
             }
 
-            foreach ($this->groupCalls as $id => $groupCall) {
-                if ($groupCall->getCallState() === GroupCallState::LEFT) {
-                    $this->cleanupGroupCall($id);
-                }
-            }
         } catch (Throwable $e) {
             try {
                 $this->report((string) $e);
@@ -1399,6 +1435,16 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         }
         $this->stopLoops();
+        // Free the metrics port: when a new session is handed over to its IPC worker, the worker binds it.
+        if ($this->promServer) {
+            $promServer = $this->promServer;
+            $this->promServer = null;
+            try {
+                $promServer->stop();
+            } catch (Throwable $e) {
+                $this->logger->logger("Error while stopping the metrics server: $e", Logger::ERROR);
+            }
+        }
         if (isset($this->seqUpdater)) {
             $this->seqUpdater->stop();
         }
@@ -1657,6 +1703,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
         } catch (\danog\MadelineProto\TL\Exception $e) {
             $this->logger->logger($e->getMessage(), Logger::FATAL_ERROR);
+        } catch (RPCErrorException|CancelledException $e) {
+            // Called by the update loops (and when starting): failing to refresh the keys of the CDN DCs (a timeout
+            // while reconnecting, for example) must not end them. They're fetched again when connecting to a CDN DC
+            // (AuthKeyHandler).
+            $this->logger->logger("Could not get the CDN configuration: $e", Logger::ERROR);
         }
     }
     /**
@@ -1809,8 +1860,36 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->loginState->getState()->state !== API::WAITING_PASSWORD) {
             throw new Exception('Not waiting for the password!');
         }
-        Assert::string($this->authorization['hint']);
-        return $this->authorization['hint'];
+        // Optional: an empty string if the account has none.
+        $hint = $this->authorization['hint'] ?? '';
+        Assert::string($hint);
+        return $hint;
+    }
+    /**
+     * Get what the web UI shows about the login in progress: the phone number, and the kind of code sent.
+     *
+     * Never the phone code hash, nor the code.
+     *
+     * @internal
+     *
+     * @return array{phoneNumber?: string, sentCode?: array{type: string, length: ?int, nextType: ?string, timeout: ?int}}
+     */
+    public function getWebLoginInfo(): array
+    {
+        $state = $this->loginState->getState()->state;
+        $info = [];
+        if (($state === API::WAITING_CODE || $state === API::WAITING_SIGNUP) && \is_string($this->authorization['phone_number'] ?? null)) {
+            $info['phoneNumber'] = $this->authorization['phone_number'];
+        }
+        if ($state === API::WAITING_CODE && \is_string($this->authorization['type']['_'] ?? null)) {
+            $info['sentCode'] = [
+                'type' => $this->authorization['type']['_'],
+                'length' => isset($this->authorization['type']['length']) ? (int) $this->authorization['type']['length'] : null,
+                'nextType' => $this->authorization['next_type']['_'] ?? null,
+                'timeout' => isset($this->authorization['timeout']) ? (int) $this->authorization['timeout'] : null,
+            ];
+        }
+        return $info;
     }
     /**
      * IDs of peers where to report errors.
@@ -1856,62 +1935,78 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         Logger::log($message);
 
-        $warning = $this->getWebWarnings();
+        $page = new Page(
+            title: $message,
+            view: 'status',
+            step: Step::DONE,
+            alerts: self::getWebAlerts(),
+        );
         if ($this->hasEventHandler()) {
+            $page->lead = Lang::$current_lang['webDoneLead'];
             if (!$this->hasReportPeers()) {
                 Logger::log('!!! '.Lang::$current_lang['noReportPeers'].' !!!', Logger::FATAL_ERROR);
                 Logger::log("!!! public function getReportPeers() { return '@yourtelegramusername'; } !!!", Logger::FATAL_ERROR);
-                $warning .= "<h2 style='color:red;'>".htmlentities(Lang::$current_lang['noReportPeers'])."</h2>";
-                $warning .= "<code>public function getReportPeers() { return '@yourtelegramusername'; }</code>";
+                $page->addAlert(new Alert(
+                    AlertLevel::ERROR,
+                    Lang::$current_lang['noReportPeers'],
+                    code: "public function getReportPeers() { return '@yourtelegramusername'; }",
+                ));
             }
+            $classes = [];
             if ($this->event_handler_instance instanceof EventHandler) {
-                $issues = Tools::validateEventHandlerClass($this->event_handler_instance::class);
-                foreach ($issues as $issue) {
-                    $issue->log();
-                    $warning .= $issue->getHTML();
-                }
+                $classes[] = $this->event_handler_instance::class;
             }
             foreach ($this->pluginInstances as $class => $_) {
-                $issues = Tools::validateEventHandlerClass($class);
-                foreach ($issues as $issue) {
+                $classes[] = $class;
+            }
+            foreach ($classes as $class) {
+                foreach (Tools::validateEventHandlerClass($class) as $issue) {
                     $issue->log();
-                    $warning .= $issue->getHTML();
+                    $page->addAlert($issue->getAlert());
                 }
             }
         }
 
-        return "<html><body><h1>$message</h1>$warning</body></html>";
+        return WebUI::render($this->settings->getTemplates(), $page);
+    }
+    /**
+     * Get various warnings to show to the user in the web UI, as alerts.
+     *
+     * @internal
+     *
+     * @return list<Alert>
+     */
+    public static function getWebAlerts(): array
+    {
+        Magic::start(light: false);
+        $alerts = [];
+        if (API::RELEASE !== Magic::$latest_release) {
+            $alerts[] = Alert::error(sprintf(
+                Lang::$current_lang['update_madelineproto'],
+                API::RELEASE,
+                Magic::$latest_release,
+            ));
+        }
+        if (!Magic::$hasOpenssl) {
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
+        }
+        if (!\extension_loaded('gmp')) {
+            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
+        }
+        if (!\extension_loaded('uv')) {
+            $alerts[] = Alert::info(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
+        }
+        if (Lang::$currentPercentage !== 100) {
+            $alerts[] = Alert::info(new SafeHtml(sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
+        }
+        return $alerts;
     }
     /**
      * Get various warnings to show to the user in the web UI.
      */
     public static function getWebWarnings(): string
     {
-        Magic::start(light: false);
-        $warning = '';
-        if (API::RELEASE !== Magic::$latest_release) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(
-                Lang::$current_lang['update_madelineproto'],
-                API::RELEASE,
-                Magic::$latest_release,
-            )).'</h2>';
-        }
-        if (!Magic::$hasOpenssl) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'))."</h2>";
-        }
-        if (!\extension_loaded('gmp')) {
-            $warning .= "<h2 style='color:red;'>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'))."</h2>";
-        }
-        if (!\extension_loaded('uv')) {
-            $warning .= "<p>".htmlentities(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'))."</p>";
-        }
-        /*if (Magic::$hasBasedirLimitation) {
-            $warning .= "<p>".htmlentities(Lang::$current_lang['baseDirLimitation'])."</p>";
-        }*/
-        if (Lang::$currentPercentage !== 100) {
-            $warning .= "<p>".sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)."</p>";
-        }
-        return $warning;
+        return (new TemplateEngine)->render('partials/alerts', ['alerts' => self::getWebAlerts()]);
     }
 
     /** @internal */

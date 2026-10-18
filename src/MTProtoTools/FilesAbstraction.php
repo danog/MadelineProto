@@ -37,6 +37,7 @@ use danog\MadelineProto\EventHandler\Media\Audio;
 use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\DocumentPhoto;
 use danog\MadelineProto\EventHandler\Media\Gif;
+use danog\MadelineProto\EventHandler\Media\InlineThumbnail;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\RoundVideo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
@@ -1688,9 +1689,15 @@ trait FilesAbstraction
                 }
                 [$thumb_width, $thumb_height] = getimagesizefromstring($thumb);
             } elseif ($thumb === null && $file instanceof Media) {
-                $thumb = $file->thumb;
-                $thumb_width = $file->thumbWidth;
-                $thumb_height = $file->thumbHeight;
+                // Its inline thumbnail (the 90x90 one of secret chat media, or a stripped preview): the remote ones are too big.
+                foreach ($file->thumbs as $t) {
+                    if ($t instanceof InlineThumbnail) {
+                        $thumb = buffer($t->getStream(cancellation: $cancellation), $cancellation);
+                        $thumb_width = $t->width;
+                        $thumb_height = $t->height;
+                        break;
+                    }
+                }
             }
 
             if (\is_string($thumb)) {

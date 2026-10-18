@@ -23,11 +23,11 @@ namespace danog\MadelineProto\Stream\Common;
 use Amp\Cancellation;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProtoTools\Crypt\AesCtr;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\RawStreamInterface;
-use phpseclib4\Crypt\AES;
 
 /**
  * AES CTR stream wrapper.
@@ -43,8 +43,8 @@ use phpseclib4\Crypt\AES;
  */
 class CtrStream implements BufferedProxyStreamInterface, BufferInterface
 {
-    private $encrypt;
-    private $decrypt;
+    private AesCtr $encrypt;
+    private AesCtr $decrypt;
     private $stream;
     private $write_buffer;
     private $read_buffer;
@@ -59,14 +59,8 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     #[\Override]
     public function connect(ConnectionContext $ctx, string $header = ''): void
     {
-        $this->encrypt = new AES('ctr');
-        $this->encrypt->enableContinuousBuffer();
-        $this->encrypt->setKey($this->extra['encrypt']['key']);
-        $this->encrypt->setIV($this->extra['encrypt']['iv']);
-        $this->decrypt = new AES('ctr');
-        $this->decrypt->enableContinuousBuffer();
-        $this->decrypt->setKey($this->extra['decrypt']['key']);
-        $this->decrypt->setIV($this->extra['decrypt']['iv']);
+        $this->encrypt = new AesCtr($this->extra['encrypt']['key'], $this->extra['encrypt']['iv']);
+        $this->decrypt = new AesCtr($this->extra['decrypt']['key'], $this->extra['decrypt']['iv']);
         $this->stream = ($ctx->getStream($header));
     }
     /**
@@ -117,7 +111,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     #[\Override]
     public function bufferRead(int $length, ?Cancellation $cancellation = null): string
     {
-        return @$this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
+        return $this->decrypt->encrypt($this->read_buffer->bufferRead($length, $cancellation));
     }
     /**
      * Writes data to the stream.
@@ -140,7 +134,7 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
                 throw new Exception('Tried to send too much out of frame data, cannot append');
             }
         }
-        $this->write_buffer->bufferWrite(@$this->encrypt->encrypt($data));
+        $this->write_buffer->bufferWrite($this->encrypt->encrypt($data));
     }
     /**
      * Set obfuscation keys/IVs.
@@ -177,14 +171,14 @@ class CtrStream implements BufferedProxyStreamInterface, BufferInterface
     /**
      * @psalm-mutation-free
      */
-    public function getEncryptor(): AES
+    public function getEncryptor(): AesCtr
     {
         return $this->encrypt;
     }
     /**
      * @psalm-mutation-free
      */
-    public function getDecryptor(): AES
+    public function getDecryptor(): AesCtr
     {
         return $this->decrypt;
     }

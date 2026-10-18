@@ -191,7 +191,7 @@ final class Connector
             return $this->connectWaiting(null);
         }
         // Connect as soon as any server is listening, even if it was started by another process
-        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session));
+        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session), waitStartup: true);
         if (!$server instanceof ChannelledSocket) {
             throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
         }

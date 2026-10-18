@@ -531,6 +531,13 @@ final class Connection
             }
         } elseif ($method === 'users.getStoriesMaxIDs') {
             $method = 'stories.getPeerMaxIDs';
+        } elseif (\in_array($method, ['channels.createForumTopic', 'channels.editForumTopic', 'channels.deleteTopicHistory', 'channels.getForumTopics', 'channels.getForumTopicsByID', 'channels.updatePinnedForumTopic', 'channels.reorderPinnedForumTopics'], true)) {
+            // Moved to messages.* (forums of private chats with bots too), with a peer.
+            $method = 'messages.'.substr($method, \strlen('channels.'));
+            if (isset($arguments['channel'])) {
+                $arguments['peer'] ??= $arguments['channel'];
+                unset($arguments['channel']);
+            }
         } elseif ($method === 'contacts.toggleStoriesHidden') {
             $method = 'stories.togglePeerStoriesHidden';
             if (isset($arguments['id'])) {

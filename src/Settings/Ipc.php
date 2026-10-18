@@ -206,16 +206,15 @@ final class Ipc extends SettingsAbstract
     }
 
     /**
-     * Restore the endpoints and secret that are actually in use, after new ones couldn't be applied.
+     * Restore the endpoints that are actually in use, after new ones couldn't be applied.
      *
      * @internal
      *
      * @param list<string> $listen
      */
-    public function restore(array $listen, ?string $secret): void
+    public function restore(array $listen): void
     {
         $this->listen = $listen;
-        $this->secret = $secret;
     }
 
     /**

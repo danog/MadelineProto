@@ -1,0 +1,58 @@
+<?php
+/**
+ * A page of the setup flow, or a status page.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ * @var string $state Initial state of the web app (JSON)
+ *
+ * The web app renders the page from the state in #madeline-app; the markup is for browsers without JavaScript.
+ */
+$this->layout('layout', ['title' => $page->title]);
+?>
+<?php $this->start('app') ?>
+<?php if (isset($state)): ?>
+<script type="application/json" id="madeline-state"><?= $state ?></script>
+<?php endif ?>
+<div id="madeline-app"></div>
+<?php $this->stop() ?>
+<div class="shell">
+    <aside class="rail">
+        <?= $this->insert('partials/brand') ?>
+        <?php if ($page->step !== null): ?>
+            <?= $this->insert('partials/steps', ['current' => $page->step]) ?>
+        <?php endif ?>
+        <p class="rail-foot">
+            <a href="https://docs.madelineproto.xyz" target="_blank" rel="noopener noreferrer"><?= $this->t('webDocs') ?></a>
+        </p>
+    </aside>
+    <main class="pane">
+        <div class="pane-body">
+            <div class="pane-main">
+                <header class="pane-head">
+                    <h1><?= $this->e($page->title) ?></h1>
+                    <?php if ($page->lead !== ''): ?>
+                        <p class="lead"><?= $this->e($page->lead) ?></p>
+                    <?php endif ?>
+                </header>
+
+                <?= $this->insert('partials/alerts', ['alerts' => $page->alerts]) ?>
+
+                <?php if ($page->instructions): ?>
+                    <ol class="instructions">
+                        <?php foreach ($page->instructions as $instruction): ?>
+                            <li><?= $this->e($instruction) ?></li>
+                        <?php endforeach ?>
+                    </ol>
+                <?php endif ?>
+
+                <?php if ($page->submit !== null): ?>
+                    <form method="post" class="form" data-madeline-form>
+                        <?= $this->insert('partials/fields', ['page' => $page]) ?>
+                        <?= $this->insert('partials/actions', ['page' => $page]) ?>
+                    </form>
+                <?php endif ?>
+            </div>
+        </div>
+    </main>
+</div>

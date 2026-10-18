@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\VoIP\CallState;
@@ -35,6 +36,7 @@ final class FilterIncoming extends Filter
     public function apply(Update $update): bool
     {
         return ($update instanceof AbstractMessage && !$update->out)
+            || ($update instanceof MultiCallMessage && !$update->out)
             || ($update instanceof PrivateCall && $update->getCallState() === CallState::INCOMING);
     }
 }

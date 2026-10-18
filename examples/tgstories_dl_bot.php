@@ -64,7 +64,6 @@ final class StoriesEventHandler extends SimpleEventHandler
     public function onStart(): void
     {
         // Login as a user
-        $this->echo("Please login as a user!");
         $this->userInstance = new API('stories_user.madeline');
     }
 

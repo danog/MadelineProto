@@ -1,0 +1,10 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@mixin text-center() {
+  text-align: center;
+  text-wrap: balance;
+}

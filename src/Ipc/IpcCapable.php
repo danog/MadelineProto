@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RestoresDeclaredProperties;
 
 /**
  * Represents an IPC-capable object.
@@ -27,6 +28,8 @@ use danog\MadelineProto\MTProto;
  */
 abstract class IpcCapable
 {
+    use RestoresDeclaredProperties;
+
     /**
      * IPC client of this process that is unserializing a response of a remote IPC server, see EncryptedChannel.
      *
@@ -61,10 +64,13 @@ abstract class IpcCapable
     }
 
     /**
+     * Restore the properties listed by __sleep(), dropping the fields removed since the object was saved.
+     *
      * @internal
      */
-    final public function __wakeup(): void
+    final public function __unserialize(array $data): void
     {
+        $this->restoreDeclaredProperties($data);
         if (self::$remoteClient !== null) {
             // The session name is the one of the remote server, which doesn't identify the client of this process.
             $this->API = self::$remoteClient;

@@ -1,0 +1,27 @@
+<?php
+/**
+ * Progress through the setup flow.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Step $current
+ */
+use danog\MadelineProto\WebUI\Step;
+
+$steps = Step::cases();
+$currentIndex = array_search($current, $steps, true);
+?>
+<ol class="steps" aria-label="<?= $this->t('webProgress') ?>">
+    <?php foreach ($steps as $i => $step): ?>
+        <?php $state = $i < $currentIndex ? 'done' : ($i === $currentIndex ? 'current' : 'todo') ?>
+        <li class="step is-<?= $state ?>"<?= $this->attrs(['aria-current' => $state === 'current' ? 'step' : null]) ?>>
+            <span class="step-dot" aria-hidden="true">
+                <?php if ($state === 'done' || ($state === 'current' && $step === Step::DONE)): ?>
+                    <svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <?php else: ?>
+                    <?= $i + 1 ?>
+                <?php endif ?>
+            </span>
+            <span class="step-label"><?= $this->e($step->getLabel()) ?></span>
+        </li>
+    <?php endforeach ?>
+</ol>

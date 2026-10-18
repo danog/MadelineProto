@@ -24,6 +24,27 @@ enum CommandType: string implements JsonSerializable
     case DOT = '.';
     case BANG = '!';
 
+    /**
+     * Parse the command at the start of a text, if any.
+     *
+     * @internal
+     *
+     * @return array{?self, ?string, ?list<string>} The command type, the command (without the bot username) and its arguments.
+     *
+     * @psalm-pure
+     */
+    public static function parse(string $text): array
+    {
+        $type = self::tryFrom($text[0] ?? '');
+        if ($type === null) {
+            return [null, null, null];
+        }
+        $space = strpos($text, ' ', 1) ?: \strlen($text);
+        $args = explode(' ', substr($text, $space+1));
+        $length = ($len = strpos($cmd = substr($text, 1, $space-1), "@")) ? $len : $space-1;
+        return [$type, substr($cmd, 0, $length), $args === [''] ? [] : $args];
+    }
+
     /** @internal */
     #[\Override]
     public function jsonSerialize(): mixed

@@ -33,6 +33,7 @@ use danog\MadelineProto\EventHandler\Media\Document;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Sticker;
+use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
@@ -43,6 +44,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\Entities\Phone;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
+use danog\MadelineProto\EventHandler\Message\Entities\Unknown;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
@@ -2088,11 +2090,15 @@ abstract class InternalDoc
     /**
      * Asynchronously read line.
      *
-     * @param string $prompt Prompt
+     * @param string  $prompt    Prompt
+     * @param bool    $hidden    Whether to hide what is typed (for tokens, passwords and codes), when reading from a terminal
+     * @param ?string $hideAfter Show what is typed until this character, censor what follows it with asterisks
+     *                           (for prompts that take either a phone number or a bot token, which contains a
+     *                           colon), when reading from a terminal
      */
-    final public static function readLine(string $prompt = '', ?\Amp\Cancellation $cancel = null): string
+    final public static function readLine(string $prompt = '', ?\Amp\Cancellation $cancel = null, bool $hidden = false, ?string $hideAfter = null): string
     {
-        return \danog\MadelineProto\AsyncTools::readLine($prompt, $cancel);
+        return \danog\MadelineProto\AsyncTools::readLine($prompt, $cancel, $hidden, $hideAfter);
     }
     /**
      * Refresh full peer cache for a certain peer.

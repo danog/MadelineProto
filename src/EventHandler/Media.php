@@ -18,10 +18,14 @@ namespace danog\MadelineProto\EventHandler;
 
 use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
+use danog\MadelineProto\EventHandler\Media\AbstractThumbnail;
+use danog\MadelineProto\EventHandler\Media\InlineThumbnail;
+use danog\MadelineProto\EventHandler\Media\Thumbnail;
+use danog\MadelineProto\EventHandler\Media\VideoThumbnail;
 use danog\MadelineProto\Ipc\IpcCapable;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ResumableStream;
-use danog\MadelineProto\TL\Types\Bytes;
+use danog\MadelineProto\Tools;
 use JsonSerializable;
 
 /**
@@ -47,10 +51,21 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** Time-to-live of media */
     public readonly ?int $ttl;
 
-    /** @var list<array> Thumbnails */
+    /**
+     * Thumbnails, from the smallest to the biggest: for photos, the smaller sizes of the photo.
+     *
+     * Includes the thumbnails inlined in the media (always the only thumbnail of secret chat media),
+     * which are downloaded from memory, without contacting Telegram.
+     *
+     * @var list<Thumbnail|InlineThumbnail>
+     */
     public readonly array $thumbs;
 
-    /** @var list<array> Video thumbnails */
+    /**
+     * Animated thumbnails (MPEG4 videos), from the smallest to the biggest.
+     *
+     * @var list<VideoThumbnail>
+     */
     public readonly array $videoThumbs;
 
     /** Whether the media should be hidden behind a spoiler */
@@ -75,13 +90,6 @@ abstract class Media extends IpcCapable implements JsonSerializable
     /** Whether this media originates from a secret chat. */
     public readonly bool $encrypted;
 
-    /** Content of thumbnail file (JPEGfile, quality 55, set in a square 90x90) only for secret chats. */
-    public readonly ?Bytes $thumb;
-    /** Thumbnail height only for secret chats. */
-    public readonly ?int $thumbHeight;
-    /** Thumbnail width only for secret chats. */
-    public readonly ?int $thumbWidth;
-
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -94,36 +102,109 @@ abstract class Media extends IpcCapable implements JsonSerializable
         if ($rawMedia['secret'] ?? false) {
             $rawMedia = $rawMedia['document'];
         }
+        $info = $this->extractDownloadInfo($API, $rawMedia);
         [
             'name' => $name,
             'ext' => $this->fileExt,
             'mime' => $this->mimeType,
             'size' => $this->size,
             'InputFileLocation' => $this->location
-        ] = $API->getDownloadInfo($rawMedia);
+        ] = $info;
         $this->fileName = $name.$this->fileExt;
+        $this->keyFingerprint = $info['key_fingerprint'] ?? null;
+        $this->key = isset($info['key']) ? (string) $info['key'] : null;
+        $this->iv = isset($info['iv']) ? (string) $info['iv'] : null;
 
         [
             'file_id' => $this->botApiFileId,
             'file_unique_id' => $this->botApiFileUniqueId
-        ] = $API->extractBotAPIFile($API->MTProtoToBotAPI($rawMedia));
+        ] = $this->extractBotApiFile($API, $rawMedia);
 
         $this->creationDate = ($rawMedia['document'] ?? $rawMedia['photo'] ?? $rawMedia)['date'];
         $this->ttl = $rawMedia['ttl_seconds'] ?? null;
         $this->spoiler = $rawMedia['spoiler'] ?? false;
-        $this->keyFingerprint = $rawMedia['file']['key_fingerprint'] ?? null;
-        $this->key = isset($rawMedia['key']) ? (string) $rawMedia['key'] : null;
-        $this->iv = isset($rawMedia['iv']) ? (string) $rawMedia['iv'] : null;
-        if ($this->encrypted = isset($rawMedia['iv'])) {
-            $thumb = $rawMedia['thumb'] ?? null;
-            $this->thumb = \is_string($thumb) ? new Bytes($thumb) : $thumb;
-            $this->thumbHeight = $rawMedia['thumb_h'] ?? null;
-            $this->thumbWidth = $rawMedia['thumb_w'] ?? null;
-        } else {
-            $this->thumb = null;
-            $this->thumbHeight = null;
-            $this->thumbWidth = null;
+        $this->encrypted = isset($rawMedia['iv']);
+        [$this->thumbs, $this->videoThumbs] = $this->extractThumbs($API, $rawMedia);
+    }
+
+    /**
+     * @internal
+     *
+     * @return array{name: string, ext: string, mime: string, size: int, InputFileLocation: array, key_fingerprint?: int, key?: string, iv?: string}
+     */
+    protected function extractDownloadInfo(MTProto $API, array $rawMedia): array
+    {
+        return $API->getDownloadInfo($rawMedia);
+    }
+
+    /**
+     * @internal
+     *
+     * @return array{file_id: string, file_unique_id: string}
+     */
+    protected function extractBotApiFile(MTProto $API, array $rawMedia): array
+    {
+        return $API->extractBotAPIFile($API->MTProtoToBotAPI($rawMedia));
+    }
+
+    /**
+     * @internal
+     *
+     * @return array{list<Thumbnail|InlineThumbnail>, list<VideoThumbnail>}
+     */
+    protected function extractThumbs(MTProto $API, array $rawMedia): array
+    {
+        if (isset($rawMedia['iv'])) {
+            // Secret chat media only carries an inline JPEG thumbnail.
+            if ((string) ($rawMedia['thumb'] ?? '') === '') {
+                return [[], []];
+            }
+            return [[new InlineThumbnail($API, $rawMedia, [
+                '_' => 'photoCachedSize',
+                'type' => InlineThumbnail::SECRET_CHAT_TYPE,
+                'w' => $rawMedia['thumb_w'] ?? 0,
+                'h' => $rawMedia['thumb_h'] ?? 0,
+                'bytes' => $rawMedia['thumb'],
+            ], $this->protected)], []];
         }
+        if (isset($rawMedia['photo'])) {
+            $sizes = $rawMedia['photo']['sizes'];
+            $videoSizes = $rawMedia['photo']['video_sizes'] ?? [];
+            // The biggest size is the photo itself.
+            $mainType = Tools::maxSize($sizes)['type'];
+        } else {
+            if ($rawMedia['_'] === 'decryptedMessageMediaExternalDocument') {
+                $rawMedia = ['_' => 'messageMediaDocument', 'document' => $rawMedia + ['thumbs' => [$rawMedia['thumb']]]];
+            }
+            $sizes = $rawMedia['document']['thumbs'] ?? [];
+            $videoSizes = $rawMedia['document']['video_thumbs'] ?? [];
+            $mainType = null;
+        }
+        $thumbs = [];
+        $videoThumbs = [];
+        foreach ($sizes as $size) {
+            switch ($size['_']) {
+                case 'photoSize':
+                case 'photoSizeProgressive':
+                    if ($size['type'] !== $mainType) {
+                        $thumbs[] = new Thumbnail($API, $rawMedia, $size, $this->protected);
+                    }
+                    break;
+                case 'photoStrippedSize':
+                case 'photoCachedSize':
+                    $thumbs[] = new InlineThumbnail($API, $rawMedia, $size, $this->protected);
+                    break;
+            }
+        }
+        foreach ($videoSizes as $size) {
+            if ($size['_'] === 'videoSize') {
+                $videoThumbs[] = new VideoThumbnail($API, $rawMedia, $size, $this->protected);
+            }
+        }
+        $cmp = static fn (AbstractThumbnail $a, AbstractThumbnail $b): int => $a->width*$a->height <=> $b->width*$b->height;
+        usort($thumbs, $cmp);
+        usort($videoThumbs, $cmp);
+        return [$thumbs, $videoThumbs];
     }
 
     /**

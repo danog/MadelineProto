@@ -597,7 +597,7 @@ final class Client extends ClientAbstract
         }
         if ($this->connector->isRemote()) {
             $messageMedia = $this->getDownloadInfo($messageMedia);
-            return $this->downloadToFile($messageMedia, $dir.'/'.$messageMedia['name'].$messageMedia['ext'], $cb, $cancellation);
+            return $this->downloadToFile($messageMedia, $dir.'/'.Tools::sanitizeFileName($messageMedia['name'].$messageMedia['ext']), $cb, $cancellation);
         }
         $params = [$messageMedia, $dir, &$cb, &$cancellation];
         $wrapper = Wrapper::create($params, $this->connector, $this->logger);

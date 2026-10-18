@@ -202,6 +202,11 @@ trait ResponseHandler
             $this->API->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
         }
+        if ($response instanceof Throwable) {
+            // The result couldn't be deserialized, see ReadLoop::deserialize.
+            $request->reply(static fn (): Throwable => $response);
+            return;
+        }
         $constructor = $response['_'] ?? '';
         if ($request->specialMethodType === SpecialMethodType::USER_RELATED) {
             $this->API->loginState->publish($this->API->loginState->getState()->setDc($this->datacenter));

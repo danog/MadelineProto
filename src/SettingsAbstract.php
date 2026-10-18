@@ -24,6 +24,7 @@ use ReflectionProperty;
  */
 abstract class SettingsAbstract
 {
+    use RestoresDeclaredProperties;
     /**
      * Whether this setting was changed.
      *
@@ -40,6 +41,19 @@ abstract class SettingsAbstract
             $result []= $property->getName();
         }
         return $result;
+    }
+    /**
+     * Restore the properties listed by __sleep(), dropping the settings removed since they were saved.
+     *
+     * @internal
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->restoreDeclaredProperties($data);
+        // PHP does not call __wakeup() on a class that has __unserialize().
+        if (method_exists($this, '__wakeup')) {
+            $this->__wakeup();
+        }
     }
     /**
      * Merge with other settings instance.

@@ -36,6 +36,7 @@ use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Serialization;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
 use danog\MadelineProto\Shutdown;
@@ -45,6 +46,7 @@ use Throwable;
 
 use function Amp\async;
 use function Amp\delay;
+use function Amp\Ipc\connect;
 
 /**
  * IPC server.
@@ -150,8 +152,8 @@ abstract class AbstractServer extends Loop
             $this->listener = new Listener($secret, $endpoints, $this->acceptRemote(...), $this->API->getPsrLogger());
             $this->listenerSecret = $secret;
         } catch (Throwable $e) {
-            // Keep accepting connections where it worked.
-            if ($old !== null && $oldSecret !== null) {
+            // Keep accepting connections where it worked, unless the secret was changed (maybe because it leaked).
+            if ($old !== null && $oldSecret !== null && $oldSecret === $secret) {
                 try {
                     $this->listener = new Listener($oldSecret, $old->endpoints, $this->acceptRemote(...), $this->API->getPsrLogger());
                     $this->listenerSecret = $oldSecret;
@@ -247,14 +249,33 @@ abstract class AbstractServer extends Loop
                 return true;
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!", previous: $e);
-            } elseif ($count >= self::STARTUP_TIMEOUT*2) {
-                // The server died before reporting its state, or got stuck while starting
+            } elseif ($count > 0 && $count % 2 === 0 && self::isListening($session)) {
+                // Served by a process that started before us (our workers exit, finding it)
+                Logger::log('IPC server already running!');
+                return true;
+            } elseif ($count >= self::STARTUP_TIMEOUT*2 && !Serialization::isLockedByAnotherProcess($session)) {
+                // The server died before reporting its state.
+                // While the session is locked, a server is still loading it (or it's held by another process
+                // that will release it soon): that can take longer than any fixed timeout.
                 return new Exception("The IPC server didn't start within ".self::STARTUP_TIMEOUT." seconds, please check the logs!", previous: $e);
             }
             delay(0.5);
             $count++;
         }
         return false;
+    }
+    /**
+     * Whether an IPC server listens on the socket of the session.
+     */
+    private static function isListening(SessionPaths $session): bool
+    {
+        try {
+            clearstatcache(true, $session->getIpcPath());
+            connect($session->getIpcPath())->disconnect();
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
     }
     /**
      * Wait for shutdown.
