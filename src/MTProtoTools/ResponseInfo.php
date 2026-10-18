@@ -62,7 +62,7 @@ final class ResponseInfo
      *
      * @psalm-mutation-free
      */
-    private function __construct(string $method, array $headers, array|int $messageMedia)
+    private function __construct(string $method, array $headers, array|int $messageMedia, bool $sandbox = true)
     {
         if (\is_int($messageMedia)) {
             $this->code = $messageMedia;
@@ -128,13 +128,17 @@ final class ResponseInfo
         } elseif ($size > 0) {
             $this->headers['Content-Length'] = (string) $size;
         }
-        $mime = self::normalizeMime((string) $messageMedia['mime']);
+        if ($sandbox) {
+            // The MIME type and the name come from whoever sent the file on Telegram (or from the query string of the
+            // download script): a file opened as a page can't run scripts nor access the origin serving it, and the
+            // browser must not guess a more dangerous type (see Settings\Files::setSandboxDownloads()).
+            $mime = self::normalizeMime((string) $messageMedia['mime']);
+            $this->headers['Content-Security-Policy'] = 'sandbox';
+            $this->headers['X-Content-Type-Options'] = 'nosniff';
+        } else {
+            $mime = (string) $messageMedia['mime'];
+        }
         $this->headers['Content-Type'] = $mime;
-        // The MIME type and the name come from whoever sent the file on Telegram (or from the query string of the
-        // download script): a file opened as a page can't run scripts nor access the origin serving it, and the
-        // browser must not guess a more dangerous type.
-        $this->headers['Content-Security-Policy'] = 'sandbox';
-        $this->headers['X-Content-Type-Options'] = 'nosniff';
         $this->headers['Cache-Control'] = 'max-age=31556926';
         $this->headers['Content-Transfer-Encoding'] = 'Binary';
         $this->headers['Accept-Ranges'] = 'bytes';
@@ -147,7 +151,7 @@ final class ResponseInfo
             }
 
             // Only media is shown by the browser, the rest is downloaded (for the browsers ignoring the sandbox).
-            $disposition = self::isInlineSafe($mime) ? 'inline' : 'attachment';
+            $disposition = !$sandbox || self::isInlineSafe($mime) ? 'inline' : 'attachment';
             if (!empty($messageMedia['name']) && !empty($messageMedia['ext'])) {
                 $this->headers['Content-Disposition'] = $disposition.self::filenameParameters($messageMedia['name'].$messageMedia['ext']);
             } elseif ($disposition === 'attachment') {
@@ -192,12 +196,13 @@ final class ResponseInfo
      * @param string $method       HTTP method
      * @param array  $headers      HTTP headers
      * @param array  $messageMedia Media info
+     * @param bool   $sandbox      Whether the file can't run as a page of the website serving it (see Settings\Files::setSandboxDownloads())
      *
      * @psalm-pure
      */
-    public static function parseHeaders(string $method, array $headers, array $messageMedia): self
+    public static function parseHeaders(string $method, array $headers, array $messageMedia, bool $sandbox = true): self
     {
-        return new self($method, $headers, $messageMedia);
+        return new self($method, $headers, $messageMedia, $sandbox);
     }
     /**
      * @psalm-pure

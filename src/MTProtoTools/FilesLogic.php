@@ -122,6 +122,7 @@ trait FilesLogic
                 $_SERVER['REQUEST_METHOD'],
                 $headers,
                 $messageMedia,
+                $this->getSettings()->getFiles()->getSandboxDownloads(),
             );
         } catch (Throwable $e) {
             $this->logger->logger("An error occurred inside of downloadToBrowser: $e", Logger::FATAL_ERROR);
@@ -250,6 +251,7 @@ trait FilesLogic
             $request->getMethod(),
             array_map(static fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
+            $this->getSettings()->getFiles()->getSandboxDownloads(),
         );
 
         $body = null;

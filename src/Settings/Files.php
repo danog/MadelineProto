@@ -54,6 +54,11 @@ final class Files extends SettingsAbstract
     protected bool $resumeInterruptedCalls = true;
 
     /**
+     * Whether files served to browsers can't run as pages of the website serving them.
+     */
+    protected bool $sandboxDownloads = true;
+
+    /**
      * Get allow automatic upload of files from file paths present in constructors?
      */
     public function getAllowAutomaticUpload(): bool
@@ -143,6 +148,35 @@ final class Files extends SettingsAbstract
     public function setResumeInterruptedCalls(bool $resumeInterruptedCalls): self
     {
         $this->resumeInterruptedCalls = $resumeInterruptedCalls;
+
+        return $this;
+    }
+
+    /**
+     * Get whether files served to browsers can't run as pages of the website serving them.
+     */
+    public function getSandboxDownloads(): bool
+    {
+        return $this->sandboxDownloads;
+    }
+
+    /**
+     * Set whether files served to browsers can't run as pages of the website serving them.
+     *
+     * Applies to the files served by the download script (getDownloadLink, downloadToBrowser) and by downloadToResponse:
+     * their MIME type and name come from whoever sent them on Telegram, or from the query string of the download script.
+     * If enabled, they're served with a sandboxing Content-Security-Policy and X-Content-Type-Options: nosniff, with
+     * their MIME type normalized, and only media and plain text are shown inline (everything else is downloaded).
+     *
+     * Disable it only if the files served are trusted, and must be shown as pages of the website (HTML, SVG, PDF...).
+     *
+     * @param bool $sandboxDownloads Whether files served to browsers can't run as pages of the website serving them
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setSandboxDownloads(bool $sandboxDownloads): self
+    {
+        $this->sandboxDownloads = $sandboxDownloads;
 
         return $this;
     }

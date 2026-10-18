@@ -60,6 +60,18 @@ final class ResponseInfoTest extends TestCase
         $this->assertStringStartsWith('inline', self::headers('Video/MP4; codecs="avc1"', 'film', '.mp4')['Content-Disposition']);
     }
 
+    public function testTheSandboxCanBeDisabled(): void
+    {
+        $headers = ResponseInfo::parseHeaders('GET', [], ['mime' => 'text/html; charset=utf-8', 'name' => 'page', 'ext' => '.html', 'size' => 10], false)->getHeaders();
+        $this->assertSame('text/html; charset=utf-8', $headers['Content-Type']);
+        $this->assertArrayNotHasKey('Content-Security-Policy', $headers);
+        $this->assertArrayNotHasKey('X-Content-Type-Options', $headers);
+        $this->assertStringStartsWith('inline', $headers['Content-Disposition']);
+        // The name is still escaped.
+        $headers = ResponseInfo::parseHeaders('GET', [], ['mime' => 'text/html', 'name' => 'x"y', 'ext' => '.html', 'size' => 10], false)->getHeaders();
+        $this->assertStringStartsWith('inline; filename="x_y.html"', $headers['Content-Disposition']);
+    }
+
     public function testTheNameCantBreakOutOfTheHeader(): void
     {
         $disposition = self::headers('image/jpeg', 'x"; filename="evil.html', '.jpg')['Content-Disposition'];
