@@ -36,6 +36,7 @@ use danog\MadelineProto\Loop\Update\UpdateLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\ResponseException;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 use phpseclib4\Math\BigInteger;
@@ -51,6 +52,7 @@ use Webmozart\Assert\Assert;
  */
 final class SecretChatController implements Stringable
 {
+    use RestoresDeclaredProperties;
     use LegacyMigrator;
 
     /**
@@ -163,9 +165,7 @@ final class SecretChatController implements Stringable
 
     public function __unserialize(array $data): void
     {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         $this->rekeyMutex = new LocalMutex;
         $this->encryptMutex = new LocalMutex;
         $this->sentMutex = new LocalKeyedMutex;

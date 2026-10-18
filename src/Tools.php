@@ -500,14 +500,18 @@ abstract class Tools extends AsyncTools
      */
     public static function closeConnection(string $message): void
     {
-        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || headers_sent() || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
+        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
         }
         $buffer = @ob_get_clean() ?: '';
         $buffer .= $message;
         ignore_user_abort(true);
-        header('Connection: close');
-        header('Content-Type: text/html');
+        // Output may already have been sent (an echo in onStart, a displayed warning): the request must end anyway,
+        // or the client that started a web bot waits on it for as long as the bot runs.
+        if (!headers_sent()) {
+            header('Connection: close');
+            header('Content-Type: text/html');
+        }
         echo $buffer;
         flush();
         $GLOBALS['exited'] = true;

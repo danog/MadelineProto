@@ -41,6 +41,7 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\TextEntities;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
@@ -63,6 +64,7 @@ use Webmozart\Assert\Assert;
  */
 final class GroupCallController implements CallControllerInterface, GroupConnectionOwner
 {
+    use RestoresDeclaredProperties;
     use GroupMediaTrait;
 
     /** How often [phone.checkGroupCall](https://core.telegram.org/method/phone.checkGroupCall) is polled while reconnecting. */
@@ -154,12 +156,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->gapWatcher = null;
         $this->streamReceiver = null;
         $this->rtmpPublisher = null;
-        foreach ($data as $key => $value) {
-            // Skip the state of properties removed since the call was persisted.
-            if (property_exists($this, $key)) {
-                $this->{$key} = $value;
-            }
-        }
+        $this->restoreDeclaredProperties($data);
         if (!isset($this->API->logger)) {
             $this->API->setupLogger();
         }

@@ -18,29 +18,16 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Reactive;
 
-use Amp\Cancellation;
-use Amp\DeferredFuture;
-
 /**
- * A fiber waiting for a state: ephemeral, it's never serialized (it isn't, itself: see __sleep()).
- *
- * @template T
+ * Only kept to load the sessions saved by the versions up to 8.8.9, which saved the fibers waiting for a state
+ * (without their state): Publisher drops them when loading, and keeps the waits itself (Publisher::waitForState()).
  *
  * @internal
  *
- * @implements Subscriber<T>
+ * @implements Subscriber<mixed>
  */
 final class AsyncWaiter implements Subscriber, EphemeralSubscriber
 {
-    /** @var DeferredFuture<T> */
-    private readonly DeferredFuture $future;
-    public function __construct(
-        /** @var T */
-        private readonly mixed $waitFor
-    ) {
-        $this->future = new DeferredFuture;
-    }
-
     /**
      * @psalm-pure
      */
@@ -52,29 +39,10 @@ final class AsyncWaiter implements Subscriber, EphemeralSubscriber
     #[\Override]
     public function onAttach($initState): void
     {
-        if ($initState === $this->waitFor) {
-            $this->complete();
-        }
     }
 
     #[\Override]
     public function onStateChange($prevState, $state): void
     {
-        if ($state === $this->waitFor) {
-            $this->complete();
-        }
-    }
-
-    private function complete(): void
-    {
-        // The state can be reached again before the waiting fiber resumes and unsubscribes it.
-        if (!$this->future->isComplete()) {
-            $this->future->complete();
-        }
-    }
-
-    public function wait(?Cancellation $cancellation): void
-    {
-        $this->future->getFuture()->await($cancellation);
     }
 }
