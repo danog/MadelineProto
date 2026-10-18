@@ -188,12 +188,13 @@ final class OutputConverter
     private function photo(array $block): array
     {
         $photo = $this->photos[$block['photo_id']] ?? null;
-        if ($photo === null) {
+        $wrapped = $photo === null ? null : ($this->wrapMedia)(['_' => 'messageMediaPhoto', 'photo' => $photo, 'spoiler' => $block['spoiler'] ?? false], 'photo');
+        if ($wrapped === null) {
             return ['type' => 'unknown'];
         }
         return [
             'type' => 'photo',
-            'photo' => ($this->wrapMedia)(['_' => 'messageMediaPhoto', 'photo' => $photo, 'spoiler' => $block['spoiler'] ?? false], 'photo'),
+            'photo' => $wrapped,
             ...$this->caption($block['caption']),
             ...(($block['spoiler'] ?? false) ? ['has_spoiler' => true] : []),
         ];
@@ -202,12 +203,15 @@ final class OutputConverter
     private function video(array $block): array
     {
         [$type, $document] = $this->documents[$block['video_id']] ?? [null, null];
-        if ($document === null || ($type !== 'video' && $type !== 'animation')) {
+        $wrapped = $document === null || ($type !== 'video' && $type !== 'animation')
+            ? null
+            : ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document, 'spoiler' => $block['spoiler'] ?? false], $type);
+        if ($wrapped === null) {
             return ['type' => 'unknown'];
         }
         $result = [
             'type' => $type,
-            $type => ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document, 'spoiler' => $block['spoiler'] ?? false], $type),
+            $type => $wrapped,
             ...$this->caption($block['caption']),
         ];
         if ($block['autoplay'] ?? false) {
@@ -235,9 +239,13 @@ final class OutputConverter
             // E.g. a pageBlockAudio with a document that has no audio attribute
             $type = $types[0];
         }
+        $wrapped = ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document], $type);
+        if ($wrapped === null) {
+            return ['type' => 'unsupported'];
+        }
         return [
             'type' => $type,
-            $type => ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document], $type),
+            $type => $wrapped,
             ...$this->caption($block['caption']),
         ];
     }
