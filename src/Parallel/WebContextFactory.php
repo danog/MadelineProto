@@ -80,6 +80,7 @@ final class WebContextFactory implements ContextFactory
             || !isset($_SERVER['SERVER_NAME'])
             || !$_SERVER['SERVER_NAME']
             || ThreadContext::isSupported()
+            || PHP_OS_FAMILY === 'Windows'
         ) {
             return;
         }
@@ -92,49 +93,49 @@ final class WebContextFactory implements ContextFactory
     }
 
     /**
-     * The directory of the request files and IPC endpoints of the contexts, private to the user of the webserver.
+     * The directory of the request file and the IPC endpoint of a context, private to the user of the webserver.
      *
      * The temporary directory may be shared with other users (on shared hosting): they must not get to choose what
-     * a context runs, nor to send to the IPC endpoints, which unserialize what they receive before the key is checked.
-     *
-     * On Windows, owners and permissions can't be checked: the temporary directory is per user, unless the
-     * webserver (IIS) uses the one of the system.
-     *
-     * @internal
-     *
-     * @param bool $create Whether to create the directory if missing.
-     * @return string|null Null if missing, or not private.
-     */
-    public static function getDirectory(bool $create): ?string
-    {
-        $uid = \function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR."madeline-parallel-$uid";
-        clearstatcache(true, $dir);
-        if ($create && !is_dir($dir)) {
-            @mkdir($dir, 0o700);
-            clearstatcache(true, $dir);
-        }
-        if (is_link($dir) || !is_dir($dir)) {
-            return null;
-        }
-        if (PHP_OS_FAMILY !== 'Windows' && (fileowner($dir) !== $uid || (fileperms($dir) & 0o077) !== 0)) {
-            Logger::log("$dir is not private to user $uid, not using it", Logger::ERROR);
-            return null;
-        }
-        return $dir;
-    }
-
-    /**
-     * Path of the request file of a context, in the {@see getDirectory()}.
+     * a context runs, nor to send to the IPC endpoint, which unserializes what it receives before the key is checked.
+     * Every context gets its own directory, so that there's no predictable path for others to take first.
      *
      * The webserver request only gets the ID: whoever can request the entry script must not be able to choose what
      * it runs.
      *
      * @internal
      */
-    public static function getRequestPath(string $dir, string $id): string
+    public static function getDirectory(string $id): string
     {
-        return $dir.DIRECTORY_SEPARATOR."$id.json";
+        return sys_get_temp_dir().DIRECTORY_SEPARATOR."madeline-parallel-$id";
+    }
+
+    /**
+     * Path of the request file of a context.
+     *
+     * @internal
+     */
+    public static function getRequestPath(string $id): string
+    {
+        return self::getDirectory($id).DIRECTORY_SEPARATOR.'request.json';
+    }
+
+    /**
+     * Whether only the user of the webserver can access a directory (or file).
+     *
+     * @internal
+     */
+    public static function isPrivate(string $path): bool
+    {
+        clearstatcache(true, $path);
+        if (is_link($path) || !file_exists($path)) {
+            return false;
+        }
+        $uid = \function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
+        if (fileowner($path) !== $uid || (fileperms($path) & 0o077) !== 0) {
+            Logger::log("$path is not private to user $uid", Logger::ERROR);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -147,21 +148,28 @@ final class WebContextFactory implements ContextFactory
         if (!$script) {
             throw new \ValueError('Empty script array provided to web context');
         }
-
-        $dir = self::getDirectory(create: true);
-        if ($dir === null) {
-            throw new ContextException('Could not create a directory private to this user in '.sys_get_temp_dir());
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Owners and permissions can't be checked (IIS may use the temporary directory of the system)
+            throw new ContextException('Web contexts are not supported on Windows');
         }
+
         $id = bin2hex(random_bytes(16));
         $key = bin2hex(random_bytes(16));
-        $request = self::getRequestPath($dir, $id);
+        $dir = self::getDirectory($id);
+        $request = self::getRequestPath($id);
 
-        // Only this user may connect to the UNIX socket or the FIFO (the directory already ensures that)
         $umask = umask(0o077);
         try {
-            $server = new IpcServer($dir.DIRECTORY_SEPARATOR."$id.ipc");
+            if (!mkdir($dir, 0o700) || !self::isPrivate($dir)) {
+                throw new ContextException("Could not create the private directory $dir");
+            }
+            // Not TCP: anyone could connect, and the key is checked after unserializing
+            $server = new IpcServer($dir.DIRECTORY_SEPARATOR.'ipc', IpcServer::TYPE_UNIX | IpcServer::TYPE_FIFO);
         } catch (Throwable $e) {
-            throw new ContextException('Could not create the IPC server of the context', previous: $e);
+            @rmdir($dir);
+            throw $e instanceof ContextException
+                ? $e
+                : new ContextException('Could not create the IPC server of the context', previous: $e);
         } finally {
             umask($umask);
         }
@@ -185,6 +193,7 @@ final class WebContextFactory implements ContextFactory
             $server->close();
             // The request didn't get to read it
             @unlink($request);
+            @rmdir($dir);
             // The request already ignores the abort (or it never came)
             foreach ($requests ?? [] as $connection) {
                 $connection->map(static fn (?Socket $socket) => $socket?->close())->ignore();

@@ -46,12 +46,7 @@ final class WebContextRunner
             error_log("MadelineProto web context: invalid ID");
             return false;
         }
-        $dir = WebContextFactory::getDirectory(create: false);
-        if ($dir === null) {
-            error_log("MadelineProto web context: no directory private to this user in ".sys_get_temp_dir());
-            return false;
-        }
-        $request = self::readRequest(WebContextFactory::getRequestPath($dir, $id));
+        $request = self::readRequest($id);
         if ($request === null) {
             return false;
         }
@@ -125,20 +120,20 @@ final class WebContextRunner
      *
      * @return array{uri: string, key: string, script: non-empty-list<string>, cwd: string, timeout: positive-int}|null
      */
-    private static function readRequest(string $path): ?array
+    private static function readRequest(string $id): ?array
     {
+        $path = WebContextFactory::getRequestPath($id);
         clearstatcache(true, $path);
         if (!is_file($path)) {
             // Already served
             return null;
         }
-        if (PHP_OS_FAMILY !== 'Windows') {
-            // The temporary directory of Windows is per user
-            $uid = \function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
-            if (fileowner($path) !== $uid || (fileperms($path) & 0o077) !== 0) {
-                error_log("MadelineProto web context: $path is not private to user $uid, ignoring it");
-                return null;
-            }
+        if (PHP_OS_FAMILY === 'Windows'
+            || !WebContextFactory::isPrivate(WebContextFactory::getDirectory($id))
+            || !WebContextFactory::isPrivate($path)
+        ) {
+            error_log("MadelineProto web context: $path is not private to this user, ignoring it");
+            return null;
         }
         $contents = @file_get_contents($path);
         if (!@unlink($path) || !\is_string($contents)) {
