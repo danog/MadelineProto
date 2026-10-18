@@ -10,7 +10,6 @@
  * when it starts, rendering the page again from the state.
  */
 $this->layout('layout', ['title' => $page->title]);
-$hasQr = $page->qrEndpoint !== null;
 ?>
 <?php if (isset($state)): ?>
     <script type="application/json" id="madeline-state"><?= $state ?></script>
@@ -27,7 +26,7 @@ $hasQr = $page->qrEndpoint !== null;
         </p>
     </aside>
     <main class="pane">
-        <div class="pane-body<?= $hasQr ? ' has-qr' : '' ?>">
+        <div class="pane-body">
             <div class="pane-main">
                 <header class="pane-head">
                     <h1><?= $this->e($page->title) ?></h1>
@@ -53,9 +52,6 @@ $hasQr = $page->qrEndpoint !== null;
                     </form>
                 <?php endif ?>
             </div>
-            <?php if ($hasQr): ?>
-                <?= $this->insert('partials/qr', ['page' => $page]) ?>
-            <?php endif ?>
         </div>
     </main>
 </div>

@@ -165,25 +165,6 @@ final class API extends AbstractAPI
     private $unlock = null;
 
     /**
-     * Obtain the API ID UI template.
-     *
-     * @psalm-mutation-free
-     */
-    public function getWebAPITemplate(): string
-    {
-        return $this->wrapper->getWebApiTemplate();
-    }
-    /**
-     * Set the API ID UI template.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function setWebApiTemplate(string $template): void
-    {
-        $this->wrapper->setWebApiTemplate($template);
-    }
-
-    /**
      * Constructor function.
      *
      * @param string           $session  Session name
