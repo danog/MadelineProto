@@ -1,0 +1,14 @@
+<?php
+/**
+ * The buttons of a form.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+?>
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary"><?= $this->e($page->submit) ?></button>
+    <?php foreach ($page->actions as $action): ?>
+        <button type="submit" class="btn btn-quiet" formnovalidate<?= $this->attrs(['name' => $action->name, 'value' => $action->value]) ?>><?= $this->e($action->label) ?></button>
+    <?php endforeach ?>
+</div>

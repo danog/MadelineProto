@@ -1,0 +1,89 @@
+/*
+ * MadelineProto's liquid glass: the material every surface of the web UI is made of.
+ *
+ * A pane of glass is a translucent tint over a blurred, saturated backdrop (backdrop-filter), with a specular
+ * rim (a gradient border, bright where the light comes from) and a soft caustic shadow. Where the browser can
+ * displace the backdrop (Chromium: `html.glass-refraction`, set by components/liquidGlass.tsx), the backdrop is
+ * also refracted through an SVG lens (#mp-glass-refraction): the fine texture of the light field
+ * (`.light-field`) bends at the edges of the panes. Other browsers drop a backdrop-filter with url() entirely,
+ * so it's only set behind that class.
+ *
+ * The tokens are CSS variables (see _tokens.scss), so the night palette and the accessibility fallbacks
+ * (prefers-reduced-transparency, prefers-contrast) only redefine them.
+ */
+
+// A pane: tint, blur, rim, shadow. `$rim`: the pseudo-element drawing the specular rim (null for elements
+// that already use theirs, or can't have one, like inputs).
+// The pane must be positioned (relative, absolute...): the rim covers it.
+@mixin pane($tint: var(--glass-tint), $blur: var(--glass-blur), $shadow: var(--glass-shadow), $rim: before) {
+  background-color: $tint;
+  -webkit-backdrop-filter: blur($blur) saturate(var(--glass-saturate));
+  backdrop-filter: blur($blur) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge-top),
+    inset 0 -1px 0 var(--glass-edge-bottom),
+    $shadow;
+
+  @if $rim {
+    &::#{$rim} {
+      @include rim();
+    }
+  }
+}
+
+// The specular rim, on a pseudo-element covering the pane: a 1px border painted with a gradient, bright at the
+// top-left (where the light comes from) and at the bottom-right (the light leaving the glass).
+@mixin rim($width: 1px) {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: $width;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    var(--glass-rim-light) 0%,
+    var(--glass-rim-fade) 28%,
+    transparent 50%,
+    var(--glass-rim-fade) 72%,
+    var(--glass-rim-light-2) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  z-index: 3;
+}
+
+// The refraction, where supported: in plain stylesheets (`$global: false`) or in CSS modules.
+@mixin refract($blur: var(--glass-blur), $global: false) {
+  @if $global {
+    html.glass-refraction & {
+      -webkit-backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
+      backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
+    }
+  } @else {
+    :global(html.glass-refraction) & {
+      -webkit-backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
+      backdrop-filter: url(#mp-glass-refraction) blur($blur) saturate(var(--glass-saturate));
+    }
+  }
+}
+
+// A well: a recess in the glass (inputs, code boxes), darker than the pane it's in, lit from below.
+@mixin well() {
+  background-color: var(--glass-well);
+  -webkit-backdrop-filter: blur(var(--glass-blur-small)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur-small)) saturate(var(--glass-saturate));
+  border-color: var(--glass-well-border);
+  box-shadow:
+    inset 0 1px 2px var(--glass-well-shadow),
+    inset 0 -1px 0 var(--glass-edge-bottom);
+}
+
+// A focused well: the accent glows through the glass.
+@mixin well-focus($color: var(--primary-color-rgb)) {
+  box-shadow:
+    inset 0 1px 2px var(--glass-well-shadow),
+    0 0 0 4px rgba($color, .16),
+    0 0 18px -2px rgba($color, .45);
+}

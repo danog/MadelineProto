@@ -29,6 +29,8 @@ abstract class AbstractGroupCallMessage extends MultiCallMessage
     public readonly int $id;
     /** Whether the sender is an admin of the call. */
     public readonly bool $fromAdmin;
+    /** Bot API ID of the peer the call belongs to (the group or channel of a video chat, the poster of a live story), if known. */
+    public readonly ?int $peerId;
 
     /**
      * @internal
@@ -43,6 +45,7 @@ abstract class AbstractGroupCallMessage extends MultiCallMessage
         $message = $rawUpdate['message'];
         $this->id = $message['id'];
         $this->fromAdmin = $message['from_admin'];
+        $this->peerId = $API->getGroupCallPeerId($this->callId);
     }
 
     /**

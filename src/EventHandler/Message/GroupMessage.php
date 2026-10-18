@@ -331,9 +331,9 @@ class GroupMessage extends GroupOrChannelMessage
         }
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'channels.createForumTopic',
+            'messages.createForumTopic',
             [
-                'channel' => $this->chatId,
+                'peer' => $this->chatId,
                 'title' => $title,
                 ...\is_int($icon)
                     ? ['icon_emoji_id' => $icon]
@@ -358,9 +358,9 @@ class GroupMessage extends GroupOrChannelMessage
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'channels.editForumTopic',
+            'messages.editForumTopic',
             [
-                'channel' => $this->chatId,
+                'peer' => $this->chatId,
                 'topic_id' => $topicId,
                 'title' => $title,
                 'icon_emoji_id' => $icon,
@@ -382,9 +382,9 @@ class GroupMessage extends GroupOrChannelMessage
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'channels.editForumTopic',
+            'messages.editForumTopic',
             [
-                'channel' => $this->chatId,
+                'peer' => $this->chatId,
                 'topic_id' => $topicId,
                 'closed' => false,
             ]
@@ -405,9 +405,9 @@ class GroupMessage extends GroupOrChannelMessage
         Assert::notNull($topicId, "No topic ID was provided!");
         $client = $this->getClient();
         $result = $client->methodCallAsyncRead(
-            'channels.editForumTopic',
+            'messages.editForumTopic',
             [
-                'channel' => $this->chatId,
+                'peer' => $this->chatId,
                 'topic_id' => $topicId,
                 'closed' => true,
             ]
@@ -427,9 +427,9 @@ class GroupMessage extends GroupOrChannelMessage
         $topicId ??= $this->topicId;
         Assert::notNull($topicId, "No topic ID was provided!");
         $this->getClient()->methodCallAsyncRead(
-            'channels.deleteTopicHistory',
+            'messages.deleteTopicHistory',
             [
-                'channel' => $this->chatId,
+                'peer' => $this->chatId,
                 'top_msg_id' => $topicId,
             ]
         );

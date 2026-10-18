@@ -1,0 +1,21 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+// An offscreen canvas at the size of the picture last committed to it (its pixels over the device
+// pixel ratio, `--dpr`), from the corner: never stretched over a box that changed before the worker
+// drew for it. Placed by its physical top left corner, as the rects drawn on it are: in flow it is
+// an inline box wider than its line, which a right-to-left line puts out on the left
+@mixin offscreen-canvas-committed-size {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  right: auto;
+  bottom: auto;
+  transform-origin: 0 0;
+  transform: scale(calc(1 / var(--dpr)));
+}

@@ -399,7 +399,7 @@ interface Bots
      * @param bool $enabled If set, adds the verification; otherwise removes verification.
      * @param array|int|string $bot Must **not** be set if invoked by a bot, **must** be set to the ID of an owned bot if invoked by a user. @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
      * @param array|int|string $peer The peer to verify @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
-     * @param array{_: 'textWithEntities', text?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}|array{_: 'messageEntityBlockquote', collapsed?: bool, offset?: int, length?: int}|array{_: 'messageEntityFormattedDate', relative?: bool, short_time?: bool, long_time?: bool, short_date?: bool, long_date?: bool, day_of_week?: bool, offset?: int, length?: int, date?: int}|array{_: 'messageEntityDiffInsert', offset?: int, length?: int}|array{_: 'messageEntityDiffReplace', offset?: int, length?: int, old_text?: string}|array{_: 'messageEntityDiffDelete', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}>} $custom_description @see https://docs.madelineproto.xyz/API_docs/types/TextWithEntities.html
+     * @param array{_: 'textWithEntities', text?: string, entities?: list<array{_: 'messageEntityUnknown', offset?: int, length?: int}|array{_: 'messageEntityMention', offset?: int, length?: int}|array{_: 'messageEntityHashtag', offset?: int, length?: int}|array{_: 'messageEntityBotCommand', offset?: int, length?: int}|array{_: 'messageEntityUrl', offset?: int, length?: int}|array{_: 'messageEntityEmail', offset?: int, length?: int}|array{_: 'messageEntityBold', offset?: int, length?: int}|array{_: 'messageEntityItalic', offset?: int, length?: int}|array{_: 'messageEntityCode', offset?: int, length?: int}|array{_: 'messageEntityPre', offset?: int, length?: int, language?: string}|array{_: 'messageEntityTextUrl', offset?: int, length?: int, url?: string}|array{_: 'messageEntityMentionName', offset?: int, length?: int, user_id?: int}|array{_: 'inputMessageEntityMentionName', offset?: int, length?: int, user_id?: array|int|string}|array{_: 'messageEntityPhone', offset?: int, length?: int}|array{_: 'messageEntityCashtag', offset?: int, length?: int}|array{_: 'messageEntityUnderline', offset?: int, length?: int}|array{_: 'messageEntityStrike', offset?: int, length?: int}|array{_: 'messageEntityBankCard', offset?: int, length?: int}|array{_: 'messageEntitySpoiler', offset?: int, length?: int}|array{_: 'messageEntityCustomEmoji', offset?: int, length?: int, document_id?: int}|array{_: 'messageEntityBlockquote', collapsed?: bool, offset?: int, length?: int}|array{_: 'messageEntityFormattedDate', relative?: bool, short_time?: bool, long_time?: bool, short_date?: bool, long_date?: bool, day_of_week?: bool, offset?: int, length?: int, date?: int}|array{_: 'messageEntityDiffInsert', offset?: int, length?: int}|array{_: 'messageEntityDiffReplace', offset?: int, length?: int, old_text?: string}|array{_: 'messageEntityDiffDelete', offset?: int, length?: int}|array{_: 'messageEntityTonAddress', offset?: int, length?: int}|array{_: 'messageEntityBlockquote', offset?: int, length?: int}>} $custom_description @see https://docs.madelineproto.xyz/API_docs/types/TextWithEntities.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
@@ -423,6 +423,7 @@ interface Bots
     /**
      * 
      *
+     * @param bool $additional 
      * @param string $username 
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -430,7 +431,7 @@ interface Bots
      * @return bool 
      * @psalm-impure
      */
-    public function checkUsername(string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+    public function checkUsername(bool|null $additional = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 
     /**
      * 
@@ -524,4 +525,30 @@ interface Bots
      * @psalm-impure
      */
     public function setJoinChatResults(array $result, int|null $query_id = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     * 
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param string $username 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function addUsername(array|int|string|null $bot = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     * 
+     *
+     * @param array|int|string $bot @see https://docs.madelineproto.xyz/API_docs/types/InputUser.html
+     * @param string $username 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function removeUsername(array|int|string|null $bot = null, string|null $username = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

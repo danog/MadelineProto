@@ -27,6 +27,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\VoIP\MediaState;
 use danog\MadelineProto\VoIP\SignalingProtocolVersion;
 use Revolt\EventLoop;
@@ -77,6 +78,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  */
 final class Controller implements VideoCodecObserver, SignalingServiceObserver, SctpSignalingObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, PeerConnectionDataChannelListener, DataChannelOpenListener, DataChannelMessageListener, IncomingMediaObserver
 {
+    use RestoresDeclaredProperties;
     private RTCPeerConnection $peerConnection;
     private EncryptedConnection $encryption;
     /**
@@ -398,9 +400,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // Synchronous restore only — all async resume work (the recorders reopening their files, notably)
         // happens in resume(), called once the call graph is whole.
         $this->signalingMutex = new LocalMutex;
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
     }
 
     /**

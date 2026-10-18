@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\EventHandler\Filter;
 
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\InlineQuery;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Query\ButtonQuery;
@@ -65,6 +66,11 @@ final class FilterRegex extends Filter
         }
 
         if ($update instanceof Story && preg_match($this->regex, $update->caption, $matches, $this->flags, $this->offset)) {
+            /** @psalm-suppress InaccessibleProperty */
+            $update->matches = $matches;
+            return true;
+        }
+        if ($update instanceof MultiCallMessage && preg_match($this->regex, $update->message->text, $matches, $this->flags, $this->offset)) {
             /** @psalm-suppress InaccessibleProperty */
             $update->matches = $matches;
             return true;

@@ -1,0 +1,19 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "animationLevel" as *;
+
+/**
+ * The rows of a list `Sortable` is reordering make way for the dragged one by sliding into place.
+ * Apply it to the rows themselves.
+ */
+@mixin sortable-item-transition() {
+  .is-reordering & {
+    @include animation-level(2) {
+      transition: transform var(--transition-standard-in);
+    }
+  }
+}

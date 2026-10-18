@@ -17,38 +17,73 @@
 namespace danog\MadelineProto\Settings;
 
 use danog\MadelineProto\SettingsAbstract;
+use danog\MadelineProto\Tools;
+use danog\MadelineProto\WebUI\TemplateEngine;
 
 /**
- * Web and CLI template settings for login.
+ * Web template settings for the login and status pages.
+ *
+ * The pages are rendered by native PHP templates (see {@see TemplateEngine}): to customize them, copy the
+ * templates you want to change from the builtin template directory ({@see TemplateEngine::BUILTIN_DIRECTORY})
+ * to a directory of yours, and add it with {@see self::addDirectory()}.
  *
  * @psalm-external-mutation-free
  */
 final class Templates extends SettingsAbstract
 {
     /**
-     * Web template used for querying app information.
+     * Template directories, searched in order before the builtin one.
+     *
+     * @var list<string>
      */
-    protected string $htmlTemplate = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
+    protected array $directories = [];
+
+    private ?TemplateEngine $engine = null;
 
     /**
-     * Get web template used for querying app information.
+     * Get the template directories, searched in order before the builtin one.
+     *
+     * @return list<string>
      */
-    public function getHtmlTemplate(): string
+    public function getDirectories(): array
     {
-        return $this->htmlTemplate;
+        return $this->directories;
     }
 
     /**
-     * Set web template used for querying app information.
+     * Set the template directories, searched in order before the builtin one.
      *
-     * @param string $htmlTemplate Web template used for querying app information.
+     * A directory only needs to contain the templates it overrides.
      *
-     * @psalm-external-mutation-free
+     * @param list<string> $directories Template directories
      */
-    public function setHtmlTemplate(string $htmlTemplate): self
+    public function setDirectories(array $directories): self
     {
-        $this->htmlTemplate = $htmlTemplate;
+        $this->directories = array_values(array_map(Tools::absolute(...), $directories));
+        $this->engine = null;
 
         return $this;
+    }
+
+    /**
+     * Add a template directory, searched before the ones that were already added and the builtin one.
+     *
+     * A directory only needs to contain the templates it overrides.
+     *
+     * @param string $directory Template directory
+     */
+    public function addDirectory(string $directory): self
+    {
+        return $this->setDirectories([$directory, ...$this->directories]);
+    }
+
+    /**
+     * Get the template engine.
+     *
+     * @internal
+     */
+    public function getEngine(): TemplateEngine
+    {
+        return $this->engine ??= new TemplateEngine($this->directories);
     }
 }

@@ -32,6 +32,8 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Settings\Templates;
+use danog\MadelineProto\WebUI\WebUI;
 use Revolt\EventLoop;
 use Revolt\EventLoop\UncaughtThrowable;
 use Throwable;
@@ -51,7 +53,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.8.8';
+    public const RELEASE = '8.10.0';
     /**
      * We're not logged in.
      *
@@ -165,25 +167,6 @@ final class API extends AbstractAPI
     private $unlock = null;
 
     /**
-     * Obtain the API ID UI template.
-     *
-     * @psalm-mutation-free
-     */
-    public function getWebAPITemplate(): string
-    {
-        return $this->wrapper->getWebApiTemplate();
-    }
-    /**
-     * Set the API ID UI template.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function setWebApiTemplate(string $template): void
-    {
-        $this->wrapper->setWebApiTemplate($template);
-    }
-
-    /**
      * Constructor function.
      *
      * @param string           $session  Session name
@@ -193,6 +176,17 @@ final class API extends AbstractAPI
     {
         Magic::start(light: true);
         $settings ??= new SettingsEmpty;
+        // The assets of the web UI (scripts, animations...), requested by its pages from this same script
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && isset($_GET[WebUI::ASSET_PARAMETER])) {
+            $templates = match (true) {
+                $settings instanceof Settings => $settings->getTemplates(),
+                $settings instanceof Templates => $settings,
+                default => new Templates,
+            };
+            if (WebUI::serveAsset($templates)) {
+                die;
+            }
+        }
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this->session);
         $this->exportNamespaces();
@@ -226,6 +220,8 @@ final class API extends AbstractAPI
             $appInfo->setApiId($app['api_id']);
             $appInfo->setApiHash($app['api_hash']);
         }
+        // Set without finishing the web setup (in the settings, for example): drop its my.telegram.org login
+        $this->session->storeApiSetupState(null);
         $this->wrapper->setAPI(new MTProto($settings, $this->wrapper));
         $this->wrapper->logger('Prompting initial serialization...');
         $this->wrapper->serialize();
@@ -314,19 +310,31 @@ final class API extends AbstractAPI
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 
-        try {
-            [$unserialized, $this->unlock] = async(
-                Serialization::unserialize(...),
-                $this->session,
-                $settings,
-                $forceFull
-            )->await(Tools::getTimeoutCancellation(30.0, "Timeout during session unserialization!"));
-        } catch (CancelledException $e) {
-            if (!$e->getPrevious() instanceof TimeoutException) {
-                throw $e;
+        $future = async(
+            Serialization::unserialize(...),
+            $this->session,
+            $settings,
+            $forceFull
+        );
+        while (true) {
+            try {
+                [$unserialized, $this->unlock] = $future->await(Tools::getTimeoutCancellation(30.0, "Timeout during session unserialization!"));
+                break;
+            } catch (CancelledException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
+                // The lock holder is alive (a lock dies with its process): it's loading the session, which
+                // can take a while with a big database, and serves it once it's done, or it's shutting down
+                // to let us in. Either way, giving up now would fail a startup that is going well.
+                if (Serialization::isLockedByAnotherProcess($this->session)) {
+                    Logger::log('The session is still locked by another process (loading or releasing it), waiting...');
+                    continue;
+                }
+                $future->ignore();
+                [$unserialized, $this->unlock] = [0, null];
+                break;
             }
-
-            [$unserialized, $this->unlock] = [0, null];
         }
 
         if ($unserialized === 0) {

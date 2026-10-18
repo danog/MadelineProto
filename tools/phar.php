@@ -23,7 +23,9 @@ if (!\defined('MADELINE_ALLOW_COMPOSER') && class_exists(\Composer\Autoload\Clas
 class Installer
 {
     public const RELEASE_TEMPLATE = 'https://phar.madelineproto.xyz/release%s?v=new';
-    public const PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline%s.phar?v=%s';
+    public const PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline.phar?v=%s';
+    /** The previous name of the phar, still uploaded for the madeline.php files that only know it. */
+    public const LEGACY_PHAR_TEMPLATE = 'https://github.com/danog/MadelineProto/releases/latest/download/madeline%s.phar?v=%s';
 
     /**
      * Phar lock instance.
@@ -221,7 +223,8 @@ class Installer
 
         if (!file_exists($madeline_phar)) {
             for ($x = 0; $x < 10; $x++) {
-                $pharTest = file_get_contents(sprintf(self::PHAR_TEMPLATE, $this->version, $remote_release.$x));
+                $pharTest = file_get_contents(sprintf(self::PHAR_TEMPLATE, $remote_release.$x))
+                    ?: file_get_contents(sprintf(self::LEGACY_PHAR_TEMPLATE, $this->version, $remote_release.$x));
                 if ($pharTest && str_contains($pharTest, $remote_release)) {
                     $phar = $pharTest;
                     unset($pharTest);

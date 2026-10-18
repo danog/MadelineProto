@@ -1,0 +1,26 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "hover" as *;
+
+/**
+ * The floating plate painted like a service message: the auth flow's corner buttons, and the empty
+ * column's tip toggle and its Previous / Next pills. Only the paint — where the plate sits and how
+ * big it is belongs to the call site.
+ *
+ * The hover shade is composed from the colour's own parts instead of being read from
+ * `--message-highlighting-hover-color`, which is declared on `.chat` (see `scss/base.scss`). Every
+ * one of these plates sits outside a chat, where that variable resolves to nothing and the plate
+ * drops out from under the cursor.
+ */
+@mixin service-plate() {
+  background-color: var(--message-highlighting-color);
+  color: #fff;
+
+  @include hover-global() {
+    background-color: rgba(var(--message-highlighting-color-rgb), calc(var(--message-highlighting-alpha) + .24)) !important;
+  }
+}

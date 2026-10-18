@@ -5,8 +5,13 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    # Not the branch of the pull requests of the daily build (see autobuild.yml), nor Dependabot's: tested as pull
+    # requests, rather than with the whole test suite, whose job (waiting for the user sessions, held by the daily
+    # build that pushed it) would cancel the one of the main branch, GitHub only keeping one waiting job per
+    # concurrency group.
+    branches-ignore:
+      - autobuild
+      - 'dependabot/**'
     tags:
       - '*'
   pull_request:
@@ -14,29 +19,116 @@ on:
 permissions:
   contents: read
 
+env:
+  # Cached between runs (see the cache steps).
+  COMPOSER_CACHE_DIR: /github/home/composer-cache
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Not the builds of tags, which release.
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
 jobs:
-  cs:
+  # The image the other jobs run in, rebuilt when the main branch or a tag is pushed: they wait for it, and
+  # pull the new one.
+  docker:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/v8' || github.ref_type == 'tag')
+    strategy:
+      matrix:
+        include:
+          - image: ubuntu-latest
+            arch: amd64
+          - image: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push the image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          # Without attestations: a plain image (rather than an index), for docker manifest in docker-merge.
+          docker buildx build --platform "linux/$ARCH" . -f tests/dockerfiles/Dockerfile -t "danog/madelineproto:next-debian-$ARCH" --cache-from "danog/madelineproto:next-debian-$ARCH" --cache-to type=inline --provenance=false --sbom=false --push
+
+  docker-merge:
+    needs: docker
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    steps:
+      - name: Push the multi-arch image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        # With docker manifest, which reads the images as the account logged in: docker buildx imagetools create
+        # read some of them anonymously, failing with the rate limit of anonymous pulls (429).
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          for tag in debian next latest; do
+            docker manifest create "danog/madelineproto:$tag" danog/madelineproto:next-debian-{amd,arm}64
+            docker manifest push "danog/madelineproto:$tag"
+          done
+
+  cs:
+    needs: docker-merge
+    # Also when the image wasn't rebuilt.
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
+      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
+      # so they get no credentials at all.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Check the code style and the generated docs
         env:
           # For the GitHub API, which only allows 60 unauthenticated requests per hour per IP.
           GITHUB_TOKEN: ${{ github.token }}
         run: tests/test.sh cs
 
-  test:
-    if: github.ref_type == 'tag'
+  # Not in the container: it has no Node.js, the runner has.
+  webui:
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
-    # The user sessions must not be used by two jobs at once.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the web UI, and check that its committed bundle is up to date
+        run: tests/webui.sh
+
+  # The whole test suite, with the secrets: for pushes.
+  test:
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    # Rather than the default 6 hours if a test hangs, holding the user sessions (the daily build waits for them).
+    timeout-minutes: 60
+    # The user sessions (and the one of the bot) must not be used by two jobs at once.
     concurrency:
       group: telegram-user-sessions
       cancel-in-progress: false
@@ -44,57 +136,94 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Run the tests
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           DEST: ${{ secrets.DEST }}
+          # Only for the bot API: the bot logs in with BOT_SESSION_AUTH (see tests/ci_sessions.php).
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_SESSION_AUTH: ${{ secrets.BOT_SESSION_AUTH }}
           USER_SESSION_AUTH: ${{ secrets.USER_SESSION_AUTH }}
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
+  # The tests that don't need any secret, for pull requests (which don't get them, if from forks).
   test_light:
-    if: github.ref_type != 'tag'
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Run the light tests
         run: tests/test.sh phpunit-light
 
   handshake:
+    needs: docker-merge
+    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
+      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
+      # so they get no credentials at all.
+      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
       - name: Test the handshake
         run: tests/test.sh handshake
 
   build:
-    needs: [cs, test, test_light, handshake]
-    # Either test or test_light is skipped. Not for pull requests: it releases the tags, the secrets it
-    # tests with are not given to pull requests from forks, and the push of a branch of this
-    # repository already builds it.
+    # At once with the other tests: the release job publishes the phar once all of them passed. Not for pull
+    # requests: the secrets it tests with are not given to pull requests from forks, and the push of a branch of
+    # this repository already builds it.
+    needs: docker-merge
     if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
-    permissions:
-      # To upload the phar to the release of a tag.
-      contents: write
+    # It tests the phar with the session of authorization 0 of the bot (see tests/session_tests.sh), which two
+    # builds must not use at once.
+    concurrency:
+      group: telegram-phar-build
+      cancel-in-progress: false
+    container:
+      image: danog/madelineproto:next
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     services:
       mariadb:
         image: mariadb
@@ -124,18 +253,60 @@ jobs:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
         run: |
-          apt-get update && apt-get install -y git
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v4
-      - name: Build, test and release the phar
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Build and test the phar
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           DEST: ${{ secrets.DEST }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_SESSION_AUTH: ${{ secrets.BOT_SESSION_AUTH }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
           # Empty unless building a tag, like Woodpecker's.
           CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          RELEASE_DIR: ${{ github.workspace }}/release-files
         run: /bin/bash -e tests/makephar.sh
+      - name: Keep the files of the release
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: release-files
+          if-no-files-found: error
+
+  release:
+    # Once every test passed. Either test or test_light is skipped.
+    needs: [cs, webui, test, test_light, handshake, build]
+    if: ${{ !failure() && !cancelled() && github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    permissions:
+      # To upload the phar to the release of a tag.
+      contents: write
+      # To run release.yml.
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: release-files
+      - name: Release the phar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: tests/release_phar.sh "${{ github.ref_name }}" release-files
+      # Released with the token of the job: its events don't run workflows, so run it, and wait for it, so that the
+      # release fails if it fails.
+      - name: Announce the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: tests/release_dispatch.sh "${{ github.ref_name }}"

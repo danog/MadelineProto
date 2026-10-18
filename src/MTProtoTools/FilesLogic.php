@@ -24,6 +24,9 @@ use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
+use Amp\CancelledException;
+use Amp\CompositeCancellation;
+use Amp\DeferredCancellation;
 use Amp\File\File;
 use Amp\File\Whence;
 use Amp\Http\HttpStatus;
@@ -122,6 +125,7 @@ trait FilesLogic
                 $_SERVER['REQUEST_METHOD'],
                 $headers,
                 $messageMedia,
+                $this->getSettings()->getFiles()->getSandboxDownloads(),
             );
         } catch (Throwable $e) {
             $this->logger->logger("An error occurred inside of downloadToBrowser: $e", Logger::FATAL_ERROR);
@@ -138,7 +142,38 @@ trait FilesLogic
                 ob_implicit_flush();
             }
             [$start, $end] = $result->getServeRange();
-            $this->downloadToStream($messageMedia, getOutputBufferStream(), $cb, $start, $end, $cancellation);
+            // PHP only notices that the client went away when output fails to be sent:
+            // flush after each chunk, and stop the download (in the IPC worker, too) once the client is gone.
+            $aborted = new DeferredCancellation;
+            $output = getOutputBufferStream();
+            $callable = static function (string $payload) use ($output, $aborted): int {
+                $aborted->getCancellation()->throwIfRequested();
+                $output->write($payload);
+                flush();
+                if (connection_aborted()) {
+                    $aborted->cancel();
+                }
+                return \strlen($payload);
+            };
+            try {
+                $this->downloadToCallable(
+                    $messageMedia,
+                    $callable,
+                    $cb,
+                    false,
+                    $start,
+                    $end,
+                    null,
+                    $cancellation === null
+                        ? $aborted->getCancellation()
+                        : new CompositeCancellation($cancellation, $aborted->getCancellation()),
+                );
+            } catch (CancelledException $e) {
+                if (!$aborted->isCancelled()) {
+                    throw $e;
+                }
+                $this->logger->logger('The client closed the connection, stopped downloadToBrowser', Logger::NOTICE);
+            }
         }
     }
     /**
@@ -250,6 +285,7 @@ trait FilesLogic
             $request->getMethod(),
             array_map(static fn (array $headers) => $headers[0], $request->getHeaders()),
             $messageMedia,
+            $this->getSettings()->getFiles()->getSandboxDownloads(),
         );
 
         $body = null;
@@ -340,9 +376,8 @@ trait FilesLogic
             return $this->uploadFromUrl($file, 0, $fileName, $cb, $encrypted, $cancellation);
         }
         if ($file instanceof BotApiFileId) {
-            $info = $this->getDownloadInfo($file->fileId);
-            $info['size'] = $file->size;
-            return $this->uploadFromTgfile($info, $cb, $encrypted, $cancellation);
+            // Not its download info: the upload is resumed by its file ID.
+            return $this->uploadFromTgfile($file, $cb, $encrypted, $cancellation);
         }
         if (\is_string($file) || (\is_object($file) && method_exists($file, '__toString'))) {
             if (filter_var($file, FILTER_VALIDATE_URL)) {

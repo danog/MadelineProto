@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Filter;
 
 use AssertionError;
 use Attribute;
+use danog\MadelineProto\EventHandler\Calls\MultiCallMessage;
 use danog\MadelineProto\EventHandler\CommandType;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Update;
@@ -65,6 +66,6 @@ final class FilterCommandCaseInsensitive extends Filter
     #[\Override]
     public function apply(Update $update): bool
     {
-        return $update instanceof Message && $update->command !== null && mb_strtolower($update->command) === $this->command && \in_array($update->commandType, $this->commandTypes, true);
+        return ($update instanceof Message || $update instanceof MultiCallMessage) && $update->command !== null && mb_strtolower($update->command) === $this->command && \in_array($update->commandType, $this->commandTypes, true);
     }
 }

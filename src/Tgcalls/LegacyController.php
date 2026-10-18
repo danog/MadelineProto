@@ -24,6 +24,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RecordingEvent;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\VoIP\Endpoint;
 use danog\MadelineProto\VoIP\MessageHandler;
 use danog\MadelineProto\VoIP\VoIPState;
@@ -47,6 +48,7 @@ use function Amp\Future\await;
  */
 final class LegacyController
 {
+    use RestoresDeclaredProperties;
 
     private VoIPState $voipState = VoIPState::CREATED;
     private MessageHandler $messageHandler;
@@ -104,9 +106,7 @@ final class LegacyController
         $this->recorder = null;
         $this->pendingPing = null;
         $this->timeoutWatcher = null;
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         if ($this->closed) {
             return;
         }

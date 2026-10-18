@@ -48,6 +48,10 @@ use function substr;
 final class ReadLoop extends Loop
 {
     use Common;
+    /** rpc_result#f35c6d01, little-endian. */
+    private const RPC_RESULT = "\x01\x6d\x5c\xf3";
+    /** msg_container#73f1f8dc, little-endian. */
+    private const MSG_CONTAINER = "\xdc\xf8\xf1\x73";
     /**
      * Main loop.
      */
@@ -238,11 +242,10 @@ final class ReadLoop extends Loop
             $this->API->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
 
             try {
-                $deserialized = $this->API->getTL()->deserialize($message_data, ['type' => '', 'connection' => $this->connection, 'encrypted' => !$unencrypted]);
-            } catch (\Throwable $e) {
-                Logger::log('Error during deserializing message (base64): ' .  base64_encode($message_data), Logger::ERROR);
-                $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
-                throw $e;
+                $deserialized = $this->deserialize($message_data, $message_id, !$unencrypted);
+                if ($deserialized === null) {
+                    return null;
+                }
             } finally {
                 $this->API->minDatabase->reset();
                 $this->API->referenceDatabase->reset();
@@ -264,6 +267,53 @@ final class ReadLoop extends Loop
         } finally {
             $this->connection->reading(false);
         }
+        return null;
+    }
+    /**
+     * Deserialize a message, or as much of it as possible if it contains constructors missing from the schema.
+     *
+     * An undeserializable result fails its request with the deserialization error: had the read loop exited, the
+     * request would be resent after reconnecting, and get the same result, forever.
+     * The other undeserializable messages are acknowledged (so they aren't resent) and dropped,
+     * the rest of their container is still handled.
+     *
+     * @return ?array The message, null if it was dropped.
+     */
+    private function deserialize(string $data, int $messageId, bool $encrypted, bool $fromContainer = false): ?array
+    {
+        try {
+            return $this->API->getTL()->deserialize($data, ['type' => '', 'connection' => $this->connection, 'encrypted' => $encrypted]);
+        } catch (\Throwable $e) {
+            Logger::log('Error during deserializing message (base64): ' .  base64_encode($data), Logger::ERROR);
+            if (!$encrypted) {
+                $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
+                throw $e;
+            }
+        }
+        $constructor = substr($data, 0, 4);
+        if ($constructor === self::RPC_RESULT && \strlen($data) >= 12) {
+            $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
+            return ['_' => 'rpc_result', 'req_msg_id' => Tools::unpackSignedLong(substr($data, 4, 8)), 'result' => $e];
+        }
+        if ($constructor === self::MSG_CONTAINER && !$fromContainer && \strlen($data) >= 8) {
+            $messages = [];
+            $count = unpack('V', substr($data, 4, 4))[1];
+            $offset = 8;
+            for ($i = 0; $i < $count && \strlen($data) >= $offset + 16; $i++) {
+                $innerId = Tools::unpackSignedLong(substr($data, $offset, 8));
+                $seqno = unpack('V', substr($data, $offset + 8, 4))[1];
+                $length = unpack('V', substr($data, $offset + 12, 4))[1];
+                $body = $this->deserialize(substr($data, $offset + 16, $length), $innerId, $encrypted, true);
+                $offset += 16 + $length;
+                if ($body !== null) {
+                    $messages []= ['_' => 'message', 'msg_id' => $innerId, 'seqno' => $seqno, 'bytes' => $length, 'body' => $body];
+                }
+            }
+            return ['_' => 'msg_container', 'messages' => $messages];
+        }
+        $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
+        $this->API->logger("Dropping undeserializable message $messageId from DC {$this->datacenter}", Logger::ERROR);
+        $this->connection->ack_queue []= $messageId;
         return null;
     }
     /**

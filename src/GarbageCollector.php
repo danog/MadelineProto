@@ -121,6 +121,10 @@ final class GarbageCollector
                         $unlock = Tools::flock(MADELINE_PHP.'.lock', LOCK_EX);
                         write(MADELINE_PHP.'.temp.php', $contents);
                         move(MADELINE_PHP.'.temp.php', MADELINE_PHP);
+                        // With opcache.validate_timestamps=0 (php-fpm), the old loader would run until a restart
+                        if (\function_exists('opcache_invalidate')) {
+                            @opcache_invalidate(MADELINE_PHP, true);
+                        }
                         $unlock();
                     }
 
@@ -159,7 +163,9 @@ final class GarbageCollector
                 Logger::log("An error occurred in the phar cleanup loop: $e", Logger::FATAL_ERROR);
             }
         };
-        $cb();
+        // Not awaited: the startup doesn't wait for the release URL, which can take a while (three connection
+        // attempts) to fail when it can't be reached.
+        EventLoop::queue($cb);
         EventLoop::unreference($id = EventLoop::repeat(3600.0, $cb));
     }
 

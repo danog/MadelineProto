@@ -27,34 +27,25 @@ done
 
 # The user accounts of the CI, and the bots they interact with, are on the test servers.
 php tests/ci_sessions.php --test unauth fuzz_unauth.madeline
-php tests/ci_sessions.php --test bot fuzz_bot.madeline TEST_BOT_TOKEN
+php tests/ci_sessions.php --test bot-token fuzz_bot.madeline TEST_BOT_TOKEN
 php tests/ci_sessions.php --test user fuzz_user.madeline USER_SESSION_AUTH
 
 composer build
 
+source tests/submit_pr.sh
+
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
+# The release label of the pull request of MadelineProto, see .github/release.yml.
+label=release:internal
+if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
+    label=release:layer
+fi
 
-# Commit the staged changes of a repository to the autobuild branch, opening a pull request if there's none.
-# Not called in a condition: there, errors would not stop the script.
-submit()
-{
-    local dir=$1 repository=$2 body=$3
-    git -C "$dir" status --short
-    git -C "$dir" checkout -q -B "$BRANCH"
-    git -C "$dir" commit -q -m "$title"
-    git -C "$dir" push -q --force origin "$BRANCH"
-    if [ "$(gh pr list --repo "$repository" --head "$BRANCH" --state open --json number --jq length)" == "0" ]; then
-        base=$(gh repo view "$repository" --json defaultBranchRef --jq .defaultBranchRef.name)
-        gh pr create --repo "$repository" --base "$base" --head "$BRANCH" --title "$title" --body "$body
+# The pull requests of this build, and their bodies, to link them to each other once all of them are submitted.
+urls=()
+bodies=()
 
-Built by $RUN_URL"
-    else
-        echo "Updated the pull request of $repository"
-    fi
-}
-
-changed=""
 for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
     dir=${submodule%%:*}
     repository=${submodule#*:}
@@ -63,21 +54,41 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
         echo "Nothing changed in $repository"
         continue
     fi
-    submit "$dir" "$repository" "The daily \`composer build\` of MadelineProto, see the pull request with the same title in danog/MadelineProto."
-    changed="$changed $repository"
+    body="The daily \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
+    submit_pr "$dir" "$repository" "$BRANCH" "$title" "$body"
+    urls+=("$PR_URL")
+    bodies+=("$body")
 done
+submodules=${#urls[@]}
 
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
-    exit 0
-fi
-body="The daily \`composer build\`."
-if [ "$changed" != "" ]; then
-    body="$body
+else
+    body="The daily \`composer build\`."
+    if [ "$submodules" -ne 0 ]; then
+        body="$body
 
-It points to the commits of the pull requests with the same title in:$changed. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
+It points to the commits of the other pull requests of this build. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
+    fi
+    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
+    urls+=("$PR_URL")
+    bodies+=("$body")
 fi
-submit . danog/MadelineProto "$body"
+
+if [ ${#urls[@]} -gt 1 ]; then
+    for i in "${!urls[@]}"; do
+        others=""
+        for j in "${!urls[@]}"; do
+            if [ "$i" -ne "$j" ]; then
+                others="$others
+- ${urls[$j]}"
+            fi
+        done
+        gh pr edit "${urls[$i]}" --body "$(pr_body "${bodies[$i]}
+
+The other pull requests of this build:$others")"
+    done
+fi

@@ -25,6 +25,7 @@ use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\DeferredFuture;
 use AssertionError;
+use danog\MadelineProto\AsyncTools;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\ConferenceCall;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
@@ -38,6 +39,7 @@ use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\Tgcalls\PrivateCallController;
 use phpseclib4\Math\BigInteger;
+use Revolt\EventLoop;
 use Throwable;
 
 use const STR_PAD_LEFT;
@@ -58,6 +60,13 @@ trait AuthKeyHandler
     /** @var array<int, PrivateCallController> */
     private array $callsByPeer = [];
     private array $pendingCalls = [];
+    /**
+     * The updates of the calls we do not track yet, received while a phone.requestCall is in flight
+     * (the call may be the one it creates): call ID => updates, see {@see self::postponeCallUpdate()}.
+     *
+     * @var array<int, list<array>>
+     */
+    private array $postponedCallUpdates = [];
     /**
      * Request a one-to-one voice or video call.
      *
@@ -95,15 +104,93 @@ trait AuthKeyHandler
             ])['phone_call'];
             $res['a'] = $a;
             $res['g_a'] = str_pad($g_a->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-            $this->calls[$res['id']] = $controller = new PrivateCallController($this, $res);
-            $this->callsByPeer[$controller->public->otherID] = $controller;
-            unset($this->pendingCalls[$user]);
-            $deferred->complete($controller->public);
+            $deferred->complete($this->trackRequestedCall($res)->public);
         } catch (Throwable $e) {
-            unset($this->pendingCalls[$user]);
             $deferred->error($e);
+        } finally {
+            unset($this->pendingCalls[$user]);
+            $this->dropPostponedCallUpdates();
         }
         return $deferred->getFuture()->await();
+    }
+
+    /**
+     * Start tracking the call created by phone.requestCall, and apply the updates it got before.
+     *
+     * @internal
+     */
+    public function trackRequestedCall(array $call): PrivateCallController
+    {
+        $this->calls[$call['id']] = $controller = new PrivateCallController($this, $call);
+        $this->callsByPeer[$controller->public->otherID] = $controller;
+        if (isset($this->postponedCallUpdates[$call['id']])) {
+            EventLoop::queue($this->replayPostponedCallUpdates(...), $call['id']);
+        }
+        return $controller;
+    }
+
+    /**
+     * Once no phone.requestCall is in flight, drop the postponed updates of the calls we do not track:
+     * they are of calls requested by another session of the account.
+     *
+     * @internal
+     */
+    public function dropPostponedCallUpdates(): void
+    {
+        if ($this->pendingCalls) {
+            return;
+        }
+        foreach ($this->postponedCallUpdates as $id => $_) {
+            if (!isset($this->calls[$id])) {
+                unset($this->postponedCallUpdates[$id]);
+            }
+        }
+    }
+
+    /**
+     * Postpone an [updatePhoneCall](https://core.telegram.org/constructor/updatePhoneCall) we cannot
+     * apply yet, as TDLib does.
+     *
+     * The server sends the updates of an outgoing call (its phoneCallWaiting, and the phoneCallAccepted,
+     * phoneCall or phoneCallDiscarded that follow if the other party answers or declines right away)
+     * independently of the result of phone.requestCall, which is what gives us its ID: they can come
+     * first. An update of an untracked call that comes while a phone.requestCall is in flight is
+     * postponed until it returns, then replayed if it is the call it created (see
+     * {@see self::replayPostponedCallUpdates()}), or dropped otherwise. The later updates of a call whose
+     * postponed updates are not replayed yet are postponed too, to apply them in order.
+     *
+     * @internal
+     *
+     * @return bool Whether the update was postponed.
+     */
+    public function postponeCallUpdate(array $update): bool
+    {
+        $id = $update['phone_call']['id'];
+        if (isset($this->postponedCallUpdates[$id])
+            || ($this->pendingCalls && !isset($this->calls[$id]) && $update['phone_call']['_'] !== 'phoneCallRequested')
+        ) {
+            $this->logger->logger("Postponing {$update['phone_call']['_']} of untracked call $id until phone.requestCall returns", Logger::VERBOSE);
+            $this->postponedCallUpdates[$id][] = $update;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Apply the updates postponed (see {@see self::postponeCallUpdate()}) for a call we now track, in order.
+     */
+    private function replayPostponedCallUpdates(int $id): void
+    {
+        // Updates postponed while one is applied are appended, see postponeCallUpdate().
+        while ($this->postponedCallUpdates[$id] ?? null) {
+            $update = array_shift($this->postponedCallUpdates[$id]);
+            try {
+                $this->applyCallUpdate($update);
+            } catch (Throwable $e) {
+                AsyncTools::rethrow($e);
+            }
+        }
+        unset($this->postponedCallUpdates[$id]);
     }
 
     /**

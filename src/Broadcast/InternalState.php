@@ -24,6 +24,7 @@ use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -37,6 +38,7 @@ use function Amp\Future\await;
  */
 final class InternalState
 {
+    use RestoresDeclaredProperties;
     /** @var array<int> */
     private array $peers = [];
     private int $totalCount = 0;
@@ -75,9 +77,7 @@ final class InternalState
     }
     public function __unserialize(array $data): void
     {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         $this->cancellation = new DeferredCancellation;
         if ($this->cancelled) {
             $this->cancel();

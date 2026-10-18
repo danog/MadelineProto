@@ -1,0 +1,179 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * The buttons of the auth flow, out of tweb's scss/partials/_button.scss.
+ */
+
+@use "../shared" as *;
+
+$btn-menu-z-index: 4;
+
+.btn,
+.btn-icon {
+  background: none;
+	outline: none;
+  border: none;
+  cursor: pointer;
+
+  body.animation-level-0 & {
+    transition: none;
+  }
+
+  @include btn-hoverable();
+
+  &:disabled {
+    pointer-events: none !important;
+    opacity: var(--disabled-opacity);
+  }
+}
+
+.btn-icon {
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  border-radius: 50% !important;
+  color: var(--primary-text-color);
+  background-color: transparent;
+  border: none;
+  padding: .5rem;
+  position: relative;
+  // overflow: hidden;
+  transition: color .15s ease-in-out, opacity .15s ease-in-out/* , background-color .15s ease-in-out */;
+
+  /* kostil */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.rp {
+    overflow: hidden;
+  }
+
+  &.active {
+    color: var(--primary-color);
+  }
+}
+
+
+.btn-primary {
+  border-radius: $button-border-radius;
+  width: 100%;
+  text-align: center;
+  height: $button-height;
+  border: none;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  padding: 0; // new
+  transition: opacity var(--transition-standard-out), background-color var(--transition-standard-out), color var(--transition-standard-out);
+  line-height: var(--line-height);
+  text-transform: uppercase;
+
+  @include hover() {
+    // transition: /* .2s background-color,  */.2s opacity;
+    background: var(--dark-primary-color);
+  }
+
+  &-transparent {
+    --ripple-color: var(--light-primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+
+    @include hover() {
+      background: var(--light-primary-color);
+    }
+
+    &.danger {
+      @include hover-background-effect(red, false);
+    }
+
+    .preloader-circular .preloader-path {
+      stroke: var(--primary-color);
+    }
+  }
+
+  body.animation-level-0 & {
+    transition: none;
+  }
+
+  > svg,
+  use {
+    height: calc(100% - 20px);
+    inset-inline: auto 15px;
+  }
+
+  &:disabled {
+    pointer-events: none !important;
+    opacity: var(--disabled-opacity);
+  }
+}
+
+// ! example: multiselect input, button in pinned messages chat, settings, chat background tab
+.btn-transparent {
+  color: var(--primary-text-color);
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  height: $button-height;
+  text-transform: unset;
+  font-weight: normal;
+  line-height: var(--line-height); // * it centers the text
+
+  @include hover-background-effect();
+
+  &.danger {
+    @include hover-background-effect(red);
+  }
+
+  &.primary {
+    @include hover-background-effect(primary);
+  }
+
+  // * tgico
+  .button-icon {
+    color: var(--secondary-text-color);
+    font-size: 1.5rem;
+    margin-inline-end: 2rem;
+
+    @include respond-to(handhelds) {
+      margin-inline-end: 1.5rem;
+    }
+  }
+
+  &.btn-short .button-icon {
+    margin-inline-end: 1rem;
+  }
+}
+
+
+.btn-disabled {
+  pointer-events: none !important;
+  cursor: default !important;
+  color: var(--secondary-text-color) !important;
+
+  .button-icon {
+    color: inherit !important;
+  }
+}
+
+.btn-secondary {
+  margin-top: -1rem;
+}
+
+.btn-color-primary {
+  background: var(--primary-color);
+  color: #fff;
+
+  // the contrast-checked fill, with the a11y layer (Increase Contrast is part of it)
+  :where(.a11y) & {
+    background: var(--primary-button-color, var(--primary-color));
+  }
+
+  /* .c-ripple__circle {
+    background-color: var(--light-primary-color);
+  } */
+}

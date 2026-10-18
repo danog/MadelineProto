@@ -1,0 +1,19 @@
+<?php
+/**
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var list<\danog\MadelineProto\WebUI\Alert> $alerts
+ */
+use danog\MadelineProto\WebUI\AlertLevel;
+
+?>
+<?php foreach ($alerts as $alert): ?>
+    <div class="alert is-<?= $alert->level->value ?>"<?= $this->attrs(['role' => $alert->level === AlertLevel::ERROR ? 'alert' : 'status']) ?>>
+        <?php if ($alert->title !== null): ?>
+            <p class="alert-title"><?= $this->e($alert->title) ?></p>
+        <?php endif ?>
+        <p><?= $this->e($alert->message) ?></p>
+        <?php if ($alert->code !== null): ?>
+            <pre><code><?= $this->e($alert->code) ?></code></pre>
+        <?php endif ?>
+    </div>
+<?php endforeach ?>
