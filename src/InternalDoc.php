@@ -1421,13 +1421,14 @@ abstract class InternalDoc
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params       Params: once the timeout expires, an empty array is returned
+     * @param  ?Cancellation                                     $cancellation Cancellation: once cancelled, the wait stops with a CancelledException
      * @return list<array{update_id: mixed, update: mixed}>
      */
     final public function getUpdates(array $params = [
-    ]): array
+    ], ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->getUpdates($params);
+        return $this->wrapper->getAPI()->getUpdates($params, $cancellation);
     }
     /**
      * Get a message to show to the user when starting the bot.
