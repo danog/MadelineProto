@@ -1445,7 +1445,7 @@ trait Handler
                 $fromId = $this->getIdInternal($update['from_id']) ?? 0;
                 $encrypted = (string) $update['encrypted_message'];
                 EventLoop::queue(function () use ($id, $fromId, $encrypted, $update): void {
-                    $message = $this->conferenceCalls[$id]?->onEncryptedMessage($fromId, $encrypted);
+                    $message = ($this->conferenceCalls[$id] ?? null)?->onEncryptedMessage($fromId, $encrypted);
                     if ($message === null) {
                         return;
                     }
