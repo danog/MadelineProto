@@ -94,7 +94,7 @@
         "danog/phpdoc": "^0.1.24",
         "phpunit/phpunit": "^9.6.36",
         "amphp/phpunit-util": "^3",
-        "bamarni/composer-bin-plugin": "1.8.2",
+        "bamarni/composer-bin-plugin": "1.9.1",
         "symfony/yaml": "^6.4.45",
         "dg/bypass-finals": "dev-master",
         "brianium/paratest": "^6.11.1",
