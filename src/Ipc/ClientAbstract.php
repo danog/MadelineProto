@@ -24,8 +24,8 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
+use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\Serialization;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -40,7 +40,7 @@ abstract class ClientAbstract
     /**
      * IPC server socket.
      */
-    protected ChannelledSocket $server;
+    protected ChannelledSocket|EncryptedChannel $server;
     protected ?Future $serverFuture = null;
 
     private int $id = 0;
@@ -121,12 +121,7 @@ abstract class ClientAbstract
                     }
                     $requests = [];
                     try {
-                        // Connect as soon as any server is listening, even if it was started by another process
-                        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session));
-                        if (!$server instanceof ChannelledSocket) {
-                            throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
-                        }
-                        $this->server = $server;
+                        $this->server = $this->connector->reconnect();
                         $this->logger('Reconnected to IPC server!');
                         $requests = $this->requests;
                         $this->requests = [];

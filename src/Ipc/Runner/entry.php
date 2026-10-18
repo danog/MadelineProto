@@ -28,6 +28,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
+use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Ipc;
 use Revolt\EventLoop\UncaughtThrowable;
 use Webmozart\Assert\Assert;
@@ -149,6 +150,61 @@ use Webmozart\Assert\Assert;
             } else {
                 Logger::log('Not reporting error!');
             }
+        }
+    } elseif (MADELINE_WORKER_TYPE === 'madeline-server') {
+        // Standalone IPC server (see the docs of Settings\Ipc): it never forks, and is configured with environment variables.
+        $session = MADELINE_WORKER_ARGS[0];
+        // The phar changes the working directory to its own when run directly
+        if (!str_starts_with($session, '/') && \PHP_OS_FAMILY !== 'Windows' && ($cwd = getenv('PWD'))) {
+            $session = "$cwd/$session";
+        }
+        if (\function_exists('cli_set_process_title')) {
+            @cli_set_process_title("MadelineProto server $session");
+        }
+
+        $env = static fn (string $name): ?string => \is_string($value = getenv($name)) && $value !== '' ? $value : null;
+        // Always set, so that the environment replaces the endpoints and secret stored in the session.
+        $ipc = (new Ipc)
+            ->setSecret($env('MADELINE_IPC_SECRET'))
+            ->setListen(array_values(array_filter(array_map(trim(...), explode(',', $env('MADELINE_IPC_LISTEN') ?? '')))));
+        $settings = (new Settings)->setIpc($ipc);
+        if (($apiId = $env('MADELINE_API_ID')) && ($apiHash = $env('MADELINE_API_HASH'))) {
+            Assert::numeric($apiId);
+            $settings->getAppInfo()->setApiId((int) $apiId)->setApiHash($apiHash);
+        } elseif (!file_exists($session)) {
+            fwrite(STDERR, "The session $session does not exist: set the MADELINE_API_ID and MADELINE_API_HASH environment variables to create it.".PHP_EOL);
+            exit(1);
+        }
+
+        try {
+            Magic::start(light: false);
+            $API = new API($session, $settings);
+            Logger::log("Started the standalone IPC server of $session", Logger::WARNING);
+            while (true) {
+                try {
+                    Server::waitShutdown();
+                    Logger::log('The IPC server was shut down!', Logger::WARNING);
+                    return;
+                } catch (\Throwable $e) {
+                    if ($e instanceof UncaughtThrowable) {
+                        $e = $e->getPrevious();
+                    }
+                    if ($e instanceof SecurityException || $e instanceof SignalException) {
+                        throw $e;
+                    }
+                    Logger::log((string) $e, Logger::FATAL_ERROR);
+                    $API->report("Surfaced: $e");
+                }
+            }
+        } catch (\Throwable $e) {
+            // Also while waiting for the session lock, where the signal surfaces from the event loop.
+            if ($e instanceof UncaughtThrowable) {
+                $e = $e->getPrevious() ?? $e;
+            }
+            if (!$e instanceof SignalException) {
+                throw $e;
+            }
+            Logger::log("{$e->getMessage()}, shutting down the IPC server...", Logger::WARNING);
         }
     }
 })();

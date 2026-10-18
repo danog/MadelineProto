@@ -23,6 +23,7 @@ use Amp\CancelledException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use danog\MadelineProto\FileCallback as MadelineProtoFileCallback;
 use danog\MadelineProto\FileCallbackInterface;
+use danog\MadelineProto\Ipc\Remote\EncryptedChannel;
 use danog\MadelineProto\Ipc\Wrapper\Cancellation as WrapperCancellation;
 use danog\MadelineProto\Ipc\Wrapper\CancellationReference;
 use danog\MadelineProto\Ipc\Wrapper\FileCallback;
@@ -33,11 +34,8 @@ use danog\MadelineProto\Ipc\Wrapper\SeekableWritableStream;
 use danog\MadelineProto\Ipc\Wrapper\WrappedCancellation;
 use danog\MadelineProto\Ipc\Wrapper\WritableStream;
 use danog\MadelineProto\Logger;
-use danog\MadelineProto\SessionPaths;
 use Revolt\EventLoop;
 use Throwable;
-
-use function Amp\Ipc\connect;
 
 /**
  * Callback payload wrapper.
@@ -88,7 +86,7 @@ final class Wrapper extends ClientAbstract
      *
      * @param mixed $data Payload data
      */
-    public static function create(mixed &$data, SessionPaths $session, Logger $logger): self
+    public static function create(mixed &$data, Connector $connector, Logger $logger): self
     {
         $instance = new self;
         $instance->data = &$data;
@@ -96,7 +94,7 @@ final class Wrapper extends ClientAbstract
         $instance->run = false;
 
         $logger->logger('Connecting to callback IPC server...');
-        $instance->server = connect($session->getIpcCallbackPath());
+        $instance->server = $connector->connectCallback();
         $logger->logger('Connected to callback IPC server!');
 
         $instance->remoteId = $instance->server->receive();
@@ -274,10 +272,10 @@ final class Wrapper extends ClientAbstract
     /**
      * Set socket and unwrap data.
      *
-     * @param ChannelledSocket $server Socket.
+     * @param ChannelledSocket|EncryptedChannel $server Socket.
      * @internal
      */
-    public function unwrap(ChannelledSocket $server)
+    public function unwrap(ChannelledSocket|EncryptedChannel $server)
     {
         $this->server = $server;
         EventLoop::queue($this->loopInternal(...));

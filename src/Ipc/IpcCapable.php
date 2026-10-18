@@ -27,6 +27,13 @@ use danog\MadelineProto\MTProto;
  */
 abstract class IpcCapable
 {
+    /**
+     * IPC client of this process that is unserializing a response of a remote IPC server, see EncryptedChannel.
+     *
+     * @internal
+     */
+    public static ?Client $remoteClient = null;
+
     protected readonly string $session;
     private MTProto|Client|null $API;
 
@@ -51,6 +58,17 @@ abstract class IpcCapable
         $vars = get_object_vars($this);
         unset($vars['API']);
         return array_keys($vars);
+    }
+
+    /**
+     * @internal
+     */
+    final public function __wakeup(): void
+    {
+        if (self::$remoteClient !== null) {
+            // The session name is the one of the remote server, which doesn't identify the client of this process.
+            $this->API = self::$remoteClient;
+        }
     }
 
     /**

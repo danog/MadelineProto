@@ -254,7 +254,8 @@ final class Magic
             set_error_handler(Exception::exceptionErrorHandler(...));
             set_exception_handler(Exception::exceptionHandler(...));
             self::$can_use_igbinary = \function_exists('igbinary_serialize');
-            self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') ? MADELINE_WORKER_TYPE === 'madeline-ipc' : false;
+            // Both the IPC servers started automatically and the standalone ones
+            self::$isIpcWorker = \defined('MADELINE_WORKER_TYPE') && (MADELINE_WORKER_TYPE === 'madeline-ipc' || MADELINE_WORKER_TYPE === 'madeline-server');
             // Important, obtain root relative to caller script
             $backtrace = debug_backtrace(0);
 

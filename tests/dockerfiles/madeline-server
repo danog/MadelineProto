@@ -1,0 +1,15 @@
+#!/bin/sh
+# Standalone MadelineProto IPC server, see https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/Ipc.html
+#
+# Usage: madeline-server [session], by default $MADELINE_SESSION or /data/session.madeline.
+#
+# Environment:
+# - MADELINE_IPC_LISTEN: comma-separated endpoints for remote clients, e.g. tcp://0.0.0.0:6100,http://0.0.0.0:8080
+# - MADELINE_IPC_SECRET: shared secret of remote clients (at least 16 bytes, e.g. `openssl rand -hex 32`)
+# - MADELINE_API_ID, MADELINE_API_HASH: API ID and hash, to create the session if it doesn't exist
+session="${1:-${MADELINE_SESSION:-/data/session.madeline}}"
+case "$session" in
+    /*) ;;
+    *) session="$PWD/$session" ;;
+esac
+exec php /usr/local/lib/madelineproto/madeline.phar madeline-server "$session"
