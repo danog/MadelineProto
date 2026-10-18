@@ -34,9 +34,8 @@ export function isEmptyText(text: Text | null | undefined): boolean {
 
 function textContent(text: Text): string {
   if(typeof(text) === 'string') return text;
-  const div = document.createElement('div');
-  div.innerHTML = text.html;
-  return div.textContent;
+  // parsed in an inert document: nothing in it loads or runs
+  return new DOMParser().parseFromString(text.html, 'text/html').body.textContent ?? '';
 }
 
 /**

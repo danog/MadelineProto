@@ -266,16 +266,27 @@ final class WebUI
     }
 
     /**
-     * Get the path of the current URL, without the query string.
+     * Get the path of the current URL, without the query string (or with the query of the page).
      *
      * Always same-origin: a request for `//evil.example/` (which a front controller may route to the script)
      * would otherwise give a protocol-relative URL, pointing redirects and the QR code requests to another
      * host.
      */
-    public static function getSelfUrl(): string
+    public static function getSelfUrl(bool $withQuery = false): string
     {
-        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0];
-        return '/'.ltrim(str_replace('\\', '/', $path), '/');
+        [$path, $query] = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2) + [1 => ''];
+        $path = '/'.ltrim(str_replace('\\', '/', $path), '/');
+        if (!$withQuery) {
+            return $path;
+        }
+        // The query of the page, which may select the session or the bot (index.php?bot=x), without the
+        // parameters of the web UI: as is (parse_str() would rename the parameters with dots or spaces)
+        $query = implode('&', array_filter(
+            explode('&', $query),
+            static fn (string $pair): bool => $pair !== ''
+                && !\in_array(urldecode(explode('=', $pair, 2)[0]), ['getQrCode', 'waitQrCodeOrLogin', self::ASSET_PARAMETER], true),
+        ));
+        return $query === '' ? $path : "$path?$query";
     }
 
     /**

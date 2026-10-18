@@ -24,8 +24,8 @@ function pageUrl() {
  * POST the fields to the script, as the form of the server-rendered page would.
  *
  * `{state}`: the next page (or the same one, with an error). `{loggedIn}`: the login is over, and the
- * user's script runs in the GET of the reload; any answer that isn't JSON means the same (the script
- * printed its own page).
+ * user's script runs in the GET of the reload; any successful answer that isn't JSON means the same (the
+ * script printed its own page). A failed one (an error of PHP, of a proxy) is an error, not a login.
  */
 export async function submitForm(fields: Record<string, string>): Promise<SubmitResult> {
   submitted = true;
@@ -40,6 +40,10 @@ export async function submitForm(fields: Record<string, string>): Promise<Submit
       },
       body: new URLSearchParams(fields)
     });
+
+    if(!response.ok) {
+      throw new Error('HTTP ' + response.status);
+    }
 
     if(!(response.headers.get('Content-Type') || '').includes('application/json')) {
       return {loggedIn: true};
@@ -76,8 +80,9 @@ export async function pollQr(endpoint: string, query: 'getQrCode' | 'waitQrCodeO
     throw new Error('The QR code endpoint is on another origin');
   }
 
-  // the validated URL itself: a path starting with `//`, fetched on its own, would be another host
-  url.search = '?' + query;
+  // the validated URL itself: a path starting with `//`, fetched on its own, would be another host. With the
+  // query of the page, which may select the session or the bot (index.php?bot=x)
+  url.search = url.search ? url.search + '&' + query : '?' + query;
   url.hash = '';
   const response = await fetch(url.href, {credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal});
   if(!response.ok) {
