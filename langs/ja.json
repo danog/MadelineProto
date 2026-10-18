@@ -154,6 +154,7 @@
     "dl.php_powered_by_madelineproto": "Telegram ファイルダウンロードサーバー (最大 4GB)、powered by <a href=\"https://docs.madelineproto.xyz\" target=\"_blank\">MadelineProto</a>！<br>独自の Telegram ファイルダウンロードサーバーを構築する方法の詳細は<a href=\"https://docs.madelineproto.xyz/docs/FILES.html#getting-a-download-link\" target=\"_blank\">こちら</a>をクリックしてください！",
     "dl.php_check_logs_make_sure_session_running": "関連付けられた MadelineProto EventHandler ボットか MadelineProto IPC サーバーのいずれかがオフラインです。ログを確認し、少なくとも一方が実行中であることを確認してください！",
     "account_banned": "!!!!!!! 警告 !!!!!!!\nTelegram のフラッド防止システムによって、このアカウントは停止されました。\n続行するには手動での認証が必要です。\nrecover@telegram.org にメールを送り、電話番号 %s の停止解除を依頼するとともに、この電話番号で何をするのかを簡単に説明してください。\nその後、もう一度ログインしてください。\nこのアカウントを意図的に削除した場合は、このメッセージを無視してください。",
+    "session_revoked": "!!!!!!! 警告 !!!!!!!\nこのセッションは終了しました：別のデバイスからログアウトされたか、Telegramによって取り消されたか、同じセッションの別のコピーが実行中です。\nもう一度ログインしてください。",
     "plugin_path_does_not_exist": "プラグインのパス %s が存在しません！",
     "windows_warning": "Windows ユーザーの方へ: これが失敗する場合は Linux に切り替えてください。すべての PHP プロセスにソケットの作成を許可するようファイアウォールの設定を変更してみることもできます (Linux に切り替えるほうが 100% 簡単です。Linux では MadelineProto は変更なしでそのまま動作します)",
     "could_not_connect_to_MadelineProto": "MadelineProto に接続できませんでした。修正するには、proc_open を有効にして open_basedir の制限を解除するか、Web サーバーのパス書き換えを無効にしてください！すでに対応済みの場合は、CLI 版の PHP が Web 版とまったく同じ (バージョン、拡張機能など) であることを確認し、IPC サーバーの起動を妨げたエラーの詳細について MadelineProto.log ファイルを確認してください。",

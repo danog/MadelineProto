@@ -223,6 +223,9 @@ final class Lang
             'secret_chat_skipping' => 'المحادثة السرية %s غير موجودة في قاعدة البيانات، جارٍ تخطي الرسالة...',
             'serialization_ofd' => 'التسلسل (serialization) قديم، جارٍ إعادة بناء الكائن!',
             'session_corrupted' => 'الجلسة تالفة!',
+            'session_revoked' => '!!!!!!! تحذير !!!!!!!
+تم إنهاء هذه الجلسة: تم تسجيل الخروج منها من جهاز آخر، أو ألغتها Telegram، أو أن نسخة أخرى من الجلسة نفسها قيد التشغيل.
+يرجى تسجيل الدخول مرة أخرى.',
             'signing_up' => 'جارٍ التسجيل كمستخدم عادي...',
             'signupFirstName' => 'أدخل اسمك الأول: ',
             'signupFirstNameWeb' => 'الاسم الأول',
@@ -518,6 +521,9 @@ final class Lang
             'secret_chat_skipping' => 'من چاتی نهێنی %sم لە بنکەدراوەدا نییە، نامەکەم بەجێهێشتووە...',
             'serialization_ofd' => 'زنجیرەییکردن بەسەرچووە، دووبارە بنیاتنانەوەی ئۆبجێکتی!',
             'session_corrupted' => 'دانیشتنەکە تێکچووە!',
+            'session_revoked' => '!!!!!!! ئاگاداری !!!!!!!
+ئەم دانیشتنە کۆتایی پێهات: لە ئامێرێکی ترەوە چوونەدەرەوەی بۆ کرا، لەلایەن Telegram ەوە هەڵوەشێنرایەوە، یان کۆپییەکی تری هەمان دانیشتن کاردەکات.
+تکایە دووبارە بچۆ ژوورەوە.',
             'signing_up' => 'ناو تۆمارکردن وەک بەکارهێنەرێکی ئاسایی...',
             'signupFirstName' => 'ناوی یەکەمی خۆت بنووسە: ',
             'signupFirstNameWeb' => 'ناوی یەکەم',
@@ -813,6 +819,9 @@ Wenn Sie dieses Konto absichtlich gelöscht haben, ignorieren Sie diese Nachrich
             'secret_chat_skipping' => 'Der geheime Chat %s ist nicht in der Datenbank vorhanden, Nachricht wird übersprungen...',
             'serialization_ofd' => 'Die Serialisierung ist veraltet, das Objekt wird neu aufgebaut!',
             'session_corrupted' => 'Die Sitzung ist beschädigt!',
+            'session_revoked' => '!!!!!!! WARNUNG !!!!!!!
+Diese Sitzung wurde beendet: Sie wurde von einem anderen Gerät abgemeldet, von Telegram widerrufen, oder eine andere Kopie derselben Sitzung läuft.
+Bitte melde dich erneut an.',
             'signing_up' => 'Registrierung als normaler Benutzer...',
             'signupFirstName' => 'Geben Sie Ihren Vornamen ein: ',
             'signupFirstNameWeb' => 'Vorname',
@@ -1108,6 +1117,9 @@ If you intentionally deleted this account, ignore this message.',
             'secret_chat_skipping' => 'I do not have the secret chat %s in the database, skipping message...',
             'serialization_ofd' => 'Serialization is out of date, reconstructing object!',
             'session_corrupted' => 'The session is corrupted!',
+            'session_revoked' => '!!!!!!! WARNING !!!!!!!
+This session was terminated: it was logged out from another device, revoked by Telegram, or another copy of the same session is running.
+Please login again.',
             'signing_up' => 'Signing up as a normal user...',
             'signupFirstName' => 'Enter your first name: ',
             'signupFirstNameWeb' => 'First name',
@@ -1403,6 +1415,9 @@ Si eliminó esta cuenta intencionadamente, ignore este mensaje.',
             'secret_chat_skipping' => 'El chat secreto %s no está en la base de datos, se omite el mensaje...',
             'serialization_ofd' => 'La serialización está desactualizada, ¡reconstruyendo el objeto!',
             'session_corrupted' => '¡La sesión está dañada!',
+            'session_revoked' => '!!!!!!! ADVERTENCIA !!!!!!!
+Esta sesión ha sido terminada: se cerró desde otro dispositivo, Telegram la revocó, o se está ejecutando otra copia de la misma sesión.
+Por favor, inicia sesión de nuevo.',
             'signing_up' => 'Registrándose como usuario normal...',
             'signupFirstName' => 'Introduzca su nombre: ',
             'signupFirstNameWeb' => 'Nombre',
@@ -1698,6 +1713,9 @@ e introduzca su número de teléfono.',
             'secret_chat_skipping' => 'من چت مخفی (سکرت) %s را در پایگاه داده (دیتابیس) ندارم، درحال رد شدن از پیام...',
             'serialization_ofd' => 'مرتب سازی (سریالایز) منقضی شده، درحال بازسازی شی!',
             'session_corrupted' => 'سشن شما خراب است!',
+            'session_revoked' => '!!!!!!! هشدار !!!!!!!
+این نشست خاتمه یافت: از دستگاه دیگری خارج شده، توسط تلگرام لغو شده، یا نسخهٔ دیگری از همین نشست در حال اجراست.
+لطفاً دوباره وارد شوید.',
             'signing_up' => 'در حال ثبت‌نام به عنوان یک کاربر عادی...',
             'signupFirstName' => 'نام خود را وارد کنید: ',
             'signupFirstNameWeb' => 'نام',
@@ -1993,6 +2011,9 @@ Si vous avez supprimé ce compte intentionnellement, ignorez ce message.',
             'secret_chat_skipping' => 'Je n\'ai pas le chat secret %s dans la base de données, message ignoré...',
             'serialization_ofd' => 'La sérialisation est obsolète, reconstruction de l\'objet!',
             'session_corrupted' => 'La session est corrompue!',
+            'session_revoked' => '!!!!!!! ATTENTION !!!!!!!
+Cette session a été terminée : elle a été déconnectée depuis un autre appareil, révoquée par Telegram, ou une autre copie de la même session est en cours d\'exécution.
+Veuillez vous reconnecter.',
             'signing_up' => 'Inscription en tant qu\'utilisateur normal...',
             'signupFirstName' => 'Entrez votre prénom: ',
             'signupFirstNameWeb' => 'Prénom',
@@ -2288,6 +2309,9 @@ et entrer votre numéro de téléphone.',
             'secret_chat_skipping' => 'אין לי את הצ\'אט הסודי %s במסד הנתונים, דילוג על הודעה...',
             'serialization_ofd' => 'הסידרה לא מעודכנת, משחזרת אובייקט!',
             'session_corrupted' => 'הסשן פגום!',
+            'session_revoked' => '!!!!!!! אזהרה !!!!!!!
+הסשן הזה הסתיים: בוצעה ממנו התנתקות ממכשיר אחר, הוא בוטל על ידי Telegram, או שעותק אחר של אותו סשן פועל.
+אנא התחבר שוב.',
             'signing_up' => 'נרשם כמשתמש רגיל...',
             'signupFirstName' => 'הזן את השם הפרטי שלך: ',
             'signupFirstNameWeb' => 'שם פרטי',
@@ -2583,6 +2607,9 @@ recover@telegram.org पर एक ईमेल भेजें, जिसमे
             'secret_chat_skipping' => 'डेटाबेस में सीक्रेट चैट %s मौजूद नहीं है, संदेश छोड़ा जा रहा है...',
             'serialization_ofd' => 'सीरियलाइज़ेशन पुराना हो गया है, ऑब्जेक्ट को फिर से बनाया जा रहा है!',
             'session_corrupted' => 'सेशन दूषित हो गया है!',
+            'session_revoked' => '!!!!!!! चेतावनी !!!!!!!
+यह सत्र समाप्त कर दिया गया: इसे किसी अन्य डिवाइस से लॉग आउट किया गया, Telegram ने इसे रद्द कर दिया, या इसी सत्र की कोई अन्य प्रति चल रही है।
+कृपया फिर से लॉगिन करें।',
             'signing_up' => 'सामान्य यूज़र के रूप में साइन अप किया जा रहा है...',
             'signupFirstName' => 'अपना पहला नाम दर्ज करें: ',
             'signupFirstNameWeb' => 'पहला नाम',
@@ -2878,6 +2905,9 @@ Jika Anda sengaja menghapus akun ini, abaikan pesan ini.',
             'secret_chat_skipping' => 'Saya tidak memiliki obrolan rahasia %s di database, melewati pesan...',
             'serialization_ofd' => 'Serialisasi sudah usang, merekonstruksi objek!',
             'session_corrupted' => 'Sesi rusak!',
+            'session_revoked' => '!!!!!!! PERINGATAN !!!!!!!
+Sesi ini telah dihentikan: sesi ini dikeluarkan dari perangkat lain, dicabut oleh Telegram, atau salinan lain dari sesi yang sama sedang berjalan.
+Silakan login kembali.',
             'signing_up' => 'Mendaftar sebagai pengguna biasa...',
             'signupFirstName' => 'Masukkan nama depan Anda: ',
             'signupFirstNameWeb' => 'Nama depan',
@@ -3173,6 +3203,9 @@ Ignorare questo messaggio se la sessione è stata resettata intenzionalmente.',
             'secret_chat_skipping' => 'Non ho la chat segreta %s nel database, ignorando messaggio...',
             'serialization_ofd' => 'La serializzazione non è aggiornata, reistanziamento dell\'oggetto in corso!',
             'session_corrupted' => 'La sessione si è corrotta!',
+            'session_revoked' => '!!!!!!! ATTENZIONE !!!!!!!
+Questa sessione è stata terminata: è stata disconnessa da un altro dispositivo, revocata da Telegram, oppure è in esecuzione un\'altra copia della stessa sessione.
+Rieseguite nuovamente il login.',
             'signing_up' => 'Mi sto registrando su telegram come utente normale...',
             'signupFirstName' => 'Inserisci il tuo nome: ',
             'signupFirstNameWeb' => 'Nome',
@@ -3468,6 +3501,9 @@ recover@telegram.org にメールを送り、電話番号 %s の停止解除を�
             'secret_chat_skipping' => 'シークレットチャット %s がデータベースにないため、メッセージをスキップします...',
             'serialization_ofd' => 'シリアライズ形式が古いため、オブジェクトを再構築しています！',
             'session_corrupted' => 'セッションが破損しています！',
+            'session_revoked' => '!!!!!!! 警告 !!!!!!!
+このセッションは終了しました：別のデバイスからログアウトされたか、Telegramによって取り消されたか、同じセッションの別のコピーが実行中です。
+もう一度ログインしてください。',
             'signing_up' => '通常のユーザーとして登録しています...',
             'signupFirstName' => '名を入力してください: ',
             'signupFirstNameWeb' => '名',
@@ -3763,6 +3799,9 @@ recover@telegram.org로 이메일을 보내 전화번호 %s의 정지 해제를 
             'secret_chat_skipping' => '데이터베이스에 비밀 채팅 %s이(가) 없으므로 메시지를 건너뜁니다...',
             'serialization_ofd' => '직렬화 형식이 오래되어 객체를 재구성하는 중입니다!',
             'session_corrupted' => '세션이 손상되었습니다!',
+            'session_revoked' => '!!!!!!! 경고 !!!!!!!
+이 세션이 종료되었습니다: 다른 기기에서 로그아웃되었거나, Telegram에 의해 취소되었거나, 같은 세션의 다른 사본이 실행 중입니다.
+다시 로그인하세요.',
             'signing_up' => '일반 사용자로 가입하는 중...',
             'signupFirstName' => '이름을 입력하십시오: ',
             'signupFirstNameWeb' => '이름',
@@ -4058,6 +4097,9 @@ Jeśli konto zostało celowo usunięte, zignoruj tę wiadomość.',
             'secret_chat_skipping' => 'Nie mam tajnego czatu %s w bazie danych, pomijanie wiadomości...',
             'serialization_ofd' => 'Serializacja jest nieaktualna, odtwarzanie obiektu!',
             'session_corrupted' => 'Sesja jest uszkodzona!',
+            'session_revoked' => '!!!!!!! UWAGA !!!!!!!
+Ta sesja została zakończona: wylogowano ją z innego urządzenia, unieważnił ją Telegram lub działa inna kopia tej samej sesji.
+Zaloguj się ponownie.',
             'signing_up' => 'Rejestracja jako zwykły użytkownik...',
             'signupFirstName' => 'Wprowadź imię: ',
             'signupFirstNameWeb' => 'Imię',
@@ -4353,6 +4395,9 @@ Se você excluiu esta conta intencionalmente, ignore esta mensagem.',
             'secret_chat_skipping' => 'Não tenho o chat secreto %s no banco de dados, ignorando a mensagem...',
             'serialization_ofd' => 'A serialização está desatualizada, reconstruindo o objeto!',
             'session_corrupted' => 'A sessão está corrompida!',
+            'session_revoked' => '!!!!!!! AVISO !!!!!!!
+Esta sessão foi encerrada: foi desconectada a partir de outro dispositivo, revogada pelo Telegram, ou outra cópia da mesma sessão está em execução.
+Por favor, faça login novamente.',
             'signing_up' => 'Cadastrando-se como um usuário normal...',
             'signupFirstName' => 'Digite seu primeiro nome: ',
             'signupFirstNameWeb' => 'Primeiro nome',
@@ -4648,6 +4693,9 @@ e digite seu número de telefone.',
             'secret_chat_skipping' => 'Секретного чата %s нет в базе, пропускаю сообщение...',
             'serialization_ofd' => 'Сериализация устарела, объект реконструируется!',
             'session_corrupted' => 'Сессия повреждена!',
+            'session_revoked' => '!!!!!!! ВНИМАНИЕ !!!!!!!
+Этот сеанс был завершён: из него вышли с другого устройства, его отозвал Telegram, или запущена другая копия того же сеанса.
+Войдите снова.',
             'signing_up' => 'Регистрация в качестве обычного пользователя...',
             'signupFirstName' => 'Введите ваше имя: ',
             'signupFirstNameWeb' => 'Имя',
@@ -4943,6 +4991,9 @@ Bu hesabı bilerek sildiyseniz bu mesajı dikkate almayın.',
             'secret_chat_skipping' => '%s gizli sohbeti veritabanında yok, mesaj atlanıyor...',
             'serialization_ofd' => 'Serileştirme güncel değil, nesne yeniden oluşturuluyor!',
             'session_corrupted' => 'Oturum bozuk!',
+            'session_revoked' => '!!!!!!! UYARI !!!!!!!
+Bu oturum sonlandırıldı: başka bir cihazdan çıkış yapıldı, Telegram tarafından iptal edildi veya aynı oturumun başka bir kopyası çalışıyor.
+Lütfen tekrar giriş yapın.',
             'signing_up' => 'Normal kullanıcı olarak kaydolunuyor...',
             'signupFirstName' => 'Adınızı girin: ',
             'signupFirstNameWeb' => 'Ad',
@@ -5238,6 +5289,9 @@ ve telefon numaranızı girin.',
             'secret_chat_skipping' => 'Секретного чату %s немає в базі даних, повідомлення пропускається...',
             'serialization_ofd' => 'Серіалізація застаріла, об\'єкт реконструюється!',
             'session_corrupted' => 'Сесію пошкоджено!',
+            'session_revoked' => '!!!!!!! УВАГА !!!!!!!
+Цей сеанс було завершено: з нього вийшли з іншого пристрою, його відкликав Telegram, або запущено іншу копію того самого сеансу.
+Увійдіть знову.',
             'signing_up' => 'Реєстрація як звичайний користувач...',
             'signupFirstName' => 'Введіть своє ім\'я: ',
             'signupFirstNameWeb' => 'Ім\'я',
@@ -5533,6 +5587,9 @@ Agar siz ushbu hisobni ataylab o\'chirib tashlagan bo\'lsangiz, bu xabarni e\'ti
             'secret_chat_skipping' => 'Menda %s maxfiy chati maʼlumotlar bazasida yoʻq, xabar oʻtkazib yuborilmoqda...',
             'serialization_ofd' => 'Seriyalash eskirgan, ob\'ekt qayta tiklanmoqda!',
             'session_corrupted' => 'Sessiya buzilgan!',
+            'session_revoked' => '!!!!!!! OGOHLANTIRISH !!!!!!!
+Ushbu seans yakunlandi: undan boshqa qurilmadan chiqildi, Telegram tomonidan bekor qilindi yoki xuddi shu seansning boshqa nusxasi ishlamoqda.
+Iltimos, qaytadan kiring.',
             'signing_up' => 'Oddiy foydalanuvchi sifatida roʻyxatdan oʻtish...',
             'signupFirstName' => 'Ismingizni kiriting: ',
             'signupFirstNameWeb' => 'Ism',
@@ -5828,6 +5885,9 @@ Nếu bạn cố ý xóa tài khoản này, hãy bỏ qua thông báo này.',
             'secret_chat_skipping' => 'Tôi không có cuộc trò chuyện bí mật %s trong cơ sở dữ liệu, bỏ qua tin nhắn...',
             'serialization_ofd' => 'Dữ liệu tuần tự hóa đã lỗi thời, đang tái tạo đối tượng!',
             'session_corrupted' => 'Phiên bị hỏng!',
+            'session_revoked' => '!!!!!!! CẢNH BÁO !!!!!!!
+Phiên này đã bị chấm dứt: nó đã bị đăng xuất từ thiết bị khác, bị Telegram thu hồi, hoặc một bản sao khác của cùng phiên đang chạy.
+Vui lòng đăng nhập lại.',
             'signing_up' => 'Đang đăng ký với tư cách người dùng thông thường...',
             'signupFirstName' => 'Nhập tên của bạn: ',
             'signupFirstNameWeb' => 'Tên',
@@ -6123,6 +6183,9 @@ Telegram 的防洪系统已暂停此帐户。
             'secret_chat_skipping' => '我的数据库中没有秘密聊天 %s，跳过消息...',
             'serialization_ofd' => '序列化已过时，正在重建对象！',
             'session_corrupted' => '会话已损坏！',
+            'session_revoked' => '!!!!!!! 警告 !!!!!!!
+此会话已被终止：它已从其他设备注销、被 Telegram 撤销，或者同一会话的另一个副本正在运行。
+请重新登录。',
             'signing_up' => '正在注册为普通用户...',
             'signupFirstName' => '输入您的名字： ',
             'signupFirstNameWeb' => '名字',
@@ -6421,6 +6484,9 @@ If you intentionally deleted this account, ignore this message.',
         'secret_chat_skipping' => 'I do not have the secret chat %s in the database, skipping message...',
         'serialization_ofd' => 'Serialization is out of date, reconstructing object!',
         'session_corrupted' => 'The session is corrupted!',
+        'session_revoked' => '!!!!!!! WARNING !!!!!!!
+This session was terminated: it was logged out from another device, revoked by Telegram, or another copy of the same session is running.
+Please login again.',
         'signing_up' => 'Signing up as a normal user...',
         'signupFirstName' => 'Enter your first name: ',
         'signupFirstNameWeb' => 'First name',
