@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
@@ -31,6 +32,7 @@ use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\Driver\DriverArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
+use danog\MadelineProto\Ipc\AlreadyServedException;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use Revolt\EventLoop;
@@ -38,6 +40,8 @@ use Throwable;
 
 use const LOCK_EX;
 
+use function Amp\async;
+use function Amp\delay;
 use function Amp\File\exists;
 use function Amp\Ipc\connect;
 
@@ -124,32 +128,65 @@ abstract class Serialization
         $lightState = null;
         $cancelFlock = new DeferredCancellation;
         $cancelIpc = new DeferredFuture;
+        // Cancelled once we stop waiting for the lock
+        $lockWait = new DeferredCancellation;
         $canContinue = true;
         $ipcSocket = null;
-        $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $forceFull ? null : static function () use ($session, &$cancelFlock, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
-            $cancelFull = static function () use (&$cancelFlock): void {
-                if ($cancelFlock !== null) {
-                    $copy = $cancelFlock;
-                    $cancelFlock = null;
-                    $copy->cancel();
+        $alreadyServed = false;
+        $cancelFull = static function () use (&$cancelFlock): void {
+            if ($cancelFlock !== null) {
+                $copy = $cancelFlock;
+                $cancelFlock = null;
+                $copy->cancel();
+            }
+        };
+        if (!$forceFull) {
+            $failureCb = static function () use ($session, $cancelFull, $cancelIpc, &$canContinue, &$ipcSocket, &$lightState): void {
+                EventLoop::queue(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+                    try {
+                        $lightState = $session->getLightState();
+                        if (!$lightState->canStartIpc()) {
+                            $canContinue = false;
+                            $cancelFull();
+                        }
+                    } catch (Throwable) {
+                        $lightState = false;
+                    }
+                });
+                $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
+            };
+        } elseif (Magic::$isIpcWorker) {
+            // An IPC worker that doesn't get the lock was started concurrently with another one (by concurrent
+            // clients, or by the process and the web runner of the same client): if the lock holder serves the
+            // session, this worker is redundant and must exit, without reporting an error.
+            // Only a server that answers counts: one that is shutting down may still have its socket bound.
+            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$alreadyServed): void {
+                while (!$lockWait->isCancelled()) {
+                    if (self::isServed($session->getIpcPath(), $lockWait->getCancellation())) {
+                        $alreadyServed = true;
+                        $cancelFull();
+                        return;
+                    }
+                    try {
+                        delay(1.0, true, $lockWait->getCancellation());
+                    } catch (CancelledException) {
+                    }
                 }
             };
-            EventLoop::queue(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
-                try {
-                    $lightState = $session->getLightState();
-                    if (!$lightState->canStartIpc()) {
-                        $canContinue = false;
-                        $cancelFull();
-                    }
-                } catch (Throwable) {
-                    $lightState = false;
-                }
-            });
-            $ipcSocket = self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), $cancelFull);
-        });
-        EventLoop::cancel($warningId);
+        } else {
+            $failureCb = null;
+        }
+        try {
+            $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $failureCb);
+        } finally {
+            $lockWait->cancel();
+            EventLoop::cancel($warningId);
+        }
 
         if (!$unlock) { // Canceled, don't have lock
+            if ($alreadyServed) {
+                throw new AlreadyServedException("Another process is already serving the session {$session->getSessionDirectoryPath()}");
+            }
             return $ipcSocket;
         }
         if (!$canContinue) { // Have lock, can't use it
@@ -263,6 +300,34 @@ abstract class Serialization
 
         Shutdown::removeCallback($tempId);
         return [$unserialized, $unlock];
+    }
+
+    /**
+     * Whether a live server answers on the IPC socket.
+     *
+     * Connecting is not enough: the socket of a server that is shutting down may still be bound.
+     */
+    private static function isServed(string $ipcPath, Cancellation $cancellation): bool
+    {
+        try {
+            clearstatcache(true, $ipcPath);
+            $socket = connect($ipcPath);
+        } catch (Throwable) {
+            return false;
+        }
+        try {
+            $socket->send(['isIpcWorker', []]);
+            // The server answers once it has loaded the session
+            $res = async($socket->receive(...))->await($cancellation);
+            return \is_array($res);
+        } catch (Throwable) {
+            return false;
+        } finally {
+            try {
+                $socket->disconnect();
+            } catch (Throwable) {
+            }
+        }
     }
 
     /**
