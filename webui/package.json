@@ -18,7 +18,7 @@
     },
     "devDependencies": {
         "@solidjs/testing-library": "0.8.10",
-        "@types/node": "26.6.3",
+        "@types/node": "26.6.5",
         "jsdom": "29.1.1",
         "sass": "1.105.1",
         "typescript": "7.0.2",
