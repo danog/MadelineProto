@@ -77,7 +77,7 @@ trait Start
                         if ($login->isRequested()) {
                             $stdout->write(PHP_EOL.PHP_EOL.Lang::$current_lang['loginQrCodeSuccessful'].PHP_EOL);
                             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint()), hidden: true));
+                                $this->complete2faLogin(Tools::readLine($this->getPasswordPrompt(), hidden: true));
                             }
                             $this->serialize();
                             return $this->fullGetSelf();
@@ -96,7 +96,7 @@ trait Start
                 $this->completePhoneLogin(Tools::readLine(Lang::$current_lang['loginUserCode'], hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_PASSWORD) {
-                $this->complete2faLogin(Tools::readLine(sprintf(Lang::$current_lang['loginUserPass'], $this->getHint()), hidden: true));
+                $this->complete2faLogin(Tools::readLine($this->getPasswordPrompt(), hidden: true));
             }
             if ($this->getAuthorization() === \danog\MadelineProto\API::WAITING_SIGNUP) {
                 $this->completeSignup(Tools::readLine(Lang::$current_lang['signupFirstName']), Tools::readLine(Lang::$current_lang['signupLastName']));
@@ -275,11 +275,10 @@ trait Start
             $form = "<input type='password' name='phone_code' placeholder='$phone' required/>";
         } elseif ($auth === \danog\MadelineProto\API::WAITING_PASSWORD) {
             $title = Lang::$current_lang['loginUserPassWeb'];
-            $hint = htmlentities(sprintf(
-                Lang::$current_lang['loginUserPassHint'],
-                $this->getHint(),
-            ));
-            $form = "<input type='password' name='password' placeholder='$hint' required/>";
+            $hint = $this->getHint();
+            // Without a placeholder if the account has no hint.
+            $hint = $hint === '' ? '' : " placeholder='".htmlentities(sprintf(Lang::$current_lang['loginUserPassHint'], $hint))."'";
+            $form = "<input type='password' name='password'$hint required/>";
         } elseif ($auth === \danog\MadelineProto\API::WAITING_SIGNUP) {
             $title = Lang::$current_lang['signupWeb'];
             $firstName = Lang::$current_lang['signupFirstNameWeb'];
@@ -297,5 +296,16 @@ trait Start
             Lang::$current_lang['go'],
             $trailer
         ));
+    }
+
+    /**
+     * The CLI prompt of the 2FA password, with the hint of the account if it has one.
+     */
+    private function getPasswordPrompt(): string
+    {
+        $hint = $this->getHint();
+        return $hint === ''
+            ? Lang::$current_lang['loginUserPassWeb']
+            : sprintf(Lang::$current_lang['loginUserPass'], $hint);
     }
 }
