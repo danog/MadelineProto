@@ -125,6 +125,17 @@ class EntitiesTest extends TestCase
         $this->expectException(AssertionError::class);
         MessageEntity::fromRawEntity(['_' => 'messageMediaEmpty']);
     }
+    public function testExpandableBlockquote(): void
+    {
+        $result = TextEntities::fromHtml('a<blockquote expandable>quote</blockquote>');
+        $this->assertSame('aquote', $result->message);
+        $this->assertSame([['type' => 'expandable_blockquote', 'offset' => 1, 'length' => 5]], array_map(static fn ($e) => $e->toBotAPI(), $result->entities));
+        $this->assertSame([['_' => 'messageEntityBlockquote', 'collapsed' => true, 'offset' => 1, 'length' => 5]], array_map(static fn ($e) => $e->toMTProto(), $result->entities));
+        $this->assertSame('a<blockquote expandable>quote</blockquote>', StrTools::entitiesToHtml($result->message, $result->entities, true));
+
+        $quote = MessageEntity::fromRawEntity(['_' => 'messageEntityBlockquote', 'offset' => 0, 'length' => 1]);
+        $this->assertSame(['type' => 'blockquote', 'offset' => 0, 'length' => 1], $quote->toBotAPI());
+    }
     private static function sendMessage(string $message, string $parse_mode): TextEntities
     {
         return match ($parse_mode) {
@@ -153,7 +164,7 @@ class EntitiesTest extends TestCase
         $this->assertEquals($entities, $result['entities']);
         if (strtolower($mode) === 'html') {
             $this->assertEquals(
-                str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
+                str_replace(['<br/>', 'mention:'], ['<br>', 'tg://user?id='], $htmlReverse ?? $html),
                 StrTools::entitiesToHtml(
                     $resultMTProto->message,
                     $resultMTProto->entities,
@@ -258,7 +269,7 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 6,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'bold',
                     ],
                 ],
@@ -332,7 +343,7 @@ class EntitiesTest extends TestCase
                     [
                         'offset' => 49,
                         'length' => 10,
-                        'type' => 'block_quote',
+                        'type' => 'blockquote',
                     ],
                     [
                         'offset' => 127,
@@ -340,7 +351,7 @@ class EntitiesTest extends TestCase
                         'type' => 'spoiler',
                     ],
                 ],
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre><code class="language-html">test</code></pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
             ],
             [
                 'markdown',
@@ -471,7 +482,7 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 0,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'text_link',
                         'url' => 'https://google.com/',
                     ],
@@ -555,12 +566,12 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 0,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'text_link',
                         'url' => 'https://google.com/',
                     ],
                 ],
-                '<a href="https://google.com/">link</a> test',
+                '<a href="https://google.com/">link </a>test',
             ],
             [
                 'html',
