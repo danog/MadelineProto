@@ -53,6 +53,19 @@ describe("useQrLogin", () => {
         ]);
     });
 
+    it("never polls another origin", async () => {
+        const fetch = vi.fn(() => json({ logged_in: false, svg: "<svg>evil</svg>" }));
+        vi.stubGlobal("fetch", fetch);
+        function Evil() {
+            const state = useQrLogin("//evil.example/login.php", () => {});
+            return <p data-testid="state">{state.status}</p>;
+        }
+        render(<Evil />);
+        await act(async () => {});
+        expect(fetch).not.toHaveBeenCalled();
+        expect(screen.getByTestId("state").textContent).toBe("loading");
+    });
+
     it("stops polling when unmounted", async () => {
         let signal: AbortSignal | undefined;
         vi.stubGlobal(

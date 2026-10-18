@@ -20,8 +20,13 @@ export function useQrLogin(endpoint: string, onLoggedIn: () => void, retryDelay 
         let timer: ReturnType<typeof setTimeout> | undefined;
         let failures = 0;
         let svg: string | null = null;
+        // The response is injected as markup: only ever ask the script that served the page
+        const url = new URL(endpoint, window.location.href);
+        if (url.origin !== window.location.origin) {
+            return;
+        }
         const poll = (query: "getQrCode" | "waitQrCodeOrLogin") => {
-            fetch(`${endpoint}?${query}`, { credentials: "same-origin", cache: "no-store", signal: controller.signal })
+            fetch(`${url.pathname}?${query}`, { credentials: "same-origin", cache: "no-store", signal: controller.signal })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}`);

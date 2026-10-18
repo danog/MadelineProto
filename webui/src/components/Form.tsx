@@ -124,7 +124,18 @@ function ChoiceField({ field, value, onChange }: { field: Field; value: string; 
  * A form of a page: submitted natively with a POST to the current URL, as the server-rendered one is, so the
  * script handles both the same way.
  */
-export function Form({ fields, submit, actions }: { fields: Field[]; submit: string; actions: Action[] }) {
+export function Form({
+    fields,
+    submit,
+    actions,
+    onSubmitted,
+}: {
+    fields: Field[];
+    submit: string;
+    actions: Action[];
+    /** Called when the form is submitted (once). */
+    onSubmitted?: () => void;
+}) {
     const [choices, setChoices] = useState<Record<string, string>>(() =>
         Object.fromEntries(fields.filter((field) => field.type === "choice").map((field) => [field.name, field.value])),
     );
@@ -164,6 +175,7 @@ export function Form({ fields, submit, actions }: { fields: Field[]; submit: str
             return;
         }
         submitted.current = true;
+        onSubmitted?.();
         const submitter = (event.nativeEvent as SubmitEvent).submitter;
         setBusy(submitter?.getAttribute("data-key") ?? "submit");
     };

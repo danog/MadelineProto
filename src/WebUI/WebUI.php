@@ -111,17 +111,23 @@ final class WebUI
         if (headers_sent() || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !isset($_SERVER['REQUEST_URI'])) {
             return false;
         }
-        header('Location: '.$_SERVER['REQUEST_URI'], true, 303);
+        $query = explode('?', $_SERVER['REQUEST_URI'], 2)[1] ?? null;
+        header('Location: '.self::getSelfUrl().($query === null ? '' : "?$query"), true, 303);
         header('Cache-Control: no-store');
         return true;
     }
 
     /**
-     * Get the URL of the current script, without the query string.
+     * Get the path of the current URL, without the query string.
+     *
+     * Always same-origin: a request for `//evil.example/` (which a front controller may route to the script)
+     * would otherwise give a protocol-relative URL, pointing redirects and the QR code requests to another
+     * host.
      */
     public static function getSelfUrl(): string
     {
-        return explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0];
+        $path = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0];
+        return '/'.ltrim(str_replace('\\', '/', $path), '/');
     }
 
     /**
@@ -134,7 +140,7 @@ final class WebUI
         $data = ['page' => $page];
         $trailer = $engine->render('partials/legacy-actions', $data)
             .$engine->render('partials/qr', $data)
-            .'<script>'.str_ireplace('</script', '<\\/script', $engine->asset('assets/madeline.js')).'</script>';
+            .'<script>'.Template::escapeScript($engine->asset('assets/madeline.js')).'</script>';
         return sprintf(
             $templates->getHtmlTemplate(),
             $engine->render('partials/legacy-intro', $data),

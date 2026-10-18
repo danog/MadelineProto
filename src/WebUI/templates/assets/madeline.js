@@ -69,6 +69,13 @@
     var qr = document.querySelector("[data-qr-endpoint]");
     if (qr && window.fetch) {
         var endpoint = qr.getAttribute("data-qr-endpoint");
+        // The response is injected as markup: only ever ask the script that served the page
+        var link = document.createElement("a");
+        link.href = endpoint;
+        if (link.protocol + "//" + link.host !== window.location.protocol + "//" + window.location.host) {
+            return;
+        }
+        endpoint = link.pathname;
         var code = qr.querySelector("[data-qr-code]");
         var statusText = qr.querySelector("[data-qr-status-text]");
         var failures = 0;
@@ -83,6 +90,11 @@
                 .then(function (result) {
                     failures = 0;
                     if (result.logged_in) {
+                        // After a submission, a reload would cancel it in the browser but not on the server,
+                        // where the script continues (bot login), and would run the script again
+                        if (document.querySelector("form[data-submitted]")) {
+                            return;
+                        }
                         qr.classList.add("is-done");
                         statusText.textContent = statusText.getAttribute("data-done-label");
                         window.location.href = window.location.href.split("#")[0];

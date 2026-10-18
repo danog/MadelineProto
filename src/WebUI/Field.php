@@ -84,7 +84,8 @@ final class Field implements JsonSerializable
             'id' => $id,
             'name' => $this->name,
             'placeholder' => $this->placeholder ?: null,
-            'required' => $this->required,
+            // Without JavaScript, all the conditional fields are shown: requiring them would block the form
+            'required' => $this->required && $this->showWhen === null,
             'autocomplete' => $this->autocomplete ?? match ($this->type) {
                 FieldType::CODE => 'one-time-code',
                 FieldType::PHONE => 'tel',

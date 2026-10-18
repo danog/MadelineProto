@@ -164,12 +164,21 @@ final class Template
     /**
      * Get the contents of a script asset, to inline it in a `<script>` tag.
      *
-     * A `</script` in the script (in a string literal, or in a comment) would close the tag early: it's
-     * escaped to `<\/script`, which means the same in JavaScript strings and comments.
+     * A `</script` in the script (in a string literal, or in a comment) would close the tag early, and a
+     * `<!--` followed by `<script` would keep the real `</script>` from closing it: they're escaped to
+     * `<\/script` and `<\!--`, which mean the same in JavaScript strings and comments.
      */
     public function script(string $file): SafeHtml
     {
-        return new SafeHtml(str_ireplace('</script', '<\\/script', $this->engine->asset($file)));
+        return new SafeHtml(self::escapeScript($this->engine->asset($file)));
+    }
+
+    /**
+     * Escape a script to inline it in a `<script>` tag, see {@see self::script()}.
+     */
+    public static function escapeScript(string $script): string
+    {
+        return str_replace('<!--', '<\\!--', str_ireplace('</script', '<\\/script', $script));
     }
 
     /**

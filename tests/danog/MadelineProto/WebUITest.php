@@ -30,6 +30,7 @@ use danog\MadelineProto\WebUI\FieldType;
 use danog\MadelineProto\WebUI\Page;
 use danog\MadelineProto\WebUI\SafeHtml;
 use danog\MadelineProto\WebUI\Step;
+use danog\MadelineProto\WebUI\Template;
 use danog\MadelineProto\WebUI\TemplateEngine;
 use danog\MadelineProto\WebUI\WebUI;
 use PHPUnit\Framework\TestCase;
@@ -93,6 +94,11 @@ final class WebUITest extends TestCase
         $html = WebUI::render(new Templates, self::loginPage());
         self::assertStringContainsString('<form method="post" class="form" data-madeline-form>', $html);
         self::assertStringContainsString('data-show-when="type=phone"', $html);
+        // Without JavaScript all the conditional fields are shown: they can't be required
+        self::assertSame(1, preg_match('~<input type="tel" id="f-phone_number"[^>]*>~', $html, $input));
+        self::assertStringNotContainsString(' required', $input[0]);
+        self::assertSame(1, preg_match('~<input type="password"[^>]*>~', $html, $input));
+        self::assertStringContainsString(' required', $input[0]);
         self::assertStringContainsString('name="api_setup" value="manual"', $html);
         self::assertStringContainsString('data-qr-endpoint="/login.php"', $html);
         self::assertStringContainsString('aria-current="step"', $html);
@@ -115,7 +121,8 @@ final class WebUITest extends TestCase
     {
         $html = WebUI::render(new Templates, self::loginPage());
         $bundle = (new TemplateEngine)->asset('assets/app.js');
-        self::assertStringContainsString(str_ireplace('</script', '<\/script', $bundle), $html);
+        self::assertStringContainsString(Template::escapeScript($bundle), $html);
+        self::assertSame('a<\/script><\!--b', Template::escapeScript('a</SCRIPT><!--b'));
         // One closing tag per script: the state and the bundle
         self::assertSame(2, substr_count($html, '</script>'));
     }
@@ -193,6 +200,28 @@ final class WebUITest extends TestCase
         $merged = new Settings;
         $merged->merge($settings);
         self::assertSame([$this->dir], $merged->getTemplates()->getDirectories());
+    }
+
+    public function testSelfUrlIsAlwaysSameOrigin(): void
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? null;
+        try {
+            foreach ([
+                '/login.php?x=1' => '/login.php',
+                '//evil.example/login.php' => '/evil.example/login.php',
+                '/\\evil.example/' => '/evil.example/',
+                '' => '/',
+            ] as $requestUri => $expected) {
+                $_SERVER['REQUEST_URI'] = $requestUri;
+                self::assertSame($expected, WebUI::getSelfUrl());
+            }
+        } finally {
+            if ($uri === null) {
+                unset($_SERVER['REQUEST_URI']);
+            } else {
+                $_SERVER['REQUEST_URI'] = $uri;
+            }
+        }
     }
 
     public function testAlertsAsText(): void

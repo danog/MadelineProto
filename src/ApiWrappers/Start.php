@@ -219,12 +219,17 @@ trait Start
             'app_platform' => 'other',
             'app_desc' => trim((string) ($_POST['app_desc'] ?? '')),
         ];
+        if ($app['app_title'] === '' || $app['app_shortname'] === '') {
+            WebUI::write($templates, self::getCreateApiPage()->addAlert(Alert::error(Lang::$current_lang['apiParamsError'])));
+            return null;
+        }
         try {
             $result = $wrapper->createApp($app);
         } catch (Exception|HttpException $e) {
-            // Retrying from the same IP is pointless if it's a datacenter IP: offer the manual setup
-            $this->session->storeApiSetupState(null);
-            WebUI::write($templates, self::getManualApiPage()->addAlert(self::getCreateAppErrorAlert($e)));
+            // Keep the login: the error may be fixable (a short name already taken), and from a datacenter IP
+            // the page offers the manual setup
+            $this->session->storeApiSetupState($wrapper);
+            WebUI::write($templates, self::getCreateApiPage()->addAlert(self::getCreateAppErrorAlert($e)));
             return null;
         }
         $this->session->storeApiSetupState(null);
