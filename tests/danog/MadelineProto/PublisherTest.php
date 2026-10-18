@@ -49,6 +49,20 @@ final class PublisherTest extends TestCase
         }
     }
 
+    public function testTheAwaitedStateReachedTwiceBeforeTheWaiterResumes(): void
+    {
+        $publisher = new Publisher(0);
+        $wait = async($publisher->waitForState(...), 1);
+        delay(0);
+        // Queued in the actor of the waiter, processed at once.
+        $publisher->publish(1);
+        $publisher->publish(2);
+        $publisher->publish(1);
+        $wait->await();
+        delay(0.01);
+        $this->assertSame(1, $publisher->getState());
+    }
+
     public function testWaitersSavedByOlderVersionsAreDropped(): void
     {
         // As saved by the versions that serialized the waiters: an empty AsyncWaiter, in its actor.

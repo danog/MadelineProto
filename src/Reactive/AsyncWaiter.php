@@ -53,7 +53,7 @@ final class AsyncWaiter implements Subscriber, EphemeralSubscriber
     public function onAttach($initState): void
     {
         if ($initState === $this->waitFor) {
-            $this->future->complete();
+            $this->complete();
         }
     }
 
@@ -61,6 +61,14 @@ final class AsyncWaiter implements Subscriber, EphemeralSubscriber
     public function onStateChange($prevState, $state): void
     {
         if ($state === $this->waitFor) {
+            $this->complete();
+        }
+    }
+
+    private function complete(): void
+    {
+        // The state can be reached again before the waiting fiber resumes and unsubscribes it.
+        if (!$this->future->isComplete()) {
             $this->future->complete();
         }
     }

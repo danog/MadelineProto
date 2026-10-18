@@ -71,7 +71,7 @@ final class Publisher
         /** @var WeakMap<BaseSubscriber<T>, Subscriber<T>>  */
         $this->subscribers = new WeakMap;
         foreach ($data['subscribers'] as [$subscriber, $v]) {
-            // Saved by versions that serialized the waiters (up to 8.9.0), without their state.
+            // Saved by versions that serialized the waiters (up to 8.8.9), without their state.
             if ($subscriber instanceof EphemeralSubscriber) {
                 continue;
             }
