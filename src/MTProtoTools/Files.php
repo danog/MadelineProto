@@ -1583,7 +1583,7 @@ trait Files
                 $this->config['expires'] = 0;
                 $this->getConfig();
                 try {
-                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation], $this->loginState->getState()->authorizedDc));
+                    $this->addCdnHashes($messageMedia['file_token'], $this->methodCallAsyncRead('upload.reuploadCdnFile', ['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation, 'specialMethodType' => SpecialMethodType::SESSION_RELATED], $this->loginState->getState()->authorizedDc));
                 } catch (FileTokenInvalidError|RequestTokenInvalidError) {
                     $cdn = false;
                     $datacenter = $this->loginState->getState()->authorizedDc;
@@ -1650,7 +1650,7 @@ trait Files
     {
         while (\strlen($data)) {
             if (!isset($this->cdn_hashes[$file][$offset])) {
-                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $this->loginState->getState()->authorizedDc));
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation, 'specialMethodType' => SpecialMethodType::SESSION_RELATED], $this->loginState->getState()->authorizedDc));
             }
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);

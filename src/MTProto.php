@@ -1672,7 +1672,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     public function getCdnConfig(): void
     {
         try {
-            foreach (($this->methodCallAsyncRead('help.getCdnConfig', [], $this->loginState->getState()->authorizedDc))['public_keys'] as $curkey) {
+            foreach (($this->methodCallAsyncRead('help.getCdnConfig', ['specialMethodType' => SpecialMethodType::SESSION_RELATED], $this->loginState->getState()->authorizedDc))['public_keys'] as $curkey) {
                 $curkey = RSA::load($this->TL, $curkey['public_key']);
                 $this->cdnRsaKeys[$curkey->fp] = $curkey;
             }
@@ -1702,7 +1702,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->config['expires'] > time()) {
             return $this->config;
         }
-        $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', $config) : $config;
+        $this->config = empty($config) ? $this->methodCallAsyncRead('help.getConfig', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]) : $config;
         $this->parseConfig();
         $this->logger->logger('Updated config!', Logger::NOTICE);
         return $this->config;
@@ -1829,7 +1829,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         try {
             $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']], 'specialMethodType' => SpecialMethodType::USER_RELATED]))[0]];
             if ($this->businessConnection !== null) {
-                $this->businessConnection->setUser($this->methodCallAsyncRead('users.getUsers', ['id' => [$this->businessConnection->userId]])[0]);
+                $this->businessConnection->setUser($this->methodCallAsyncRead('users.getUsers', ['id' => [$this->businessConnection->userId], 'specialMethodType' => SpecialMethodType::SESSION_RELATED])[0]);
             }
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
@@ -2160,7 +2160,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                         $file = $this->methodCallAsyncRead(
                             'messages.uploadMedia',
                             [
-                                'businessConnectionId' => null,
+                                'specialMethodType' => SpecialMethodType::SESSION_RELATED,
                                 'peer' => $this->reportDest[0],
                                 'media' => [
                                     '_' => 'inputMediaUploadedDocument',
@@ -2179,9 +2179,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $sent = false;
             foreach ($this->reportDest as $id) {
                 try {
-                    $this->methodCallAsyncRead('messages.sendMessage', ['businessConnectionId' => null, 'peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
+                    $this->methodCallAsyncRead('messages.sendMessage', ['specialMethodType' => SpecialMethodType::SESSION_RELATED, 'peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
                     if ($file) {
-                        $this->methodCallAsyncRead('messages.sendMedia', ['businessConnectionId' => null, 'peer' => $id, 'media' => $file]);
+                        $this->methodCallAsyncRead('messages.sendMedia', ['specialMethodType' => SpecialMethodType::SESSION_RELATED, 'peer' => $id, 'media' => $file]);
                     }
                     $sent = true;
                 } catch (Throwable $e) {

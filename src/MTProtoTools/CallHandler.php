@@ -59,10 +59,12 @@ trait CallHandler
         );
     }
     /**
-     * When logged in through a business connection, make the calls that act on behalf of the user go through it.
+     * When logged in through a business connection, make every call on behalf of its user, like a user session.
      *
-     * Wrapped calls are sent to the DC of the connection, which is returned.
-     * A businessConnectionId argument set to null runs the call as the bot.
+     * Calls are wrapped in invokeWithBusinessConnection and sent to the DC of the connection, which is returned:
+     * the ones Telegram doesn't allow through a business connection fail, as they can't be made as the user.
+     * Methods taking the connection as their business_connection_id parameter get it instead.
+     * Only calls of MadelineProto's own session mechanics (with a special method type) are made as the bot.
      *
      * @param string $method Method name
      * @param array  $args   Arguments
@@ -70,21 +72,20 @@ trait CallHandler
     private function businessCall(string $method, array &$args): ?int
     {
         $connection = $this->businessConnection;
-        if ($connection === null || \array_key_exists('businessConnectionId', $args)) {
+        if ($connection === null || isset($args['specialMethodType'])) {
             return null;
         }
-        if ($connection->wraps($method, $args)) {
-            $args['businessConnectionId'] = $connection->id;
-            return $connection->dcId;
+        if (isset($args['businessConnectionId'])) {
+            return $args['businessConnectionId'] === $connection->id ? $connection->dcId : null;
         }
-        if ($method === 'messages.uploadMedia') {
-            $args['business_connection_id'] ??= $connection->id;
-        } elseif ($method === 'photos.uploadProfilePhoto' || $method === 'photos.updateProfilePhoto') {
-            // An upload (wraps() is false for photos.updateProfilePhoto with an existing photo):
-            // bots upload the profile photo of the user who connected them with the bot parameter.
-            $args['bot'] ??= $connection->userId;
+        foreach (($this->TL->getMethods()->findByMethod($method) ?: [])['params'] ?? [] as $param) {
+            if ($param['name'] === 'business_connection_id') {
+                $args['business_connection_id'] ??= $connection->id;
+                return null;
+            }
         }
-        return null;
+        $args['businessConnectionId'] = $connection->id;
+        return $connection->dcId;
     }
     /**
      * Call method and make sure it is asynchronously sent.

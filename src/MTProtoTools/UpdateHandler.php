@@ -469,7 +469,7 @@ trait UpdateHandler
      */
     private function getUpdatesState()
     {
-        $data = $this->methodCallAsyncRead('updates.getState', []);
+        $data = $this->methodCallAsyncRead('updates.getState', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         $this->getCdnConfig();
         return $data;
     }
@@ -1346,7 +1346,7 @@ trait UpdateHandler
                     return;
                 }
                 $this->logger->logger('Applying qts: '.$update['qts'].' over current qts '.$cur_state->qts().', chat id: '.$update['message']['chat_id'], Logger::VERBOSE);
-                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts'])]);
+                $this->methodCallAsyncRead('messages.receivedQueue', ['max_qts' => $cur_state->qts($update['qts']), 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
             }
             EventLoop::queue(function () use ($update): void {
                 if (!isset($this->secretChats[$update['message']['chat_id']])) {

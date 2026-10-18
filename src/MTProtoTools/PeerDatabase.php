@@ -33,6 +33,7 @@ use danog\MadelineProto\Exception;
 use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\UsernameNotOccupiedError;
 use danog\MadelineProto\RPCErrorException;
@@ -233,7 +234,7 @@ final class PeerDatabase implements TLCallback
             if ($r = Tools::parseLink($id)) {
                 [$invite, $content] = $r;
                 if ($invite) {
-                    $invite = $this->API->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
+                    $invite = $this->API->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                     if (!isset($invite['chat'])) {
                         throw new Exception('You have not joined this chat');
                     }
@@ -247,7 +248,7 @@ final class PeerDatabase implements TLCallback
                 if ($id === 'me') {
                     $id = $this->API->getSelfId();
                 } elseif ($id === 'support') {
-                    $id = $this->API->methodCallAsyncRead('help.getSupport', [])['user'];
+                    $id = $this->API->methodCallAsyncRead('help.getSupport', ['specialMethodType' => SpecialMethodType::SESSION_RELATED])['user'];
                 } else {
                     $id = $this->resolveUsername($id);
                     if ($id === null) {
@@ -352,7 +353,7 @@ final class PeerDatabase implements TLCallback
         $result = null;
         try {
             $result = $this->API->getIdInternal(
-                ($this->API->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
+                ($this->API->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]))['peer'],
             );
         } catch (UsernameNotOccupiedError) {
         } finally {
@@ -418,7 +419,7 @@ final class PeerDatabase implements TLCallback
                             '_' => 'inputUser',
                             'user_id' => $user['id'],
                             'access_hash' => 0,
-                        ]]]);
+                        ]], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                         return;
                     } catch (RPCErrorException $e) {
                         $this->API->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
@@ -560,7 +561,7 @@ final class PeerDatabase implements TLCallback
                             '_' => 'inputChannel',
                             'channel_id' => $chat['id'],
                             'access_hash' => 0,
-                        ]]]);
+                        ]], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                         return;
                     } catch (RPCErrorException $e) {
                         $this->API->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);

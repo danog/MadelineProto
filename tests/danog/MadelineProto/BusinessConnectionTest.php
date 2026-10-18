@@ -58,21 +58,6 @@ final class BusinessConnectionTest extends TestCase
         $this->assertSame(10_002, self::connection(true)->dcId);
     }
 
-    public function testWrappedMethods(): void
-    {
-        $connection = self::connection();
-        foreach (['messages.sendMessage', 'messages.sendMedia', 'messages.sendMultiMedia', 'messages.editMessage', 'messages.deleteMessages', 'messages.readHistory', 'messages.setTyping', 'account.updateProfile'] as $method) {
-            $this->assertTrue($connection->wraps($method, []), $method);
-        }
-        // Methods that are the bot's, or take the connection or the user directly.
-        foreach (['users.getUsers', 'updates.getDifference', 'upload.saveFilePart', 'messages.uploadMedia', 'messages.getMessages', 'stories.sendStory', 'photos.uploadProfilePhoto'] as $method) {
-            $this->assertFalse($connection->wraps($method, []), $method);
-        }
-        // Setting an existing photo is wrapped, uploading one isn't.
-        $this->assertTrue($connection->wraps('photos.updateProfilePhoto', ['id' => ['_' => 'inputPhotoEmpty']]));
-        $this->assertFalse($connection->wraps('photos.updateProfilePhoto', ['id' => 'photo.jpg']));
-    }
-
     public function testMessages(): void
     {
         $connection = self::connection();

@@ -30,37 +30,9 @@ namespace danog\MadelineProto\MTProto;
 final class BusinessConnection
 {
     /**
-     * Methods that act on behalf of the user: they're wrapped in invokeWithBusinessConnection and sent to the DC of
-     * the connection, everything else runs as the bot (the list of the API docs and of TDLib's business methods).
-     */
-    private const WRAPPED_METHODS = [
-        'account.setGlobalPrivacySettings' => true,
-        'account.updateProfile' => true,
-        'account.updateUsername' => true,
-        'messages.deleteMessages' => true,
-        'messages.editMessage' => true,
-        'messages.readHistory' => true,
-        'messages.sendMedia' => true,
-        'messages.sendMessage' => true,
-        'messages.sendMultiMedia' => true,
-        'messages.setTyping' => true,
-        'messages.updatePinnedMessage' => true,
-        'payments.convertStarGift' => true,
-        'payments.exportInvoice' => true,
-        'payments.getPaymentForm' => true,
-        'payments.getSavedStarGifts' => true,
-        'payments.getStarsStatus' => true,
-        'payments.sendStarsForm' => true,
-        'payments.transferStarGift' => true,
-        'payments.upgradeStarGift' => true,
-        'photos.updateProfilePhoto' => true,
-        'stories.deleteStories' => true,
-    ];
-
-    /**
      * @param string $id     Connection ID
      * @param int    $userId ID of the user who connected the bot
-     * @param int    $dcId   DC of the connection, where the wrapped methods are sent
+     * @param int    $dcId   DC of the connection, where the calls made through it are sent
      * @param array  $rights businessBotRights of the bot
      * @param array  $user   The user who connected the bot, as seen by the bot
      */
@@ -106,21 +78,6 @@ final class BusinessConnection
             $connection['rights'] ?? ['_' => 'businessBotRights'],
             $user,
         );
-    }
-
-    /**
-     * Whether a method call acts on behalf of the user, and must be wrapped in invokeWithBusinessConnection.
-     *
-     * @param string $method Method name, before MadelineProto's method abstractions
-     * @param array  $args   Arguments
-     */
-    public function wraps(string $method, array $args): bool
-    {
-        if ($method === 'photos.updateProfilePhoto' && !\is_array($args['id'] ?? null)) {
-            // A file to upload: it's turned into photos.uploadProfilePhoto, which bots run for the user with its bot parameter.
-            return false;
-        }
-        return isset(self::WRAPPED_METHODS[$method]);
     }
 
     /**

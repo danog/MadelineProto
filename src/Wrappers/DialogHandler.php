@@ -117,6 +117,7 @@ trait DialogHandler
                                 "Timeout while getting difference for searchRightPts"
                             ),
                             'floodWaitLimit' => 86400,
+                            'specialMethodType' => SpecialMethodType::SESSION_RELATED,
                         ],
                     )['_'];
                 } catch (Throwable $e) {

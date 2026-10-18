@@ -49,9 +49,9 @@ use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\Rights;
 use danog\MadelineProto\EventHandler\Pinned;
 use danog\MadelineProto\EventHandler\Story\Story;
-use danog\MadelineProto\EventHandler\Typing;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\EventHandler\User\Status\Emoji;
 use danog\MadelineProto\EventHandler\User\Username;
@@ -342,10 +342,10 @@ abstract class InternalDoc
      * The session logs in as the bot, and behaves like a session of the user who connected it
      * (see https://core.telegram.org/api/bots/connected-business-bots):
      * getSelf returns the user, the messages of the user's chats managed by the bot are received as new, edited and
-     * deleted messages, and the methods that act on behalf of the user (sending, editing, deleting and reading
-     * messages, typing, pinning, editing the profile, gifts and stars, deleting stories) are sent through the
-     * business connection.
-     * All other methods run as the bot, and the bot's own updates are not received.
+     * deleted messages (the bot's own updates are not received), and all methods are called on behalf of the user,
+     * through the business connection.
+     * Methods Telegram doesn't allow through a business connection, or outside the rights and chats the user gave
+     * the bot, fail.
      *
      * @param string $token        Bot token
      * @param string $connectionId ID of the business connection (the business_connection_id of the Bot API)

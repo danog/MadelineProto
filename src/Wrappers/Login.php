@@ -88,10 +88,10 @@ trait Login
      * The session logs in as the bot, and behaves like a session of the user who connected it
      * (see https://core.telegram.org/api/bots/connected-business-bots):
      * getSelf returns the user, the messages of the user's chats managed by the bot are received as new, edited and
-     * deleted messages, and the methods that act on behalf of the user (sending, editing, deleting and reading
-     * messages, typing, pinning, editing the profile, gifts and stars, deleting stories) are sent through the
-     * business connection.
-     * All other methods run as the bot, and the bot's own updates are not received.
+     * deleted messages (the bot's own updates are not received), and all methods are called on behalf of the user,
+     * through the business connection.
+     * Methods Telegram doesn't allow through a business connection, or outside the rights and chats the user gave
+     * the bot, fail.
      *
      * @param string $token        Bot token
      * @param string $connectionId ID of the business connection (the business_connection_id of the Bot API)
@@ -110,7 +110,7 @@ trait Login
             $this->botLogin($token);
         }
         $connection = null;
-        foreach ($this->extractUpdates($this->methodCallAsyncRead('account.getBotBusinessConnection', ['connection_id' => $connectionId])) as $update) {
+        foreach ($this->extractUpdates($this->methodCallAsyncRead('account.getBotBusinessConnection', ['connection_id' => $connectionId, 'specialMethodType' => SpecialMethodType::SESSION_RELATED])) as $update) {
             if ($update['_'] === 'updateBotBusinessConnect') {
                 $connection = $update['connection'];
             }
@@ -124,7 +124,7 @@ trait Login
         $this->businessConnection = BusinessConnection::fromConnection(
             $connection,
             $this->isTestMode(),
-            $this->getInfo($connection['user_id'], API::INFO_TYPE_CONSTRUCTOR),
+            $this->getInfo($connection['user_id'])['User'],
         );
         $this->logger->logger("Logged in as {$connection['user_id']} through the business connection $connectionId", Logger::NOTICE);
         $this->serialize();
@@ -234,7 +234,7 @@ trait Login
     public function logout(): void
     {
         if ($this->loginState->getState()->state === API::LOGGED_IN) {
-            $this->methodCallAsyncRead('auth.logOut', []);
+            $this->methodCallAsyncRead('auth.logOut', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         }
         $this->setLoginState(API::LOGGED_OUT);
         $this->businessConnection = null;
