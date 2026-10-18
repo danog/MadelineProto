@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Tgcalls;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\OggWriter;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use Throwable;
 
 use function Amp\File\openFile;
@@ -36,6 +37,7 @@ use function Amp\File\openFile;
  */
 final class OpusRecorder
 {
+    use RestoresDeclaredProperties;
     private OggWriter $writer;
     private bool $closed = false;
 
@@ -75,9 +77,7 @@ final class OpusRecorder
     {
         // Synchronous state restoration only — no async work here (see resume()). Until resume() runs,
         // $writer stays unset and writeChunk/writeOpus/close guard on isset($this->writer).
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
     }
 
     /**
