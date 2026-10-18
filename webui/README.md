@@ -10,6 +10,25 @@ tweb is licensed under the GNU GPL v3, and so is this app (`GPL-3.0-or-later`): 
 MadelineProto's AGPL v3 (section 13 of both). The files out of tweb keep its copyright header, with
 "Adapted for MadelineProto" on the ones that were changed.
 
+## Liquid glass
+
+Every surface is made of liquid glass, over a slowly drifting field of purple, indigo, pink and blue light
+(`components/liquidGlass.tsx`, `scss/glass/`):
+
+- the material (`scss/glass/_material.scss`): a translucent tint over a blurred, saturated backdrop
+  (`backdrop-filter`), a specular rim (a gradient border, bright where the light comes from), a caustic shadow;
+  wells for the inputs and the code boxes, drops of tinted glass for the buttons and the logo, thick glass for
+  the country dropdown;
+- refraction: on Chromium, the backdrop is also displaced through an SVG lens (`#mp-glass-refraction`), so the
+  hairlines of the light field bend under the edges of the panes. The other engines drop a backdrop-filter with
+  `url()` entirely, so it's only set behind `html.glass-refraction`;
+- the light follows the pointer over the card (`--glass-x`/`--glass-y`), except on touch screens and with
+  reduced motion; the light field stops drifting with reduced motion;
+- with `prefers-reduced-transparency` or `prefers-contrast: more`, the panes are opaque, without refraction.
+
+The tokens (tints, blurs, the colors of the light field) are CSS variables in `scss/glass/_tokens.scss`, for
+day and night: the rest of the theme is tweb's, with the purple accent of `scss/theme.scss`.
+
 ## How it fits together
 
 - The PHP side builds each page as a view model (`src/WebUI`: `Page`, `Field`, `Alert`, `Action`) and

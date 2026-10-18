@@ -30,6 +30,7 @@ import {
 } from '@/pages/authFlow';
 import styles from '@/pages/authFlow.module.scss';
 import Button from '@components/buttonTsx';
+import LiquidGlass from '@components/liquidGlass';
 
 import SignInCard from '@/pages/cards/SignInCard';
 import SignBotCard from '@/pages/cards/SignBotCard';
@@ -90,6 +91,7 @@ export default function AuthCardsHost(): JSX.Element {
 
   return (
     <AuthFlowContext.Provider value={ctx}>
+      <LiquidGlass />
       <main ref={hostEl} style={{opacity: 0}} class={classNames('whole', styles.host)} id="auth-pages">
         <Button.Icon icon="darkmode_filled" class={styles.themeButton} onClick={toggleTheme} aria-label={I18n.format('DarkMode', true)} />
         <div

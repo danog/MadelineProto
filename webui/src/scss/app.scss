@@ -14,3 +14,6 @@
 @use "partials/preloader";
 @use "partials/input";
 @use "partials/button";
+// MadelineProto: the liquid glass, over tweb's styles
+@use "glass/tokens";
+@use "glass/skin";

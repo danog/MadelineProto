@@ -1,0 +1,90 @@
+/*
+ * The tokens of the liquid glass (see _material.scss), for day and night, and their accessible fallbacks.
+ */
+
+:root {
+  // the panes: the card is the thickest, controls are thinner and clearer
+  --glass-tint: rgba(255, 255, 255, .20);
+  --glass-tint-strong: rgba(255, 255, 255, .26);
+  --glass-tint-control: rgba(255, 255, 255, .28);
+  --glass-tint-menu: rgba(248, 245, 255, .93);
+  --glass-blur: 16px;
+  --glass-blur-strong: 28px;
+  --glass-blur-small: 8px;
+  --glass-saturate: 170%;
+  --glass-shadow: 0 30px 60px -24px rgba(48, 30, 140, .38), 0 6px 18px -6px rgba(48, 30, 140, .14);
+  --glass-shadow-small: 0 10px 24px -10px rgba(48, 30, 140, .35);
+  // the light on the edges
+  --glass-edge-top: rgba(255, 255, 255, .85);
+  --glass-edge-bottom: rgba(255, 255, 255, .22);
+  --glass-rim-light: rgba(255, 255, 255, .95);
+  --glass-rim-light-2: rgba(255, 255, 255, .55);
+  --glass-rim-fade: rgba(255, 255, 255, .18);
+  // the wells (inputs)
+  --glass-well: rgba(255, 255, 255, .16);
+  --glass-well-border: rgba(255, 255, 255, .60);
+  --glass-well-shadow: rgba(40, 24, 110, .16);
+  // the light following the pointer (see components/liquidGlass.tsx)
+  --glass-sheen: rgba(255, 255, 255, .30);
+  // the accent, as glass
+  --glass-accent-alpha: .80;
+
+  // the light field behind the glass
+  --field-base: linear-gradient(160deg, #d9cfff 0%, #eae1ff 45%, #d3e2ff 100%);
+  --field-1: rgba(118, 96, 255, .95);
+  --field-2: rgba(85, 70, 214, .75);
+  --field-3: rgba(255, 112, 196, .70);
+  --field-4: rgba(80, 190, 255, .65);
+  --field-texture: rgba(255, 255, 255, .26);
+  --field-texture-2: rgba(60, 40, 170, .07);
+
+}
+
+.night {
+  --glass-tint: rgba(30, 24, 62, .26);
+  --glass-tint-strong: rgba(20, 16, 44, .34);
+  --glass-tint-control: rgba(255, 255, 255, .08);
+  --glass-tint-menu: rgba(26, 21, 52, .95);
+  --glass-shadow: 0 34px 70px -24px rgba(0, 0, 0, .70), 0 8px 20px -8px rgba(0, 0, 0, .45);
+  --glass-shadow-small: 0 10px 24px -10px rgba(0, 0, 0, .6);
+  --glass-edge-top: rgba(255, 255, 255, .22);
+  --glass-edge-bottom: rgba(255, 255, 255, .05);
+  --glass-rim-light: rgba(255, 255, 255, .45);
+  --glass-rim-light-2: rgba(200, 190, 255, .28);
+  --glass-rim-fade: rgba(255, 255, 255, .06);
+  --glass-well: rgba(8, 6, 22, .22);
+  --glass-well-border: rgba(255, 255, 255, .16);
+  --glass-well-shadow: rgba(0, 0, 0, .35);
+  --glass-sheen: rgba(190, 180, 255, .16);
+  --glass-accent-alpha: .72;
+
+  --field-base: linear-gradient(160deg, #0b0920 0%, #110c2c 50%, #070d24 100%);
+  --field-1: rgba(98, 74, 255, .85);
+  --field-2: rgba(143, 132, 255, .50);
+  --field-3: rgba(200, 70, 220, .55);
+  --field-4: rgba(40, 120, 240, .50);
+  --field-texture: rgba(255, 255, 255, .055);
+  --field-texture-2: rgba(170, 160, 255, .14);
+}
+
+// Glass is hard to read for some: frosted, near-opaque panes instead, without refraction (see liquidGlass.tsx).
+@mixin solid-panes() {
+  --glass-tint: var(--surface-color);
+  --glass-tint-strong: var(--surface-color);
+  --glass-tint-control: var(--surface-color);
+  --glass-tint-menu: var(--surface-color);
+  --glass-well: var(--surface-color);
+  --glass-well-border: var(--border-color);
+  --glass-rim-light: transparent;
+  --glass-rim-light-2: transparent;
+  --glass-rim-fade: transparent;
+  --glass-sheen: transparent;
+  --glass-accent-alpha: 1;
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root,
+  .night {
+    @include solid-panes();
+  }
+}
