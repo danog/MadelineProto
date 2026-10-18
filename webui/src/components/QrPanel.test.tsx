@@ -53,6 +53,18 @@ describe("useQrLogin", () => {
         ]);
     });
 
+    it("keeps the query of the page, which may select the session", async () => {
+        const fetch = vi.fn(() => new Promise<Response>(() => {}));
+        vi.stubGlobal("fetch", fetch);
+        function Probe3() {
+            useQrLogin("/index.php?bot=a", () => {});
+            return null;
+        }
+        render(<Probe3 />);
+        await act(async () => {});
+        expect(fetch.mock.calls.map((call) => (call as unknown[])[0])).toEqual([`${window.location.origin}/index.php?bot=a&getQrCode`]);
+    });
+
     it("never polls another origin", async () => {
         const fetch = vi.fn(() => json({ logged_in: false, svg: "<svg>evil</svg>" }));
         vi.stubGlobal("fetch", fetch);

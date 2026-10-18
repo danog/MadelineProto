@@ -57,6 +57,12 @@ trait Start
     public function start(): array
     {
         if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
+            // A QR code poll of the web UI that comes after the login (late, or from another tab): it's answered
+            // here, the script must not run in it (it runs in the page)
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode']))) {
+                $this->webQrLogin();
+                die;
+            }
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
@@ -265,7 +271,7 @@ trait Start
                     ],
                     submit: Lang::$current_lang['webContinue'],
                     alerts: $alerts,
-                    qrEndpoint: WebUI::getSelfUrl(),
+                    qrEndpoint: WebUI::getSelfUrl(true),
                 );
             case API::WAITING_CODE:
                 return new Page(

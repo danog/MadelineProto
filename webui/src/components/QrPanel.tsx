@@ -26,9 +26,10 @@ export function useQrLogin(endpoint: string, onLoggedIn: () => void, retryDelay 
             return;
         }
         // Absolute: a path starting with // (https://host//evil.example/) would be a protocol-relative URL
-        const base = url.origin + url.pathname;
+        // the query of the page may select the session or the bot (index.php?bot=x): keep it
+        const base = url.origin + url.pathname + url.search;
         const poll = (query: "getQrCode" | "waitQrCodeOrLogin") => {
-            fetch(`${base}?${query}`, { credentials: "same-origin", cache: "no-store", redirect: "error", signal: controller.signal })
+            fetch(`${base}${url.search ? "&" : "?"}${query}`, { credentials: "same-origin", cache: "no-store", redirect: "error", signal: controller.signal })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}`);

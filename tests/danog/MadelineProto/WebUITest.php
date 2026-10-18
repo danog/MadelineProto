@@ -199,6 +199,17 @@ final class WebUITest extends TestCase
                 $_SERVER['REQUEST_URI'] = $requestUri;
                 self::assertSame($expected, WebUI::getSelfUrl());
             }
+            // With the query of the page (which may select the session), without the parameters of the web UI
+            foreach ([
+                '/index.php?bot=a&getQrCode' => '/index.php?bot=a',
+                '/index.php?waitQrCodeOrLogin=&x=1' => '/index.php?x=1',
+                '/index.php?getQrCode' => '/index.php',
+                '//evil.example/x?bot=a' => '/evil.example/x?bot=a',
+                '/index.php?bot.name=a%20b&getQrCode' => '/index.php?bot.name=a%20b',
+            ] as $requestUri => $expected) {
+                $_SERVER['REQUEST_URI'] = $requestUri;
+                self::assertSame($expected, WebUI::getSelfUrl(true));
+            }
         } finally {
             if ($uri === null) {
                 unset($_SERVER['REQUEST_URI']);
