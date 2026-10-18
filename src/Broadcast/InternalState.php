@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Broadcast;
 
+use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use danog\MadelineProto\Logger;
@@ -179,46 +180,67 @@ final class InternalState
             return;
         }
         $this->setStatus(StatusInternal::BROADCASTING);
-        $cancellation = $this->cancellation->getCancellation();
-        $promises = [];
-        foreach ($this->peers as $key => $peer) {
-            $promises []= async(function () use ($key, $peer, $cancellation): void {
+        // Runs in its own fiber: resume() is also called by MTProto::wakeup(), which must not wait for the broadcast.
+        async(function (): void {
+            $cancellation = $this->cancellation->getCancellation();
+            $promises = [];
+            $first = true;
+            foreach ($this->peers as $key => $peer) {
+                if ($this->delay === null) {
+                    $promises []= async($this->broadcastPeer(...), $key, $peer, $cancellation);
+                    if (\count($promises) % 50 === 0) {
+                        await($promises);
+                        $promises = [];
+                    }
+                    continue;
+                }
+                // With a delay, the peers are sent one at a time, $this->delay seconds apart.
+                if (!$first) {
+                    try {
+                        delay($this->delay, cancellation: $cancellation);
+                    } catch (CancelledException) {
+                    }
+                }
+                $first = false;
                 if ($this->cancellation->isCancelled()) {
                     $this->setStatus(StatusInternal::CANCELLED);
                     return;
                 }
+                $this->broadcastPeer($key, $peer, $cancellation);
+            }
+            await($promises);
+        });
+    }
 
-                $e = null;
-                try {
-                    if ($this->delay !== null) {
-                        delay($this->delay);
-                    }
-                    $this->action->act($this->broadcastId, $peer, $cancellation);
-                    $this->successCount++;
-                } catch (Throwable $e) {
-                    $this->failCount++;
-                    if ($e instanceof CancelledException && $e->getPrevious() instanceof BroadcastCancelledException) {
-                        // The finally block will still be executed
-                        return;
-                    }
-                    $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
-                } finally {
-                    if ($this->cancellation->isCancelled()) {
-                        $this->setStatus(StatusInternal::CANCELLED);
-                        return;
-                    }
+    private function broadcastPeer(int $key, int $peer, Cancellation $cancellation): void
+    {
+        if ($this->cancellation->isCancelled()) {
+            $this->setStatus(StatusInternal::CANCELLED);
+            return;
+        }
 
-                    unset($this->peers[$key]);
-                    if (!$this->peers) {
-                        $this->setStatus(StatusInternal::FINISHED);
-                    } else {
-                        $this->notifyProgress();
-                    }
-                }
-            });
-            if (\count($promises) % 50 === 0) {
-                await($promises);
-                $promises = [];
+        $e = null;
+        try {
+            $this->action->act($this->broadcastId, $peer, $cancellation);
+            $this->successCount++;
+        } catch (Throwable $e) {
+            $this->failCount++;
+            if ($e instanceof CancelledException && $e->getPrevious() instanceof BroadcastCancelledException) {
+                // The finally block will still be executed
+                return;
+            }
+            $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
+        } finally {
+            if ($this->cancellation->isCancelled()) {
+                $this->setStatus(StatusInternal::CANCELLED);
+                return;
+            }
+
+            unset($this->peers[$key]);
+            if (!$this->peers) {
+                $this->setStatus(StatusInternal::FINISHED);
+            } else {
+                $this->notifyProgress();
             }
         }
     }
