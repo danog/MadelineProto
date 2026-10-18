@@ -75,12 +75,13 @@
         if (link.protocol + "//" + link.host !== window.location.protocol + "//" + window.location.host) {
             return;
         }
-        endpoint = link.pathname;
+        // Absolute: a path starting with // (https://host//evil.example/) would be a protocol-relative URL
+        endpoint = link.protocol + "//" + link.host + link.pathname;
         var code = qr.querySelector("[data-qr-code]");
         var statusText = qr.querySelector("[data-qr-status-text]");
         var failures = 0;
         var poll = function (query) {
-            fetch(endpoint + "?" + query, { credentials: "same-origin", cache: "no-store" })
+            fetch(endpoint + "?" + query, { credentials: "same-origin", cache: "no-store", redirect: "error" })
                 .then(function (response) {
                     if (!response.ok) {
                         throw new Error("HTTP " + response.status);
