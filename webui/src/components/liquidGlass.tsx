@@ -49,7 +49,7 @@ function followPointer(): () => void {
 }
 
 /**
- * The light field and the lens: rendered behind the auth flow while the glass is on (helpers/glass.ts).
+ * The light field and the lens: rendered once, behind the auth flow.
  *
  * The lens displaces the backdrop with low-frequency noise, so the hairlines of the light field bend where they
  * pass under the edges of a pane; it's mild enough to leave the blurred backdrop calm in the middle.
@@ -58,9 +58,6 @@ export default function LiquidGlass(): JSX.Element {
   onMount(() => {
     document.documentElement.classList.toggle('glass-refraction', canRefract());
     onCleanup(followPointer());
-  });
-  onCleanup(() => {
-    document.documentElement.classList.remove('glass-refraction');
   });
 
   return (

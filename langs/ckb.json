@@ -271,6 +271,5 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "ئەم تۆکنی بۆتە هەڵوەشێنراوەتەوە",
     "tweb.FIRSTNAME_INVALID": "ناوی یەکەم نادروستە",
     "tweb.LASTNAME_INVALID": "ناوی کۆتایی نادروستە",
-    "tweb.Close": "داخستن",
-    "tweb.LiquidGlass": "Liquid Glass"
+    "tweb.Close": "داخستن"
 }

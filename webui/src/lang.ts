@@ -55,7 +55,6 @@ const lang = {
 
   // * MadelineProto
   'Close': 'Close',
-  'LiquidGlass': 'Liquid Glass',
   'Login.Bot': 'Log in as a bot >',
   'Login.Bot.Title': 'Log in as a Bot',
   'Login.Bot.Subtitle': 'Enter the token @BotFather gave you\nwhen you created the bot.',

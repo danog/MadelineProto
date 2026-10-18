@@ -16,7 +16,6 @@ import {IS_MOBILE_SAFARI} from '@environment/userAgent';
 import classNames from '@helpers/string/classNames';
 import liteMode from '@helpers/liteMode';
 import {toggleNight} from '@helpers/theme';
-import {glass, toggleGlass} from '@helpers/glass';
 import I18n from '@lib/langPack';
 
 import {
@@ -92,18 +91,9 @@ export default function AuthCardsHost(): JSX.Element {
 
   return (
     <AuthFlowContext.Provider value={ctx}>
-      <Show when={glass()}>
-        <LiquidGlass />
-      </Show>
+      <LiquidGlass />
       <main ref={hostEl} style={{opacity: 0}} class={classNames('whole', styles.host)} id="auth-pages">
         <Button.Icon icon="darkmode_filled" class={styles.themeButton} onClick={toggleTheme} aria-label={I18n.format('DarkMode', true)} />
-        <Button.Icon
-          icon="apps_magic"
-          class={styles.glassButton}
-          onClick={toggleGlass}
-          aria-pressed={glass()}
-          aria-label={I18n.format('LiquidGlass', true)}
-        />
         <div
           class={classNames(
             'scrollable',

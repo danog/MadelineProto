@@ -1,9 +1,8 @@
 /*
- * The tokens of the liquid glass (see _material.scss), for day and night, and their accessible fallbacks: only
- * while the glass is on (`html.glass`).
+ * The tokens of the liquid glass (see _material.scss), for day and night, and their accessible fallbacks.
  */
 
-html.glass {
+:root {
   // the panes: the card is the thickest, controls are thinner and clearer
   --glass-tint: rgba(255, 255, 255, .20);
   --glass-tint-strong: rgba(255, 255, 255, .26);
@@ -50,7 +49,7 @@ html.glass {
 
 }
 
-html.glass.night {
+.night {
   --glass-tint: rgba(30, 24, 62, .26);
   --glass-tint-strong: rgba(20, 16, 44, .34);
   --glass-tint-control: rgba(255, 255, 255, .08);
@@ -102,8 +101,8 @@ html.glass.night {
 }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  html.glass,
-  html.glass.night {
+  :root,
+  .night {
     @include solid-panes();
   }
 }

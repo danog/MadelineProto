@@ -15,7 +15,6 @@ import {render} from 'solid-js/web';
 
 import IS_TOUCH_SUPPORTED from '@environment/touchSupport';
 import {initTheme} from '@helpers/theme';
-import {initGlass} from '@helpers/glass';
 import lottieLoader from '@lib/lottie/lottieLoader';
 import I18n from '@lib/langPack';
 import type {State} from '@/types';
@@ -53,7 +52,6 @@ function loadStylesheet(): Promise<void> {
 export function mount(root: HTMLElement, state: State) {
   initDocument();
   initTheme();
-  initGlass();
   lottieLoader.setAssetUrl(state.assetUrl ?? '');
   // the strings of the session's language, before anything is rendered
   I18n.applyStrings((state.strings ?? {}) as Record<string, unknown>, state.lang);

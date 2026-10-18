@@ -139,21 +139,18 @@
 }
 
 // ----- Liquid glass: each digit is a small well -----------------------
-// (only while the glass is on: components/liquidGlass.tsx)
 
-:global(html.glass) {
-  .digit {
-    @include glass.well();
-    border-radius: .875rem;
-    transition-property: border-color, box-shadow, opacity;
+.digit {
+  @include glass.well();
+  border-radius: .875rem;
+  transition-property: border-color, box-shadow, opacity;
 
-    &.active {
-      @include glass.well-focus();
-      background-color: var(--glass-tint-control);
-    }
+  &.active {
+    @include glass.well-focus();
+    background-color: var(--glass-tint-control);
+  }
 
-    .error & {
-      @include glass.well-focus(var(--danger-color-rgb));
-    }
+  .error & {
+    @include glass.well-focus(var(--danger-color-rgb));
   }
 }

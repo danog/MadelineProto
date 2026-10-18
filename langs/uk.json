@@ -271,6 +271,5 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Цей токен бота відкликано",
     "tweb.FIRSTNAME_INVALID": "Неприпустиме ім'я",
     "tweb.LASTNAME_INVALID": "Неприпустиме прізвище",
-    "tweb.Close": "Закрити",
-    "tweb.LiquidGlass": "Liquid Glass"
+    "tweb.Close": "Закрити"
 }

@@ -271,6 +271,5 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Este token del bot ha sido revocado",
     "tweb.FIRSTNAME_INVALID": "Nombre no válido",
     "tweb.LASTNAME_INVALID": "Apellidos no válidos",
-    "tweb.Close": "Cerrar",
-    "tweb.LiquidGlass": "Liquid Glass"
+    "tweb.Close": "Cerrar"
 }

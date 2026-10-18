@@ -48,7 +48,6 @@ vi.mock('@lib/transport', async(importOriginal) => ({
 
 import {pageToCardSpec, startAuth} from '@/pages/authFlow';
 import AuthCardsHost from '@/pages/AuthCardsHost';
-import {initGlass} from '@helpers/glass';
 
 type Answer = State | {loggedIn: true} | string;
 
@@ -340,34 +339,5 @@ describe('the theme', () => {
     const before = document.documentElement.classList.contains('night');
     (document.querySelector('#auth-pages > button, #auth-pages .btn-icon') as HTMLElement).click();
     expect(document.documentElement.classList.contains('night')).toBe(!before);
-  });
-
-  it('switches the liquid glass off and on, and remembers it', () => {
-    localStorage.removeItem('madeline-webui-glass');
-    initGlass();
-    mount('status');
-    const root = document.documentElement;
-    const button = screen.getByRole('button', {name: 'Liquid Glass'});
-    const repainted = vi.fn();
-    window.addEventListener('madeline-theme-change', repainted);
-    expect(root.classList.contains('glass')).toBe(true);
-    expect(button.getAttribute('aria-pressed')).toBe('true');
-    expect(document.querySelector('.light-field')).toBeTruthy();
-
-    button.click();
-    expect(root.classList.contains('glass')).toBe(false);
-    expect(root.classList.contains('glass-refraction')).toBe(false);
-    expect(button.getAttribute('aria-pressed')).toBe('false');
-    expect(document.querySelector('.light-field')).toBeNull();
-    // the QR code is redrawn on the colours of the other look
-    expect(repainted).toHaveBeenCalledTimes(1);
-    expect(localStorage.getItem('madeline-webui-glass')).toBe('0');
-    initGlass();
-    expect(root.classList.contains('glass')).toBe(false);
-
-    button.click();
-    expect(root.classList.contains('glass')).toBe(true);
-    expect(document.querySelector('.light-field')).toBeTruthy();
-    window.removeEventListener('madeline-theme-change', repainted);
   });
 });

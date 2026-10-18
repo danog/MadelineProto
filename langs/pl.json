@@ -271,6 +271,5 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Ten token bota został unieważniony",
     "tweb.FIRSTNAME_INVALID": "Nieprawidłowe imię",
     "tweb.LASTNAME_INVALID": "Nieprawidłowe nazwisko",
-    "tweb.Close": "Zamknij",
-    "tweb.LiquidGlass": "Liquid Glass"
+    "tweb.Close": "Zamknij"
 }
