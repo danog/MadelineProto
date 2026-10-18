@@ -393,12 +393,16 @@ $corner-button-size: 2.5rem;
   text-align: start;
 }
 
+// A row of tweb's settings: an icon of the notice's color, the text, on a light tint of that color.
 .notice {
   --notice-color: var(--primary-color);
-  padding: .625rem .875rem;
-  border-radius: $border-radius-medium;
-  background-color: var(--light-primary-color);
-  border-inline-start: 3px solid var(--notice-color);
+  --notice-glyph: var(--surface-color);
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .75rem .875rem;
+  border-radius: $border-radius;
+  background-color: color-mix(in srgb, var(--notice-color) 10%, transparent);
   font-size: var(--font-size-14);
   line-height: var(--line-height-14);
   color: var(--primary-text-color);
@@ -409,19 +413,34 @@ $corner-button-size: 2.5rem;
   }
 
   &.warning {
-    --notice-color: #e6a23c;
-    background-color: rgba(230, 162, 60, .1);
+    --notice-color: #e8a33d;
   }
 
   &.error {
     --notice-color: var(--danger-color);
-    background-color: var(--light-danger-color);
   }
 
   &.success {
     --notice-color: #4fae4e;
-    background-color: rgba(79, 174, 78, .1);
   }
+
+  :global(.night) & {
+    background-color: color-mix(in srgb, var(--notice-color) 14%, transparent);
+  }
+}
+
+.noticeIcon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  // centred on the first line of text
+  margin-top: calc((var(--line-height-14) - 1.25rem) / 2);
+  color: var(--notice-color);
+}
+
+.noticeBody {
+  flex: 1;
+  min-width: 0;
 }
 
 .noticeTitle {

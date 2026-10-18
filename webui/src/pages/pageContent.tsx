@@ -75,6 +75,26 @@ export function pageErrorText(page: Page | undefined): string | undefined {
   return rpcError;
 }
 
+/** The icon of a notice: a disc of its color, with a glyph cut out of it. */
+function NoticeIcon(props: {level: Alert['level']}): JSX.Element {
+  const glyph = () => {
+    switch(props.level) {
+      case 'success':
+        return <path d="M6.5 10.4l2.3 2.3 4.7-5.2" fill="none" stroke="var(--notice-glyph)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />;
+      case 'info':
+        return <><circle cx="10" cy="6.4" r="1.15" fill="var(--notice-glyph)" /><rect x="9" y="8.6" width="2" height="5.6" rx="1" fill="var(--notice-glyph)" /></>;
+      default:
+        return <><rect x="9" y="5.2" width="2" height="6.4" rx="1" fill="var(--notice-glyph)" /><circle cx="10" cy="14" r="1.15" fill="var(--notice-glyph)" /></>;
+    }
+  };
+  return (
+    <svg class={styles.noticeIcon} viewBox="0 0 20 20" aria-hidden="true">
+      <circle cx="10" cy="10" r="10" fill="currentColor" />
+      {glyph()}
+    </svg>
+  );
+}
+
 /** Warnings and information of the server (a missing extension, a new version), under the header. */
 export function PageNotices(props: {alerts: Alert[], errors?: boolean}): JSX.Element {
   const alerts = () => props.alerts.filter((alert) => props.errors || alert.level !== 'error');
@@ -84,13 +104,16 @@ export function PageNotices(props: {alerts: Alert[], errors?: boolean}): JSX.Ele
         <For each={alerts()}>
           {(alert) => (
             <div class={styles.notice} classList={{[styles[alert.level]]: true}} role={alert.level === 'error' ? 'alert' : 'status'}>
-              <Show when={!isEmptyText(alert.title)}>
-                <div class={styles.noticeTitle}><RichText text={alert.title} /></div>
-              </Show>
-              <RichText text={alert.message} />
-              <Show when={!isEmptyText(alert.code)}>
-                <pre class={styles.noticeCode}><RichText text={alert.code} /></pre>
-              </Show>
+              <NoticeIcon level={alert.level} />
+              <div class={styles.noticeBody}>
+                <Show when={!isEmptyText(alert.title)}>
+                  <div class={styles.noticeTitle}><RichText text={alert.title} /></div>
+                </Show>
+                <RichText text={alert.message} />
+                <Show when={!isEmptyText(alert.code)}>
+                  <pre class={styles.noticeCode}><RichText text={alert.code} /></pre>
+                </Show>
+              </div>
             </div>
           )}
         </For>
