@@ -22,6 +22,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MatroskaWriter;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 
 /**
  * Records the incoming media of one party of a call into Matroska (.mkv) files, in pure PHP.
@@ -62,6 +63,7 @@ use danog\MadelineProto\RecordingFormat;
  */
 final class CallRecorder
 {
+    use RestoresDeclaredProperties;
     /** The two video slots, as {@see CallStream} flags. */
     private const VIDEO_SLOTS = [CallStream::VIDEO, CallStream::SCREEN];
     /** Every slot, as {@see CallStream} flags. */
@@ -211,9 +213,7 @@ final class CallRecorder
     public function __unserialize(array $data): void
     {
         // Synchronous state restoration only — no async work here (see resume()).
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
         if (!isset($this->out) && $this->file !== null) {
             $this->out = $this->file;
         }

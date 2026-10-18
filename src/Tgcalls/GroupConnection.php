@@ -26,6 +26,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
 use Throwable;
 use Webrtc\DataChannel\Enum\State;
@@ -67,6 +68,7 @@ use Webrtc\Webrtc\RTCPeerConnection;
  */
 final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackListener, PeerConnectionConnectionStateChangeListener, DataChannelOpenListener, DataChannelMessageListener, IncomingMediaObserver
 {
+    use RestoresDeclaredProperties;
     /** Colibri video-quality tiers, in pixels of height: thumbnail, medium and full. */
     private const HEIGHT_THUMBNAIL = 180;
     private const HEIGHT_MEDIUM = 360;
@@ -258,9 +260,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     public function __unserialize(array $data): void
     {
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->restoreDeclaredProperties($data);
     }
 
     /**

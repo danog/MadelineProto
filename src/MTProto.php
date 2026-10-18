@@ -120,6 +120,7 @@ use function time;
  */
 final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 {
+    use RestoresDeclaredProperties;
     use AuthKeyHandler;
     use CallHandler;
     use PeerHandler;
@@ -897,6 +898,17 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
+     * Restore the properties listed by __sleep(), dropping those removed since the session was saved
+     * (e.g. rsa_keys and test_rsa_keys, renamed to rsaKeys and testRsaKeys): the keys are refetched.
+     *
+     * @internal
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->restoreDeclaredProperties($data);
+    }
+
+    /**
      * Logger.
      *
      * @param mixed  $param Parameter
@@ -1231,13 +1243,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $chat->notifyLayer();
             } catch (RPCErrorException) {
             }
-        }
-
-        if (isset($this->updates) && \is_array($this->updates)) {
-            foreach ($this->updates as $update) {
-                $this->updateQueue->enqueue($update);
-            }
-            unset($this->updates);
         }
     }
     /**
