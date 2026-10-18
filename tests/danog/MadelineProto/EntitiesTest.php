@@ -7,6 +7,10 @@ namespace danog\MadelineProto\Test;
 use AssertionError;
 use danog\MadelineProto\EventHandler\Message\Entities\BankCard;
 use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
+use danog\MadelineProto\EventHandler\Message\Entities\DiffDelete;
+use danog\MadelineProto\EventHandler\Message\Entities\DiffInsert;
+use danog\MadelineProto\EventHandler\Message\Entities\DiffReplace;
+use danog\MadelineProto\EventHandler\Message\Entities\TonAddress;
 use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\BotCommand;
 use danog\MadelineProto\EventHandler\Message\Entities\Cashtag;
@@ -66,6 +70,10 @@ class EntitiesTest extends TestCase
             [new BankCard(1, 2)],
             [new Blockquote(1, 2)],
             [new Blockquote(1, 2, true)],
+            [new DiffInsert(1, 2)],
+            [new DiffDelete(1, 2)],
+            [new DiffReplace(1, 2, 'old')],
+            [new TonAddress(1, 2)],
             [new Bold(1, 2)],
             [new BotCommand(1, 2)],
             [new Cashtag(1, 2)],
@@ -115,7 +123,7 @@ class EntitiesTest extends TestCase
         $this->assertEquals(new Unknown(1, 2), MessageEntity::fromRawEntity((new Unknown(1, 2))->toBotAPI()));
 
         // Entity types from newer layers are kept as-is instead of failing to wrap the message
-        $raw = ['_' => 'messageEntityDiffReplace', 'offset' => 1, 'length' => 2, 'old_text' => 'test'];
+        $raw = ['_' => 'messageEntityFromTheFuture', 'offset' => 1, 'length' => 2, 'some_field' => 'test'];
         $entity = MessageEntity::fromRawEntity($raw);
         $this->assertEquals(new Unknown(1, 2, $raw), $entity);
         $this->assertSame($raw, $entity->toMTProto());
@@ -304,7 +312,7 @@ class EntitiesTest extends TestCase
             ],
             [
                 'html',
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre><code class="language-html">test</code></pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
                 "test\ntest test test test strikethrough underline blockquote https://google.com daniil@daniil.it +39398172758722 @daniilgentili spoiler <b>not_bold</b>",
                 [
                     [
@@ -631,6 +639,24 @@ class EntitiesTest extends TestCase
                         'length' => 7,
                         'type' => 'spoiler',
                     ],
+                ],
+            ],
+            [
+                'html',
+                'a<blockquote expandable>quote</blockquote> <tg-time unix="1647531900" format="wDT">tomorrow</tg-time>',
+                'aquote tomorrow',
+                [
+                    ['offset' => 1, 'length' => 5, 'type' => 'expandable_blockquote'],
+                    ['offset' => 7, 'length' => 8, 'type' => 'date_time', 'unix_time' => 1647531900, 'date_time_format' => 'wDT'],
+                ],
+            ],
+            [
+                'markdown',
+                ">quote||\n![tomorrow](tg://time?unix=1647531900&format=r)",
+                "quote\ntomorrow",
+                [
+                    ['offset' => 0, 'length' => 5, 'type' => 'expandable_blockquote'],
+                    ['offset' => 6, 'length' => 8, 'type' => 'date_time', 'unix_time' => 1647531900, 'date_time_format' => 'r'],
                 ],
             ],
         ];
