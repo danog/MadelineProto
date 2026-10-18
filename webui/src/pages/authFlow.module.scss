@@ -86,6 +86,9 @@ $corner-button-size: 2.5rem;
   position: relative;
   margin: 0 auto;
   padding: 0 1rem;
+  // the global .scrollable is width: 100% (partials/_scrollable.scss): the padding is inside it, or the cards
+  // run off the screen on phones (tweb's <Scrollable> puts it on an inner element)
+  box-sizing: border-box;
   opacity: 1;
   transition: opacity var(--transition-standard-in);
 }
