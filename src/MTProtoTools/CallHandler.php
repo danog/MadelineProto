@@ -51,8 +51,40 @@ trait CallHandler
             'method',
             $method,
             $args,
-            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+            function (array $args) use ($method, $datacenter) {
+                // Not saved with the arguments of the call: a resumed call goes through the current business connection.
+                $datacenter = $this->businessCall($method, $args) ?? $datacenter;
+                return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
+            },
         );
+    }
+    /**
+     * When logged in through a business connection, make the calls that act on behalf of the user go through it.
+     *
+     * Wrapped calls are sent to the DC of the connection, which is returned.
+     * A businessConnectionId argument set to null runs the call as the bot.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     */
+    private function businessCall(string $method, array &$args): ?int
+    {
+        $connection = $this->businessConnection;
+        if ($connection === null || \array_key_exists('businessConnectionId', $args)) {
+            return null;
+        }
+        if ($connection->wraps($method, $args)) {
+            $args['businessConnectionId'] = $connection->id;
+            return $connection->dcId;
+        }
+        if ($method === 'messages.uploadMedia') {
+            $args['business_connection_id'] ??= $connection->id;
+        } elseif ($method === 'photos.uploadProfilePhoto' || $method === 'photos.updateProfilePhoto') {
+            // An upload (wraps() is false for photos.updateProfilePhoto with an existing photo):
+            // bots upload the profile photo of the user who connected them with the bot parameter.
+            $args['bot'] ??= $connection->userId;
+        }
+        return null;
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -64,6 +96,7 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array $args, ?int $datacenter = null): WrappedFuture
     {
+        $datacenter = $this->businessCall($method, $args) ?? $datacenter;
         return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
     }
 }

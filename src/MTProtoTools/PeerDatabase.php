@@ -245,7 +245,7 @@ final class PeerDatabase implements TLCallback
             if (\is_string($id)) {
                 $id = strtolower(str_replace('@', '', $id));
                 if ($id === 'me') {
-                    $id = $this->API->authorization['user']['id'];
+                    $id = $this->API->getSelfId();
                 } elseif ($id === 'support') {
                     $id = $this->API->methodCallAsyncRead('help.getSupport', [])['user'];
                 } else {
@@ -384,6 +384,9 @@ final class PeerDatabase implements TLCallback
         }
         if ($user['id'] === ($this->API->authorization['user']['id'] ?? null)) {
             $this->API->authorization['user'] = $user;
+        }
+        if ($user['id'] === $this->API->businessConnection?->userId) {
+            $this->API->businessConnection->setUser($user);
         }
         if (($this->pendingDb[$user['id']] ?? null) == $user) {
             return;

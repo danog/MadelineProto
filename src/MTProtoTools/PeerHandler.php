@@ -212,7 +212,7 @@ trait PeerHandler
                     return $id['community_id'];
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
-                    return $this->authorization['user']['id'];
+                    return $this->getSelfId();
                 case 'user':
                 case 'userFull':
                     return $id['id'];
@@ -239,7 +239,7 @@ trait PeerHandler
                         // It's a channel/chat, 100% what we need
                         || $id['peer_id'] < 0
                         // It is a user, and it's not ourselves
-                        || $id['peer_id'] !== $this->authorization['user']['id']
+                        || $id['peer_id'] !== $this->getSelfId()
                     ) {
                         return $id['peer_id'];
                     }
@@ -470,7 +470,7 @@ trait PeerHandler
         if (\is_string($id)) {
             $id = strtolower(str_replace('@', '', $id));
             if ($id === 'me') {
-                return $this->getInfo($this->authorization['user']['id'], $type);
+                return $this->getInfo($this->getSelfId(), $type);
             }
             if ($id === 'support') {
                 if (!$this->supportUser) {
@@ -624,7 +624,7 @@ trait PeerHandler
                 if (\is_string($id)) {
                     $id = strtolower(str_replace('@', '', $id));
                     if ($id === 'me') {
-                        $id = $this->authorization['user']['id'];
+                        $id = $this->getSelfId();
                     } elseif ($id === 'support') {
                         $this->methodCallAsyncRead('help.getSupport', []);
                         continue;

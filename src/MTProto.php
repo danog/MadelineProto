@@ -59,6 +59,7 @@ use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\Loop\Update\FeedLoop;
 use danog\MadelineProto\Loop\Update\SeqLoop;
 use danog\MadelineProto\Loop\Update\UpdateLoop;
+use danog\MadelineProto\MTProto\BusinessConnection;
 use danog\MadelineProto\MTProto\LoginState;
 use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\MTProtoTools\AuthKeyHandler;
@@ -235,6 +236,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      */
     public ?array $authorization = null;
+    /**
+     * Business connection we're logged in through: the session is logged in as a bot, acting on behalf of the user
+     * who connected it, and authorization holds the bot.
+     *
+     * @internal
+     */
+    public ?BusinessConnection $businessConnection = null;
     /**
      * Whether we're authorized.
      *
@@ -794,7 +802,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->settings->getDb() instanceof DriverDatabaseAbstract) {
             $prefix = $this->settings->getDb()->getEphemeralFilesystemPrefix();
         }
-        $prefix ??= $this->getSelf()['id'] ?? null;
+        // The account the data belongs to: the bot, when logged in through a business connection.
+        $prefix ??= $this->authorization['user']['id'] ?? null;
         if ($prefix === null) {
             $this->tmpDbPrefix ??= 'tmp_'.hash('xxh3', $this->getSessionName());
             $prefix = $this->tmpDbPrefix;
@@ -864,6 +873,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             // Authorization state
             'authorization',
+            'businessConnection',
             'loginState',
 
             // Authorization cache
@@ -1759,7 +1769,27 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function getSelf(): array|false
     {
-        return $this->authorization['user'] ?? false;
+        return $this->businessConnection?->user ?? $this->authorization['user'] ?? false;
+    }
+    /**
+     * ID of the logged-in user (the user who connected the business bot, if logged in through a business connection).
+     *
+     * @internal
+     *
+     * @psalm-mutation-free
+     */
+    public function getSelfId(): ?int
+    {
+        return $this->businessConnection?->userId ?? $this->authorization['user']['id'] ?? null;
+    }
+    /**
+     * Returns the ID of the business connection we're logged in through, or null if we didn't log in through a business connection.
+     *
+     * @psalm-mutation-free
+     */
+    public function getBusinessConnectionId(): ?string
+    {
+        return $this->businessConnection?->id;
     }
     /**
      * Returns whether the current user is a bot.
@@ -1771,7 +1801,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($this->loginState->getState()->state !== API::LOGGED_IN) {
             throw new Exception('Not logged in!');
         }
-        return $this->authorization['user']['bot'];
+        return $this->businessConnection === null && $this->authorization['user']['bot'];
     }
     /**
      * Returns whether the current user is a user.
@@ -1780,7 +1810,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function isSelfUser(): bool
     {
-        return !$this->authorization['user']['bot'];
+        return $this->businessConnection !== null || !$this->authorization['user']['bot'];
     }
     /**
      * Returns whether the current user is a premium user, cached.
@@ -1798,6 +1828,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         try {
             $this->authorization = ['user' => ($this->methodCallAsyncRead('users.getUsers', ['id' => [['_' => 'inputUserSelf']], 'specialMethodType' => SpecialMethodType::USER_RELATED]))[0]];
+            if ($this->businessConnection !== null) {
+                $this->businessConnection->setUser($this->methodCallAsyncRead('users.getUsers', ['id' => [$this->businessConnection->userId]])[0]);
+            }
         } catch (RPCErrorException $e) {
             $this->logger->logger($e->getMessage());
             return false;
@@ -2015,7 +2048,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!(\is_array($userOrId) && !isset($userOrId['_']) && !isset($userOrId['id']))) {
             $userOrId = [$userOrId];
         }
-        $selfBot = $this->getSelf()['bot'];
+        // Reports are sent by the bot even when logged in through a business connection.
+        $selfBot = $this->authorization['user']['bot'];
         foreach ($userOrId as $k => &$peer) {
             try {
                 $peer = $this->getInfo($peer);
@@ -2126,6 +2160,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                         $file = $this->methodCallAsyncRead(
                             'messages.uploadMedia',
                             [
+                                'businessConnectionId' => null,
                                 'peer' => $this->reportDest[0],
                                 'media' => [
                                     '_' => 'inputMediaUploadedDocument',
@@ -2144,9 +2179,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $sent = false;
             foreach ($this->reportDest as $id) {
                 try {
-                    $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
+                    $this->methodCallAsyncRead('messages.sendMessage', ['businessConnectionId' => null, 'peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
                     if ($file) {
-                        $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
+                        $this->methodCallAsyncRead('messages.sendMedia', ['businessConnectionId' => null, 'peer' => $id, 'media' => $file]);
                     }
                     $sent = true;
                 } catch (Throwable $e) {

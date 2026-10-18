@@ -23,6 +23,8 @@ enum CallDenialReason: string
 {
     /** We are a bot, and bots cannot make one-to-one calls. */
     case BOTS_CANNOT_CALL = 'Bots cannot make calls!';
+    /** We are logged in through a business connection, which cannot make calls. */
+    case BUSINESS_CONNECTION_CANNOT_CALL = 'Calls cannot be made through a business connection!';
     /** The other user of the private chat is ourselves. */
     case CANNOT_CALL_SELF = 'Cannot call ourselves!';
     /** The other user cannot be called at all. */
@@ -34,6 +36,8 @@ enum CallDenialReason: string
 
     /** We are a bot, and bots cannot create group calls. */
     case BOTS_CANNOT_CREATE_GROUP_CALLS = 'Bots cannot create group calls!';
+    /** We are logged in through a business connection, which cannot create group calls. */
+    case BUSINESS_CONNECTION_CANNOT_CREATE_GROUP_CALLS = 'Group calls cannot be created through a business connection!';
     /** We are not a member of the group or channel. */
     case NOT_A_MEMBER = 'We are not a member of this chat!';
     /** We lack the `manage_call` admin right in the group or channel. */

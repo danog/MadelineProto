@@ -140,6 +140,9 @@ abstract class GroupOrChannelMessage extends Message
         if ($client->isSelfBot()) {
             return CallDenialReason::BOTS_CANNOT_CREATE_GROUP_CALLS;
         }
+        if ($client->getBusinessConnectionId() !== null) {
+            return CallDenialReason::BUSINESS_CONNECTION_CANNOT_CREATE_GROUP_CALLS;
+        }
         $chat = $client->getInfo($this->chatId)['Chat'] ?? [];
         if (($chat['left'] ?? false) || ($chat['deactivated'] ?? false)) {
             return CallDenialReason::NOT_A_MEMBER;
