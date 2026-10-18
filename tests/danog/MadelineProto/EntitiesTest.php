@@ -655,7 +655,7 @@ class EntitiesTest extends TestCase
                 ">quote||\n![tomorrow](tg://time?unix=1647531900&format=r)",
                 "quote\ntomorrow",
                 [
-                    ['offset' => 0, 'length' => 5, 'type' => 'expandable_blockquote'],
+                    ['offset' => 0, 'length' => 6, 'type' => 'expandable_blockquote'],
                     ['offset' => 6, 'length' => 8, 'type' => 'date_time', 'unix_time' => 1647531900, 'date_time_format' => 'r'],
                 ],
             ],
