@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Broadcast;
 
+use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredCancellation;
 use danog\MadelineProto\Logger;
@@ -179,47 +180,60 @@ final class InternalState
             return;
         }
         $this->setStatus(StatusInternal::BROADCASTING);
-        $cancellation = $this->cancellation->getCancellation();
-        $promises = [];
-        foreach ($this->peers as $key => $peer) {
-            $promises []= async(function () use ($key, $peer, $cancellation): void {
-                if ($this->cancellation->isCancelled()) {
-                    $this->setStatus(StatusInternal::CANCELLED);
-                    return;
-                }
-
-                $e = null;
-                try {
-                    if ($this->delay !== null) {
-                        delay($this->delay);
+        async(function (): void {
+            $cancellation = $this->cancellation->getCancellation();
+            if ($this->delay !== null) {
+                // Send sequentially, waiting between each peer
+                $first = true;
+                foreach ($this->peers as $key => $peer) {
+                    if (!$first) {
+                        try {
+                            delay($this->delay, cancellation: $cancellation);
+                        } catch (CancelledException) {
+                            break;
+                        }
                     }
-                    $this->action->act($this->broadcastId, $peer, $cancellation);
-                    $this->successCount++;
-                } catch (Throwable $e) {
-                    $this->failCount++;
-                    if ($e instanceof CancelledException && $e->getPrevious() instanceof BroadcastCancelledException) {
-                        // The finally block will still be executed
-                        return;
-                    }
-                    $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
-                } finally {
+                    $first = false;
                     if ($this->cancellation->isCancelled()) {
-                        $this->setStatus(StatusInternal::CANCELLED);
-                        return;
+                        break;
                     }
-
-                    unset($this->peers[$key]);
-                    if (!$this->peers) {
-                        $this->setStatus(StatusInternal::FINISHED);
-                    } else {
-                        $this->notifyProgress();
+                    $this->act($key, $peer, $cancellation);
+                }
+            } else {
+                $promises = [];
+                foreach ($this->peers as $key => $peer) {
+                    if ($this->cancellation->isCancelled()) {
+                        break;
+                    }
+                    $promises []= async($this->act(...), $key, $peer, $cancellation);
+                    if (\count($promises) === 50) {
+                        await($promises);
+                        $promises = [];
                     }
                 }
-            });
-            if (\count($promises) % 50 === 0) {
                 await($promises);
-                $promises = [];
             }
+            $this->setStatus($this->cancellation->isCancelled() ? StatusInternal::CANCELLED : StatusInternal::FINISHED);
+        });
+    }
+    private function act(int $key, int $peer, Cancellation $cancellation): void
+    {
+        try {
+            $this->action->act($this->broadcastId, $peer, $cancellation);
+            $this->successCount++;
+        } catch (Throwable $e) {
+            $this->failCount++;
+            if ($e instanceof CancelledException && $e->getPrevious() instanceof BroadcastCancelledException) {
+                return;
+            }
+            $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
+        }
+        if ($this->cancellation->isCancelled()) {
+            return;
+        }
+        unset($this->peers[$key]);
+        if ($this->peers) {
+            $this->notifyProgress();
         }
     }
 
