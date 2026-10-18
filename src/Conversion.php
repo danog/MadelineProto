@@ -26,8 +26,6 @@ use Webmozart\Assert\Assert;
 
 use const DIRECTORY_SEPARATOR;
 
-use function stream_get_contents;
-
 final class Conversion
 {
     /**
@@ -126,355 +124,306 @@ final class Conversion
     }
 
     /**
-     * @psalm-pure
+     * Convert a Telegram Desktop session.
+     *
+     * Passcodes set by recent versions of Telegram Desktop are wrapped with argon2id or scrypt, which are not supported: turn off the local passcode before converting.
+     *
+     * @param string $session Telegram Desktop tdata directory (or its parent directory)
+     * @param string $new_session MadelineProto session directory to create
+     * @param SettingsAbstract|null $settings Settings
+     * @param string $passcode Local passcode, if any
+     * @param string $key Data name, if Telegram Desktop is started with -key
+     * @param int|null $account Index of the account to convert, the active one by default
      */
-    private static function tdesktop_md5($data)
+    public static function tdesktop(string $session, string $new_session, ?SettingsAbstract $settings = null, string $passcode = '', string $key = 'data', ?int $account = null): API
     {
-        $result = '';
-        foreach (str_split(md5($data), 2) as $byte) {
-            $result .= strrev($byte);
-        }
-
-        return strtoupper($result);
+        $authorization = self::parseTdesktop($session, $passcode, $key, $account);
+        return self::importAuthorization($authorization['auth_keys'], $authorization['main_dc_id'], $new_session, $settings);
     }
 
-    private const FILEOPTION_SAFE = 1;
-    private const FILEOPTION_USER = 2;
-    public static $tdesktop_base_path;
-    public static $tdesktop_user_base_path;
-    public static $tdesktop_key;
-
-    private static function tdesktop_fopen($fileName, $options = self::FILEOPTION_SAFE|self::FILEOPTION_USER)
-    {
-        $name = ($options & self::FILEOPTION_USER ? self::$tdesktop_user_base_path : self::$tdesktop_base_path).$fileName;
-        $totry = [];
-        foreach (['0', '1', 's'] as $x) {
-            if (file_exists($name.$x)) {
-                $totry[] = fopen($name.$x, 'rb');
-            }
-        }
-        foreach ($totry as $fp) {
-            if (stream_get_contents($fp, 4) !== 'TDF$') {
-                Logger::log('Wrong magic', Logger::ERROR);
-                continue;
-            }
-            $versionBytes = stream_get_contents($fp, 4);
-            $version = Tools::unpackSignedInt($versionBytes);
-            Logger::log("TDesktop version: $version");
-            $data = stream_get_contents($fp);
-            $md5 = substr($data, -16);
-            $data = substr($data, 0, -16);
-
-            $length = pack('l', \strlen($data));
-            $length = Magic::$BIG_ENDIAN ? strrev($length) : $length;
-
-            if (md5($data.$length.$versionBytes.'TDF$', true) !== $md5) {
-                Logger::log('Wrong MD5', Logger::ERROR);
-            }
-
-            $res = fopen('php://memory', 'rw+b');
-            fwrite($res, $data);
-            fseek($res, 0);
-
-            return $res;
-        }
-
-        throw new Exception("Could not open $fileName");
-    }
-
-    private static function tdesktop_fopen_encrypted($fileName, $options = 3)
-    {
-        $f = self::tdesktop_fopen($fileName, $options);
-        $data = self::tdesktop_read_bytearray($f);
-        $res = self::tdesktop_decrypt($data, self::$tdesktop_key);
-        $length = unpack('V', stream_get_contents($res, 4))[1];
-
-        if ($length > fstat($res)['size'] || $length < 4) {
-            throw new Exception('Wrong length');
-        }
-
-        return $res;
-    }
-
-    private static function tdesktop_read_bytearray($fp, bool $asString = false)
-    {
-        $length = Tools::unpackSignedInt(strrev(stream_get_contents($fp, 4)));
-        $data = $length > 0 ? stream_get_contents($fp, $length) : '';
-        if ($asString) {
-            return $data;
-        }
-        $res = fopen('php://memory', 'rw+b');
-        fwrite($res, $data);
-        fseek($res, 0);
-
-        return $res;
-    }
-
-    private static function tdesktop_decrypt($data, $auth_key)
-    {
-        $message_key = stream_get_contents($data, 16);
-        $encrypted_data = stream_get_contents($data);
-
-        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $auth_key, false);
-        $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
-
-        if ($message_key != substr(sha1($decrypted_data, true), 0, 16)) {
-            throw new SecurityException('msg_key mismatch');
-        }
-
-        $res = fopen('php://memory', 'rw+b');
-        fwrite($res, $decrypted_data);
-        fseek($res, 0);
-
-        return $res;
-    }
+    private const TDESKTOP_SALT_SIZE = 32;
+    private const TDESKTOP_KEY_DATA_MAGIC = 0x4B443200;
+    private const TDESKTOP_KEY_DATA_FORMAT_VERSION = 2;
 
     private const dbiKey = 0x00;
     private const dbiUser = 0x01;
-    private const dbiDcOptionOldOld = 0x02;
-    private const dbiChatSizeMax = 0x03;
-    private const dbiMutePeer = 0x04;
-    private const dbiSendKey = 0x05;
-    private const dbiAutoStart = 0x06;
-    private const dbiStartMinimized = 0x07;
-    private const dbiSoundNotify = 0x08;
-    private const dbiWorkMode = 0x09;
-    private const dbiSeenTrayTooltip = 0x0a;
-    private const dbiDesktopNotify = 0x0b;
-    private const dbiAutoUpdate = 0x0c;
-    private const dbiLastUpdateCheck = 0x0d;
-    private const dbiWindowPosition = 0x0e;
-    private const dbiConnectionTypeOld = 0x0f;
-    // 0x10 reserved
-    private const dbiDefaultAttach = 0x11;
-    private const dbiCatsAndDogs = 0x12;
-    private const dbiReplaceEmojis = 0x13;
-    private const dbiAskDownloadPath = 0x14;
-    private const dbiDownloadPathOld = 0x15;
-    private const dbiScale = 0x16;
-    private const dbiEmojiTabOld = 0x17;
-    private const dbiRecentEmojiOldOld = 0x18;
-    private const dbiLoggedPhoneNumber = 0x19;
-    private const dbiMutedPeers = 0x1a;
-    // 0x1b reserved
-    private const dbiNotifyView = 0x1c;
-    private const dbiSendToMenu = 0x1d;
-    private const dbiCompressPastedImage = 0x1e;
-    private const dbiLangOld = 0x1f;
-    private const dbiLangFileOld = 0x20;
-    private const dbiTileBackground = 0x21;
-    private const dbiAutoLock = 0x22;
-    private const dbiDialogLastPath = 0x23;
-    private const dbiRecentEmojiOld = 0x24;
-    private const dbiEmojiVariantsOld = 0x25;
-    private const dbiRecentStickers = 0x26;
-    private const dbiDcOptionOld = 0x27;
-    private const dbiTryIPv6 = 0x28;
-    private const dbiSongVolume = 0x29;
-    private const dbiWindowsNotificationsOld = 0x30;
-    private const dbiIncludeMuted = 0x31;
-    private const dbiMegagroupSizeMax = 0x32;
-    private const dbiDownloadPath = 0x33;
-    private const dbiAutoDownload = 0x34;
-    private const dbiSavedGifsLimit = 0x35;
-    private const dbiShowingSavedGifsOld = 0x36;
-    private const dbiAutoPlay = 0x37;
-    private const dbiAdaptiveForWide = 0x38;
-    private const dbiHiddenPinnedMessages = 0x39;
-    private const dbiRecentEmoji = 0x3a;
-    private const dbiEmojiVariants = 0x3b;
-    private const dbiDialogsMode = 0x40;
-    private const dbiModerateMode = 0x41;
-    private const dbiVideoVolume = 0x42;
-    private const dbiStickersRecentLimit = 0x43;
-    private const dbiNativeNotifications = 0x44;
-    private const dbiNotificationsCount = 0x45;
-    private const dbiNotificationsCorner = 0x46;
-    private const dbiThemeKey = 0x47;
-    private const dbiDialogsWidthRatioOld = 0x48;
-    private const dbiUseExternalVideoPlayer = 0x49;
-    private const dbiDcOptions = 0x4a;
     private const dbiMtpAuthorization = 0x4b;
-    private const dbiLastSeenWarningSeenOld = 0x4c;
-    private const dbiAuthSessionSettings = 0x4d;
-    private const dbiLangPackKey = 0x4e;
-    private const dbiConnectionType = 0x4f;
-    private const dbiStickersFavedLimit = 0x50;
-    private const dbiSuggestStickersByEmoji = 0x51;
 
-    private const dbiEncryptedWithSalt = 333;
-    private const dbiEncrypted = 444;
-
-    // 500-600 reserved
-
-    private const dbiVersion = 666;
-
-    private static function tdesktop(string $session, string $new_session, $settings = [])
+    /**
+     * Parse the MTProto authorization of a Telegram Desktop session.
+     *
+     * @internal
+     *
+     * @param string $session Telegram Desktop tdata directory (or its parent directory)
+     * @param string $passcode Local passcode, if any
+     * @param string $key Data name, if Telegram Desktop is started with -key
+     * @param int|null $account Index of the account to parse, the active one by default
+     *
+     * @return array{main_dc_id: int, user_id: int, auth_keys: array<int, string>}
+     */
+    public static function parseTdesktop(string $session, string $passcode = '', string $key = 'data', ?int $account = null): array
     {
-        set_error_handler(['\\danog\\MadelineProto\\Exception', 'ExceptionErrorHandler']);
-        $settings['old_session_key'] ??= 'data';
-        $settings['old_session_passcode'] ??= '';
-
         if (basename($session) !== 'tdata') {
             $session .= DIRECTORY_SEPARATOR.'tdata';
         }
+        $base = $session.DIRECTORY_SEPARATOR;
 
-        [$part_one_md5, $part_two_md5] = str_split(self::tdesktop_md5($settings['old_session_key']), 16);
-        self::$tdesktop_base_path = $session.DIRECTORY_SEPARATOR;
-        self::$tdesktop_user_base_path = self::$tdesktop_base_path.$part_one_md5.DIRECTORY_SEPARATOR;
-
-        $data = self::tdesktop_fopen('map');
-
-        $salt = self::tdesktop_read_bytearray($data, true);
-        $encryptedKey = self::tdesktop_read_bytearray($data);
-
-        if (\strlen($salt)) {
-            $keyIterCount = \strlen($settings['old_session_passcode']) ? 4000 : 4;
-            $passKey = openssl_pbkdf2($settings['old_session_passcode'], $salt, 256, $keyIterCount);
-
-            self::$tdesktop_key = stream_get_contents(
-                self::tdesktop_read_bytearray(
-                    self::tdesktop_decrypt($encryptedKey, $passKey),
-                ),
-            );
-        } else {
-            $key = 'key_'.$settings['old_session_key'];
-            $data = self::tdesktop_fopen($key, self::FILEOPTION_SAFE);
-
-            $salt = self::tdesktop_read_bytearray($data, true);
-            if (\strlen($salt) !== 32) {
-                throw new Exception('Length of salt is wrong!');
+        // storage_domain.cpp, Domain::startModern
+        $keyData = self::tdesktopReadFile($base.'key_'.$key);
+        if ($keyData !== null) {
+            $offset = 0;
+            $salt = self::tdesktopReadByteArray($keyData, $offset);
+            $openKeyEncrypted = self::tdesktopReadByteArray($keyData, $offset);
+            $infoEncrypted = self::tdesktopReadByteArray($keyData, $offset);
+            if (\strlen($salt) !== self::TDESKTOP_SALT_SIZE) {
+                throw new Exception('Wrong salt length in the key data!');
+            }
+            if ($offset === \strlen($keyData)) {
+                // Legacy key data, wrapped with the passcode (if any)
+                $localKey = self::tdesktopUnwrapLocalKey($openKeyEncrypted, self::tdesktopCreateLocalKey($passcode, $salt));
+            } elseif ($passcode === '') {
+                if ($openKeyEncrypted === '') {
+                    throw new Exception('The Telegram Desktop session is protected by a local passcode!');
+                }
+                $localKey = self::tdesktopUnwrapLocalKey($openKeyEncrypted, self::tdesktopCreateLocalKey('', $salt));
+            } else {
+                $trailer = self::tdesktopReadByteArray($keyData, $offset);
+                $offset = 0;
+                $magic = self::tdesktopReadUint32($trailer, $offset);
+                $formatVersion = self::tdesktopReadUint32($trailer, $offset);
+                $committed = self::tdesktopReadUint32($trailer, $offset);
+                $wrapCount = self::tdesktopReadUint32($trailer, $offset);
+                if ($magic !== self::TDESKTOP_KEY_DATA_MAGIC || $formatVersion > self::TDESKTOP_KEY_DATA_FORMAT_VERSION) {
+                    throw new Exception('Unsupported key data format!');
+                }
+                $wraps = [];
+                for ($x = 0; $x < $wrapCount; $x++) {
+                    $kind = self::tdesktopReadUint32($trailer, $offset);
+                    $generation = self::tdesktopReadUint32($trailer, $offset);
+                    $offset += 12; // KDF memory, time and parallelism
+                    $wrapSalt = self::tdesktopReadByteArray($trailer, $offset);
+                    $wrapKeyEncrypted = self::tdesktopReadByteArray($trailer, $offset);
+                    // Only the wrap of the committed generation is live
+                    if ($generation === $committed) {
+                        $wraps[] = [$kind, $wrapSalt, $wrapKeyEncrypted];
+                    }
+                }
+                if (\count($wraps) !== 1) {
+                    throw new Exception('The Telegram Desktop session is not protected by a local passcode!');
+                }
+                [[$kind, $wrapSalt, $wrapKeyEncrypted]] = $wraps;
+                if ($kind !== 0) {
+                    throw new Exception('The local passcode of the Telegram Desktop session uses argon2id or scrypt, which are not supported: turn off the local passcode in Telegram Desktop before converting.');
+                }
+                $localKey = self::tdesktopUnwrapLocalKey($wrapKeyEncrypted, self::tdesktopCreateLocalKey($passcode, $wrapSalt));
             }
 
-            $encryptedKey = self::tdesktop_read_bytearray($data);
-            $encryptedInfo = self::tdesktop_read_bytearray($data);
-
-            $hash = hash('sha512', $salt.$settings['old_session_passcode'].$salt, true);
-            $iterCount = \strlen($settings['old_session_passcode']) ? 100000 : 1;
-
-            $passKey = openssl_pbkdf2($hash, $salt, 256, $iterCount, 'sha512');
-
-            $key = self::tdesktop_read_bytearray(self::tdesktop_decrypt($encryptedKey, $passKey), true);
-            $info = self::tdesktop_read_bytearray(self::tdesktop_decrypt($encryptedInfo, $key));
-
-            self::$tdesktop_key = $key;
-
-            $count = Tools::unpackSignedInt(strrev(stream_get_contents($info, 4)));
-            Logger::log("Number of accounts: $count");
-            for ($i = 0; $i != $count; $i++) {
-                $idx = Tools::unpackSignedInt(strrev(stream_get_contents($info, 4)));
-                if ($idx >= 0) {
-                    $dataName = $settings['old_session_key'];
-                    if ($idx > 0) {
-                        $dataName = $settings['old_session_key'].'#'.($idx+1);
-                    }
-                    [$part_one_md5] = str_split(self::tdesktop_md5($dataName), 16);
+            $info = self::tdesktopDecrypt($infoEncrypted, $localKey);
+            $offset = 0;
+            $count = self::tdesktopReadInt32($info, $offset);
+            $indexes = [];
+            for ($x = 0; $x < $count; $x++) {
+                $index = self::tdesktopReadInt32($info, $offset);
+                if ($index >= 0) {
+                    $indexes[$index] = true;
                 }
             }
+            if (!$indexes) {
+                throw new Exception('No accounts in the Telegram Desktop session!');
+            }
+            if ($account === null) {
+                $account = $offset < \strlen($info) ? self::tdesktopReadInt32($info, $offset) : -1;
+                if (!isset($indexes[$account])) {
+                    $account = array_key_first($indexes);
+                }
+            }
+            if (!isset($indexes[$account])) {
+                throw new Exception("No account with index $account in the Telegram Desktop session!");
+            }
+        } else {
+            // Before multiple accounts: storage_account.cpp, Account::readMapWith
+            if ($account) {
+                throw new Exception("No account with index $account in the Telegram Desktop session!");
+            }
+            $account = 0;
+            $map = self::tdesktopReadFile($base.self::tdesktopFilePart($key).DIRECTORY_SEPARATOR.'map');
+            if ($map === null) {
+                throw new Exception("Could not find a Telegram Desktop session in $session!");
+            }
+            $offset = 0;
+            $salt = self::tdesktopReadByteArray($map, $offset);
+            $keyEncrypted = self::tdesktopReadByteArray($map, $offset);
+            if (\strlen($salt) !== self::TDESKTOP_SALT_SIZE) {
+                throw new Exception('Wrong salt length in the map!');
+            }
+            $passKey = openssl_pbkdf2($passcode, $salt, 256, $passcode === '' ? 4 : 4000, 'sha1');
+            $localKey = self::tdesktopUnwrapLocalKey($keyEncrypted, $passKey);
         }
 
-        $main = self::tdesktop_fopen_encrypted($part_one_md5, self::FILEOPTION_SAFE);
+        // main_account.cpp, ComposeDataString; storage_account.cpp, Account::readMtpData
+        $dataName = str_replace('#', '', $key);
+        if ($account > 0) {
+            $dataName .= '#'.($account + 1);
+        }
+        $mtp = self::tdesktopReadFile($base.self::tdesktopFilePart($dataName));
+        if ($mtp === null) {
+            throw new Exception("Could not find the MTProto data of account $account!");
+        }
+        $offset = 0;
+        $mtp = self::tdesktopDecrypt(self::tdesktopReadByteArray($mtp, $offset), $localKey);
 
+        $authorization = null;
+        $user_id = 0;
+        $main_dc_id = 0;
         $auth_keys = [];
-
-        while (!feof($main)) {
-            $magic = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-            switch ($magic) {
-                case self::dbiDcOptionOldOld:
-                    stream_get_contents($main, 4);
-                    self::tdesktop_read_bytearray($main);
-                    self::tdesktop_read_bytearray($main);
-                    stream_get_contents($main, 4);
-                    break;
-                case self::dbiDcOptionOld:
-                    stream_get_contents($main, 8);
-                    self::tdesktop_read_bytearray($main);
-                    stream_get_contents($main, 4);
-                    break;
-                case self::dbiDcOptions:
-                    self::tdesktop_read_bytearray($main);
+        $offset = 0;
+        while ($offset < \strlen($mtp)) {
+            $block = self::tdesktopReadUint32($mtp, $offset);
+            switch ($block) {
+                case self::dbiMtpAuthorization:
+                    $authorization = self::tdesktopReadByteArray($mtp, $offset);
                     break;
                 case self::dbiUser:
-                    stream_get_contents($main, 4);
-                    $main_dc_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
+                    $user_id = self::tdesktopReadInt32($mtp, $offset);
+                    $main_dc_id = self::tdesktopReadUint32($mtp, $offset);
                     break;
                 case self::dbiKey:
-                    $auth_keys[Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)))] = stream_get_contents($main, 256);
-                    break;
-                case self::dbiMtpAuthorization:
-                    $main = self::tdesktop_read_bytearray($main);
-                    //stream_get_contents($main, 4);
-                    $user_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-                    $main_dc_id = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-                    $length = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-                    for ($x = 0; $x < $length; $x++) {
-                        $dc = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-                        $auth_key = stream_get_contents($main, 256);
-                        if ($dc <= 5) {
-                            $auth_keys[$dc] = $auth_key;
-                        }
-                    }
-                    break 2;
-                case self::dbiAutoDownload:
-                    stream_get_contents($main, 12);
-                    break;
-                case self::dbiDialogsMode:
-                    stream_get_contents($main, 8);
-                    break;
-                case self::dbiAuthSessionSettings:
-                    self::tdesktop_read_bytearray($main);
-                    break;
-                case self::dbiConnectionTypeOld:
-                    switch (Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)))) {
-                        case 2:
-                        case 3:
-                            self::tdesktop_read_bytearray($main);
-                            stream_get_contents($main, 4);
-                            self::tdesktop_read_bytearray($main);
-                            self::tdesktop_read_bytearray($main);
-                            break;
-                    }
-                    break;
-                case self::dbiConnectionType:
-                    stream_get_contents($main, 8);
-                    self::tdesktop_read_bytearray($main);
-                    stream_get_contents($main, 4);
-                    self::tdesktop_read_bytearray($main);
-                    self::tdesktop_read_bytearray($main);
-                    break;
-                case self::dbiThemeKey:
-                case self::dbiLangPackKey:
-                case self::dbiMutePeer:
-                    stream_get_contents($main, 8);
-                    break;
-                case self::dbiWindowPosition:
-                    stream_get_contents($main, 24);
-                    break;
-                case self::dbiLoggedPhoneNumber:
-                    self::tdesktop_read_bytearray($main);
-                    break;
-                case self::dbiMutedPeers:
-                    $length = Tools::unpackSignedInt(strrev(stream_get_contents($main, 4)));
-                    for ($x = 0; $x < $length; $x++) {
-                        stream_get_contents($main, 8);
-                    }
-                    // no break
-                case self::dbiDownloadPathOld:
-                    self::tdesktop_read_bytearray($main);
-                    break;
-                case self::dbiDialogLastPath:
-                    self::tdesktop_read_bytearray($main);
-                    break;
-                case self::dbiDownloadPath:
-                    self::tdesktop_read_bytearray($main);
-                    self::tdesktop_read_bytearray($main);
+                    $dc = self::tdesktopReadInt32($mtp, $offset);
+                    $auth_keys[$dc] = self::tdesktopRead($mtp, $offset, 256);
                     break;
                 default:
-                    throw new \Exception("Unknown type $magic");
-                    break;
+                    throw new Exception("Unknown block $block in the MTProto data!");
             }
         }
+        if ($authorization !== null) {
+            // main_account.cpp, Account::setMtpAuthorization
+            $auth_keys = [];
+            $offset = 0;
+            $user_id = self::tdesktopReadInt32($authorization, $offset);
+            $main_dc_id = self::tdesktopReadInt32($authorization, $offset);
+            if ($user_id === -1 && $main_dc_id === -1) {
+                // kWideIdsTag, followed by a 64-bit user ID
+                $user_id = unpack('J', self::tdesktopRead($authorization, $offset, 8))[1];
+                $main_dc_id = self::tdesktopReadInt32($authorization, $offset);
+            }
+            $count = self::tdesktopReadInt32($authorization, $offset);
+            for ($x = 0; $x < $count; $x++) {
+                $dc = self::tdesktopReadInt32($authorization, $offset);
+                $auth_keys[$dc] = self::tdesktopRead($authorization, $offset, 256);
+            }
+        }
+        if (!isset($auth_keys[$main_dc_id])) {
+            throw new Exception("No auth key for the main DC $main_dc_id in the Telegram Desktop session!");
+        }
 
-        return self::importAuthorization($auth_keys, $main_dc_id, $new_session, $settings);
+        return ['main_dc_id' => $main_dc_id, 'user_id' => $user_id, 'auth_keys' => $auth_keys];
+    }
+
+    /**
+     * File name of a key, as in tdesktop's ToFilePart: the first 8 bytes of the MD5 of the name, in hex, low nibble first.
+     *
+     * @psalm-pure
+     */
+    private static function tdesktopFilePart(string $name): string
+    {
+        return strtoupper(strrev(bin2hex(strrev(substr(md5($name, true), 0, 8)))));
+    }
+
+    /**
+     * Read a file as tdesktop's ReadFile does, returning its data or null if no valid copy exists.
+     */
+    private static function tdesktopReadFile(string $name): ?string
+    {
+        if (file_exists($name.'s')) {
+            $totry = [$name.'s'];
+        } else {
+            $totry = array_filter([$name.'0', $name.'1'], file_exists(...));
+            usort($totry, static fn (string $a, string $b): int => filemtime($b) <=> filemtime($a));
+        }
+        foreach ($totry as $file) {
+            $contents = file_get_contents($file);
+            if (\strlen($contents) < 24 || substr($contents, 0, 4) !== 'TDF$') {
+                Logger::log("Wrong magic in $file", Logger::ERROR);
+                continue;
+            }
+            $versionBytes = substr($contents, 4, 4);
+            Logger::log('TDesktop version: '.unpack('V', $versionBytes)[1]);
+            $data = substr($contents, 8, -16);
+            if (md5($data.pack('V', \strlen($data)).$versionBytes.'TDF$', true) !== substr($contents, -16)) {
+                Logger::log("Wrong MD5 in $file", Logger::ERROR);
+                continue;
+            }
+            return $data;
+        }
+        return null;
+    }
+
+    private static function tdesktopRead(string $data, int &$offset, int $length): string
+    {
+        if ($length < 0 || $offset + $length > \strlen($data)) {
+            throw new Exception('Unexpected end of Telegram Desktop data!');
+        }
+        $result = substr($data, $offset, $length);
+        $offset += $length;
+        return $result;
+    }
+
+    private static function tdesktopReadUint32(string $data, int &$offset): int
+    {
+        return unpack('N', self::tdesktopRead($data, $offset, 4))[1];
+    }
+
+    private static function tdesktopReadInt32(string $data, int &$offset): int
+    {
+        $value = self::tdesktopReadUint32($data, $offset);
+        return $value >= 0x80000000 ? $value - 0x100000000 : $value;
+    }
+
+    /**
+     * Read a QByteArray (a null one is empty).
+     */
+    private static function tdesktopReadByteArray(string $data, int &$offset): string
+    {
+        $length = self::tdesktopReadUint32($data, $offset);
+        return $length === 0xFFFFFFFF ? '' : self::tdesktopRead($data, $offset, $length);
+    }
+
+    /**
+     * Decrypt data encrypted with a local key, as tdesktop's DecryptLocal does.
+     */
+    private static function tdesktopDecrypt(string $encrypted, string $key): string
+    {
+        if (\strlen($encrypted) <= 16 || \strlen($encrypted) % 16) {
+            throw new Exception('Wrong length of Telegram Desktop encrypted data!');
+        }
+        $message_key = substr($encrypted, 0, 16);
+        [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $key, false);
+        $decrypted = Crypt::igeDecrypt(substr($encrypted, 16), $aes_key, $aes_iv);
+        if ($message_key !== substr(sha1($decrypted, true), 0, 16)) {
+            throw new SecurityException('msg_key mismatch: wrong passcode?');
+        }
+        $length = unpack('V', $decrypted)[1];
+        if ($length > \strlen($decrypted) || $length <= \strlen($decrypted) - 16 || $length < 4) {
+            throw new Exception('Wrong length of Telegram Desktop decrypted data!');
+        }
+        return substr($decrypted, 4, $length - 4);
+    }
+
+    /**
+     * Local key from a passcode, as tdesktop's CreateLocalKey does.
+     */
+    private static function tdesktopCreateLocalKey(string $passcode, string $salt): string
+    {
+        $hash = hash('sha512', $salt.$passcode.$salt, true);
+        return openssl_pbkdf2($hash, $salt, 256, $passcode === '' ? 1 : 100000, 'sha512');
+    }
+
+    private static function tdesktopUnwrapLocalKey(string $encrypted, string $wrapKey): string
+    {
+        $key = self::tdesktopDecrypt($encrypted, $wrapKey);
+        if (\strlen($key) !== 256) {
+            throw new Exception('Wrong length of the Telegram Desktop local key!');
+        }
+        return $key;
     }
 }

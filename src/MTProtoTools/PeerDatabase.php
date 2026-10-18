@@ -465,6 +465,54 @@ final class PeerDatabase implements TLCallback
             EventLoop::queue($lock->release(...));
         }
     }
+    /**
+     * Merge a partial user update into the cached user.
+     *
+     * @internal
+     *
+     * @param array $update updateUserStatus or updateUserEmojiStatus
+     */
+    private function addUserUpdate(array $update): void
+    {
+        [$key, $value] = match ($update['_']) {
+            'updateUserStatus' => ['status', $update['status']],
+            'updateUserEmojiStatus' => ['emoji_status', $update['emoji_status']['_'] === 'emojiStatusEmpty' ? null : $update['emoji_status']],
+        };
+        $id = $update['user_id'];
+        if ($id === ($this->API->authorization['user']['id'] ?? null)) {
+            $this->API->authorization['user'] = self::withField($this->API->authorization['user'], $key, $value);
+        }
+        if ($this->API->settings->getDb()->getEnablePeerInfoDb()) {
+            EventLoop::queue($this->processUserUpdate(...), $id, $key, $value);
+        }
+    }
+    private function processUserUpdate(int $id, string $key, ?array $value): void
+    {
+        // Queued after any user object received before the update: a user object still pending once the
+        // lock is held was received after the update and carries a newer value.
+        $lock = $this->mutex->acquire((string) $id);
+        try {
+            $user = $this->db[$id];
+            if ($user === null || ($user[$key] ?? null) == $value) {
+                return;
+            }
+            $this->db[$id] = self::withField($user, $key, $value);
+        } finally {
+            EventLoop::queue($lock->release(...));
+        }
+    }
+    /**
+     * @psalm-pure
+     */
+    private static function withField(array $user, string $key, ?array $value): array
+    {
+        if ($value === null) {
+            unset($user[$key]);
+        } else {
+            $user[$key] = $value;
+        }
+        return $user;
+    }
     public function addChatBlocking(int $chat): void
     {
         if (isset($this->pendingDb[$chat])) {
@@ -650,6 +698,7 @@ final class PeerDatabase implements TLCallback
         return array_merge(
             array_fill_keys(['chat', 'chatEmpty', 'chatForbidden', 'channel', 'channelEmpty', 'channelForbidden', 'community', 'communityForbidden'], [$this->addChat(...)]),
             array_fill_keys(['user', 'userEmpty'], [$this->addUser(...)]),
+            array_fill_keys(['updateUserStatus', 'updateUserEmojiStatus'], [$this->addUserUpdate(...)]),
             array_fill_keys(['chatFull', 'channelFull', 'userFull', 'communityFull'], [$this->addFullChat(...)]),
         );
     }
