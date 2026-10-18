@@ -504,6 +504,31 @@ class RichMessageTest extends TestCase
         $this->assertSame($mtproto, $this->convert(new RichMessage($output['blocks'])));
     }
 
+    /**
+     * Blocks and texts that can't be represented are dropped when sending a received rich message again.
+     */
+    public function testRoundTripUnrepresentable(): void
+    {
+        $output = self::output(['_' => 'richMessage', 'blocks' => [
+            ['_' => 'pageBlockTitle', 'text' => ['_' => 'textPlain', 'text' => 'iv']],
+            ['_' => 'pageBlockUnsupported'],
+            ['_' => 'pageBlockPhoto', 'photo_id' => 404, 'caption' => ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']]],
+            ['_' => 'pageBlockParagraph', 'text' => ['_' => 'textTonAddress', 'text' => ['_' => 'textPlain', 'text' => 'UQ']]],
+        ], 'photos' => [], 'documents' => []]);
+        $this->assertSame(
+            ['_' => 'inputRichMessage', 'rtl' => false, 'noautolink' => false, 'blocks' => [['_' => 'pageBlockParagraph', 'text' => ['_' => 'textPlain', 'text' => 'UQ']]]],
+            $this->convert(new RichMessage($output['blocks'])),
+        );
+
+        // Media that can't be wrapped
+        $output = OutputConverter::convert(
+            ['_' => 'richMessage', 'blocks' => [['_' => 'pageBlockPhoto', 'photo_id' => 1, 'caption' => ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']]]], 'photos' => [['_' => 'photo', 'id' => 1]], 'documents' => []],
+            static fn (): mixed => null,
+            static fn (int $id): array => ['id' => $id],
+        );
+        $this->assertSame([['type' => 'unknown']], $output['blocks']);
+    }
+
     public function testGetText(): void
     {
         $message = new RichMessage([

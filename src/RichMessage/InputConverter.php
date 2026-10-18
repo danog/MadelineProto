@@ -179,7 +179,12 @@ final class InputConverter
         if (!\is_array($blocks) || !array_is_list($blocks)) {
             throw new Exception('Expected an array of InputRichBlock');
         }
-        return array_map($this->block(...), $blocks);
+        // Blocks of received rich messages that can't be represented (and so can't be sent again)
+        $blocks = array_filter(
+            $blocks,
+            static fn (mixed $block): bool => !\is_array($block) || !\in_array($block['type'] ?? null, ['unknown', 'unsupported'], true),
+        );
+        return array_map($this->block(...), array_values($blocks));
     }
 
     private function block(mixed $block): array
@@ -628,7 +633,7 @@ final class InputConverter
             'marked' => ['_' => 'textMarked', 'text' => $inner()],
             'date_time' => $this->date($text, $inner()),
             // Detected by the server unless skip_entity_detection is set, like for the Bot API
-            'mention', 'hashtag', 'cashtag', 'bot_command', 'bank_card_number' => $inner(),
+            'mention', 'hashtag', 'cashtag', 'bot_command', 'bank_card_number', 'ton_address' => $inner(),
             'text_mention' => $this->mentionName($text, $inner()),
             'url' => ['_' => 'textUrl', 'text' => $inner(), 'url' => (string) ($text['url'] ?? throw new Exception('The URL of the url rich text must be specified')), 'webpage_id' => 0],
             'email_address' => ['_' => 'textEmail', 'text' => $inner(), 'email' => (string) ($text['email_address'] ?? throw new Exception('The email address of the email_address rich text must be specified'))],
