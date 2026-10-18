@@ -310,19 +310,31 @@ final class API extends AbstractAPI
         }
         $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
 
-        try {
-            [$unserialized, $this->unlock] = async(
-                Serialization::unserialize(...),
-                $this->session,
-                $settings,
-                $forceFull
-            )->await(Tools::getTimeoutCancellation(30.0, "Timeout during session unserialization!"));
-        } catch (CancelledException $e) {
-            if (!$e->getPrevious() instanceof TimeoutException) {
-                throw $e;
+        $future = async(
+            Serialization::unserialize(...),
+            $this->session,
+            $settings,
+            $forceFull
+        );
+        while (true) {
+            try {
+                [$unserialized, $this->unlock] = $future->await(Tools::getTimeoutCancellation(30.0, "Timeout during session unserialization!"));
+                break;
+            } catch (CancelledException $e) {
+                if (!$e->getPrevious() instanceof TimeoutException) {
+                    throw $e;
+                }
+                // The lock holder is alive (a lock dies with its process): it's loading the session, which
+                // can take a while with a big database, and serves it once it's done, or it's shutting down
+                // to let us in. Either way, giving up now would fail a startup that is going well.
+                if (Serialization::isLockedByAnotherProcess($this->session)) {
+                    Logger::log('The session is still locked by another process (loading or releasing it), waiting...');
+                    continue;
+                }
+                $future->ignore();
+                [$unserialized, $this->unlock] = [0, null];
+                break;
             }
-
-            [$unserialized, $this->unlock] = [0, null];
         }
 
         if ($unserialized === 0) {

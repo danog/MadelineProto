@@ -30,11 +30,12 @@ use function Amp\Future\await;
 
 /**
  * Starting the IPC server of a session from several clients at once (a web server receiving several requests after
- * a restart, for example).
+ * a restart, for example), or while the session takes long to load.
  *
  * Every client that gets the session lock starts a worker, which then waits for the lock: only one of them gets it.
  * The others used to time out after 30 seconds, and to report "Could not connect to MadelineProto, please enable
- * proc_open..." as their startup error, which reached the clients waiting for them.
+ * proc_open..." as their startup error, which reached the clients waiting for them; and a client gave up after
+ * 30 seconds even while the session was still being loaded by its server.
  *
  * Uses a new session (API_ID and API_HASH only).
  *
@@ -94,6 +95,26 @@ final class IpcStartupTest extends TestCase
 
         // And the clients still use the server that won
         $this->runClients(1);
+        self::assertCount(1, $this->workers());
+    }
+
+    public function testClientWaitsForASessionThatTakesLongToLoad(): void
+    {
+        $this->runClients(1);
+        $this->killWorkers();
+
+        // Locked by a server loading the session for longer than the 30 seconds clients used to wait
+        $lock = fopen((new SessionPaths($this->session))->getLockPath(), 'c');
+        self::assertTrue(flock($lock, LOCK_EX));
+        try {
+            $client = async($this->runClients(...), 1);
+            delay(40);
+            self::assertFalse($client->isComplete(), 'The client did not wait for the session to be loaded');
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+        $client->await();
         self::assertCount(1, $this->workers());
     }
 
