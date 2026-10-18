@@ -6,6 +6,10 @@
  * A lite version of tweb's `lib/langPack.ts`: the same `i18n` / `I18n.format` / `superFormatter`, over
  * the English strings of `src/lang.ts` (seeded synchronously, no language packs to download), and the
  * country list of `src/countries.ts`.
+ *
+ * Adapted for MadelineProto: the strings come in the page, in the language of the session (applyStrings():
+ * MadelineProto translates them in its langs/*.json, as tweb.<key>), with src/lang.ts as the English fallback;
+ * the names of the countries are the browser's, in that language (Intl.DisplayNames).
  */
 
 import Countries from '@/countries';
@@ -20,6 +24,37 @@ export type FormatterArguments = FormatterArgument[];
 namespace I18n {
   export const strings: Map<string, string> = new Map(Object.entries(lang));
   export const countriesList: HelpCountry[] = Countries.countries;
+
+  /** Apply the strings of the page (the language of the session), and name the countries in that language. */
+  export function applyStrings(record: Record<string, unknown>, langCode?: string) {
+    for(const [key, value] of Object.entries(record)) {
+      if(typeof value === 'string') {
+        strings.set(key, value);
+      }
+    }
+    if(langCode && langCode !== 'en') {
+      localizeCountries(langCode);
+    }
+  }
+
+  function localizeCountries(langCode: string) {
+    let names: Intl.DisplayNames;
+    try {
+      names = new Intl.DisplayNames([langCode], {type: 'region', fallback: 'none'});
+    } catch(err) {
+      // an engine without the language: tweb's English names
+      return;
+    }
+    for(const country of countriesList) {
+      try {
+        // the virtual countries (anonymous numbers, satellite networks) have no name: their English one
+        const name = names.of(country.iso2);
+        if(name) {
+          country.name = name;
+        }
+      } catch(err) {}
+    }
+  }
 
   function pushNextArgument(out: ReturnType<typeof superFormatter>, args: FormatterArguments, indexHolder: {i: number}, i?: number) {
     const arg = args[i === undefined ? indexHolder.i++ : i];

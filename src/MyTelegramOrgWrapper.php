@@ -233,11 +233,18 @@ final class MyTelegramOrgWrapper
             $this->creation_hash = $matches[1];
             return null;
         }
+        // The first number after the label of the API ID, and the first 32 hex digits after the label of the hash:
+        // the markup changes (a <strong> in a form, then a <span class="vv"> with the hash masked, its value in a
+        // data-value attribute)
         if ($title === 'App configuration'
-            && preg_match('~App api_id:</label>.*?<strong>\s*(\d+)\s*</strong>~s', $page, $id)
-            && preg_match('~App api_hash:</label>.*?<span[^>]*>\s*([a-f0-9]{32})\s*</span>~s', $page, $hash)
+            && preg_match('~App api_id\b.*?\b(\d{3,})\b~s', $page, $id)
+            && preg_match('~App api_hash\b.*?\b([a-f0-9]{32})\b~s', $page, $hash)
         ) {
             return ['api_id' => (int) $id[1], 'api_hash' => $hash[1]];
+        }
+        if ($title === 'App configuration') {
+            // Logged in, with an app: its page changed again
+            throw new Exception('Could not find the API ID and hash in the page of the app on my.telegram.org');
         }
         // Most likely, the login expired
         $this->logged = false;

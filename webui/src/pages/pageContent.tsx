@@ -1,7 +1,7 @@
 // What every card shows of the page the server sent, in tweb's style: its texts (trusted markup or
 // plain text), its error, and its notices (missing extensions, an update...).
 
-import {For, JSX, Show} from 'solid-js';
+import {For, JSX, Show, createMemo, createSignal} from 'solid-js';
 
 import I18n, {i18n} from '@lib/langPack';
 import type {Alert, Page, Text} from '@/types';
@@ -95,28 +95,60 @@ function NoticeIcon(props: {level: Alert['level']}): JSX.Element {
   );
 }
 
-/** Warnings and information of the server (a missing extension, a new version), under the header. */
-export function PageNotices(props: {alerts: Alert[], errors?: boolean}): JSX.Element {
-  const alerts = () => props.alerts.filter((alert) => props.errors || alert.level !== 'error');
+function Notice(props: {alert: Alert, pager?: JSX.Element}): JSX.Element {
   return (
-    <Show when={alerts().length}>
+    <div class={styles.notice} classList={{[styles[props.alert.level]]: true}} role={props.alert.level === 'error' ? 'alert' : 'status'}>
+      <NoticeIcon level={props.alert.level} />
+      <div class={styles.noticeBody}>
+        <Show when={!isEmptyText(props.alert.title)}>
+          <div class={styles.noticeTitle}><RichText text={props.alert.title} /></div>
+        </Show>
+        <RichText text={props.alert.message} />
+        <Show when={!isEmptyText(props.alert.code)}>
+          <pre class={styles.noticeCode}><RichText text={props.alert.code} /></pre>
+        </Show>
+      </div>
+      {props.pager}
+    </div>
+  );
+}
+
+/**
+ * Warnings and information of the server (a missing extension, a new version), under the header: the errors
+ * one under the other (they are what to act on), the rest in a single notice, one at a time ("1/3 >").
+ */
+export function PageNotices(props: {alerts: Alert[], errors?: boolean}): JSX.Element {
+  const errors = () => props.errors ? props.alerts.filter((alert) => alert.level === 'error') : [];
+  const others = () => props.alerts.filter((alert) => alert.level !== 'error');
+  const [index, setIndex] = createSignal(0);
+  const current = createMemo(() => others()[index() % Math.max(others().length, 1)]);
+
+  return (
+    <Show when={errors().length || others().length}>
       <div class={styles.notices}>
-        <For each={alerts()}>
-          {(alert) => (
-            <div class={styles.notice} classList={{[styles[alert.level]]: true}} role={alert.level === 'error' ? 'alert' : 'status'}>
-              <NoticeIcon level={alert.level} />
-              <div class={styles.noticeBody}>
-                <Show when={!isEmptyText(alert.title)}>
-                  <div class={styles.noticeTitle}><RichText text={alert.title} /></div>
-                </Show>
-                <RichText text={alert.message} />
-                <Show when={!isEmptyText(alert.code)}>
-                  <pre class={styles.noticeCode}><RichText text={alert.code} /></pre>
-                </Show>
-              </div>
-            </div>
-          )}
+        <For each={errors()}>
+          {(alert) => <Notice alert={alert} />}
         </For>
+        <Show when={current()} keyed>
+          {(alert) => (
+            <Notice
+              alert={alert}
+              pager={
+                <Show when={others().length > 1}>
+                  <button
+                    type="button"
+                    class={styles.noticePager}
+                    aria-label={I18n.format('Login.Next', true).replace(/\s*>$/, '')}
+                    onClick={() => setIndex((index() + 1) % others().length)}
+                  >
+                    {(index() % others().length) + 1}/{others().length}
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5l4.5 4.5L6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                  </button>
+                </Show>
+              }
+            />
+          )}
+        </Show>
       </div>
     </Show>
   );
