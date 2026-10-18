@@ -47,7 +47,7 @@ foreach (new RecursiveIteratorIterator(
     $f = realpath($f);
     $f = substr($f, strlen(realpath(__DIR__.'/../src/'))+1);
     if (str_ends_with($f, '.php')) {
-        if ($f === 'polyfill.php' || basename($f) === 'entry.php') {
+        if ($f === 'polyfill.php' || basename($f) === 'entry.php' || $f === 'polyfill_phpseclib3.php') {
             continue;
         }
         $f = str_replace(['/', '.php', 'src\\'], ['\\', '', ''], $f);
