@@ -22,6 +22,7 @@ use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Http\Client\Connection\DefaultConnectionFactory;
 use Amp\Http\Client\Connection\UnlimitedConnectionPool;
@@ -191,7 +192,18 @@ final class Connector
             return $this->connectWaiting(null);
         }
         // Connect as soon as any server is listening, even if it was started by another process
-        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session), waitStartup: true);
+        $stopMonitor = new DeferredCancellation;
+        $monitor = Server::startMe($this->session, $stopMonitor->getCancellation());
+        try {
+            [$server] = Serialization::tryConnect($this->session->getIpcPath(), $monitor, waitStartup: true);
+        } finally {
+            // See Serialization::unserialize()
+            $stopMonitor->cancel();
+            try {
+                $monitor->await();
+            } catch (Throwable) {
+            }
+        }
         if (!$server instanceof ChannelledSocket) {
             throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
         }
