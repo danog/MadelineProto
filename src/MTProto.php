@@ -1870,7 +1870,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return WebUI::render($this->settings->getTemplates(), $page);
     }
     /**
-     * Get various warnings to show to the user in the web UI.
+     * Get various warnings to show to the user in the web UI, as alerts.
+     *
+     * @internal
      *
      * @return list<Alert>
      */
@@ -1900,7 +1902,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $alerts;
     }
     /**
-     * Get various warnings to show to the user in the web UI, as HTML.
+     * Get various warnings to show to the user in the web UI.
      */
     public static function getWebWarnings(): string
     {
