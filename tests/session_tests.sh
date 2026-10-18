@@ -9,14 +9,16 @@
 # after the other, with testing.madeline.
 
 # Each lane: the classes, and the authorizations of its main session (MadelineTestCase) and of the template of the
-# sessions of its child processes (RESUME_CYCLE_SESSION), or - without sessions of the bot. Authorization 0 is the one of
-# the phar build, 11 and 12 are the ones of the lane of the classes that aren't in one.
+# sessions of its child processes (RESUME_CYCLE_SESSION), or - without sessions of the bot. They can be the same if they
+# are never used at once: ResumableStreamTest has no child processes, and the ones of EventHandlerStartTest run once
+# the worker of the session of FileIdTest stopped. Authorization 0 is the one of the phar build, 9 the one of the lane of
+# the classes that aren't in one.
 lanes=(
-    "ResumableStreamTest:1:2"
-    "FileIdTest EventHandlerStartTest:3:4"
-    "ResumeCycleTest:5:6"
-    "ResumeCycleUploadTest:7:8"
-    "ResumeCycleEncryptedUploadTest:9:10"
+    "ResumableStreamTest:1:1"
+    "FileIdTest EventHandlerStartTest:2:2"
+    "ResumeCycleTest:3:4"
+    "ResumeCycleUploadTest:5:6"
+    "ResumeCycleEncryptedUploadTest:7:8"
     # The two user accounts, without the bot.
     "CallResumeTest SecretChatResumeTest:-:-"
 )
@@ -81,7 +83,7 @@ run_lane()
 }
 
 if [ -n "$extra" ]; then
-    lanes+=("$extra:11:12")
+    lanes+=("$extra:9:9")
 fi
 
 failed=0
