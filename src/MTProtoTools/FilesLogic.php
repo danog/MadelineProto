@@ -24,6 +24,9 @@ use Amp\ByteStream\StreamException;
 use Amp\ByteStream\WritableResourceStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
+use Amp\CancelledException;
+use Amp\CompositeCancellation;
+use Amp\DeferredCancellation;
 use Amp\File\File;
 use Amp\File\Whence;
 use Amp\Http\HttpStatus;
@@ -139,7 +142,38 @@ trait FilesLogic
                 ob_implicit_flush();
             }
             [$start, $end] = $result->getServeRange();
-            $this->downloadToStream($messageMedia, getOutputBufferStream(), $cb, $start, $end, $cancellation);
+            // PHP only notices that the client went away when output fails to be sent:
+            // flush after each chunk, and stop the download (in the IPC worker, too) once the client is gone.
+            $aborted = new DeferredCancellation;
+            $output = getOutputBufferStream();
+            $callable = static function (string $payload) use ($output, $aborted): int {
+                $aborted->getCancellation()->throwIfRequested();
+                $output->write($payload);
+                flush();
+                if (connection_aborted()) {
+                    $aborted->cancel();
+                }
+                return \strlen($payload);
+            };
+            try {
+                $this->downloadToCallable(
+                    $messageMedia,
+                    $callable,
+                    $cb,
+                    false,
+                    $start,
+                    $end,
+                    null,
+                    $cancellation === null
+                        ? $aborted->getCancellation()
+                        : new CompositeCancellation($cancellation, $aborted->getCancellation()),
+                );
+            } catch (CancelledException $e) {
+                if (!$aborted->isCancelled()) {
+                    throw $e;
+                }
+                $this->logger->logger('The client closed the connection, stopped downloadToBrowser', Logger::NOTICE);
+            }
         }
     }
     /**
