@@ -22,6 +22,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -321,10 +322,11 @@ trait UpdateHandler
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params       Params: once the timeout expires, an empty array is returned
+     * @param  ?Cancellation                                     $cancellation Cancellation: once cancelled, the wait stops with a CancelledException
      * @return list<array{update_id: mixed, update: mixed}>
      */
-    public function getUpdates(array $params = []): array
+    public function getUpdates(array $params = [], ?Cancellation $cancellation = null): array
     {
         if ($this->usingGetUpdates) {
             throw new AssertionError("Concurrent getUpdates detected, aborting!");
@@ -364,14 +366,19 @@ trait UpdateHandler
                 $id = EventLoop::delay($timeout, static fn () => $deferred->cancel(self::$getUpdatesTimeout));
                 $timeout = $deferred->getCancellation();
             }
+            $wait = $timeout !== null && $cancellation !== null
+                ? new CompositeCancellation($timeout, $cancellation)
+                : $timeout ?? $cancellation;
 
             do {
                 if (!$this->getUpdatesQueue->count()) {
                     try {
                         $this->update_deferred = new DeferredFuture();
-                        $this->update_deferred->getFuture()->await($timeout);
+                        $this->update_deferred->getFuture()->await($wait);
                     } catch (CancelledException $e) {
-                        if (!$e->getPrevious() instanceof TimeoutException) {
+                        // Only our own timeout returns what was received so far: a cancellation of the caller
+                        // (even one by a TimeoutCancellation of its own) is thrown.
+                        if ($cancellation?->isRequested() || !$timeout?->isRequested()) {
                             throw $e;
                         }
                     }

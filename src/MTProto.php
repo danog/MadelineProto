@@ -691,6 +691,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
+        $this->datacenter->applySettings();
         // Load rsa keys
         $this->rsaKeys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
@@ -1294,6 +1295,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             } else {
                 Lang::$currentPercentage = 0;
             }
+            // Apply the connection settings changed before the session was saved
+            $this->datacenter->applySettings();
             // Reset MTProto session (not related to user session)
             $this->resetMTProtoSession("wakeup");
             // Update settings from constructor
