@@ -43,7 +43,8 @@ final class PublisherTest extends TestCase
             $loaded->publish(2);
             delay(0.01);
             $this->assertSame(2, $loaded->getState());
-            $this->assertSame([], (fn () => iterator_to_array($this->subscribers))->call($loaded));
+            $this->assertSame([], (fn () => $this->waiters)->call($loaded));
+            $this->assertCount(0, (fn () => $this->subscribers)->call($loaded));
         } finally {
             gc_enable();
         }
@@ -90,7 +91,7 @@ final class PublisherTest extends TestCase
         }
         gc_disable();
         try {
-            $this->assertCount(0, (fn () => $this->subscribers)->call($publisher));
+            $this->assertSame([], (fn () => $this->waiters)->call($publisher));
         } finally {
             gc_enable();
         }

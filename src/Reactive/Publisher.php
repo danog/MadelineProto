@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Reactive;
 
 use Amp\Cancellation;
+use Amp\DeferredFuture;
 use WeakMap;
 use Webmozart\Assert\Assert;
 
@@ -32,6 +33,13 @@ final class Publisher
     /** @var WeakMap<BaseSubscriber<T>, Subscriber<T>> */
     private WeakMap $subscribers;
     private bool $wokeup = false;
+    /**
+     * Fibers waiting for a state (waitForState()): never serialized, a wait can't survive a restart.
+     *
+     * @var array<int, list{T, DeferredFuture<null>}>
+     */
+    private array $waiters = [];
+    private int $waiterId = 0;
     /**
      * @param T $state
      *
@@ -71,7 +79,8 @@ final class Publisher
         /** @var WeakMap<BaseSubscriber<T>, Subscriber<T>>  */
         $this->subscribers = new WeakMap;
         foreach ($data['subscribers'] as [$subscriber, $v]) {
-            // Saved by versions that serialized the waiters (up to 8.8.9), without their state.
+            // The waiters (AsyncWaiter) saved by the versions up to 8.8.9, without their state: a wait can't survive a
+            // restart.
             if ($subscriber instanceof EphemeralSubscriber) {
                 continue;
             }
@@ -119,6 +128,13 @@ final class Publisher
             $prev = $this->state;
             $this->state = $state;
             $this->wokeup = true;
+            foreach ($this->waiters as $id => [$waitFor, $deferred]) {
+                if ($state === $waitFor) {
+                    // Completed once: removed even before the waiting fiber resumes.
+                    unset($this->waiters[$id]);
+                    $deferred->complete();
+                }
+            }
             foreach ($this->subscribers as $subscriber) {
                 $subscriber->onStateChange($prev, $state);
             }
@@ -131,13 +147,13 @@ final class Publisher
         if ($state === $this->state) {
             return;
         }
-        $waiter = new AsyncWaiter($state);
-        $this->subscribe($waiter);
+        $id = $this->waiterId++;
+        $deferred = new DeferredFuture;
+        $this->waiters[$id] = [$state, $deferred];
         try {
-            $waiter->wait($cancellation);
+            $deferred->getFuture()->await($cancellation);
         } finally {
-            // Otherwise it stays subscribed until a GC cycle frees it (its actor, the value of its entry, references it).
-            $this->unsubscribe($waiter);
+            unset($this->waiters[$id]);
         }
     }
 }
