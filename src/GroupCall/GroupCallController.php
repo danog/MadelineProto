@@ -161,6 +161,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             $this->API->setupLogger();
         }
         $this->diskJockey ??= new DjLoop($this);
+        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
+        $this->resumePending = true;
+        if (!$this->isInUse()) {
+            // Dropped by MTProto::wakeup() (see forgetIfUnjoined()): start nothing.
+            return;
+        }
         Assert::true($this->diskJockey->start());
         if ($this->presentationDj !== null) {
             Assert::true($this->presentationDj->start());
@@ -168,8 +174,37 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->silentDj !== null) {
             Assert::true($this->silentDj->start());
         }
-        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
-        $this->resumePending = true;
+    }
+
+    /**
+     * Whether we are in the call (or joining it), or publishing to its RTMP livestream: the only
+     * group calls a session keeps across restarts.
+     *
+     * @psalm-mutation-free
+     */
+    private function isInUse(): bool
+    {
+        return $this->callState === GroupCallState::JOINED
+            || $this->callState === GroupCallState::JOINING
+            || $this->publishing;
+    }
+
+    /**
+     * Stop tracking the call if we are not in it, without making any request, see
+     * {@see \danog\MadelineProto\GroupCall\Handler::dropUnjoinedGroupCalls()}.
+     *
+     * @internal
+     *
+     * @return bool Whether the call is no longer tracked.
+     */
+    public function forgetIfUnjoined(): bool
+    {
+        if ($this->isInUse()) {
+            return false;
+        }
+        $this->cleanup();
+        $this->API->cleanupGroupCall($this->public->id);
+        return true;
     }
 
     /**

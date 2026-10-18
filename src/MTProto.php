@@ -52,7 +52,6 @@ use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -898,6 +897,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'calls',
             'callsByPeer',
             'groupCalls',
+            'seenGroupCalls',
             'conferenceCalls',
             'snitch',
 
@@ -1333,6 +1333,18 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
             $this->loginState->wakeup();
 
+            // Before anything can use the restored calls (the updates the loops started below fetch, the
+            // onStart of the event handler), drop the ones this session is not in, without requests: the
+            // incoming calls it never answered (they may have been answered by another session of the
+            // account) and the group calls it did not join (older versions tracked every group call it
+            // got updates about). The private calls whose end we may have missed expire later.
+            $ringTimeout = intdiv((int) ($this->config['call_ring_timeout_ms'] ?? 90000), 1000);
+            $receiveTimeout = intdiv((int) ($this->config['call_receive_timeout_ms'] ?? 20000), 1000);
+            foreach ($this->calls as $call) {
+                $call->expireAfterRestart($ringTimeout, $receiveTimeout);
+            }
+            $this->dropUnjoinedGroupCalls();
+
             // Connect to all DCs, start internal loops
             $loggedIn = false;
             if ($this->fullGetSelf()) {
@@ -1375,11 +1387,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 }
             }
 
-            foreach ($this->groupCalls as $id => $groupCall) {
-                if ($groupCall->getCallState() === GroupCallState::LEFT) {
-                    $this->cleanupGroupCall($id);
-                }
-            }
         } catch (Throwable $e) {
             try {
                 $this->report((string) $e);
