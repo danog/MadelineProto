@@ -27,6 +27,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\ChatAdminRequiredError;
@@ -212,7 +213,7 @@ trait PeerHandler
                     return $id['community_id'];
                 case 'inputUserSelf':
                 case 'inputPeerSelf':
-                    return $this->authorization['user']['id'];
+                    return $this->getSelfId();
                 case 'user':
                 case 'userFull':
                     return $id['id'];
@@ -239,7 +240,7 @@ trait PeerHandler
                         // It's a channel/chat, 100% what we need
                         || $id['peer_id'] < 0
                         // It is a user, and it's not ourselves
-                        || $id['peer_id'] !== $this->authorization['user']['id']
+                        || $id['peer_id'] !== $this->getSelfId()
                     ) {
                         return $id['peer_id'];
                     }
@@ -411,7 +412,7 @@ trait PeerHandler
                     if (DialogId::isSupergroupOrChannelOrMonoforum($id)) {
                         $this->peerDatabase->addChatBlocking($id);
                     } elseif ($id < 0) {
-                        $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id]]);
+                        $this->methodCallAsyncRead('messages.getChats', ['id' => [-$id], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                     } else {
                         $this->peerDatabase->addUserBlocking($id);
                     }
@@ -436,9 +437,9 @@ trait PeerHandler
                 $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                 try {
                     if ($id < 0) {
-                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                     } else {
-                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                     }
                 } catch (Exception $e) {
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
@@ -458,7 +459,7 @@ trait PeerHandler
         if ($r = Tools::parseLink($id)) {
             [$invite, $content] = $r;
             if ($invite) {
-                $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
+                $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 if (isset($invite['chat'])) {
                     return $this->getInfo($invite['chat'], $type);
                 }
@@ -470,11 +471,11 @@ trait PeerHandler
         if (\is_string($id)) {
             $id = strtolower(str_replace('@', '', $id));
             if ($id === 'me') {
-                return $this->getInfo($this->authorization['user']['id'], $type);
+                return $this->getInfo($this->getSelfId(), $type);
             }
             if ($id === 'support') {
                 if (!$this->supportUser) {
-                    $this->methodCallAsyncRead('help.getSupport', []);
+                    $this->methodCallAsyncRead('help.getSupport', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 }
                 return $this->getInfo($this->supportUser, $type);
             }
@@ -612,7 +613,7 @@ trait PeerHandler
                 if ($r = Tools::parseLink($id)) {
                     [$invite, $content] = $r;
                     if ($invite) {
-                        $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content]);
+                        $invite = $this->methodCallAsyncRead('messages.checkChatInvite', ['hash' => $content, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                         if (isset($invite['chat'])) {
                             continue;
                         }
@@ -624,9 +625,9 @@ trait PeerHandler
                 if (\is_string($id)) {
                     $id = strtolower(str_replace('@', '', $id));
                     if ($id === 'me') {
-                        $id = $this->authorization['user']['id'];
+                        $id = $this->getSelfId();
                     } elseif ($id === 'support') {
-                        $this->methodCallAsyncRead('help.getSupport', []);
+                        $this->methodCallAsyncRead('help.getSupport', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                         continue;
                     } else {
                         $id = $this->peerDatabase->resolveUsername($id);
@@ -656,13 +657,13 @@ trait PeerHandler
             }
         }
         if ($supergroups) {
-            $this->methodCallAsyncRead('channels.getChannels', ['id' => $supergroups]);
+            $this->methodCallAsyncRead('channels.getChannels', ['id' => $supergroups, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         }
         if ($chats) {
-            $this->methodCallAsyncRead('messages.getChats', ['id' => $chats]);
+            $this->methodCallAsyncRead('messages.getChats', ['id' => $chats, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         }
         if ($users) {
-            $this->methodCallAsyncRead('users.getUsers', ['id' => $users]);
+            $this->methodCallAsyncRead('users.getUsers', ['id' => $users, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         }
     }
     /**
@@ -693,15 +694,15 @@ trait PeerHandler
         switch ($partial['type']) {
             case 'user':
             case 'bot':
-                $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['bot_api_id']]);
+                $this->methodCallAsyncRead('users.getFullUser', ['id' => $partial['bot_api_id'], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 break;
             case 'chat':
-                $this->methodCallAsyncRead('messages.getFullChat', $partial);
+                $this->methodCallAsyncRead('messages.getFullChat', $partial + ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 break;
             case 'channel':
             case 'community':
             case 'supergroup':
-                $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['bot_api_id']]);
+                $this->methodCallAsyncRead('channels.getFullChannel', ['channel' => $partial['bot_api_id'], 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 break;
             default:
                 throw new Exception('Invalid peer type '.$partial['type']);

@@ -51,8 +51,41 @@ trait CallHandler
             'method',
             $method,
             $args,
-            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+            function (array $args) use ($method, $datacenter) {
+                // Not saved with the arguments of the call: a resumed call goes through the current business connection.
+                $datacenter = $this->businessCall($method, $args) ?? $datacenter;
+                return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args);
+            },
         );
+    }
+    /**
+     * When logged in through a business connection, make every call on behalf of its user, like a user session.
+     *
+     * Calls are wrapped in invokeWithBusinessConnection and sent to the DC of the connection, which is returned:
+     * the ones Telegram doesn't allow through a business connection fail, as they can't be made as the user.
+     * Methods taking the connection as their business_connection_id parameter get it instead.
+     * Only calls of MadelineProto's own session mechanics (with a special method type) are made as the bot.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     */
+    private function businessCall(string $method, array &$args): ?int
+    {
+        $connection = $this->businessConnection;
+        if ($connection === null || isset($args['specialMethodType'])) {
+            return null;
+        }
+        if (isset($args['businessConnectionId'])) {
+            return $args['businessConnectionId'] === $connection->id ? $connection->dcId : null;
+        }
+        foreach (($this->TL->getMethods()->findByMethod($method) ?: [])['params'] ?? [] as $param) {
+            if ($param['name'] === 'business_connection_id') {
+                $args['business_connection_id'] ??= $connection->id;
+                return null;
+            }
+        }
+        $args['businessConnectionId'] = $connection->id;
+        return $connection->dcId;
     }
     /**
      * Call method and make sure it is asynchronously sent.
@@ -64,6 +97,7 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array $args, ?int $datacenter = null): WrappedFuture
     {
+        $datacenter = $this->businessCall($method, $args) ?? $datacenter;
         return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
     }
 }

@@ -31,6 +31,7 @@ use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto\BusinessConnection;
 use danog\MadelineProto\MTProto\ConnectionState;
 use danog\MadelineProto\MTProto\LoginState;
 use danog\MadelineProto\MTProto\SpecialMethodType;
@@ -79,6 +80,77 @@ trait Login
         );
         $this->authFuture?->await();
         return $res;
+    }
+
+    /**
+     * Login as a user, through a business bot connected to their account.
+     *
+     * The session logs in as the bot, and behaves like a session of the user who connected it
+     * (see https://core.telegram.org/api/bots/connected-business-bots):
+     * getSelf returns the user, the messages of the user's chats managed by the bot are received as new, edited and
+     * deleted messages (the bot's own updates are not received), and all methods are called on behalf of the user,
+     * through the business connection.
+     * Methods Telegram doesn't allow through a business connection, or outside the rights and chats the user gave
+     * the bot, fail.
+     *
+     * @param string $token        Bot token
+     * @param string $connectionId ID of the business connection (the business_connection_id of the Bot API)
+     */
+    public function businessConnectionLogin(string $token, string $connectionId): array
+    {
+        if ($this->businessConnection !== null) {
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
+        }
+        if ($this->loginState->getState()->state === API::LOGGED_IN) {
+            // Already logged in as this bot.
+            if (!$this->authorization['user']['bot'] || (string) $this->authorization['user']['id'] !== explode(':', $token, 2)[0]) {
+                throw new Exception(Lang::$current_lang['already_loggedIn']);
+            }
+        } else {
+            $this->botLogin($token);
+        }
+        $connection = null;
+        foreach ($this->extractUpdates($this->methodCallAsyncRead('account.getBotBusinessConnection', ['connection_id' => $connectionId, 'specialMethodType' => SpecialMethodType::SESSION_RELATED])) as $update) {
+            if ($update['_'] === 'updateBotBusinessConnect') {
+                $connection = $update['connection'];
+            }
+        }
+        if ($connection === null) {
+            throw new Exception("Could not find the business connection $connectionId!");
+        }
+        if ($connection['disabled'] ?? false) {
+            throw new Exception("The business connection $connectionId is disabled!");
+        }
+        $this->businessConnection = BusinessConnection::fromConnection(
+            $connection,
+            $this->isTestMode(),
+            $this->getInfo($connection['user_id'])['User'],
+        );
+        $this->logger->logger("Logged in as {$connection['user_id']} through the business connection $connectionId", Logger::NOTICE);
+        $this->serialize();
+        return $this->businessConnection->user;
+    }
+    /**
+     * Apply a change of a business connection of the bot.
+     *
+     * @internal
+     *
+     * @param array $connection botBusinessConnection constructor
+     */
+    public function updateBusinessConnection(array $connection): void
+    {
+        $current = $this->businessConnection;
+        if ($current === null || $connection['user_id'] !== $current->userId) {
+            return;
+        }
+        if ($connection['connection_id'] !== $current->id) {
+            // A connection whose ID is no longer valid is replaced by a new one.
+            $this->logger->logger("The business connection {$current->id} was replaced by {$connection['connection_id']}", Logger::NOTICE);
+        }
+        if ($connection['disabled'] ?? false) {
+            $this->logger->logger("The business connection {$connection['connection_id']} was disabled by the user, calls on its behalf will fail until the bot is connected again", Logger::WARNING);
+        }
+        $this->businessConnection = BusinessConnection::fromConnection($connection, $this->isTestMode(), $current->user);
     }
 
     private ?DeferredCancellation $qrLoginDeferred = null;
@@ -162,9 +234,10 @@ trait Login
     public function logout(): void
     {
         if ($this->loginState->getState()->state === API::LOGGED_IN) {
-            $this->methodCallAsyncRead('auth.logOut', []);
+            $this->methodCallAsyncRead('auth.logOut', ['specialMethodType' => SpecialMethodType::SESSION_RELATED]);
         }
         $this->setLoginState(API::LOGGED_OUT);
+        $this->businessConnection = null;
         if ($this->hasEventHandler()) {
             $this->stop();
         } else {

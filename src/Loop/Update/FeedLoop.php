@@ -116,7 +116,7 @@ final class FeedLoop extends Loop implements SimpleSubscriber
             $this->parsedUpdates = [];
             foreach ($parsedUpdates as $update) {
                 try {
-                    $this->API->saveUpdate($update);
+                    $this->API->saveUpdate($update, true);
                 } catch (\Throwable $e) {
                     AsyncTools::rethrow($e);
                 }

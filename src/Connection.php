@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
+use Amp\Cancellation;
 use Amp\Sync\LocalMutex;
 use AssertionError;
 use danog\DialogId\DialogId;
@@ -448,17 +449,20 @@ final class Connection
                     }
                 }
                 $this->API->processMedia($arguments['media'], $arguments['cancellation'] ?? null, true);
+                if (isset($arguments['businessConnectionId'])
+                    && ($method === 'messages.sendMedia' || $method === 'messages.editMessage')
+                    && self::mustUploadMedia($arguments['media'])
+                ) {
+                    $arguments['media'] = $this->uploadBusinessMedia($arguments['peer'], $arguments['media'], $arguments['cancellation'] ?? null);
+                }
             }
         } elseif ($method === 'messages.sendMultiMedia') {
             if (isset($arguments['multi_media'])) {
                 foreach ($arguments['multi_media'] as &$singleMedia) {
-                    if (\is_string($singleMedia['media'])
-                        || $singleMedia['media']['_'] === 'inputMediaUploadedPhoto'
-                        || $singleMedia['media']['_'] === 'inputMediaUploadedDocument'
-                        || $singleMedia['media']['_'] === 'inputMediaPhotoExternal'
-                        || $singleMedia['media']['_'] === 'inputMediaDocumentExternal'
-                    ) {
-                        $singleMedia['media'] = $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media'], 'cancellation' => $arguments['cancellation'] ?? null]);
+                    if (\is_string($singleMedia['media']) || self::mustUploadMedia($singleMedia['media'])) {
+                        $singleMedia['media'] = isset($arguments['businessConnectionId'])
+                            ? $this->uploadBusinessMedia($arguments['peer'], $singleMedia['media'], $arguments['cancellation'] ?? null)
+                            : $this->methodCallAsyncRead('messages.uploadMedia', ['peer' => $arguments['peer'], 'media' => $singleMedia['media'], 'cancellation' => $arguments['cancellation'] ?? null]);
                     }
                 }
             }
@@ -547,6 +551,27 @@ final class Connection
         if (isset($arguments['reply_to_msg_id'])) {
             throw new Exception("reply_to_msg_id is deprecated, please use reply_to or the new sendMessage/sendVideo/etc... methods instead!");
         }
+    }
+    /**
+     * Whether media must be uploaded with messages.uploadMedia before it can be sent in an album, or through a business connection.
+     */
+    private static function mustUploadMedia(array $media): bool
+    {
+        return $media['_'] === 'inputMediaUploadedPhoto'
+            || $media['_'] === 'inputMediaUploadedDocument'
+            || $media['_'] === 'inputMediaPhotoExternal'
+            || $media['_'] === 'inputMediaDocumentExternal';
+    }
+    /**
+     * Upload media to send through the business connection we're logged in through.
+     *
+     * Like TDLib, upload it with messages.uploadMedia and its business_connection_id parameter, which is not wrapped
+     * in invokeWithBusinessConnection: it's sent from the API, to the DC of the bot (where the files were uploaded),
+     * not to the DC of the business connection, where this connection may be.
+     */
+    private function uploadBusinessMedia(mixed $peer, mixed $media, ?Cancellation $cancellation): array
+    {
+        return $this->API->methodCallAsyncRead('messages.uploadMedia', ['peer' => $peer, 'media' => $media, 'cancellation' => $cancellation]);
     }
     /**
      * Send an MTProto message.

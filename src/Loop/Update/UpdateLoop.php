@@ -127,7 +127,7 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
                 }
                 $request_pts = $state->pts();
                 try {
-                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true, 'floodWaitLimit' => 86400]);
+                    $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true, 'floodWaitLimit' => 86400, 'specialMethodType' => SpecialMethodType::SESSION_RELATED]);
                 } catch (ChannelPrivateError|ChatForbiddenError|ChannelInvalidError|UserBannedInChannelError) {
                     $this->feeder->stop();
                     unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);

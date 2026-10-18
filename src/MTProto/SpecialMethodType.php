@@ -20,10 +20,18 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProto;
 
+/**
+ * Calls of MadelineProto's own session mechanics.
+ *
+ * Calls with a special method type are made as the account the session is authorized as: when logged in through a
+ * business connection, they're the bot's, and are never sent through the connection.
+ */
 enum SpecialMethodType
 {
     case UNAUTHED_METHOD;
     case USER_RELATED;
     case FILE_RELATED;
     case FILEREF_RELATED;
+    /** Session mechanics with no special handling: peer database, config, update state. */
+    case SESSION_RELATED;
 }

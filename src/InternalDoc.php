@@ -49,6 +49,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\Url;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
 use danog\MadelineProto\EventHandler\Participant\Member;
+use danog\MadelineProto\EventHandler\Participant\Rights;
 use danog\MadelineProto\EventHandler\Pinned;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\EventHandler\Update;
@@ -334,6 +335,24 @@ abstract class InternalDoc
     final public function broadcastMessages(array $messages, ?\danog\MadelineProto\Broadcast\Filter $filter = null, bool $pin = false, ?float $delay = null): int
     {
         return $this->wrapper->getAPI()->broadcastMessages($messages, $filter, $pin, $delay);
+    }
+    /**
+     * Login as a user, through a business bot connected to their account.
+     *
+     * The session logs in as the bot, and behaves like a session of the user who connected it
+     * (see https://core.telegram.org/api/bots/connected-business-bots):
+     * getSelf returns the user, the messages of the user's chats managed by the bot are received as new, edited and
+     * deleted messages (the bot's own updates are not received), and all methods are called on behalf of the user,
+     * through the business connection.
+     * Methods Telegram doesn't allow through a business connection, or outside the rights and chats the user gave
+     * the bot, fail.
+     *
+     * @param string $token        Bot token
+     * @param string $connectionId ID of the business connection (the business_connection_id of the Bot API)
+     */
+    final public function businessConnectionLogin(string $token, string $connectionId): array
+    {
+        return $this->wrapper->getAPI()->businessConnectionLogin($token, $connectionId);
     }
     /**
      * Fork a new green thread and execute the passed function in the background.
@@ -834,6 +853,15 @@ abstract class InternalDoc
     final public function getBroadcastProgress(int $id): ?\danog\MadelineProto\Broadcast\Progress
     {
         return $this->wrapper->getAPI()->getBroadcastProgress($id);
+    }
+    /**
+     * Returns the ID of the business connection we're logged in through, or null if we didn't log in through a business connection.
+     *
+     * @psalm-mutation-free
+     */
+    final public function getBusinessConnectionId(): ?string
+    {
+        return $this->wrapper->getAPI()->getBusinessConnectionId();
     }
     /**
      * Get cached server-side config.

@@ -103,6 +103,9 @@ abstract class AbstractPrivateMessage extends Message
         if ($client->isSelfBot()) {
             return CallDenialReason::BOTS_CANNOT_CALL;
         }
+        if ($client->getBusinessConnectionId() !== null) {
+            return CallDenialReason::BUSINESS_CONNECTION_CANNOT_CALL;
+        }
         $peer = $this->getCallPeer();
         $self = $client->getSelf();
         if ($self !== false && $peer === $self['id']) {
