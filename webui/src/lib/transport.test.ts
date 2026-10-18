@@ -39,6 +39,13 @@ describe('submitForm', () => {
     expect(await submitForm({app_title: 'x', app_shortname: 'xxxxx'})).toEqual({loggedIn: true});
   });
 
+  it('fails on HTTP errors, rather than taking an error page of PHP or of a proxy for a login', async() => {
+    vi.stubGlobal('fetch', vi.fn(() => respond('<html>Fatal error</html>', 'text/html', 500)));
+    await expect(submitForm({phone_code: '12345'})).rejects.toThrow('HTTP 500');
+    vi.stubGlobal('fetch', vi.fn(() => respond('Bad gateway', 'text/plain', 502)));
+    await expect(submitForm({phone_code: '12345'})).rejects.toThrow('HTTP 502');
+  });
+
   it('marks the submission as pending while it runs', async() => {
     let resolve: (response: Response) => void;
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((r) => resolve = r)));
@@ -58,6 +65,13 @@ describe('pollQr', () => {
     expect(await pollQr('/login.php', 'getQrCode')).toEqual({logged_in: false, link: 'tg://login?token=a'});
     expect(fetch.mock.calls[0][0]).toBe(window.location.origin + '/login.php?getQrCode');
     expect(fetch.mock.calls[0][1].redirect).toBe('error');
+  });
+
+  it('keeps the query of the page, which may select the session', async() => {
+    const fetch = vi.fn(() => respond({logged_in: false, link: 'tg://login?token=a'}));
+    vi.stubGlobal('fetch', fetch);
+    await pollQr('/index.php?bot=a', 'waitQrCodeOrLogin');
+    expect((fetch.mock.calls[0] as unknown[])[0]).toBe(window.location.origin + '/index.php?bot=a&waitQrCodeOrLogin');
   });
 
   it('never asks another origin', async() => {
