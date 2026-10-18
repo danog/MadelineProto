@@ -112,6 +112,8 @@ final class BusinessConnectionTest extends TestCase
         $message = ['_' => 'message', 'id' => 10, 'from_id' => self::OTHER, 'peer_id' => self::OTHER];
         // Another business connection of the bot.
         $this->assertNull($connection->toUserUpdate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'other', 'message' => $message, 'qts' => 5]));
+        // In the result of a call made through another connection of the bot.
+        $this->assertNull($connection->toUserUpdate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => '', 'message' => ['from_id' => 7654321, 'peer_id' => self::OTHER] + $message, 'qts' => 0]));
         // The bot's own updates.
         $this->assertNull($connection->toUserUpdate(['_' => 'updateNewMessage', 'message' => $message, 'pts' => 1, 'pts_count' => 1]));
         $this->assertNull($connection->toUserUpdate(['_' => 'updateBotStopped', 'user_id' => self::OTHER, 'date' => 0, 'stopped' => true, 'qts' => 5]));

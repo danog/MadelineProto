@@ -121,11 +121,18 @@ final class BusinessConnection
     /**
      * Whether an update is of this connection.
      *
-     * The results of the calls made through the connection contain its updates with an empty connection ID.
+     * The results of the calls made through a connection contain its messages with an empty connection ID: they're
+     * ours if sent by our user (not if the call was explicitly made through another connection of the bot).
      */
     private function isOwn(array $update): bool
     {
-        return isset($update['connection_id']) && ($update['connection_id'] === $this->id || $update['connection_id'] === '');
+        if (!isset($update['connection_id'])) {
+            return false;
+        }
+        if ($update['connection_id'] === '') {
+            return ($update['message']['from_id'] ?? null) === $this->userId;
+        }
+        return $update['connection_id'] === $this->id;
     }
 
     /** Keys of the business events handled last, see isDuplicate. */
