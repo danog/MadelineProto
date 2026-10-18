@@ -87,7 +87,8 @@ class Exception extends \Exception
     {
         $errfileReplaced = $errfile ?? '';
         // If error is suppressed with @, don't throw an exception
-        if (error_reporting() === 0
+        // (since PHP 8, @ doesn't set error_reporting to 0, but to the fatal errors, which never reach this handler)
+        if (!(error_reporting() & $errno)
             || strpos($errstr, 'headers already sent')
             || str_contains($errstr, 'Creation of dynamic property')
             || str_contains($errstr, 'Legacy nullable type detected')
