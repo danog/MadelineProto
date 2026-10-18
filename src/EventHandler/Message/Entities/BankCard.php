@@ -13,7 +13,7 @@ final class BankCard extends MessageEntity
     #[\Override]
     public function toBotAPI(): array
     {
-        return ['type' => 'bank_card', 'offset' => $this->offset, 'length' => $this->length];
+        return ['type' => 'bank_card_number', 'offset' => $this->offset, 'length' => $this->length];
     }
     /**
      * @psalm-mutation-free

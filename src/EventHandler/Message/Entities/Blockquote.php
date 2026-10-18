@@ -10,10 +10,25 @@ final class Blockquote extends MessageEntity
     /**
      * @psalm-mutation-free
      */
+    public function __construct(
+        /** Offset of message entity within message (in UTF-16 code units) */
+        public readonly int $offset,
+
+        /** Length of message entity within message (in UTF-16 code units) */
+        public readonly int $length,
+
+        /** Whether the quote is collapsed by default (an expandable block quote) */
+        public readonly bool $collapsed = false
+    ) {
+    }
+
+    /**
+     * @psalm-mutation-free
+     */
     #[\Override]
     public function toBotAPI(): array
     {
-        return ['type' => 'block_quote', 'offset' => $this->offset, 'length' => $this->length];
+        return ['type' => $this->collapsed ? 'expandable_blockquote' : 'blockquote', 'offset' => $this->offset, 'length' => $this->length];
     }
     /**
      * @psalm-mutation-free
@@ -21,6 +36,6 @@ final class Blockquote extends MessageEntity
     #[\Override]
     public function toMTProto(): array
     {
-        return ['_' => 'messageEntityBlockquote', 'offset' => $this->offset, 'length' => $this->length];
+        return ['_' => 'messageEntityBlockquote', 'collapsed' => $this->collapsed, 'offset' => $this->offset, 'length' => $this->length];
     }
 }
