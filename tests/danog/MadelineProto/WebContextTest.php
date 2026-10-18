@@ -48,8 +48,10 @@ final class WebContextTest extends TestCase
         self::assertFalse(WebContextRunner::run('../../etc/passwd'));
         self::assertFalse(WebContextRunner::run(bin2hex(random_bytes(16))), 'A missing request ran');
 
+        $dir = WebContextFactory::getDirectory(create: true);
+        self::assertNotNull($dir);
         $id = bin2hex(random_bytes(16));
-        $path = WebContextFactory::getRequestPath($id);
+        $path = WebContextFactory::getRequestPath($dir, $id);
         $marker = sys_get_temp_dir().'/madeline-parallel-marker-'.$id;
         $script = sys_get_temp_dir().'/madeline-parallel-script-'.$id.'.php';
         file_put_contents($script, '<?php touch('.var_export($marker, true).'); return static fn () => null;');
@@ -130,7 +132,7 @@ final class WebContextTest extends TestCase
             self::assertSame('Task 4 failed', $result['taskFailure']);
             self::assertTrue($result['shutdown']);
 
-            self::assertSame([], glob(sys_get_temp_dir().'/madeline-parallel-*'), 'Request files or IPC endpoints were left behind');
+            self::assertSame([], glob(WebContextFactory::getDirectory(create: false).'/*'), 'Request files or IPC endpoints were left behind');
         } catch (\Throwable $e) {
             $process->kill();
             fwrite(STDERR, "Webserver log:\n".$log->await());

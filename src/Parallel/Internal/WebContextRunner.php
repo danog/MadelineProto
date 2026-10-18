@@ -46,7 +46,12 @@ final class WebContextRunner
             error_log("MadelineProto web context: invalid ID");
             return false;
         }
-        $request = self::readRequest(WebContextFactory::getRequestPath($id));
+        $dir = WebContextFactory::getDirectory(create: false);
+        if ($dir === null) {
+            error_log("MadelineProto web context: no directory private to this user in ".sys_get_temp_dir());
+            return false;
+        }
+        $request = self::readRequest(WebContextFactory::getRequestPath($dir, $id));
         if ($request === null) {
             return false;
         }
@@ -115,8 +120,8 @@ final class WebContextRunner
      * Read and delete the request file.
      *
      * Only the first request for an ID runs it (WebRunner::selfStart() may reach the webserver more than once), and
-     * only if the file was written by the user of the webserver: on shared hosting, the temporary directory may be
-     * shared with other users, who must not get to run scripts as this one.
+     * only if the file was written by the user of the webserver, in its private directory: on shared hosting, the
+     * temporary directory may be shared with other users, who must not get to run scripts as this one.
      *
      * @return array{uri: string, key: string, script: non-empty-list<string>, cwd: string, timeout: positive-int}|null
      */
