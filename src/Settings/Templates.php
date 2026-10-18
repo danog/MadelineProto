@@ -32,16 +32,6 @@ use danog\MadelineProto\WebUI\TemplateEngine;
 final class Templates extends SettingsAbstract
 {
     /**
-     * Default value of the legacy sprintf template.
-     */
-    public const LEGACY_HTML_TEMPLATE = '<!DOCTYPE html><html><head><title>MadelineProto</title></head><body><h1>MadelineProto</h1><p>%s</p><form method="POST">%s<button type="submit"/>%s</button></form>%s</body></html>';
-
-    /**
-     * Legacy sprintf web template.
-     */
-    protected string $htmlTemplate = self::LEGACY_HTML_TEMPLATE;
-
-    /**
      * Template directories, searched in order before the builtin one.
      *
      * @var list<string>
@@ -95,42 +85,5 @@ final class Templates extends SettingsAbstract
     public function getEngine(): TemplateEngine
     {
         return $this->engine ??= new TemplateEngine($this->directories);
-    }
-
-    /**
-     * Get the legacy sprintf web template.
-     *
-     * @deprecated Use template directories instead, see {@see self::addDirectory()}.
-     */
-    public function getHtmlTemplate(): string
-    {
-        return $this->htmlTemplate;
-    }
-
-    /**
-     * Set a legacy sprintf web template, used instead of the template directories.
-     *
-     * The template gets four strings: the title and messages, the form fields, the label of the submit button,
-     * and the trailing HTML (scripts and the QR code login panel).
-     *
-     * @deprecated Use template directories instead, see {@see self::addDirectory()}.
-     *
-     * @param string $htmlTemplate Legacy sprintf web template.
-     */
-    public function setHtmlTemplate(string $htmlTemplate): self
-    {
-        $this->htmlTemplate = $htmlTemplate;
-
-        return $this;
-    }
-
-    /**
-     * Whether a legacy sprintf web template was set.
-     *
-     * @internal
-     */
-    public function hasLegacyHtmlTemplate(): bool
-    {
-        return $this->htmlTemplate !== self::LEGACY_HTML_TEMPLATE;
     }
 }

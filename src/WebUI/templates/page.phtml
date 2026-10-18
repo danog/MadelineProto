@@ -9,7 +9,6 @@
  * The web app renders the page from the state in #madeline-app; the markup is for browsers without JavaScript.
  */
 $this->layout('layout', ['title' => $page->title]);
-$hasQr = $page->qrEndpoint !== null;
 ?>
 <?php $this->start('app') ?>
 <?php if (isset($state)): ?>
@@ -28,7 +27,7 @@ $hasQr = $page->qrEndpoint !== null;
         </p>
     </aside>
     <main class="pane">
-        <div class="pane-body<?= $hasQr ? ' has-qr' : '' ?>">
+        <div class="pane-body">
             <div class="pane-main">
                 <header class="pane-head">
                     <h1><?= $this->e($page->title) ?></h1>
@@ -54,9 +53,6 @@ $hasQr = $page->qrEndpoint !== null;
                     </form>
                 <?php endif ?>
             </div>
-            <?php if ($hasQr): ?>
-                <?= $this->insert('partials/qr', ['page' => $page]) ?>
-            <?php endif ?>
         </div>
     </main>
 </div>

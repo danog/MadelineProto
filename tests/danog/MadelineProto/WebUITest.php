@@ -109,7 +109,6 @@ final class WebUITest extends TestCase
         self::assertSame(1, preg_match('~<input type="password"[^>]*>~', $html, $input));
         self::assertStringContainsString(' required', $input[0]);
         self::assertStringContainsString('name="api_setup" value="manual"', $html);
-        self::assertStringContainsString('data-qr-endpoint="/login.php"', $html);
         self::assertStringContainsString('aria-current="step"', $html);
 
         self::assertSame(1, preg_match('~<script type="application/json" id="madeline-state">(.*?)</script>~s', $html, $matches));
@@ -267,21 +266,6 @@ final class WebUITest extends TestCase
         (new TemplateEngine)->render('../../../../etc/passwd');
     }
 
-    public function testLegacyTemplateStillWorks(): void
-    {
-        $templates = (new Templates)->setHtmlTemplate('<h1>Custom</h1><p>%s</p><form method="POST">%s<button>%s</button></form>%s');
-        self::assertTrue($templates->hasLegacyHtmlTemplate());
-        self::assertFalse((new Templates)->hasLegacyHtmlTemplate());
-        $html = WebUI::render($templates, self::loginPage());
-        self::assertStringStartsWith('<h1>Custom</h1><p>Log in<br>', $html);
-        self::assertStringContainsString('name="phone_number"', $html);
-        self::assertStringContainsString('<button>Continue</button></form>', $html);
-        // Actions are standalone forms after the template's form, so Enter submits the primary button
-        self::assertGreaterThan(strpos($html, '</form>'), strpos($html, 'name="api_setup" value="manual"'));
-        self::assertStringContainsString('data-qr-endpoint="/login.php"', $html);
-        self::assertStringNotContainsString('madeline-state', $html);
-    }
-
     public function testTemplateSettingsSurviveSerialization(): void
     {
         $settings = new Settings;
@@ -316,6 +300,41 @@ final class WebUITest extends TestCase
                 $_SERVER['REQUEST_URI'] = $uri;
             }
         }
+    }
+
+    public function testSessionsOfTheLegacyTemplatesStillLoad(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+            return true;
+        }, E_DEPRECATED | E_USER_DEPRECATED);
+        try {
+            // Settings saved with the removed sprintf template
+            $class = Templates::class;
+            $templates = unserialize('O:'.\strlen($class).':"'.$class.'":3:{'
+                .'s:15:"'."\0*\0htmlTemplate".'";s:4:"<p/>";'
+                .'s:14:"'."\0*\0directories".'";a:1:{i:0;s:4:"/tmp";}'
+                .'s:10:"'."\0*\0changed".'";b:0;'
+                .'}');
+            self::assertInstanceOf(Templates::class, $templates);
+            self::assertSame(['/tmp'], $templates->getDirectories());
+
+            // A session saved with the removed API ID UI template
+            $class = \danog\MadelineProto\APIWrapper::class;
+            $wrapper = unserialize('O:'.\strlen($class).':"'.$class.'":2:{'
+                .'s:'.(\strlen($class) + 5).':"'."\0$class\0API".'";N;'
+                .'s:'.(\strlen($class) + 16).':"'."\0$class\0webApiTemplate".'";s:4:"<p/>";'
+                .'}');
+            self::assertInstanceOf(\danog\MadelineProto\APIWrapper::class, $wrapper);
+            self::assertNull($wrapper->getAPI());
+            // Saved through __sleep(), the removed private property keeps its mangled name, which no code can
+            // access, nor unset: it isn't saved again
+            self::assertStringNotContainsString('webApiTemplate', serialize($wrapper));
+        } finally {
+            restore_error_handler();
+        }
+        self::assertSame([], $deprecations);
     }
 
     public function testAlertsAsText(): void

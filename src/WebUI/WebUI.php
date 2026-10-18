@@ -71,9 +71,6 @@ final class WebUI
      */
     public static function render(Templates $templates, Page $page): string
     {
-        if ($templates->hasLegacyHtmlTemplate()) {
-            return self::renderLegacy($templates, $page);
-        }
         $lang = self::getLangCode();
         $dir = \in_array($lang, self::RTL_LANGUAGES, true) ? 'rtl' : 'ltr';
         return $templates->getEngine()->render($page->template, [
@@ -279,26 +276,6 @@ final class WebUI
     {
         $path = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0];
         return '/'.ltrim(str_replace('\\', '/', $path), '/');
-    }
-
-    /**
-     * Render a page with the legacy sprintf template.
-     */
-    private static function renderLegacy(Templates $templates, Page $page): string
-    {
-        // The parts are rendered with the builtin templates, never with custom directories meant for full pages
-        $engine = new TemplateEngine;
-        $data = ['page' => $page];
-        $trailer = $engine->render('partials/legacy-actions', $data)
-            .$engine->render('partials/qr', $data)
-            .'<script>'.Template::escapeScript($engine->asset('assets/madeline.js')).'</script>';
-        return sprintf(
-            $templates->getHtmlTemplate(),
-            $engine->render('partials/legacy-intro', $data),
-            $page->submit === null ? '' : $engine->render('partials/fields', $data),
-            htmlspecialchars($page->submit ?? '', ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8'),
-            $trailer,
-        );
     }
 
     /**

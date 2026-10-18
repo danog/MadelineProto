@@ -22,10 +22,13 @@ namespace danog\MadelineProto;
 
 use danog\MadelineProto\Ipc\Client;
 
+/**
+ * The root of a session. Dynamic properties are allowed only for unserialization: see __wakeup().
+ */
+#[\AllowDynamicProperties]
 final class APIWrapper
 {
     private MTProto|Client|null $API = null;
-    private string $webApiTemplate = '';
 
     /**
      * API wrapper.
@@ -42,18 +45,6 @@ final class APIWrapper
     public function setSession(SessionPaths $session): void
     {
         $this->session = $session;
-    }
-
-    public function getWebApiTemplate(): string
-    {
-        return $this->webApiTemplate;
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function setWebApiTemplate(string $template): void
-    {
-        $this->webApiTemplate = $template;
     }
 
     /**
@@ -76,7 +67,22 @@ final class APIWrapper
      */
     public function __sleep(): array
     {
-        return ['API', 'webApiTemplate'];
+        return ['API'];
+    }
+
+    /**
+     * Drop the properties removed since the session was saved (webApiTemplate): they come back as dynamic
+     * properties (allowed, see the class, or a deprecation), and __sleep() doesn't save them again.
+     *
+     * @internal
+     */
+    public function __wakeup(): void
+    {
+        foreach (get_object_vars($this) as $name => $_) {
+            if (!property_exists(self::class, (string) $name) && !str_starts_with((string) $name, "\0")) {
+                unset($this->{$name});
+            }
+        }
     }
 
     /**
