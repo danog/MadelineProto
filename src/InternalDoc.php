@@ -1421,13 +1421,14 @@ abstract class InternalDoc
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params       Params: once the timeout expires, an empty array is returned
+     * @param  ?Cancellation                                     $cancellation Cancellation: once cancelled, the wait stops with a CancelledException
      * @return list<array{update_id: mixed, update: mixed}>
      */
     final public function getUpdates(array $params = [
-    ]): array
+    ], ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->getUpdates($params);
+        return $this->wrapper->getAPI()->getUpdates($params, $cancellation);
     }
     /**
      * Get a message to show to the user when starting the bot.
@@ -2236,7 +2237,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $duration                Duration of the audio
      * @param string|null                                                   $title                   Title of the audio
@@ -2274,7 +2275,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream      $file                   File to upload: can be a message to reuse media present in a message.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                             $caption                Caption of document
-     * @param ?callable(float, float, int)                                       $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                     $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                            $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                          $parseMode              Text parse mode for the caption
      * @param integer|null                                                       $replyToMsgId           ID of message to reply to.
@@ -2302,7 +2303,7 @@ abstract class InternalDoc
      * @param integer|string                                                $peer                   Destination peer or username.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
@@ -2332,7 +2333,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
@@ -2401,7 +2402,7 @@ abstract class InternalDoc
      * @param integer|string                                                $peer                   Destination peer or username.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
@@ -2428,7 +2429,7 @@ abstract class InternalDoc
      *
      * @param integer|string                                                $peer                   Destination peer or username.
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
      * @param integer|null                                                  $topMsgId               ID of thread where to send the message.
@@ -2460,7 +2461,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
@@ -2496,7 +2497,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $ttl                     Time to live
      * @param integer|null                                                  $duration                Duration of the voice
@@ -2807,7 +2808,7 @@ abstract class InternalDoc
      * @param integer|string|null                                                $peer                   Optional: associate the audio to the specified peer or username.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $duration                Duration of the audio
      * @param string|null                                                   $title                   Title of the audio
@@ -2838,7 +2839,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream|null $thumb                  Optional: Thumbnail to upload
      * @param integer|string|null                                                     $peer              Optional: associate the media to the specified peer or username.
      * @param string                                                             $caption                Caption of document
-     * @param ?callable(float, float, int)                                       $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                     $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                            $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                          $parseMode              Text parse mode for the caption
      * @param integer|null                                                       $replyToMsgId           ID of message to reply to.
@@ -2866,7 +2867,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
      * @param integer|string|null                                           $peer                   Optional: associate the file to the destination peer or username.
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
@@ -2972,7 +2973,7 @@ abstract class InternalDoc
      * @param integer|string|null                                                $peer                   Optional: associate the media to the peer or username.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
      * @param integer|null                                                  $replyToMsgId            ID of message to reply to.
@@ -3000,7 +3001,7 @@ abstract class InternalDoc
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
      * @param string                                                        $caption                Caption of document
      * @param integer|string|null                                           $peer                   Optional: associate the media to the specified peer or username.
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
@@ -3026,7 +3027,7 @@ abstract class InternalDoc
      * Please use named arguments to call this method.
      *
      * @param Message|Media|LocalFile|RemoteUrl|BotApiFileId|ReadableStream $file                   File to upload: can be a message to reuse media present in a message.
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|string|null                                           $peer                   Optional: associate the file to the specified peer or username.
      * @param integer|null                                                  $replyToMsgId           ID of message to reply to.
@@ -3059,7 +3060,7 @@ abstract class InternalDoc
      * @param integer|string|null                                           $peer                   Optional: associate the media to the specified peer or username.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param boolean                                                       $spoiler                 Whether the message is a spoiler
      * @param boolean                                                       $roundMessage            Whether the message should be round
@@ -3094,7 +3095,7 @@ abstract class InternalDoc
      * @param integer|string|null                                                $peer                   Optional: associate the media to the specified peer or username.
      * @param string                                                        $caption                Caption of document
      * @param ParseMode                                                     $parseMode              Text parse mode for the caption
-     * @param ?callable(float, float, int)                                  $callback               Upload callback (percent, speed in mpbs, time elapsed)
+     * @param ?callable(float, float, float)                                $callback               Upload callback (percent, speed in mbps, seconds elapsed)
      * @param ?string                                                       $fileName               Optional file name, if absent will be extracted from the passed $file.
      * @param integer|null                                                  $duration                Duration of the voice
      * @param array|null                                                    $waveform                Waveform of the voice

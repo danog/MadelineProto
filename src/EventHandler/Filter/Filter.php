@@ -20,6 +20,8 @@ use AssertionError;
 use danog\MadelineProto\EventHandler;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersAnd;
 use danog\MadelineProto\EventHandler\Filter\Combinator\FiltersOr;
+use danog\MadelineProto\EventHandler\Filter\Location\FilterLiveLocation;
+use danog\MadelineProto\EventHandler\Filter\Location\FilterVenue;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterAudio;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterDocument;
 use danog\MadelineProto\EventHandler\Filter\Media\FilterDocumentPhoto;
@@ -45,6 +47,8 @@ use danog\MadelineProto\EventHandler\SimpleFilter\HasAudio;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocument;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasDocumentPhoto;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasGif;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasLiveLocation;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasLocation;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMedia;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasMultiplePoll;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasNoMedia;
@@ -55,6 +59,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\HasRoundVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasSinglePoll;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasSticker;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasTopic;
+use danog\MadelineProto\EventHandler\SimpleFilter\HasVenue;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVideo;
 use danog\MadelineProto\EventHandler\SimpleFilter\HasVoice;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
@@ -132,6 +137,9 @@ abstract class Filter
                 HasQuizPoll::class => new FilterQuizPoll,
                 HasSinglePoll::class => new FilterSinglePoll,
                 HasMultiplePoll::class => new FilterMultiplePoll,
+                HasLocation::class => new FilterLocation,
+                HasLiveLocation::class => new FilterLiveLocation,
+                HasVenue::class => new FilterVenue,
                 Ended::class => new FilterEnded,
                 Running::class => new FilterRunning,
                 FromAdminOrOutgoing::class => new FiltersOr(new FilterFromAdmin, new FilterOutgoing),
