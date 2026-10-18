@@ -70,8 +70,40 @@ final class BusinessConnectionTest extends TestCase
         $this->assertSame('updateEditMessage', $update['_']);
         $this->assertTrue($update['message']['out']);
 
+        // Messages sent through the connection are in the result of the call, with an empty connection ID.
+        $sent = ['_' => 'message', 'id' => 12, 'out' => true, 'from_id' => self::OWNER, 'peer_id' => self::OTHER, 'via_business_bot_id' => 1, 'message' => 'sent'];
+        $update = $connection->toUserUpdate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => '', 'message' => $sent, 'qts' => 0]);
+        $this->assertSame(['_' => 'updateNewMessage', 'message' => $sent, 'pts' => -1, 'pts_count' => -1], $update);
+
+        // So are edits made through the connection, as new messages with an edit date.
+        $edited = ['edit_date' => 1, 'message' => 'edited'] + $sent;
+        $update = $connection->toUserUpdate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => '', 'message' => $edited, 'qts' => 0]);
+        $this->assertSame(['_' => 'updateEditMessage', 'message' => $edited, 'pts' => -1, 'pts_count' => -1], $update);
+
         $update = $connection->toUserUpdate(['_' => 'updateBotDeleteBusinessMessage', 'connection_id' => 'conn', 'peer' => self::OTHER, 'messages' => [10, 11], 'qts' => 7]);
         $this->assertSame(['_' => 'updateDeleteMessages', 'messages' => [10, 11], 'pts' => -1, 'pts_count' => -1], $update);
+    }
+
+    public function testDuplicates(): void
+    {
+        $connection = self::connection();
+        $message = ['_' => 'message', 'id' => 10, 'from_id' => self::OTHER, 'peer_id' => self::OTHER];
+        // In the qts sequence, then with qts 0.
+        $this->assertFalse($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'conn', 'message' => $message, 'qts' => 5]));
+        $this->assertTrue($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'conn', 'message' => $message, 'qts' => 0]));
+        // An edit, in the result of messages.editMessage, then in the qts sequence.
+        $edited = ['edit_date' => 1] + $message;
+        $this->assertFalse($connection->isDuplicate(['_' => 'updateBotNewBusinessMessage', 'connection_id' => '', 'message' => $edited, 'qts' => 0]));
+        $this->assertTrue($connection->isDuplicate(['_' => 'updateBotEditBusinessMessage', 'connection_id' => 'conn', 'message' => $edited, 'qts' => 6]));
+        // Another edit is not a duplicate.
+        $this->assertFalse($connection->isDuplicate(['_' => 'updateBotEditBusinessMessage', 'connection_id' => 'conn', 'message' => ['edit_date' => 2] + $message, 'qts' => 7]));
+        $delete = ['_' => 'updateBotDeleteBusinessMessage', 'connection_id' => 'conn', 'peer' => self::OTHER, 'messages' => [10], 'qts' => 0];
+        $this->assertFalse($connection->isDuplicate($delete));
+        $this->assertTrue($connection->isDuplicate(['qts' => 8] + $delete));
+        // Not recorded for other connections.
+        $other = ['_' => 'updateBotNewBusinessMessage', 'connection_id' => 'other', 'message' => ['id' => 11] + $message, 'qts' => 9];
+        $this->assertFalse($connection->isDuplicate($other));
+        $this->assertFalse($connection->isDuplicate($other));
     }
 
     public function testUpdatesThatAreNotTheUsers(): void

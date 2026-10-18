@@ -386,7 +386,8 @@ final class PeerDatabase implements TLCallback
         if ($user['id'] === ($this->API->authorization['user']['id'] ?? null)) {
             $this->API->authorization['user'] = $user;
         }
-        if ($user['id'] === $this->API->businessConnection?->userId) {
+        // Not min users: the results of calls made through the business connection contain the user as a min user.
+        if ($user['id'] === $this->API->businessConnection?->userId && !($user['min'] ?? false)) {
             $this->API->businessConnection->setUser($user);
         }
         if (($this->pendingDb[$user['id']] ?? null) == $user) {

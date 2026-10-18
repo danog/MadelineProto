@@ -1126,7 +1126,9 @@ trait UpdateHandler
                 $this->seqUpdater->resume();
                 break;
             case 'updateShort':
-                $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
+                if ($this->applyPushedQts($updates['update'])) {
+                    $this->feeders[$this->feeders[FeedLoop::GENERIC]->feedSingle($updates['update'])]->resume();
+                }
                 break;
             case 'updateShortSentMessage':
                 if (!isset($updates['request']['body'])) {
@@ -1159,6 +1161,40 @@ trait UpdateHandler
                 throw new ResponseException('Unrecognized update received: '.var_export($updates, true));
                 break;
         }
+    }
+    /**
+     * Apply the qts of an update received through the socket.
+     *
+     * Not for the updates returned by updates.getDifference, whose state already includes them.
+     * Without this, pushed qts updates never advanced the qts state, and the next getDifference returned them again.
+     *
+     * Returns whether to handle the update: not if it was already applied, or if there's a gap (filled by
+     * updates.getDifference, which returns it).
+     *
+     * @internal
+     */
+    public function applyPushedQts(array $update): bool
+    {
+        // Updates with qts 0 are not part of the sequence.
+        if (!isset($update['qts']) || $update['qts'] === 0) {
+            return true;
+        }
+        $state = $this->loadUpdateState();
+        if ($state->qts() === -1) {
+            $state->qts($update['qts']);
+            return true;
+        }
+        if ($update['qts'] <= $state->qts()) {
+            $this->logger->logger("Skipping already applied {$update['_']} with qts {$update['qts']} <= {$state->qts()}", Logger::VERBOSE);
+            return false;
+        }
+        if ($update['qts'] > $state->qts() + 1) {
+            $this->logger->logger("Qts hole: {$update['_']} with qts {$update['qts']} > {$state->qts()} + 1, getting difference", Logger::NOTICE);
+            $this->updaters[UpdateLoop::GENERIC]->resume();
+            return false;
+        }
+        $state->qts($update['qts']);
+        return true;
     }
     /**
      * Subscribe to event handler updates for a channel/supergroup we're not a member of.
@@ -1198,8 +1234,7 @@ trait UpdateHandler
      */
     public function saveUpdate(array $update, bool $received = false): void
     {
-        $this->logger->logger("Saving update of type {$update['_']}", Logger::VERBOSE);
-        if ($update['_'] === 'updateConfig') {
+        $this->logger->logger("Saving update of type {$update['_']}", Logger::VERBOSE);        if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
             $this->getConfig();
         }
@@ -1387,6 +1422,10 @@ trait UpdateHandler
             $this->updateBusinessConnection($update['connection']);
         }
         if ($received && $this->businessConnection !== null) {
+            // The same business event can come more than once (see BusinessConnection::isDuplicate).
+            if ($this->businessConnection->isDuplicate($update)) {
+                return;
+            }
             // We act as the user who connected the bot: the bot's own updates are not the user's.
             $update = $this->businessConnection->toUserUpdate($update);
             if ($update === null) {

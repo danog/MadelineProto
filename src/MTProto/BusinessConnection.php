@@ -89,12 +89,14 @@ final class BusinessConnection
      */
     public function toUserUpdate(array $update): ?array
     {
-        if (!isset($update['connection_id']) || $update['connection_id'] !== $this->id) {
+        if (!$this->isOwn($update)) {
             return null;
         }
         return match ($update['_']) {
             'updateBotNewBusinessMessage' => [
-                '_' => 'updateNewMessage',
+                // The result of messages.editMessage contains the edited message in an updateBotNewBusinessMessage:
+                // new messages have no edit date.
+                '_' => isset($update['message']['edit_date']) ? 'updateEditMessage' : 'updateNewMessage',
                 'message' => $this->toUserMessage($update['message']),
                 'pts' => -1,
                 'pts_count' => -1,
@@ -114,6 +116,48 @@ final class BusinessConnection
             // Callback queries pressed on the bot's messages are the bot's, users never receive them.
             default => null,
         };
+    }
+
+    /**
+     * Whether an update is of this connection.
+     *
+     * The results of the calls made through the connection contain its updates with an empty connection ID.
+     */
+    private function isOwn(array $update): bool
+    {
+        return isset($update['connection_id']) && ($update['connection_id'] === $this->id || $update['connection_id'] === '');
+    }
+
+    /** Keys of the business events handled last, see isDuplicate. */
+    private array $handled = [];
+
+    /**
+     * Whether a business event of the connection was already handled, recording it if not.
+     *
+     * Telegram sends business events in the qts sequence, and/or with qts 0: the actions made through the
+     * connection only with qts 0 (in the results of the calls, or pushed), others sometimes with both.
+     * A message ID identifies a message of the user's private chats, and the edit date an edit of it.
+     *
+     * @param array $update Update received by the bot
+     */
+    public function isDuplicate(array $update): bool
+    {
+        $key = match ($update['_']) {
+            'updateBotNewBusinessMessage', 'updateBotEditBusinessMessage' => $update['message']['peer_id'].':'.$update['message']['id'].':'.($update['message']['edit_date'] ?? 0),
+            'updateBotDeleteBusinessMessage' => 'delete:'.$update['peer'].':'.implode(',', $update['messages']),
+            default => null,
+        };
+        if ($key === null || !$this->isOwn($update)) {
+            return false;
+        }
+        if (isset($this->handled[$key])) {
+            return true;
+        }
+        $this->handled[$key] = true;
+        if (\count($this->handled) > 1000) {
+            unset($this->handled[array_key_first($this->handled)]);
+        }
+        return false;
     }
 
     /**

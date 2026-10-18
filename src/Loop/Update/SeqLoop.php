@@ -164,7 +164,7 @@ final class SeqLoop extends Loop implements SimpleSubscriber
      */
     public function save(array $updates): void
     {
-        $this->pendingWakeups += ($this->feeder->feed($updates['updates']));
+        $this->pendingWakeups += ($this->feeder->feed(array_filter($updates['updates'], $this->API->applyPushedQts(...))));
     }
     /**
      * @param array<true> $wakeups
