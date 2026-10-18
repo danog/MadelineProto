@@ -134,6 +134,9 @@ abstract class Message extends AbstractMessage
     /** The poll */
     public readonly ?AbstractPoll $poll;
 
+    /** The location (a geo point, a live location or a venue) */
+    public readonly ?AbstractLocation $location;
+
     /** @internal */
     public function __construct(
         MTProto $API,
@@ -196,6 +199,10 @@ abstract class Message extends AbstractMessage
 
         $this->poll = ($rawMessage['media']['_'] ?? '') === 'messageMediaPoll'
             ? AbstractPoll::fromRawPoll($rawMessage['media'])
+            : null;
+
+        $this->location = isset($rawMessage['media'])
+            ? AbstractLocation::fromRawMedia($rawMessage['media'])
             : null;
 
         [$this->commandType, $this->command, $this->commandArgs] = CommandType::parse($this->message);
