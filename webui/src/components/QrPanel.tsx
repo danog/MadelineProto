@@ -25,8 +25,10 @@ export function useQrLogin(endpoint: string, onLoggedIn: () => void, retryDelay 
         if (url.origin !== window.location.origin) {
             return;
         }
+        // Absolute: a path starting with // (https://host//evil.example/) would be a protocol-relative URL
+        const base = url.origin + url.pathname;
         const poll = (query: "getQrCode" | "waitQrCodeOrLogin") => {
-            fetch(`${url.pathname}?${query}`, { credentials: "same-origin", cache: "no-store", signal: controller.signal })
+            fetch(`${base}?${query}`, { credentials: "same-origin", cache: "no-store", redirect: "error", signal: controller.signal })
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}`);

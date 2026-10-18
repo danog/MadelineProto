@@ -32,9 +32,9 @@ describe("useQrLogin", () => {
         await waitFor(() => expect(onLoggedIn).toHaveBeenCalledOnce());
         expect(screen.getByTestId("state").textContent).toBe("done:<svg>2</svg>");
         expect(fetch.mock.calls.map((call) => (call as unknown[])[0])).toEqual([
-            "/login.php?getQrCode",
-            "/login.php?waitQrCodeOrLogin",
-            "/login.php?waitQrCodeOrLogin",
+            `${window.location.origin}/login.php?getQrCode`,
+            `${window.location.origin}/login.php?waitQrCodeOrLogin`,
+            `${window.location.origin}/login.php?waitQrCodeOrLogin`,
         ]);
     });
 
@@ -46,10 +46,10 @@ describe("useQrLogin", () => {
 
         await waitFor(() => expect(screen.getByTestId("state").textContent).toBe("waiting:<svg>3</svg>"));
         expect(fetch.mock.calls.map((call) => (call as unknown[])[0])).toEqual([
-            "/login.php?getQrCode",
-            "/login.php?waitQrCodeOrLogin",
-            "/login.php?getQrCode",
-            "/login.php?waitQrCodeOrLogin",
+            `${window.location.origin}/login.php?getQrCode`,
+            `${window.location.origin}/login.php?waitQrCodeOrLogin`,
+            `${window.location.origin}/login.php?getQrCode`,
+            `${window.location.origin}/login.php?waitQrCodeOrLogin`,
         ]);
     });
 
@@ -64,6 +64,18 @@ describe("useQrLogin", () => {
         await act(async () => {});
         expect(fetch).not.toHaveBeenCalled();
         expect(screen.getByTestId("state").textContent).toBe("loading");
+    });
+
+    it("never turns a path starting with // into another origin", async () => {
+        const fetch = vi.fn(() => new Promise<Response>(() => {}));
+        vi.stubGlobal("fetch", fetch);
+        function Probe2() {
+            useQrLogin(`${window.location.origin}//evil.example/login.php`, () => {});
+            return null;
+        }
+        render(<Probe2 />);
+        await act(async () => {});
+        expect(fetch.mock.calls.map((call) => (call as unknown[])[0])).toEqual([`${window.location.origin}//evil.example/login.php?getQrCode`]);
     });
 
     it("stops polling when unmounted", async () => {
