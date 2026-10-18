@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Namespace;
 
+use Amp\DeferredFuture;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Exception;
 use InvalidArgumentException;
@@ -30,6 +31,11 @@ use InvalidArgumentException;
 final class AbstractAPI
 {
     private APIWrapper $wrapper;
+    /**
+     * Number of calls in progress.
+     */
+    private int $calls = 0;
+    private ?DeferredFuture $idle = null;
     /**
      * @psalm-mutation-free
      */
@@ -75,6 +81,27 @@ final class AbstractAPI
             throw new Exception(Blacklist::BLACKLIST[$name]);
         }
 
-        return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args);
+        $this->calls++;
+        try {
+            return $this->wrapper->getAPI()->methodCallAsyncRead($name, $args);
+        } finally {
+            if (--$this->calls === 0 && $this->idle) {
+                $this->idle->complete();
+                $this->idle = null;
+            }
+        }
+    }
+    /**
+     * Wait for the calls in progress to return.
+     *
+     * Unlike the methods of the API, which keep it alive while they run, a namespace only holds the APIWrapper:
+     * `$service->api()->channels->createChannel()` destroys the API before the call even starts.
+     */
+    public function awaitCalls(): void
+    {
+        if ($this->calls) {
+            $this->idle ??= new DeferredFuture;
+            $this->idle->getFuture()->await();
+        }
     }
 }

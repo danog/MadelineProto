@@ -30,6 +30,7 @@ use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
+use danog\MadelineProto\Namespace\AbstractAPI as NamespaceAPI;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Settings\Templates;
@@ -398,6 +399,12 @@ final class API extends AbstractAPI
     private function destruct(int|null $id = null): void
     {
         $this->wrapper->logger('Shutting down MadelineProto ('.static::class.')');
+        // Calls made through the namespaces don't keep this instance alive (#1606)
+        foreach (get_object_vars($this) as $namespace) {
+            if ($namespace instanceof NamespaceAPI) {
+                $namespace->awaitCalls();
+            }
+        }
         $this->wrapper->getAPI()?->unreference();
         if (isset($this->wrapper)) {
             $this->wrapper->logger('Prompting final serialization...');
