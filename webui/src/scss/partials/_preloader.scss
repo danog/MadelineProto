@@ -1,0 +1,285 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../shared" as *;
+
+$transition: .2s ease-in-out;
+
+.preloader {
+  &-circular {
+    //animation: rotate 2s linear infinite;
+    animation: rotate 1s linear infinite;
+    height: 100%;
+    transform-origin: center center;
+    /* width: 100%; */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+
+  &-path {
+    //stroke-dasharray: 1, 200;
+    stroke-dasharray: 93.6375, 124.85; // 75%
+    stroke-dashoffset: 0;
+    //animation: dash 1.5s ease-in-out infinite/* , color 6s ease-in-out infinite */;
+    stroke-linecap: round;
+    stroke: white;
+    stroke-width: 3;
+  }
+
+  &-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 54px;
+    height: 54px;
+    display: flex;
+    cursor: pointer;
+    overflow: hidden; // * fix overflow of rotate
+
+    opacity: 0;
+    transform: scale(0);
+
+    @include animation-level-transition(opacity $transition, transform $transition);
+
+    &.is-visible {
+      &.forwards {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  &-container-rtmp {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    backdrop-filter: blur(0px) brightness(1.0);
+    border-radius: inherit;
+
+    body:not(.animation-level-0) & {
+      transition: opacity $transition, backdrop-filter $transition;
+    }
+
+    &.is-visible {
+      &.forwards {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.preloader-template {
+  border-radius: inherit;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.ckin__player.is-buffering.default-live {
+  .preloader {
+    &-container-rtmp {
+      &.is-visible {
+        &.forwards {
+          backdrop-filter: blur(10px) brightness(0.8);
+        }
+      }
+    }
+  }
+}
+
+.preloader-container {
+  --color: #fff;
+
+  .you-spin-me-round {
+    width: 100%;
+    height: 100%;
+  }
+
+  .preloader-circular {
+    animation: none;
+    background-color: rgba(0, 0, 0, .3);
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+  }
+
+  .preloader-path-new {
+    stroke-dasharray: 5, 149.82;
+    //stroke-dasharray: 112.36, 149.82;
+    stroke-dashoffset: 0;
+    
+    stroke-linecap: round;
+    stroke: var(--color);
+    stroke-width: 2;
+  }
+
+  // a spinner and its progress say something is going on, so they keep going
+  // with reduced animations
+  @include animation-level(1) {
+    &.is-visible:not(.manual), &.is-visible.animating {
+      .you-spin-me-round {
+        animation: rotate 2s linear infinite;
+      }
+  
+      .preloader-path-new {
+        transition: stroke-dasharray $transition, stroke-width $transition;
+      }
+    }
+  }
+
+  &.preloader-swing {
+    cursor: default;
+
+    .you-spin-me-round {
+      animation: rotate 1s linear infinite !important;
+    }
+
+    .preloader-path-new {
+      //animation: dashNew 1.5s ease-in-out infinite;
+      stroke-dasharray: 112.36, 149.82;
+    }
+
+    &.preloader-streamable .preloader-path-new {
+      stroke-dasharray: 88.95, 118.61;
+    }
+  }
+
+  .preloader-close, .preloader-download {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    color: var(--color);
+    width: 56%;
+    height: 56%;
+    //transform: scale(1);
+    opacity: 1;
+    
+    @include animation-level(1) {
+      transition: opacity .2s ease-in-out/* , transform .2s ease-in-out */;
+    }
+
+    path {
+      fill: var(--color);
+    }
+
+    @include hover() {
+      background: none;
+    }
+  }
+
+  &:not(.manual) .preloader-download, 
+  &.manual .preloader-close {
+    opacity: 0;
+    //transform: scale(.5);
+  }
+
+  &.manual .preloader-path-new {
+    stroke-width: 0;
+  }
+
+  .preloader-download {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.preloader-streamable {
+    &, svg {
+      cursor: pointer !important;
+    }
+
+    circle {
+      stroke-width: 2.5 !important;
+      //animation: dashNewStreamable 1.5s ease-in-out infinite !important;
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      width: .8125rem;
+      height: .8125rem;
+      border-radius: .125rem;
+      background-color: var(--color);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &.preloader-transparent {
+    .preloader-circular {
+      background-color: transparent;
+    }
+  }
+
+  &.preloader-bold {
+    .preloader-path-new {
+      stroke-width: 3.5;
+    }
+  }
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+
+@keyframes dashNew {
+  0% {
+    stroke-dasharray: 1, 149.82; // 149.82 = getTotalLength
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 112.36, 149.82; // 112.36 = 149.82 * .75
+    stroke-dashoffset: -38; // bruted
+  }
+  100% {
+    stroke-dasharray: 112.36, 149.82;
+    stroke-dashoffset: -149.82; // totalLength
+  }
+}
+
+@keyframes dashNewStreamable {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -237%;
+  }
+}

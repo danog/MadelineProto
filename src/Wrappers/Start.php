@@ -57,11 +57,16 @@ trait Start
     public function start(): array
     {
         if ($this->getAuthorization() === \danog\MadelineProto\API::LOGGED_IN) {
-            // A QR code poll of the web UI that comes after the login (late, or from another tab): it's answered
-            // here, the script must not run in it (it runs in the page)
-            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode']))) {
-                $this->webQrLogin();
-                die;
+            // Requests of the web UI that come after the login (a late QR code poll, a form submitted twice, or
+            // from another tab): they're answered here, the script must not run in them (it runs in the page)
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+                if (isset($_GET['waitQrCodeOrLogin']) || isset($_GET['getQrCode'])) {
+                    $this->webQrLogin();
+                    die;
+                }
+                if (WebUI::writeLoggedIn()) {
+                    die;
+                }
             }
             return $this instanceof Client ? $this->getSelf() : $this->fullGetSelf();
         }
@@ -166,11 +171,19 @@ trait Start
         try {
             $step();
         } catch (RPCErrorException|Exception $e) {
-            $this->webEcho(Alert::error(sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))));
+            $this->webEcho(
+                Alert::error(sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))),
+                $e instanceof RPCErrorException ? $e->rpc : null,
+            );
             return;
         }
         if ($this->getAuthorization() === API::LOGGED_IN) {
-            // The script continues in this request: it must not run again after a redirect
+            // The web app reloads the page: the script runs in that request, once
+            if (WebUI::writeLoggedIn()) {
+                $this->serialize();
+                die;
+            }
+            // Otherwise, the script continues in this request: it must not run again after a redirect
             return;
         }
         if (!WebUI::redirectToSelf()) {
@@ -197,6 +210,7 @@ trait Start
             if ($qr) {
                 $result = [
                     'logged_in' => false,
+                    'link' => $qr->link,
                     'svg' => $qr->getQRSvg(400, 2),
                 ];
             }
@@ -211,8 +225,10 @@ trait Start
 
     /**
      * Show the page of the current login step.
+     *
+     * @param ?string $rpcError Type of the RPC error of the submitted step, for the web app
      */
-    private function webEcho(?Alert $alert = null): void
+    private function webEcho(?Alert $alert = null, ?string $rpcError = null): void
     {
         $page = $this->getWebLoginPage();
         if ($page === null) {
@@ -220,6 +236,9 @@ trait Start
         }
         if ($alert !== null) {
             $page->addAlert($alert);
+        }
+        if ($rpcError !== null) {
+            $page->data['rpcError'] = $rpcError;
         }
         WebUI::write($this->getSettings()->getTemplates(), $page);
     }
@@ -235,6 +254,7 @@ trait Start
                 $type = ($_POST['type'] ?? 'phone') === 'bot' ? 'bot' : 'phone';
                 return new Page(
                     title: Lang::$current_lang['loginTitleWeb'],
+                    view: 'login.signIn',
                     lead: Lang::$current_lang['loginLeadWeb'],
                     step: Step::ACCOUNT,
                     fields: [
@@ -276,6 +296,8 @@ trait Start
             case API::WAITING_CODE:
                 return new Page(
                     title: Lang::$current_lang['loginCodeTitleWeb'],
+                    view: 'login.code',
+                    data: $this->getWebLoginInfo(),
                     lead: Lang::$current_lang['loginCodeLeadWeb'],
                     step: Step::VERIFY,
                     fields: [
@@ -294,6 +316,8 @@ trait Start
                 $hint = $this->getHint();
                 return new Page(
                     title: Lang::$current_lang['loginPasswordTitleWeb'],
+                    view: 'login.password',
+                    data: ['hint' => $hint],
                     lead: Lang::$current_lang['loginPasswordLeadWeb'],
                     step: Step::VERIFY,
                     fields: [
@@ -311,6 +335,8 @@ trait Start
             case API::WAITING_SIGNUP:
                 return new Page(
                     title: Lang::$current_lang['signupTitleWeb'],
+                    view: 'login.signUp',
+                    data: $this->getWebLoginInfo(),
                     lead: Lang::$current_lang['signupLeadWeb'],
                     step: Step::VERIFY,
                     fields: [

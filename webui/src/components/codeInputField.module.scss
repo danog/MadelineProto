@@ -1,0 +1,137 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+.wrap {
+  position: relative;
+  pointer-events: none;
+  display: flex;
+  // A code is always one row: the boxes give up width instead (see `.digit`).
+  // Wrapping is deliberately NOT allowed — a flex line wraps before it shrinks, so
+  // permitting it is what would push an 8-digit code onto a second row.
+  gap: 0.625rem;
+  container-type: inline-size;
+  justify-content: center;
+  width: 100%;
+}
+
+.input {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  padding: 0;
+  color: transparent;
+  background: transparent;
+  caret-color: transparent;
+  border: 0px solid transparent;
+  outline: transparent solid 0px;
+  box-shadow: none;
+  line-height: 1;
+  letter-spacing: -1em;
+  font-family: monospace;
+  font-variant-numeric: tabular-nums;
+  pointer-events: all;
+
+  .disabled & {
+    pointer-events: none;
+  }
+}
+
+// This field already shows focus: the input is an invisible overlay across the
+// whole row, and the digit box the caret sits in lights up (`.digit.active`).
+// The global ring would add a second outline around all six boxes at once, so
+// it is turned off here — the `.wrap` prefix outweighs the rule in
+// scss/partials/_accessibility.scss, which is loaded last on purpose.
+:global(:where(.a11y)) .wrap .input:focus-visible {
+  outline: none;
+}
+
+.digit {
+  // Sized like the other clients: the box keeps its height and gives up width as the
+  // code gets longer (tdesktop draws it 0.8 of its height, Android shrinks it outright
+  // for the types with more digits). A Fragment code is 8 digits and used to run past
+  // the card at a fixed 3rem.
+  flex: 1 1 3rem;
+  max-width: 3rem;
+  // no floor: the schema allows a code of up to 32, and a squeezed row still reads
+  // better than one that runs out of the card
+  min-width: 0;
+  height: 3rem;
+  border: 1px solid var(--input-search-border-color);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition-property: border-color, opacity;
+  transition-duration: 0.1s, 0.3s;
+  transition-timing-function: var(--transition-standard-easing);
+  position: relative;
+  overflow: hidden;
+
+  &.active {
+    border-color: var(--primary-color);
+    transition: none;
+  }
+  
+  .error & {
+    border-color: var(--danger-color);
+  }
+
+  .disabled & {
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  &Content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global {
+    .s-enter-active,
+    .s-exit-active {
+      transition-property: opacity, transform;
+      transition-duration: 0.2s;
+      transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .s-enter {
+      transform: translateY(20px);
+    }
+
+    .s-exit-to {
+      opacity: 0;
+      transform: scale(0.5)
+    }
+  }
+}
+
+@container (width <= 320px) {
+  .digit {
+    max-width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+.caret {
+  height: 1rem;
+  width: 1px;
+  animation: caret-blink 1.25s ease-out infinite;
+  transition-duration: 1000ms;
+  background-color: var(--primary-text-color);
+}
+
+@keyframes caret-blink {
+  0%, 70%, 100% {
+    opacity: 1;
+  }
+  20%, 50% {
+    opacity: 0;
+  }
+}

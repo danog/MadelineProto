@@ -182,13 +182,13 @@ trait Start
                 return null;
             }
             $this->session->storeApiSetupState($wrapper);
-            WebUI::redirectToSelf() || WebUI::write($templates, self::getCodeApiPage());
+            WebUI::redirectToSelf() || WebUI::write($templates, self::getCodeApiPage($wrapper->getPhoneNumber()));
             return null;
         }
 
         if (!$wrapper->loggedIn()) {
             if (!isset($_POST['my_code'])) {
-                WebUI::write($templates, self::getCodeApiPage());
+                WebUI::write($templates, self::getCodeApiPage($wrapper->getPhoneNumber()));
                 return null;
             }
             try {
@@ -199,7 +199,7 @@ trait Start
                 }
             } catch (Exception|HttpException $e) {
                 $this->session->storeApiSetupState($wrapper);
-                WebUI::write($templates, self::getCodeApiPage()->addAlert(self::getAutoErrorAlert($e)));
+                WebUI::write($templates, self::getCodeApiPage($wrapper->getPhoneNumber())->addAlert(self::getAutoErrorAlert($e)));
                 return null;
             }
             // Logged in, with the creation hash of the app
@@ -256,6 +256,7 @@ trait Start
     {
         return new Page(
             title: Lang::$current_lang['apiSetupTitleWeb'],
+            view: 'api.auto',
             lead: Lang::$current_lang['apiSetupLeadWeb'],
             step: Step::APP,
             fields: [
@@ -275,10 +276,12 @@ trait Start
         );
     }
 
-    private static function getCodeApiPage(): Page
+    private static function getCodeApiPage(string $phoneNumber): Page
     {
         return new Page(
             title: Lang::$current_lang['apiAutoCodeTitleWeb'],
+            view: 'api.code',
+            data: ['phoneNumber' => $phoneNumber],
             lead: Lang::$current_lang['apiAutoCodeLeadWeb'],
             step: Step::APP,
             fields: [
@@ -304,6 +307,7 @@ trait Start
     {
         return new Page(
             title: Lang::$current_lang['apiCreateTitleWeb'],
+            view: 'api.create',
             lead: Lang::$current_lang['apiCreateLeadWeb'],
             step: Step::APP,
             fields: [
@@ -353,6 +357,7 @@ trait Start
         }
         return new Page(
             title: Lang::$current_lang['apiManualWeb'],
+            view: 'api.manual',
             lead: new SafeHtml(sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html')),
             step: Step::APP,
             fields: [

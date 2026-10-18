@@ -6,15 +6,16 @@
  * @var \danog\MadelineProto\WebUI\Page $page
  * @var string $state Initial state of the web app (JSON)
  *
- * The markup is the fallback for browsers without JavaScript: the web app replaces the content of #madeline-app
- * when it starts, rendering the page again from the state.
+ * The web app renders the page from the state in #madeline-app; the markup is for browsers without JavaScript.
  */
 $this->layout('layout', ['title' => $page->title]);
 ?>
+<?php $this->start('app') ?>
 <?php if (isset($state)): ?>
-    <script type="application/json" id="madeline-state"><?= $state ?></script>
+<script type="application/json" id="madeline-state"><?= $state ?></script>
 <?php endif ?>
-<div id="madeline-app">
+<div id="madeline-app"></div>
+<?php $this->stop() ?>
 <div class="shell">
     <aside class="rail">
         <?= $this->insert('partials/brand') ?>
@@ -54,5 +55,4 @@ $this->layout('layout', ['title' => $page->title]);
             </div>
         </div>
     </main>
-</div>
 </div>

@@ -1,0 +1,25 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ *
+ * Adapted for MadelineProto: the entry of the stylesheet (tweb: scss/style.scss), with only what the auth
+ * flow uses. The card modules (*.module.scss) are added by the components that import them.
+ */
+
+@use "fonts/roboto";
+@use "theme";
+@use "base";
+@use "partials/scrollable";
+@use "partials/ripple";
+@use "partials/preloader";
+@use "partials/input";
+@use "partials/button";
+
+// The root of the app (PROTOCOL.md): like tweb's #auth-flow-root, it takes no box, so that the heights of the
+// auth flow (#auth-pages.whole: 100%) resolve against body, and its scrollable is the height of the screen.
+// With a box of its own (auto height), they would grow with the card, and nothing could scroll (body is
+// overflow: hidden).
+#madeline-app {
+  display: contents;
+}

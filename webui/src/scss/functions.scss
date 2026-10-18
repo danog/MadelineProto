@@ -1,0 +1,24 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "variables" as *;
+
+@function hover-color($color, $alpha: $hover-alpha) {
+  @return rgba($color, $alpha);
+}
+
+@function rgba-to-rgb($rgba, $background: #fff) {
+  @if $background == true {
+    $background: #fff;
+  }
+
+  @return mix(rgb(red($rgba), green($rgba), blue($rgba)), $background, alpha($rgba) * 100%);
+}
+
+@mixin avatar-color($color, $top, $bottom) {
+  --peer-avatar-#{$color}-top: #{$top};
+  --peer-avatar-#{$color}-bottom: #{$bottom};
+}

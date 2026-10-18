@@ -1,0 +1,198 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../shared" as *;
+
+html.overlay-scroll {
+  .scrollable::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    opacity: 0; // for safari
+    width: .375rem;
+  }
+
+  .scrollable::-webkit-scrollbar-thumb {
+    width: 0;
+    height: 0;
+  }
+
+  .scrollable::-webkit-scrollbar-thumb {
+    opacity: 0;
+    transition: .2s ease-in-out;
+  }
+
+  .scrollable::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  .scrollable::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  .scrollable:hover {
+    scrollbar-color: var(--scrollbar-color) rgba(0, 0, 0, 0);
+  }
+
+  .scrollable:hover::-webkit-scrollbar {
+    opacity: 1; // for safari
+  }
+
+  .scrollable:hover::-webkit-scrollbar-thumb {
+    min-height: 5rem;
+    max-height: 12.5rem;
+    border-radius: $border-radius-medium;
+    background-color: var(--scrollbar-color);
+    opacity: 1;
+  }
+}
+
+html.custom-scroll {
+  .scrollable::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .scrollable:hover .scrollable-thumb,
+  .scrollable-thumb.is-focused {
+    opacity: 1;
+  }
+
+  .scrollable-thumb--hidden {
+    transition: none !important;
+    opacity: 0 !important;
+  }
+}
+
+.scrollable-x::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none; // for safari iOS
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.no-scrollbar::-webkit-scrollbar-thumb {
+  width: 0;
+  height: 0;
+}
+
+.no-scrollbar {
+  scrollbar-width: none !important;
+}
+
+.scrollable {
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  max-height: 100%;
+
+  //@include respond-to(not-handhelds) {
+    position: absolute;
+    inset: 0;
+  //}
+
+  -webkit-overflow-scrolling: touch;
+
+  &.relative {
+    position: relative;
+  }
+
+  &.scrollable-x {
+    overflow-x: auto;
+    scrollbar-width: none; // Firefox only
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+  }
+
+  &.scrollable-y {
+    overflow-y: auto;
+    overflow-y: overlay;
+    scrollbar-width: none;
+    overscroll-behavior-y: contain;
+
+    html.overlay-scroll & {
+      scrollbar-width: thin;
+    }
+
+    .is-firefox & {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
+    }
+
+    @if $use-acceleration {
+      transform: translateZ(0);
+    }
+
+    // each side is opted into on its own — a scroll with nothing above it wants no top border,
+    // and one with nothing below it no bottom border. The colour then follows the scroll position.
+    &.scrollable-y-bordered {
+      @include animation-level(1) {
+        transition: border-top-color var(--transition-standard-in), border-bottom-color var(--transition-standard-in);
+      }
+
+      &-top {
+        border-top: 1px solid transparent;
+
+        &:not(.scrolled-start) {
+          border-top-color: var(--border-color);
+        }
+      }
+
+      &-bottom {
+        border-bottom: 1px solid transparent;
+
+        &:not(.scrolled-end) {
+          border-bottom-color: var(--border-color);
+        }
+      }
+    }
+
+    // html.is-firefox & {
+    //   transition: scrollbar-color .3s ease;
+    // }
+
+    /* html.is-safari & {
+      overflow-y: scroll;
+    } */
+  }
+
+  // &-padding {
+  //   min-width: 100%;
+  //   height: 100%;
+  // }
+
+  /* html.is-safari &-padding {
+    margin-right: -6px;
+  } */
+
+  &-thumb {
+    position: absolute;
+    inset-inline-end: 1px;
+    width: 5px;
+    //margin-left: 2px;
+    background-color: var(--scrollbar-color);
+    //cursor: grab;
+    cursor: default;
+    opacity: 0;
+    border-radius: $border-radius;
+    // z-index: 5;
+
+    @include animation-level(1) {
+      transition: opacity .1s ease-in-out;
+    }
+
+    &-container {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+    }
+  }
+}

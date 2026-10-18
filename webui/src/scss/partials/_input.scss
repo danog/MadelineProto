@@ -1,0 +1,408 @@
+/*
+ * https://github.com/morethanwords/tweb
+ * Copyright (C) 2019-2026 Eduard Kuzmenko
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
+@use "../shared" as *;
+
+.input-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 100%;
+}
+
+.input-field {
+  --height: #{$input-height};
+  --border-radius: #{$input-border-radius};
+  // --padding: calc((var(--height) - var(--border-width) * 2 - var(--line-height)) / 2);
+  --padding: 0.8125rem;
+  --padding-horizontal: 1rem;
+  --border-width: 1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  .arrow-down {
+    position: absolute;
+    content: " ";
+    top: 50%;
+    bottom: 0;
+    inset-inline-end: 21px;
+    cursor: pointer;
+    
+    height: 0;
+    width: 0;
+    
+    border: solid var(--secondary-text-color);
+    border-radius: 1px;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 5px;
+    vertical-align: middle;
+    
+    z-index: 2;
+    
+    margin-top: -9px;
+    transform: rotate(45deg);
+    transition: .2s all;
+  }
+
+  label,
+  &-error-label {
+    position: absolute;
+    color: $placeholder-color;
+    top: 0;
+    inset-inline: var(--padding-horizontal) auto;
+    z-index: 2;
+    height: 1.5rem;
+    transform: translate(0, 0);
+    background-color: var(--surface-color);
+    transform-origin: var(--transform-origin-left-center);
+    pointer-events: none;
+    margin-top: calc((var(--height) - 1.5rem) / 2); // * Center of first line
+    white-space: nowrap;
+
+    @include animation-level-transition(.2s transform, .2s padding, .1s opacity, font-weight 0s .1s);
+  }
+
+  &-error-label {
+    color: var(--danger-color);
+  }
+
+  &-border {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 2px solid var(--primary-color);
+    opacity: 0;
+    border-radius: var(--border-radius);
+    pointer-events: none;
+    z-index: 1;
+
+    @include animation-level(1) {
+      transition: opacity .2s;
+    }
+  }
+
+  &-icon {
+    position: absolute;
+    inset-inline-end: 1rem;
+    z-index: 1;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: .375rem;
+    pointer-events: none;
+  }
+  
+  &-input {
+    border: var(--border-width) solid var(--input-search-border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--surface-color);
+    //padding: 0 1rem;
+    padding: calc(var(--padding) - var(--border-width)) calc(var(--padding-horizontal) - var(--border-width));
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--height);
+    transition: 0s border-color;
+    position: relative;
+    z-index: 1;
+    line-height: var(--line-height);
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      //transition: background-color 5000s ease-in-out 0s;
+      -webkit-box-shadow: 0 0 0px 1000px var(--surface-color) inset;
+    }
+
+    &:-webkit-autofill::first-line,
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      font-family: var(--font-family);
+      font-size: var(--font-size) !important;
+      color: var(--primary-text-color) !important;
+    }
+
+    @include animation-level(0) {
+      transition: none !important;
+    }
+
+    @include hover() {
+      &:not(:focus):not(.error):not(.valid) {
+        border-color: var(--primary-color);
+        transition: .2s border-color;
+
+        & ~ label {
+          color: var(--primary-color);
+        }
+      }
+    }
+
+    &:focus {
+      border-color: var(--primary-color);
+    }
+
+    &.error {
+      border-color: var(--danger-color);
+
+      & ~ label,
+      & ~ .input-field-error-label {
+        color: var(--danger-color) !important;
+      }
+
+      & ~ .input-field-border {
+        border-color: var(--danger-color) !important;
+      }
+    }
+
+    &.valid {
+      border-color: #26962F;
+      
+      & ~ label {
+        color: #26962F !important;
+      }
+
+      & ~ .input-field-border {
+        border-color: #26962F !important;
+      }
+    }
+
+    /* &.error, &.valid {
+      transition: .2s border-width;
+    } */
+
+    &:focus ~ .arrow-down {
+      margin-top: -4px;
+      transform: rotate(225deg);
+      border-color: var(--primary-color);
+    }
+
+    &:focus ~ label,
+    &:focus ~ .input-field-error-label,
+    &.force-focus ~ label,
+    &.force-focus ~ .input-field-error-label {
+      color: var(--primary-color);
+      font-weight: var(--font-weight-bold);
+    }
+
+    &:focus ~ .input-field-border, &.force-focus ~ .input-field-border {
+      opacity: 1;
+    }
+
+    /* // * valid for plain text, empty for contenteditable
+    &:valid ~ label, 
+    &:not(:empty):focus ~ label {
+      transition-delay: 0s, 0s, 0s, 0s;
+    } */
+
+    &:focus ~ label,
+    &:focus ~ .input-field-error-label,
+    &:valid ~ label,
+    &:valid ~ .input-field-error-label,
+    &:not(.is-empty) ~ label,
+    &:not(.is-empty) ~ .input-field-error-label,
+    &:disabled ~ label,
+    &:disabled ~ .input-field-error-label,
+    &.force-focus ~ label,
+    &.force-focus ~ .input-field-error-label {
+      // * floats up toward the inline start
+      transform: translate(calc((-.1875rem + (1rem - var(--padding-horizontal))) * var(--reflect)), calc(var(--height) / -2 + .0625rem)) scale(.75);
+      padding: 0 .3125rem;
+      opacity: 1;
+    }
+
+    &:not(:focus).is-empty ~ .input-field-placeholder ~ label {
+      opacity: 0;
+    }
+  }
+
+  &.has-error-label > label {
+    opacity: 0;
+  }
+
+  & &-input[contenteditable="false"] {
+    opacity: var(--disabled-opacity);
+    pointer-events: none;
+  }
+
+  &-placeholder {
+    color: var(--input-placeholder-color);
+    display: block; /* For Firefox By Ariel Flesler */
+    pointer-events: none;
+    position: absolute;
+    opacity: 0;
+    max-width: 100%;
+    padding-inline-end: 0.5rem;
+    inset-inline-start: var(--padding-horizontal);
+    z-index: 1;
+    @include text-overflow(true);
+
+    @include animation-level-transition(opacity var(--input-placeholder-transition) .01s, transform var(--input-placeholder-transition) .01s);
+
+    @include animation-level(2) {
+      transform: translateX(calc(1rem * var(--reflect)));
+    }
+
+    &.is-empty {
+      opacity: 1;
+
+      @include animation-level(2) {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  &-right-label {
+    position: absolute;
+    inset-inline-end: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    color: var(--secondary-text-color);
+  }
+}
+
+.input-field-height-wrapper {
+  // The real editor keeps its intrinsic height; only this clipping wrapper
+  // receives a numeric height and transitions between ResizeObserver targets.
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  max-height: inherit;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+
+  @include animation-level(2) {
+    transition-property: height;
+    transition-timing-function: var(--transition-standard-in);
+  }
+}
+
+.input-fields-row {
+  display: flex;
+  gap: .5rem;
+
+  .input-field {
+    flex: 1 1 auto;
+    width: 1%; // fix width because of contenteditable
+  }
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: var(--input-placeholder-color);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: var(--input-placeholder-color);
+}
+
+.input-clear {
+  outline: none;
+  border: none;
+  padding: 0;
+
+  &.error {
+    @include animation-level-below(2) {
+      color: var(--danger-color) !important;
+    }
+
+    @include animation-level(2) {
+      animation: input-shake .2s ease-in-out forwards;
+    }
+  }
+}
+
+@keyframes input-shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-.5rem);
+  }
+
+  75% {
+    transform: translateX(.5rem);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.input-field-password {
+  .input-field-input {
+    padding-inline-end: 2.5rem;
+    max-height: var(--height);
+
+    &[type="password"] {
+      font-size: 2.25rem;
+      padding-inline-start: calc(.875rem - var(--border-width));
+      line-height: 1;
+      padding-top: 0;
+      padding-bottom: 0;
+      font-family: Arial, Helvetica, sans-serif; // roboto is weird here, can't make them centered
+  
+      @media (-webkit-min-device-pixel-ratio: 2) { 
+        font-size: 1.75rem;
+        letter-spacing: .125rem;
+      }
+  
+      html.is-ios & {
+        // ! меньше 1rem будет зумить поле
+        font-size: 1rem;
+      }
+
+      &::-ms-reveal {
+        display: none; // Remove the reveal password eye in Edge browsers
+      }
+    }
+  }
+  
+  .toggle-visible {
+    position: absolute;
+    inset-inline-end: .375rem;
+    z-index: 2;
+    font-size: 1.5rem;
+    color: $placeholder-color;
+    cursor: pointer;
+    transition: color .2s;
+    padding: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
+
+    @include hover() {
+      color: var(--primary-text-color);
+    }
+  }
+}
+
+.input-field-phone {
+  .input-field-input {
+    --letter-spacing: .24px;
+
+    &:after {
+      content: attr(data-left-pattern);
+      // opacity: .4;
+      color: $placeholder-color;
+      letter-spacing: var(--letter-spacing);
+    }
+  }
+}
