@@ -31,6 +31,7 @@ use danog\MadelineProto\MTProto\PermAuthKey;
 use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Reactive\SimpleSubscriber;
+use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\ContextIterator;
 use Revolt\EventLoop;
@@ -274,20 +275,28 @@ final class DataCenterConnection implements SimpleSubscriber
             $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->datacenter);
             $authorized_socket =  $this->API->datacenter->getDataCenterConnection($authed);
             $authorized_socket->waitGetConnection();
-            for ($attempt = 1; ; $attempt++) {
-                $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
-                    'auth.exportAuthorization',
-                    ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
-                );
-                $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
+            for ($attempt = 1; ;) {
                 try {
+                    $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
+                        'auth.exportAuthorization',
+                        ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
+                    );
+                    $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
                     $connection->methodCallAsyncRead('auth.importAuthorization', $e);
                     break;
+                } catch (FloodWaitError $error) {
+                    // Many processes of the account copying its authorization at once (CI runs creating sessions)
+                    // get FLOOD_WAITs longer than the flood timeout: wait them out, as this runs in the transition of
+                    // the state of the connection, where an exception kills the process, and the connection can't be
+                    // used without the authorization anyway. Not through the floodWaitLimit of the calls: their
+                    // timeout (the RPC drop timeout) would expire first.
+                    $logger->logger("Got {$error->rpc} copying the authorization to DC {$this->datacenter}, waiting {$error->waitTime} seconds", Logger::WARNING);
+                    delay($error->waitTime);
                 } catch (RPCErrorException $error) {
                     // A newer export of the same account (another process of the account copying its authorization
                     // at the same time, for example) invalidates the exported bytes: export them again, after a
                     // random delay, so that the processes don't keep invalidating each other's.
-                    if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt === 5) {
+                    if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt++ === 5) {
                         throw $error;
                     }
                     $logger->logger("The exported authorization for DC {$this->datacenter} was invalidated, exporting it again", Logger::WARNING);
