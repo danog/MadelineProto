@@ -174,7 +174,7 @@ final class MtProxyTest extends TestCase
         // Responses and requests spanning many TLS records.
         $strings = $API->langpack->getLangPack(lang_pack: 'android', lang_code: 'en')['strings'];
         self::assertGreaterThan(1000, \count($strings));
-        $keys = array_slice(array_column($strings, 'key'), 0, 5000);
+        $keys = \array_slice(array_column($strings, 'key'), 0, 5000);
         self::assertGreaterThan(20 * FakeTlsStream::MAX_TLS_PACKET_LENGTH, \strlen(implode('', $keys)));
         $strings = $API->langpack->getStrings(lang_pack: 'android', lang_code: 'en', keys: $keys);
         self::assertSame($keys, array_column($strings, 'key'));
