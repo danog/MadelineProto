@@ -32,6 +32,7 @@ use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\ContextIterator;
 use danog\MadelineProto\Stream\MTProtoTransport\AbridgedStream;
+use danog\MadelineProto\Stream\MTProtoTransport\FakeTlsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\FullStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
@@ -92,6 +93,7 @@ final class DataCenter
     public function __construct(private readonly MTProto $API)
     {
         $this->__wakeup();
+        $this->applySettings();
     }
 
     /**
@@ -102,23 +104,34 @@ final class DataCenter
         return ['API', 'list', 'currentDatacenter'];
     }
 
+    /**
+     * Runs during unserialize(), before MTProto itself is woken up: must not connect or log.
+     */
     public function __wakeup(): void
     {
         $this->connectMutex = new LocalKeyedMutex;
-        if ($this->getSettings()->hasChanged()) {
-            unset($this->dohWrapper);
+        $this->dohWrapper = new DoHWrapper($this->API);
+    }
+
+    /**
+     * Apply changed connection settings to the existing connections.
+     *
+     * @internal
+     */
+    public function applySettings(): void
+    {
+        if (!$this->getSettings()->hasChanged()) {
+            return;
         }
-        $this->dohWrapper ??= new DoHWrapper($this->API);
-        if ($this->getSettings()->hasChanged()) {
-            foreach ($this->list as $dc => $socket) {
-                if (\is_string($dc)) {
-                    continue;
-                }
-                $socket->setCtx($this->generateContexts($dc));
-                $socket->reconnect();
+        $this->dohWrapper = new DoHWrapper($this->API);
+        foreach ($this->list as $dc => $socket) {
+            if (\is_string($dc)) {
+                continue;
             }
-            $this->getSettings()->applyChanges();
+            $socket->setCtx($this->generateContexts($dc));
+            $socket->reconnect();
         }
+        $this->getSettings()->applyChanges();
     }
     /**
      * @return array<int, DataCenterConnection>
@@ -278,8 +291,16 @@ final class DataCenter
         $proxyCombos = [];
         foreach ($settings->getProxies() as $proxy => $extras) {
             foreach ($extras as $extra) {
-                if ($proxy === ObfuscatedStream::class && \in_array(\strlen($extra['secret']), [17, 34], true)) {
-                    $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                if ($proxy === ObfuscatedStream::class && isset($extra['secret'])) {
+                    $secret = ObfuscatedStream::decodeSecret($extra['secret']);
+                    if ($secret['domain'] !== null) {
+                        // Fake TLS only carries the padded intermediate transport, as in TDLib.
+                        $proxyCombos []= [[DefaultStream::class, []], [BufferedRawStream::class, []], [FakeTlsStream::class, $extra], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                        continue;
+                    }
+                    if ($secret['padded']) {
+                        $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [$proxy, $extra], [IntermediatePaddedStream::class, []]];
+                    }
                 }
                 foreach ($combos as $orig) {
                     $combo = [];
@@ -308,11 +329,12 @@ final class DataCenter
                 }
             }
         }
-        if ($settings->getRetry()) {
-            $combos = array_merge($proxyCombos, $combos);
+        if ($proxyCombos) {
+            // Only through the proxies unless allowed: a direct connection would bypass them.
+            $combos = $settings->getDirectFallback() ? array_merge($proxyCombos, $combos) : $proxyCombos;
+        }
+        if ($settings->getRetry() && (!$proxyCombos || $settings->getDirectFallback())) {
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
-        } elseif ($proxyCombos) {
-            $combos = $proxyCombos;
         }
         $combos = array_unique($combos, SORT_REGULAR);
 

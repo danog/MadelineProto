@@ -44,11 +44,12 @@ release_notes()
     old=$(layer "$previous")
     new=$(layer "$ref")
     if [ "$old" != "$new" ]; then
-        git submodule update --init schemas
+        # What's printed is the notes: git's output goes to stderr.
+        git submodule update --init schemas >&2
         diff=$(php tools/layerdiff.php --no-send "$old" "$new")
         printf '\n%s\n## Layer %s\n\nChanges since layer %s:\n\n' "$LAYER_DIFF_MARKER" "$new" "$old"
-        # Without what the logger prints before it.
-        sed -n '/^New /,$p' <<< "$diff"
+        # Without the blank lines before it (its first section isn't always a "New" one: only the non-empty ones are listed).
+        sed '/./,$!d' <<< "$diff"
     fi
 }
 

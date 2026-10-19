@@ -22,6 +22,7 @@ namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -321,10 +322,11 @@ trait UpdateHandler
      *
      * **Only use the [event handler](#async-event-driven) when writing a MadelineProto bot**, because update handling in the **event handler** is completely parallelized and non-blocking.
      *
-     * @param  array{offset?: int, limit?: int, timeout?: float} $params Params
+     * @param  array{offset?: int, limit?: int, timeout?: float} $params       Params: once the timeout expires, an empty array is returned
+     * @param  ?Cancellation                                     $cancellation Cancellation: once cancelled, the wait stops with a CancelledException
      * @return list<array{update_id: mixed, update: mixed}>
      */
-    public function getUpdates(array $params = []): array
+    public function getUpdates(array $params = [], ?Cancellation $cancellation = null): array
     {
         if ($this->usingGetUpdates) {
             throw new AssertionError("Concurrent getUpdates detected, aborting!");
@@ -364,14 +366,19 @@ trait UpdateHandler
                 $id = EventLoop::delay($timeout, static fn () => $deferred->cancel(self::$getUpdatesTimeout));
                 $timeout = $deferred->getCancellation();
             }
+            $wait = $timeout !== null && $cancellation !== null
+                ? new CompositeCancellation($timeout, $cancellation)
+                : $timeout ?? $cancellation;
 
             do {
                 if (!$this->getUpdatesQueue->count()) {
                     try {
                         $this->update_deferred = new DeferredFuture();
-                        $this->update_deferred->getFuture()->await($timeout);
+                        $this->update_deferred->getFuture()->await($wait);
                     } catch (CancelledException $e) {
-                        if (!$e->getPrevious() instanceof TimeoutException) {
+                        // Only our own timeout returns what was received so far: a cancellation of the caller
+                        // (even one by a TimeoutCancellation of its own) is thrown.
+                        if ($cancellation?->isRequested() || !$timeout?->isRequested()) {
                             throw $e;
                         }
                     }
@@ -1058,8 +1065,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = array_merge($updates['request']['body'] ?? [], $updates);
-                unset($updates['request']);
+                $updates = $this->mergeSentRequest($updates);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
@@ -1072,6 +1078,75 @@ trait UpdateHandler
                 return [$updates];
             default:
                 throw new ResponseException('Unrecognized update received: '.$updates['_']);
+        }
+    }
+    /**
+     * Fill a short message update with the parameters of the request that sent it.
+     *
+     * The request has the input types of the method (InputReplyTo, InputMedia, ...), not the ones of the message.
+     */
+    private function mergeSentRequest(array $updates): array
+    {
+        $body = $updates['request']['body'] ?? [];
+        // The media actually sent, if any, is in the update itself.
+        unset($updates['request'], $body['media'], $body['rich_message']);
+        if (isset($body['reply_to'])) {
+            $body['reply_to'] = self::inputReplyToHeader(
+                $body['reply_to'],
+                isset($body['reply_to']['top_msg_id']) && $this->isForum($body['peer']),
+                fn (mixed $peer): int => $this->getInfo($peer, API::INFO_TYPE_ID),
+            );
+        }
+        return array_merge($body, $updates);
+    }
+    /**
+     * Convert the InputReplyTo of a request into the MessageReplyHeader of the message it sent.
+     *
+     * @internal
+     *
+     * @param \Closure(mixed): int $getId
+     */
+    public static function inputReplyToHeader(array $replyTo, bool $forum, \Closure $getId): ?array
+    {
+        switch ($replyTo['_'] ?? null) {
+            case 'inputReplyToMessage':
+                $header = [
+                    '_' => 'messageReplyHeader',
+                    'reply_to_scheduled' => false,
+                    'forum_topic' => $forum,
+                    'quote' => isset($replyTo['quote_text']),
+                    'reply_to_ephemeral' => false,
+                ];
+                $msgId = $replyTo['reply_to_msg_id'] ?? null;
+                $topId = $replyTo['top_msg_id'] ?? null;
+                if (!$msgId || $msgId === $topId) {
+                    // A message at the root of a thread replies to its top message.
+                    $msgId = $topId;
+                    $topId = null;
+                }
+                if ($msgId !== null) {
+                    $header['reply_to_msg_id'] = $msgId;
+                }
+                if ($topId !== null) {
+                    $header['reply_to_top_id'] = $topId;
+                }
+                if (isset($replyTo['reply_to_peer_id'])) {
+                    $header['reply_to_peer_id'] = $getId($replyTo['reply_to_peer_id']);
+                }
+                foreach (['quote_text', 'quote_entities', 'quote_offset', 'todo_item_id', 'poll_option'] as $key) {
+                    if (isset($replyTo[$key])) {
+                        $header[$key] = $replyTo[$key];
+                    }
+                }
+                return $header;
+            case 'inputReplyToStory':
+                return [
+                    '_' => 'messageReplyStoryHeader',
+                    'peer' => $getId($replyTo['peer']),
+                    'story_id' => $replyTo['story_id'],
+                ];
+            default:
+                return null;
         }
     }
     private function populateMessageFlags(array &$message): void
@@ -1129,8 +1204,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = array_merge($updates['request']['body'] ?? [], $updates);
-                unset($updates['request']);
+                $updates = $this->mergeSentRequest($updates);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {
@@ -1271,56 +1345,10 @@ trait UpdateHandler
             $this->handleGroupCallUpdate($update);
         }
         if ($update['_'] === 'updatePhoneCall') {
-            switch ($update['phone_call']['_']) {
-                case 'phoneCallRequested':
-                    if (isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
-                        $this,
-                        $update['phone_call'],
-                    );
-                    $this->callsByPeer[$controller->public->otherID] = $controller;
-                    $update['phone_call'] = $controller->public;
-                    break;
-                case 'phoneCallWaiting':
-                    if (isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
-                        $this,
-                        $update['phone_call']
-                    );
-                    $this->callsByPeer[$controller->public->otherID] = $controller;
-                    $update['phone_call'] = $controller->public;
-                    break;
-                case 'phoneCallAccepted':
-                    if (!isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $controller = $this->calls[$update['phone_call']['id']];
-                    $controller->confirm($update['phone_call']);
-                    $update['phone_call'] = $controller->public;
-                    break;
-                case 'phoneCall':
-                    if (!isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $controller = $this->calls[$update['phone_call']['id']];
-                    $controller->complete($update['phone_call']);
-                    $update['phone_call'] = $controller->public;
-                    break;
-                case 'phoneCallDiscarded':
-                    if (!isset($this->calls[$update['phone_call']['id']])) {
-                        return;
-                    }
-                    $controller = $this->calls[$update['phone_call']['id']];
-                    $controller->onDiscarded($update['phone_call']);
-                    $update['phone_call'] = $controller->public;
-                    break;
-                case 'phoneCallEmpty':
-                    return;
+            if (!$this->postponeCallUpdate($update)) {
+                $this->applyCallUpdate($update);
             }
+            return;
         }
         if ($update['_'] === 'updateNewEncryptedMessage' && !isset($update['message']['decrypted_message'])) {
             if (isset($update['qts'])) {
@@ -1364,8 +1392,10 @@ trait UpdateHandler
                         }
                         break;
                     case 'encryptedChatDiscarded':
+                        // Discarded by the other party, or accepted by another session of the account: forget it
+                        // without echoing a messages.discardEncryption, which is only for chats we close ourselves.
                         $this->logger->logger('Deleting secret chat '.$update['chat']['id'].' because it was revoked by the other user (it was probably accepted by another client)', Logger::NOTICE);
-                        $this->discardSecretChat($update['chat']['id']);
+                        unset($this->secretChats[$update['chat']['id']], $this->temp_requested_secret_chats[$update['chat']['id']]);
                         break;
                     case 'encryptedChat':
                         $this->logger->logger('Completing creation of secret chat '.$update['chat']['id'], Logger::NOTICE);
@@ -1402,6 +1432,65 @@ trait UpdateHandler
         }
 
         $this->handleUpdate($update);
+    }
+    /**
+     * Apply an [updatePhoneCall](https://core.telegram.org/constructor/updatePhoneCall) to its call, then
+     * dispatch it, see {@see self::postponeCallUpdate()}.
+     */
+    private function applyCallUpdate(array $update): void
+    {
+        switch ($update['phone_call']['_']) {
+            case 'phoneCallRequested':
+                // Ringing on every session of the account: only the one that accepts it will be in
+                // it, see PrivateCallController::accept() and onDiscarded().
+                if (isset($this->calls[$update['phone_call']['id']])) {
+                    return;
+                }
+                $this->calls[$update['phone_call']['id']] = $controller = new PrivateCallController(
+                    $this,
+                    $update['phone_call'],
+                );
+                $this->callsByPeer[$controller->public->otherID] = $controller;
+                $update['phone_call'] = $controller->public;
+                break;
+            case 'phoneCallWaiting':
+                // The state of an outgoing call, which requestCall() tracks from the result of
+                // phone.requestCall (the updates that come before it are postponed until then, see
+                // postponeCallUpdate()): any other one was requested by another session of the account
+                // (as TDLib, only create calls from phoneCallRequested), and tracking it would make
+                // this session confirm or discard a call it is not in. It carries nothing to apply to
+                // a call we track.
+                return;
+            case 'phoneCallAccepted':
+                if (!isset($this->calls[$update['phone_call']['id']])) {
+                    return;
+                }
+                $controller = $this->calls[$update['phone_call']['id']];
+                $controller->confirm($update['phone_call']);
+                $update['phone_call'] = $controller->public;
+                break;
+            case 'phoneCall':
+                if (!isset($this->calls[$update['phone_call']['id']])) {
+                    return;
+                }
+                $controller = $this->calls[$update['phone_call']['id']];
+                $controller->complete($update['phone_call']);
+                $update['phone_call'] = $controller->public;
+                break;
+            case 'phoneCallDiscarded':
+                if (!isset($this->calls[$update['phone_call']['id']])) {
+                    return;
+                }
+                $controller = $this->calls[$update['phone_call']['id']];
+                $controller->onDiscarded($update['phone_call']);
+                $update['phone_call'] = $controller->public;
+                break;
+            case 'phoneCallEmpty':
+                return;
+        }
+        if ($this->updateHandlerType !== UpdateHandlerType::NOOP) {
+            $this->handleUpdate($update);
+        }
     }
     /**
      * Handle the updates postponed while the event handler is starting, once it started.

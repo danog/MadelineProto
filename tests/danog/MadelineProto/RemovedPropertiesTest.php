@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\API;
 use danog\MadelineProto\EventHandler\Calls\PrivateCall;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
@@ -150,6 +151,21 @@ final class RemovedPropertiesTest extends TestCase
         $this->assertSame(["\0danog\\MadelineProto\\Removed\0x", "\0*\0removedProtected"], self::dynamicProperties($mtproto));
         $this->assertSame(['a' => 'b'], (new ReflectionProperty($class, 'rsaKeys'))->getValue($mtproto));
         $this->assertSame(123, (new ReflectionProperty($class, 'v'))->getValue($mtproto));
+    }
+
+    public function testTheLoginStateOfAPreReactiveSessionIsMigrated(): void
+    {
+        // Saved before 8.4.7: authorized and authorized_dc, no loginState.
+        $mtproto = unserialize(self::serialized(MTProto::class, [
+            'authorized' => API::LOGGED_IN,
+            'authorized_dc' => 4,
+        ]));
+        $this->assertInstanceOf(MTProto::class, $mtproto);
+        $this->assertSame([], $this->deprecations);
+        $this->assertSame([], self::dynamicProperties($mtproto));
+        $state = $mtproto->loginState->getState();
+        $this->assertSame(API::LOGGED_IN, $state->state);
+        $this->assertSame(4, $state->authorizedDc);
     }
 
     public function testTheObjectsOfTheSessionSeeItsPropertiesWhenTheyWakeUp(): void

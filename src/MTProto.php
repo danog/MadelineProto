@@ -52,7 +52,6 @@ use danog\BetterPrometheus\BetterGauge;
 use danog\BetterPrometheus\BetterHistogram;
 use danog\BetterPrometheus\BetterSummary;
 use danog\MadelineProto\Broadcast\Broadcast;
-use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
@@ -735,6 +734,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
+        $this->datacenter->applySettings();
         // Load rsa keys
         $this->rsaKeys = [];
         foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
@@ -816,7 +816,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function __sleep(): array
     {
-        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         return [
             // Databases
             'referenceDatabase',
@@ -898,6 +897,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'calls',
             'callsByPeer',
             'groupCalls',
+            'seenGroupCalls',
             'conferenceCalls',
             'snitch',
 
@@ -917,10 +917,20 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * unserialization, which recreates the removed ones as dynamic properties (allowed, see the class: else a
      * deprecation). __sleep() lists the declared ones, so they're never saved again.
      *
+     * The removed properties whose state is migrated are read first, here: once dropped, they're gone.
+     *
      * @internal
      */
     public function __wakeup(): void
     {
+        // Sessions saved before the reactive login state (8.4.7): the defaults are those of the removed properties.
+        if (!isset($this->loginState)) {
+            /** @psalm-suppress UndefinedThisPropertyFetch */
+            $this->loginState = new Publisher(new LoginState(
+                $this->authorized ?? API::NOT_LOGGED_IN,
+                $this->authorized_dc ?? null,
+            ));
+        }
         foreach (get_object_vars($this) as $name => $_) {
             // A private property of a class that is no longer an ancestor keeps its mangled name ("\0Class\0name"),
             // which can't be unset: unreachable by any code, it's dropped by the next save
@@ -1094,7 +1104,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
             }
         }
-        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
         $info?->set(1, [
             'php_version' => PHP_VERSION,
@@ -1318,6 +1327,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             } else {
                 Lang::$currentPercentage = 0;
             }
+            // Apply the connection settings changed before the session was saved
+            $this->datacenter->applySettings();
             // Reset MTProto session (not related to user session)
             $this->resetMTProtoSession("wakeup");
             // Update settings from constructor
@@ -1332,6 +1343,18 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
 
             $this->loginState->wakeup();
+
+            // Before anything can use the restored calls (the updates the loops started below fetch, the
+            // onStart of the event handler), drop the ones this session is not in, without requests: the
+            // incoming calls it never answered (they may have been answered by another session of the
+            // account) and the group calls it did not join (older versions tracked every group call it
+            // got updates about). The private calls whose end we may have missed expire later.
+            $ringTimeout = intdiv((int) ($this->config['call_ring_timeout_ms'] ?? 90000), 1000);
+            $receiveTimeout = intdiv((int) ($this->config['call_receive_timeout_ms'] ?? 20000), 1000);
+            foreach ($this->calls as $call) {
+                $call->expireAfterRestart($ringTimeout, $receiveTimeout);
+            }
+            $this->dropUnjoinedGroupCalls();
 
             // Connect to all DCs, start internal loops
             $loggedIn = false;
@@ -1375,14 +1398,17 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 }
             }
 
-            foreach ($this->groupCalls as $id => $groupCall) {
-                if ($groupCall->getCallState() === GroupCallState::LEFT) {
-                    $this->cleanupGroupCall($id);
-                }
-            }
         } catch (Throwable $e) {
             try {
                 $this->report((string) $e);
+            } catch (Throwable) {
+            }
+            // The session lock is released when the exception leaves the API constructor: stop the IPC server
+            // and drop the instance from the references (serialized at shutdown), so nothing touches the session
+            // without holding the lock (a client changing the database settings deleted the session from the
+            // database while the next worker was loading it).
+            try {
+                $this->unreference();
             } catch (Throwable) {
             }
             throw $e;

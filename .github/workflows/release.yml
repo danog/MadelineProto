@@ -1,7 +1,7 @@
 name: Release
 
 # When a release is published, its notes are generated (see tests/release_notes.sh); once it's fully released
-# (not a pre-release anymore), its changelog is sent to @danogentili on Telegram (see tests/announce_release.php).
+# (not a pre-release anymore), its changelog is sent to the @MadelineProto channel (see tests/announce_release.php).
 # Both only once.
 
 on:
@@ -47,7 +47,7 @@ jobs:
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: tests/send_phar.sh "$TAG"
-      - name: Send the changelog to @danogentili
+      - name: Send the changelog to @MadelineProto
         if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}

@@ -1,7 +1,10 @@
 name: Daily build
 
-# Runs composer build once a day, submitting what changed (usually, a new layer) as pull requests to
-# danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto: see tests/autobuild.sh.
+# Runs composer build and rebuilds the web UI once a day, submitting what changed (usually, a new layer) as
+# pull requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto: see tests/autobuild.sh.
+#
+# The web UI is built in a job of its own, without any secret or token: the build runs the code of its npm
+# dependencies, which must not reach the token of the app or the sessions. Only the bundle is passed on.
 #
 # It pushes with the token of a GitHub App installed on the three repositories (contents and pull
 # requests: read and write), whose ID is the AUTOBUILD_APP_ID variable and private key the
@@ -18,7 +21,27 @@ permissions:
   contents: read
 
 jobs:
+  # Not in the container: it has no Node.js, the runner has.
+  webui:
+    if: vars.AUTOBUILD_APP_ID != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test and build the web UI
+        run: tests/webui.sh --update
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webui
+          path: src/WebUI/templates/assets/tweb
+          if-no-files-found: error
+
   build:
+    needs: webui
     # Until the app is set up.
     if: vars.AUTOBUILD_APP_ID != ''
     runs-on: ubuntu-latest
@@ -57,6 +80,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ steps.app.outputs.token }}
+
+      - name: Get the bundle of the web UI
+        uses: actions/download-artifact@v4
+        with:
+          name: webui
+          path: src/WebUI/templates/assets/tweb
 
       - name: Build and submit the changes
         env:

@@ -31,6 +31,9 @@ use const PHP_BINARY;
 use const PHP_BINDIR;
 use const PHP_OS;
 use const PHP_SAPI;
+
+use function Amp\async;
+use function Amp\Future\await;
 use function Amp\Process\escapeArgument;
 
 /**
@@ -62,7 +65,9 @@ final class ProcessRunner extends RunnerAbstract
     private static ?string $binaryPath = null;
 
     /**
-     * Resources.
+     * Handles of the workers, until they exit.
+     *
+     * @var array<int, resource>
      */
     private static array $resources = [];
 
@@ -121,7 +126,7 @@ final class ProcessRunner extends RunnerAbstract
             ],
         );
 
-        self::$resources []= proc_open(
+        $process = proc_open(
             $command,
             [
                 ["pipe", "r"],
@@ -132,15 +137,44 @@ final class ProcessRunner extends RunnerAbstract
             null,
             $envVars
         );
+        if ($process === false) {
+            throw new Error("Could not start the IPC worker process!");
+        }
+        // The process handle references its pipes: they stay open for as long as it's kept, whatever happens to
+        // their streams. It's only kept until the worker exits, and the worker doesn't read its standard input.
+        fclose($pipes[0]);
+        $id = (int) $process;
+        self::$resources[$id] = $process;
         $stdout = new ReadableResourceStream($pipes[1]);
         $stderr = new ReadableResourceStream($pipes[2]);
 
-        EventLoop::queue(self::readUnref(...), $stdout);
-        EventLoop::queue(self::readUnref(...), $stderr);
+        EventLoop::queue(static function () use ($id, $stdout, $stderr): void {
+            await([async(self::readUnref(...), $stdout), async(self::readUnref(...), $stderr)]);
+            self::reap($id);
+        });
         return true;
     }
     /**
-     * Unreference and read data from fd, logging results.
+     * Release the handle of a worker that closed its output, once it exits, without keeping the loop alive.
+     */
+    private static function reap(int $id): void
+    {
+        $check = static function (?string $watcher = null) use ($id): void {
+            // proc_get_status() reaps the process once it exited
+            if (!proc_get_status(self::$resources[$id])['running']) {
+                unset(self::$resources[$id]);
+                if ($watcher !== null) {
+                    EventLoop::cancel($watcher);
+                }
+            }
+        };
+        $check();
+        if (isset(self::$resources[$id])) {
+            EventLoop::unreference(EventLoop::repeat(0.1, $check));
+        }
+    }
+    /**
+     * Unreference and read data from fd, logging results, then close it.
      */
     private static function readUnref(ReadableResourceStream $stream): void
     {
@@ -159,6 +193,7 @@ final class ProcessRunner extends RunnerAbstract
             Logger::log("An error occurred while reading the process status: $e");
         } finally {
             Logger::log("Got final message from worker: $lastLine");
+            $stream->close();
         }
     }
     /**

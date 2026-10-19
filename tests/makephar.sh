@@ -173,6 +173,7 @@ rm -f madeline-*phar madeline.version
 
 php tools/makephar.php $madelinePath/../phar "madeline$php$branch.phar" "$COMMIT-81"
 cp "madeline$php$branch.phar" "madeline-TESTING.phar"
+php tests/phar_webui.php "madeline-TESTING.phar"
 echo -n "TESTING" > "madeline.version"
 echo 0.0.0.0 phar.madelineproto.xyz > /etc/hosts
 cp tools/phar.php madeline.php

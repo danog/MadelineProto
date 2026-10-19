@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\CompositeException;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -30,6 +32,7 @@ use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
@@ -105,6 +108,20 @@ abstract class AbstractServer extends Loop
         $this->server = new IpcServer($session->getIpcPath());
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
+        self::warnIfOverTcp($session);
+    }
+    /**
+     * Warn once (per session and process) if the IPC server of the session listens on TCP, because UNIX sockets
+     * are unavailable (on Windows, without the sockets extension).
+     */
+    public static function warnIfOverTcp(SessionPaths $session): void
+    {
+        static $warned = [];
+        $path = $session->getSessionDirectoryPath();
+        if (!isset($warned[$path]) && $session->isIpcOverTcp()) {
+            $warned[$path] = true;
+            Logger::log(Lang::$current_lang['ipc_tcp_warning'], Logger::WARNING);
+        }
     }
     #[\Override]
     public function start(): bool
@@ -114,11 +131,15 @@ abstract class AbstractServer extends Loop
     /**
      * Start IPC server in background.
      *
-     * @param SessionPaths $session Session path
+     * @param SessionPaths  $session      Session path
+     * @param ?Cancellation $cancellation Stops monitoring the startup (the future then resolves to false): the
+     *                                    monitor polls the IPC state file, so whoever stops caring about the
+     *                                    startup must cancel it and await the future, or it outlives its caller
+     *                                    with file operations in flight.
      *
      * @return Future<bool|Throwable>
      */
-    public static function startMe(SessionPaths $session): Future
+    public static function startMe(SessionPaths $session, ?Cancellation $cancellation = null): Future
     {
         $id = Tools::randomInt(2000000000);
         $startTime = microtime(true);
@@ -129,7 +150,7 @@ abstract class AbstractServer extends Loop
             ProcessRunner::start((string) $session, $id);
             $started = true;
             WebRunner::start((string) $session, $id);
-            return async(self::monitor(...), $session, $id, $startTime, $started, null);
+            return async(self::monitor(...), $session, $id, $startTime, $started, null, $cancellation);
         } catch (Throwable $e) {
             Logger::log($e);
         }
@@ -146,20 +167,20 @@ abstract class AbstractServer extends Loop
                 $e = $e2;
             }
         }
-        return async(self::monitor(...), $session, $id, $startTime, $started, $e);
+        return async(self::monitor(...), $session, $id, $startTime, $started, $e, $cancellation);
     }
     /**
      * Monitor session.
      *
      * @param float $startTime When the server was started, to recognize servers started concurrently by other processes
      */
-    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e): bool|Throwable
+    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e, ?Cancellation $cancellation): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
         }
         $count = 0;
-        while (true) {
+        while (!$cancellation?->isRequested()) {
             $state = $session->getIpcState();
             if ($state && $state->getStartupId() === $id) {
                 if ($e = $state->getException()) {
@@ -184,7 +205,11 @@ abstract class AbstractServer extends Loop
                 // that will release it soon): that can take longer than any fixed timeout.
                 return new Exception("The IPC server didn't start within ".self::STARTUP_TIMEOUT." seconds, please check the logs!", previous: $e);
             }
-            delay(0.5);
+            try {
+                delay(0.5, true, $cancellation);
+            } catch (CancelledException) {
+                break;
+            }
             $count++;
         }
         return false;

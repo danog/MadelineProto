@@ -67,8 +67,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     use RestoresDeclaredProperties;
     use GroupMediaTrait;
 
-    /** How often [phone.checkGroupCall](https://core.telegram.org/method/phone.checkGroupCall) is polled while reconnecting. */
-    private const CHECK_INTERVAL = 4.0;
+    /**
+     * How often [phone.checkGroupCall](https://core.telegram.org/method/phone.checkGroupCall) is polled while
+     * joined, as TDLib does: the WebRTC connection can't tell whether we're still in the call, as the SFU keeps
+     * the endpoint of a call that ended (or that dropped us) for as long as we send it media.
+     */
+    private const CHECK_INTERVAL = 10.0;
     /** How long we wait for a missing `version` before refetching the whole call. */
     private const VERSION_GAP_TIMEOUT = 1.0;
     /** How many participants are fetched per page, and at most, when (re)loading the participant list. */
@@ -105,6 +109,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     private bool $connectionParamsApplied = false;
 
     private ?string $checkWatcher = null;
+    /** Whether a {@see self::checkJoined()} is running. */
+    private bool $checking = false;
     private ?string $gapWatcher = null;
 
     /** @var array<int, int> Every signed source ever seen => bot API peer ID, to attribute the last events of a participant that left. */
@@ -145,7 +151,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = get_object_vars($this);
         // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
         // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
-        unset($result['joinMutex'], $result['checkWatcher'], $result['gapWatcher'], $result['streamReceiver'], $result['rtmpPublisher'], $result['resumePending']);
+        unset($result['joinMutex'], $result['checkWatcher'], $result['checking'], $result['gapWatcher'], $result['streamReceiver'], $result['rtmpPublisher'], $result['resumePending']);
         return $result;
     }
 
@@ -153,6 +159,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     {
         $this->joinMutex = new LocalMutex;
         $this->checkWatcher = null;
+        $this->checking = false;
         $this->gapWatcher = null;
         $this->streamReceiver = null;
         $this->rtmpPublisher = null;
@@ -161,6 +168,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             $this->API->setupLogger();
         }
         $this->diskJockey ??= new DjLoop($this);
+        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
+        $this->resumePending = true;
+        if (!$this->isInUse()) {
+            // Dropped by MTProto::wakeup() (see forgetIfUnjoined()): start nothing.
+            return;
+        }
         Assert::true($this->diskJockey->start());
         if ($this->presentationDj !== null) {
             Assert::true($this->presentationDj->start());
@@ -168,8 +181,37 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->silentDj !== null) {
             Assert::true($this->silentDj->start());
         }
-        // Resumed by MTProto::wakeup() once the MTProto session is reset and connected, see resumeAfterRestart().
-        $this->resumePending = true;
+    }
+
+    /**
+     * Whether we are in the call (or joining it), or publishing to its RTMP livestream: the only
+     * group calls a session keeps across restarts.
+     *
+     * @psalm-mutation-free
+     */
+    private function isInUse(): bool
+    {
+        return $this->callState === GroupCallState::JOINED
+            || $this->callState === GroupCallState::JOINING
+            || $this->publishing;
+    }
+
+    /**
+     * Stop tracking the call if we are not in it, without making any request, see
+     * {@see \danog\MadelineProto\GroupCall\Handler::dropUnjoinedGroupCalls()}.
+     *
+     * @internal
+     *
+     * @return bool Whether the call is no longer tracked.
+     */
+    public function forgetIfUnjoined(): bool
+    {
+        if ($this->isInUse()) {
+            return false;
+        }
+        $this->cleanup();
+        $this->API->cleanupGroupCall($this->public->id);
+        return true;
     }
 
     /**
@@ -206,6 +248,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         // now that the whole graph is back, resume the recorders (reopen their files, re-subscribe
         // to their live tracks) and re-poll the participant list so received sources are in sync.
         $this->log("Resumed $this after a restart of the process.");
+        $this->startChecking();
         // Restart the demuxers/readers too (DjLoop::__unserialize() deliberately leaves them dormant),
         // or nothing is transmitted after a restart.
         $this->diskJockey->resumeReader();
@@ -297,6 +340,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             }
             $this->callState = GroupCallState::JOINED;
             $this->log("Joined $this!", Logger::NOTICE);
+            $this->startChecking();
             // A (re-)join always starts from a fresh WebRTC connection: hand it every recording that
             // was requested, so recordings resume (in new segments) instead of silently stopping.
             $this->rewireOutputs();
@@ -614,45 +658,94 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     #[\Override]
     public function onConnectionFailed(): void
     {
-        if ($this->callState !== GroupCallState::JOINED || $this->checkWatcher !== null) {
+        if ($this->callState !== GroupCallState::JOINED) {
             return;
         }
         $this->log("The WebRTC connection of $this failed, checking whether we are still joined...", Logger::WARNING);
-        $this->checkWatcher = EventLoop::repeat(self::CHECK_INTERVAL, function (): void {
-            if ($this->callState !== GroupCallState::JOINED) {
-                $this->stopChecking();
-                return;
-            }
-            $sources = [$this->source];
-            $presentationSource = $this->presentationConnection?->getAudioSource();
-            if ($presentationSource !== null) {
-                $sources[] = $presentationSource;
-            }
-            try {
-                $alive = $this->API->methodCallAsyncRead('phone.checkGroupCall', [
-                    'call' => $this->inputCall,
-                    'sources' => $sources,
-                ]);
-            } catch (Throwable) {
-                $alive = [];
-            }
-            if (\in_array($this->source, $alive, true)) {
-                if ($presentationSource !== null && !\in_array($presentationSource, $alive, true)) {
-                    // Only the screen-share was dropped: rejoin just the presentation.
-                    $this->log("Our screen-share was dropped from $this, rejoining it...", Logger::WARNING);
-                    $this->disablePresentation();
-                    try {
-                        $this->enablePresentation();
-                    } catch (Throwable $e) {
-                        $this->log("Could not rejoin the presentation of $this: $e", Logger::ERROR);
-                    }
-                }
-                return;
-            }
+        EventLoop::queue($this->checkJoined(...));
+    }
+
+    /**
+     * Check whether we're still in the call every {@see self::CHECK_INTERVAL} seconds, while joined.
+     */
+    private function startChecking(): void
+    {
+        if ($this->checkWatcher === null) {
+            $this->checkWatcher = EventLoop::repeat(self::CHECK_INTERVAL, $this->checkJoined(...));
+        }
+    }
+
+    /**
+     * Check whether we're still in the call, like TDLib: rejoin it if the server dropped us, leave it if it
+     * ended or we may not be in it anymore (we may have missed its groupCallDiscarded, e.g. if it ended while
+     * the process was down), and just try again later on other errors.
+     */
+    private function checkJoined(): void
+    {
+        if ($this->callState !== GroupCallState::JOINED) {
             $this->stopChecking();
-            $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
-            $this->rejoin();
-        });
+            return;
+        }
+        if ($this->checking) {
+            return;
+        }
+        $this->checking = true;
+        $sources = [$this->source];
+        $presentationSource = $this->presentationConnection?->getAudioSource();
+        if ($presentationSource !== null) {
+            $sources[] = $presentationSource;
+        }
+        try {
+            $alive = $this->API->methodCallAsyncRead('phone.checkGroupCall', [
+                'call' => $this->inputCall,
+                'sources' => $sources,
+            ]);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_FORBIDDEN' || $e->rpc === 'GROUPCALL_INVALID') {
+                $this->onEnded($e->rpc);
+                return;
+            }
+            if ($e->rpc !== 'GROUPCALL_JOIN_MISSING') {
+                $this->log("Could not check whether we are still in $this: $e", Logger::WARNING);
+                return;
+            }
+            // The server dropped us, like when it leaves our source out of the result.
+            $alive = [];
+        } catch (Throwable $e) {
+            $this->log("Could not check whether we are still in $this: $e", Logger::WARNING);
+            return;
+        } finally {
+            $this->checking = false;
+        }
+        if ($this->callState !== GroupCallState::JOINED) {
+            // Left, or rejoined, while checking.
+            return;
+        }
+        if (\in_array($this->source, $alive, true)) {
+            if ($presentationSource !== null && !\in_array($presentationSource, $alive, true)) {
+                // Only the screen-share was dropped: rejoin just the presentation.
+                $this->log("Our screen-share was dropped from $this, rejoining it...", Logger::WARNING);
+                $this->disablePresentation();
+                try {
+                    $this->enablePresentation();
+                } catch (Throwable $e) {
+                    $this->log("Could not rejoin the presentation of $this: $e", Logger::ERROR);
+                }
+            }
+            return;
+        }
+        $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
+        $this->rejoin();
+    }
+
+    /**
+     * The call ended, or we may not be in it anymore (GROUPCALL_FORBIDDEN or GROUPCALL_INVALID): leave it, as
+     * TDLib does.
+     */
+    private function onEnded(string $rpc): void
+    {
+        $this->log("$this ended, or we may not be in it anymore ($rpc): leaving it.", Logger::NOTICE);
+        $this->cleanup();
     }
 
     /**
@@ -670,6 +763,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->callState = GroupCallState::NOT_JOINED;
         try {
             $this->join($muted);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_FORBIDDEN' || $e->rpc === 'GROUPCALL_INVALID') {
+                $this->onEnded($e->rpc);
+                return;
+            }
+            $this->log("Could not rejoin $this: $e", Logger::ERROR);
         } catch (Throwable $e) {
             $this->log("Could not rejoin $this: $e", Logger::ERROR);
         }
