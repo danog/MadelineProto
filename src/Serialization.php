@@ -110,10 +110,11 @@ abstract class Serialization
      * @param SessionPaths     $session   Session name
      * @param SettingsAbstract $settings  Settings
      * @param bool             $forceFull Whether to force full session deserialization
+     * @param bool             $selfRestart Whether full deserialization is only forced by a self-restart, which waits for its predecessor to release the lock: connect to a live server instead, which won't release it
      * @internal
      * @return array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}
      */
-    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false): array
+    public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false, bool $selfRestart = false): array
     {
         //Logger::log('Waiting for exclusive session lock...');
         $warningId = EventLoop::delay(1, static function () use (&$warningId): void {
@@ -200,6 +201,29 @@ abstract class Serialization
                         $alreadyServed = true;
                         $cancelFull();
                         return;
+                    }
+                    try {
+                        delay(1.0, true, $lockWait->getCancellation());
+                    } catch (CancelledException) {
+                    }
+                }
+            };
+        } elseif ($selfRestart) {
+            // A self-restarted request forces full instances to take over the session of the request it replaces,
+            // which releases the lock as it exits; but the script may also open other sessions, served by an IPC
+            // worker that never releases the lock: a live server answers, so connect to it instead of waiting
+            // forever. If it's the event handler's session, startAndLoop() then stops the server and takes over.
+            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$ipcSocket): void {
+                while (!$lockWait->isCancelled()) {
+                    if (self::isServed($session->getIpcPath(), $lockWait->getCancellation())) {
+                        try {
+                            $socket = connect($session->getIpcPath());
+                            Logger::log('Connected to IPC socket!');
+                            $ipcSocket = [$socket, null];
+                            $cancelFull();
+                            return;
+                        } catch (Throwable) {
+                        }
                     }
                     try {
                         delay(1.0, true, $lockWait->getCancellation());

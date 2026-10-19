@@ -308,13 +308,15 @@ final class API extends AbstractAPI
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
-        $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
+        $selfRestart = !$forceFull && isset($_GET['MadelineSelfRestart']) && !Magic::$altervista;
+        $forceFull = $forceFull || $selfRestart || Magic::$altervista;
 
         $future = async(
             Serialization::unserialize(...),
             $this->session,
             $settings,
-            $forceFull
+            $forceFull,
+            $selfRestart,
         );
         while (true) {
             try {
