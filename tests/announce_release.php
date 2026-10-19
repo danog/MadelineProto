@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
 
 /**
- * Send the changelog of a release to @danogentili on Telegram (without the diff of the layer, too big), once
- * it's fully released: see tests/release_notes.sh.
+ * Send the changelog of a release to the chats of CHATS on Telegram (without the diff of the layer, too big), once
+ * it's fully released: see tests/release_notes.sh. The bot must be a member of the chats, and an admin allowed to
+ * pin messages where the changelog is pinned.
  *
  * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN
  * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh).
  * Does nothing if the release is still a draft or a pre-release, or was already announced; if it fails midway,
- * running it again sends the rest (the messages sent are counted in the body of the release).
+ * running it again sends the rest (the steps done, messages sent and pins, are counted in the body of the release).
  *
  * With DRY_RUN=1, prints the messages instead (of any release, PHAR_BOT_TOKEN is not needed).
  */
@@ -17,7 +18,12 @@ use danog\TelegramEntities\EntityTools;
 
 require __DIR__.'/../vendor/autoload.php';
 
-const CHAT_ID = 101374607; // @danogentili
+// Chat => whether the first message of the changelog is pinned there.
+const CHATS = [
+    101374607 => false, // @danogentili
+    '@MadeLine_Farsi' => false,
+    '@pwrtelegramgroupru' => true,
+];
 const MAX_LENGTH = 4096;
 // More fail with ENTITIES_TOO_LONG.
 const MAX_ENTITIES = 100;
@@ -26,8 +32,8 @@ const MAX_ENTITIES = 100;
 // rejected (the changelog of 8.8.8). With a margin.
 const MAX_ENTITIES_SIZE = 10000;
 const ANNOUNCED = '<!-- announced -->';
-// How many of the messages were sent, if not all of them.
-const SENT = '/<!-- announced (\d+) messages -->\n?/';
+// How many of the steps (messages sent and pins) were done, if not all of them, and the message to pin next.
+const DONE = '/<!-- announced (\d+) steps(?: pin (\d+))? -->\n?/';
 
 $tag = $argv[1] ?? '';
 $repository = getenv('GH_REPO') ?: 'danog/MadelineProto';
@@ -152,31 +158,60 @@ foreach ($lines as $line) {
 }
 $messages[] = $current;
 
-// Sent by a previous run, which failed midway.
-$sent = preg_match(SENT, $body, $match) ? (int) $match[1] : 0;
-$body = rtrim(preg_replace(SENT, '', $body));
-foreach ($messages as $i => $message) {
-    $entities = Entities::fromMarkdown(preg_replace("/\n{3,}/", "\n\n", $message));
+// Every message to every chat, each followed by its pin if it's the first message of a chat where it's pinned.
+$steps = [];
+foreach (CHATS as $chat => $pin) {
+    foreach ($messages as $i => $message) {
+        $steps[] = ['send', $chat, $i];
+        if ($pin && $i === 0) {
+            $steps[] = ['pin', $chat, $i];
+        }
+    }
+}
+
+// Done by a previous run, which failed midway.
+$done = preg_match(DONE, $body, $match) ? (int) $match[1] : 0;
+$toPin = isset($match[2]) ? (int) $match[2] : null;
+$body = rtrim(preg_replace(DONE, '', $body));
+foreach ($steps as $step => [$action, $chat, $i]) {
+    $entities = Entities::fromMarkdown(preg_replace("/\n{3,}/", "\n\n", $messages[$i]));
     if ($dryRun) {
-        printf("--- message %d/%d: %d characters, %d entities of size %d%s\n", $i + 1, count($messages), EntityTools::mbStrlen($entities->message), count($entities->entities), entitiesSize($entities->entities), $i < $sent ? ' (already sent)' : '');
-        echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL;
+        if ($action === 'pin') {
+            printf("--- pin message 1 in %s%s\n", $chat, $step < $done ? ' (already pinned)' : '');
+            continue;
+        }
+        printf("--- message %d/%d to %s: %d characters, %d entities of size %d%s\n", $i + 1, count($messages), $chat, EntityTools::mbStrlen($entities->message), count($entities->entities), entitiesSize($entities->entities), $step < $done ? ' (already sent)' : '');
+        if ($chat === array_key_first(CHATS)) {
+            echo $entities->message, PHP_EOL, json_encode($entities->entities), PHP_EOL;
+        }
         continue;
     }
-    if ($i < $sent) {
+    if ($step < $done) {
         continue;
     }
-    call('POST', "https://api.telegram.org/bot$botToken/sendMessage", [], [
-        'chat_id' => CHAT_ID,
-        'text' => $entities->message,
-        'entities' => $entities->entities,
-        'link_preview_options' => ['is_disabled' => true],
-    ]);
-    if ($i + 1 < count($messages)) {
-        github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n<!-- announced ".($i + 1)." messages -->\n"]);
+    if ($action === 'pin') {
+        call('POST', "https://api.telegram.org/bot$botToken/pinChatMessage", [], [
+            'chat_id' => $chat,
+            'message_id' => $toPin,
+        ]);
+        $toPin = null;
+    } else {
+        $sent = call('POST', "https://api.telegram.org/bot$botToken/sendMessage", [], [
+            'chat_id' => $chat,
+            'text' => $entities->message,
+            'entities' => $entities->entities,
+            'link_preview_options' => ['is_disabled' => true],
+        ]);
+        if (($steps[$step + 1][0] ?? null) === 'pin') {
+            $toPin = $sent['result']['message_id'];
+        }
+    }
+    if ($step + 1 < count($steps)) {
+        github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n<!-- announced ".($step + 1).' steps'.($toPin === null ? '' : " pin $toPin")." -->\n"]);
     }
 }
 if ($dryRun) {
     exit(0);
 }
 github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => "$body\n".ANNOUNCED."\n"]);
-echo "Sent the changelog of $tag in ".count($messages).' message(s)'.($sent ? ", $sent of them by a previous run" : '').PHP_EOL;
+echo "Sent the changelog of $tag in ".count($messages).' message(s) to '.count(CHATS).' chats'.($done ? ", $done of the steps by a previous run" : '').PHP_EOL;

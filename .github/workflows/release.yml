@@ -1,7 +1,7 @@
 name: Release
 
 # When a release is published, its notes are generated (see tests/release_notes.sh); once it's fully released
-# (not a pre-release anymore), its changelog is sent to @danogentili on Telegram (see tests/announce_release.php).
+# (not a pre-release anymore), its changelog is sent to Telegram (see tests/announce_release.php).
 # Both only once.
 
 on:
