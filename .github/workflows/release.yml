@@ -47,7 +47,7 @@ jobs:
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: tests/send_phar.sh "$TAG"
-      - name: Send the changelog to @danogentili
+      - name: Send the changelog to Telegram
         if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}

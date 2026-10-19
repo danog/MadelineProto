@@ -135,31 +135,34 @@ final class DoHWrapper
         $combos = [
             [[DefaultStream::class, []], [BufferedRawStream::class, []]],
         ];
-        if ($this->API->getSettings()->getConnection()->getRetry()) {
-            $proxyCombos = [];
-            foreach ($this->API->getSettings()->getConnection()->getProxies() as $proxy => $extras) {
-                if ($proxy === ObfuscatedStream::class) {
-                    continue;
-                }
-                foreach ($extras as $extra) {
-                    foreach ($combos as $orig) {
-                        $combo = [];
-                        if ($orig[1][0] === BufferedRawStream::class) {
-                            [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
-                            $first[] = [$proxy, $extra];
-                            $combo = array_merge($first, $second);
-                        } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
-                            [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
-                            $first[] = [BufferedRawStream::class, []];
-                            $first[] = [$proxy, $extra];
-                            $combo = array_merge($first, $second);
-                        }
-                        $proxyCombos []= $combo;
+        $proxyCombos = [];
+        foreach ($this->API->getSettings()->getConnection()->getProxies() as $proxy => $extras) {
+            // MTProxies only carry MTProto.
+            if ($proxy === ObfuscatedStream::class) {
+                continue;
+            }
+            foreach ($extras as $extra) {
+                foreach ($combos as $orig) {
+                    $combo = [];
+                    if ($orig[1][0] === BufferedRawStream::class) {
+                        [$first, $second] = [\array_slice($orig, 0, 2), \array_slice($orig, 2)];
+                        $first[] = [$proxy, $extra];
+                        $combo = array_merge($first, $second);
+                    } elseif (\in_array($orig[1][0], [WsStream::class, WssStream::class], true)) {
+                        [$first, $second] = [\array_slice($orig, 0, 1), \array_slice($orig, 1)];
+                        $first[] = [BufferedRawStream::class, []];
+                        $first[] = [$proxy, $extra];
+                        $combo = array_merge($first, $second);
                     }
+                    $proxyCombos []= $combo;
                 }
             }
-            $combos = array_merge($proxyCombos, $combos);
-            $combos = array_unique($combos, SORT_REGULAR);
+        }
+        if ($proxyCombos) {
+            // Only through the proxies unless allowed: a direct connection would bypass them.
+            $combos = $this->API->getSettings()->getConnection()->getDirectFallback()
+                ? array_unique(array_merge($proxyCombos, $combos), SORT_REGULAR)
+                : $proxyCombos;
         }
 
         $context ??= (new ConnectContext())->withConnectTimeout($this->API->getSettings()->getConnection()->getTimeout())->withBindTo($this->API->getSettings()->getConnection()->getBindTo());
