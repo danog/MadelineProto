@@ -360,7 +360,14 @@ final class API extends AbstractAPI
                 if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
-                $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
+                try {
+                    $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
+                } catch (Throwable $e) {
+                    // Not saved at shutdown (by serializeAll() or the destructor): the session on disk is the one
+                    // that failed to wake up, a half-initialized instance must not overwrite it.
+                    $this->wrapper->setAPI(null);
+                    throw $e;
+                }
                 $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return true;
             }
