@@ -161,8 +161,8 @@ final class MtProxyTest extends TestCase
             ->setApiId((int) (getenv('API_ID') ?: 4))
             ->setApiHash(getenv('API_HASH') ?: '014b35b6184100b085b0d0572f9b5103');
         $settings->getLogger()->setType(Logger::FILE_LOGGER)->setExtra(sys_get_temp_dir().'/madeline-mtproxy.log')->setLevel(Logger::VERBOSE);
-        // Only through the proxy: by default, the direct connections are tried when it fails.
-        $settings->getConnection()->setRetry(false)->addProxy(ObfuscatedStream::class, [
+        // Default settings: only through the proxy (no direct fallback hiding a failure).
+        $settings->getConnection()->addProxy(ObfuscatedStream::class, [
             'address' => '127.0.0.1',
             'port' => $this->port,
             'secret' => $encode("\xee".$this->key.self::DOMAIN),

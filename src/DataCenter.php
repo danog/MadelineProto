@@ -329,11 +329,12 @@ final class DataCenter
                 }
             }
         }
-        if ($settings->getRetry()) {
-            $combos = array_merge($proxyCombos, $combos);
+        if ($proxyCombos) {
+            // Only through the proxies unless allowed: a direct connection would bypass them.
+            $combos = $settings->getDirectFallback() ? array_merge($proxyCombos, $combos) : $proxyCombos;
+        }
+        if ($settings->getRetry() && (!$proxyCombos || $settings->getDirectFallback())) {
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
-        } elseif ($proxyCombos) {
-            $combos = $proxyCombos;
         }
         $combos = array_unique($combos, SORT_REGULAR);
 
