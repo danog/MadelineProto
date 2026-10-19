@@ -18,7 +18,8 @@ If not, see <http://www.gnu.org/licenses/>.
  */
 
 require 'vendor/autoload.php';
-$logger = new Logger(new SettingsLogger);
+// The diff is printed on stdout (tests/release_notes.sh adds it to the release notes): log to stderr.
+$logger = new Logger((new SettingsLogger)->setType(Logger::FILE_LOGGER)->setExtra('php://stderr'));
 
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
