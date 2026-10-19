@@ -48,7 +48,7 @@
         "amphp/http-client-cookies": "^2",
         "danog/tg-file-decoder": "^1.0.2",
         "league/uri": "^7.8.1",
-        "danog/ipc": "^1.0.1",
+        "danog/ipc": "^1.1.0",
         "amphp/log": "^2",
         "danog/loop": "^1.1.1",
         "phpseclib/phpseclib": "^4.0.1",
@@ -109,7 +109,8 @@
         "ext-sodium": "Install the sodium extension for faster crypto",
         "ext-uv": "Install the uv extension to greatly speed up MadelineProto!",
         "ext-gmp": "Install the gmp extension to speed up authorization",
-        "ext-bcmath": "Install the bcmath extension to speed up authorization"
+        "ext-bcmath": "Install the bcmath extension to speed up authorization",
+        "ext-sockets": "Install the sockets extension on Windows to use UNIX sockets for IPC (otherwise TCP on 127.0.0.1 is used, which any local user can connect to)"
     },
     "authors": [
         {

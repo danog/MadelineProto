@@ -433,9 +433,6 @@ abstract class Serialization
         $x = 0;
         while ($waitStartup || $x++ < 25) {
             Logger::log('MadelineProto is starting, please wait...');
-            if (\PHP_OS_FAMILY === 'Windows') {
-                Logger::log(Lang::$current_lang['windows_warning']);
-            }
             try {
                 clearstatcache(true, $ipcPath);
                 $socket = connect($ipcPath);

@@ -32,6 +32,7 @@ use danog\Loop\Loop;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\ProcessRunner;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\InternalLoop;
 use danog\MadelineProto\MTProto;
@@ -107,6 +108,20 @@ abstract class AbstractServer extends Loop
         $this->server = new IpcServer($session->getIpcPath());
         $this->callback = new ServerCallback($this->API);
         $this->callback->setIpcPath($session);
+        self::warnIfOverTcp($session);
+    }
+    /**
+     * Warn once (per session and process) if the IPC server of the session listens on TCP, because UNIX sockets
+     * are unavailable (on Windows, without the sockets extension).
+     */
+    public static function warnIfOverTcp(SessionPaths $session): void
+    {
+        static $warned = [];
+        $path = $session->getSessionDirectoryPath();
+        if (!isset($warned[$path]) && $session->isIpcOverTcp()) {
+            $warned[$path] = true;
+            Logger::log(Lang::$current_lang['ipc_tcp_warning'], Logger::WARNING);
+        }
     }
     #[\Override]
     public function start(): bool
