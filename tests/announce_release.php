@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * Send the changelog of a release to @danogentili on Telegram (without the diff of the layer, too big), once
- * it's fully released: see tests/release_notes.sh.
+ * Send the changelog of a release to the @MadelineProto channel (without the diff of the layer, too big, the
+ * internal changes and the updates of dependabot), with a link to the phar sent to @madelineprotophar by
+ * tests/send_phar.sh, once it's fully released: see tests/release_notes.sh.
  *
  * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN
- * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh).
+ * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh; an admin of @MadelineProto too).
  * Does nothing if the release is still a draft or a pre-release, or was already announced; if it fails midway,
  * running it again sends the rest (the messages sent are counted in the body of the release).
  *
@@ -17,7 +18,7 @@ use danog\TelegramEntities\EntityTools;
 
 require __DIR__.'/../vendor/autoload.php';
 
-const CHAT_ID = 101374607; // @danogentili
+const CHAT_ID = '@MadelineProto';
 const MAX_LENGTH = 4096;
 // More fail with ENTITIES_TOO_LONG.
 const MAX_ENTITIES = 100;
@@ -118,8 +119,44 @@ if (str_contains($body, ANNOUNCED) && !$dryRun) {
 $changelog = explode('<!-- layer-diff -->', $body, 2)[0];
 $changelog = trim(preg_replace('/<!--.*?-->/s', '', $changelog));
 
-$lines = ['*'.EntityTools::markdownEscape("MadelineProto {$release['name']}").'*', inline($release['html_url']), ''];
+// Without the internal changes (the section of the generated notes, or of the notes written by hand, which start
+// their sections with a label like "Fixes:") and the updates of dependabot.
+$filtered = [];
+$internal = false;
 foreach (preg_split('/\r?\n/', $changelog) as $line) {
+    if (preg_match('/^(?:#{1,6}\s+(.*?)|\**([^\s*\-][^:]*):\**)\s*$/', $line, $match)) {
+        $internal = (bool) preg_match('/^\**internal( changes)?\**$/i', trim(($match[1] ?? '').($match[2] ?? '')));
+    }
+    if (!$internal && !str_contains($line, '@dependabot')) {
+        $filtered[] = $line;
+    }
+}
+// Without the headings left empty: a heading is kept if text follows it (not the link to the full changelog, which
+// ends the generated notes), or a kept heading of a deeper level.
+$kept = [];
+$content = false;
+$nextLevel = 0;
+foreach (array_reverse($filtered) as $line) {
+    if (preg_match('/^(#{1,6})\s/', $line, $match)) {
+        $level = strlen($match[1]);
+        if (!$content && $nextLevel <= $level) {
+            continue;
+        }
+        $content = false;
+        $nextLevel = $level;
+    } elseif (trim($line) !== '' && !str_starts_with($line, '**Full Changelog**')) {
+        $content = true;
+    }
+    $kept[] = $line;
+}
+
+$lines = ['*'.EntityTools::markdownEscape("MadelineProto {$release['name']}").'*', inline($release['html_url'])];
+// The message with the phar, sent before by tests/send_phar.sh.
+if (preg_match('/<!-- phar sent (\d+) -->/', $body, $match)) {
+    $lines[] = EntityTools::markdownEscape('Phar: ').inline("https://t.me/madelineprotophar/{$match[1]}");
+}
+$lines[] = '';
+foreach (array_reverse($kept) as $line) {
     if (preg_match('/^#{1,6}\s+(.*)$/', $line, $match)) {
         $lines[] = '*'.text(trim($match[1], '* ')).'*';
     } elseif (preg_match('/^\s*[*-]\s+(.*)$/', $line, $match)) {
