@@ -60,7 +60,7 @@
         "nikic/php-parser": "^5.9.0",
         "revolt/event-loop": "^1.0.9",
         "danog/async-orm": "^1.1.5",
-        "danog/telegram-entities": "^1.0.6",
+        "danog/telegram-entities": "^1.1.0",
         "danog/better-prometheus": "^0.1.1",
         "amphp/http-server": "^3.4.6",
         "danog/tg-dialog-id": "^2",
