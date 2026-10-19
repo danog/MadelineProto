@@ -28,6 +28,7 @@ use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LegacyMigrator;
@@ -603,7 +604,7 @@ final class PeerDatabase implements TLCallback
                     try {
                         $this->API->methodCallAsyncRead('channels.getChannels', ['id' => [[
                             '_' => 'inputChannel',
-                            'channel_id' => $chat['id'],
+                            'channel_id' => DialogId::toMTProtoId($chat['id']),
                             'access_hash' => 0,
                         ]]]);
                         return;
