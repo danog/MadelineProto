@@ -705,8 +705,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
                 $this->onEnded($e->rpc);
                 return;
             }
-            $this->log("Could not check whether we are still in $this: $e", Logger::WARNING);
-            return;
+            if ($e->rpc !== 'GROUPCALL_JOIN_MISSING') {
+                $this->log("Could not check whether we are still in $this: $e", Logger::WARNING);
+                return;
+            }
+            // The server dropped us, like when it leaves our source out of the result.
+            $alive = [];
         } catch (Throwable $e) {
             $this->log("Could not check whether we are still in $this: $e", Logger::WARNING);
             return;
