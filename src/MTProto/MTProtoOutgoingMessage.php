@@ -259,7 +259,8 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function resetForResend(): bool
     {
         if ($this->sessionBound) {
-            $this->reply(static fn () => new Exception("$this->constructor can't be sent again with a new message ID"));
+            $constructor = $this->constructor;
+            $this->reply(static fn () => new Exception("$constructor can't be sent again with a new message ID"));
             return false;
         }
         $this->setMsgId(null);

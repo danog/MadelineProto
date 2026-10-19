@@ -85,9 +85,11 @@ final class ReadLoop extends Loop
             return self::STOP;
         } catch (SecurityException $e) {
             $this->connection->resetSession("security exception {$e->getMessage()}");
+            $this->API->logger($e, Logger::ERROR);
             $this->API->logger("Got security exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
-            $this->connection->reconnect();
-            throw $e;
+            // Not from this fiber: reconnecting restarts this loop, which waits for this loop() to return.
+            EventLoop::queue($this->connection->reconnect(...));
+            return self::STOP;
         }
         if (\is_int($error)) {
             EventLoop::queue(function () use ($error): void {
