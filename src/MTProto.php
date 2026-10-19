@@ -1026,7 +1026,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function fileGetContents(string $url, ?Cancellation $cancellation = null): string
     {
-        return $this->getHTTPClient()->request(new Request($url), $cancellation)->getBody()->buffer($cancellation);
+        $request = new Request($url);
+        // No limit on the whole transfer (10 seconds by default), like the other downloads: a big or slow file
+        // takes longer. The inactivity timeout still fails a stalled transfer, and the cancellation bounds it.
+        $request->setTransferTimeout(INF);
+        return $this->getHTTPClient()->request($request, $cancellation)->getBody()->buffer($cancellation);
     }
     /**
      * Get main DC ID.
