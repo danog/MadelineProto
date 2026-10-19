@@ -2,7 +2,8 @@
 
 /**
  * Send the changelog of a release to the @MadelineProto channel (without the diff of the layer, too big, the
- * internal changes and the updates of dependabot), once it's fully released: see tests/release_notes.sh.
+ * internal changes and the updates of dependabot), with a link to the phar sent to @madelineprotophar by
+ * tests/send_phar.sh, once it's fully released: see tests/release_notes.sh.
  *
  * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN
  * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh; an admin of @MadelineProto too).
@@ -149,7 +150,12 @@ foreach (array_reverse($filtered) as $line) {
     $kept[] = $line;
 }
 
-$lines = ['*'.EntityTools::markdownEscape("MadelineProto {$release['name']}").'*', inline($release['html_url']), ''];
+$lines = ['*'.EntityTools::markdownEscape("MadelineProto {$release['name']}").'*', inline($release['html_url'])];
+// The message with the phar, sent before by tests/send_phar.sh.
+if (preg_match('/<!-- phar sent (\d+) -->/', $body, $match)) {
+    $lines[] = EntityTools::markdownEscape('Phar: ').inline("https://t.me/madelineprotophar/{$match[1]}");
+}
+$lines[] = '';
 foreach (array_reverse($kept) as $line) {
     if (preg_match('/^#{1,6}\s+(.*)$/', $line, $match)) {
         $lines[] = '*'.text(trim($match[1], '* ')).'*';
