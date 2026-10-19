@@ -594,8 +594,26 @@ final class Connection
             $this->uninitedPendingOutgoing->enqueue($message);
         } else {
             $this->mainPendingOutgoing->enqueue($message);
+            if ($message->contentRelated) {
+                $this->shared->authorizationNeeded();
+            }
         }
         $this->flush();
+    }
+    /**
+     * Whether requests (not service messages) wait to be sent once the connection is authorized.
+     */
+    public function hasPendingRequests(): bool
+    {
+        if (!isset($this->mainPendingOutgoing)) {
+            return false;
+        }
+        for ($message = $this->mainPendingOutgoing->next; $message instanceof MTProtoOutgoingMessage; $message = $message->next) {
+            if ($message->contentRelated) {
+                return true;
+            }
+        }
+        return false;
     }
     /**
      * Flush pending packets.
