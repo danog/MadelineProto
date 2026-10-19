@@ -345,6 +345,7 @@ final class API extends AbstractAPI
             throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
+            Server::warnIfOverTcp($this->session);
             $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
             return true;
         } elseif ($unserialized) {

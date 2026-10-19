@@ -155,7 +155,6 @@
     "dl.php_check_logs_make_sure_session_running": "Either the associated MadelineProto EventHandler bot or the MadelineProto IPC server are offline, please check logs and make sure at least one of them is running!",
     "account_banned": "!!!!!!! WARNING !!!!!!!\nTelegram's flood prevention system suspended this account.\nTo continue, manual verification is required.\nSend an email to recover@telegram.org, asking to unban the phone number %s, and shortly describe what will you do with this phone number.\nThen login again.\nIf you intentionally deleted this account, ignore this message.",
     "plugin_path_does_not_exist": "Plugin path %s does not exist!",
-    "windows_warning": "For Windows users: please switch to Linux if this fails. You can also try modifying the firewall settings to allow all PHP processes to create sockets (it's 100% easier to just switch to Linux, on Linux MadelineProto just works out of the box, no changes needed)",
     "could_not_connect_to_MadelineProto": "Could not connect to MadelineProto, please enable proc_open and remove open_basedir restrictions or disable webserver path rewrites to fix! If you already did that, make sure the CLI version of PHP is exactly the same as the web version (same version, extensions, et cetera) and check out the MadelineProto.log file for more info about the error that prevented the IPC server from starting.",
     "translate_madelineproto_web": "MadelineProto can be translated in your language (current translation progress: %d%%), click <a href=\"https://github.com/danog/MadelineProto/tree/v8/langs\" target=\"_blank\">here to contribute with the translation!</a>",
     "translate_madelineproto_cli": "MadelineProto can be translated in your language (current translation progress: %d%%), go to https://github.com/danog/MadelineProto/tree/v8/langs to contribute with the translation!",
@@ -271,5 +270,6 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "This bot token was revoked",
     "tweb.FIRSTNAME_INVALID": "Invalid first name",
     "tweb.LASTNAME_INVALID": "Invalid last name",
-    "tweb.Close": "Close"
+    "tweb.Close": "Close",
+    "ipc_tcp_warning": "UNIX sockets are not available, so the IPC server of the session listens on TCP (127.0.0.1) instead: any program running on this machine can connect to it, and control the session. On Windows 10 1803+, enable the sockets extension (extension=sockets in php.ini) to use UNIX sockets."
 }
