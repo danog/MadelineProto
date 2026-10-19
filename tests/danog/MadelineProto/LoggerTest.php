@@ -22,6 +22,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Settings\Logger as LoggerSettings;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
+use Revolt\EventLoop;
 
 use function Amp\delay;
 
@@ -40,6 +42,34 @@ final class LoggerTest extends TestCase
         self::assertStringEndsWith('end', $entry);
         self::assertStringContainsString('bytes omitted', $entry);
         self::assertLessThan(200, \strlen($entry));
+    }
+
+    public function testOnlyTheLastLoggerOfAFileRotatesIt(): void
+    {
+        $dir = sys_get_temp_dir().'/madeline-logger-'.bin2hex(random_bytes(8));
+        mkdir("$dir/sub", recursive: true);
+        $rotateId = static fn (Logger $logger): ?string => (new ReflectionProperty(Logger::class, 'rotateId'))->getValue($logger);
+        try {
+            // Like a worker that loaded a session with the default logger (1 MB), then got the settings of its client:
+            // the same file, spelled differently, with another maximum size.
+            $old = new Logger((new LoggerSettings)->setType(Logger::FILE_LOGGER)->setExtra("$dir/MadelineProto.log"));
+            $new = new Logger((new LoggerSettings)->setType(Logger::FILE_LOGGER)->setExtra("$dir/sub/../MadelineProto.log")->setMaxSize(100 * 1024 * 1024));
+
+            // The replaced logger is still referenced (by its PSR logger, or whoever holds that), but doesn't truncate
+            // the file at its own maximum size anymore.
+            self::assertNotContains($rotateId($old), EventLoop::getIdentifiers());
+            self::assertContains($rotateId($new), EventLoop::getIdentifiers());
+
+            unset($old);
+            gc_collect_cycles();
+            self::assertContains($rotateId($new), EventLoop::getIdentifiers());
+        } finally {
+            unset($old, $new);
+            gc_collect_cycles();
+            @unlink("$dir/MadelineProto.log");
+            rmdir("$dir/sub");
+            rmdir($dir);
+        }
     }
 
     public function testHugeExceptionsAreNotLoggedWhole(): void
