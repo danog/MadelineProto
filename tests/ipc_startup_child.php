@@ -19,7 +19,8 @@ declare(strict_types=1);
 /*
  * An IPC client of IpcStartupTest: opens the session (starting its IPC server if needed) and calls a method.
  *
- * Usage: php ipc_startup_child.php <session> <log>, with API_ID and API_HASH in the environment.
+ * Usage: php ipc_startup_child.php <session> <log> [mode], with API_ID and API_HASH in the environment.
+ * mode: "self-restart" opens the session like a request self-restarted by a web-hosted event handler.
  */
 
 use danog\MadelineProto\API;
@@ -29,6 +30,10 @@ use danog\MadelineProto\Settings;
 require __DIR__.'/../vendor/autoload.php';
 
 [, $session, $log] = $argv;
+$mode = $argv[3] ?? '';
+if ($mode === 'self-restart') {
+    $_GET['MadelineSelfRestart'] = 1;
+}
 
 $settings = new Settings;
 $settings->getAppInfo()->setApiId((int) getenv('API_ID'))->setApiHash((string) getenv('API_HASH'));
