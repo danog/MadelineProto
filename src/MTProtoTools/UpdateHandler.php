@@ -1063,8 +1063,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = array_merge($updates['request']['body'] ?? [], $updates);
-                unset($updates['request']);
+                $updates = $this->mergeSentRequest($updates);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 $message = $updates;
@@ -1077,6 +1076,75 @@ trait UpdateHandler
                 return [$updates];
             default:
                 throw new ResponseException('Unrecognized update received: '.$updates['_']);
+        }
+    }
+    /**
+     * Fill a short message update with the parameters of the request that sent it.
+     *
+     * The request has the input types of the method (InputReplyTo, InputMedia, ...), not the ones of the message.
+     */
+    private function mergeSentRequest(array $updates): array
+    {
+        $body = $updates['request']['body'] ?? [];
+        // The media actually sent, if any, is in the update itself.
+        unset($updates['request'], $body['media'], $body['rich_message']);
+        if (isset($body['reply_to'])) {
+            $body['reply_to'] = self::inputReplyToHeader(
+                $body['reply_to'],
+                isset($body['reply_to']['top_msg_id']) && $this->isForum($body['peer']),
+                fn (mixed $peer): int => $this->getInfo($peer, API::INFO_TYPE_ID),
+            );
+        }
+        return array_merge($body, $updates);
+    }
+    /**
+     * Convert the InputReplyTo of a request into the MessageReplyHeader of the message it sent.
+     *
+     * @internal
+     *
+     * @param \Closure(mixed): int $getId
+     */
+    public static function inputReplyToHeader(array $replyTo, bool $forum, \Closure $getId): ?array
+    {
+        switch ($replyTo['_'] ?? null) {
+            case 'inputReplyToMessage':
+                $header = [
+                    '_' => 'messageReplyHeader',
+                    'reply_to_scheduled' => false,
+                    'forum_topic' => $forum,
+                    'quote' => isset($replyTo['quote_text']),
+                    'reply_to_ephemeral' => false,
+                ];
+                $msgId = $replyTo['reply_to_msg_id'] ?? null;
+                $topId = $replyTo['top_msg_id'] ?? null;
+                if (!$msgId || $msgId === $topId) {
+                    // A message at the root of a thread replies to its top message.
+                    $msgId = $topId;
+                    $topId = null;
+                }
+                if ($msgId !== null) {
+                    $header['reply_to_msg_id'] = $msgId;
+                }
+                if ($topId !== null) {
+                    $header['reply_to_top_id'] = $topId;
+                }
+                if (isset($replyTo['reply_to_peer_id'])) {
+                    $header['reply_to_peer_id'] = $getId($replyTo['reply_to_peer_id']);
+                }
+                foreach (['quote_text', 'quote_entities', 'quote_offset', 'todo_item_id', 'poll_option'] as $key) {
+                    if (isset($replyTo[$key])) {
+                        $header[$key] = $replyTo[$key];
+                    }
+                }
+                return $header;
+            case 'inputReplyToStory':
+                return [
+                    '_' => 'messageReplyStoryHeader',
+                    'peer' => $getId($replyTo['peer']),
+                    'story_id' => $replyTo['story_id'],
+                ];
+            default:
+                return null;
         }
     }
     private function populateMessageFlags(array &$message): void
@@ -1134,8 +1202,7 @@ trait UpdateHandler
                 // no break
             case 'updateShortMessage':
             case 'updateShortChatMessage':
-                $updates = array_merge($updates['request']['body'] ?? [], $updates);
-                unset($updates['request']);
+                $updates = $this->mergeSentRequest($updates);
                 $from_id = $updates['from_id'] ?? ($updates['out'] ? $this->authorization['user']['id'] : $updates['user_id']);
                 $to_id = $updates['chat_id'] ?? ($updates['out'] ? $updates['user_id'] : $this->authorization['user']['id']);
                 if (!(($this->peerIsset($from_id)) || !(($this->peerIsset($to_id)) || isset($updates['via_bot_id']) && !(($this->peerIsset($updates['via_bot_id'])) || isset($updates['entities']) && !(($this->entitiesPeerIsset($updates['entities'])) || isset($updates['fwd_from']) && !($this->fwdPeerIsset($updates['fwd_from']))))))) {

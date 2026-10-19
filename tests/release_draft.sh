@@ -5,7 +5,8 @@
 # - its version: a minor one if a pull request merged since then is labelled release:feature, a patch one
 #   otherwise (never lower than the one of the draft, which can be set by hand);
 # - the RELEASE constant, which must match it for the phar to be built (pushed to the main branch);
-# - its notes (see tests/release_notes.sh), below what was written by hand, and its title (unless set by hand).
+# - its notes (see tests/release_notes.sh), below what was written by hand, and its title (unless set by hand);
+# - that it's a pre-release, not the latest release, until the CI of its tag passed (see tests/release_phar.sh).
 #
 # Needs GITHUB_TOKEN, able to push to the main branch (a token of an admin: see the rulesets), and the tags.
 # Runs once the CI of a push succeeded, CI_SHA being the commit it succeeded on (see release-draft.yml):
@@ -99,10 +100,14 @@ if [ -n "$DRY_RUN" ]; then
     exit 0
 fi
 
+# To be published as a pre-release, which tests/release_phar.sh makes final and the latest once the CI of the
+# tag passed. Set on every update too (a draft can be created or edited by hand), and not as the latest
+# release: make_latest defaults to true, which publishing it as a pre-release contradicts.
+prerelease=(-F prerelease=true -f make_latest=false)
 if [ "$draft" == "" ]; then
-    gh api -X POST "repos/$repository/releases" -f tag_name="$version" -f target_commitish="$branch" -f name="$title" -f body="$body" -F draft=true -F prerelease=true > /dev/null
+    gh api -X POST "repos/$repository/releases" -f tag_name="$version" -f target_commitish="$branch" -f name="$title" -f body="$body" -F draft=true "${prerelease[@]}" > /dev/null
     echo "Drafted $version ($title), since $last"
 else
-    gh api -X PATCH "repos/$repository/releases/$(jq -r .id <<< "$draft")" -f tag_name="$version" -f target_commitish="$branch" -f name="$title" -f body="$body" > /dev/null
+    gh api -X PATCH "repos/$repository/releases/$(jq -r .id <<< "$draft")" -f tag_name="$version" -f target_commitish="$branch" -f name="$title" -f body="$body" "${prerelease[@]}" > /dev/null
     echo "Updated the draft of $version ($title), since $last"
 fi

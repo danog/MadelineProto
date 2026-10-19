@@ -5,10 +5,27 @@
 
 version: 2
 updates:
+  # Labelled for pr-labels.yml, which requires a release label on every pull request.
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "release:internal"
+  # The tools of the code checks (bamarni/composer-bin-plugin).
+  - package-ecosystem: "composer"
+    directory: "/vendor-bin/check"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "release:internal"
+  # The actions of the workflows, pinned by commit with their version in a comment, which Dependabot updates too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "release:internal"
   - package-ecosystem: "npm"
     directory: "/webui"
     schedule:

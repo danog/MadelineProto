@@ -65,6 +65,7 @@ class EntitiesTest extends TestCase
         return [
             [new BankCard(1, 2)],
             [new Blockquote(1, 2)],
+            [new Blockquote(1, 2, true)],
             [new Bold(1, 2)],
             [new BotCommand(1, 2)],
             [new Cashtag(1, 2)],
@@ -125,6 +126,20 @@ class EntitiesTest extends TestCase
         $this->expectException(AssertionError::class);
         MessageEntity::fromRawEntity(['_' => 'messageMediaEmpty']);
     }
+    public function testExpandableBlockquote(): void
+    {
+        $html = TextEntities::fromHtml('<blockquote expandable>quote</blockquote>');
+        $this->assertEquals([new Blockquote(0, 5, true)], $html->entities);
+        $this->assertSame(['_' => 'messageEntityBlockquote', 'collapsed' => true, 'offset' => 0, 'length' => 5], $html->entities[0]->toMTProto());
+        $this->assertSame('<blockquote expandable>quote</blockquote>', StrTools::entitiesToHtml($html->message, $html->entities, true));
+
+        $markdown = TextEntities::fromMarkdown("**>quote||");
+        $this->assertEquals([new Blockquote(0, 5, true)], $markdown->entities);
+
+        $this->assertEquals(new Blockquote(0, 5), MessageEntity::fromRawEntity(['_' => 'messageEntityBlockquote', 'collapsed' => false, 'offset' => 0, 'length' => 5]));
+        $this->assertEquals(new Blockquote(0, 5), MessageEntity::fromRawEntity(['type' => 'block_quote', 'offset' => 0, 'length' => 5]));
+        $this->assertEquals(new BankCard(0, 5), MessageEntity::fromRawEntity(['type' => 'bank_card', 'offset' => 0, 'length' => 5]));
+    }
     private static function sendMessage(string $message, string $parse_mode): TextEntities
     {
         return match ($parse_mode) {
@@ -153,7 +168,7 @@ class EntitiesTest extends TestCase
         $this->assertEquals($entities, $result['entities']);
         if (strtolower($mode) === 'html') {
             $this->assertEquals(
-                str_replace(['<br/>', ' </b>', 'mention:'], ['<br>', '</b> ', 'tg://user?id='], $htmlReverse ?? $html),
+                str_replace(['<br/>', 'mention:'], ['<br>', 'tg://user?id='], $htmlReverse ?? $html),
                 StrTools::entitiesToHtml(
                     $resultMTProto->message,
                     $resultMTProto->entities,
@@ -258,7 +273,7 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 6,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'bold',
                     ],
                 ],
@@ -332,7 +347,7 @@ class EntitiesTest extends TestCase
                     [
                         'offset' => 49,
                         'length' => 10,
-                        'type' => 'block_quote',
+                        'type' => 'blockquote',
                     ],
                     [
                         'offset' => 127,
@@ -340,7 +355,7 @@ class EntitiesTest extends TestCase
                         'type' => 'spoiler',
                     ],
                 ],
-                '<b>test</b><br><i>test</i> <code>test</code> <pre language="html">test</pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
+                '<b>test</b><br><i>test</i> <code>test</code> <pre><code class="language-html">test</code></pre> <a href="https://example.com/">test</a> <s>strikethrough</s> <u>underline</u> <blockquote>blockquote</blockquote> https://google.com daniil@daniil.it +39398172758722 @daniilgentili <tg-spoiler>spoiler</tg-spoiler> &lt;b&gt;not_bold&lt;/b&gt;',
             ],
             [
                 'markdown',
@@ -471,7 +486,7 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 0,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'text_link',
                         'url' => 'https://google.com/',
                     ],
@@ -555,12 +570,11 @@ class EntitiesTest extends TestCase
                 [
                     [
                         'offset' => 0,
-                        'length' => 4,
+                        'length' => 5,
                         'type' => 'text_link',
                         'url' => 'https://google.com/',
                     ],
                 ],
-                '<a href="https://google.com/">link</a> test',
             ],
             [
                 'html',

@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 # Run composer build (usually, to pick up a new layer of the schema), and submit what changed as pull
-# requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto.
+# requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto, with the bundle of the web UI
+# that .github/workflows/autobuild.yml rebuilt (tests/webui.sh --update) in a job without secrets.
 #
 # Run by tests/test.sh build, once it set up the tools and the dependencies. Needs:
 # - GITHUB_TOKEN, able to push branches to the three repositories and to open pull requests (but not to
@@ -67,7 +68,7 @@ git add -A src
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
 else
-    body="The daily \`composer build\`."
+    body="The daily \`composer build\`, and build of the web UI."
     if [ "$submodules" -ne 0 ]; then
         body="$body
 

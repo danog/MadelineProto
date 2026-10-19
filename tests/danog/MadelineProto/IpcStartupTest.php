@@ -18,7 +18,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\CancelledException;
 use Amp\Process\Process;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use PHPUnit\Framework\TestCase;
@@ -118,6 +120,24 @@ final class IpcStartupTest extends TestCase
         self::assertCount(1, $this->workers());
     }
 
+    public function testSelfRestartUsesTheServerOfAnotherSession(): void
+    {
+        // A worker serves the session and never releases its lock
+        $this->runClients(1);
+        self::assertCount(1, $this->workers());
+
+        // A request self-restarted by a web-hosted event handler forces full instances of the sessions it opens,
+        // to take over the session of the request it replaces once that releases the lock; a script that also
+        // opens another session, served by a worker, waited forever for its lock (filling the web server's
+        // pool with one stuck request per self-restart): it uses the worker instead.
+        $start = microtime(true);
+        [$code, $output] = $this->runClient('self-restart', 60);
+        self::assertSame(0, $code, "The self-restarted client failed: $output");
+        self::assertSame('OK', $output);
+        self::assertLessThan(30, microtime(true) - $start, 'The self-restarted client waited for the lock');
+        self::assertCount(1, $this->workers());
+    }
+
     /**
      * Run clients concurrently, checking that they all succeed.
      */
@@ -126,18 +146,33 @@ final class IpcStartupTest extends TestCase
         $futures = [];
         for ($x = 0; $x < $count; $x++) {
             $futures[] = async(function () use ($x): void {
-                $process = Process::start(
-                    [PHP_BINARY, self::CHILD, $this->session, "{$this->dir}/client$x.log"],
-                    $this->dir,
-                );
-                $output = async(static fn () => buffer($process->getStdout()).buffer($process->getStderr()));
-                $code = $process->join();
-                $output = $output->await();
+                [$code, $output] = $this->runClient('', null, $x);
                 self::assertSame(0, $code, "Client $x failed: $output");
                 self::assertSame('OK', $output, "Client $x failed");
             });
         }
         await($futures);
+    }
+
+    /**
+     * Run a client, killing it if it takes more than $timeout seconds.
+     *
+     * @return array{int, string} Exit code and output
+     */
+    private function runClient(string $mode, ?float $timeout = null, int $x = 0): array
+    {
+        $process = Process::start(
+            [PHP_BINARY, self::CHILD, $this->session, "{$this->dir}/client$x.log", $mode],
+            $this->dir,
+        );
+        $output = async(static fn () => buffer($process->getStdout()).buffer($process->getStderr()));
+        try {
+            $code = $process->join($timeout === null ? null : new TimeoutCancellation($timeout));
+        } catch (CancelledException) {
+            $process->kill();
+            self::fail("The client hung for more than $timeout seconds");
+        }
+        return [$code, $output->await()];
     }
 
     /**
