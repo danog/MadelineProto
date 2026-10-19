@@ -48,8 +48,8 @@ release_notes()
         git submodule update --init schemas >&2
         diff=$(php tools/layerdiff.php --no-send "$old" "$new")
         printf '\n%s\n## Layer %s\n\nChanges since layer %s:\n\n' "$LAYER_DIFF_MARKER" "$new" "$old"
-        # Without the blank lines before it.
-        sed -n '/^New /,$p' <<< "$diff"
+        # Without the blank lines before it (its first section isn't always a "New" one: only the non-empty ones are listed).
+        sed '/./,$!d' <<< "$diff"
     fi
 }
 
