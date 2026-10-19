@@ -247,7 +247,7 @@ jobs:
         run: /bin/bash -e tests/makephar.sh
       - name: Keep the files of the release
         if: github.ref_type == 'tag'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-files
           path: release-files
