@@ -92,10 +92,8 @@ trait CallHandler
             return;
         }
         $datacenter = $forceDatacenter ?? $this->datacenter;
-        if ($forceDatacenter !== null) {
-            /** @var MTProtoOutgoingMessage */
-            $request->setMsgId(null);
-            $request->setSeqNo(null);
+        if ($forceDatacenter !== null && !$request->resetForResend()) {
+            return;
         }
         if ($datacenter === $this->datacenter) {
             EventLoop::queue($this->sendMessage(...), $request);
@@ -210,6 +208,7 @@ trait CallHandler
             cancellation: $cancellation,
             takeoutId: $args['takeoutId'] ?? null,
             businessConnectionId: $args['businessConnectionId'] ?? null,
+            sessionBound: isset($args['madelineMsgId']),
         );
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);

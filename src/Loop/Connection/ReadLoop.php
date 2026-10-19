@@ -174,7 +174,12 @@ final class ReadLoop extends Loop
             $auth = $this->shared->auth;
             if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
                 if ($this->shared->auth->connectionState->getState()->isEncrypted()) {
-                    throw new SecurityException("Got unencrypted message from encrypted socket!");
+                    // The late answer to an unencrypted request of the key exchange that was sent again by its
+                    // check timer (MTProtoOutgoingMessage::check) and was answered twice: the key is already
+                    // generated, nothing unencrypted is accepted anymore, drop it.
+                    $this->API->logger("Dropping unencrypted message received in DC {$this->datacenter} after generating the auth key", Logger::WARNING);
+                    $buffer->bufferRead($payload_length - 8);
+                    return null;
                 }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
                 $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);

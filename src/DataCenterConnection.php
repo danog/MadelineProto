@@ -443,11 +443,8 @@ final class DataCenterConnection implements SimpleSubscriber
             if ($message instanceof Container || $message->hasReply()) {
                 continue;
             }
-            if ($message->hasSeqno()) {
-                $message->setSeqno(null);
-            }
-            if ($message->hasMsgId()) {
-                $message->setMsgId(null);
+            if (!$message->resetForResend()) {
+                continue;
             }
             $message->connection = $connection = $this->getConnection();
             $this->API->logger("Restoring $message to DC {$this->datacenter}");
