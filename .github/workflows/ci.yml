@@ -3,18 +3,18 @@ name: CI
 # The logic lives in tests/test.sh and tests/makephar.sh, not here: keep it that way, so that the CI
 # can move to another provider.
 
+# The main branch and the tags, with the secrets (the whole test suite and the build of the phar, which use the
+# sessions of the accounts of the CI). The other branches are tested as pull requests, with the jobs that need no
+# secret, in their own workflow (pull-request.yml), so that neither lists jobs it skips. A branch push running these
+# jobs too would compete for the sessions and the build with the main branch (GitHub only keeps one waiting job per
+# concurrency group, cancelling the others), and log in again with the authorizations of the accounts, which gets
+# FLOOD_WAITs once many runs do it at once.
 on:
-  # Only the main branch and the tags get the jobs with the secrets (the whole test suite and the build of the phar,
-  # which use the sessions of the accounts of the CI): the other branches are tested as pull requests, with the jobs
-  # that need no secret. A branch push running them too would compete for the sessions and the build with the main
-  # branch (GitHub only keeps one waiting job per concurrency group, cancelling the others), and log in again with the
-  # authorizations of the accounts, which gets FLOOD_WAITs once many runs do it at once.
   push:
     branches:
       - v8
     tags:
       - '*'
-  pull_request:
 
 permissions:
   contents: read
@@ -29,10 +29,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
-  # The image the other jobs run in, rebuilt when the main branch or a tag is pushed: they wait for it, and
-  # pull the new one.
+  # The image the other jobs run in, rebuilt for every run: they wait for it, and pull the new one.
   docker:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/v8' || github.ref_type == 'tag')
     strategy:
       matrix:
         include:
@@ -74,15 +72,14 @@ jobs:
 
   cs:
     needs: docker-merge
-    # Also when the image wasn't rebuilt.
-    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     container:
       image: danog/madelineproto:next
-      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
-      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
-      # so they get no credentials at all.
-      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
@@ -114,10 +111,9 @@ jobs:
       - name: Test the web UI, and check that its committed bundle is up to date
         run: tests/webui.sh
 
-  # The whole test suite, with the secrets: for pushes (to the main branch and the tags).
+  # The whole test suite, with the secrets.
   test:
     needs: docker-merge
-    if: ${{ !failure() && !cancelled() && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     container:
       image: danog/madelineproto:next
@@ -157,38 +153,16 @@ jobs:
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
-  # The tests that don't need any secret, for pull requests (which don't get them, if from forks).
-  test_light:
-    needs: docker-merge
-    if: ${{ !failure() && !cancelled() && github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    container: danog/madelineproto:next
-    steps:
-      - name: Install git
-        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
-        run: |
-          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v4
-        with:
-          path: /github/home/composer-cache
-          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
-          restore-keys: composer-
-      - name: Run the light tests
-        run: tests/test.sh phpunit-light
-
   handshake:
     needs: docker-merge
-    if: ${{ !failure() && !cancelled() }}
     runs-on: ubuntu-latest
     container:
       image: danog/madelineproto:next
-      # Pulled as the account of the image (see the test job), except for pull requests, which may come from forks,
-      # without the secrets: empty credentials would fail the job, and so does a null value (Unexpected value ''),
-      # so they get no credentials at all.
-      credentials: ${{ github.event_name == 'push' && fromJSON(format('{{"username":{0},"password":{1}}}', toJSON(secrets.DOCKER_USERNAME), toJSON(secrets.DOCKER_PASSWORD))) || fromJSON('{}') }}
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
@@ -206,10 +180,8 @@ jobs:
         run: tests/test.sh handshake
 
   build:
-    # At once with the other tests: the release job publishes the phar once all of them passed. Not for pull
-    # requests: it tests with the secrets (only for the main branch and the tags, see on.push).
+    # At once with the other tests: the release job publishes the phar once all of them passed.
     needs: docker-merge
-    if: ${{ !failure() && !cancelled() && github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     # It tests the phar with the session of authorization 0 of the bot (see tests/session_tests.sh), which two
     # builds must not use at once.
@@ -282,9 +254,10 @@ jobs:
           if-no-files-found: error
 
   release:
-    # Once every test passed. Either test or test_light is skipped.
-    needs: [cs, webui, test, test_light, handshake, build]
-    if: ${{ !failure() && !cancelled() && github.ref_type == 'tag' }}
+    # Once every test passed. Skipped for the main branch: it needs the results of this run, so it can't be in a
+    # workflow of its own.
+    needs: [cs, webui, test, handshake, build]
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       # To upload the phar to the release of a tag.

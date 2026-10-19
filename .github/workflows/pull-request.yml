@@ -1,0 +1,93 @@
+name: Pull request
+
+# The jobs that need no secret, for pull requests (which don't get them, if from forks): the main branch and the tags
+# run the whole CI, with the secrets (ci.yml). The logic lives in tests/test.sh, not here.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Cached between runs (see the cache steps).
+  COMPOSER_CACHE_DIR: /github/home/composer-cache
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cs:
+    runs-on: ubuntu-latest
+    # The image of the main branch, pulled anonymously: without the secrets.
+    container: danog/madelineproto:next
+    steps:
+      # Before the checkout: without git, it downloads the sources without the repository.
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Check the code style and the generated docs
+        env:
+          # For the GitHub API, which only allows 60 unauthenticated requests per hour per IP.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: tests/test.sh cs
+
+  # Not in the container: it has no Node.js, the runner has.
+  webui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the web UI, and check that its committed bundle is up to date
+        run: tests/webui.sh
+
+  # The tests that don't need any secret.
+  test_light:
+    runs-on: ubuntu-latest
+    container: danog/madelineproto:next
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Run the light tests
+        run: tests/test.sh phpunit-light
+
+  handshake:
+    runs-on: ubuntu-latest
+    container: danog/madelineproto:next
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v4
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v4
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Test the handshake
+        run: tests/test.sh handshake
