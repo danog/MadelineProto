@@ -72,7 +72,7 @@ trait PeerHandler
      */
     public function isForum(mixed $peer): bool
     {
-        return $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+        return $this->getInfo($peer)['Chat']['forum'] ?? false;
     }
 
     /**
