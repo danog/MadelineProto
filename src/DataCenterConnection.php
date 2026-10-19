@@ -197,6 +197,13 @@ final class DataCenterConnection implements SimpleSubscriber
         } elseif ($state === ConnectionState::ENCRYPTED_NOT_BOUND) {
             $expires_in = MTProto::PFS_DURATION;
             for ($retry_id_total = 1; $retry_id_total <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id_total++) {
+                if ($this->auth->connectionState->getState() !== ConnectionState::ENCRYPTED_NOT_BOUND) {
+                    // A binding answered with CONNECTION_NOT_INITED (ResponseHandler): an earlier binding went
+                    // through but its answer was lost (e.g. with a session reset), the key is bound.
+                    // Or the key was dropped: the next transition takes over either way.
+                    $logger->logger("Not binding authorization keys anymore in DC {$this->datacenter}, now in state {$this->auth->connectionState->getState()->name}", Logger::NOTICE);
+                    return;
+                }
                 try {
                     $logger->logger('Binding authorization keys...', Logger::VERBOSE);
                     $nonce = Tools::random(8);
@@ -443,11 +450,8 @@ final class DataCenterConnection implements SimpleSubscriber
             if ($message instanceof Container || $message->hasReply()) {
                 continue;
             }
-            if ($message->hasSeqno()) {
-                $message->setSeqno(null);
-            }
-            if ($message->hasMsgId()) {
-                $message->setMsgId(null);
+            if (!$message->resetForResend()) {
+                continue;
             }
             $message->connection = $connection = $this->getConnection();
             $this->API->logger("Restoring $message to DC {$this->datacenter}");

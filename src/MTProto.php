@@ -1395,6 +1395,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 $this->report((string) $e);
             } catch (Throwable) {
             }
+            // The session lock is released when the exception leaves the API constructor: stop the IPC server
+            // and drop the instance from the references (serialized at shutdown), so nothing touches the session
+            // without holding the lock (a client changing the database settings deleted the session from the
+            // database while the next worker was loading it).
+            try {
+                $this->unreference();
+            } catch (Throwable) {
+            }
             throw $e;
         } finally {
             $deferred->complete();
