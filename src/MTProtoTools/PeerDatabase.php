@@ -331,6 +331,12 @@ final class PeerDatabase implements TLCallback
             unset($this->usernames[$username]);
             return null;
         }
+        // Min peers seen without an access hash (in a forward, a mention, a group call...) are indexed by username
+        // too, but can't be used in any method call: getInfo() would throw PeerNotInDbException for them, so let the
+        // username be resolved again instead.
+        if ($id !== null && !isset($this->get($id)['access_hash'])) {
+            return null;
+        }
         return $id;
     }
 
