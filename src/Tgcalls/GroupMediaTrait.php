@@ -446,7 +446,7 @@ trait GroupMediaTrait
             ]);
             return true;
         } catch (RPCErrorException $e) {
-            if ($e->rpc === 'PARTICIPANT_JOIN_MISSING') {
+            if ($e->rpc === 'PARTICIPANT_JOIN_MISSING' || $e->rpc === 'GROUPCALL_JOIN_MISSING') {
                 // The server no longer has our participant (it dropped us while the process was
                 // down): recover right away rather than waiting for the transport to time out.
                 $this->log("We were dropped from $this, rejoining...", Logger::WARNING);

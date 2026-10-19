@@ -186,6 +186,26 @@ final class GroupCallMembershipTest extends TestCase
     }
 
     /**
+     * The server may also say we were dropped with GROUPCALL_JOIN_MISSING instead of leaving our source out (it
+     * does for a call resumed after a restart of the process): the call is rejoined, or left if it ended.
+     */
+    public function testAJoinMissingErrorRejoinsOrLeavesAnEndedCall(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        $this->answer = static fn (string $method) => match ($method) {
+            'phone.checkGroupCall' => throw RPCErrorException::make('GROUPCALL_JOIN_MISSING', 400, ''),
+            'phone.joinGroupCall' => throw RPCErrorException::make('GROUPCALL_FORBIDDEN', 403, ''),
+        };
+
+        self::check($controller);
+
+        $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
+        $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
      * Joined calls are checked periodically, also after a restart, until they're left.
      */
     public function testJoinedCallsAreCheckedUntilLeft(): void
