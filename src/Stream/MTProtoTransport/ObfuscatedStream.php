@@ -37,6 +37,10 @@ use danog\MadelineProto\Tools;
  */
 final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInterface
 {
+    /**
+     * Maximum length of the domain of a fake TLS secret, as in TDLib, to fit in a ClientHello.
+     */
+    public const MAX_DOMAIN_LENGTH = 182;
     private $stream;
     private $extra;
     /**
@@ -82,18 +86,22 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
     public function setExtra($extra): void
     {
         if (isset($extra['secret'])) {
-            $extra['secret'] = self::decodeSecret($extra['secret']);
+            $extra['secret'] = self::decodeSecret($extra['secret'])['key'];
         }
         $this->extra = $extra;
     }
 
     /**
-     * The 16-byte key of an MTProxy secret: raw, or hex or (URL-safe, as in proxy links) base64
-     * encoded, optionally with the dd prefix of padded intermediate secrets.
+     * Decode an MTProxy secret: raw, or hex or (URL-safe, as in proxy links) base64 encoded.
+     *
+     * Returns its 16-byte key, whether the transport must be padded (dd and ee secrets), and the
+     * domain that fake TLS secrets (ee) append to the key.
+     *
+     * @return array{key: string, padded: bool, domain: ?string}
      *
      * @psalm-pure
      */
-    private static function decodeSecret(string $secret): string
+    public static function decodeSecret(string $secret): array
     {
         if (\strlen($secret) !== 16) {
             $decoded = preg_match('/^(?:[a-f0-9]{2})+$/i', $secret)
@@ -104,17 +112,19 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
             }
             $secret = $decoded;
         }
+        if (\strlen($secret) === 16) {
+            return ['key' => $secret, 'padded' => false, 'domain' => null];
+        }
         if (\strlen($secret) === 17 && $secret[0] === "\xdd") {
-            $secret = substr($secret, 1);
+            return ['key' => substr($secret, 1), 'padded' => true, 'domain' => null];
         }
-        if (\strlen($secret) !== 16) {
-            throw new Exception(
-                ($secret[0] ?? '') === "\xee"
-                    ? 'MTProxy secrets for fake TLS (starting with ee) are not supported'
-                    : 'Invalid MTProxy secret: it must be 16 bytes long, or 17 starting with dd'
-            );
+        if (\strlen($secret) >= 18 && $secret[0] === "\xee") {
+            if (\strlen($secret) > 17 + self::MAX_DOMAIN_LENGTH) {
+                throw new Exception('The domain of the fake TLS MTProxy secret is too long');
+            }
+            return ['key' => substr($secret, 1, 16), 'padded' => true, 'domain' => substr($secret, 17)];
         }
-        return $secret;
+        throw new Exception('Invalid MTProxy secret: it must be 16 bytes long, 17 starting with dd, or start with ee followed by the key and a domain');
     }
     /**
      * @psalm-pure
