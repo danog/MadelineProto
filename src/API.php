@@ -53,7 +53,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.10.0';
+    public const RELEASE = '8.10.1';
     /**
      * We're not logged in.
      *
@@ -308,13 +308,15 @@ final class API extends AbstractAPI
         } elseif ($settings instanceof Settings) {
             $forceFull = $forceFull || $settings->getIpc()->getSlow();
         }
-        $forceFull = $forceFull || isset($_GET['MadelineSelfRestart']) || Magic::$altervista;
+        $selfRestart = !$forceFull && isset($_GET['MadelineSelfRestart']) && !Magic::$altervista;
+        $forceFull = $forceFull || $selfRestart || Magic::$altervista;
 
         $future = async(
             Serialization::unserialize(...),
             $this->session,
             $settings,
-            $forceFull
+            $forceFull,
+            $selfRestart,
         );
         while (true) {
             try {
@@ -345,6 +347,7 @@ final class API extends AbstractAPI
             throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
+            Server::warnIfOverTcp($this->session);
             $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
             return true;
         } elseif ($unserialized) {
@@ -359,7 +362,14 @@ final class API extends AbstractAPI
                 if ($settings instanceof SettingsIpc) {
                     $settings = new SettingsEmpty;
                 }
-                $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
+                try {
+                    $this->wrapper->getAPI()->wakeup($settings, $this->wrapper);
+                } catch (Throwable $e) {
+                    // Not saved at shutdown (by serializeAll() or the destructor): the session on disk is the one
+                    // that failed to wake up, a half-initialized instance must not overwrite it.
+                    $this->wrapper->setAPI(null);
+                    throw $e;
+                }
                 $this->wrapper->logger(Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
                 return true;
             }

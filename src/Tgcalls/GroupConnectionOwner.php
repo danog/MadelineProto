@@ -52,9 +52,9 @@ interface GroupConnectionOwner extends Stringable
     /** The WebRTC connection failed and should be checked/rejoined. */
     public function onConnectionFailed(): void;
 
-    /** Tell the server whether our camera video is stopped. */
-    public function setVideoStopped(bool $stopped): void;
+    /** Tell the server whether our camera video is stopped: returns whether it took the change. */
+    public function setVideoStopped(bool $stopped): bool;
 
-    /** Tell the server whether our screen-share is paused. */
-    public function setPresentationPaused(bool $paused): void;
+    /** Tell the server whether our screen-share is paused: returns whether it took the change. */
+    public function setPresentationPaused(bool $paused): bool;
 }

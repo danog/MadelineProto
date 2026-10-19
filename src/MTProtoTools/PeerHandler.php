@@ -27,6 +27,7 @@ use danog\MadelineProto\EventHandler\Message\Entities\InputMentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\ChatAdminRequiredError;
@@ -72,7 +73,7 @@ trait PeerHandler
      */
     public function isForum(mixed $peer): bool
     {
-        return $this->getInfo($peer, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)['forum'] ?? false;
+        return $this->getInfo($peer)['Chat']['forum'] ?? false;
     }
 
     /**
@@ -250,6 +251,14 @@ trait PeerHandler
                 case 'inputPeerChannel':
                 case 'inputChannelFromMessage':
                 case 'inputPeerChannelFromMessage':
+                    // Built to be serialized, with the MTProto ID (see genAll), unlike the received constructors below,
+                    // whose IDs the deserializer already converted to bot API IDs.
+                    if ($id['channel_id'] > 0) {
+                        return $id['channel_id'] > Magic::MAX_CHANNEL_ID
+                            ? DialogId::fromMonoforumId($id['channel_id'])
+                            : DialogId::fromSupergroupOrChannelId($id['channel_id']);
+                    }
+                    return $id['channel_id'];
                 case 'updateChannelReadMessagesContents':
                 case 'updateChannelAvailableMessages':
                 case 'updateChannel':
@@ -435,10 +444,13 @@ trait PeerHandler
                 $this->caching_full_info[$id] = true;
                 $this->logger->logger("Only have min peer for {$id} in database, trying to fetch full info");
                 try {
+                    // A min peer may come without an access hash: the serializer replaces the min input constructor
+                    // with inputChannelFromMessage/inputUserFromMessage, which don't need one.
+                    $input = $this->genAll(['access_hash' => $chat['access_hash'] ?? 0] + $chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR);
                     if ($id < 0) {
-                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('channels.getChannels', ['id' => [$input]]);
                     } else {
-                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$this->genAll($chat, \danog\MadelineProto\API::INFO_TYPE_CONSTRUCTOR)]]);
+                        $this->methodCallAsyncRead('users.getUsers', ['id' => [$input]]);
                     }
                 } catch (Exception $e) {
                     $this->logger->logger($e->getMessage(), Logger::WARNING);
@@ -447,6 +459,7 @@ trait PeerHandler
                 } finally {
                     unset($this->caching_full_info[$id]);
                 }
+                $chat = $this->peerDatabase->get($id) ?? $chat;
             }
             try {
                 return $this->genAll($chat, $type);
@@ -479,7 +492,14 @@ trait PeerHandler
                 return $this->getInfo($this->supportUser, $type);
             }
             if ($bot_api_id = $this->peerDatabase->getIdFromUsername($id)) {
-                return $this->getInfo($bot_api_id, $type);
+                // Usernames are indexed for min peers too, which may lack an access hash (seen in a forward, a mention,
+                // a group call...): check that the peer can be used (fetching it through the min database if needed)
+                // even when only its ID is requested, or resolve the username again.
+                try {
+                    $info = $this->getInfo($bot_api_id);
+                    return $type === \danog\MadelineProto\API::INFO_TYPE_ALL ? $info : $this->getInfo($bot_api_id, $type);
+                } catch (PeerNotInDbException) {
+                }
             }
             if ($bot_api_id = $this->peerDatabase->resolveUsername($id)) {
                 return $this->getInfo($bot_api_id, $type);

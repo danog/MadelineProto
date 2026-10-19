@@ -155,7 +155,6 @@
     "dl.php_check_logs_make_sure_session_running": "関連付けられた MadelineProto EventHandler ボットか MadelineProto IPC サーバーのいずれかがオフラインです。ログを確認し、少なくとも一方が実行中であることを確認してください！",
     "account_banned": "!!!!!!! 警告 !!!!!!!\nTelegram のフラッド防止システムによって、このアカウントは停止されました。\n続行するには手動での認証が必要です。\nrecover@telegram.org にメールを送り、電話番号 %s の停止解除を依頼するとともに、この電話番号で何をするのかを簡単に説明してください。\nその後、もう一度ログインしてください。\nこのアカウントを意図的に削除した場合は、このメッセージを無視してください。",
     "plugin_path_does_not_exist": "プラグインのパス %s が存在しません！",
-    "windows_warning": "Windows ユーザーの方へ: これが失敗する場合は Linux に切り替えてください。すべての PHP プロセスにソケットの作成を許可するようファイアウォールの設定を変更してみることもできます (Linux に切り替えるほうが 100% 簡単です。Linux では MadelineProto は変更なしでそのまま動作します)",
     "could_not_connect_to_MadelineProto": "MadelineProto に接続できませんでした。修正するには、proc_open を有効にして open_basedir の制限を解除するか、Web サーバーのパス書き換えを無効にしてください！すでに対応済みの場合は、CLI 版の PHP が Web 版とまったく同じ (バージョン、拡張機能など) であることを確認し、IPC サーバーの起動を妨げたエラーの詳細について MadelineProto.log ファイルを確認してください。",
     "translate_madelineproto_web": "MadelineProto はあなたの言語に翻訳できます (現在の翻訳進捗: %d%%)。<a href=\"https://github.com/danog/MadelineProto/tree/v8/langs\" target=\"_blank\">こちらをクリックして翻訳に協力してください！</a>",
     "translate_madelineproto_cli": "MadelineProto はあなたの言語に翻訳できます (現在の翻訳進捗: %d%%)。翻訳に協力するには https://github.com/danog/MadelineProto/tree/v8/langs にアクセスしてください！",

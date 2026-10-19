@@ -30,6 +30,8 @@ use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
+use function Amp\delay;
+
 /**
  * IPC client.
  *
@@ -37,6 +39,10 @@ use const DEBUG_BACKTRACE_IGNORE_ARGS;
  */
 abstract class ClientAbstract
 {
+    /**
+     * Minimum interval between reconnections, in seconds.
+     */
+    private const RECONNECT_INTERVAL = 1.0;
     /**
      * IPC server socket.
      */
@@ -84,6 +90,7 @@ abstract class ClientAbstract
      */
     protected function loopInternal(): void
     {
+        $lastReconnect = 0.0;
         do {
             while (true) {
                 $payload = null;
@@ -119,10 +126,17 @@ abstract class ClientAbstract
                         $this->server->disconnect();
                     } catch (Throwable $e) {
                     }
+                    // A server shutting down can still accept connections, dropping them: reconnecting to it right
+                    // away spun, starting a server (a worker process, the requests of the web runner) every time.
+                    $wait = $lastReconnect + self::RECONNECT_INTERVAL - microtime(true);
+                    if ($wait > 0) {
+                        delay($wait);
+                    }
+                    $lastReconnect = microtime(true);
                     $requests = [];
                     try {
                         // Connect as soon as any server is listening, even if it was started by another process
-                        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session), waitStartup: true);
+                        [$server] = Serialization::startServerAndConnect($this->session);
                         if (!$server instanceof ChannelledSocket) {
                             throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
                         }
