@@ -145,7 +145,10 @@ abstract class Serialization
         };
         if (!$forceFull) {
             $failureCb = static function () use ($session, $cancelFull, $lockWait, &$canContinue, &$ipcSocket, &$lightState): void {
-                EventLoop::queue(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+                if ($lockWait->isCancelled()) {
+                    return;
+                }
+                $lightStateRead = async(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
                     try {
                         $lightState = $session->getLightState();
                         if (!$lightState->canStartIpc()) {
@@ -156,28 +159,34 @@ abstract class Serialization
                         $lightState = false;
                     }
                 });
-                // The lock holder is an instance that serves (or will serve) the session once it's loaded, or a
-                // client that releases the lock in a moment: connect as soon as the holder listens, however
-                // long it takes to load the session, unless we get the lock first.
-                while (!$lockWait->isCancelled()) {
-                    Logger::log('MadelineProto is starting, please wait...');
-                    try {
-                        clearstatcache(true, $session->getIpcPath());
-                        $socket = connect($session->getIpcPath());
-                        Logger::log('Connected to IPC socket!');
-                        $ipcSocket = [$socket, null];
-                        $cancelFull();
-                        return;
-                    } catch (Throwable $e) {
-                        $e = $e->getMessage();
-                        if ($e !== 'The endpoint does not exist!') {
-                            Logger::log("$e while connecting to IPC socket");
+                try {
+                    // The lock holder is an instance that serves (or will serve) the session once it's loaded, or a
+                    // client that releases the lock in a moment: connect as soon as the holder listens, however
+                    // long it takes to load the session, unless we get the lock first.
+                    while (!$lockWait->isCancelled()) {
+                        Logger::log('MadelineProto is starting, please wait...');
+                        try {
+                            clearstatcache(true, $session->getIpcPath());
+                            $socket = connect($session->getIpcPath());
+                            Logger::log('Connected to IPC socket!');
+                            $ipcSocket = [$socket, null];
+                            $cancelFull();
+                            return;
+                        } catch (Throwable $e) {
+                            $e = $e->getMessage();
+                            if ($e !== 'The endpoint does not exist!') {
+                                Logger::log("$e while connecting to IPC socket");
+                            }
+                        }
+                        try {
+                            delay(1.0, true, $lockWait->getCancellation());
+                        } catch (CancelledException) {
                         }
                     }
-                    try {
-                        delay(1.0, true, $lockWait->getCancellation());
-                    } catch (CancelledException) {
-                    }
+                } finally {
+                    // Its result is used once we get the lock, and it must not outlive this call: at shutdown,
+                    // ext-uv runs the callbacks of the file operations still in flight on its destroyed loop.
+                    $lightStateRead->await();
                 }
             };
         } elseif (Magic::$isIpcWorker) {
@@ -201,11 +210,22 @@ abstract class Serialization
         } else {
             $failureCb = null;
         }
+        // Awaited once we stop waiting for the lock, so that it doesn't outlive this call
+        $failure = null;
         try {
-            $unlock = Tools::flock($session->getLockPath(), LOCK_EX, 1, $cancelFlock->getCancellation(), $failureCb);
+            $unlock = Tools::flock(
+                $session->getLockPath(),
+                LOCK_EX,
+                1,
+                $cancelFlock->getCancellation(),
+                $failureCb ? static function () use ($failureCb, &$failure): void {
+                    $failure = async($failureCb);
+                } : null,
+            );
         } finally {
             $lockWait->cancel();
             EventLoop::cancel($warningId);
+            $failure?->await();
         }
 
         if (!$unlock) { // Canceled, don't have lock
@@ -235,15 +255,7 @@ abstract class Serialization
             if (!$class = $lightState->getEventHandler()) {
                 // Unlock and fork
                 $unlock();
-                $monitor = Server::startMe($session);
-                EventLoop::queue(static function () use ($cancelIpc, $monitor): void {
-                    try {
-                        $cancelIpc->complete($monitor->await());
-                    } catch (\Throwable $e) {
-                        $cancelIpc->error($e);
-                    }
-                });
-                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), waitStartup: true);
+                return self::startServerAndConnect($session, $ipcSocket);
             } elseif (!class_exists($class)) {
                 // Have lock, can't use it
                 $unlock();
@@ -372,6 +384,37 @@ abstract class Serialization
             try {
                 $socket->disconnect();
             } catch (Throwable) {
+            }
+        }
+    }
+
+    /**
+     * Start the IPC server of a session, and connect to it (or to the one another process started concurrently).
+     *
+     * @internal
+     *
+     * @param  ?array{0: ChannelledSocket, 1: null}              $connected An existing connection to return instead
+     * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
+     */
+    public static function startServerAndConnect(SessionPaths $session, ?array $connected = null): array
+    {
+        $stopMonitor = new DeferredCancellation;
+        $monitor = Server::startMe($session, $stopMonitor->getCancellation());
+        $result = null;
+        try {
+            return $result = $connected ?? self::tryConnect($session->getIpcPath(), $monitor, waitStartup: true);
+        } finally {
+            // We're connected (or gave up) before the server reports its startup, possibly: the monitor polls the IPC
+            // state file until then, so it must not outlive this call. At shutdown, ext-uv runs the callbacks of the
+            // file operations still in flight on its destroyed loop.
+            $stopMonitor->cancel();
+            try {
+                $monitor->await();
+            } catch (Throwable $e) {
+                // Otherwise tryConnect threw it already
+                if ($result !== null) {
+                    Logger::log("Error while monitoring the IPC server startup: $e", Logger::ERROR);
+                }
             }
         }
     }
