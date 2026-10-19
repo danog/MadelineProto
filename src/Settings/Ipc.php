@@ -34,7 +34,7 @@ use danog\MadelineProto\SettingsAbstract;
  * Remote connections are authenticated and encrypted with a shared secret, which must be set on both sides.
  *
  * To start a standalone IPC server, run `php madeline.phar madeline-server /path/to/session.madeline` (or, with
- * composer, `php vendor/danog/madelineproto/src/Ipc/Runner/entry.php madeline-server /path/to/session.madeline`),
+ * composer, `vendor/bin/madeline-server /path/to/session.madeline`),
  * with the MADELINE_IPC_LISTEN (comma-separated endpoints) and MADELINE_IPC_SECRET environment variables, plus
  * MADELINE_API_ID and MADELINE_API_HASH to create a new session; the docker image provides the `madeline-server`
  * command, which serves /data/session.madeline by default.

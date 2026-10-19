@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+/**
+ * Standalone MadelineProto IPC server, see https://docs.madelineproto.xyz/docs/IPC.html.
+ *
+ * Usage: vendor/bin/madeline-server [session], by default $MADELINE_SESSION.
+ *
+ * Environment:
+ * - MADELINE_IPC_LISTEN: comma-separated endpoints for remote clients, e.g. tcp://0.0.0.0:6100,http://0.0.0.0:8080
+ * - MADELINE_IPC_SECRET: shared secret of remote clients (at least 16 bytes, e.g. `openssl rand -hex 32`)
+ * - MADELINE_API_ID, MADELINE_API_HASH: API ID and hash, to create the session if it doesn't exist
+ *
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2025 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
+
+$session = $argv[1] ?? (getenv('MADELINE_SESSION') ?: null);
+if ($session === null || $session === '' || \in_array($session, ['-h', '--help'], true)) {
+    fwrite(STDERR, 'Usage: madeline-server <session>, or set MADELINE_SESSION; see https://docs.madelineproto.xyz/docs/IPC.html'.PHP_EOL);
+    exit($session === null || $session === '' ? 1 : 0);
+}
+if (!preg_match('~^(/|[a-zA-Z]:[\\\\/]|\\\\\\\\)~', $session)) {
+    $session = getcwd().DIRECTORY_SEPARATOR.$session;
+}
+
+// Set by the proxies of composer (vendor/bin/madeline-server), or a checkout of MadelineProto.
+require $GLOBALS['_composer_autoload_path'] ?? __DIR__.'/../vendor/autoload.php';
+
+define('MADELINE_WORKER_TYPE', 'madeline-server');
+define('MADELINE_WORKER_ARGS', [$session]);
+require __DIR__.'/../src/Ipc/Runner/entry.php';
