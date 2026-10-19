@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Revolt\EventLoop;
 use Throwable;
 use Webmozart\Assert\Assert;
 
@@ -165,6 +166,18 @@ class RPCErrorException extends \Exception
 
     private static string $auth;
     /**
+     * The errors already reported by this process, so that an error the database has no description for is not
+     * reported again every time it is received.
+     *
+     * @var array<string, true>
+     */
+    private static array $reported = [];
+    /**
+     * Get the description of an error, reporting it in the background if it is not known.
+     *
+     * The report never delays the request that got the error: it waits for an HTTP request, up to its 10 second
+     * timeout, and its result is only cached for the next errors.
+     *
      * @internal
      */
     private static function report(string $error, int $code, string $method): string
@@ -173,42 +186,43 @@ class RPCErrorException extends \Exception
             return $error;
         }
         $error = preg_replace('/\\d+$/', 'X', $error);
-        $description = self::$descriptions[$error] ?? '';
         if ((!isset(self::$errorMethodMap[$code][$method][$error]) || !isset(self::$descriptions[$error]))
             && !self::isBad($error, $code, $method)
+            && !isset(self::$reported["$code $method $error"])
         ) {
-            try {
-                if (!isset(self::$auth)) {
-                    $auth = '';
-                    try {
-                        $auth = getenv('TELERPC_AUTH_TOKEN') ?: '';
-                    } catch (Throwable) {
-                    }
-                    Assert::true(preg_match('/^[a-zA-Z0-9_-]*$/', $auth) === 1, 'TELERPC_AUTH_TOKEN can only contain a-z, A-Z, 0-9, _ and -');
-                    $auth = $auth === '' ? '' : 'auth='.$auth.'&';
-                    self::$auth = $auth;
+            self::$reported["$code $method $error"] = true;
+            EventLoop::queue(self::sendReport(...), $error, $code, $method);
+        }
+        return self::$descriptions[$error] ?? $error;
+    }
+    private static function sendReport(string $error, int $code, string $method): void
+    {
+        try {
+            if (!isset(self::$auth)) {
+                $auth = '';
+                try {
+                    $auth = getenv('TELERPC_AUTH_TOKEN') ?: '';
+                } catch (Throwable) {
                 }
-                $auth = self::$auth;
-                $res = json_decode(
-                    (
-                        HttpClientBuilder::buildDefault()
-                        ->request(new Request('https://report-rpc-error.madelineproto.xyz/?'.$auth.'method='.$method.'&code='.$code.'&error='.$error))
-                    )->getBody()->buffer(),
-                    true,
-                );
-                if (isset($res['ok']) && $res['ok'] && isset($res['result']) && \is_string($res['result'])) {
-                    $description = $res['result'];
-                    self::$descriptions[$error] = $description;
-                    self::$errorMethodMap[$code][$method][$error] = $error;
-                }
-            } catch (Throwable $e) {
-                Logger::log("Failed to report RPC error: $error (code $code) in method $method: ".$e->getMessage());
+                Assert::true(preg_match('/^[a-zA-Z0-9_-]*$/', $auth) === 1, 'TELERPC_AUTH_TOKEN can only contain a-z, A-Z, 0-9, _ and -');
+                $auth = $auth === '' ? '' : 'auth='.$auth.'&';
+                self::$auth = $auth;
             }
+            $auth = self::$auth;
+            $res = json_decode(
+                (
+                    HttpClientBuilder::buildDefault()
+                    ->request(new Request('https://report-rpc-error.madelineproto.xyz/?'.$auth.'method='.$method.'&code='.$code.'&error='.$error))
+                )->getBody()->buffer(),
+                true,
+            );
+            if (isset($res['ok']) && $res['ok'] && isset($res['result']) && \is_string($res['result'])) {
+                self::$descriptions[$error] = $res['result'];
+                self::$errorMethodMap[$code][$method][$error] = $error;
+            }
+        } catch (Throwable $e) {
+            Logger::log("Failed to report RPC error: $error (code $code) in method $method: ".$e->getMessage());
         }
-        if (!$description) {
-            return $error;
-        }
-        return $description;
     }
     /**
      * Get string representation of exception.

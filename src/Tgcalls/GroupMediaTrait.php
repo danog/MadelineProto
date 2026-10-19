@@ -428,15 +428,15 @@ trait GroupMediaTrait
     }
 
     /**
-     * Tell the server whether our camera video is stopped.
+     * Tell the server whether our camera video is stopped: returns whether it took the change.
      *
      * @internal
      */
     #[\Override]
-    public function setVideoStopped(bool $stopped): void
+    public function setVideoStopped(bool $stopped): bool
     {
         if ($this->getCallState() !== GroupCallState::JOINED) {
-            return;
+            return false;
         }
         try {
             $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
@@ -444,30 +444,32 @@ trait GroupMediaTrait
                 'participant' => ['_' => 'inputPeerSelf'],
                 'video_stopped' => $stopped,
             ]);
+            return true;
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'PARTICIPANT_JOIN_MISSING') {
                 // The server no longer has our participant (it dropped us while the process was
                 // down): recover right away rather than waiting for the transport to time out.
                 $this->log("We were dropped from $this, rejoining...", Logger::WARNING);
                 $this->onDroppedByServer();
-                return;
+                return false;
             }
             $this->log("Could not change the video state of $this: $e", Logger::WARNING);
         } catch (Throwable $e) {
             $this->log("Could not change the video state of $this: $e", Logger::WARNING);
         }
+        return false;
     }
 
     /**
-     * Tell the server whether our screen-share is paused.
+     * Tell the server whether our screen-share is paused: returns whether it took the change.
      *
      * @internal
      */
     #[\Override]
-    public function setPresentationPaused(bool $paused): void
+    public function setPresentationPaused(bool $paused): bool
     {
         if ($this->getCallState() !== GroupCallState::JOINED) {
-            return;
+            return false;
         }
         try {
             $this->API->methodCallAsyncRead('phone.editGroupCallParticipant', [
@@ -475,9 +477,11 @@ trait GroupMediaTrait
                 'participant' => ['_' => 'inputPeerSelf'],
                 'presentation_paused' => $paused,
             ]);
+            return true;
         } catch (Throwable $e) {
             $this->log("Could not change the presentation state of $this: $e", Logger::WARNING);
         }
+        return false;
     }
 
     /**
