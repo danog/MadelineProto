@@ -73,13 +73,14 @@ function text(string $text): string
 }
 
 /**
- * Convert a line of GitHub markdown to Telegram markdown: only links (also bare URLs), bold and code are kept.
+ * Convert a line of GitHub markdown to Telegram markdown: only links (also bare URLs), bold and code are kept, and
+ * mentions of GitHub users (@user, @app[bot]) link to them, or Telegram would show them as Telegram usernames.
  */
 function inline(string $line): string
 {
     $result = '';
     $offset = 0;
-    preg_match_all('/\[([^\]]+)\]\(([^)\s]+)\)|\*\*(.+?)\*\*|`([^`]+)`|(https?:\/\/[^\s<>()]+)/', $line, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+    preg_match_all('/\[([^\]]+)\]\(([^)\s]+)\)|\*\*(.+?)\*\*|`([^`]+)`|(https?:\/\/[^\s<>()]+)|(?<![\w@\/.])@([A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38})(\[bot\])?(?![\w\/-])/', $line, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
     foreach ($matches as $match) {
         $result .= text(substr($line, $offset, $match[0][1] - $offset));
         if (($match[1][1] ?? -1) !== -1 && $match[1][0] !== '') {
@@ -90,6 +91,10 @@ function inline(string $line): string
             $result .= '*'.text($match[3][0]).'*';
         } elseif (($match[4][1] ?? -1) !== -1 && $match[4][0] !== '') {
             $result .= '`'.EntityTools::markdownCodeEscape($match[4][0]).'`';
+        } elseif (($match[6][1] ?? -1) !== -1 && $match[6][0] !== '') {
+            // The accounts of GitHub apps (@dependabot[bot]) are at /apps/.
+            $url = 'https://github.com/'.(($match[7][1] ?? -1) !== -1 ? 'apps/' : '').$match[6][0];
+            $result .= '['.EntityTools::markdownEscape($match[0][0]).']('.EntityTools::markdownUrlEscape($url).')';
         } else {
             $result .= '['.EntityTools::markdownEscape($match[5][0]).']('.EntityTools::markdownUrlEscape($match[5][0]).')';
         }
