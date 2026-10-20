@@ -624,22 +624,7 @@ final class TL implements TLInterface
                     return $object;
                 }
         }
-        if ($object instanceof MessageEntity) {
-            $object = $object->toMTProto();
-        }
-        if ($type['type'] === 'InputMessage' && !\is_array($object)) {
-            $object = ['_' => 'inputMessageID', 'id' => $object];
-        } elseif ($type['type'] === 'TextWithEntities' && !\is_array($object)) {
-            $object = ['_' => 'textWithEntities', 'text' => $object];
-        } elseif (isset($this->typeMismatch[$type['type']]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type['type'])) {
-            $object = $this->typeMismatch[$type['type']]($object);
-            if (!isset($object['_'])) {
-                if (!isset($object[$type['type']])) {
-                    throw new \danog\MadelineProto\Exception(sprintf(Lang::$current_lang['could_not_convert_object'], $type['type']));
-                }
-                $object = $object[$type['type']];
-            }
-        }
+        $object = $this->convertTypeMismatch($type['type'], $object);
         if (!isset($object['_'])) {
             $constructorData = $this->constructors->findByPredicate($type['type'], $layer);
             if ($constructorData === false) {
@@ -667,6 +652,37 @@ final class TL implements TLInterface
         }
         $concat = $bare ? '' : $constructorData['id'];
         return $concat.($this->serializeParams($constructorData, $object, '', $layer));
+    }
+    /**
+     * Convert a value passed for an object of a TL type to a constructor of that type, as done when serializing it
+     * (a MessageMedia passed as an InputMedia, a peer ID passed as an InputPeer...).
+     *
+     * Returns other values unchanged.
+     *
+     * @internal
+     */
+    #[\Override]
+    public function convertTypeMismatch(string $type, mixed $object): mixed
+    {
+        if ($object instanceof MessageEntity) {
+            return $object->toMTProto();
+        }
+        if ($type === 'InputMessage' && !\is_array($object)) {
+            return ['_' => 'inputMessageID', 'id' => $object];
+        }
+        if ($type === 'TextWithEntities' && !\is_array($object)) {
+            return ['_' => 'textWithEntities', 'text' => $object];
+        }
+        if (isset($this->typeMismatch[$type]) && (!\is_array($object) || isset($object['_']) && $this->constructors->findByPredicate($object['_'])['type'] !== $type)) {
+            $object = $this->typeMismatch[$type]($object);
+            if (!isset($object['_'])) {
+                if (!isset($object[$type])) {
+                    throw new \danog\MadelineProto\Exception(sprintf(Lang::$current_lang['could_not_convert_object'], $type));
+                }
+                $object = $object[$type];
+            }
+        }
+        return $object;
     }
     /**
      * Serialize method.
