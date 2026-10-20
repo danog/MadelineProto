@@ -354,16 +354,17 @@ trait ResponseHandler
                 switch ($response['error_message']) {
                     case 'USER_DEACTIVATED':
                     case 'USER_DEACTIVATED_BAN':
+                        $this->API->logger($response['error_message'], Logger::FATAL_ERROR);
+                        $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
+                        $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                        $this->API->logout();
+                        return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
                     case 'SESSION_REVOKED':
                     case 'SESSION_EXPIRED':
                         $this->API->logger($response['error_message'], Logger::FATAL_ERROR);
-                        $phone = null;
-                        if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
-                            $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
-                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
-                        }
+                        $this->API->logger(Lang::$current_lang['session_revoked'], Logger::FATAL_ERROR);
                         $this->API->logout();
-                        return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
+                        return static fn () => new SignalException(Lang::$current_lang['session_revoked']);
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->loginState->getState()->state !== \danog\MadelineProto\API::LOGGED_IN) {
@@ -377,10 +378,9 @@ trait ResponseHandler
                         $this->API->logger("Auth key not registered in DC {$this->datacenter} with RPC error {$response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);
                         if ($this->API->loginState->getState()->authorizedDc == $this->datacenter) {
                             $this->API->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
-                            $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->API->logger(Lang::$current_lang['session_revoked'], Logger::FATAL_ERROR);
                             $this->API->logout();
-                            return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
+                            return static fn () => new SignalException(Lang::$current_lang['session_revoked']);
                         }
                         $this->methodRecall($request, $this->datacenter);
                         return null;
