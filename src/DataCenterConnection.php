@@ -105,10 +105,6 @@ final class DataCenterConnection implements SimpleSubscriber
      *
      */
     private bool $needsReconnect = false;
-    /**
-     * Whether the authorization is being copied to this DC.
-     */
-    private bool $copyingAuthorization = false;
 
     public function __construct(private readonly MTProto $API, private readonly int $datacenter)
     {
@@ -272,115 +268,45 @@ final class DataCenterConnection implements SimpleSubscriber
             ]);
             $this->auth->init();
         } elseif ($state === ConnectionState::ENCRYPTED_NOT_AUTHED) {
-            // Only once a request needs it, as the clients of Telegram do: logging in from another DC than the
-            // first one (the one of the config, of the phone number, or an imported authorization) left a
-            // connection to it, and copying the authorization there every time exhausts the exports allowed to the
-            // account (FLOOD_WAITs of several minutes, then, for the requests that do need it).
-            if ($this->hasPendingRequests()) {
-                $this->authorizationNeeded();
-            } else {
-                $logger->logger("Not copying the authorization to DC {$this->datacenter} until a request needs it", Logger::NOTICE);
+            Assert::eq($this->API->loginState->getState()->state, API::LOGGED_IN);
+            $authed = $this->API->loginState->getState()->authorizedDc;
+            Assert::notNull($authed);
+
+            $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->datacenter);
+            $authorized_socket =  $this->API->datacenter->getDataCenterConnection($authed);
+            $authorized_socket->waitGetConnection();
+            for ($attempt = 1; ;) {
+                try {
+                    $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
+                        'auth.exportAuthorization',
+                        ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
+                    );
+                    $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
+                    $connection->methodCallAsyncRead('auth.importAuthorization', $e);
+                    break;
+                } catch (FloodWaitError $error) {
+                    // Many processes of the account copying its authorization at once (CI runs creating sessions)
+                    // get FLOOD_WAITs longer than the flood timeout: wait them out, as this runs in the transition of
+                    // the state of the connection, where an exception kills the process, and the connection can't be
+                    // used without the authorization anyway. Not through the floodWaitLimit of the calls: their
+                    // timeout (the RPC drop timeout) would expire first.
+                    $logger->logger("Got {$error->rpc} copying the authorization to DC {$this->datacenter}, waiting {$error->waitTime} seconds", Logger::WARNING);
+                    delay($error->waitTime);
+                } catch (RPCErrorException $error) {
+                    // A newer export of the same account (another process of the account copying its authorization
+                    // at the same time, for example) invalidates the exported bytes: export them again, after a
+                    // random delay, so that the processes don't keep invalidating each other's.
+                    if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt++ === 5) {
+                        throw $error;
+                    }
+                    $logger->logger("The exported authorization for DC {$this->datacenter} was invalidated, exporting it again", Logger::WARNING);
+                    delay(random_int(100, 2000) / 1000);
+                }
             }
+            $this->auth->authorize();
         }
 
         $logger->logger("Finished auth key transition to {$state->name} in DC {$this->datacenter}", Logger::NOTICE);
-    }
-
-    /**
-     * Whether requests wait for the authorization of this DC (or of its media DC, which copies its auth key).
-     */
-    private function hasPendingRequests(): bool
-    {
-        $dcs = [$this];
-        $media = $this->API->datacenter->getDataCenterConnections()[-$this->datacenter] ?? null;
-        if ($media !== null) {
-            $dcs[] = $media;
-        }
-        foreach ($dcs as $dc) {
-            foreach ($dc->connections as $connection) {
-                if ($connection->hasPendingRequests()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Signal that a request was queued: copy the authorization to this DC, if it still needs it.
-     */
-    public function authorizationNeeded(): void
-    {
-        if ($this->auth->connectionState->getState() === ConnectionState::ENCRYPTED) {
-            return;
-        }
-        if ($this->auth->isMedia) {
-            // It waits for the auth key of its main DC.
-            $this->API->datacenter->getDataCenterConnection(-$this->datacenter)->authorizationNeeded();
-            return;
-        }
-        if ($this->copyingAuthorization || $this->auth->connectionState->getState() !== ConnectionState::ENCRYPTED_NOT_AUTHED) {
-            return;
-        }
-        $this->copyingAuthorization = true;
-        // Not in the transitions of the state of the auth key, which it would hold up while waiting for the
-        // FLOOD_WAITs.
-        EventLoop::queue(function (): void {
-            try {
-                $this->copyAuthorization();
-            } catch (\Throwable $e) {
-                throw new SecurityException("An error occurred while copying the authorization to DC {$this->datacenter}: ".$e->getMessage(), 0, $e);
-            } finally {
-                $this->copyingAuthorization = false;
-            }
-        });
-    }
-
-    private function copyAuthorization(): void
-    {
-        $logger = $this->API->logger;
-        Assert::eq($this->API->loginState->getState()->state, API::LOGGED_IN);
-        $authed = $this->API->loginState->getState()->authorizedDc;
-        Assert::notNull($authed);
-
-        $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->datacenter);
-        $authorized_socket =  $this->API->datacenter->getDataCenterConnection($authed);
-        $authorized_socket->waitGetConnection();
-        for ($attempt = 1; ;) {
-            try {
-                $e = $authorized_socket->getAuthConnection()->methodCallAsyncRead(
-                    'auth.exportAuthorization',
-                    ['dc_id' => $this->datacenter % 10_000, 'specialMethodType' => SpecialMethodType::USER_RELATED]
-                );
-                $e['specialMethodType'] = SpecialMethodType::UNAUTHED_METHOD;
-                $this->getAuthConnection()->methodCallAsyncRead('auth.importAuthorization', $e);
-                break;
-            } catch (FloodWaitError $error) {
-                // Many processes of the account copying its authorization at once (CI runs creating sessions)
-                // get FLOOD_WAITs longer than the flood timeout: wait them out, as the connection can't be used
-                // without the authorization anyway. Not through the floodWaitLimit of the calls: their timeout (the
-                // RPC drop timeout) would expire first.
-                $logger->logger("Got {$error->rpc} copying the authorization to DC {$this->datacenter}, waiting {$error->waitTime} seconds", Logger::WARNING);
-                delay($error->waitTime);
-            } catch (RPCErrorException $error) {
-                // A newer export of the same account (another process of the account copying its authorization
-                // at the same time, for example) invalidates the exported bytes: export them again, after a
-                // random delay, so that the processes don't keep invalidating each other's.
-                if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt++ === 5) {
-                    throw $error;
-                }
-                $logger->logger("The exported authorization for DC {$this->datacenter} was invalidated, exporting it again", Logger::WARNING);
-                delay(random_int(100, 2000) / 1000);
-            }
-        }
-        // The auth key may have been reset meanwhile (its authorization stays with the permanent key): the next
-        // transition takes over.
-        if ($this->auth->connectionState->getState() !== ConnectionState::ENCRYPTED_NOT_AUTHED) {
-            $logger->logger("Copied the authorization to DC {$this->datacenter}, now in state {$this->auth->connectionState->getState()->name}", Logger::NOTICE);
-            return;
-        }
-        $this->auth->authorize();
-        $logger->logger("Copied the authorization to DC {$this->datacenter}", Logger::NOTICE);
     }
 
     /**
