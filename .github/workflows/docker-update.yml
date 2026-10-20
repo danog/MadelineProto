@@ -36,7 +36,7 @@ jobs:
           echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
           echo "email=$(gh api "/users/$SLUG%5Bbot%5D" --jq .id)+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ steps.app.outputs.token }}
 
