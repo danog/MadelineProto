@@ -22,10 +22,13 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SimpleEventHandler;
 
 // MadelineProto is already loaded
@@ -59,6 +62,8 @@ final class StoriesEventHandler extends SimpleEventHandler
     private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n/dlStories @danogentili - Download all the stories of a @username!\n\n[Source code](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) powered by @MadelineProto";
     // Username of the admin of the bot
     private const ADMIN = "@danogentili";
+
+    private const PAGE_SIZE = 10;
 
     private API $userInstance;
     public function onStart(): void
@@ -121,32 +126,116 @@ final class StoriesEventHandler extends SimpleEventHandler
             return;
         }
 
-        $stories = $this->userInstance->stories->getPeerStories(peer: $message->commandArgs[0])['stories']['stories'];
-        $last = null;
-        do {
-            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories'];
-            $last = $res ? end($res)['id'] : null;
-            $stories = array_merge($res, $stories);
-        } while ($last);
-        // Skip deleted stories
-        $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
-        // Skip protected stories
-        $stories = array_filter($stories, static fn (array $s): bool => !$s['noforwards']);
-        // Sort by date
-        usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
+        [$text, $markup] = $this->renderStoriesPage($this->userInstance->getId($message->commandArgs[0]), 0);
+        $message->reply($text, parseMode: ParseMode::MARKDOWN, replyMarkup: $markup, noWebpage: true);
+    }
 
-        $message = $message->reply("Total stories: ".count($stories));
-        foreach (array_chunk($stories, 10) as $sub) {
-            $result = '';
-            foreach ($sub as $story) {
-                $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
-                if (isset($story['caption'])) {
-                    $cur .= ', "'.self::markdownEscape($story['caption']).'"';
-                }
-                $result .= "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
+    /**
+     * Shows another page of the stories of a user.
+     */
+    #[FilterRegex('/^stories:(-?\d+):(\d+)$/')]
+    public function storiesPageQuery(ChatButtonQuery $query): void
+    {
+        try {
+            [$text, $markup] = $this->renderStoriesPage((int) $query->matches[1], (int) $query->matches[2]);
+            $query->editText($text, $markup, ParseMode::MARKDOWN, noWebpage: true);
+        } catch (RPCErrorException $e) {
+            // Pressing the button of the page that is already shown
+            if ($e->rpc !== 'MESSAGE_NOT_MODIFIED') {
+                throw $e;
             }
-            $message = $message->reply($result, parseMode: ParseMode::MARKDOWN);
+        } finally {
+            $query->answer(cacheTime: 0);
         }
+    }
+
+    /**
+     * Renders a page of the downloadable stories of a peer, newest first.
+     *
+     * The active stories that aren't posted to the profile come first, then the profile stories in the order of stories.getPinnedStories (the ones pinned to the top first).
+     *
+     * Only fetches the profile stories up to the requested page (plus one, to know whether there is a next page).
+     *
+     * @return array{string, ?array}
+     */
+    private function renderStoriesPage(int $peer, int $page): array
+    {
+        $needed = ($page + 1) * self::PAGE_SIZE;
+
+        $active = $this->userInstance->stories->getPeerStories(peer: $peer)['stories']['stories'];
+        // Active stories may be returned as storyItemSkipped, fetch them in full
+        $skipped = array_column(array_filter($active, static fn (array $s): bool => $s['_'] === 'storyItemSkipped'), 'id');
+        if ($skipped) {
+            $active = array_merge(
+                array_filter($active, static fn (array $s): bool => $s['_'] !== 'storyItemSkipped'),
+                $this->userInstance->stories->getStoriesByID(peer: $peer, id: $skipped)['stories'],
+            );
+        }
+        usort($active, static fn (array $a, array $b): int => $b['id'] <=> $a['id']);
+
+        // Story ID => story, deduplicated: the active stories posted to the profile are also returned by getPinnedStories, and so are the stories pinned to the top of the profile, a second time in their place
+        $seen = [];
+        $stories = [];
+        $add = static function (array $story) use (&$seen, &$stories): bool {
+            if (isset($seen[$story['id']])) {
+                return false;
+            }
+            $seen[$story['id']] = true;
+            // Skip deleted and protected stories
+            if ($story['_'] === 'storyItem' && !$story['noforwards']) {
+                $stories[] = $story;
+            }
+            return true;
+        };
+        foreach ($active as $story) {
+            if ($story['_'] !== 'storyItem' || !$story['pinned']) {
+                $add($story);
+            }
+        }
+
+        $offset = 0;
+        while (count($stories) <= $needed) {
+            $res = $this->userInstance->stories->getPinnedStories(peer: $peer, offset_id: $offset, limit: 100);
+            $pinnedToTop = $res['pinned_to_top'] ?? [];
+            $new = false;
+            foreach ($res['stories'] as $story) {
+                $new = $add($story) || $new;
+                // The stories pinned to the top come first whatever their ID, they can't be used as offset
+                if (!in_array($story['id'], $pinnedToTop, true)) {
+                    $offset = $offset === 0 ? $story['id'] : min($offset, $story['id']);
+                }
+            }
+            if (!$new) {
+                break;
+            }
+        }
+
+        $result = '';
+        foreach (array_slice($stories, $page * self::PAGE_SIZE, self::PAGE_SIZE) as $story) {
+            $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
+            if (isset($story['caption']) && $story['caption'] !== '') {
+                $caption = mb_strlen($story['caption']) > 100 ? mb_substr($story['caption'], 0, 100).'…' : $story['caption'];
+                $cur .= ', "'.self::markdownEscape($caption).'"';
+            }
+            $result .= "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
+        }
+        if ($result === '') {
+            $result = $page === 0 ? "This user has no downloadable stories!" : "No more stories!";
+        } else {
+            $result = "Stories, page ".($page + 1).":\n\n$result";
+        }
+
+        $buttons = [];
+        if ($page > 0) {
+            $buttons[] = ['_' => 'keyboardButtonCallback', 'text' => '« Previous', 'data' => "stories:$peer:".($page - 1)];
+        }
+        if (count($stories) > $needed) {
+            $buttons[] = ['_' => 'keyboardButtonCallback', 'text' => 'Next »', 'data' => "stories:$peer:".($page + 1)];
+        }
+        return [
+            $result,
+            $buttons ? ['_' => 'replyInlineMarkup', 'rows' => [['_' => 'keyboardButtonRow', 'buttons' => $buttons]]] : null,
+        ];
     }
 }
 
