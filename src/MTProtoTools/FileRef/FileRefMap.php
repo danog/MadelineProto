@@ -337,13 +337,14 @@ final class FileRefMap
     }
 
     /**
-     * Evaluate a TypedOp (or a bare TypedOpOp: the map has both in vectorOp values) against a stored file source.
+     * Evaluate a TypedOp against a stored file source.
      */
     public function evaluate(array $op, array $source, FileRefEnvironment $env): mixed
     {
-        if ($op['_'] === 'typedOp') {
-            $op = $op['op'];
+        if ($op['_'] !== 'typedOp') {
+            throw new AssertionError("Expected a typedOp, got a {$op['_']}");
         }
+        $op = $op['op'];
         switch ($op['_']) {
             case 'copyOp':
                 return \array_key_exists($op['from'], $source) ? $source[$op['from']] : FileRefMarker::ABSENT;

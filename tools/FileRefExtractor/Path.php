@@ -160,7 +160,7 @@ final readonly class Path
                 Assert::eq($type, 'InputChannel');
                 $type = 'long';
             } elseif ($extractor === 'extractUserIdFromUserAndStore') {
-                Assert::eq($type, 'Channel');
+                Assert::eq($type, 'User');
                 $type = 'long';
             } elseif ($extractor === 'extractUserIdFromInputUserAndStore') {
                 Assert::eq($type, 'InputUser');
