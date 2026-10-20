@@ -31,7 +31,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -65,7 +65,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -84,7 +84,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
