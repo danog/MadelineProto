@@ -788,17 +788,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      * @internal
      */
-    public function syncIpcClientPhar(string $release, string $phar, string $versionFile): void
+    public function syncIpcClientPhar(string $release, string $phar, string $versionFile, string $loader): void
     {
         // Queued: a worker shuts down to update by throwing out of the event loop
-        EventLoop::queue(function () use ($release, $phar, $versionFile): void {
+        EventLoop::queue(function () use ($release, $phar, $versionFile, $loader): void {
             try {
                 GarbageCollector::syncIpcClientPhar(
                     $release,
                     $phar,
                     $versionFile,
+                    $loader,
                     \defined('MADELINE_PHAR') ? \MADELINE_PHAR : null,
                     \defined('MADELINE_PHAR_VERSION') ? \MADELINE_PHAR_VERSION : null,
+                    \defined('MADELINE_PHP') ? \MADELINE_PHP : null,
                 );
             } catch (SignalException $e) {
                 throw $e;

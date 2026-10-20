@@ -66,35 +66,46 @@ final class IpcPharSyncTest extends TestCase
     {
         $server = $this->install('server', API::RELEASE, 'server phar');
         $serverVersion = "$this->dir/server/madeline.version";
+        $serverLoader = "$this->dir/server/madeline.php";
         $clientVersion = "$this->dir/client/madeline.version";
-        $sync = static fn (string $release, string $phar) => GarbageCollector::syncIpcClientPhar($release, $phar, $clientVersion, $server, $serverVersion);
+        $clientLoader = "$this->dir/client/madeline.php";
+        file_put_contents($serverLoader, '<?php // server loader');
+        file_put_contents($clientLoader, '<?php // old client loader');
+        $sync = static fn (string $release, string $phar) => GarbageCollector::syncIpcClientPhar($release, $phar, $clientVersion, $clientLoader, $server, $serverVersion, $serverLoader);
 
-        // An older client gets our phar
+        // An older client gets our phar and loader
         $client = $this->install('client', '8.0.0', 'old client phar');
         $sync('8.0.0', $client);
         self::assertSame(API::RELEASE, file_get_contents($clientVersion));
         self::assertSame('server phar', file_get_contents("$this->dir/client/madeline-".API::RELEASE.'.phar'));
+        self::assertSame('<?php // server loader', file_get_contents($clientLoader));
 
         // The same release changes nothing
+        file_put_contents($clientLoader, '<?php // old client loader');
         $sync(API::RELEASE, $client);
         self::assertSame(API::RELEASE, file_get_contents($clientVersion));
+        self::assertSame('<?php // old client loader', file_get_contents($clientLoader));
 
-        // A madeline.version already pointing to a newer phar isn't downgraded
+        // A madeline.version already pointing to a newer phar isn't downgraded, nor is its loader
         file_put_contents($clientVersion, '99.1.0');
         $sync('8.0.0', $client);
         self::assertSame('99.1.0', file_get_contents($clientVersion));
+        self::assertSame('<?php // old client loader', file_get_contents($clientLoader));
 
         // Installed with composer, we have no phar to give
         file_put_contents($clientVersion, '8.0.0');
-        GarbageCollector::syncIpcClientPhar('8.0.0', $client, $clientVersion, null, null);
+        GarbageCollector::syncIpcClientPhar('8.0.0', $client, $clientVersion, $clientLoader, null, null, null);
         self::assertSame('8.0.0', file_get_contents($clientVersion));
+        self::assertSame('<?php // old client loader', file_get_contents($clientLoader));
 
-        // A newer client gives us its phar, without stopping a full instance
+        // A newer client gives us its phar and loader, without stopping a full instance
         $client = $this->install('client', '99.0.0', 'new client phar');
+        file_put_contents($clientLoader, '<?php // new client loader');
         $sync('99.0.0', $client);
         self::assertSame('99.0.0', file_get_contents($serverVersion));
         self::assertSame('new client phar', file_get_contents("$this->dir/server/madeline-99.0.0.phar"));
-        self::assertSame([], glob("$this->dir/*/*.temp"));
+        self::assertSame('<?php // new client loader', file_get_contents($serverLoader));
+        self::assertSame([], glob("$this->dir/*/*.temp*"));
 
         // A worker shuts down to be restarted with it
         $wasWorker = Magic::$isIpcWorker;
