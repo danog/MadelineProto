@@ -103,7 +103,7 @@
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
-        "ext-ffi": "Install the FFI extension (with libopus, libvpx and ffmpeg) to transcode audio and video in realtime; not required to play back pre-converted files",
+        "ext-ffi": "Install the FFI extension (with libopus, libvpx and ffmpeg) to transcode audio and video in realtime; not required to play and record video and audio inside calls",
         "ext-pdo": "Install the pdo extension to store session data on MySQL",
         "ext-openssl": "Install the openssl extension for faster crypto",
         "ext-sodium": "Install the sodium extension for faster crypto",
