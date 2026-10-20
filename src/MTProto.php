@@ -784,6 +784,31 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private ?string $tmpDbPrefix = null;
 
     /**
+     * Called by IPC clients loaded with madeline.php when they connect, see GarbageCollector::syncIpcClientPhar.
+     *
+     * @internal
+     */
+    public function syncIpcClientPhar(string $release, string $phar, string $versionFile): void
+    {
+        // Queued: a worker shuts down to update by throwing out of the event loop
+        EventLoop::queue(function () use ($release, $phar, $versionFile): void {
+            try {
+                GarbageCollector::syncIpcClientPhar(
+                    $release,
+                    $phar,
+                    $versionFile,
+                    \defined('MADELINE_PHAR') ? \MADELINE_PHAR : null,
+                    \defined('MADELINE_PHAR_VERSION') ? \MADELINE_PHAR_VERSION : null,
+                );
+            } catch (SignalException $e) {
+                throw $e;
+            } catch (Throwable $e) {
+                $this->logger->logger("Could not sync the phar of an IPC client: $e", Logger::ERROR);
+            }
+        });
+    }
+
+    /**
      * @internal
      *
      * @psalm-external-mutation-free

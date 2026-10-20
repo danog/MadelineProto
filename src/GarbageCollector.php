@@ -31,8 +31,10 @@ use WeakMap;
 use const LOCK_EX;
 use const LOCK_NB;
 
+use function Amp\ByteStream\pipe;
+use function Amp\File\exists;
 use function Amp\File\move;
-
+use function Amp\File\openFile;
 use function Amp\File\read;
 use function Amp\File\write;
 
@@ -141,8 +143,9 @@ final class GarbageCollector
                     return;
                 }
 
+                // Not MADELINE_PHAR_GLOB: madeline.php defines it as madeline*-81.phar, which matches no phar
                 /** @var string */
-                foreach (glob(MADELINE_PHAR_GLOB) as $path) {
+                foreach (glob(\dirname(MADELINE_PHAR_VERSION).DIRECTORY_SEPARATOR.'madeline-*.phar') as $path) {
                     $base = basename($path);
                     if ($base === 'madeline-'.API::RELEASE.'.phar') {
                         continue;
@@ -167,6 +170,66 @@ final class GarbageCollector
         // attempts) to fail when it can't be reached.
         EventLoop::queue($cb);
         EventLoop::unreference($id = EventLoop::repeat(3600.0, $cb));
+    }
+
+    /**
+     * Brings the phars of an IPC client and of this instance to the newest of the two releases.
+     *
+     * Short-lived clients (like dl.php, or any script that runs a few IPC calls) exit before completing the
+     * update check, and their madeline.php may load phars from another directory than ours, so they'd never
+     * update: the newest of the two phars is copied to the directory of the other, and a worker running the
+     * older one shuts down to be restarted with the newer one.
+     *
+     * @param string  $release        Release of the client
+     * @param string  $phar           Phar of the client
+     * @param string  $versionFile    madeline.version file of the madeline.php of the client
+     * @param ?string $ownPhar        Our phar (MADELINE_PHAR), null if installed with composer
+     * @param ?string $ownVersionFile Our madeline.version file (MADELINE_PHAR_VERSION), null if not loaded by madeline.php
+     */
+    public static function syncIpcClientPhar(string $release, string $phar, string $versionFile, ?string $ownPhar, ?string $ownVersionFile): void
+    {
+        $cmp = version_compare($release, API::RELEASE);
+        if ($cmp < 0) {
+            if ($ownPhar === null) {
+                return;
+            }
+            Logger::log("Updating the MadelineProto phar of an IPC client in ".\dirname($versionFile)." from $release to ".API::RELEASE);
+            self::installPhar($ownPhar, API::RELEASE, $versionFile);
+        } elseif ($cmp > 0) {
+            if ($ownVersionFile === null) {
+                Logger::log("An IPC client uses a newer MadelineProto ($release) than this instance (".API::RELEASE."), please update it!", Logger::FATAL_ERROR);
+                return;
+            }
+            Logger::log("!!!!!!!!!!!!! An IPC client uses a newer MadelineProto, updating (old=".API::RELEASE.", new=$release)! !!!!!!!!!!!!!", Logger::FATAL_ERROR);
+            self::installPhar($phar, $release, $ownVersionFile);
+            if (Magic::$isIpcWorker) {
+                throw new SignalException('!!!!!!!!!!!!! An update of MadelineProto is required, shutting down worker! !!!!!!!!!!!!!');
+            }
+        }
+    }
+
+    /**
+     * Copies a phar next to a madeline.version file and points it to the phar, unless it points to a newer one.
+     */
+    private static function installPhar(string $source, string $release, string $versionFile): void
+    {
+        $target = \dirname($versionFile).DIRECTORY_SEPARATOR."madeline-$release.phar";
+        if (!exists($target)) {
+            $in = openFile($source, 'r');
+            $out = openFile("$target.temp", 'w');
+            try {
+                pipe($in, $out);
+            } finally {
+                $in->close();
+                $out->close();
+            }
+            move("$target.temp", $target);
+        }
+        $current = exists($versionFile) ? trim(read($versionFile)) : '';
+        if ($current === '' || version_compare($release, $current) > 0) {
+            write("$versionFile.temp", $release);
+            move("$versionFile.temp", $versionFile);
+        }
     }
 
     /** @var \WeakMap<\Fiber, true> */

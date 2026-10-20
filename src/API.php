@@ -348,7 +348,17 @@ final class API extends AbstractAPI
         } elseif ($unserialized instanceof ChannelledSocket) {
             // Success, IPC client
             Server::warnIfOverTcp($this->session);
-            $this->wrapper->setAPI(new Client($unserialized, $this->session, Logger::$default));
+            $this->wrapper->setAPI($client = new Client($unserialized, $this->session, Logger::$default));
+            if (\defined('MADELINE_PHAR') && \defined('MADELINE_PHAR_VERSION')) {
+                // Short-lived clients (like dl.php) exit before completing the update check, and their phars may be
+                // in another directory than the worker's: the worker brings both to the newest release.
+                try {
+                    $client->syncIpcClientPhar(self::RELEASE, \MADELINE_PHAR, \MADELINE_PHAR_VERSION);
+                } catch (Throwable $e) {
+                    // Workers older than this method
+                    Logger::log("Could not sync the phar with the IPC server: $e", Logger::NOTICE);
+                }
+            }
             return true;
         } elseif ($unserialized) {
             // Success, full session
