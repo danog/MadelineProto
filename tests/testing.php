@@ -296,7 +296,7 @@ function eq(string $file, string $contents, string $type, string $subtype): void
     }
 }
 
-function sendMedia(API $MadelineProto, array $media, string $message, string $mention, mixed $peer, string $type): void
+function sendMedia(API $MadelineProto, array $media, string $message, int $mention, mixed $peer, string $type): void
 {
     $medias = [
         'base' => $media,
@@ -336,7 +336,7 @@ function sendMedia(API $MadelineProto, array $media, string $message, string $me
     }
 }
 
-function testMedia(API $MadelineProto, array $inputMedia, string $message, string $mention, mixed $peer, string $type): void
+function testMedia(API $MadelineProto, array $inputMedia, string $message, int $mention, mixed $peer, string $type): void
 {
     if ($type !== 'sticker' && $type !== 'voice') {
         $MadelineProto->logger("Sending multi $type");
@@ -384,8 +384,7 @@ foreach ($peers as $peer) {
 
     // The media are independent: tested concurrently, through the IPC worker.
     await(array_map(
-        // Called from strict code (async()): the user ID must be a string already.
-        static fn (string $type) => async(testMedia(...), $MadelineProto, $media[$type], $message, (string) $mention, $peer, $type),
+        static fn (string $type) => async(testMedia(...), $MadelineProto, $media[$type], $message, $mention, $peer, $type),
         array_keys($media),
     ));
 }
