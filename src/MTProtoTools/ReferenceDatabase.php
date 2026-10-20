@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Files module.
+ * File reference database.
  *
  * This file is part of MadelineProto.
  * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -21,82 +21,84 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
-use Closure;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\KeyType;
 use danog\AsyncOrm\ValueType;
-use danog\MadelineProto\Exception;
 use danog\MadelineProto\LegacyMigrator;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProto\SpecialMethodType;
+use danog\MadelineProto\MTProtoTools\FileRef\FileRefEnvironment;
+use danog\MadelineProto\MTProtoTools\FileRef\FileRefMap;
+use danog\MadelineProto\MTProtoTools\FileRef\FileRefTraversal;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\TL\TLCallback;
-use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
-use Webmozart\Assert\Assert;
+use Throwable;
 
 /**
- * Manages upload and download of files.
+ * File reference database, driven by the file reference map (https://core.telegram.org/api/file-references).
+ *
+ * - The file reference table maps a FileId to the last file reference seen for it, the file source table maps it
+ *   to the file sources it was seen in (one per source type, the most recently seen one).
+ * - Both are populated by traversing the results of method calls (see ResponseHandler) and the updates (see
+ *   UpdateHandler::saveUpdate()) with the incoming traversers of the map ({@see FileRefTraversal}).
+ * - Outgoing media locations get the last file reference seen for them when they're serialized; when a call fails
+ *   with FILE_REFERENCE_EXPIRED and similar errors, the outgoing traversers find the locations in its arguments, the
+ *   refresh actions of their sources fetch them again, and the call is repeated with the new file references
+ *   ({@see self::refreshMethodCall()}).
  *
  * @internal
  */
-final class ReferenceDatabase implements TLCallback
+final class ReferenceDatabase implements TLCallback, FileRefEnvironment
 {
     use LegacyMigrator;
+    use RestoresDeclaredProperties;
 
-    // Reference from a document
-    public const DOCUMENT_LOCATION = 0;
-    // Reference from a photo
-    public const PHOTO_LOCATION = 1;
-    // Reference from a photo location (can only be photo location)
-    public const PHOTO_LOCATION_LOCATION = 2;
-    // Peer + photo ID
-    public const USER_PHOTO_ORIGIN = 0;
-    // Peer (default photo ID)
-    public const PEER_PHOTO_ORIGIN = 1;
-    // set ID
-    public const STICKER_SET_ID_ORIGIN = 2;
-    // Peer + msg ID
-    public const MESSAGE_ORIGIN = 3;
-    public const SAVED_GIFS_ORIGIN = 4;
-    public const STICKER_SET_RECENT_ORIGIN = 5;
-    public const STICKER_SET_FAVED_ORIGIN = 6;
-    // emoticon
-    public const STICKER_SET_EMOTICON_ORIGIN = 8;
-    public const WALLPAPER_ORIGIN = 9;
-    public const LOCATION_CONTEXT = [
-        //'inputFileLocation'         => self::PHOTO_LOCATION_LOCATION, // DEPRECATED
-        'inputDocumentFileLocation' => self::DOCUMENT_LOCATION,
-        'inputPhotoFileLocation' => self::PHOTO_LOCATION,
-        'inputPhoto' => self::PHOTO_LOCATION,
-        'inputDocument' => self::DOCUMENT_LOCATION,
-    ];
-    public const METHOD_CONTEXT = ['photos.updateProfilePhoto' => self::USER_PHOTO_ORIGIN, 'photos.getUserPhotos' => self::USER_PHOTO_ORIGIN, 'photos.uploadProfilePhoto' => self::USER_PHOTO_ORIGIN, 'messages.getStickers' => self::STICKER_SET_EMOTICON_ORIGIN];
-    public const CONSTRUCTOR_CONTEXT = ['message' => self::MESSAGE_ORIGIN, 'messageService' => self::MESSAGE_ORIGIN, 'chatFull' => self::PEER_PHOTO_ORIGIN, 'channelFull' => self::PEER_PHOTO_ORIGIN, 'chat' => self::PEER_PHOTO_ORIGIN, 'channel' => self::PEER_PHOTO_ORIGIN, 'updateUserPhoto' => self::USER_PHOTO_ORIGIN, 'user' => self::USER_PHOTO_ORIGIN, 'userFull' => self::USER_PHOTO_ORIGIN, 'wallPaper' => self::WALLPAPER_ORIGIN, 'messages.savedGifs' => self::SAVED_GIFS_ORIGIN, 'messages.recentStickers' => self::STICKER_SET_RECENT_ORIGIN, 'messages.favedStickers' => self::STICKER_SET_FAVED_ORIGIN, 'messages.stickerSet' => self::STICKER_SET_ID_ORIGIN, 'document' => self::STICKER_SET_ID_ORIGIN];
+    /** FileId of a photo. */
+    public const PHOTO = 'fileIdPhoto';
+    /** FileId of a document. */
+    public const DOCUMENT = 'fileIdDocument';
 
-    private const V = 1;
+    /** Version 1 was the location database the map replaced, whose data is dropped. */
+    private const V = 2;
+
     /**
-     * References indexed by location.
-     * @var DbArray<string, array>
+     * File reference table: FileId key => file reference.
+     *
+     * @var DbArray<string, string>
      */
     #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
     private $db;
     /**
-     * @var array<string, list{string, int, array}>
+     * File source table: FileId key => file sources, at most one per type, from the least to the most recently seen.
+     *
+     * @var DbArray<string, list<array>>
      */
-    private array $pendingDb = [];
-    private array $cache = [];
-    private array $cacheContexts = [];
-    private bool $refresh = false;
-    private array $refreshQueue = [];
+    #[OrmMappedArray(KeyType::STRING, ValueType::SCALAR)]
+    private $sources;
+    /**
+     * File references not yet written to the database.
+     *
+     * @var array<string, string>
+     */
+    private array $pendingReferences = [];
+    /**
+     * File sources not yet written to the database.
+     *
+     * @var array<string, list<array>>
+     */
+    private array $pendingSources = [];
     private int $v = 0;
 
     private LocalKeyedMutex $flushMutex;
+    private LocalKeyedMutex $refreshMutex;
+
     public function __construct(private MTProto $API)
     {
         $this->flushMutex = new LocalKeyedMutex;
+        $this->refreshMutex = new LocalKeyedMutex;
         $this->v = self::V;
     }
     /**
@@ -104,92 +106,371 @@ final class ReferenceDatabase implements TLCallback
      */
     public function __sleep()
     {
-        return ['db', 'pendingDb', 'API', 'v'];
+        return ['db', 'sources', 'pendingReferences', 'pendingSources', 'API', 'v'];
     }
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
+        // Drops the state of version 1 (pendingDb).
+        $this->restoreDeclaredProperties($data);
         $this->flushMutex = new LocalKeyedMutex;
+        $this->refreshMutex = new LocalKeyedMutex;
     }
     public function init(): void
     {
         $this->initDbProperties($this->API->getDbSettings(), $this->API->getDbPrefix().'_ReferenceDatabase_');
-        if ($this->v === 0) {
+        if ($this->v !== self::V) {
+            // The file references of version 1 are refetched when needed.
             $this->db->clear();
-            $this->pendingDb = [];
+            $this->sources->clear();
+            $this->pendingReferences = [];
+            $this->pendingSources = [];
             $this->v = self::V;
         }
-        foreach ($this->pendingDb as $key => $_) {
-            EventLoop::queue($this->flush(...), $key);
+        foreach (array_keys($this->pendingReferences + $this->pendingSources) as $key) {
+            EventLoop::queue($this->flush(...), (string) $key);
         }
     }
     public function clear(): void
     {
+        $this->pendingReferences = [];
+        $this->pendingSources = [];
         $this->db->clear();
+        $this->sources->clear();
     }
-    private function flush(string $location): void
+
+    private static function getMap(): FileRefMap
     {
-        if (!isset($this->pendingDb[$location])) {
+        return FileRefMap::get();
+    }
+
+    /**
+     * Store the file references and file sources found in the result of a method call.
+     *
+     * @param array $args The arguments of the call, as passed by the user
+     */
+    public function onMethodResult(string $method, array $args, mixed $result): void
+    {
+        $map = self::getMap();
+        if (!isset($map->methodResults[$method])) {
             return;
         }
-
-        $lock = $this->flushMutex->acquire($location);
         try {
-            if (!isset($this->pendingDb[$location])) {
-                return;
-            }
-            [
-                $reference,
-                $originType,
-                $origin
-            ] = $this->pendingDb[$location];
-            $locationValue = $this->db[$location];
-            if (!$locationValue) {
-                $locationValue = ['origins' => []];
-            }
-            $locationValue['reference'] = $reference;
-            $locationValue['origins'][$originType] = $origin;
-            ksort($locationValue['origins']);
-            $this->db[$location] = $locationValue;
-        } finally {
-            unset($this->pendingDb[$location]);
-            EventLoop::queue($lock->release(...));
+            $this->store(FileRefTraversal::traverseMethodResult($map, $this, $method, $args, $result));
+        } catch (Throwable $e) {
+            $this->API->logger("Could not store the file references of the result of $method: $e", Logger::ERROR);
         }
     }
     /**
-     * @psalm-mutation-free
+     * Store the file references and file sources found in an update.
+     */
+    public function onUpdate(array $update): void
+    {
+        $map = self::getMap();
+        if (!isset($map->incoming[$update['_']])) {
+            return;
+        }
+        try {
+            $this->store(FileRefTraversal::traverseUpdate($map, $this, $update));
+        } catch (Throwable $e) {
+            $this->API->logger("Could not store the file references of {$update['_']}: $e", Logger::ERROR);
+        }
+    }
+
+    /**
+     * Store the commits of a traversal: visible at once, written to the database in the background.
+     *
+     * @param list<array{fileId: array{_: string, id: int}, reference: string, sources: list<array>}> $commits
+     */
+    private function store(array $commits): void
+    {
+        foreach ($commits as ['fileId' => $fileId, 'reference' => $reference, 'sources' => $sources]) {
+            $key = FileRefMap::getFileIdKey($fileId);
+            $this->pendingReferences[$key] = $reference;
+            if ($sources) {
+                $this->pendingSources[$key] = self::mergeSources($this->pendingSources[$key] ?? [], $sources);
+            }
+            EventLoop::queue($this->flush(...), $key);
+        }
+    }
+
+    /**
+     * Merge file sources, keeping only the most recent one of each type, the most recent ones last.
+     *
+     * @param list<array> $old
+     * @param list<array> $new
+     * @return list<array>
+     */
+    private static function mergeSources(array $old, array $new): array
+    {
+        $res = [];
+        foreach ([...$old, ...$new] as $source) {
+            unset($res[$source['_']]);
+            $res[$source['_']] = $source;
+        }
+        return array_values($res);
+    }
+
+    private function flush(string $key): void
+    {
+        if (!isset($this->pendingReferences[$key]) && !isset($this->pendingSources[$key])) {
+            return;
+        }
+        $lock = $this->flushMutex->acquire($key);
+        $reference = $sources = null;
+        try {
+            // Removed from the pending ones only once written, if not replaced meanwhile:
+            // until then, they're what the database is about to contain.
+            $reference = $this->pendingReferences[$key] ?? null;
+            $sources = $this->pendingSources[$key] ?? null;
+            if ($reference !== null) {
+                $this->db[$key] = $reference;
+            }
+            if ($sources !== null) {
+                $existing = $this->sources[$key] ?? [];
+                $merged = self::mergeSources($existing, $sources);
+                if ($merged !== $existing) {
+                    $this->sources[$key] = $merged;
+                }
+            }
+        } finally {
+            if ($reference !== null && ($this->pendingReferences[$key] ?? null) === $reference) {
+                unset($this->pendingReferences[$key]);
+            }
+            if ($sources !== null && ($this->pendingSources[$key] ?? null) === $sources) {
+                unset($this->pendingSources[$key]);
+            }
+            $lock->release();
+        }
+    }
+
+    /**
+     * The last file reference seen for a FileId, null if unknown.
+     */
+    private function getStoredReference(string $key): ?string
+    {
+        if (isset($this->pendingReferences[$key])) {
+            return $this->pendingReferences[$key];
+        }
+        $reference = $this->db[$key];
+        return \is_string($reference) ? $reference : null;
+    }
+
+    /**
+     * The file sources of a FileId, the most recently seen ones last.
+     *
+     * @return list<array>
+     */
+    private function getSources(string $key): array
+    {
+        $sources = $this->sources[$key] ?? [];
+        if (isset($this->pendingSources[$key])) {
+            $sources = self::mergeSources($sources, $this->pendingSources[$key]);
+        }
+        return $sources;
+    }
+
+    /**
+     * The file reference to use for a photo or document: the last one seen, or the one of the object.
+     *
+     * @param self::PHOTO|self::DOCUMENT $type
+     * @param array                      $object A photo or document constructor
+     */
+    public function getReference(string $type, array $object): string
+    {
+        $reference = isset($object['id'])
+            ? $this->getStoredReference(FileRefMap::getFileIdKey(['_' => $type, 'id' => (int) $object['id']]))
+            : null;
+        return $reference ?? FileRefMap::getBytes($object['file_reference'] ?? null) ?? '';
+    }
+
+    /**
+     * Use the last file reference seen in an outgoing media location.
+     */
+    private function populateReference(array $location): array
+    {
+        if (!isset($location['id'])) {
+            return $location;
+        }
+        $type = self::getMap()->swapLocations[$location['_']];
+        $reference = $this->getStoredReference(FileRefMap::getFileIdKey(['_' => $type, 'id' => (int) $location['id']]));
+        if ($reference !== null) {
+            $location['file_reference'] = $reference;
+        } else {
+            $location['file_reference'] ??= '';
+        }
+        return $location;
+    }
+
+    /**
+     * Refresh the file references of a method call that failed with a FILE_REFERENCE_* error.
+     *
+     * @param string $error The error: FILE_REFERENCE_%d_EXPIRED and FILE_REFERENCE_%d_INVALID point to the media at
+     *                      index %d of the first vector of media in the arguments (multi_media of
+     *                      messages.sendMultiMedia, extended_media of inputMediaPaidMedia)
+     *
+     * @return ?array The arguments with the new file references, null if none could be refreshed.
+     */
+    public function refreshMethodCall(string $method, array $args, string $error): ?array
+    {
+        $map = self::getMap();
+        $TL = $this->API->getTL();
+        [$args, $locations] = $map->findLocations($method, $args, function (string $type, mixed $value) use ($TL, $method): mixed {
+            try {
+                return $TL->convertTypeMismatch($type, $value);
+            } catch (Throwable $e) {
+                $this->API->logger("Could not convert an argument of $method to $type: $e", Logger::ERROR);
+                return $value;
+            }
+        });
+        $candidates = $locations;
+        if (preg_match('/^FILE_REFERENCE_(\d+)_/', $error, $matches)) {
+            $index = (int) $matches[1];
+            $candidates = array_values(array_filter($locations, static fn (array $location): bool => $location['group'] === $index));
+            if (!$candidates) {
+                $this->API->logger("No media at index $index of the arguments of $method, refreshing all of them", Logger::WARNING);
+                $candidates = $locations;
+            }
+        }
+        $references = [];
+        foreach ($candidates as $location) {
+            $key = FileRefMap::getFileIdKey($location['fileId']);
+            if (\array_key_exists($key, $references)) {
+                continue;
+            }
+            $references[$key] = $this->refreshFileId($location['fileId'], $location['reference']);
+        }
+        $references = array_filter($references, static fn (?string $reference): bool => $reference !== null);
+        if (!$references) {
+            return null;
+        }
+        return FileRefMap::swapReferences($args, $locations, $references);
+    }
+
+    /**
+     * Refresh the file reference of a FileId using its file sources.
+     *
+     * Tries the sources from the most recently seen one, stopping as soon as the file reference changes.
+     * Concurrent refreshes of the same FileId wait for the first one, and use its result.
+     *
+     * @param array{_: string, id: int} $fileId
+     * @param ?string                   $used   The file reference the failed call used, if known
+     *
+     * @return ?string The new file reference, null if it couldn't be refreshed.
+     */
+    public function refreshFileId(array $fileId, ?string $used): ?string
+    {
+        $key = FileRefMap::getFileIdKey($fileId);
+        $before = $this->getStoredReference($key) ?? $used;
+        $lock = $this->refreshMutex->acquire($key);
+        try {
+            $current = $this->getStoredReference($key);
+            if ($current !== null && $current !== $before) {
+                // Refreshed while waiting for the lock.
+                return $current;
+            }
+            $sources = array_reverse($this->getSources($key));
+            if (!$sources) {
+                $this->API->logger("No file sources to refresh the file reference of $key", Logger::WARNING);
+            }
+            foreach ($sources as $source) {
+                try {
+                    $call = self::getMap()->buildRefreshCall($source, $this);
+                    if ($call === null) {
+                        continue;
+                    }
+                    [$method, $args] = $call;
+                    $this->API->logger("Refreshing the file reference of $key from {$source['_']} with $method", Logger::VERBOSE);
+                    $args['specialMethodType'] = SpecialMethodType::FILEREF_RELATED;
+                    // Its result is traversed by the response handler, which updates the file reference table.
+                    $this->API->methodCallAsyncRead($method, $args);
+                } catch (Throwable $e) {
+                    $this->API->logger("Could not refresh the file reference of $key from {$source['_']}: $e", Logger::ERROR);
+                    continue;
+                }
+                $current = $this->getStoredReference($key);
+                if ($current !== null && $current !== $before) {
+                    return $current;
+                }
+            }
+            return null;
+        } finally {
+            $lock->release();
+        }
+    }
+
+    #[\Override]
+    public function getSelfId(): ?int
+    {
+        return $this->API->authorization['user']['id'] ?? null;
+    }
+    #[\Override]
+    public function getPeerId(mixed $peer): ?int
+    {
+        try {
+            return $this->API->getIdInternal($peer);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+    #[\Override]
+    public function getInputPeerById(int $id): array
+    {
+        if ($id === $this->getSelfId()) {
+            return ['_' => 'inputPeerSelf'];
+        }
+        return $this->API->getInputPeer($id);
+    }
+    #[\Override]
+    public function getInputUserById(int $id): array
+    {
+        if ($id === $this->getSelfId()) {
+            return ['_' => 'inputUserSelf'];
+        }
+        return $this->API->getInputConstructor($id);
+    }
+    #[\Override]
+    public function getInputChannelById(int $id): array
+    {
+        return $this->API->getInputConstructor($id);
+    }
+    #[\Override]
+    public function getThemeFormat(): string
+    {
+        // No theming engine is supported.
+        return '';
+    }
+
+    /**
+     * @psalm-pure
      */
     #[\Override]
     public function getMethodAfterResponseDeserializationCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethod(...)]);
+        return [];
     }
     /**
-     * @psalm-mutation-free
+     * @psalm-pure
      */
     #[\Override]
     public function getMethodBeforeResponseDeserializationCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::METHOD_CONTEXT), [$this->addOriginMethodContext(...)]);
+        return [];
     }
     /**
-     * @psalm-mutation-free
+     * @psalm-pure
      */
     #[\Override]
     public function getConstructorAfterDeserializationCallbacks(): array
     {
-        return array_merge(
-            array_fill_keys(['document', 'photo', 'fileLocation'], [$this->addReference(...)]),
-            array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOrigin(...)]),
-            ['document' => [$this->addReference(...), $this->addOrigin(...)]]
-        );
+        return [];
     }
     /**
-     * @psalm-mutation-free
+     * @psalm-pure
      */
     #[\Override]
     public function getConstructorBeforeDeserializationCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::CONSTRUCTOR_CONTEXT), [$this->addOriginContext(...)]);
+        return [];
     }
     /**
      * @psalm-mutation-free
@@ -197,7 +478,7 @@ final class ReferenceDatabase implements TLCallback
     #[\Override]
     public function getConstructorBeforeSerializationCallbacks(): array
     {
-        return array_fill_keys(array_keys(self::LOCATION_CONTEXT), $this->populateReference(...));
+        return array_fill_keys(array_keys(self::getMap()->swapLocations), $this->populateReference(...));
     }
     /**
      * @psalm-pure
@@ -206,421 +487,6 @@ final class ReferenceDatabase implements TLCallback
     public function getTypeMismatchCallbacks(): array
     {
         return [];
-    }
-
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function reset(): void
-    {
-        if ($this->cache) {
-            $this->API->logger('Found '.\count($this->cache).' pending contexts', Logger::ERROR);
-            $this->cache = [];
-        }
-        if ($this->cacheContexts) {
-            $this->API->logger('Found '.\count($this->cacheContexts).' pending contexts', Logger::ERROR);
-            $this->cacheContexts = [];
-        }
-    }
-    public function addReference(array $location): bool
-    {
-        if (!$this->cacheContexts) {
-            $this->API->logger('Trying to add reference out of context, report the following message to @danogentili!', Logger::ERROR);
-            $frames = [];
-            $previous = '';
-            foreach (debug_backtrace(0) as $k => $frame) {
-                if (isset($frame['function']) && $frame['function'] === 'deserialize') {
-                    if (isset($frame['args'][1]['subtype'])) {
-                        if ($frame['args'][1]['subtype'] === $previous) {
-                            continue;
-                        }
-                        $frames[] = $frame['args'][1]['subtype'];
-                        $previous = $frame['args'][1]['subtype'];
-                    } elseif (isset($frame['args'][1]['type'])) {
-                        if ($frame['args'][1]['type'] === '') {
-                            break;
-                        }
-                        if ($frame['args'][1]['type'] === $previous) {
-                            continue;
-                        }
-                        $frames[] = $frame['args'][1]['type'];
-                        $previous = $frame['args'][1]['type'];
-                    }
-                }
-            }
-            $frames = array_reverse($frames);
-            $tlTrace = array_shift($frames);
-            foreach ($frames as $frame) {
-                $tlTrace .= "['".$frame."']";
-            }
-            $this->API->logger($tlTrace, Logger::ERROR);
-            return false;
-        }
-        if (!isset($location['file_reference'])) {
-            $this->API->logger("Object {$location['_']} does not have reference", Logger::ERROR);
-            return false;
-        }
-        $key = \count($this->cacheContexts) - 1;
-        switch ($location['_']) {
-            case 'document':
-                $locationType = self::DOCUMENT_LOCATION;
-                break;
-            case 'photo':
-                $locationType = self::PHOTO_LOCATION;
-                break;
-            case 'fileLocation':
-                $locationType = self::PHOTO_LOCATION_LOCATION;
-                break;
-            default:
-                throw new Exception('Unknown location type provided: '.$location['_']);
-        }
-        $this->API->logger("Caching reference from location of type {$locationType} from {$location['_']}", Logger::ULTRA_VERBOSE);
-        if (!isset($this->cache[$key])) {
-            $this->cache[$key] = [];
-        }
-        $this->cache[$key][self::serializeLocation($locationType, $location)] = (string) $location['file_reference'];
-        return true;
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function addOriginContext(string $type): void
-    {
-        if (!isset(self::CONSTRUCTOR_CONTEXT[$type])) {
-            throw new Exception("Unknown origin type provided: {$type}");
-        }
-        $originContext = self::CONSTRUCTOR_CONTEXT[$type];
-        //$this->API->logger("Adding origin context {$originContext} for {$type}!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-        $this->cacheContexts[] = $originContext;
-    }
-    public function addOrigin(array $data = []): void
-    {
-        $key = \count($this->cacheContexts) - 1;
-        if ($key === -1) {
-            throw new Exception("Trying to add origin to constructor {$data['_']} with no origin context set");
-        }
-        $originType = array_pop($this->cacheContexts);
-        if (!isset($this->cache[$key])) {
-            //$this->API->logger("Removing origin context {$originType} for {$data['_']}, nothing in the reference cache!", \danog\MadelineProto\Logger::ULTRA_VERBOSE);
-            return;
-        }
-        $cache = $this->cache[$key];
-        unset($this->cache[$key]);
-        $origin = [];
-        switch ($data['_']) {
-            case 'message':
-            case 'messageService':
-                $origin['peer'] = $this->API->getIdInternal($data);
-                $origin['msg_id'] = $data['id'];
-                break;
-            case 'messages.savedGifs':
-            case 'messages.recentStickers':
-            case 'messages.favedStickers':
-            case 'wallPaper':
-                break;
-            case 'user':
-                $origin['max_id'] = $data['photo']['photo_id'];
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $origin['user_id'] = $data['id'];
-                break;
-            case 'updateUserPhoto':
-                $origin['max_id'] = $data['photo']['photo_id'];
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $origin['user_id'] = $data['user_id'];
-                break;
-            case 'userFull':
-                if (!isset($data['profile_photo'])) {
-                    $key = \count($this->cacheContexts) - 1;
-                    if (!isset($this->cache[$key])) {
-                        $this->cache[$key] = [];
-                    }
-                    foreach ($cache as $location => $reference) {
-                        $this->cache[$key][$location] = $reference;
-                    }
-                    $this->API->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
-                    return;
-                }
-                $origin['max_id'] = $data['profile_photo']['id'];
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $origin['user_id'] = $data['id'];
-                break;
-            case 'chatFull':
-            case 'chat':
-                $origin['peer'] = $data['id'];
-                break;
-            case 'channelFull':
-            case 'channel':
-                $origin['peer'] = $data['id'];
-                break;
-            case 'document':
-                foreach ($data['attributes'] as $attribute) {
-                    if ($attribute['_'] === 'documentAttributeSticker' && $attribute['stickerset']['_'] !== 'inputStickerSetEmpty') {
-                        $origin['stickerset'] = $attribute['stickerset'];
-                    }
-                }
-                if (!isset($origin['stickerset'])) {
-                    $key = \count($this->cacheContexts) - 1;
-                    if (!isset($this->cache[$key])) {
-                        $this->cache[$key] = [];
-                    }
-                    foreach ($cache as $location => $reference) {
-                        $this->cache[$key][$location] = $reference;
-                    }
-                    $this->API->logger("Skipped origin {$originType} ({$data['_']}) for ".\count($cache).' references', Logger::ULTRA_VERBOSE);
-                    return;
-                }
-                break;
-            case 'messages.stickerSet':
-                $origin['stickerset'] = ['_' => 'inputStickerSetID', 'id' => $data['set']['id'], 'access_hash' => $data['set']['access_hash']];
-                break;
-            default:
-                throw new Exception("Unknown origin type provided: {$data['_']}");
-        }
-        foreach ($cache as $location => $reference) {
-            $this->storeReference($location, $reference, $originType, $origin);
-        }
-        $this->API->logger("Added origin {$originType} ({$data['_']}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function addOriginMethodContext(string $type): void
-    {
-        if (!isset(self::METHOD_CONTEXT[$type])) {
-            throw new Exception("Unknown origin type provided: {$type}");
-        }
-        $originContext = self::METHOD_CONTEXT[$type];
-        //$this->API->logger("Adding origin context {$originContext} for {$type}!", Logger::ULTRA_VERBOSE);
-        $this->cacheContexts[] = $originContext;
-    }
-    public function addOriginMethod(MTProtoOutgoingMessage $data, array $res): void
-    {
-        $key = \count($this->cacheContexts) - 1;
-        $constructor = $data->constructor;
-        if ($key === -1) {
-            throw new Exception("Trying to add origin to method $constructor with no origin context set");
-        }
-        $originType = array_pop($this->cacheContexts);
-        if (!isset($this->cache[$key])) {
-            //$this->API->logger("Removing origin context {$originType} for {$constructor}, nothing in the reference cache!", Logger::ULTRA_VERBOSE);
-            return;
-        }
-        $cache = $this->cache[$key];
-        unset($this->cache[$key]);
-        $origin = [];
-        switch ($data->constructor) {
-            case 'photos.updateProfilePhoto':
-                $origin['max_id'] = $res['photo_id'] ?? 0;
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $origin['user_id'] = $this->API->authorization['user']['id'];
-                break;
-            case 'photos.uploadProfilePhoto':
-                $origin['max_id'] = $res['photo']['id'];
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $origin['user_id'] = $this->API->authorization['user']['id'];
-                break;
-            case 'photos.getUserPhotos':
-                $origin['user_id'] = $data->getBodyOrEmpty()['user_id'];
-                $origin['offset'] = -1;
-                $origin['limit'] = 1;
-                $count = 0;
-                foreach ($res['photos'] as $photo) {
-                    $origin['max_id'] = $photo['id'];
-                    $dc_id = $photo['dc_id'];
-                    $location = self::serializeLocation(self::PHOTO_LOCATION, $photo);
-                    if (isset($cache[$location])) {
-                        $reference = $cache[$location];
-                        unset($cache[$location]);
-                        $this->storeReference($location, $reference, $originType, $origin);
-                        $count++;
-                    }
-                    if (isset($photo['sizes'])) {
-                        foreach ($photo['sizes'] as $size) {
-                            if (isset($size['location'])) {
-                                $size['location']['dc_id'] = $dc_id;
-                                $location = self::serializeLocation(self::PHOTO_LOCATION_LOCATION, $size['location']);
-                                if (isset($cache[$location])) {
-                                    $reference = $cache[$location];
-                                    unset($cache[$location]);
-                                    $this->storeReference($location, $reference, $originType, $origin);
-                                    $count++;
-                                }
-                            }
-                        }
-                    }
-                }
-                $this->API->logger("Added origin {$originType} ($constructor) to {$count} references", Logger::ULTRA_VERBOSE);
-                return;
-            case 'messages.getStickers':
-                $origin['emoticon'] = $data->getBodyOrEmpty()['emoticon'];
-                break;
-            default:
-                throw new Exception("Unknown origin type provided: {$constructor}");
-        }
-        foreach ($cache as $location => $reference) {
-            $this->storeReference($location, $reference, $originType, $origin);
-        }
-        $this->API->logger("Added origin {$originType} ({$constructor}) to ".\count($cache).' references', Logger::ULTRA_VERBOSE);
-    }
-    private function storeReference(string $location, string $reference, int $originType, array $origin): void
-    {
-        $this->pendingDb[$location] = [
-            $reference,
-            $originType,
-            $origin,
-        ];
-
-        $key = \count($this->cacheContexts) - 1;
-        if ($key >= 0) {
-            $this->cache[$key][$location] = $reference;
-        }
-
-        EventLoop::queue($this->flush(...), $location);
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    public function refreshNextEnable(): void
-    {
-        Assert::false($this->refresh, 'Cannot enable refresh when it is already enabled');
-        $this->refresh = true;
-    }
-    public function refreshNextDisable(): ?Closure
-    {
-        Assert::true($this->refresh, 'Cannot disable refresh when it is already disabled');
-        $this->refresh = false;
-        $queue = $this->refreshQueue;
-        $this->refreshQueue = [];
-
-        $ok = false;
-        foreach ($queue as $locationString => $_) {
-            $data = $this->getDb($locationString);
-            $data['reference'] = (string) $data['reference'];
-            $count = 0;
-            foreach ($data['origins'] ?? [] as $originType => $origin) {
-                $count++;
-                $this->API->logger("Try {$count} refreshing file reference with origin type {$originType}", Logger::VERBOSE);
-                $origin['specialMethodType'] = SpecialMethodType::FILEREF_RELATED;
-                try {
-                    switch ($originType) {
-                        // Peer + msg ID
-                        case self::MESSAGE_ORIGIN:
-                            if (\is_array($origin['peer'])) {
-                                $origin['peer'] = $this->API->getIdInternal($origin['peer']);
-                            }
-                            if ($origin['peer'] < 0) {
-                                $this->API->methodCallAsyncRead('channels.getMessages', ['channel' => $origin['peer'], 'id' => [$origin['msg_id']]]);
-                                break;
-                            }
-                            $this->API->methodCallAsyncRead('messages.getMessages', ['id' => [$origin['msg_id']]]);
-                            break;
-                            // Peer + photo ID
-                        case self::PEER_PHOTO_ORIGIN:
-                            $this->API->peerDatabase->expireFull($origin['peer']);
-                            $this->API->getFullInfo($origin['peer']);
-                            break;
-                            // Peer (default photo ID)
-                        case self::USER_PHOTO_ORIGIN:
-                            $this->API->methodCallAsyncRead('photos.getUserPhotos', $origin);
-                            break;
-                        case self::SAVED_GIFS_ORIGIN:
-                            $this->API->methodCallAsyncRead('messages.getSavedGifs', $origin);
-                            break;
-                        case self::STICKER_SET_ID_ORIGIN:
-                            $this->API->methodCallAsyncRead('messages.getStickerSet', $origin);
-                            break;
-                        case self::STICKER_SET_RECENT_ORIGIN:
-                            $this->API->methodCallAsyncRead('messages.getRecentStickers', $origin);
-                            break;
-                        case self::STICKER_SET_FAVED_ORIGIN:
-                            $this->API->methodCallAsyncRead('messages.getFavedStickers', $origin);
-                            break;
-                        case self::STICKER_SET_EMOTICON_ORIGIN:
-                            $this->API->methodCallAsyncRead('messages.getStickers', $origin);
-                            break;
-                        case self::WALLPAPER_ORIGIN:
-                            $this->API->methodCallAsyncRead('account.getWallPapers', $origin);
-                            break;
-                        default:
-                            throw new Exception("Unknown origin type {$originType}");
-                    }
-                    $got = (string) $this->getDb($locationString)['reference'];
-                    if ($got !== $data['reference']) {
-                        $ok = true;
-                        break;
-                    }
-                } catch (\Throwable $e) {
-                    $this->API->logger("Could not refresh file reference for location {$locationString} with origin type {$originType}: $e", Logger::ERROR);
-                }
-            }
-        }
-        if (!$ok) {
-            $count = \count($queue);
-            return static fn () => new Exception("Could not refresh file reference for any of the {$count} locations");
-        }
-        return null;
-    }
-    private function populateReference(array $object): array
-    {
-        $object['file_reference'] = $this->getReference(self::LOCATION_CONTEXT[$object['_']], $object);
-        return $object;
-    }
-    private function getDb(string $location): ?array
-    {
-        while (isset($this->pendingDb[$location])) {
-            $this->flush($location);
-        }
-        return $this->db[$location];
-    }
-    public function getReference(int $locationType, array $location): string
-    {
-        $locationString = self::serializeLocation($locationType, $location);
-        if ($this->refresh) {
-            $this->refreshQueue[$locationString] = true;
-            $res = [];
-        } else {
-            $res = $this->getDb($locationString);
-        }
-
-        if (!isset($res['reference'])) {
-            if (isset($location['file_reference'])) {
-                $this->API->logger("Using outdated file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
-                if (\is_array($location['file_reference'])) {
-                    Assert::eq($location['file_reference']['_'], 'bytes');
-                    return base64_decode($location['file_reference']['bytes'], true);
-                }
-                return (string) $location['file_reference'];
-            }
-            if ($this->refresh) {
-                $this->API->logger("Using null file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
-                return '';
-            }
-            throw new Exception("Could not find file reference for location of type {$locationType} object {$location['_']}");
-        }
-        $this->API->logger("Got file reference for location of type {$locationType} object {$location['_']}", Logger::ULTRA_VERBOSE);
-        return (string) $res['reference'];
-    }
-    /**
-     * @psalm-external-mutation-free
-     */
-    private static function serializeLocation(int $locationType, array $location): string
-    {
-        switch ($locationType) {
-            case self::DOCUMENT_LOCATION:
-            case self::PHOTO_LOCATION:
-                return $locationType.bin2hex(Tools::packSignedLong($location['id']));
-            case self::PHOTO_LOCATION_LOCATION:
-                $dc_id = Tools::packSignedInt($location['dc_id']);
-                $volume_id = Tools::packSignedLong($location['volume_id']);
-                $local_id = Tools::packSignedInt($location['local_id']);
-                return $locationType.bin2hex($dc_id.$volume_id.$local_id);
-        }
-        throw new Exception('Invalid location type specified!');
     }
     /**
      * @psalm-mutation-free
