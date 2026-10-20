@@ -190,10 +190,10 @@ final class DataCenterConnection implements SimpleSubscriber
         if ($state === ConnectionState::UNENCRYPTED_NO_PERMANENT) {
             Assert::false($this->auth->isMedia);
             Assert::false($this->auth->isCdn);
-            $logger->logger(sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+            $logger->logger(\sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
             $connection->createAuthKey(false);
         } elseif ($state === ConnectionState::UNENCRYPTED) {
-            $logger->logger(sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+            $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
             $connection->createAuthKey(true);
         } elseif ($state === ConnectionState::ENCRYPTED_NOT_BOUND) {
             $expires_in = MTProto::PFS_DURATION;

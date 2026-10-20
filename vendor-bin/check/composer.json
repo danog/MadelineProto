@@ -3,7 +3,7 @@
         "amphp/php-cs-fixer-config": "v2.x-dev",
         "slevomat/coding-standard": "^8.7",
         "squizlabs/php_codesniffer": "^4.0",
-        "friendsofphp/php-cs-fixer": "3.24.0"
+        "friendsofphp/php-cs-fixer": "3.95.27"
     },
     "config": {
         "allow-plugins": {

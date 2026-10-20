@@ -228,10 +228,10 @@ final class PrivateCallController implements CallControllerInterface
         $lock = $this->authMutex->acquire();
         try {
             if ($this->callState !== CallState::REQUESTED) {
-                $this->log(sprintf(Lang::$current_lang['call_error_2'], $this->public->callID));
+                $this->log(\sprintf(Lang::$current_lang['call_error_2'], $this->public->callID));
                 return false;
             }
-            $this->log(sprintf(Lang::$current_lang['call_confirming'], $this->public->otherID), Logger::VERBOSE);
+            $this->log(\sprintf(Lang::$current_lang['call_confirming'], $this->public->otherID), Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig();
             $params['g_b'] = new BigInteger((string) $params['g_b'], 256);
             Crypt::checkG($params['g_b'], $dh_config['p']);
@@ -244,7 +244,7 @@ final class PrivateCallController implements CallControllerInterface
                     'protocol' => self::CALL_PROTOCOL,
                 ]))['phone_call'];
             } catch (CallAlreadyAcceptedError) {
-                $this->log(sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
+                $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $params['id']));
                 return true;
             } catch (CallAlreadyDeclinedError) {
                 // Already ended by the other party: nothing to discard.
@@ -275,7 +275,7 @@ final class PrivateCallController implements CallControllerInterface
             }
             Assert::eq($this->callState->name, CallState::INCOMING->name);
 
-            $this->log(sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
+            $this->log(\sprintf(Lang::$current_lang['accepting_call'], $this->public->otherID), Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig($cancellation);
             if ($this->callState !== CallState::INCOMING) {
                 // Ended meanwhile: discarded, or expired, see expireAfterRestart().
@@ -304,7 +304,7 @@ final class PrivateCallController implements CallControllerInterface
                 ]);
             } catch (CallAlreadyAcceptedError) {
                 // Accepted by another session of the account, which is in the call: leave it alone.
-                $this->log(sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
+                $this->log(\sprintf(Lang::$current_lang['call_already_accepted'], $this->public->callID));
                 $this->end();
                 return $this;
             } catch (CallAlreadyDeclinedError) {
@@ -333,7 +333,7 @@ final class PrivateCallController implements CallControllerInterface
                 return false;
             }
 
-            $this->log(sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
+            $this->log(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig();
             if (hash('sha256', (string) $params['g_a_or_b'], true) !== (string) $this->call['g_a_hash']) {
                 throw new SecurityException('Invalid g_a!');
@@ -528,7 +528,7 @@ final class PrivateCallController implements CallControllerInterface
         $this->API->waitForInit();
         $this->end();
 
-        $this->log(sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
+        $this->log(\sprintf(Lang::$current_lang['call_discarding'], $this->public->callID), Logger::VERBOSE);
         try {
             $this->API->methodCallAsyncRead('phone.discardCall', [
                 'video' => $this->public->video,

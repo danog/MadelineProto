@@ -112,7 +112,7 @@ trait FileServer
                 $scriptUrl = $this->getDefaultDownloadScript();
             } catch (Throwable $e) {
                 $sessionPath = var_export($this->getSessionName(), true);
-                throw new Exception(sprintf(
+                throw new Exception(\sprintf(
                     Lang::$current_lang['need_dl.php'],
                     $e->getMessage(),
                     "<?php require 'vendor/autoload.php'; \\danog\\MadelineProto\\API::downloadServer($sessionPath); ?>",
@@ -192,7 +192,7 @@ trait FileServer
         $this->scriptMutex ??= new LocalMutex;
         $lock = $this->scriptMutex->acquire();
         try {
-            $downloadScript = sprintf('<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);', var_export($autoloadPath, true));
+            $downloadScript = \sprintf('<?php require %s; \danog\MadelineProto\API::downloadServer(__DIR__);', var_export($autoloadPath, true));
             $f = $s.DIRECTORY_SEPARATOR.'dl.php';
             $recreate = true;
             if (exists($f)) {
@@ -246,7 +246,7 @@ trait FileServer
             $result = $this->fileGetContents($scriptUrlNew);
             $expected = (string) $this->getSelf()['id'];
             if ($result !== $expected) {
-                throw new AssertionError(sprintf(
+                throw new AssertionError(\sprintf(
                     Lang::$current_lang['invalid_dl.php_session'],
                     $scriptUrl,
                     $expected,

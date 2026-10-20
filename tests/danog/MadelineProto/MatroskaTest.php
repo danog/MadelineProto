@@ -147,7 +147,7 @@ final class MatroskaTest extends TestCase
         }
 
         $path = sys_get_temp_dir().'/madeline-matroska-test.webm';
-        shell_exec(sprintf(
+        shell_exec(\sprintf(
             'ffmpeg -y -f lavfi -i testsrc=size=160x120:rate=10:duration=1 '
             .'-f lavfi -i sine=frequency=440:duration=1 '
             .'-c:v libvpx -deadline realtime -cpu-used 8 -c:a libopus -f webm %s 2>/dev/null',
@@ -157,11 +157,11 @@ final class MatroskaTest extends TestCase
             $this->markTestSkipped('Could not produce a sample WebM file.');
         }
 
-        $expectedVideo = (int) shell_exec(sprintf(
+        $expectedVideo = (int) shell_exec(\sprintf(
             'ffprobe -v error -select_streams v -count_packets -show_entries stream=nb_read_packets -of csv=p=0 %s',
             escapeshellarg($path)
         ));
-        $expectedAudio = (int) shell_exec(sprintf(
+        $expectedAudio = (int) shell_exec(\sprintf(
             'ffprobe -v error -select_streams a -count_packets -show_entries stream=nb_read_packets -of csv=p=0 %s',
             escapeshellarg($path)
         ));

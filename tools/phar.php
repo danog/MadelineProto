@@ -70,7 +70,7 @@ class Installer
         $this->version = (string) min(81, (int) (PHP_MAJOR_VERSION.PHP_MINOR_VERSION));
         \define('MADELINE_PHAR_GLOB', getcwd().DIRECTORY_SEPARATOR."madeline*-{$this->version}.phar");
         \define('MADELINE_PHAR_VERSION', getcwd().DIRECTORY_SEPARATOR."madeline.version");
-        \define('MADELINE_RELEASE_URL', sprintf(self::RELEASE_TEMPLATE, $this->version));
+        \define('MADELINE_RELEASE_URL', \sprintf(self::RELEASE_TEMPLATE, $this->version));
     }
 
     /**
@@ -141,7 +141,7 @@ class Installer
                 'method' => 'POST',
                 'header' => [
                     'Content-Type: application/json',
-                    sprintf(
+                    \sprintf(
                         'User-Agent: Composer/%s (%s; %s; %s; %s%s%s; MadelineProto)',
                         '2.7.4',
                         \function_exists('php_uname') ? @php_uname('s') : 'Unknown',
@@ -223,8 +223,8 @@ class Installer
 
         if (!file_exists($madeline_phar)) {
             for ($x = 0; $x < 10; $x++) {
-                $pharTest = file_get_contents(sprintf(self::PHAR_TEMPLATE, $remote_release.$x))
-                    ?: file_get_contents(sprintf(self::LEGACY_PHAR_TEMPLATE, $this->version, $remote_release.$x));
+                $pharTest = file_get_contents(\sprintf(self::PHAR_TEMPLATE, $remote_release.$x))
+                    ?: file_get_contents(\sprintf(self::LEGACY_PHAR_TEMPLATE, $this->version, $remote_release.$x));
                 if ($pharTest && str_contains($pharTest, $remote_release)) {
                     $phar = $pharTest;
                     unset($pharTest);
