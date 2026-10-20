@@ -152,7 +152,7 @@ final class StoriesEventHandler extends SimpleEventHandler
     {
         // Remove the button first, so that the page is loaded once even if it's pressed again
         try {
-            $query->editReplyMarkup(['_' => 'replyInlineMarkup', 'rows' => []]);
+            $query->editReplyMarkup(['inline_keyboard' => []]);
         } catch (RPCErrorException $e) {
             if ($e->rpc !== 'MESSAGE_NOT_MODIFIED') {
                 throw $e;
@@ -233,9 +233,8 @@ final class StoriesEventHandler extends SimpleEventHandler
 
     private static function nextPageMarkup(int $peer, int $offset): array
     {
-        return ['_' => 'replyInlineMarkup', 'rows' => [['_' => 'keyboardButtonRow', 'buttons' => [
-            ['_' => 'keyboardButtonCallback', 'text' => 'Next page »', 'data' => "stories:$peer:$offset"],
-        ]]]];
+        // Bot API style: MadelineProto converts it to the constructors of the current layer
+        return ['inline_keyboard' => [[['text' => 'Next page »', 'callback_data' => "stories:$peer:$offset"]]]];
     }
 }
 
