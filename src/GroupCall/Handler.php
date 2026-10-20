@@ -1003,7 +1003,9 @@ trait Handler
     public function getGroupCallStreamChannels(int $id): array
     {
         $controller = $this->getGroupCallController($id);
-        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall()], $this->groupCallStreamDc($controller));
+        // A flood wait is thrown, not waited for here: the stream receiver polls this while the livestream has no
+        // media yet, and waits as long as the server asks itself.
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall(), 'floodWaitLimit' => 0], $this->groupCallStreamDc($controller));
         $channels = [];
         foreach ($result['channels'] as $channel) {
             $channels[] = ['channel' => (int) $channel['channel'], 'scale' => (int) $channel['scale'], 'last_timestamp_ms' => (int) $channel['last_timestamp_ms']];
