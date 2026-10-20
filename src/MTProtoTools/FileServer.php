@@ -55,6 +55,9 @@ trait FileServer
     public static function downloadServer(string $session): void
     {
         if (isset($_GET['login'])) {
+            // The session ID check must reach this script: a cached answer (a CDN caching everything) would make
+            // getDownloadLink fail, or succeed for a script that no longer works, until the cache expires.
+            header('Cache-Control: no-store');
             $API = new API($session);
             $API->start();
             $id = (string) $API->getSelf()['id'];
@@ -63,6 +66,7 @@ trait FileServer
             die;
         }
         if (!isset($_GET['f'])) {
+            header('Cache-Control: no-store');
             new AppInfo;
             die(Lang::$current_lang["dl.php_powered_by_madelineproto"]);
         }
@@ -236,7 +240,8 @@ trait FileServer
             if (isset(self::$checkedScripts[$scriptUrl])) {
                 return;
             }
-            $scriptUrlNew = $scriptUrl.'?'.http_build_query(['login' => 1]);
+            // A new URL every time, for caches that ignore the Cache-Control of the answer
+            $scriptUrlNew = $scriptUrl.'?'.http_build_query(['login' => 1, 'nonce' => bin2hex(random_bytes(8))]);
             $this->logger->logger("Checking $scriptUrlNew...");
             $result = $this->fileGetContents($scriptUrlNew);
             $expected = (string) $this->getSelf()['id'];
