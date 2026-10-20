@@ -152,7 +152,8 @@ final class StoriesEventHandler extends SimpleEventHandler
     {
         // Remove the button first, so that the page is loaded once even if it's pressed again
         try {
-            $query->editReplyMarkup(['inline_keyboard' => []]);
+            // Without reply_markup: Telegram rejects an empty inline keyboard (REPLY_MARKUP_INVALID)
+            $this->messages->editMessage(peer: $query->chatId, id: $query->messageId);
         } catch (RPCErrorException $e) {
             if ($e->rpc !== 'MESSAGE_NOT_MODIFIED') {
                 throw $e;
