@@ -49,6 +49,11 @@ if [ "$1" == "release-draft" ]; then
     exit 0
 fi
 
+if [ "$1" == "release-publish" ]; then
+    tests/release_publish.sh
+    exit 0
+fi
+
 if [ "$1" == "announce" ]; then
     php tests/announce_release.php "$2"
     exit 0
