@@ -40,7 +40,7 @@ jobs:
             arch: arm64
     runs-on: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build and push the image
@@ -87,7 +87,7 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
       - uses: actions/cache@v4
         with:
@@ -104,7 +104,7 @@ jobs:
   webui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -134,7 +134,7 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
       - uses: actions/cache@v4
         with:
@@ -169,7 +169,7 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
       - uses: actions/cache@v4
         with:
@@ -226,7 +226,7 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The packages downloaded by composer, between runs.
       - uses: actions/cache@v4
         with:
@@ -265,7 +265,7 @@ jobs:
       # To run release.yml.
       actions: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           name: release-files

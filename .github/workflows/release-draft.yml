@@ -33,7 +33,7 @@ jobs:
         run: |
           apt-get update && apt-get install -y git jq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The tags, for the last release.
           fetch-depth: 0

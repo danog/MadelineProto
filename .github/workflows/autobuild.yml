@@ -26,7 +26,7 @@ jobs:
     if: vars.AUTOBUILD_APP_ID != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -77,7 +77,7 @@ jobs:
           echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
           echo "email=$id+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           token: ${{ steps.app.outputs.token }}
 
