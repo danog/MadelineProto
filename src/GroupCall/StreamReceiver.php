@@ -242,7 +242,7 @@ final class StreamReceiver
                 delay(self::RETRY_MS / 1000);
                 continue;
             }
-            $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes)', Logger::VERBOSE);
+            $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes)', Logger::ULTRA_VERBOSE);
             $this->nextTimestamp = $timestamp + self::SEGMENT_MS;
             $this->lastTimestamp = $timestamp;
             try {
