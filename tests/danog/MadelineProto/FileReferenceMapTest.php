@@ -43,9 +43,65 @@ final class FileReferenceMapTest extends TestCase
 {
     /**
      * The message magnaluna (8.11.1) failed to deserialize with "Trying to add origin to constructor channelFull with
-     * no origin context set": an rpc_result with the gzipped messages.chatFull of channels.getFullChannel.
+     * no origin context set": an rpc_result with the messages.chatFull of channels.getFullChannel (received gzipped,
+     * with layer 231). Its content, serialized with the current layer: the wire format of channelFull and channel
+     * changes with the layers (232 added a flag to both), and the tests run without the schemas of past layers.
      */
-    public const CHANNEL_FULL_PAYLOAD = 'AW1c83Q6DgAFe9dqoc9yMP6jAgAfiwgAAAAAAAADm3Px+lOrXr8F+gU7VBgSZBhkGOucGIAg2j8tLTM5MzFHwTcxJTUnMy81oCi/JF8hOSMxLy81R4/LsyQxJzMxT8EZImCl4ICiECjN5V6UX1oAlCgoLypJzUlNL0rMTQcJ3ZRgYGAD2sHIgACczAh2apXkbxC9YbmhNGvHbDG3rHmvpx5Yt1uUIet6NWtewuGFTXkMzQ82HRDf+DODg4Ehav3FCNEjW2VARiT0HS9lTGRgWMAAwRf4oWJJDAwOjBB8Sh0qlszA0MAEwdwZDAxAioFHJ2kmyO5pe3UWKQBpuYySkoJiK339Er3cVH3tbPdMA49gp9xCT18j31y/TIZVF7bpgdQ72qmkgtwA8tNMpi5fEC3XdMoHRP8CGrxD63sgSB3IDltOBgb+llU3dsZpeT7517g3JC6mc+NOE1Ml8cBImHnIbFZoWIHMB+k/ZjL/SkLGBEag1+HxpSb/sct9sxU3WnTVKMDjERpRQLW8KGoYGARl8sDmwsJbnJGDI1HsP0PK69/vj1//9NJVJMzcVlU6hgnqz6sqm+LtbzGD3cGgKMIAcgfMf1OPL7zU2zWnUhXVHcWlBQX5RSUKugqZeSWpRXmJJZn5eYk5CLu7NhlK72j4GcQLtPvyz+/fj2Us6mKrZ2BgAcoJ13ulSLAIzWdoYWP5//9/PSwcms/s2Fgtw8AkAGTDwuq02VJWpqPGL7l8E9PzEhV8SvMSGQRyE9MzkxNzkosSqyoL8vMqgeq4LSwsDIwtjEwtzQ3Yvl9sApnHyJ0tDTJHCOiGxbvuv/lhvefOP5FA1+yi82B32Bf0MHwrvZ4FspfbgYFJCCmOuxIfGVWt2DJBDM3fqcmlRZkllQwSKOLBUGGn/BJo3AIAWuC/GIgDAAAA';
+    public static function channelFullPayload(): string
+    {
+        $TL = new TL(null);
+        $TL->init((new Settings)->getSchema());
+        $chatFull = [
+            '_' => 'messages.chatFull',
+            'full_chat' => [
+                '_' => 'channelFull',
+                'can_view_participants' => true,
+                'has_scheduled' => true,
+                'can_view_stats' => true,
+                'id' => self::CHANNEL_FULL_CHANNEL,
+                'about' => "Official MadelineProto channel.\nItalian Channel: @MadelineProtoIta\nGroup: @pwrtelegramgroup",
+                'participants_count' => 6361,
+                'admins_count' => 6,
+                'read_inbox_max_id' => 777,
+                'read_outbox_max_id' => 0,
+                'unread_count' => 0,
+                'chat_photo' => [
+                    '_' => 'photo',
+                    'id' => self::CHANNEL_FULL_PHOTO,
+                    'access_hash' => -4922785592533685690,
+                    'file_reference' => base64_decode('AGrXewVuYMOhgm4Ag+CywBex+WgI', true),
+                    'date' => 1490136922,
+                    'sizes' => [
+                        ['_' => 'photoSize', 'type' => 'a', 'w' => 160, 'h' => 160, 'size' => 4048],
+                        ['_' => 'photoSize', 'type' => 'b', 'w' => 320, 'h' => 320, 'size' => 10186],
+                        ['_' => 'photoSize', 'type' => 'c', 'w' => 640, 'h' => 640, 'size' => 26635],
+                    ],
+                    'dc_id' => 2,
+                ],
+                'notify_settings' => ['_' => 'peerNotifySettings'],
+                'bot_info' => [['_' => 'botInfo', 'user_id' => 5583307294]],
+                'pinned_msg_id' => 762,
+                'linked_chat_id' => 1375152824,
+                'stats_dc' => 2,
+                'pts' => 2365,
+            ],
+            'chats' => [[
+                '_' => 'channel',
+                'broadcast' => true,
+                'signatures' => true,
+                'has_link' => true,
+                'id' => self::CHANNEL_FULL_CHANNEL,
+                'access_hash' => 1,
+                'title' => 'MadelineProto | Official Channel',
+                'username' => 'MadelineProto',
+                'photo' => ['_' => 'chatPhoto', 'photo_id' => self::CHANNEL_FULL_PHOTO, 'dc_id' => 2],
+                'date' => 1696874049,
+            ]],
+            'users' => [],
+        ];
+        // rpc_result#f35c6d01 req_msg_id:long result:Object
+        return pack('V', 0xf35c6d01).pack('P', 7698486276853202908).$TL->serializeObject(['type' => 'messages.ChatFull'], $chatFull, 'result');
+    }
     /** The channel of that payload (MadelineProto). */
     public const CHANNEL_FULL_CHANNEL = 1115554076;
     /** Its photo. */
@@ -93,17 +149,22 @@ final class FileReferenceMapTest extends TestCase
     {
         $map = FileRefMap::get();
         $this->assertSame($map, FileRefMap::get());
-        $this->assertSame(231, $map->layer);
-        $this->assertCount(133, $map->methodResults);
-        $this->assertCount(201, $map->incoming);
+        // Generated for the layer of the schema (the counts below change with every layer: not checked).
+        $this->assertSame((new Settings)->getSchema()->getLayer(), $map->layer);
+        $this->assertNotEmpty($map->methodResults);
+        $this->assertNotEmpty($map->incoming);
+        $this->assertNotEmpty($map->skipped);
         $this->assertSame([
             'inputPhoto' => 'fileIdPhoto',
             'inputDocument' => 'fileIdDocument',
             'inputDocumentFileLocation' => 'fileIdDocument',
             'inputPhotoFileLocation' => 'fileIdPhoto',
         ], $map->swapLocations);
-        $this->assertCount(28, $map->refreshActions);
-        $this->assertCount(29, $map->skipped);
+        // A refresh action for every file source of the database schema, and only for them.
+        $dbSchema = json_decode(file_get_contents(__DIR__.'/../../../src/file_ref_map.json'), true, flags: JSON_THROW_ON_ERROR)['db_schema'];
+        preg_match_all('/^(fileSource\w+)#/m', $dbSchema, $matches);
+        $this->assertNotEmpty($matches[1]);
+        $this->assertEqualsCanonicalizing($matches[1], array_keys($map->refreshActions));
 
         // Every file source the traversers can store can be refreshed.
         foreach ([...$map->methodResults, ...$map->incoming] as $traverser) {
@@ -117,7 +178,7 @@ final class FileReferenceMapTest extends TestCase
     {
         $TL = new TL(null);
         $TL->init((new Settings)->getSchema());
-        $message = $TL->deserialize(base64_decode(self::CHANNEL_FULL_PAYLOAD, true), ['type' => '', 'connection' => null, 'encrypted' => false]);
+        $message = $TL->deserialize(self::channelFullPayload(), ['type' => '', 'connection' => null, 'encrypted' => false]);
         $this->assertSame('rpc_result', $message['_']);
         $result = $message['result'];
         $this->assertSame('channelFull', $result['full_chat']['_']);

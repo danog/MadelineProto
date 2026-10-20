@@ -69,7 +69,8 @@ final readonly class GetInputChannelOp implements FieldTransformationOp
                 ],
             ];
         }
-        Assert::eq($type, 'Channel', "Expected type 'Channel' at position {$this->path->path[0][0]} but got '$type'");
+        // A channel constructor is of type Chat: there is no Channel type.
+        Assert::eq($type, 'Chat', "Expected type 'Chat' at position {$this->path->path[0][0]} but got '$type'");
         return [
             '_' => 'typedOp',
             'type' => $this->getType($tl),

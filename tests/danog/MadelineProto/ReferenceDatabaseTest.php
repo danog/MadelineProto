@@ -375,7 +375,7 @@ final class ReferenceDatabaseTest extends TestCase
         };
         $this->client($references);
         $deserialize = async(fn () => $this->API->getTL()->deserialize(
-            base64_decode(FileReferenceMapTest::CHANNEL_FULL_PAYLOAD, true),
+            FileReferenceMapTest::channelFullPayload(),
             ['type' => '', 'connection' => null, 'encrypted' => true],
         ));
         // Another connection's read loop finishing a message meanwhile.
