@@ -126,7 +126,7 @@ final class DocsBuilder
             if (isset($this->tdDescriptions['types'][$otype])) {
                 $header = "{$this->tdDescriptions['types'][$otype]}\n\n$header";
             }
-            $header = sprintf(
+            $header = \sprintf(
                 $this->templates['Type'],
                 $type,
                 $redir,
@@ -163,6 +163,6 @@ final class DocsBuilder
      */
     protected function template(string $name, string ...$params): string
     {
-        return sprintf($this->templates[$name], ...$params);
+        return \sprintf($this->templates[$name], ...$params);
     }
 }

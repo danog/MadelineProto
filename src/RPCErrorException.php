@@ -230,7 +230,7 @@ class RPCErrorException extends \Exception
     public function __toString(): string
     {
         Magic::start(light: true);
-        $result = sprintf(Lang::$current_lang['rpc_tg_error'], $this->description." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
+        $result = \sprintf(Lang::$current_lang['rpc_tg_error'], $this->description." ({$this->code})", $this->rpc, $this->file, $this->line.PHP_EOL, Magic::$revision.PHP_EOL.PHP_EOL).PHP_EOL.$this->getTLTrace().PHP_EOL;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $result = str_replace(PHP_EOL, '<br>'.PHP_EOL, $result);
         }

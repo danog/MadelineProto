@@ -160,7 +160,7 @@ abstract class Filter
                             return $update instanceof $this->class;
                         }
                     }
-                    : throw new AssertionError("Unknown type ".$type->getName().", did you forget to `use` it?")
+                : throw new AssertionError("Unknown type ".$type->getName().", did you forget to `use` it?")
             }
         };
     }

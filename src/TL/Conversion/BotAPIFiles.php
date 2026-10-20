@@ -236,7 +236,7 @@ trait BotAPIFiles
                 $attribute = ['_' => 'documentAttributeVideo', 'round_message' => true];
                 break;
             default:
-                throw new Exception(sprintf(Lang::$current_lang['file_type_invalid'], $fileId->type->name));
+                throw new Exception(\sprintf(Lang::$current_lang['file_type_invalid'], $fileId->type->name));
         }
 
         $constructor = [

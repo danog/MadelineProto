@@ -1368,7 +1368,7 @@ trait UpdateHandler
             }
             EventLoop::queue(function () use ($update): void {
                 if (!isset($this->secretChats[$update['message']['chat_id']])) {
-                    $this->logger->logger(sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
+                    $this->logger->logger(\sprintf(Lang::$current_lang['secret_chat_skipping'], $update['message']['chat_id']));
                     return;
                 }
                 $this->secretChats[$update['message']['chat_id']]->feed($update);

@@ -160,7 +160,7 @@ abstract class Tools extends AsyncTools
      */
     private static function uRShift(int $a, int $b): int
     {
-        if($b == 0) {
+        if ($b == 0) {
             return $a;
         }
         return ($a >> $b) & ~(1<<(8*PHP_INT_SIZE-1)>>($b-1));
@@ -281,10 +281,10 @@ abstract class Tools extends AsyncTools
     public static function packSignedInt(int $value): string
     {
         if ($value > 2147483647) {
-            throw new TL\Exception(sprintf(Lang::$current_lang['value_bigger_than_2147483647'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_2147483647'], $value));
         }
         if ($value < -2147483648) {
-            throw new TL\Exception(sprintf(Lang::$current_lang['value_smaller_than_2147483648'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_2147483648'], $value));
         }
         $res = pack('l', $value);
         return Magic::$BIG_ENDIAN ? strrev($res) : $res;
@@ -310,10 +310,10 @@ abstract class Tools extends AsyncTools
     public static function packUnsignedInt(int $value): string
     {
         if ($value > 4294967295) {
-            throw new TL\Exception(sprintf(Lang::$current_lang['value_bigger_than_4294967296'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_bigger_than_4294967296'], $value));
         }
         if ($value < 0) {
-            throw new TL\Exception(sprintf(Lang::$current_lang['value_smaller_than_0'], $value));
+            throw new TL\Exception(\sprintf(Lang::$current_lang['value_smaller_than_0'], $value));
         }
         return pack('V', $value);
     }
@@ -884,7 +884,7 @@ abstract class Tools extends AsyncTools
                 }
                 $explanation = self::BLOCKING_FUNCTIONS[$name];
                 $issues []= new EventHandlerIssue(
-                    message: sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),
+                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_function'], $name, $explanation),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: true
@@ -895,7 +895,7 @@ abstract class Tools extends AsyncTools
             if (isset(self::DEPRECATED_FUNCTIONS[$name])) {
                 $explanation = self::DEPRECATED_FUNCTIONS[$name];
                 $issues []= new EventHandlerIssue(
-                    message: sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation),
+                    message: \sprintf(Lang::$current_lang['do_not_use_deprecated_function'], $name, $explanation),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: true
@@ -929,7 +929,7 @@ abstract class Tools extends AsyncTools
 
             if (\in_array($name, self::BANNED_FILE_FUNCTIONS, true)) {
                 $issues []= new EventHandlerIssue(
-                    message: sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
+                    message: \sprintf(Lang::$current_lang['recommend_not_use_filesystem_function'], $name),
                     file: $file,
                     line: $call->getStartLine(),
                     severe: false
@@ -946,7 +946,7 @@ abstract class Tools extends AsyncTools
             if (isset(self::BLOCKING_CLASSES[$name])) {
                 $explanation = self::BLOCKING_CLASSES[$name];
                 $issues []= new EventHandlerIssue(
-                    message: sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation),
+                    message: \sprintf(Lang::$current_lang['do_not_use_blocking_class'], $name, $explanation),
                     file: $file,
                     line: $new->getStartLine(),
                     severe: true

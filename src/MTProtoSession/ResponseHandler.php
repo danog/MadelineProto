@@ -360,10 +360,10 @@ trait ResponseHandler
                         $phone = null;
                         if (\in_array($response['error_message'], ['USER_DEACTIVATED', 'USER_DEACTIVATED_BAN'], true)) {
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : '???';
-                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->API->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                         }
                         $this->API->logout();
-                        return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
+                        return static fn () => new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone ?? '?'));
                     case 'AUTH_KEY_UNREGISTERED':
                     case 'AUTH_KEY_INVALID':
                         if ($this->API->loginState->getState()->state !== \danog\MadelineProto\API::LOGGED_IN) {
@@ -378,9 +378,9 @@ trait ResponseHandler
                         if ($this->API->loginState->getState()->authorizedDc == $this->datacenter) {
                             $this->API->logger('Permanent auth key was main authorized key, logging out...', Logger::FATAL_ERROR);
                             $phone = isset($this->API->authorization['user']['phone']) ? '+' . $this->API->authorization['user']['phone'] : 'you are currently using';
-                            $this->API->logger(sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
+                            $this->API->logger(\sprintf(Lang::$current_lang['account_banned'], $phone), Logger::FATAL_ERROR);
                             $this->API->logout();
-                            return static fn () => new SignalException(sprintf(Lang::$current_lang['account_banned'], $phone));
+                            return static fn () => new SignalException(\sprintf(Lang::$current_lang['account_banned'], $phone));
                         }
                         $this->methodRecall($request, $this->datacenter);
                         return null;

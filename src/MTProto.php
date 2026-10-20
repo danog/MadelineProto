@@ -1999,23 +1999,23 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         Magic::start(light: false);
         $alerts = [];
         if (API::RELEASE !== Magic::$latest_release) {
-            $alerts[] = Alert::error(sprintf(
+            $alerts[] = Alert::error(\sprintf(
                 Lang::$current_lang['update_madelineproto'],
                 API::RELEASE,
                 Magic::$latest_release,
             ));
         }
         if (!Magic::$hasOpenssl) {
-            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
+            $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
         }
         if (!\extension_loaded('gmp')) {
-            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
+            $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
         }
         if (!\extension_loaded('uv')) {
-            $alerts[] = Alert::info(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
+            $alerts[] = Alert::info(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
         }
         if (Lang::$currentPercentage !== 100) {
-            $alerts[] = Alert::info(new SafeHtml(sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
+            $alerts[] = Alert::info(new SafeHtml(\sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
         }
         return $alerts;
     }
