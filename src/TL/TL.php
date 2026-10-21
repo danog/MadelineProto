@@ -602,7 +602,7 @@ final class TL implements TLInterface
                     throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 if (isset($object['_'])) {
-                    throw new Exception(sprintf(Lang::$current_lang['array_invalid'], $type['subtype']));
+                    throw new Exception(\sprintf(Lang::$current_lang['array_invalid'], $type['subtype']));
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
@@ -639,7 +639,7 @@ final class TL implements TLInterface
         $constructorData = $this->constructors->findByPredicate($predicate, $layer);
         if ($constructorData === false) {
             //$this->API->logger($object, Logger::FATAL_ERROR);
-            throw new Exception(sprintf(Lang::$current_lang['type_extract_error'], $predicate));
+            throw new Exception(\sprintf(Lang::$current_lang['type_extract_error'], $predicate));
         }
         if ($bare = $type['type'] != '' && $type['type'][0] === '%') {
             $type['type'] = substr($type['type'], 1);
@@ -677,7 +677,7 @@ final class TL implements TLInterface
             $object = $this->typeMismatch[$type]($object);
             if (!isset($object['_'])) {
                 if (!isset($object[$type])) {
-                    throw new \danog\MadelineProto\Exception(sprintf(Lang::$current_lang['could_not_convert_object'], $type));
+                    throw new \danog\MadelineProto\Exception(\sprintf(Lang::$current_lang['could_not_convert_object'], $type));
                 }
                 $object = $object[$type];
             }
@@ -823,7 +823,7 @@ final class TL implements TLInterface
                         if ($this->API->getSettings()->getSchema()->getFuzzMode()) {
                             $value = $this->constructors->findByType($type);
                             if ($value === false) {
-                                throw new Exception(sprintf(Lang::$current_lang['type_extract_error'], $type));
+                                throw new Exception(\sprintf(Lang::$current_lang['type_extract_error'], $type));
                             }
                             $value = ['_' => $value['predicate']];
                         } else {
@@ -1007,7 +1007,7 @@ final class TL implements TLInterface
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
                 if ($constructorData === false) {
-                    throw new Exception(sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
+                    throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                 }
                 switch ($constructorData['predicate']) {
                     case 'gzip_packed':
@@ -1050,7 +1050,7 @@ final class TL implements TLInterface
                 if ($constructorData === false) {
                     $constructorData = $this->methods->findById($id);
                     if ($constructorData === false) {
-                        throw new Exception(sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
+                        throw new Exception(\sprintf(Lang::$current_lang['type_extract_error_id'], $type['type'], bin2hex(strrev($id))));
                     }
                     $constructorData['predicate'] = 'method_'.$constructorData['method'];
                 }
