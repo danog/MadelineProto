@@ -241,16 +241,23 @@ abstract class AsyncTools extends StrTools
         if (!\function_exists('shell_exec')) {
             return null;
         }
-        $state = trim((string) @shell_exec('stty -g 2>/dev/null'));
-        if ($state === '') {
+        try {
+            $state = trim((string) shell_exec('stty -g 2>/dev/null'));
+            if ($state === '') {
+                return null;
+            }
+            shell_exec('stty '.$mode.' 2>/dev/null');
+        } catch (Throwable) {
             return null;
         }
-        @shell_exec('stty '.$mode.' 2>/dev/null');
         $restored = false;
         $restore = static function () use ($state, &$restored): void {
             if (!$restored) {
                 $restored = true;
-                @shell_exec('stty '.escapeshellarg($state).' 2>/dev/null');
+                try {
+                    shell_exec('stty '.escapeshellarg($state).' 2>/dev/null');
+                } catch (Throwable) {
+                }
             }
         };
         // A signal (see Magic::start()) ends the script from the event loop, without running finally blocks.

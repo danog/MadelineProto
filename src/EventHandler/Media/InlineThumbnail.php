@@ -65,7 +65,13 @@ final class InlineThumbnail extends AbstractThumbnail
             $rawSize['h'] = \ord($bytes[1]);
         } elseif (!($rawSize['w'] ?? 0) || !($rawSize['h'] ?? 0)) {
             // From the header of the image, when the function is available (it may be disabled).
-            [$rawSize['w'], $rawSize['h']] = (\function_exists('getimagesizefromstring') ? @getimagesizefromstring($this->contents) : false) ?: [0, 0];
+            try {
+                $size = \function_exists('getimagesizefromstring') ? getimagesizefromstring($this->contents) : false;
+            } catch (\Throwable) {
+                // Not an image it can read
+                $size = false;
+            }
+            [$rawSize['w'], $rawSize['h']] = $size ?: [0, 0];
         }
         parent::__construct($API, $rawMedia, $rawSize, $protected);
     }

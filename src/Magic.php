@@ -358,7 +358,7 @@ final class Magic
         self::$BIG_ENDIAN = pack('L', 1) === pack('N', 1);
         self::$hasOpenssl = \extension_loaded('openssl');
         try {
-            self::$hasBasedirLimitation = (bool) @\ini_get('open_basedir');
+            self::$hasBasedirLimitation = (bool) \ini_get('open_basedir');
         } catch (\Throwable) {
         }
         self::$emojis = json_decode(self::JSON_EMOJIS);

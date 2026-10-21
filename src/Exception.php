@@ -86,7 +86,8 @@ class Exception extends \Exception
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
         $errfileReplaced = $errfile ?? '';
-        // If error is suppressed with @, don't throw an exception
+        // Warnings throw, @ included (it doesn't clear error_reporting() since PHP 8): catch them instead.
+        // Only a script that turned error reporting off entirely gets none.
         if (error_reporting() === 0
             || strpos($errstr, 'headers already sent')
             || str_contains($errstr, 'Creation of dynamic property')

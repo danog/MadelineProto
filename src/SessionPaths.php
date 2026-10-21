@@ -187,12 +187,14 @@ final class SessionPaths
      */
     private static function fsync(string $path): void
     {
-        $f = @fopen($path, 'r+');
-        if ($f === false) {
+        try {
+            $f = fopen($path, 'r+');
+        } catch (\Throwable) {
             return;
         }
         try {
-            @fsync($f);
+            fsync($f);
+        } catch (\Throwable) {
         } finally {
             fclose($f);
         }

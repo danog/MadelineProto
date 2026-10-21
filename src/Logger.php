@@ -324,7 +324,7 @@ final class Logger
                 EventLoop::unreference($this->rotateId);
             }
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
-            $result = @\ini_get('error_log');
+            $result = \ini_get('error_log');
             if ($result === 'syslog') {
                 $stdout = getStderr();
             } elseif ($result) {
