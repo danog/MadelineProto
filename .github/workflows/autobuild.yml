@@ -87,7 +87,11 @@ jobs:
     # Until the app is set up.
     if: vars.AUTOBUILD_APP_ID != ''
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     # The user sessions must not be used by two jobs at once.
     concurrency:
       group: telegram-user-sessions

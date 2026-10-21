@@ -72,6 +72,9 @@ jobs:
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -117,6 +120,9 @@ jobs:
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -159,6 +165,9 @@ jobs:
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -192,6 +201,9 @@ jobs:
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:

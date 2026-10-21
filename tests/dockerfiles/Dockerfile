@@ -264,6 +264,17 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s "$(dpkg -L libjemalloc2 | grep libjemalloc.so | head -1)" /usr/lib/libjemalloc.so
 
+# The unprivileged user the image runs as by default (see USER below), with a fixed UID and GID (1000, the first
+# user of most distributions, so that the files it writes to bind mounts belong to them), owning its home (and so
+# its own composer home, ~/.composer) and /app. Run with --user root (or user: root in compose) for the rest.
+# Nothing it can write may be in the PATH, which root uses too (/composer/vendor/bin, in it, can only be created by
+# root): so it doesn't share root's composer home, and the binaries it installs globally aren't in the PATH.
+RUN set -eux; \
+	groupadd --gid 1000 madeline; \
+	useradd --uid 1000 --gid madeline --create-home --home-dir /home/madeline --shell /bin/bash madeline; \
+	mkdir -p /app; \
+	chown madeline:madeline /app
+
 FROM scratch
 
 COPY --from=0 / /
@@ -283,6 +294,8 @@ ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
 RUN php -v
+
+USER madeline:madeline
 
 STOPSIGNAL SIGTERM
 

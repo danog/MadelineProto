@@ -26,7 +26,11 @@ jobs:
   prerelease:
     if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
