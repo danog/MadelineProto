@@ -20,13 +20,10 @@ namespace danog\MadelineProto\Test;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
-use Amp\Process\Process;
 use danog\MadelineProto\Parallel\Internal\WebContextRunner;
 use danog\MadelineProto\Parallel\WebContextFactory;
 use PHPUnit\Framework\TestCase;
 
-use function Amp\async;
-use function Amp\ByteStream\buffer;
 use function Amp\delay;
 
 /**
@@ -94,29 +91,12 @@ final class WebContextTest extends TestCase
         if (PHP_OS_FAMILY === 'Windows') {
             self::markTestSkipped('The built-in webserver serves one request at a time on Windows');
         }
-        $server = stream_socket_server('tcp://127.0.0.1:0');
-        $port = (int) substr(strrchr(stream_socket_get_name($server, false), ':'), 1);
-        fclose($server);
         // Its own temporary directory, to check that nothing is left behind
         $tmp = sys_get_temp_dir().'/madeline-webcontext-test-'.bin2hex(random_bytes(8));
         mkdir($tmp, 0o700);
-
-        $process = Process::start(
-            // The context, its workers and the request that starts them each take a webserver worker
-            [PHP_BINARY, '-d', 'opcache.enable_cli=0', '-S', "127.0.0.1:$port", '-t', self::ROOT],
-            environment: ['PHP_CLI_SERVER_WORKERS' => '6', 'TMPDIR' => $tmp] + getenv(),
-        );
-        $log = async(static fn () => buffer($process->getStdout()).buffer($process->getStderr()));
+        // The context, its workers and the request that starts them each take a webserver worker
+        [$server, $port] = self::startServer($tmp, ['PHP_CLI_SERVER_WORKERS' => '6', 'TMPDIR' => $tmp]);
         try {
-            $deadline = microtime(true) + 10;
-            while (!$socket = @stream_socket_client("tcp://127.0.0.1:$port")) {
-                if (microtime(true) > $deadline || !$process->isRunning()) {
-                    self::fail('The webserver did not start');
-                }
-                delay(0.1);
-            }
-            fclose($socket);
-
             $request = new Request("http://127.0.0.1:$port/tests/parallel_web_child.php");
             $request->setTransferTimeout(60);
             $request->setInactivityTimeout(60);
@@ -145,13 +125,83 @@ final class WebContextTest extends TestCase
 
             self::assertSame([], glob("$tmp/madeline-parallel-*"), 'Request files or IPC endpoints were left behind');
         } catch (\Throwable $e) {
-            $process->kill();
-            fwrite(STDERR, "Webserver log:\n".$log->await());
+            self::stopServer($server);
+            fwrite(STDERR, "Webserver log:\n".file_get_contents("$tmp/server.log"));
             throw $e;
         } finally {
-            $process->kill();
-            $process->join();
+            self::stopServer($server);
             exec('rm -rf '.escapeshellarg($tmp));
+        }
+    }
+
+    /**
+     * Start the built-in webserver serving the repository, in a process group of its own.
+     *
+     * Its workers (PHP_CLI_SERVER_WORKERS) are forked by the server, which doesn't stop them when it's killed: only
+     * stopping the whole process group does. Its output goes to server.log in $tmp, not to pipes, which the workers
+     * would keep open.
+     *
+     * @param array<string, string> $environment
+     * @return array{resource, int}
+     */
+    private static function startServer(string $tmp, array $environment): array
+    {
+        if (!\function_exists('posix_setpgid') || !\function_exists('pcntl_exec')) {
+            self::markTestSkipped('posix and pcntl are needed to stop the workers of the webserver');
+        }
+        $server = stream_socket_server('tcp://127.0.0.1:0');
+        $port = (int) substr(strrchr(stream_socket_get_name($server, false), ':'), 1);
+        fclose($server);
+
+        $log = "$tmp/server.log";
+        $process = proc_open(
+            [
+                PHP_BINARY, '-r', 'posix_setpgid(0, 0); pcntl_exec(PHP_BINARY, \array_slice($argv, 1));', '--',
+                '-d', 'opcache.enable_cli=0', '-S', "127.0.0.1:$port", '-t', self::ROOT,
+            ],
+            [['file', '/dev/null', 'r'], ['file', $log, 'a'], ['file', $log, 'a']],
+            $pipes,
+            null,
+            $environment + getenv(),
+        );
+        self::assertIsResource($process);
+        $server = [$process, proc_get_status($process)['pid']];
+
+        $deadline = microtime(true) + 10;
+        while (true) {
+            try {
+                fclose(stream_socket_client("tcp://127.0.0.1:$port"));
+                break;
+            } catch (\Throwable) {
+            }
+            if (microtime(true) > $deadline || !proc_get_status($process)['running']) {
+                self::stopServer($server);
+                self::fail("The webserver did not start:\n".file_get_contents($log));
+            }
+            delay(0.1);
+        }
+        return [$server, $port];
+    }
+
+    /**
+     * Stop the webserver and its workers, and wait for them to exit.
+     *
+     * @param array{resource, int} $server
+     */
+    private static function stopServer(array $server): void
+    {
+        [$process, $pid] = $server;
+        if (!\is_resource($process)) {
+            return;
+        }
+        posix_kill(-$pid, SIGTERM);
+        proc_close($process);
+        $deadline = microtime(true) + 10;
+        while (posix_kill(-$pid, 0)) {
+            if (microtime(true) > $deadline) {
+                self::fail("The workers of the webserver (process group $pid) didn't exit on SIGTERM");
+            }
+            usleep(10_000);
         }
     }
 }
