@@ -298,8 +298,11 @@ final class Magic
                 }
             } catch (Throwable $e) {
             }
-            // Define signal handlers
-            if (\defined('SIGINT')) {
+            // Define signal handlers, only in the CLI: under a web server SAPI the process belongs to the web server,
+            // which handles the signals itself. The handlers of the event loop replaced its own ones in the worker,
+            // and outlive the request (with ext-uv, the loop they belong to): php-fpm workers dumped core on the
+            // SIGQUIT that stops idle ones.
+            if (\defined('SIGINT') && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg')) {
                 //if (function_exists('pcntl_async_signals')) pcntl_async_signals(true);
                 try {
                     pcntl_signal(SIGINT, static fn () => null);
