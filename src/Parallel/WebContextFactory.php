@@ -166,7 +166,7 @@ final class WebContextFactory implements ContextFactory
             // Not TCP: anyone could connect, and the key is checked after unserializing
             $server = new IpcServer($dir.DIRECTORY_SEPARATOR.'ipc', IpcServer::TYPE_UNIX | IpcServer::TYPE_FIFO);
         } catch (Throwable $e) {
-            @rmdir($dir);
+            self::remove($dir);
             throw $e instanceof ContextException
                 ? $e
                 : new ContextException('Could not create the IPC server of the context', previous: $e);
@@ -192,8 +192,8 @@ final class WebContextFactory implements ContextFactory
         } finally {
             $server->close();
             // The request didn't get to read it
-            @unlink($request);
-            @rmdir($dir);
+            self::remove($request);
+            self::remove($dir);
             // The request already ignores the abort (or it never came)
             foreach ($requests ?? [] as $connection) {
                 $connection->map(static fn (?Socket $socket) => $socket?->close())->ignore();
@@ -202,6 +202,23 @@ final class WebContextFactory implements ContextFactory
 
         Logger::log("Started web context $id");
         return new WebContext($socket);
+    }
+
+    /**
+     * Remove a file or an empty directory, if it exists.
+     */
+    private static function remove(string $path): void
+    {
+        clearstatcache(true, $path);
+        try {
+            if (is_dir($path) && !is_link($path)) {
+                rmdir($path);
+            } elseif (file_exists($path) || is_link($path)) {
+                unlink($path);
+            }
+        } catch (Throwable $e) {
+            Logger::log("Could not remove $path: {$e->getMessage()}", Logger::ERROR);
+        }
     }
 
     /**

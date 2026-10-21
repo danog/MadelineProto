@@ -70,7 +70,11 @@ final class WebContextRunner
             \define('AMP_CONTEXT', 'process');
             \define('AMP_CONTEXT_ID', getmypid());
         }
-        @chdir($request['cwd']);
+        try {
+            chdir($request['cwd']);
+        } catch (Throwable $e) {
+            error_log("MadelineProto web context: could not change the working directory to {$request['cwd']}: {$e->getMessage()}");
+        }
 
         try {
             $argv = $request['script'];
@@ -139,9 +143,14 @@ final class WebContextRunner
             error_log("MadelineProto web context: $path is not private to this user, ignoring it");
             return null;
         }
-        $contents = @file_get_contents($path);
-        if (!@unlink($path) || !\is_string($contents)) {
+        try {
+            $contents = file_get_contents($path);
+            unlink($path);
+        } catch (Throwable) {
             // Served concurrently
+            return null;
+        }
+        if (!\is_string($contents)) {
             return null;
         }
         try {
