@@ -82,5 +82,19 @@ if [ -n "$pending" ]; then
     exit 0
 fi
 
+# GitHub refuses to merge with GH_TOKEN (without the workflow scope) a pull request whose merge commit writes a
+# workflow file anew: one that the main branch changed too since the pull request was opened (Dependabot updates the
+# same action in several pull requests). Dependabot rebases it instead, whose checks then merge it.
+mapfile -d '' workflows < <(git diff -z --no-renames --name-only "$base" "$HEAD_SHA" -- .github/workflows)
+if [ ${#workflows[@]} -ne 0 ] && [ -n "$(git diff --no-renames --name-only "$base" origin/v8 -- "${workflows[@]}")" ]; then
+    if [ "$(gh pr view "$pr" --json author --jq .author.login)" == app/dependabot ]; then
+        gh pr comment "$pr" --body "@dependabot rebase"
+        echo "Asked Dependabot to rebase #$pr: v8 changed its workflows too"
+        exit 0
+    fi
+    echo "Not merging #$pr: v8 changed its workflows too, it must be rebased"
+    exit 0
+fi
+
 gh pr merge "$pr" --merge --match-head-commit "$HEAD_SHA"
 echo "Merged #$pr"
