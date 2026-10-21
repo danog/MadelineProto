@@ -33,5 +33,6 @@ jobs:
       - name: Check the bump of the RELEASE constant
         env:
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
         # Split on purpose: the release labels have no spaces.
         run: tests/release_check.sh $LABELS

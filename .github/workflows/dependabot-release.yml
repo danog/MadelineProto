@@ -1,0 +1,36 @@
+name: Dependabot release
+
+# Bumps the RELEASE constant for the pull requests of Dependabot once merged to the main branch, as the pull requests
+# of others bump it themselves: see tests/dependabot_release.sh. The CI of the bump (cancelling the one of the merge)
+# then releases it (prerelease.yml).
+
+on:
+  push:
+    branches:
+      - v8
+
+permissions:
+  contents: read
+
+# One bump at a time: the next one sees the previous one.
+concurrency:
+  group: dependabot-release
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The pushed commit and its parent: the changes of the pull request.
+          fetch-depth: 2
+          # Of an admin, to push the bump to the main branch, and so that the push runs the CI (the events of the token
+          # of a job don't).
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+      - name: Bump the RELEASE constant for a pull request of Dependabot
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PUSH_SHA: ${{ github.sha }}
+        run: tests/dependabot_release.sh
