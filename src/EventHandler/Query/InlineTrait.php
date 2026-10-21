@@ -20,6 +20,7 @@ use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RichMessage\InputConverter;
+use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\Tools;
 
 /** @internal */
@@ -85,29 +86,25 @@ trait InlineTrait
      * Media must have already been uploaded (e.g. with uploadPhoto, uploadVideo, uploadDocument and so on).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array|null               $replyMarkup  Reply markup for inline keyboards
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
      * @param boolean                  $rtl          Whether the text is right-to-left
      * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
-     * @param array|null               $replyMarkup  Reply markup for inline keyboards
      */
     public function editRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
+        ?array $replyMarkup = null,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         array $media = [],
         bool $rtl = false,
         bool $noAutolink = false,
-        ?array $replyMarkup = null,
     ): void {
-        $client = $this->getClient();
-        $client->methodCallAsyncRead(
+        $this->getClient()->methodCallAsyncRead(
             'messages.editInlineBotMessage',
             [
                 'id' => $this->rawId,
-                'rich_message' => $client->toInputRichMessage(
-                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
-                    allowUploads: false,
-                ),
+                'rich_message' => InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
                 'reply_markup' => $replyMarkup,
             ],
         );
