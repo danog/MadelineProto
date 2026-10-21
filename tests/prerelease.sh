@@ -63,6 +63,11 @@ for set in "$(jq -r '.tag_name // empty' <<< "${draft:-{\}}")" "$release"; do
         version=$set
     fi
 done
+# It ends up in code run with the token of an admin.
+if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Invalid version: $version"
+    exit 1
+fi
 if git rev-parse -q --verify "refs/tags/$version" > /dev/null; then
     echo "The tag $version already exists, at $(git rev-parse --short "$version"), but isn't the last release ($last)"
     exit 1
@@ -77,7 +82,7 @@ if [ "$release" != "$version" ]; then
         echo "Would bump the RELEASE constant from $release to $version (since $last, labels: ${labels:-none})"
         exit 0
     fi
-    perl -pi -e "s/public const RELEASE = '[^']*';/public const RELEASE = '$version';/" src/API.php
+    VERSION=$version perl -pi -e "s/public const RELEASE = '[^']*';/public const RELEASE = '\$ENV{VERSION}';/" src/API.php
     git commit -q -m "Bump the release version to $version" src/API.php
     if ! git push -q origin "$branch"; then
         if [ "$(git ls-remote origin "refs/heads/$branch" | cut -f1)" != "$head" ]; then
