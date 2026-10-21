@@ -1023,7 +1023,7 @@ trait UpdateHandler
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage): structured text made of blocks (headings, paragraphs, lists, tables, quotes, media, buttons and so on).
      *
      * The message can be passed as:
-     * - Markdown or HTML (depending on $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
+     * - Plain text (the default, sent as a single paragraph), or Markdown or HTML (with $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
      * - A list of blocks, in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
@@ -1032,7 +1032,7 @@ trait UpdateHandler
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param integer|null             $replyToMsgId ID of message to reply to.
      * @param integer|null             $topMsgId     ID of thread where to send the message.
      * @param array|null               $replyMarkup  Keyboard information.
@@ -1050,7 +1050,7 @@ trait UpdateHandler
     public function sendRichMessage(
         int|string $peer,
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -1097,7 +1097,7 @@ trait UpdateHandler
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Partial rich message
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
      * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
@@ -1112,7 +1112,7 @@ trait UpdateHandler
     public function sendRichMessageDraft(
         int|string $peer,
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         array $media = [],
         ?int $draftId = null,
         bool $canStop = false,

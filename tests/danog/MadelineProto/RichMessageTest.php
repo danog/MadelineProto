@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
 use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
@@ -16,6 +18,9 @@ use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
+use danog\MadelineProto\EventHandler\Query\ChatTrait;
+use danog\MadelineProto\EventHandler\Query\InlineTrait;
+use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -28,6 +33,7 @@ use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as LoggerSettings;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionMethod;
 
 /** @internal */
 class RichMessageTest extends TestCase
@@ -678,6 +684,32 @@ class RichMessageTest extends TestCase
             'id' => ['_' => 'inputBotInlineMessageID', 'dc_id' => 2, 'id' => 1, 'access_hash' => 1],
             'rich_message' => ['markdown' => '![A cat](tg://photo?id=cat)', 'media' => ['cat' => ['type' => 'photo', 'media' => new LocalFile('/nonexistent.jpg')]]],
         ]);
+    }
+
+    /**
+     * Like reply() and sendMessage(), the rich methods send strings as plain text unless asked otherwise: text that
+     * comes from users must not be parsed as Markdown (links, embedded media) by default.
+     */
+    public function testRichMethodsDefaultToPlainText(): void
+    {
+        foreach ([
+            [AbstractMessage::class, 'replyRich'],
+            [AbstractMessage::class, 'sendRich'],
+            [Message::class, 'editRich'],
+            [Message::class, 'replyOrEditRich'],
+            [ChatTrait::class, 'editRich'],
+            [InlineTrait::class, 'editRich'],
+            [Story::class, 'replyRich'],
+            [MTProto::class, 'sendRichMessage'],
+            [MTProto::class, 'sendRichMessageDraft'],
+            [MTProto::class, 'sendRichMessageToAdmins'],
+        ] as [$class, $method]) {
+            $parseMode = array_values(array_filter(
+                (new ReflectionMethod($class, $method))->getParameters(),
+                static fn (\ReflectionParameter $param): bool => $param->getName() === 'parseMode',
+            ))[0];
+            $this->assertSame(RichParseMode::TEXT, $parseMode->getDefaultValue(), "$class::$method");
+        }
     }
 
     private static function api(): MTProto

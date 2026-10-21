@@ -478,7 +478,7 @@ abstract class Message extends AbstractMessage
      * Edit the message, replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null               $replyMarkup  Reply markup for inline keyboards
      * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
@@ -487,7 +487,7 @@ abstract class Message extends AbstractMessage
      */
     public function editRich(
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         array $media = [],
@@ -558,7 +558,7 @@ abstract class Message extends AbstractMessage
      * If the message is outgoing, will edit the message replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage), otherwise will reply to the message with a rich message.
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null               $replyMarkup  Reply markup for inline keyboards
      * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
@@ -567,7 +567,7 @@ abstract class Message extends AbstractMessage
      */
     public function replyOrEditRich(
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         array $media = [],

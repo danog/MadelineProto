@@ -2432,7 +2432,7 @@ abstract class InternalDoc
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage): structured text made of blocks (headings, paragraphs, lists, tables, quotes, media, buttons and so on).
      *
      * The message can be passed as:
-     * - Markdown or HTML (depending on $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
+     * - Plain text (the default, sent as a single paragraph), or Markdown or HTML (with $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
      * - A list of blocks, in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
@@ -2441,7 +2441,7 @@ abstract class InternalDoc
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param integer|null             $replyToMsgId ID of message to reply to.
      * @param integer|null             $topMsgId     ID of thread where to send the message.
      * @param array|null               $replyMarkup  Keyboard information.
@@ -2456,7 +2456,7 @@ abstract class InternalDoc
      * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation            $cancellation Cancellation
      */
-    final public function sendRichMessage(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
+    final public function sendRichMessage(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::TEXT, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
     ], bool $rtl = false, bool $noAutolink = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
         return $this->wrapper->getAPI()->sendRichMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $media, $rtl, $noAutolink, $cancellation);
@@ -2470,7 +2470,7 @@ abstract class InternalDoc
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Partial rich message
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
      * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
@@ -2482,7 +2482,7 @@ abstract class InternalDoc
      *
      * @return integer The draft ID, to pass to the next calls to update the draft.
      */
-    final public function sendRichMessageDraft(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, array $media = [
+    final public function sendRichMessageDraft(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::TEXT, array $media = [
     ], ?int $draftId = null, bool $canStop = false, bool $keepOnStop = false, bool $rtl = false, bool $noAutolink = false, ?int $topMsgId = null, ?\Amp\Cancellation $cancellation = null): int
     {
         return $this->wrapper->getAPI()->sendRichMessageDraft($peer, $message, $parseMode, $media, $draftId, $canStop, $keepOnStop, $rtl, $noAutolink, $topMsgId, $cancellation);
@@ -2491,7 +2491,7 @@ abstract class InternalDoc
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to all report peers (admins of the bot), see sendRichMessage.
      *
      * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null    $replyMarkup  Keyboard information.
      * @param integer|null  $scheduleDate Schedule date.
      * @param boolean       $silent       Whether to send the message silently, without triggering notifications.
@@ -2505,7 +2505,7 @@ abstract class InternalDoc
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */
-    final public function sendRichMessageToAdmins(\danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
+    final public function sendRichMessageToAdmins(\danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::TEXT, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
     ], bool $rtl = false, bool $noAutolink = false, ?\Amp\Cancellation $cancellation = null): array
     {
         return $this->wrapper->getAPI()->sendRichMessageToAdmins($message, $parseMode, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $media, $rtl, $noAutolink, $cancellation);

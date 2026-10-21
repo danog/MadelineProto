@@ -260,7 +260,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Reply to the message with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|string|null      $sendAs       Peer to send the message as.
      * @param integer|null             $scheduleDate Schedule date.
@@ -275,7 +275,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function replyRich(
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,
@@ -848,7 +848,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Send a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to the chat of the message.
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|string|null      $sendAs       Peer to send the message as.
      * @param integer|null             $scheduleDate Schedule date.
@@ -863,7 +863,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      */
     public function sendRich(
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,

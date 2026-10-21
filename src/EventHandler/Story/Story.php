@@ -205,7 +205,7 @@ final class Story extends AbstractStory
      * Reply to the story with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|null             $scheduleDate Schedule date.
      * @param boolean                  $silent       Whether to send the message silently, without triggering notifications.
@@ -217,7 +217,7 @@ final class Story extends AbstractStory
      */
     public function replyRich(
         string|array|RichMessage $message,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         bool $silent = false,
