@@ -2,7 +2,8 @@
 # Sourced by the scripts that deal with the version of the next release (the RELEASE constant of src/API.php):
 # tests/release_check.sh, tests/prerelease.sh, tests/autobuild.sh, tests/update_docker.sh.
 #
-# Every pull request bumps the RELEASE constant itself, as its release label requires (see tests/release_check.sh):
+# Every pull request bumps the RELEASE constant itself, as its release label and the files it changes require (see
+# tests/release_check.sh):
 # once merged, tests/prerelease.sh releases the version of the constant, if it isn't released yet.
 
 # The RELEASE constant of the checkout.
@@ -30,9 +31,26 @@ last_release()
     git ls-remote -q --tags --refs origin "refs/tags/$1.*" | cut -d/ -f3 | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true
 }
 
+# Whether changes ship (to the users of composer, of the phar or of the docker image), given the paths of the files
+# they change on stdin, one per line: everything ships but what's listed here, the export-ignore paths of
+# .gitattributes and what only the CI, the tools and the docs use. tests/ doesn't, but the Dockerfile of the docker
+# image does. Changes that ship need at least a patch release, whatever their label (release:internal too).
+ships()
+{
+    ships_list | grep -q .
+}
+
+# The paths that ship (see ships) among the ones on stdin.
+ships_list()
+{
+    EXEMPT='^(\.github/|tests/|tools/|webui/|langs/|vendor-bin/|examples/|docs$|schemas$|[^/]+\.md$|extracted\.json$|psalm(-baseline)?\.xml$|phpunit(-light)?\.xml$|phpcs\.xml$|\.php-cs-fixer\.dist\.php$|\.git(ignore|attributes|modules)$|\.env\.example$)' \
+        awk '/^tests\/dockerfiles\// || ($0 != "" && $0 !~ ENVIRON["EXEMPT"])'
+}
+
 # The lowest version a pull request must bump the RELEASE constant to, given the last release and the release
 # labels of the pull request: required_version <last release> <labels...>.
-# release:feature and release:layer need a minor version, release:fix a patch one, release:internal none.
+# release:feature and release:layer need a minor version, release:fix a patch one, release:internal none (but see
+# ships).
 required_version()
 {
     local last=$1 x y z bump=none label

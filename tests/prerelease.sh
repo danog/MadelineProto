@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
 # Release the RELEASE constant of the main branch once its CI succeeded (see prerelease.yml), if that version isn't
-# released yet: every pull request bumps it as its release label requires (see tests/release_check.sh), so a push
-# of release:internal pull requests only is usually not released. Its commit is tagged and released as a
-# pre-release: the CI of the tag builds and tests the phar, and tests/release_phar.sh makes the release final once
+# released yet: every pull request bumps it as its release label and the files it changes require (see
+# tests/release_check.sh), so a push of release:internal pull requests that change nothing that ships (CI, tests) is
+# not released. Its commit is tagged and released as a pre-release: the CI of the tag builds and tests the phar, and tests/release_phar.sh makes the release final once
 # it passed.
 #
 # The notes (see tests/release_notes.sh) go below what was written by hand in the draft of the version, if any, whose
