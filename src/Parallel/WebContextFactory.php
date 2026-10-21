@@ -27,14 +27,18 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Context\ContextException;
 use Amp\Parallel\Context\ContextFactory;
 use Amp\Parallel\Context\ThreadContext;
-use Amp\Parallel\Worker\ContextWorkerFactory;
 use Amp\Parallel\Worker\ContextWorkerPool;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
+use danog\MadelineProto\Parallel\Internal\OnDemandWorkerFactory;
+use ReflectionException;
+use ReflectionFunction;
 use Revolt\EventLoop;
 use Throwable;
+use WeakMap;
 
 use function Amp\Parallel\Context\contextFactory;
 use function Amp\Parallel\Worker\workerPool;
@@ -43,7 +47,7 @@ use function Amp\Parallel\Worker\workerPool;
  * Starts amphp/parallel contexts on webhosts, where processes can't be started: each context is a request to the
  * webserver, like the self-restarts of MadelineProto (see WebRunner::selfStart()).
  *
- * The context talks to the parent with danog/ipc (UNIX sockets, FIFOs or TCP, whatever works).
+ * The context talks to the parent with danog/ipc (UNIX sockets or FIFOs, in a directory private to this user).
  *
  * Every context occupies a worker of the webserver (a PHP-FPM child) for as long as it runs, and is subject to the
  * time limits of the webserver: keep the worker pool small.
@@ -54,9 +58,14 @@ final class WebContextFactory implements ContextFactory
     use ForbidSerialization;
 
     /**
-     * Default limit of the worker pool installed by {@see install()}.
+     * Limit of the worker pool installed by {@see install()}.
      */
     public const DEFAULT_WORKER_LIMIT = 4;
+
+    /**
+     * Seconds after which an idle worker of the pool installed by {@see install()} is stopped.
+     */
+    public const WORKER_IDLE_TIMEOUT = 10;
 
     /**
      * @param positive-int $childConnectTimeout Seconds the request has to connect back.
@@ -67,8 +76,15 @@ final class WebContextFactory implements ContextFactory
     }
 
     /**
-     * Use this factory for the global context factory and worker pool of amphp/parallel, if running in a webserver
-     * where threads aren't supported.
+     * Under a webserver, where threads aren't supported, start the contexts of amphp/parallel with requests to the
+     * webserver where processes can't be started ({@see FallbackContextFactory}), unless the global context factory
+     * of amphp/parallel was already set.
+     *
+     * Unless the global worker pool was already set, it's replaced with one of at most DEFAULT_WORKER_LIMIT workers,
+     * each stopped once idle for WORKER_IDLE_TIMEOUT seconds and started again when needed (amphp's default pool has
+     * up to 32 workers, never stopped): a web context occupies a worker of the webserver (a PHP-FPM child, of which
+     * there may be as few as 5) for as long as it runs. Starting a worker costs a request to the webserver (or a
+     * process), and running ones are subject to the time limits of the webserver.
      *
      * @internal
      */
@@ -83,12 +99,37 @@ final class WebContextFactory implements ContextFactory
         ) {
             return;
         }
-        $factory = new self();
-        contextFactory($factory);
-        workerPool(new ContextWorkerPool(
-            self::DEFAULT_WORKER_LIMIT,
-            new ContextWorkerFactory(contextFactory: $factory),
-        ));
+        if (!self::isGlobalSet('Amp\\Parallel\\Context\\contextFactory')) {
+            contextFactory(new FallbackContextFactory());
+        }
+        if (!self::isGlobalSet('Amp\\Parallel\\Worker\\workerPool')) {
+            workerPool(new ContextWorkerPool(
+                self::DEFAULT_WORKER_LIMIT,
+                new OnDemandWorkerFactory(self::WORKER_IDLE_TIMEOUT),
+            ));
+        }
+    }
+
+    /**
+     * Whether a global of amphp/parallel (contextFactory(), workerPool()) was already set for the current event
+     * loop, by the user or by using it.
+     *
+     * Its getter creates the default one when called, and keeps them in a static map: read it without calling it.
+     * If the map can't be read (another version of amphp/parallel), it's considered set, never to replace it.
+     *
+     * @param callable-string $function
+     */
+    private static function isGlobalSet(string $function): bool
+    {
+        try {
+            $map = (new ReflectionFunction($function))->getStaticVariables()['map'] ?? null;
+        } catch (ReflectionException) {
+            return true;
+        }
+        if ($map === null) {
+            return false;
+        }
+        return !$map instanceof WeakMap || isset($map[EventLoop::getDriver()]);
     }
 
     /**
