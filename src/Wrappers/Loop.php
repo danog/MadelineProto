@@ -70,7 +70,8 @@ trait Loop
                 $query = http_build_query($params);
 
                 /** @psalm-suppress InternalMethod */
-                WebRunner::selfStart("$url?$query");
+                // In a shutdown function, often after the time limit was hit: the event loop can't run there
+                WebRunner::selfStart("$url?$query", blocking: true);
 
                 $logger->logger("Payload sent with token {$params['MadelineSelfRestart']}, waiting for self-restart");
                 $logger->logger('Shutdown of self-restart callback');
