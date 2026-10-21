@@ -90,10 +90,13 @@ $modes = [
             $result['failure'] = $e->getPrevious()?->getMessage();
         }
 
+        $result['nested'] = startContext([__DIR__.'/parallel_web_context.php', 'nested'])->join();
+
         // The pool installed by MadelineProto, with workers idle for half a second stopped, and a factory counting
         // the contexts started
         $factory = new class(contextFactory()) implements ContextFactory {
-            public int $started = 2;
+            // The 4 started so far: the echoing one, the throwing one, the nested one and the one it started
+            public int $started = 4;
             public function __construct(private readonly ContextFactory $factory)
             {
             }
