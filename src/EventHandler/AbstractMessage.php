@@ -32,6 +32,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RichParseMode;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -259,10 +260,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Reply to the message with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
-     * @param boolean                  $rtl          Whether the text is right-to-left
-     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|string|null      $sendAs       Peer to send the message as.
      * @param integer|null             $scheduleDate Schedule date.
@@ -270,14 +268,14 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean                  $background   Send this message as background message
      * @param boolean                  $clearDraft   Clears the draft field
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation            $cancellation Cancellation
      */
     public function replyRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
-        array $media = [],
-        bool $rtl = false,
-        bool $noAutolink = false,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,
@@ -285,15 +283,15 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
         ?Cancellation $cancellation = null
     ): Message {
         return $this->getClient()->sendRichMessage(
             peer: $this->chatId,
             message: $message,
             parseMode: $parseMode,
-            media: $media,
-            rtl: $rtl,
-            noAutolink: $noAutolink,
             replyToMsgId: $this->id,
             topMsgId: $this->topicId === 1 ? null : $this->topicId,
             replyMarkup: $replyMarkup,
@@ -303,6 +301,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             noForwards: $noForwards,
             background: $background,
             clearDraft: $clearDraft,
+            media: $media,
+            rtl: $rtl,
+            noAutolink: $noAutolink,
             cancellation: $cancellation,
         );
     }
@@ -847,10 +848,7 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * Send a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to the chat of the message.
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
-     * @param boolean                  $rtl          Whether the text is right-to-left
-     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|string|null      $sendAs       Peer to send the message as.
      * @param integer|null             $scheduleDate Schedule date.
@@ -858,14 +856,14 @@ abstract class AbstractMessage extends Update implements SimpleFilters
      * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean                  $background   Send this message as background message
      * @param boolean                  $clearDraft   Clears the draft field
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation            $cancellation Cancellation
      */
     public function sendRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
-        array $media = [],
-        bool $rtl = false,
-        bool $noAutolink = false,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         ?array $replyMarkup = null,
         int|string|null $sendAs = null,
         ?int $scheduleDate = null,
@@ -873,15 +871,15 @@ abstract class AbstractMessage extends Update implements SimpleFilters
         bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
         ?Cancellation $cancellation = null
     ): Message {
         return $this->getClient()->sendRichMessage(
             peer: $this->chatId,
             message: $message,
             parseMode: $parseMode,
-            media: $media,
-            rtl: $rtl,
-            noAutolink: $noAutolink,
             topMsgId: $this->topicId === 1 ? null : $this->topicId,
             replyMarkup: $replyMarkup,
             sendAs: $sendAs,
@@ -890,6 +888,9 @@ abstract class AbstractMessage extends Update implements SimpleFilters
             noForwards: $noForwards,
             background: $background,
             clearDraft: $clearDraft,
+            media: $media,
+            rtl: $rtl,
+            noAutolink: $noAutolink,
             cancellation: $cancellation,
         );
     }

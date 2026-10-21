@@ -38,6 +38,7 @@ use danog\AsyncOrm\ValueType;
 use danog\BetterPrometheus\BetterCounter;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\API;
+use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\AbstractMessage;
 use danog\MadelineProto\EventHandler\BotCommands;
 use danog\MadelineProto\EventHandler\Calls\AbstractGroupCall;
@@ -146,6 +147,7 @@ use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResponseException;
 use danog\MadelineProto\RichMessage\InputConverter;
+use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\RPCError\MsgIdInvalidError;
@@ -1030,10 +1032,7 @@ trait UpdateHandler
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID (1-64 characters among A-Z, a-z, 0-9, _ and -) to file, or a list of Bot API InputRichMessageMedia objects.
-     * @param boolean                  $rtl          Whether the text is right-to-left
-     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param integer|null             $replyToMsgId ID of message to reply to.
      * @param integer|null             $topMsgId     ID of thread where to send the message.
      * @param array|null               $replyMarkup  Keyboard information.
@@ -1043,15 +1042,15 @@ trait UpdateHandler
      * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean                  $background   Send this message as background message
      * @param boolean                  $clearDraft   Clears the draft field
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID (1-64 characters among A-Z, a-z, 0-9, _ and -) to file (a Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream), or a list of Bot API InputRichMessageMedia objects.
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation            $cancellation Cancellation
      */
     public function sendRichMessage(
         int|string $peer,
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
-        array $media = [],
-        bool $rtl = false,
-        bool $noAutolink = false,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         ?int $replyToMsgId = null,
         ?int $topMsgId = null,
         ?array $replyMarkup = null,
@@ -1061,6 +1060,9 @@ trait UpdateHandler
         bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
         ?Cancellation $cancellation = null
     ): Message {
         $result = $this->methodCallAsyncRead(
@@ -1068,11 +1070,7 @@ trait UpdateHandler
             [
                 'peer' => $peer,
                 'message' => '',
-                'rich_message' => $this->toInputRichMessage(
-                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
-                    $peer,
-                    cancellation: $cancellation,
-                ),
+                'rich_message' => InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
                 'reply_to' => $replyToMsgId !== null || $topMsgId !== null ? [
                     '_' => 'inputReplyToMessage',
                     'reply_to_msg_id' => $replyToMsgId,
@@ -1099,8 +1097,8 @@ trait UpdateHandler
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Partial rich message
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file.
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
      * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
      * @param boolean                  $keepOnStop   Whether the draft should be kept if the user stops the generation
@@ -1114,7 +1112,7 @@ trait UpdateHandler
     public function sendRichMessageDraft(
         int|string $peer,
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         array $media = [],
         ?int $draftId = null,
         bool $canStop = false,
@@ -1218,6 +1216,9 @@ trait UpdateHandler
                     'voice_note' => $this->uploadVoice(peer: $peer ?? 'me', file: $media, duration: $duration, cancellation: $cancellation),
                     default => $this->uploadDocument(file: $media, thumb: $thumb, peer: $peer, cancellation: $cancellation),
                 };
+            }
+            if ($media instanceof BotApiFileId) {
+                $media = $media->fileId;
             }
             $info = $this->getFileInfo($media);
             return $info['InputPhoto'] ?? $info['InputDocument'] ?? throw new Exception("The specified $type can't be used in a rich message");

@@ -30,6 +30,7 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RichMessage\InputConverter;
+use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\StrTools;
 
 /**
@@ -204,38 +205,34 @@ final class Story extends AbstractStory
      * Reply to the story with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
-     * @param boolean                  $rtl          Whether the text is right-to-left
-     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param array|null               $replyMarkup  Keyboard information.
      * @param integer|null             $scheduleDate Schedule date.
      * @param boolean                  $silent       Whether to send the message silently, without triggering notifications.
      * @param boolean                  $background   Send this message as background message
      * @param boolean                  $clearDraft   Clears the draft field
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      */
     public function replyRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
-        array $media = [],
-        bool $rtl = false,
-        bool $noAutolink = false,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         bool $silent = false,
         bool $background = false,
         bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
     ): Message {
-        $client = $this->getClient();
-        $result = $client->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'messages.sendMessage',
             [
                 'peer' => $this->senderId,
                 'message' => '',
-                'rich_message' => $client->toInputRichMessage(
-                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
-                    $this->senderId,
-                ),
+                'rich_message' => InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
                 'reply_to' => ['_' => 'inputReplyToStory', 'peer' => $this->senderId, 'story_id' => $this->id],
                 'reply_markup' => $replyMarkup,
                 'schedule_date' => $scheduleDate,
@@ -244,7 +241,7 @@ final class Story extends AbstractStory
                 'clear_draft' => $clearDraft,
             ]
         );
-        return $client->wrapMessage($client->extractMessage($result));
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
     /**

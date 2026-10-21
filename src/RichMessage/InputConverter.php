@@ -16,11 +16,17 @@
 
 namespace danog\MadelineProto\RichMessage;
 
+use Amp\ByteStream\ReadableStream;
 use Closure;
+use danog\MadelineProto\BotApiFileId;
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\FormattedDate;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\RemoteUrl;
+use danog\MadelineProto\RichParseMode;
 
 /**
  * Converts rich messages in the format of the Bot API's InputRichMessage to MTProto InputRichMessage constructors.
@@ -53,17 +59,27 @@ final class InputConverter
      * Build a Bot API InputRichMessage from the parameters of the high-level methods.
      *
      * @param string|array|RichMessage $message Markdown or HTML (or plain text, depending on $parseMode), a list of blocks, a received RichMessage, a Bot API InputRichMessage or an MTProto InputRichMessage.
-     * @param array $media Media referenced in Markdown or HTML, as a list of Bot API InputRichMessageMedia objects ({id, media}) or as a map from ID to file.
+     * @param array $media Media referenced in Markdown or HTML, as a list of Bot API InputRichMessageMedia objects ({id, media}) or as a map from ID to file: files are Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream objects, like in the other methods, optionally in a Bot API InputMedia-like array.
      */
-    public static function fromParameters(string|array|RichMessage $message, ParseMode $parseMode, array $media, bool $rtl, bool $noAutolink): array
+    public static function fromParameters(string|array|RichMessage $message, RichParseMode $parseMode, array $media, bool $rtl, bool $noAutolink): array
     {
+        foreach ($media as $id => $file) {
+            if (\is_array($file) && !isset($file['_'])) {
+                // InputRichMessageMedia or InputMedia-like array
+                $id = $file['id'] ?? $id;
+                $file = $file['media'] ?? null;
+            }
+            if (!($file instanceof Message || $file instanceof Media || $file instanceof LocalFile || $file instanceof RemoteUrl || $file instanceof BotApiFileId || $file instanceof ReadableStream || (\is_array($file) && isset($file['_'])))) {
+                throw new Exception("The file $id of the rich message must be a Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream object: wrap bot API file IDs in BotApiFileId and URLs in RemoteUrl");
+            }
+        }
         if ($message instanceof RichMessage) {
             $message = ['blocks' => $message->blocks, 'is_rtl' => $message->rtl];
         } elseif (\is_string($message)) {
             $message = match ($parseMode) {
-                ParseMode::MARKDOWN => ['markdown' => $message, 'media' => $media],
-                ParseMode::HTML => ['html' => $message, 'media' => $media],
-                ParseMode::TEXT => ['blocks' => [['type' => 'paragraph', 'text' => $message]]],
+                RichParseMode::MARKDOWN => ['markdown' => $message, 'media' => $media],
+                RichParseMode::HTML => ['html' => $message, 'media' => $media],
+                RichParseMode::TEXT => ['blocks' => [['type' => 'paragraph', 'text' => $message]]],
             };
         } elseif (array_is_list($message)) {
             $message = ['blocks' => $message];
@@ -94,7 +110,7 @@ final class InputConverter
     public static function convert(array|RichMessage $message, Closure $resolveMedia): array
     {
         if ($message instanceof RichMessage) {
-            $message = self::fromParameters($message, ParseMode::TEXT, [], false, false);
+            $message = self::fromParameters($message, RichParseMode::TEXT, [], false, false);
         }
         if (isset($message['_'])) {
             return $message;

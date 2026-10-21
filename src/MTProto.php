@@ -2147,30 +2147,32 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to all report peers (admins of the bot), see sendRichMessage.
      *
      * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode    $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array        $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
-     * @param boolean      $rtl          Whether the text is right-to-left
-     * @param boolean      $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
-     * @param array|null   $replyMarkup  Keyboard information.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean      $silent       Whether to send the message silently, without triggering notifications.
-     * @param boolean      $background   Send this message as background message
-     * @param boolean      $clearDraft   Clears the draft field
+     * @param RichParseMode $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array|null    $replyMarkup  Keyboard information.
+     * @param integer|null  $scheduleDate Schedule date.
+     * @param boolean       $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean       $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean       $background   Send this message as background message
+     * @param boolean       $clearDraft   Clears the draft field
+     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
+     * @param boolean       $rtl          Whether the text is right-to-left
+     * @param boolean       $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param ?Cancellation $cancellation Cancellation
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */
     public function sendRichMessageToAdmins(
         string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
-        array $media = [],
-        bool $rtl = false,
-        bool $noAutolink = false,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
         ?array $replyMarkup = null,
         ?int $scheduleDate = null,
         bool $silent = false,
         bool $noForwards = false,
         bool $background = false,
         bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
         ?Cancellation $cancellation = null
     ): array {
         $result = [];
@@ -2179,15 +2181,15 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 peer: $report,
                 message: $message,
                 parseMode: $parseMode,
-                media: $media,
-                rtl: $rtl,
-                noAutolink: $noAutolink,
                 replyMarkup: $replyMarkup,
                 scheduleDate: $scheduleDate,
                 silent: $silent,
                 noForwards: $noForwards,
                 background: $background,
                 clearDraft: $clearDraft,
+                media: $media,
+                rtl: $rtl,
+                noAutolink: $noAutolink,
                 cancellation: $cancellation
             );
         }

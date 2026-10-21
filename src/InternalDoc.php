@@ -2441,10 +2441,7 @@ abstract class InternalDoc
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID (1-64 characters among A-Z, a-z, 0-9, _ and -) to file, or a list of Bot API InputRichMessageMedia objects.
-     * @param boolean                  $rtl          Whether the text is right-to-left
-     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
      * @param integer|null             $replyToMsgId ID of message to reply to.
      * @param integer|null             $topMsgId     ID of thread where to send the message.
      * @param array|null               $replyMarkup  Keyboard information.
@@ -2454,12 +2451,15 @@ abstract class InternalDoc
      * @param boolean                  $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean                  $background   Send this message as background message
      * @param boolean                  $clearDraft   Clears the draft field
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID (1-64 characters among A-Z, a-z, 0-9, _ and -) to file (a Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream), or a list of Bot API InputRichMessageMedia objects.
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation            $cancellation Cancellation
      */
-    final public function sendRichMessage(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::MARKDOWN, array $media = [
-    ], bool $rtl = false, bool $noAutolink = false, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
+    final public function sendRichMessage(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
+    ], bool $rtl = false, bool $noAutolink = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
-        return $this->wrapper->getAPI()->sendRichMessage($peer, $message, $parseMode, $media, $rtl, $noAutolink, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $cancellation);
+        return $this->wrapper->getAPI()->sendRichMessage($peer, $message, $parseMode, $replyToMsgId, $topMsgId, $replyMarkup, $sendAs, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $media, $rtl, $noAutolink, $cancellation);
     }
     /**
      * Streams a partial [rich message](https://core.telegram.org/bots/api#sendrichmessagedraft) to a private chat while it is being generated (e.g. by an AI), see sendRichMessage for the supported formats.
@@ -2470,8 +2470,8 @@ abstract class InternalDoc
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Partial rich message
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file.
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
      * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
      * @param boolean                  $keepOnStop   Whether the draft should be kept if the user stops the generation
@@ -2482,7 +2482,7 @@ abstract class InternalDoc
      *
      * @return integer The draft ID, to pass to the next calls to update the draft.
      */
-    final public function sendRichMessageDraft(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::MARKDOWN, array $media = [
+    final public function sendRichMessageDraft(string|int $peer, \danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, array $media = [
     ], ?int $draftId = null, bool $canStop = false, bool $keepOnStop = false, bool $rtl = false, bool $noAutolink = false, ?int $topMsgId = null, ?\Amp\Cancellation $cancellation = null): int
     {
         return $this->wrapper->getAPI()->sendRichMessageDraft($peer, $message, $parseMode, $media, $draftId, $canStop, $keepOnStop, $rtl, $noAutolink, $topMsgId, $cancellation);
@@ -2491,22 +2491,24 @@ abstract class InternalDoc
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to all report peers (admins of the bot), see sendRichMessage.
      *
      * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode    $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
-     * @param array        $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
-     * @param boolean      $rtl          Whether the text is right-to-left
-     * @param boolean      $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
-     * @param array|null   $replyMarkup  Keyboard information.
-     * @param integer|null $scheduleDate Schedule date.
-     * @param boolean      $silent       Whether to send the message silently, without triggering notifications.
-     * @param boolean      $background   Send this message as background message
-     * @param boolean      $clearDraft   Clears the draft field
+     * @param RichParseMode $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array|null    $replyMarkup  Keyboard information.
+     * @param integer|null  $scheduleDate Schedule date.
+     * @param boolean       $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean       $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean       $background   Send this message as background message
+     * @param boolean       $clearDraft   Clears the draft field
+     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
+     * @param boolean       $rtl          Whether the text is right-to-left
+     * @param boolean       $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param ?Cancellation $cancellation Cancellation
      *
      * @return list<\danog\MadelineProto\EventHandler\Message>
      */
-    final public function sendRichMessageToAdmins(\danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\ParseMode $parseMode = \danog\MadelineProto\ParseMode::MARKDOWN, array $media = [
-    ], bool $rtl = false, bool $noAutolink = false, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, ?\Amp\Cancellation $cancellation = null): array
+    final public function sendRichMessageToAdmins(\danog\MadelineProto\EventHandler\Message\RichMessage|array|string $message, \danog\MadelineProto\RichParseMode $parseMode = \danog\MadelineProto\RichParseMode::MARKDOWN, ?array $replyMarkup = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, array $media = [
+    ], bool $rtl = false, bool $noAutolink = false, ?\Amp\Cancellation $cancellation = null): array
     {
-        return $this->wrapper->getAPI()->sendRichMessageToAdmins($message, $parseMode, $media, $rtl, $noAutolink, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $cancellation);
+        return $this->wrapper->getAPI()->sendRichMessageToAdmins($message, $parseMode, $replyMarkup, $scheduleDate, $silent, $noForwards, $background, $clearDraft, $media, $rtl, $noAutolink, $cancellation);
     }
     /**
      * Sends a sticker.

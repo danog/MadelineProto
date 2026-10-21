@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
 use danog\MadelineProto\EventHandler\Message\Entities\Bold;
@@ -12,12 +14,20 @@ use danog\MadelineProto\EventHandler\Message\Entities\Italic;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
+use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Exception;
-use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichMessage\OutputConverter;
+use danog\MadelineProto\RichParseMode;
+use danog\MadelineProto\SessionPaths;
+use danog\MadelineProto\Settings\Logger as LoggerSettings;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /** @internal */
 class RichMessageTest extends TestCase
@@ -47,12 +57,13 @@ class RichMessageTest extends TestCase
 
     public function testFromParameters(): void
     {
-        $this->assertSame(['markdown' => '*a*', 'media' => ['x' => 'y']], InputConverter::fromParameters('*a*', ParseMode::MARKDOWN, ['x' => 'y'], false, false));
-        $this->assertSame(['html' => '<b>a</b>', 'media' => [], 'is_rtl' => true, 'skip_entity_detection' => true], InputConverter::fromParameters('<b>a</b>', ParseMode::HTML, [], true, true));
-        $this->assertSame(['blocks' => [['type' => 'paragraph', 'text' => '*a*']]], InputConverter::fromParameters('*a*', ParseMode::TEXT, [], false, false));
-        $this->assertSame(['blocks' => [['type' => 'divider']]], InputConverter::fromParameters([['type' => 'divider']], ParseMode::MARKDOWN, [], false, false));
-        $this->assertSame(['blocks' => [['type' => 'divider']], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([['type' => 'divider']], true), ParseMode::MARKDOWN, [], false, false));
-        $this->assertSame(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a', 'rtl' => true], InputConverter::fromParameters(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'], ParseMode::MARKDOWN, [], true, false));
+        $file = new RemoteUrl('https://example.com/a.jpg');
+        $this->assertSame(['markdown' => '*a*', 'media' => ['x' => $file]], InputConverter::fromParameters('*a*', RichParseMode::MARKDOWN, ['x' => $file], false, false));
+        $this->assertSame(['html' => '<b>a</b>', 'media' => [], 'is_rtl' => true, 'skip_entity_detection' => true], InputConverter::fromParameters('<b>a</b>', RichParseMode::HTML, [], true, true));
+        $this->assertSame(['blocks' => [['type' => 'paragraph', 'text' => '*a*']]], InputConverter::fromParameters('*a*', RichParseMode::TEXT, [], false, false));
+        $this->assertSame(['blocks' => [['type' => 'divider']]], InputConverter::fromParameters([['type' => 'divider']], RichParseMode::MARKDOWN, [], false, false));
+        $this->assertSame(['blocks' => [['type' => 'divider']], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([['type' => 'divider']], true), RichParseMode::MARKDOWN, [], false, false));
+        $this->assertSame(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a', 'rtl' => true], InputConverter::fromParameters(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'], RichParseMode::MARKDOWN, [], true, false));
     }
 
     public function testMarkdownAndHtml(): void
@@ -605,5 +616,75 @@ class RichMessageTest extends TestCase
         $this->assertSame("• item\nquote\ncaption\nD\na", $message->message);
         $this->assertEquals([new Blockquote(7, 5), new MentionName(21, 1, 5)], $message->entities);
         $this->assertSame([], $message->media);
+    }
+    /**
+     * Like the files of the other methods, the files of $media must be typed: a string could be a bot API file ID or a URL.
+     */
+    public function testFromParametersRejectsUntypedMedia(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('wrap bot API file IDs in BotApiFileId and URLs in RemoteUrl');
+        InputConverter::fromParameters('![A cat](tg://photo?id=cat)', RichParseMode::MARKDOWN, ['cat' => 'https://example.com/cat.jpg'], false, false);
+    }
+
+    /**
+     * A received rich message has no text of its own: Message exposes the text of its blocks, so that
+     * filters, bot commands and getHTML() work on it like on any other message.
+     */
+    public function testReceivedRichMessageUsesTheMessageApi(): void
+    {
+        $plain = static fn (string $text): array => ['_' => 'textPlain', 'text' => $text];
+        $message = new PrivateMessage(self::api(), [
+            '_' => 'message',
+            'id' => 1,
+            'out' => false,
+            'date' => 1,
+            'noforwards' => false,
+            'message' => '',
+            'rich_message' => [
+                '_' => 'richMessage',
+                'rtl' => false,
+                'part' => false,
+                'blocks' => [
+                    ['_' => 'pageBlockParagraph', 'text' => ['_' => 'textConcat', 'texts' => [
+                        $plain('/start foo '),
+                        ['_' => 'textBold', 'text' => $plain('bar')],
+                    ]]],
+                ],
+                'photos' => [],
+                'documents' => [],
+            ],
+        ], ['bot_api_id' => 101374607], false);
+
+        $this->assertSame('/start foo bar', $message->message);
+        $this->assertEquals([new Bold(11, 3)], $message->entities);
+        $this->assertSame($message->richMessage->message, $message->message);
+        $this->assertSame('start', $message->command);
+        $this->assertSame(['foo', 'bar'], $message->commandArgs);
+        $this->assertSame('/start foo <b>bar</b>', $message->getHTML());
+        $this->assertTrue((new FilterRegex('/^\/start foo/'))->apply($message));
+        $this->assertNull($message->media);
+    }
+
+    /**
+     * Raw methods accept a Bot API InputRichMessage: new files are uploaded for the destination chat, so they
+     * can't be uploaded when there is none (inline messages, drafts).
+     */
+    public function testRawRichMessageWithoutPeerDoesNotUpload(): void
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("New files can't be uploaded");
+        self::api()->botAPIToMTProto([
+            'id' => ['_' => 'inputBotInlineMessageID', 'dc_id' => 2, 'id' => 1, 'access_hash' => 1],
+            'rich_message' => ['markdown' => '![A cat](tg://photo?id=cat)', 'media' => ['cat' => ['type' => 'photo', 'media' => new LocalFile('/nonexistent.jpg')]]],
+        ]);
+    }
+
+    private static function api(): MTProto
+    {
+        $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
+        $API->logger = new Logger((new LoggerSettings)->setType(Logger::ECHO_LOGGER)->setLevel(Logger::FATAL_ERROR));
+        $API->wrapper = new APIWrapper(new SessionPaths(sys_get_temp_dir().'/madeline-rich-message'));
+        return $API;
     }
 }

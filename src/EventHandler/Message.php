@@ -31,12 +31,13 @@ use danog\MadelineProto\EventHandler\Media\Sticker;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\HtmlTrait;
 use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\RichMessage\InputConverter;
-use danog\MadelineProto\StrTools;
+use danog\MadelineProto\RichParseMode;
 use Webmozart\Assert\Assert;
 
 /**
@@ -44,6 +45,8 @@ use Webmozart\Assert\Assert;
  */
 abstract class Message extends AbstractMessage
 {
+    use HtmlTrait;
+
     /** Content of the message */
     public readonly string $message;
 
@@ -126,7 +129,11 @@ abstract class Message extends AbstractMessage
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for styled text */
     public readonly array $entities;
 
-    /** [Rich message](https://core.telegram.org/bots/api#richmessage) content, if this is a rich message (sent with sendRichMessage) */
+    /**
+     * [Rich message](https://core.telegram.org/bots/api#richmessage) content, if this is a rich message (sent with sendRichMessage).
+     *
+     * Its text and entities are also in $message and $entities; its media are only in $richMessage->media, not in $media.
+     */
     public readonly ?RichMessage $richMessage;
 
     /**
@@ -164,13 +171,19 @@ abstract class Message extends AbstractMessage
         $this->groupedId = $rawMessage['grouped_id'] ?? null;
         $this->editDate = $rawMessage['edit_date'] ?? null;
         $this->editHide = $rawMessage['edit_hide'] ?? false;
-        $this->message = $rawMessage['message'];
         $this->fromScheduled = $rawMessage['from_scheduled'] ?? false;
 
-        $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
         $this->richMessage = isset($rawMessage['rich_message'])
             ? RichMessage::fromRawRichMessage($API, $rawMessage['rich_message'], $this->protected)
             : null;
+        if ($this->richMessage !== null && $rawMessage['message'] === '') {
+            // Rich messages have no text of their own: use the text of their blocks, so that filters, bot commands and getHTML() work on them
+            $this->message = $this->richMessage->message;
+            $this->entities = $this->richMessage->entities;
+        } else {
+            $this->message = $rawMessage['message'];
+            $this->entities = MessageEntity::fromRawEntities($rawMessage['entities'] ?? []);
+        }
         $this->viaBotId = $rawMessage['via_bot_id'] ??
             (isset($rawMessage['via_bot_name']) ? $this->getClient()->getId($rawMessage['via_bot_name']) : null);
 
@@ -465,38 +478,34 @@ abstract class Message extends AbstractMessage
      * Edit the message, replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array|null               $replyMarkup  Reply markup for inline keyboards
+     * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
      * @param boolean                  $rtl          Whether the text is right-to-left
      * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
-     * @param array|null               $replyMarkup  Reply markup for inline keyboards
-     * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      */
     public function editRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
         array $media = [],
         bool $rtl = false,
         bool $noAutolink = false,
-        ?array $replyMarkup = null,
-        ?int $scheduleDate = null,
     ): Message {
-        $client = $this->getClient();
-        $result = $client->methodCallAsyncRead(
+        $result = $this->getClient()->methodCallAsyncRead(
             'messages.editMessage',
             [
                 'peer' => $this->chatId,
                 'id' => $this->id,
                 'message' => '',
-                'rich_message' => $client->toInputRichMessage(
-                    InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
-                    $this->chatId,
-                ),
+                'rich_message' => InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
                 'reply_markup' => $replyMarkup,
                 'schedule_date' => $scheduleDate,
             ]
         );
-        return $client->wrapMessage($client->extractMessage($result));
+        return $this->getClient()->wrapMessage($this->getClient()->extractMessage($result));
     }
 
     /**
@@ -549,31 +558,31 @@ abstract class Message extends AbstractMessage
      * If the message is outgoing, will edit the message replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage), otherwise will reply to the message with a rich message.
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
-     * @param ParseMode                $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param array|null               $replyMarkup  Reply markup for inline keyboards
+     * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
      * @param boolean                  $rtl          Whether the text is right-to-left
      * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
-     * @param array|null               $replyMarkup  Reply markup for inline keyboards
-     * @param int|null                 $scheduleDate Scheduled message date for scheduled messages
      */
     public function replyOrEditRich(
         string|array|RichMessage $message,
-        ParseMode $parseMode = ParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
         array $media = [],
         bool $rtl = false,
         bool $noAutolink = false,
-        ?array $replyMarkup = null,
-        ?int $scheduleDate = null,
     ): Message {
         $method = $this->out ? 'editRich' : 'replyRich';
         return $this->$method(
             message: $message,
             parseMode: $parseMode,
+            replyMarkup: $replyMarkup,
+            scheduleDate: $scheduleDate,
             media: $media,
             rtl: $rtl,
             noAutolink: $noAutolink,
-            replyMarkup: $replyMarkup,
-            scheduleDate: $scheduleDate,
         );
     }
 
@@ -668,25 +677,4 @@ abstract class Message extends AbstractMessage
      * @psalm-impure
      */
     abstract public function requestCall(): Call;
-
-    protected readonly string $html;
-    protected readonly string $htmlTelegram;
-
-    /**
-     * Get an HTML version of the message.
-     *
-     * @psalm-suppress InaccessibleProperty
-     *
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
-     */
-    public function getHTML(bool $allowTelegramTags = false): string
-    {
-        if (!$this->entities) {
-            return StrTools::htmlEscape($this->message);
-        }
-        if ($allowTelegramTags) {
-            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
-        }
-        return $this->html ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
-    }
 }
