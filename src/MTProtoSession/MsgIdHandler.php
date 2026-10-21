@@ -84,7 +84,7 @@ final class MsgIdHandler
     /**
      * Check validity of given message ID.
      */
-    public function checkIncomingMessageId(int $newMessageId, bool $container): void
+    public function checkIncomingMessageId(int $newMessageId): void
     {
         $minMessageId = (time() + $this->session->time_delta - 300) << 32;
         if ($newMessageId < $minMessageId) {
@@ -97,17 +97,9 @@ final class MsgIdHandler
         if (!($newMessageId % 2)) {
             throw new Exception('message id mod 4 != 1 or 3');
         }
-        $key = $this->maxIncomingId;
-        if ($container) {
-            if ($newMessageId >= $key) {
-                $this->session->API->logger->logger('Given message id ('.$newMessageId.') is bigger than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
-            }
-        } else {
-            if ($newMessageId <= $key) {
-                $this->session->API->logger->logger('Given message id ('.$newMessageId.') is lower than or equal to the current limit ('.$key.'). Please sync your date using NTP.', Logger::ULTRA_VERBOSE);
-            }
-        }
-        $this->maxIncomingId = $newMessageId;
+        // Not checked against the previous ones: the server can send a message before a container it created
+        // earlier (with lower message IDs), and the IDs of the messages of a container precede its own.
+        $this->maxIncomingId = max($this->maxIncomingId, $newMessageId);
     }
     /**
      * Generate message ID.

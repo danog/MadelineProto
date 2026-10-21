@@ -31,7 +31,6 @@ use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 trait SeqNoHandler
 {
     public int $session_out_seq_no = 0;
-    public int $session_in_seq_no = 0;
     public ?string $session_id = null;
     /**
      * @psalm-external-mutation-free
@@ -45,20 +44,19 @@ trait SeqNoHandler
         return $value * 2 + $in;
     }
     /**
+     * Check the parity of the seqno of an incoming message, which says whether it's content-related.
+     *
+     * Its value isn't checked against a counter of the received messages: the seqno counts the messages the
+     * server created before it, and the server can send a message before a container it created earlier (a
+     * standalone rpc_result followed by a container with the rpc_result and msgs_ack that precede it). Neither
+     * TDLib nor tdesktop check more than the parity.
+     *
      * @psalm-external-mutation-free
      */
     public function checkInSeqNo(MTProtoIncomingMessage $message): void
     {
-        if ($message->hasSeqNo()) {
-            $in = $message->contentRelated ? 1 : 0;
-            $value = $this->session_in_seq_no;
-            $this->session_in_seq_no += $in;
-            $value *= 2;
-            //$this->API->logger("IN $message ({$message->getMsgId()}): $value + $in = {$message->getSeqNo()}");
-            $seq_no = $value + $in;
-            if ($seq_no !== $message->getSeqNo()) {
-                $this->API->logger("SECURITY WARNING: Seqno mismatch (should be $seq_no, is {$message->getSeqNo()}, $message)", Logger::ULTRA_VERBOSE);
-            }
+        if ($message->hasSeqNo() && ($message->getSeqNo() & 1) !== ($message->contentRelated ? 1 : 0)) {
+            $this->API->logger("The seqno {$message->getSeqNo()} of $message has the wrong parity", Logger::WARNING);
         }
     }
 }
