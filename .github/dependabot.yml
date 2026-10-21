@@ -30,3 +30,5 @@ updates:
     directory: "/webui"
     schedule:
       interval: "weekly"
+    labels:
+      - "release:internal"

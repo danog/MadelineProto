@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Test the web UI, and check that its committed bundle is up to date
@@ -300,6 +300,9 @@ jobs:
   # latest, and the major and minor versions, only once released.
   docker-release:
     needs: release
+    # The implicit success() skips a job when any job it depends on, even indirectly, was skipped: the test job
+    # always is for tags, so latest was never moved.
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

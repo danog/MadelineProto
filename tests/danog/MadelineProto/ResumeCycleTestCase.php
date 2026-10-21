@@ -58,6 +58,8 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
     protected static string $session;
     /** Contents of the file served over HTTP. */
     protected static string $served;
+    /** Output of the last interrupted child process. */
+    private static string $interrupted = '';
 
     public static function setUpBeforeClass(): void
     {
@@ -90,7 +92,7 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
 
     public static function tearDownAfterClass(): void
     {
-        if (isset(self::$dir)) {
+        if (isset(self::$dir) && !getenv('KEEP_RESUME_DIR')) {
             exec('rm -rf '.escapeshellarg(self::$dir));
         }
         parent::tearDownAfterClass();
@@ -116,14 +118,20 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
         }
         $specPath = self::$dir.'/spec.json';
         file_put_contents($specPath, json_encode($spec, JSON_THROW_ON_ERROR));
+        clearstatcache();
+        $logOffset = file_exists($spec['log']) ? (int) filesize($spec['log']) : 0;
         $process = Process::start([PHP_BINARY, self::CHILD, $specPath]);
         $stdout = async(static fn () => buffer($process->getStdout()));
         $stderr = async(static fn () => buffer($process->getStderr()));
         $code = $process->join();
         $out = $stdout->await().$stderr->await();
         if ($spec['phase'] === 'interrupt' && !file_exists($spec['result'])) {
-            // Killed itself after saving the session.
-            self::assertNotSame(0, $code, $out);
+            // Killed itself with SIGKILL (128 + 9) once it saved the session. Any other exit is a crash before the
+            // save: the next phase would resume from an older save and fail without saying why.
+            self::assertSame(137, $code, "The interrupt phase exited with code $code before saving the session: ".substr($out, -20000));
+            // Its log (written asynchronously: the last lines before the kill may be missing).
+            $log = (string) @file_get_contents($spec['log'], false, null, $logOffset);
+            self::$interrupted = $out.self::describeLog($log);
             return null;
         }
         self::assertSame(0, $code, "The {$spec['phase']} phase failed: $out");
@@ -160,7 +168,29 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
      */
     protected static function assertUploadResumed(string $log, string $fileName): void
     {
-        self::assertLogMatches('/Resuming upload of '.preg_quote($fileName, '/').': [1-9]\d* of \d+ parts were already uploaded/', $log, 'The upload was not resumed');
+        self::assertLogMatches('/Resuming upload of '.preg_quote($fileName, '/').': [1-9]\d* of \d+ parts were already uploaded/', $log, 'The upload was not resumed'.self::describeResume($log));
+    }
+
+    /**
+     * What the resumed process logged about the resume, and the end of the output of the interrupted one: the logs of
+     * the children are deleted with the temporary directory (they're next to the sessions, they aren't kept in the
+     * CI), so this is all that's left of an intermittent failure.
+     */
+    protected static function describeResume(string $log): string
+    {
+        return "\nResumed process:".self::describeLog($log)
+            ."\nInterrupted process:\n".substr(self::$interrupted, -8000);
+    }
+
+    /**
+     * The lines of the log of a child about saving the session and uploading, and its last lines.
+     */
+    private static function describeLog(string $log): string
+    {
+        preg_match_all('/^.*(?:Resuming upload|Resuming interrupted|Resumed interrupted|Could not resume|Not resuming|had already completed|Saved session|Got exclusive session lock|Upload status|saveFilePart|saveBigFilePart|while uploading|Exception|Error).*$/m', $log, $matches);
+        $lines = explode("\n", rtrim($log));
+        return "\n".implode("\n", \array_slice($matches[0], -60))
+            ."\nLast lines:\n".implode("\n", \array_slice($lines, -20));
     }
 
     /**
@@ -284,7 +314,7 @@ abstract class ResumeCycleTestCase extends MadelineTestCase
         }
         if ($source === 'url') {
             // Reopened at the first part that wasn't uploaded.
-            self::assertSame($ranges ? [null, 'bytes='.self::STALL_AT.'-'] : [null], $requests);
+            self::assertSame($ranges ? [null, 'bytes='.self::STALL_AT.'-'] : [null], $requests, 'The upload was not reopened at the first part that was not uploaded'.self::describeResume($result['log']));
         }
     }
 }

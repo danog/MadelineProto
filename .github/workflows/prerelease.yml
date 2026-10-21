@@ -1,12 +1,12 @@
 name: Pre-release
 
-# Releases every push to the main branch once its CI succeeded: bumps the RELEASE constant (pushed to the main
-# branch), then, once the CI of the bump succeeded too, tags it as a pre-release, which the CI of the tag builds,
-# tests and makes final: see tests/prerelease.sh. Only the last push is released, if several were pushed at once.
+# Releases the version of the RELEASE constant (bumped by the pull requests themselves, see tests/release_check.sh)
+# once the CI of a push to the main branch succeeded, if it isn't released yet: tags it as a pre-release, which the CI
+# of the tag builds, tests and makes final (see tests/prerelease.sh). Only the last push is released, if several were
+# pushed at once.
 
 on:
-  # Once the CI of a push to the main branch succeeded, rather than on the push: pushing the RELEASE constant
-  # would cancel the CI still running (see its concurrency).
+  # Once the CI of a push to the main branch succeeded, rather than on the push: only what passed is released.
   workflow_run:
     workflows:
       - CI
@@ -41,10 +41,9 @@ jobs:
         with:
           # The tags, for the last release.
           fetch-depth: 0
-          # Of an admin, to push the RELEASE constant to the main branch, and so that the push and the tag run the CI
-          # (the events of the token of a job don't).
+          # So that the tag runs the CI (the events of the token of a job don't).
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-      - name: Bump the version, or release it
+      - name: Release the version
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
