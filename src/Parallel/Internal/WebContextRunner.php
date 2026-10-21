@@ -85,7 +85,7 @@ final class WebContextRunner
             $argv = $request['script'];
             $argc = \count($argv);
             if (!is_file($argv[0])) {
-                throw new \Error(sprintf(
+                throw new \Error(\sprintf(
                     "No script found at '%s' (be sure to provide the full path to the script)",
                     $argv[0],
                 ));
@@ -98,9 +98,9 @@ final class WebContextRunner
                     return require $argv[0];
                 })();
             } catch (\TypeError $e) {
-                throw new \Error(sprintf("Script '%s' did not return a callable function: %s", $argv[0], $e->getMessage()), 0, $e);
+                throw new \Error(\sprintf("Script '%s' did not return a callable function: %s", $argv[0], $e->getMessage()), 0, $e);
             } catch (\ParseError $e) {
-                throw new \Error(sprintf("Script '%s' contains a parse error: %s", $argv[0], $e->getMessage()), 0, $e);
+                throw new \Error(\sprintf("Script '%s' contains a parse error: %s", $argv[0], $e->getMessage()), 0, $e);
             }
 
             $returnValue = $callable($channel);
