@@ -253,10 +253,10 @@ final class RtmpClient
         $now = microtime(true);
         $result = $this->publishedAt === null
             ? 'before publishing'
-            : sprintf('%.1f seconds after publishing', $now - $this->publishedAt);
+            : \sprintf('%.1f seconds after publishing', $now - $this->publishedAt);
         $result .= ", {$this->mediaMessages} audio/video messages sent";
         if ($this->lastMediaAt !== null) {
-            $result .= sprintf(' (the last one %.1f seconds before)', $now - $this->lastMediaAt);
+            $result .= \sprintf(' (the last one %.1f seconds before)', $now - $this->lastMediaAt);
         }
         if ($this->lastStatus !== null) {
             $result .= ", last status: {$this->lastStatus}";
