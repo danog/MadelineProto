@@ -3,11 +3,11 @@ name: Auto-merge
 # Merges the pull requests of Dependabot, and the updates of PHP of the docker image (see tests/update_docker.sh), once
 # all of their checks (pull-request.yml, pr-labels.yml: whichever finishes last merges) passed on their last commit:
 # see tests/automerge.sh. The ruleset of the main branch requires no review nor status check, so GitHub's own
-# auto-merge would merge them before their checks run. The pull requests of Dependabot that need a release (updates of
-# composer.json) get the bump of the RELEASE constant first: see tests/dependabot_bump.sh.
+# auto-merge would merge them before their checks run. The release of the pull requests of Dependabot is bumped once
+# they're merged: see tests/dependabot_release.sh.
 #
 # On workflow_run, this runs the workflow of the main branch, with its secrets: the code of the pull requests is never
-# run, only compared and committed to by git.
+# run, only compared by git.
 
 on:
   workflow_run:
@@ -21,17 +21,18 @@ permissions:
   contents: read
 
 jobs:
-  # Once all of the checks passed. The actor is checked by tests/automerge.sh: the user of CUSTOM_GITHUB_TOKEN too.
+  # Once all of the checks passed (the actor is checked again by tests/automerge.sh).
   merge:
     if: >-
       github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.event.workflow_run.actor.login == 'dependabot[bot]' || github.event.workflow_run.actor.login == 'madelineproto-autobuild[bot]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-          # The history, without the files, to compare an update of PHP with the main branch.
+          # The history, without the files, to compare the pull requests with the main branch.
           fetch-depth: 0
           filter: blob:none
       - name: Merge the pull request
@@ -44,25 +45,3 @@ jobs:
           ACTOR: ${{ github.event.workflow_run.actor.login }}
         run: tests/automerge.sh
 
-  # Dependabot can't bump the RELEASE constant its updates of composer.json need (see tests/release_check.sh): once
-  # their version check failed, the bump is pushed to them, whose checks run again.
-  bump:
-    if: >-
-      github.event.workflow_run.name == 'Pull request labels' && github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_repository.full_name == github.repository &&
-      github.event.workflow_run.actor.login == 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          # Of an admin, so that the push of the bump runs the checks (the events of the token of a job don't).
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          # The history, without the files, to compare the pull request with the main branch.
-          fetch-depth: 0
-          filter: blob:none
-      - name: Bump the RELEASE constant
-        env:
-          GH_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: tests/dependabot_bump.sh

@@ -8,10 +8,18 @@
 # see ships in tests/release_version.sh), 8.20.2 otherwise. Once merged, tests/prerelease.sh releases the version of
 # the RELEASE constant, if it isn't released yet.
 #
+# The pull requests of Dependabot (AUTHOR) are exempt: it can't bump the RELEASE constant, tests/dependabot_release.sh
+# does once they're merged.
+#
 # Usage: tests/release_check.sh <labels...>. The changes are the ones of HEAD since BASE, by default its first parent
 # (the main branch, for the merge commit of a pull request).
 
 source tests/release_version.sh
+
+if [ "$AUTHOR" == "dependabot[bot]" ]; then
+    echo "A pull request of Dependabot: its release is bumped once it's merged, see tests/dependabot_release.sh"
+    exit 0
+fi
 
 release=$(release_constant)
 if ! [[ "$release" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
