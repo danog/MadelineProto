@@ -20,4 +20,12 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
+  <extensions>
+    <!-- Fails a test that waits forever, after dumping where it waits: see tests/danog/MadelineProto/Watchdog.php -->
+    <extension class="danog\MadelineProto\Test\Watchdog">
+      <arguments>
+        <integer>600</integer>
+      </arguments>
+    </extension>
+  </extensions>
 </phpunit>
