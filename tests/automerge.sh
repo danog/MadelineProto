@@ -1,11 +1,12 @@
 #!/bin/bash -e
 
-# Merge the pull request whose checks just passed on HEAD_SHA, if it's one merged automatically: of Dependabot, or an
-# update of PHP of the docker image (tests/update_docker.sh, on the docker-php branch of the app of the autobuild).
-# Run by automerge.yml. Only if it's still at that commit (not pushed again since), and all of its checks passed (the
-# release label and version too).
+# Merge the pull request whose checks just passed on HEAD_SHA, if it's one merged automatically: of Dependabot (with
+# the bump of the RELEASE constant of tests/dependabot_bump.sh, if any), or an update of PHP of the docker image
+# (tests/update_docker.sh, on the docker-php branch of the app of the autobuild). Run by automerge.yml. Only if it's
+# still at that commit (not pushed again since), and all of its checks passed (the release label and version too).
 #
-# Needs GH_TOKEN, able to merge pull requests that update workflows (not the token of a job), and HEAD_SHA.
+# Needs GH_TOKEN, able to merge pull requests that update workflows (not the token of a job), HEAD_SHA, and ACTOR, who
+# triggered the checks: Dependabot, the app of the autobuild or the user of GH_TOKEN (tests/dependabot_bump.sh).
 
 set -o pipefail
 
@@ -24,6 +25,31 @@ if [ -z "$pr" ]; then
     exit 0
 fi
 
+git fetch -q origin "+refs/heads/v8:refs/remotes/origin/v8" "$HEAD_SHA"
+base=$(git merge-base origin/v8 "$HEAD_SHA")
+
+# The token of the app of the autobuild is in jobs that run the code of dependencies, and can push to any branch: a
+# pull request of Dependabot is only merged if its checks ran on a push of Dependabot or of tests/dependabot_bump.sh,
+# and its commits are of Dependabot, but the bump.
+if [ "$(gh pr view "$pr" --json author --jq .author.login)" == app/dependabot ]; then
+    if [ "$ACTOR" != "dependabot[bot]" ] && [ "$ACTOR" != "$(gh api user --jq .login)" ]; then
+        echo "Not merging #$pr: its checks ran on a push of $ACTOR"
+        exit 0
+    fi
+    git rev-list "$base..$HEAD_SHA" > /dev/null
+    while read -r commit email; do
+        if [ "$email" == "49699333+dependabot[bot]@users.noreply.github.com" ]; then
+            continue
+        fi
+        files=$(git diff --no-renames --name-only "$commit^" "$commit")
+        if [ "$files" != src/API.php ] || \
+            [ "$(git show "$commit^:src/API.php" | normalize_versions)" != "$(git show "$commit:src/API.php" | normalize_versions)" ]; then
+            echo "Not merging #$pr: $commit (of $email) is not Dependabot's, nor only a bump of the RELEASE constant"
+            exit 0
+        fi
+    done < <(git log --format='%H %ae' "$base..$HEAD_SHA")
+fi
+
 # An update of PHP is merged with the token of an admin, but the token of the app is also in the jobs of the autobuild
 # that run the code of the dependencies: only if the app made all of its commits, and it only changes what
 # tests/update_docker.sh changes, the versions of PHP of the Dockerfile and the RELEASE constant (the files are the
@@ -34,8 +60,10 @@ if [ "$(gh pr view "$pr" --json headRefName --jq .headRefName)" == docker-php ];
         echo "Not merging #$pr: an update of PHP with commits of others ($others)"
         exit 0
     fi
-    git fetch -q origin "+refs/heads/v8:refs/remotes/origin/v8" "$HEAD_SHA"
-    base=$(git merge-base origin/v8 "$HEAD_SHA")
+    if [ "$ACTOR" != "madelineproto-autobuild[bot]" ]; then
+        echo "Not merging #$pr: its checks ran on a push of $ACTOR"
+        exit 0
+    fi
     # Fails before the loop, rather than in its input, if the diff fails.
     git diff -z --no-renames --name-only "$base" "$HEAD_SHA" > /dev/null
     while IFS= read -r -d '' file; do
