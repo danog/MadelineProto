@@ -79,6 +79,14 @@ final class RtmpClient
     private ?Throwable $error = null;
     /** @var DeferredFuture<null> Completed when the connection is closed. */
     private readonly DeferredFuture $closedDeferred;
+    /** When the server started accepting what we publish (microtime). */
+    private ?float $publishedAt = null;
+    /** How many audio and video messages were sent. */
+    private int $mediaMessages = 0;
+    /** When the last audio or video message was sent (microtime). */
+    private ?float $lastMediaAt = null;
+    /** The last onStatus the server sent after accepting the stream, if any. */
+    private ?string $lastStatus = null;
 
     private function __construct(private readonly Socket $socket, private readonly string $key)
     {
@@ -137,6 +145,7 @@ final class RtmpClient
             $client->publishing = new DeferredFuture;
             $client->notify('publish', null, $key, 'live');
             $client->publishing->getFuture()->await($cancellation);
+            $client->publishedAt = microtime(true);
         } catch (Throwable $e) {
             $client->close();
             throw $e;
@@ -221,6 +230,38 @@ final class RtmpClient
     public function sendMedia(int $type, int $timestamp, string $body): void
     {
         $this->writeMessage($type === self::TYPE_AUDIO ? self::CHUNK_STREAM_AUDIO : self::CHUNK_STREAM_VIDEO, $type, $this->stream, $timestamp, $body);
+        $this->mediaMessages++;
+        $this->lastMediaAt = microtime(true);
+    }
+
+    /**
+     * How many audio and video messages were sent on this connection.
+     *
+     * @psalm-mutation-free
+     */
+    public function getMediaMessages(): int
+    {
+        return $this->mediaMessages;
+    }
+
+    /**
+     * What happened on the connection, for the logs: how long the stream was published, the media
+     * sent and the last status of the server.
+     */
+    public function describe(): string
+    {
+        $now = microtime(true);
+        $result = $this->publishedAt === null
+            ? 'before publishing'
+            : sprintf('%.1f seconds after publishing', $now - $this->publishedAt);
+        $result .= ", {$this->mediaMessages} audio/video messages sent";
+        if ($this->lastMediaAt !== null) {
+            $result .= sprintf(' (the last one %.1f seconds before)', $now - $this->lastMediaAt);
+        }
+        if ($this->lastStatus !== null) {
+            $result .= ", last status: {$this->lastStatus}";
+        }
+        return $result;
     }
 
     /**
@@ -470,22 +511,27 @@ final class RtmpClient
             if ($name === '_result') {
                 $deferred->complete(\array_slice($values, 2));
             } else {
-                $deferred->error(new Exception('The RTMP server refused the command: '.self::describe($values[3] ?? null)));
+                $deferred->error(new RtmpRefusedException('The RTMP server refused the command: '.self::describeInfo($values[3] ?? null)));
             }
             return;
         }
-        if ($name === 'onStatus' && $this->publishing !== null && !$this->publishing->isComplete()) {
+        if ($name === 'onStatus' && $this->publishing !== null) {
             $info = $values[3] ?? null;
+            if ($this->publishing->isComplete()) {
+                // E.g. NetStream.Unpublish.Success before the server drops a publisher.
+                $this->lastStatus = self::describeInfo($info);
+                return;
+            }
             $code = \is_array($info) ? (string) ($info['code'] ?? '') : '';
             if ($code === 'NetStream.Publish.Start') {
                 $this->publishing->complete();
             } elseif (\is_array($info) && ($info['level'] ?? '') === 'error') {
-                $this->publishing->error(new Exception('The RTMP server refused the stream: '.self::describe($info)));
+                $this->publishing->error(new RtmpRefusedException('The RTMP server refused the stream: '.self::describeInfo($info)));
             }
         }
     }
 
-    private static function describe(mixed $info): string
+    private static function describeInfo(mixed $info): string
     {
         if (\is_array($info)) {
             return trim(($info['code'] ?? '').' '.($info['description'] ?? ''));

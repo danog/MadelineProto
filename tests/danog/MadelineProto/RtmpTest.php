@@ -22,11 +22,14 @@ use danog\MadelineProto\GroupCall\Rtmp\Amf0;
 use danog\MadelineProto\GroupCall\Rtmp\Amf0EcmaArray;
 use danog\MadelineProto\GroupCall\Rtmp\FlvTags;
 use danog\MadelineProto\GroupCall\Rtmp\RtmpPublisher;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpRefusedException;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use PHPUnit\Framework\TestCase;
+use Throwable;
+use Webrtc\Codecs\EncodedPacket;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
@@ -202,6 +205,126 @@ final class RtmpTest extends TestCase
             self::assertStringContainsString('V_VP8', implode("\n", $call->logs));
         } finally {
             exec('rm -rf '.escapeshellarg($dir));
+        }
+    }
+
+    /**
+     * The ingest drops a publisher that sends no media (Telegram's after 10 seconds): while nothing
+     * is played, the connection must not be reopened (and dropped again) in a loop, only once
+     * something is played again.
+     */
+    public function testAnIdlePublisherReconnectsOnlyOnceSomethingIsPlayed(): void
+    {
+        $server = new FakeRtmpServer(idleTimeout: 0.5);
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key'], idle: 0.25);
+        try {
+            // Nothing is played: dropped after 0.5 seconds, and not reconnected.
+            delay(3);
+            self::assertSame(1, $server->connections, implode("\n", $call->logs));
+            self::assertFalse($publisher->isConnected());
+            self::assertStringContainsString('closed while nothing was played', implode("\n", $call->logs));
+
+            // Something is played: reconnected, and kept connected while it plays.
+            $timestamp = 0;
+            $feed = static function (float $seconds) use ($publisher, &$timestamp): void {
+                for ($end = microtime(true) + $seconds; microtime(true) < $end;) {
+                    $publisher->onAudio(new EncodedPacket(FlvTags::adtsHeader("\x11\x90", 5).'12345', $timestamp += 960, false));
+                    delay(0.02);
+                }
+            };
+            $feed(1.5);
+            self::assertSame(2, $server->connections, implode("\n", $call->logs));
+            self::assertTrue($publisher->isConnected());
+            self::assertGreaterThan(0, $server->mediaMessages);
+
+            // Dropped again once nothing is played, and woken up by the next play().
+            delay(1.5);
+            self::assertFalse($publisher->isConnected());
+            self::assertSame(2, $server->connections);
+            $publisher->wake();
+            delay(0.3);
+            self::assertSame(3, $server->connections);
+            self::assertTrue($publisher->isConnected());
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
+        }
+    }
+
+    /**
+     * A server that closes the connection right after accepting the stream, while media flows, is
+     * retried with an exponential backoff, rather than in a loop.
+     */
+    public function testAServerThatKeepsClosingIsRetriedWithBackoff(): void
+    {
+        $server = new FakeRtmpServer(closeAfterPublish: true);
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key']);
+        try {
+            $timestamp = 0;
+            for ($end = microtime(true) + 4.5; microtime(true) < $end;) {
+                $publisher->onAudio(new EncodedPacket(FlvTags::adtsHeader("\x11\x90", 5).'12345', $timestamp += 960, false));
+                delay(0.02);
+            }
+            // Connected at once, then after 1 and 2 more seconds: the next one is due 4 seconds later.
+            self::assertSame(3, $server->publishes, implode("\n", $call->logs));
+            $gaps = [$server->publishedAt[1] - $server->publishedAt[0], $server->publishedAt[2] - $server->publishedAt[1]];
+            self::assertEqualsWithDelta(1.0, $gaps[0], 0.5);
+            self::assertEqualsWithDelta(2.0, $gaps[1], 0.5);
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
+        }
+    }
+
+    /**
+     * A refused stream key is fetched again: a new one (revoked meanwhile) is used, while the same
+     * one refused again stops publishing instead of retrying forever.
+     */
+    public function testARefusedKeyStopsPublishingUnlessItChanged(): void
+    {
+        $server = new FakeRtmpServer(validKey: 'good');
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $keys = ['old', 'good'];
+        $publisher = new RtmpPublisher($call, $dj, static function (bool $revoke) use ($server, &$keys): array {
+            return ['url' => $server->getUrl(), 'key' => array_shift($keys) ?? 'good'];
+        });
+        try {
+            delay(1.5);
+            self::assertSame(['old', 'good'], $server->keys, implode("\n", $call->logs));
+            self::assertTrue($publisher->isConnected());
+        } finally {
+            $publisher->stop();
+        }
+
+        $gaveUp = null;
+        $publisher = new RtmpPublisher(
+            $call,
+            $dj,
+            static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'bad'],
+            static function (Throwable $e) use (&$gaveUp): void {
+                $gaveUp = $e;
+            },
+        );
+        try {
+            delay(4);
+            self::assertSame(['old', 'good', 'bad', 'bad'], $server->keys, implode("\n", $call->logs));
+            self::assertInstanceOf(RtmpRefusedException::class, $gaveUp);
+            self::assertStringContainsString('NetStream.Publish.BadName', $gaveUp->getMessage());
+            self::assertFalse($publisher->isConnected());
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
         }
     }
 
