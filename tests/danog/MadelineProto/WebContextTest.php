@@ -20,6 +20,8 @@ namespace danog\MadelineProto\Test;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use danog\MadelineProto\Exception;
+use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
 use danog\MadelineProto\Parallel\Internal\WebContextRunner;
 use danog\MadelineProto\Parallel\WebContextFactory;
 use PHPUnit\Framework\TestCase;
@@ -138,6 +140,12 @@ final class WebContextTest extends TestCase
             self::assertNotSame($result['pid'], $result['joined']['pid'], 'The context ran in the request that started it');
             self::assertSame(realpath(self::ROOT.'/tests'), $result['joined']['cwd']);
             self::assertStringContainsString('The context failed', $result['failure']);
+
+            // A context runs with MadelineProto started: it starts web contexts too
+            self::assertSame(FallbackContextFactory::class, $result['nested']['factory']);
+            self::assertSame(Exception::class, $result['nested']['errorHandler']);
+            self::assertSame('cli-server', $result['nested']['nested']['sapi']);
+            self::assertNotContains($result['nested']['nested']['pid'], [$result['pid'], $result['nested']['pid']]);
 
             $tasks = $result['tasks'];
             ksort($tasks);

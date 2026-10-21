@@ -20,6 +20,7 @@ use Amp\Future;
 use Amp\Serialization\SerializationException;
 use Amp\Sync\ChannelException;
 use Amp\TimeoutCancellation;
+use danog\MadelineProto\Magic;
 use danog\MadelineProto\Parallel\WebContextFactory;
 use Throwable;
 
@@ -75,6 +76,10 @@ final class WebContextRunner
         } catch (Throwable $e) {
             error_log("MadelineProto web context: could not change the working directory to {$request['cwd']}: {$e->getMessage()}");
         }
+        // Like the script that started it: MadelineProto's error handler, and the context factory of this host for
+        // the contexts started by this one (the default one of amphp/parallel only starts processes)
+        Magic::start(light: true);
+        Magic::$script_cwd = $request['cwd'];
 
         try {
             $argv = $request['script'];
