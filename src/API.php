@@ -287,7 +287,8 @@ final class API extends AbstractAPI
                         }
                         $this->wrapper->logger("Restarting to full instance: error in stop loop $e");
                     }
-                    EventLoop::queue($cb);
+                    // Repeated until we get the session, but not right away: it spun as long as a server accepted connections without stopping
+                    EventLoop::delay(1.0, static fn () => $cb());
                 }
             };
             EventLoop::queue($cb);
