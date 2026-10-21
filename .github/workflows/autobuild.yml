@@ -50,8 +50,11 @@ jobs:
           echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
           echo "email=$(gh api "/users/$SLUG%5Bbot%5D" --jq .id)+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
+      # The tip of the branch when the job starts, not the commit the run was triggered on: a run queued
+      # behind another one would build on a commit older than the pull request of that run, if merged.
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
 
       - name: Update PHP
@@ -70,6 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref_name }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -121,6 +125,7 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
 
       - name: Get the bundle of the web UI
