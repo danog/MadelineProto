@@ -114,72 +114,27 @@ final class WebRunner extends RunnerAbstract
         // Without Connection: close, the server keeps the connection open after the response, until its idle timeout
         $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\nConnection: close\r\n\r\n";
 
-        // The request must be sent once: each one that reaches the web server starts a script.
-        foreach (self::getSelfAddresses($_SERVER) as $address) {
-            try {
-                $context = stream_context_create(['ssl' => ['peer_name' => $_SERVER['SERVER_NAME']]]);
-                $res = stream_socket_client($address, $errno, $errstr, self::CONNECT_TIMEOUT, STREAM_CLIENT_CONNECT, $context);
-                if (!$res) {
-                    throw new Exception("$errstr ($errno)");
+        foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
+            foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
+                try {
+                    $address = $proto.'://'.$_SERVER['SERVER_NAME'];
+                    $res = fsockopen($address, (int) $port);
+                    Logger::log("Successfully connected to {$address}:{$port}!");
+                    Logger::log("Sending payload: $payload");
+                    // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
+                    // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
+                    fwrite($res, $payload);
+                    // Closing the connection could abort the request of the worker: it's closed once the response
+                    // ends (the worker exited, or another server answered).
+                    EventLoop::queue(self::drain(...), new ReadableResourceStream($res));
+                } catch (Throwable $e) {
+                    Logger::log("Error while sending to {$address}:{$port}: $e");
                 }
-            } catch (Throwable $e) {
-                Logger::log("Error while connecting to $address: $e");
-                continue;
             }
-            Logger::log("Successfully connected to $address!");
-            Logger::log("Sending payload: $payload");
-            // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
-            // Technically should use amphp/socket, but I guess it's OK to not introduce another dependency just for a socket that will be used once.
-            fwrite($res, $payload);
-            // Closing the connection could abort the request of the worker: it's closed once the response
-            // ends (the worker exited, or another server answered).
-            EventLoop::queue(self::drain(...), new ReadableResourceStream($res));
-            return;
         }
-        throw new Exception('Could not connect to ourselves, please check the server configuration!');
-    }
-
-    /**
-     * Timeout for connecting to ourselves, in seconds.
-     */
-    private const CONNECT_TIMEOUT = 5.0;
-
-    /**
-     * The addresses to send self-requests to, in order of preference.
-     *
-     * The local address of the web server, if known, comes first: the public name may resolve to a proxy (a CDN, a
-     * load balancer) that the request would go through and back. TLS is only tried on the HTTPS port, and plain HTTP
-     * only on the others.
-     *
-     * @internal
-     *
-     * @param  array<string, mixed> $server The $_SERVER of the request
-     * @return list<string>
-     */
-    public static function getSelfAddresses(array $server): array
-    {
-        $https = !empty($server['HTTPS']) && strtolower((string) $server['HTTPS']) !== 'off';
-        $port = (int) ($server['SERVER_PORT'] ?? 0) ?: ($https ? 443 : 80);
-        $hosts = [];
-        if (isset($server['SERVER_ADDR']) && \is_string($server['SERVER_ADDR']) && $server['SERVER_ADDR'] !== '') {
-            $hosts[] = str_contains($server['SERVER_ADDR'], ':') ? "[{$server['SERVER_ADDR']}]" : $server['SERVER_ADDR'];
+        if (!isset($res)) {
+            throw new Exception('Could not connect to ourselves, please check the server configuration!');
         }
-        $hosts[] = (string) $server['SERVER_NAME'];
-        $candidates = [];
-        foreach ($hosts as $host) {
-            $candidates[] = [$https, $host, $port];
-        }
-        // The usual ports of the public name, if the server port is another one (behind a proxy, for example)
-        $candidates[] = [$https, $hosts[array_key_last($hosts)], $https ? 443 : 80];
-        $candidates[] = [!$https, $hosts[array_key_last($hosts)], $https ? 80 : 443];
-        $addresses = [];
-        foreach ($candidates as [$tls, $host, $port]) {
-            if ($port === ($tls ? 80 : 443)) {
-                continue;
-            }
-            $addresses[] = ($tls ? 'tls' : 'tcp')."://$host:$port";
-        }
-        return array_values(array_unique($addresses));
     }
 
     /**
