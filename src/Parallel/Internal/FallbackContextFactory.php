@@ -35,9 +35,10 @@ use ValueError;
  * amphp/parallel does, and falls back to requests to the webserver ({@see WebContextFactory}) where processes can't
  * work, like the IPC server of MadelineProto (AbstractServer::startMe()).
  *
- * Processes can't work without proc_open, or without a PHP binary that can run them: none in the PATH of the
- * webserver, or one of another version or without the extensions. Such a process exits or hangs without ever
- * connecting, and amphp/parallel waits for it forever: it gets PROCESS_TIMEOUT seconds.
+ * Processes can't work without proc_open, without a UNIX socket in the temporary directory for them to connect to,
+ * or without a PHP binary that can run them: none in the PATH of the webserver, or one of another version or without
+ * the extensions. Such a process exits or hangs without ever connecting, and amphp/parallel waits for it forever: it
+ * gets PROCESS_TIMEOUT seconds.
  *
  * Once a process couldn't be started, every context is a web context.
  *
@@ -55,10 +56,17 @@ final class FallbackContextFactory implements ContextFactory
 
     private bool $useWeb = false;
 
-    public function __construct(
-        private readonly ContextFactory $processFactory = new DefaultContextFactory(),
-        private readonly ContextFactory $webFactory = new WebContextFactory(),
-    ) {
+    /**
+     * amphp's default factory, created when first needed: it listens on a UNIX socket in the temporary directory,
+     * which may fail too (a temporary directory too long for a UNIX socket path).
+     */
+    private ?ContextFactory $processFactory = null;
+
+    private readonly WebContextFactory $webFactory;
+
+    public function __construct()
+    {
+        $this->webFactory = new WebContextFactory();
     }
 
     /**
@@ -75,6 +83,7 @@ final class FallbackContextFactory implements ContextFactory
         if (!$this->useWeb) {
             $timeout = new TimeoutCancellation(self::PROCESS_TIMEOUT);
             try {
+                $this->processFactory ??= new DefaultContextFactory();
                 return $this->processFactory->start(
                     $script,
                     $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout,
