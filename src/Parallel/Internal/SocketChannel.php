@@ -23,7 +23,6 @@ use Amp\ForbidSerialization;
 use Amp\Ipc\Sync\ChannelException as IpcChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Ipc\Sync\SerializationException as IpcSerializationException;
-use Amp\Parallel\Context\Internal\ContextMessage;
 use Amp\Pipeline\ConcurrentIterator;
 use Amp\Pipeline\Queue;
 use Amp\Serialization\SerializationException;
@@ -38,7 +37,7 @@ use function Amp\Parallel\Context\flattenArgument;
 /**
  * An amphp channel over a danog/ipc socket, used by both ends of a {@see \danog\MadelineProto\Parallel\WebContext}.
  *
- * Values are wrapped in a ContextMessage: a ChannelledSocket returns null once closed, and a null value must still
+ * Values are wrapped in a ChannelValue: a ChannelledSocket returns null once closed, and a null value must still
  * reach the other end (ContextWorker sends one to stop the task runner).
  * Anything else the peer sends (the exit result of the context) goes to the control message callback.
  *
@@ -75,9 +74,9 @@ final class SocketChannel implements Channel
         EventLoop::queue(static function () use ($socket, $queue, $onClose, $onControlMessage): void {
             try {
                 while (($message = $socket->receive()) !== null) {
-                    if ($message instanceof ContextMessage) {
+                    if ($message instanceof ChannelValue) {
                         // Not push(): an unread value must not stop the exit result from being read
-                        $queue->pushAsync($message->getMessage())->ignore();
+                        $queue->pushAsync($message->value)->ignore();
                     } elseif ($onControlMessage !== null) {
                         $onControlMessage($message);
                     } else {
@@ -117,7 +116,7 @@ final class SocketChannel implements Channel
     #[\Override]
     public function send(mixed $data): void
     {
-        $this->sendControl(new ContextMessage($data));
+        $this->sendControl(new ChannelValue($data));
     }
 
     /**

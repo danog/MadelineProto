@@ -17,8 +17,6 @@
 namespace danog\MadelineProto\Parallel\Internal;
 
 use Amp\Future;
-use Amp\Parallel\Context\Internal\ExitFailure;
-use Amp\Parallel\Context\Internal\ExitSuccess;
 use Amp\Serialization\SerializationException;
 use Amp\Sync\ChannelException;
 use Amp\TimeoutCancellation;
@@ -99,9 +97,9 @@ final class WebContextRunner
             }
 
             $returnValue = $callable($channel);
-            $result = new ExitSuccess($returnValue instanceof Future ? $returnValue->await() : $returnValue);
+            $result = ContextExit::success($returnValue instanceof Future ? $returnValue->await() : $returnValue);
         } catch (Throwable $e) {
-            $result = new ExitFailure($e);
+            $result = ContextExit::failure($e);
         }
 
         try {
@@ -109,7 +107,7 @@ final class WebContextRunner
                 $channel->sendControl($result);
             } catch (SerializationException $e) {
                 // Serializing the result failed: send the reason why
-                $channel->sendControl(new ExitFailure($e));
+                $channel->sendControl(ContextExit::failure($e));
             }
         } catch (ChannelException) {
             // The parent already closed the channel

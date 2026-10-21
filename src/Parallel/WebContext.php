@@ -23,8 +23,8 @@ use Amp\ForbidSerialization;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Parallel\Context\Context;
 use Amp\Parallel\Context\ContextException;
-use Amp\Parallel\Context\Internal\ExitResult;
 use Amp\Sync\ChannelException;
+use danog\MadelineProto\Parallel\Internal\ContextExit;
 use danog\MadelineProto\Parallel\Internal\SocketChannel;
 
 use function Amp\Parallel\Context\flattenArgument;
@@ -47,7 +47,7 @@ final class WebContext implements Context
     /** @var SocketChannel<TReceive, TSend> */
     private readonly SocketChannel $channel;
 
-    /** @var DeferredFuture<ExitResult<TResult>> */
+    /** @var DeferredFuture<ContextExit> */
     private readonly DeferredFuture $result;
 
     /**
@@ -57,7 +57,7 @@ final class WebContext implements Context
     {
         $result = $this->result = new DeferredFuture();
         $this->channel = new SocketChannel($socket, static function (mixed $message) use ($result): void {
-            if (!$message instanceof ExitResult || $result->isComplete()) {
+            if (!$message instanceof ContextExit || $result->isComplete()) {
                 throw new ChannelException('Unexpected message from the context: '.flattenArgument($message));
             }
             $result->complete($message);
