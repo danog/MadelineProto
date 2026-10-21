@@ -37,8 +37,7 @@ source tests/submit_pr.sh
 
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
-# The release labels of the pull request of MadelineProto (see .github/release.yml): a new layer is a feature, which
-# bumps the minor version (see tests/release_check.sh).
+# The release labels of the pull request of MadelineProto (see .github/release.yml): a new layer is a feature.
 labels=release:internal
 if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
     labels=release:layer,release:feature
@@ -65,14 +64,16 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
 done
 submodules=${#urls[@]}
 
-source tests/release_version.sh
-if [ "$labels" != release:internal ]; then
-    echo "RELEASE: $(bump_release_constant ${labels//,/ })"
-fi
-
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
+# Released (see tests/release_check.sh): a new layer as a minor version, other changes that ship (the generated code,
+# the web UI) as a patch one.
+source tests/release_version.sh
+if [ "$labels" != release:internal ] || git diff --cached --name-only | ships; then
+    echo "RELEASE: $(bump_release_constant ${labels//,/ } release:fix)"
+    git add src/API.php
+fi
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
 else
