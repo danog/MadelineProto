@@ -29,7 +29,9 @@ concurrency:
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
-  # The image the other jobs run in, rebuilt for every run: they wait for it, and pull the new one.
+  # The image the other jobs run in, rebuilt for every run: they wait for it, and pull the new one. Tagged by
+  # tests/docker_image.sh: next for the main branch; the version for a tag (whose jobs run in it), then latest, the
+  # major and the minor version once it's released (docker-release).
   docker:
     strategy:
       matrix:
@@ -47,34 +49,29 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          ARCH: ${{ matrix.arch }}
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          # Without attestations: a plain image (rather than an index), for docker manifest in docker-merge.
-          docker buildx build --platform "linux/$ARCH" . -f tests/dockerfiles/Dockerfile -t "danog/madelineproto:next-debian-$ARCH" --cache-from "danog/madelineproto:next-debian-$ARCH" --cache-to type=inline --provenance=false --sbom=false --push
+          # For the GitHub API, from which PIE downloads the extensions: 60 unauthenticated requests per hour per IP.
+          GITHUB_TOKEN: ${{ github.token }}
+          CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: tests/docker_image.sh build "${{ matrix.arch }}"
 
   docker-merge:
     needs: docker
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
       - name: Push the multi-arch image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        # With docker manifest, which reads the images as the account logged in: docker buildx imagetools create
-        # read some of them anonymously, failing with the rate limit of anonymous pulls (429).
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          for tag in debian next latest; do
-            docker manifest create "danog/madelineproto:$tag" danog/madelineproto:next-debian-{amd,arm}64
-            docker manifest push "danog/madelineproto:$tag"
-          done
+          CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        run: tests/docker_image.sh merge
 
   cs:
     needs: docker-merge
     runs-on: ubuntu-latest
     container:
-      image: danog/madelineproto:next
+      # The image of the version, for a tag.
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -118,7 +115,8 @@ jobs:
     if: github.ref_type != 'tag'
     runs-on: ubuntu-latest
     container:
-      image: danog/madelineproto:next
+      # The image of the version, for a tag.
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -159,7 +157,8 @@ jobs:
     needs: docker-merge
     runs-on: ubuntu-latest
     container:
-      image: danog/madelineproto:next
+      # The image of the version, for a tag.
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -191,7 +190,8 @@ jobs:
       group: telegram-phar-build
       cancel-in-progress: false
     container:
-      image: danog/madelineproto:next
+      # The image of the version, for a tag.
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
       # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
       # other user of the IP of the runner.
       credentials:
@@ -284,3 +284,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: tests/release_dispatch.sh "${{ github.ref_name }}"
+
+  # latest, and the major and minor versions, only once released.
+  docker-release:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Point latest to the image of the release
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          CI_COMMIT_TAG: ${{ github.ref_name }}
+          GH_REPO: ${{ github.repository }}
+        run: tests/docker_image.sh release
