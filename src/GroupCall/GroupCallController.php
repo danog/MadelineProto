@@ -879,7 +879,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
      */
     private function beforePlay(): void
     {
-        if (!($this->call['rtmp_stream'] ?? false) || $this->publishing) {
+        if (!($this->call['rtmp_stream'] ?? false)) {
+            return;
+        }
+        if ($this->publishing) {
+            // Reconnect right away, if the ingest dropped the connection while nothing was played.
+            $this->rtmpPublisher?->wake();
             return;
         }
         if ($this->callState === GroupCallState::LEFT) {
@@ -911,14 +916,23 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $peer = $this->public->peerId;
         \assert($peer !== null);
         $liveStory = $this->public instanceof LiveStory;
-        return new RtmpPublisher($this, $this->diskJockey, function (bool $revoke) use (&$ingest, $peer, $liveStory): array {
+        $publisher = null;
+        $publisher = new RtmpPublisher($this, $this->diskJockey, function (bool $revoke) use (&$ingest, $peer, $liveStory): array {
             if ($ingest !== null && !$revoke) {
                 $first = $ingest;
                 $ingest = null;
                 return $first;
             }
             return $this->API->getGroupCallStreamRtmpUrl($peer, $revoke, $liveStory);
+        }, function () use (&$publisher): void {
+            // The key was refused, or can't be fetched anymore: the next play() starts over, and
+            // reports why it can't publish (e.g. the admin rights were lost).
+            if ($this->rtmpPublisher === $publisher) {
+                $this->rtmpPublisher = null;
+                $this->publishing = false;
+            }
         });
+        return $publisher;
     }
 
     /**

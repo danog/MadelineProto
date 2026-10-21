@@ -16,10 +16,14 @@
 
 namespace danog\MadelineProto\GroupCall\Rtmp;
 
+use Amp\CancelledException;
 use Amp\DeferredCancellation;
+use Amp\DeferredFuture;
 use Closure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RPCError\RateLimitError;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\CallRecorder;
 use danog\MadelineProto\Tgcalls\OpusPlaybackTrack;
@@ -41,7 +45,12 @@ use function Amp\delay;
  * (the codecs the RTMP ingest of Telegram accepts) and frames AAC with ADTS, see {@see FlvTags}.
  *
  * The connection is reopened if it drops; meanwhile the frames are played (and dropped), so that
- * the stream stays live.
+ * the stream stays live. The RTMP ingest of Telegram drops a publisher that sends no media for 10
+ * seconds, as when nothing is played (an empty playlist without hold files, or paused playback):
+ * then the connection is only reopened once something is played again. A server that keeps closing
+ * the connection while media flows, or refuses the stream, is retried with an exponential backoff
+ * (the key is fetched again each time, which only changes if an admin revoked it: it's never revoked
+ * here); a key that can't be fetched anymore (e.g. the admin rights were lost) stops publishing.
  *
  * @internal
  */
@@ -55,7 +64,16 @@ final class RtmpPublisher
     private const REORDER_DEPTH = 2;
     /** How far the timestamps of a track may drift from the wall clock before re-anchoring it, in milliseconds. */
     private const MAX_DRIFT_MS = 1000;
+    private const MIN_RECONNECT_DELAY = 1.0;
     private const MAX_RECONNECT_DELAY = 30.0;
+    /** How long a connection must stay up to reset the backoff, in seconds. */
+    private const STABLE_CONNECTION = 60.0;
+    /**
+     * For how long nothing must have been played, in seconds, for a closed connection to count as
+     * dropped for idleness: well below the 10 seconds after which the ingest of Telegram drops a
+     * publisher sending no media.
+     */
+    private const IDLE = 5.0;
 
     private readonly OpusPlaybackTrack $audioTrack;
     private readonly VideoPlaybackTrack $videoTrack;
@@ -86,14 +104,22 @@ final class RtmpPublisher
     private ?string $metadata = null;
     /** When audio started waiting for the metadata of the first video keyframe (wall clock, seconds). */
     private ?float $awaitingVideoSince = null;
+    /** When the tracks last offered a frame to publish (wall clock, seconds), connected or not. */
+    private float $lastFrameAt = 0.0;
+    /** @var ?DeferredFuture<null> Completed when there is something to publish again, see {@see self::wake()}. */
+    private ?DeferredFuture $frameWaiter = null;
 
     /**
-     * @param Closure(bool): array{url: string, key: string} $ingest Get the URL and key to publish to (true to revoke the key first).
+     * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
+     * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
+     * @param float                                         $idle     See {@see self::IDLE}.
      */
     public function __construct(
         private readonly CallControllerInterface $call,
         private readonly DjLoop $dj,
         private readonly Closure $ingest,
+        private readonly ?Closure $onGiveUp = null,
+        private readonly float $idle = self::IDLE,
     ) {
         $this->stopping = new DeferredCancellation;
         $this->pending = new SplMinHeap;
@@ -133,6 +159,7 @@ final class RtmpPublisher
         }
         $this->running = false;
         $this->stopping->cancel();
+        $this->frameWaiter = null;
         $this->audioTrack->stop();
         $this->videoTrack->stop();
         $this->flushVideo();
@@ -150,14 +177,68 @@ final class RtmpPublisher
         return $this->client !== null && !$this->client->isClosed();
     }
 
+    /**
+     * Something is about to be played: reconnect now, if the connection was dropped while nothing was.
+     */
+    public function wake(): void
+    {
+        $waiter = $this->frameWaiter;
+        $this->frameWaiter = null;
+        $waiter?->complete();
+    }
+
+    /**
+     * Wait until something is played, see {@see self::wake()}.
+     */
+    private function awaitSomethingToPlay(): void
+    {
+        $this->frameWaiter ??= new DeferredFuture;
+        $this->frameWaiter->getFuture()->await($this->stopping->getCancellation());
+    }
+
+    /**
+     * The tracks offered a frame to publish.
+     */
+    private function onFrame(): void
+    {
+        $this->lastFrameAt = microtime(true);
+        if ($this->frameWaiter !== null) {
+            $this->wake();
+        }
+    }
+
+    /**
+     * Whether retrying can't help: Telegram refused to give a stream key (an RPC error that is not
+     * a flood wait or an internal error, e.g. CHAT_ADMIN_REQUIRED after losing the admin rights).
+     */
+    private static function isDefinitive(Throwable $e): bool
+    {
+        if ($e instanceof RPCErrorException) {
+            $code = $e->getCode();
+            return $code >= 400 && $code < 500 && $code !== 420;
+        }
+        return false;
+    }
+
+    /**
+     * Stop publishing for good, after an error that retrying can't fix.
+     */
+    private function giveUp(Throwable $e): void
+    {
+        $this->call->log("Stopped publishing to the RTMP livestream of {$this->call}: {$e->getMessage()}", Logger::ERROR);
+        $this->stop();
+        if ($this->onGiveUp !== null) {
+            ($this->onGiveUp)($e);
+        }
+    }
+
     private function connectionLoop(): void
     {
-        $delay = 1.0;
-        $revoke = false;
+        $delay = self::MIN_RECONNECT_DELAY;
         while ($this->running) {
             try {
-                ['url' => $url, 'key' => $key] = ($this->ingest)($revoke);
-                $revoke = false;
+                // Fetched every time (never revoking it): the same key unless an admin revoked it meanwhile.
+                ['url' => $url, 'key' => $key] = ($this->ingest)(false);
                 $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation());
                 if (!$this->running) {
                     $client->close();
@@ -178,25 +259,54 @@ final class RtmpPublisher
                 $this->awaitingVideoSince = null;
                 $this->client = $client;
                 $this->call->log("Publishing to the RTMP livestream of {$this->call}", Logger::NOTICE);
-                $delay = 1.0;
+                $connectedAt = microtime(true);
                 $client->awaitClose($this->stopping->getCancellation());
-                if ($this->running) {
-                    $this->call->log("The RTMP connection of {$this->call} was closed: ".($client->getError()?->getMessage() ?? 'by the server').', reconnecting...', Logger::WARNING);
-                }
-            } catch (Throwable $e) {
                 if (!$this->running) {
                     return;
                 }
-                $this->call->log("Could not publish to the RTMP livestream of {$this->call}: {$e->getMessage()}, retrying in {$delay} seconds...", Logger::ERROR);
-                try {
-                    delay($delay, cancellation: $this->stopping->getCancellation());
-                } catch (Throwable) {
+                $this->client = null;
+                $reason = ($client->getError()?->getMessage() ?? 'by the server').' ('.$client->describe().')';
+                if (microtime(true) - $this->lastFrameAt >= $this->idle) {
+                    // The ingest drops a publisher that sends no media: reconnecting now would only get
+                    // dropped again 10 seconds later, in a loop, until something is played.
+                    $this->call->log("The RTMP connection of {$this->call} was closed while nothing was played: $reason, reconnecting once something is played...", Logger::NOTICE);
+                    $delay = self::MIN_RECONNECT_DELAY;
+                    $this->awaitSomethingToPlay();
+                    continue;
+                }
+                if (microtime(true) - $connectedAt >= self::STABLE_CONNECTION) {
+                    $this->call->log("The RTMP connection of {$this->call} was closed: $reason, reconnecting...", Logger::WARNING);
+                    $delay = self::MIN_RECONNECT_DELAY;
+                    continue;
+                }
+                // Closed soon after connecting, while media flows: back off instead of reconnecting in a loop.
+                $this->call->log("The RTMP connection of {$this->call} was closed: $reason, reconnecting in {$delay} seconds...", Logger::WARNING);
+            } catch (Throwable $e) {
+                // Including the cancellation of what we were waiting for, when stopping.
+                if (!$this->running) {
                     return;
                 }
-                $delay = min($delay * 2, self::MAX_RECONNECT_DELAY);
+                if (self::isDefinitive($e)) {
+                    $this->giveUp($e);
+                    return;
+                }
+                if ($e instanceof RateLimitError) {
+                    // A flood wait longer than the flood timeout of the call: wait as long as the server asks.
+                    $delay = max($delay, (float) $e->getWaitTime());
+                }
+                // Including a refused stream (RtmpRefusedException): the key Telegram gives is the same until an
+                // admin revokes it, so a refusal of it isn't proof that it can't work (e.g. the ingest still
+                // holding our previous session after a network drop), and the key is fetched again each time.
+                $this->call->log("Could not publish to the RTMP livestream of {$this->call}: {$e->getMessage()}, retrying in {$delay} seconds...", Logger::ERROR);
             } finally {
                 $this->client = null;
             }
+            try {
+                delay($delay, cancellation: $this->stopping->getCancellation());
+            } catch (CancelledException) {
+                return;
+            }
+            $delay = min($delay * 2, self::MAX_RECONNECT_DELAY);
         }
     }
 
@@ -231,6 +341,7 @@ final class RtmpPublisher
         if (!$this->running) {
             return false;
         }
+        $this->onFrame();
         $client = $this->client;
         if ($client === null || $client->isClosed()) {
             return true;
@@ -275,6 +386,7 @@ final class RtmpPublisher
         if (!$this->running) {
             return false;
         }
+        $this->onFrame();
         $client = $this->client;
         if ($client === null || $client->isClosed()) {
             return true;
