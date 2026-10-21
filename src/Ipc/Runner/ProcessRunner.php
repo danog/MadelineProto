@@ -127,17 +127,14 @@ final class ProcessRunner extends RunnerAbstract
             ],
         );
 
-        $process = false;
         $descriptors = self::getWorkerDescriptors();
-        if (\count($descriptors) > 3) {
-            try {
-                $process = proc_open($command, $descriptors, $pipes, null, $envVars);
-            } catch (Throwable $e) {
-                // One more descriptor per hidden one: it can fail close to the descriptor limit
-                Logger::log("Could not hide the descriptors of this process from the IPC worker, starting it with them: $e", Logger::WARNING);
-            }
+        try {
+            $process = proc_open($command, $descriptors, $pipes, null, $envVars);
+        } catch (Throwable $e) {
+            // proc_open dup()s one descriptor per hidden one: it can fail close to the descriptor limit
+            Logger::log("Could not hide the descriptors of this process from the IPC worker, starting it with them: $e", Logger::WARNING);
+            $process = proc_open($command, \array_slice($descriptors, 0, 3, true), $pipes, null, $envVars);
         }
-        $process = $process ?: proc_open($command, \array_slice($descriptors, 0, 3, true), $pipes, null, $envVars);
         if ($process === false) {
             throw new Error("Could not start the IPC worker process!");
         }
@@ -166,7 +163,7 @@ final class ProcessRunner extends RunnerAbstract
      *
      * @internal
      *
-     * @return array<int, array{0: string, 1: string, 2?: string}>
+     * @return array<int, list<string>>
      */
     public static function getWorkerDescriptors(): array
     {
@@ -178,11 +175,16 @@ final class ProcessRunner extends RunnerAbstract
         if (PHP_OS_FAMILY === 'Windows') {
             return $descriptors;
         }
-        $fds = @scandir(is_dir('/proc/self/fd') ? '/proc/self/fd' : '/dev/fd');
+        try {
+            // On Linux, a link to /proc/self/fd
+            $fds = scandir('/dev/fd');
+        } catch (Throwable) {
+            $fds = false;
+        }
         foreach ($fds ?: [] as $fd) {
             // Includes the descriptor of the listed directory, closed since: /dev/null takes its place all the same
             if (ctype_digit($fd) && (int) $fd > 2) {
-                $descriptors[(int) $fd] = ['file', '/dev/null', 'r'];
+                $descriptors[(int) $fd] = ['null'];
             }
         }
         return $descriptors;
