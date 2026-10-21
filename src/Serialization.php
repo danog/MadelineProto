@@ -166,18 +166,10 @@ abstract class Serialization
                     // long it takes to load the session, unless we get the lock first.
                     while (!$lockWait->isCancelled()) {
                         Logger::log('MadelineProto is starting, please wait...');
-                        try {
-                            clearstatcache(true, $session->getIpcPath());
-                            $socket = connect($session->getIpcPath());
-                            Logger::log('Connected to IPC socket!');
+                        if ($socket = self::connectIfListening($session->getIpcPath())) {
                             $ipcSocket = [$socket, null];
                             $cancelFull();
                             return;
-                        } catch (Throwable $e) {
-                            $e = $e->getMessage();
-                            if ($e !== 'The endpoint does not exist!') {
-                                Logger::log("$e while connecting to IPC socket");
-                            }
                         }
                         try {
                             delay(1.0, true, $lockWait->getCancellation());
@@ -409,6 +401,58 @@ abstract class Serialization
                 $socket->disconnect();
             } catch (Throwable) {
             }
+        }
+    }
+
+    /**
+     * Connect to the IPC server of a session if something listens on its socket.
+     */
+    private static function connectIfListening(string $ipcPath): ?ChannelledSocket
+    {
+        try {
+            clearstatcache(true, $ipcPath);
+            $socket = connect($ipcPath);
+            Logger::log('Connected to IPC socket!');
+            return $socket;
+        } catch (Throwable $e) {
+            $e = $e->getMessage();
+            if ($e !== 'The endpoint does not exist!') {
+                Logger::log("$e while connecting to IPC socket");
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Connect again to the IPC server of a session, after losing the connection to it.
+     *
+     * Like unserialize(), only starts a server if nobody can serve the session: if something listens, that's the
+     * server (if it drops us, the client backs off and gives up eventually); if another process holds the session
+     * lock, it's an instance loading the session (it listens once it's done) or releasing it, so wait for it.
+     * Starting a server anyway spawned a worker (and sent requests to the web server) on every attempt, all of them
+     * waiting for a lock that the live holder never releases.
+     *
+     * @internal
+     *
+     * @param  Cancellation                                      $cancellation Stops waiting for the lock holder
+     * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
+     */
+    public static function reconnect(SessionPaths $session, Cancellation $cancellation): array
+    {
+        $ipcPath = $session->getIpcPath();
+        $waiting = false;
+        while (true) {
+            if ($socket = self::connectIfListening($ipcPath)) {
+                return [$socket, null];
+            }
+            if (!self::isLockedByAnotherProcess($session)) {
+                return self::startServerAndConnect($session);
+            }
+            if (!$waiting) {
+                Logger::log('The session is locked by another process (loading or releasing it), waiting for it...');
+                $waiting = true;
+            }
+            delay(1.0, true, $cancellation);
         }
     }
 

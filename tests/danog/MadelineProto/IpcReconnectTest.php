@@ -18,11 +18,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\Ipc\Sync\ChannelException;
+use ArrayObject;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
+use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
 
 use function Amp\async;
@@ -105,6 +108,132 @@ final class IpcReconnectTest extends TestCase
             delay(0.1);
         }
         self::assertLessThanOrEqual($fds, self::countFds(), 'Leaking file descriptors');
+    }
+
+    /**
+     * A server that accepts connections and drops them before answering (the session is served by an instance
+     * that can't handle the calls of the client, for example) made the client reconnect and resend its calls
+     * forever, every second, starting a new IPC server every time: a worker process, and requests to the web
+     * server, all of them waiting forever for the lock of the instance.
+     */
+    public function testGivesUpOnAServerThatDropsTheCalls(): void
+    {
+        $paths = new SessionPaths($this->session);
+        $server = listen($paths->getIpcPath());
+        $accepted = 0;
+        $acceptor = async(static function () use ($server, &$accepted): void {
+            while ($socket = $server->accept()) {
+                $accepted++;
+                $socket->disconnect();
+            }
+        });
+        $logs = $this->captureLogs();
+
+        $client = new Client(connect($paths->getIpcPath()), $paths, Logger::$default);
+        $start = microtime(true);
+        try {
+            async($client->__call(...), 'getSelf', [])->await(Tools::getTimeoutCancellation(30.0));
+            self::fail('The call should fail');
+        } catch (ChannelException $e) {
+            $previous = $e->getPrevious();
+            self::assertInstanceOf(ChannelException::class, $previous);
+            self::assertStringContainsString('without answering getSelf, giving up', $previous->getMessage());
+        }
+        $elapsed = microtime(true) - $start;
+        // Sent on 5 connections, with a growing delay between them (none, 1, 2, 4 seconds)
+        self::assertSame(5, $accepted);
+        self::assertGreaterThan(6.0, $elapsed);
+        self::assertLessThan(15.0, $elapsed);
+        // The server listens: no new server was started
+        self::assertSame([], array_values(array_filter($logs->getArrayCopy(), static fn (string $log): bool => str_contains($log, 'Starting IPC server'))));
+
+        // And the client doesn't reconnect anymore: its calls fail right away
+        delay(2.0);
+        self::assertSame(5, $accepted);
+        $this->expectException(ChannelException::class);
+        try {
+            $client->getSelf();
+        } finally {
+            $server->close();
+            $acceptor->await();
+        }
+    }
+
+    /**
+     * The process holding the session lock serves the session once it has loaded it: a client that lost its
+     * connection waits for it, instead of starting a new server that would wait for the lock.
+     */
+    public function testWaitsForTheLockHolder(): void
+    {
+        $paths = new SessionPaths($this->session);
+        touch($paths->getLockPath());
+        $lock = fopen($paths->getLockPath(), 'c');
+        self::assertTrue(flock($lock, LOCK_EX|LOCK_NB));
+        $logs = $this->captureLogs();
+
+        $server = listen($paths->getIpcPath());
+        $client = new Client(connect($paths->getIpcPath()), $paths, Logger::$default);
+        $socket = $server->accept();
+        // The holder restarts its server
+        $server->close();
+        $socket->disconnect();
+
+        $call = async($client->__call(...), 'getSelf', []);
+        delay(3.0);
+        self::assertFalse($call->isComplete());
+        self::assertSame([], array_values(array_filter($logs->getArrayCopy(), static fn (string $log): bool => str_contains($log, 'Starting IPC server'))));
+
+        $server = listen($paths->getIpcPath());
+        $socket = $server->accept();
+        [$id, [$function]] = [0, $socket->receive()];
+        self::assertSame('getSelf', $function);
+        $socket->send([$id, 'ok']);
+        self::assertSame('ok', $call->await(Tools::getTimeoutCancellation(5.0)));
+
+        $client->disconnect();
+        $socket->disconnect();
+        $server->close();
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+
+    /**
+     * A client that disconnects stops reconnecting, even while it waits for the lock holder.
+     */
+    public function testDisconnectStopsReconnecting(): void
+    {
+        $paths = new SessionPaths($this->session);
+        touch($paths->getLockPath());
+        $lock = fopen($paths->getLockPath(), 'c');
+        self::assertTrue(flock($lock, LOCK_EX|LOCK_NB));
+        $this->captureLogs();
+
+        $server = listen($paths->getIpcPath());
+        $client = new Client(connect($paths->getIpcPath()), $paths, Logger::$default);
+        $server->accept()->disconnect();
+        $server->close();
+        $call = async($client->__call(...), 'getSelf', []);
+        delay(1.0);
+        $client->disconnect();
+        try {
+            $call->await(Tools::getTimeoutCancellation(2.0));
+            self::fail('The call should fail');
+        } catch (ChannelException) {
+        }
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+
+    /**
+     * @return ArrayObject<int, string>
+     */
+    private function captureLogs(): ArrayObject
+    {
+        $logs = new ArrayObject;
+        Logger::constructorFromSettings((new SettingsLogger)->setType(Logger::CALLABLE_LOGGER)->setExtra(static function (mixed $param) use ($logs): void {
+            $logs[] = (string) $param;
+        })->setLevel(Logger::ULTRA_VERBOSE));
+        return $logs;
     }
 
     private function killWorkers(): void
