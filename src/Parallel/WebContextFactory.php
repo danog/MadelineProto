@@ -29,7 +29,6 @@ use Amp\Parallel\Context\ContextFactory;
 use Amp\Parallel\Context\ThreadContext;
 use Amp\Parallel\Worker\ContextWorkerFactory;
 use Amp\Parallel\Worker\ContextWorkerPool;
-use Amp\Socket\Socket;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
@@ -280,10 +279,7 @@ final class WebContextFactory implements ContextFactory
                 'cwd' => Magic::getcwd(),
                 'timeout' => $this->childConnectTimeout,
             ]);
-            $requests = WebRunner::selfStartAsync(WebRunner::getRunPath().'?'.http_build_query([
-                'argv' => ['madeline-parallel', $id],
-            ]), $this->childConnectTimeout);
-            $socket = $this->accept($server, $key, $cancellation);
+            $socket = $this->connect($server, $id, $key, $cancellation);
         } catch (CancelledException|ContextException $e) {
             throw $e;
         } catch (Throwable $e) {
@@ -295,10 +291,6 @@ final class WebContextFactory implements ContextFactory
             self::remove($dir);
             if ($socketDir !== null) {
                 self::remove($socketDir);
-            }
-            // The request already ignores the abort (or it never came)
-            foreach ($requests ?? [] as $connection) {
-                $connection->map(static fn (?Socket $socket) => $socket?->close())->ignore();
             }
         }
 
@@ -339,42 +331,106 @@ final class WebContextFactory implements ContextFactory
     }
 
     /**
-     * Accept the connection of the context, which authenticates with the key.
+     * Seconds to connect to an endpoint of the webserver, and send it the request of a context.
      */
-    private function accept(IpcServer $server, string $key, ?Cancellation $cancellation): ChannelledSocket
+    private const ENDPOINT_TIMEOUT = 2;
+
+    /**
+     * Seconds to wait for the context to connect before sending its request to the next endpoint too.
+     */
+    private const ENDPOINT_GRACE = 1;
+
+    /**
+     * The endpoint (index in WebRunner::getSelfStartEndpoints()) whose request started the last context: the
+     * request of the next one goes there first.
+     */
+    private static ?int $endpoint = null;
+
+    /**
+     * Send the request of the context to the webserver, and accept the connection of the context, which
+     * authenticates with the key.
+     *
+     * The request goes to one endpoint of the webserver at a time (see WebRunner::getSelfStartEndpoints()), until
+     * the context connects: every request reaching the webserver occupies one of its workers, if only for a moment
+     * (the request file is only served once). An endpoint accepting the connection doesn't mean that it reaches the
+     * webserver (a CDN, a port mapped elsewhere), so the next one is tried if the context doesn't connect within
+     * ENDPOINT_GRACE seconds.
+     *
+     * The connections of the requests are closed once their response ends (see WebRunner::sendSelfRequest()): for
+     * the one that started the context, once its request ends.
+     */
+    private function connect(IpcServer $server, string $id, string $key, ?Cancellation $cancellation): ChannelledSocket
     {
         $timeout = new TimeoutCancellation(
             $this->childConnectTimeout,
             "The context didn't connect within {$this->childConnectTimeout} seconds: check that requests to the entry script of MadelineProto succeed",
         );
+        $startCancellation = $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout;
+        $endpoints = WebRunner::getSelfStartEndpoints();
+
+        /** @var DeferredFuture<array{ChannelledSocket, ?int}> */
         $deferred = new DeferredFuture();
         /** @var array<int, ChannelledSocket> */
         $pending = [];
-
-        EventLoop::queue(static function () use ($server, $key, $deferred, &$pending): void {
+        EventLoop::queue(static function () use ($server, $key, $endpoints, $deferred, &$pending): void {
             while ($socket = $server->accept()) {
                 // Read the key of each connection on its own: one that sends nothing must not hold up the others
-                $pending[$id = spl_object_id($socket)] = $socket;
-                EventLoop::queue(static function () use ($socket, $id, $key, $deferred, &$pending): void {
+                $pending[$socketId = spl_object_id($socket)] = $socket;
+                EventLoop::queue(static function () use ($socket, $socketId, $key, $endpoints, $deferred, &$pending): void {
                     try {
                         $received = $socket->receive();
                     } catch (Throwable) {
                         $received = null;
                     }
-                    unset($pending[$id]);
-                    if (\is_string($received) && hash_equals($key, $received) && !$deferred->isComplete()) {
-                        $deferred->complete($socket);
+                    unset($pending[$socketId]);
+                    if (\is_array($received)
+                        && \is_string($received['key'] ?? null)
+                        && hash_equals($key, $received['key'])
+                        && !$deferred->isComplete()
+                    ) {
+                        $endpoint = $received['endpoint'] ?? null;
+                        $deferred->complete([$socket, \is_int($endpoint) && isset($endpoints[$endpoint]) ? $endpoint : null]);
                     } else {
                         $socket->disconnect();
                     }
                 });
             }
         });
+        $connected = $deferred->getFuture();
 
         try {
-            return $deferred->getFuture()->await(
-                $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout
-            );
+            $order = array_keys($endpoints);
+            if (self::$endpoint !== null && isset($endpoints[self::$endpoint])) {
+                $order = [self::$endpoint, ...array_diff($order, [self::$endpoint])];
+            }
+            $runPath = WebRunner::getRunPath();
+            $sent = false;
+            foreach ($order as $index) {
+                [$proto, $port] = $endpoints[$index];
+                $uri = $runPath.'?'.http_build_query(['argv' => ['madeline-parallel', $id, $index]]);
+                if (!WebRunner::sendSelfRequest($proto, $port, $uri, timeout: self::ENDPOINT_TIMEOUT)) {
+                    continue;
+                }
+                $sent = true;
+                try {
+                    $connected->await(new CompositeCancellation(
+                        $startCancellation,
+                        new TimeoutCancellation(self::ENDPOINT_GRACE),
+                    ));
+                    break;
+                } catch (CancelledException $e) {
+                    if ($startCancellation->isRequested()) {
+                        throw $e;
+                    }
+                    // Not served (yet): try the next endpoint too
+                }
+            }
+            if (!$sent) {
+                throw new ContextException('Could not send the request of the context to the webserver: check the logs and the server configuration');
+            }
+            [$socket, $endpoint] = $connected->await($startCancellation);
+            self::$endpoint = $endpoint;
+            return $socket;
         } catch (CancelledException $e) {
             $cancellation?->throwIfRequested();
             throw new ContextException('Starting the context failed', previous: $e);

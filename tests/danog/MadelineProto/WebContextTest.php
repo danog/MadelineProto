@@ -127,22 +127,9 @@ final class WebContextTest extends TestCase
      */
     public function testContextsAndWorkersRunInWebserverRequests(string $tmp): void
     {
-        if (PHP_OS_FAMILY === 'Windows') {
-            self::markTestSkipped('The built-in webserver serves one request at a time on Windows');
-        }
-        // Its own temporary directory, to check that nothing is left behind
-        $tmp .= bin2hex(random_bytes(8));
-        mkdir($tmp, 0o700);
         // The context, its workers and the request that starts them each take a webserver worker
-        [$server, $port] = self::startServer($tmp, ['PHP_CLI_SERVER_WORKERS' => '6', 'TMPDIR' => $tmp]);
-        try {
-            $request = new Request("http://127.0.0.1:$port/tests/parallel_web_child.php");
-            $request->setTransferTimeout(60);
-            $request->setInactivityTimeout(60);
-            $response = HttpClientBuilder::buildDefault()->request($request)->getBody()->buffer();
-            $result = json_decode($response, true);
-            self::assertIsArray($result, "Unexpected response: $response");
-            self::assertArrayNotHasKey('error', $result, $result['error'] ?? '');
+        self::withServer($tmp, ['PHP_CLI_SERVER_WORKERS' => '6'], static function (int $port, string $tmp): void {
+            $result = self::request($port, 'contexts');
 
             self::assertTrue($result['installed']);
             self::assertSame([1, null, 'two', [3]], $result['echoed']);
@@ -163,12 +150,85 @@ final class WebContextTest extends TestCase
             self::assertTrue($result['shutdown']);
 
             self::assertSame([], glob("$tmp/madeline-parallel-*"), 'Request files or IPC endpoints were left behind');
-        } catch (\Throwable $e) {
-            self::stopServer($server);
-            fwrite(STDERR, "Webserver log:\n".file_get_contents("$tmp/server.log"));
-            throw $e;
+
+            // Every context was started with one request, to one endpoint: every request reaching the webserver
+            // takes one of its workers
+            $log = file_get_contents("$tmp/server.log");
+            preg_match_all('/\]: GET \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/', $log, $matches);
+            self::assertNotEmpty($matches[1]);
+            self::assertSame(array_values(array_unique($matches[1])), $matches[1], 'A context was requested more than once');
+            self::assertSame(
+                substr_count($log, ' Accepted') - substr_count($log, 'Closed without sending a request'),
+                preg_match_all('/\]: [A-Z]+ \//', $log),
+                'A connection to the webserver sent no request',
+            );
+        });
+    }
+
+    /**
+     * WebRunner::selfStart() doesn't block the event loop, nor wait for every endpoint: with one worker, which is
+     * busy with the request calling it, the TLS handshake with the plain HTTP port (one of the endpoints) can't be
+     * answered until the request ends.
+     */
+    public function testSelfStartDoesntWaitForTheWebserver(): void
+    {
+        self::withServer(sys_get_temp_dir().'/madeline-webcontext-test-', [], static function (int $port, string $tmp): void {
+            $result = self::request($port, 'selfstart');
+            self::assertLessThan(2, $result['selfStart']);
+
+            // Served once the worker is free
+            $deadline = microtime(true) + 10;
+            while (!str_contains(file_get_contents("$tmp/server.log"), ']: GET /tests/parallel_web_child.php?mode=ping')) {
+                if (microtime(true) > $deadline) {
+                    self::fail('The request sent by selfStart() was not served');
+                }
+                delay(0.1);
+            }
+        });
+    }
+
+    /**
+     * Request tests/parallel_web_child.php.
+     */
+    private static function request(int $port, string $mode): array
+    {
+        $request = new Request("http://127.0.0.1:$port/tests/parallel_web_child.php?mode=$mode");
+        $request->setTransferTimeout(30);
+        $request->setInactivityTimeout(30);
+        // Not retried: a request that timed out would time out again
+        $response = (new HttpClientBuilder)->retry(0)->build()->request($request)->getBody()->buffer();
+        $result = json_decode($response, true);
+        self::assertIsArray($result, "Unexpected response: $response");
+        self::assertArrayNotHasKey('error', $result, $result['error'] ?? '');
+        return $result;
+    }
+
+    /**
+     * Run a test with the built-in webserver serving the repository, with its own temporary directory (to check
+     * that nothing is left behind), named $tmp followed by random characters.
+     *
+     * @param array<string, string>        $environment
+     * @param \Closure(int, string): void $test Called with the port of the webserver and its temporary directory.
+     */
+    private static function withServer(string $tmp, array $environment, \Closure $test): void
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            self::markTestSkipped('The built-in webserver serves one request at a time on Windows');
+        }
+        $tmp .= bin2hex(random_bytes(8));
+        mkdir($tmp, 0o700);
+        try {
+            [$server, $port] = self::startServer($tmp, ['TMPDIR' => $tmp] + $environment);
+            try {
+                $test($port, $tmp);
+            } catch (\Throwable $e) {
+                self::stopServer($server);
+                fwrite(STDERR, "Webserver log:\n".file_get_contents("$tmp/server.log"));
+                throw $e;
+            } finally {
+                self::stopServer($server);
+            }
         } finally {
-            self::stopServer($server);
             exec('rm -rf '.escapeshellarg($tmp));
         }
     }
