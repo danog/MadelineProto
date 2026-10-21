@@ -87,7 +87,7 @@ trait InlineTrait
      *
      * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
      * @param array|null               $replyMarkup  Reply markup for inline keyboards
-     * @param RichParseMode            $parseMode    How to parse a string $message: Markdown (the default) and HTML are parsed by Telegram, plain text is sent as a single paragraph.
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
      * @param boolean                  $rtl          Whether the text is right-to-left
      * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
@@ -95,7 +95,7 @@ trait InlineTrait
     public function editRich(
         string|array|RichMessage $message,
         ?array $replyMarkup = null,
-        RichParseMode $parseMode = RichParseMode::MARKDOWN,
+        RichParseMode $parseMode = RichParseMode::TEXT,
         array $media = [],
         bool $rtl = false,
         bool $noAutolink = false,
