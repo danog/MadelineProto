@@ -3,7 +3,7 @@
 # (src/WebUI/templates/assets/tweb/) is the build of the committed sources: Composer and the phar ship the
 # bundle, without running npm.
 #
-# With --update (the daily build, .github/workflows/autobuild.yml), the bundle is only rebuilt, to be
+# With --update (the hourly build, .github/workflows/autobuild.yml), the bundle is only rebuilt, to be
 # committed: run it without secrets, it runs the code of the npm dependencies.
 
 cd "$(dirname "$0")/../webui"

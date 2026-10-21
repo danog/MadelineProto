@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 
 $commit = getenv('GITHUB_SHA');
 $branch = trim(shell_exec("git rev-parse --abbrev-ref HEAD"));

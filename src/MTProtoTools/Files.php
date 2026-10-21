@@ -824,6 +824,15 @@ trait Files
         return $res;
     }
 
+    private static function inputGeoPoint(array $geo): array
+    {
+        $point = ['_' => 'inputGeoPoint', 'lat' => $geo['lat'], 'long' => $geo['long']];
+        if (isset($geo['accuracy_radius'])) {
+            $point['accuracy_radius'] = $geo['accuracy_radius'];
+        }
+        return $point;
+    }
+
     private function genAllFile($media)
     {
         $res = [$this->TL->getConstructors()->findByPredicate($media['_'])['type'] => $media];
@@ -921,6 +930,49 @@ trait Files
             case 'messageMediaStory':
                 $media['_'] = 'inputMediaStory';
                 $res['InputMedia'] = $media;
+                break;
+            case 'messageMediaWebPage':
+                // The link preview of a text message (webPageNotModified has no URL)
+                if (!isset($media['webpage']['url'])) {
+                    throw new Exception('The link preview has no URL');
+                }
+                $res['InputMedia'] = [
+                    '_' => 'inputMediaWebPage',
+                    'url' => $media['webpage']['url'],
+                    'force_large_media' => $media['force_large_media'] ?? false,
+                    'force_small_media' => $media['force_small_media'] ?? false,
+                    // Don't fail if no preview can be generated (webPageEmpty: there was none)
+                    'optional' => true,
+                ];
+                break;
+            case 'messageMediaGeo':
+                if ($media['geo']['_'] !== 'geoPoint') {
+                    throw new Exception('Empty location');
+                }
+                $res['InputMedia'] = ['_' => 'inputMediaGeoPoint', 'geo_point' => self::inputGeoPoint($media['geo'])];
+                break;
+            case 'messageMediaVenue':
+                if ($media['geo']['_'] !== 'geoPoint') {
+                    throw new Exception('Empty location');
+                }
+                $res['InputMedia'] = [
+                    '_' => 'inputMediaVenue',
+                    'geo_point' => self::inputGeoPoint($media['geo']),
+                    'title' => $media['title'],
+                    'address' => $media['address'],
+                    'provider' => $media['provider'],
+                    'venue_id' => $media['venue_id'],
+                    'venue_type' => $media['venue_type'],
+                ];
+                break;
+            case 'messageMediaContact':
+                $res['InputMedia'] = [
+                    '_' => 'inputMediaContact',
+                    'phone_number' => $media['phone_number'],
+                    'first_name' => $media['first_name'],
+                    'last_name' => $media['last_name'],
+                    'vcard' => $media['vcard'],
+                ];
                 break;
             default:
                 throw new Exception("Could not convert media object of type {$media['_']}");

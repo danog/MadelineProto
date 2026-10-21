@@ -4,10 +4,10 @@
 # .github/release.yml), with the diff of the layer if it changed since the previous release.
 #
 # tests/release_notes.sh <tag>: add them to the release of <tag> (below what was written by hand), if they
-# weren't already, or the release draft keeps them up to date (see tests/release_draft.sh).
+# weren't already (tests/prerelease.sh adds them when it creates the release).
 # With DRY_RUN=1, prints the new body of the release instead.
 #
-# Sourced (by tests/release_draft.sh), defines release_notes <tag> <target> [<previous tag>], printing them.
+# Sourced (by tests/prerelease.sh), defines release_notes <tag> <target> [<previous tag>], printing them.
 #
 # Needs GITHUB_TOKEN (able to edit the releases) and the tags.
 

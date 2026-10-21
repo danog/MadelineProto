@@ -55,10 +55,12 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
         echo "Nothing changed in $repository"
         continue
     fi
-    body="The daily \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
+    body="The hourly \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
     submit_pr "$dir" "$repository" "$BRANCH" "$title" "$body"
-    urls+=("$PR_URL")
-    bodies+=("$body")
+    if [ -n "$PR_URL" ]; then
+        urls+=("$PR_URL")
+        bodies+=("$body")
+    fi
 done
 submodules=${#urls[@]}
 
@@ -68,15 +70,17 @@ git add -A src
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
 else
-    body="The daily \`composer build\`, and build of the web UI."
+    body="The hourly \`composer build\`, and build of the web UI."
     if [ "$submodules" -ne 0 ]; then
         body="$body
 
 It points to the commits of the other pull requests of this build. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
     fi
     submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
-    urls+=("$PR_URL")
-    bodies+=("$body")
+    if [ -n "$PR_URL" ]; then
+        urls+=("$PR_URL")
+        bodies+=("$body")
+    fi
 fi
 
 if [ ${#urls[@]} -gt 1 ]; then

@@ -20,7 +20,7 @@
  *
  * Logging in a bot with its token creates a new authorization every time: done by every run of the CI, it
  * gets FLOOD_WAITs (auth.importBotAuthorization), so the CI logs its bot in with an exported authorization
- * (BOT_SESSION_AUTH), like its users. Only the daily build logs in with a token (TEST_BOT_TOKEN, once a day).
+ * (BOT_SESSION_AUTH), like its users. Only the hourly build logs in with a token (TEST_BOT_TOKEN, once an hour).
  *
  * API_ID and API_HASH are needed. Exits with 2 if <variable> is not set.
  *

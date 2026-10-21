@@ -373,7 +373,7 @@ final class Logger
 
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
             if (Lang::$currentPercentage !== 100) {
-                $this->logger(sprintf(Lang::$current_lang['translate_madelineproto_cli'], Lang::$currentPercentage));
+                $this->logger(\sprintf(Lang::$current_lang['translate_madelineproto_cli'], Lang::$currentPercentage));
             }
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }

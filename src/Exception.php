@@ -64,13 +64,13 @@ class Exception extends \Exception
     public static function extension(string $extensionName): self
     {
         if ($extensionName === 'libtgvoip') {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
         } elseif ($extensionName === 'prime') {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
         } else {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
         }
-        $message = sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
+        $message = \sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             echo htmlentities($message).'<br>';
         }
@@ -135,9 +135,9 @@ class Exception extends \Exception
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
-            $print(sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
-            $print(sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
-            $print(sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
             $print(Lang::$current_lang['mmapErrorPart4']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);

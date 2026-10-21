@@ -206,7 +206,6 @@ final class Files extends SettingsAbstract
     /**
      * Get custom download link URL for CLI bots, used by `getDownloadLink`.
      *
-     * @return ?string
      */
     public function getDownloadLink(): ?string
     {

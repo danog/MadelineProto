@@ -63,6 +63,8 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
+    /** How long to wait before fetching the stream channels again when they have no usable timestamp, in seconds. */
+    private const CHANNELS_RETRY = 1.0;
     /** How many audio-only chunks of an RTMP stream are held, waiting for its video, before recording only its audio. */
     private const MAX_AUDIO_ONLY_CHUNKS = 10;
 
@@ -108,6 +110,8 @@ final class StreamReceiver
      */
     private array $videoWriters = [];
     private bool $unsupportedLogged = false;
+    /** The current interval between fetches of the stream channels, see loop(). */
+    private float $channelsRetry = self::CHANNELS_RETRY;
 
     /**
      * @psalm-mutation-free
@@ -187,14 +191,24 @@ final class StreamReceiver
             if ($this->nextTimestamp === null) {
                 try {
                     $edge = $this->liveEdge();
+                } catch (RateLimitError $e) {
+                    // Polled faster than the server allows (FLOOD_WAIT_3 while the livestream has no media): wait
+                    // as long as it asks, and poll at that pace from now on, until the stream starts.
+                    $this->channelsRetry = max($this->channelsRetry, (float) $e->getWaitTime());
+                    $this->call->log("Waiting {$e->getWaitTime()} seconds to fetch the stream channels of {$this->call} again", Logger::VERBOSE);
+                    delay((float) $e->getWaitTime());
+                    continue;
                 } catch (Throwable $e) {
                     $this->call->log("Could not fetch the stream channels of {$this->call}: $e", Logger::WARNING);
                     $edge = null;
                 }
                 if ($edge === null) {
-                    delay(1.0);
+                    // No usable timestamp yet: the channels are empty while the publisher of the livestream sends
+                    // no media, see https://core.telegram.org/api/group-calls (tgcalls retries after a second).
+                    delay($this->channelsRetry);
                     continue;
                 }
+                $this->channelsRetry = self::CHANNELS_RETRY;
                 // The live edge may not have moved since the last chunk (e.g. a resynchronization
                 // after the next chunk was not ready yet): never consume a chunk twice, unless the
                 // edge is far behind it (the timeline restarted).

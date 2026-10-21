@@ -1,7 +1,8 @@
-name: Daily build
+name: Autobuild
 
-# Runs composer build and rebuilds the web UI once a day, submitting what changed (usually, a new layer) as
+# Runs composer build and rebuilds the web UI every hour, submitting what changed (usually, a new layer) as
 # pull requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto: see tests/autobuild.sh.
+# Also updates the version of PHP of the docker image, submitting it as a pull request: see tests/update_docker.sh.
 #
 # The web UI is built in a job of its own, without any secret or token: the build runs the code of its npm
 # dependencies, which must not reach the token of the app or the sessions. Only the bundle is passed on.
@@ -13,14 +14,58 @@ name: Daily build
 
 on:
   schedule:
-    - cron: '17 3 * * *'
+    - cron: '17 * * * *'
   # From the Actions tab, or with gh workflow run autobuild.yml.
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# A run still going when the next one starts is left to finish.
+concurrency:
+  group: autobuild
+  cancel-in-progress: false
+
 jobs:
+  docker:
+    # Until the app is set up.
+    if: vars.AUTOBUILD_APP_ID != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get a token of the app
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.AUTOBUILD_APP_ID }}
+          private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: MadelineProto
+
+      - name: Get the user of the app
+        id: user
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=$(gh api "/users/$SLUG%5Bbot%5D" --jq .id)+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
+
+      # The tip of the branch when the job starts, not the commit the run was triggered on: a run queued
+      # behind another one would build on a commit older than the pull request of that run, if merged.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Update PHP
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          GIT_NAME: ${{ steps.user.outputs.name }}
+          GIT_EMAIL: ${{ steps.user.outputs.email }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: tests/update_docker.sh
+
   # Not in the container: it has no Node.js, the runner has.
   webui:
     if: vars.AUTOBUILD_APP_ID != ''
@@ -28,6 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref_name }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -79,6 +125,7 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
 
       - name: Get the bundle of the web UI
@@ -107,6 +154,6 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           php -r '
-            $context = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json", "content" => json_encode(["chat_id" => 101374607, "text" => "The daily composer build of MadelineProto failed: ".getenv("RUN_URL")])]]);
+            $context = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json", "content" => json_encode(["chat_id" => 101374607, "text" => "The hourly composer build of MadelineProto failed: ".getenv("RUN_URL")])]]);
             exit(file_get_contents("https://api.telegram.org/bot".getenv("BOT_TOKEN")."/sendMessage", false, $context) === false ? 1 : 0);
           '

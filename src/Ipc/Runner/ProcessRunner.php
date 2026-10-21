@@ -229,7 +229,7 @@ final class ProcessRunner extends RunnerAbstract
         $result = [];
 
         foreach ($options as $option => $value) {
-            $result[] = sprintf('-d%s=%s', $option, $value);
+            $result[] = \sprintf('-d%s=%s', $option, $value);
         }
 
         return $result;
