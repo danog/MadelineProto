@@ -143,42 +143,38 @@ abstract class AbstractServer extends Loop
     {
         $id = Tools::randomInt(2000000000);
         $startTime = microtime(true);
-        // One runner only: each one starts a worker (the web runner through requests to the web server), and all
-        // but one of them just wait for the session lock, then exit. The web runner is a fallback, for when worker
-        // processes can't be started or die before reporting their state (for example, when the PHP binary that
-        // a web server finds in the PATH is another PHP version, or lacks extensions).
+        $started = false;
+        $e = null;
         try {
             Logger::log("Starting IPC server $session (process)");
-            $exited = ProcessRunner::startProcess((string) $session, $id);
-            return async(self::monitor(...), $session, $id, $startTime, true, null, $cancellation, $exited);
+            ProcessRunner::start((string) $session, $id);
+            $started = true;
+            WebRunner::start((string) $session, $id);
+            return async(self::monitor(...), $session, $id, $startTime, $started, null, $cancellation);
         } catch (Throwable $e) {
             Logger::log($e);
         }
-        [$started, $e] = self::startWeb($session, $id, $e);
-        return async(self::monitor(...), $session, $id, $startTime, $started, $e, $cancellation, null);
-    }
-    /**
-     * Start an IPC server with the web runner.
-     *
-     * @return list{bool, ?Throwable} Whether it was started, and the errors so far
-     */
-    private static function startWeb(SessionPaths $session, int $id, ?Throwable $e): array
-    {
         try {
             Logger::log("Starting IPC server $session (web)");
-            return [WebRunner::start((string) $session, $id), $e];
+            if (WebRunner::start((string) $session, $id)) {
+                $started = true;
+            }
         } catch (Throwable $e2) {
             Logger::log($e2);
-            return [false, $e ? new CompositeException([$e, $e2]) : $e2];
+            if ($e) {
+                $e = new CompositeException([$e, $e2]);
+            } else {
+                $e = $e2;
+            }
         }
+        return async(self::monitor(...), $session, $id, $startTime, $started, $e, $cancellation);
     }
     /**
      * Monitor session.
      *
-     * @param float         $startTime When the server was started, to recognize servers started concurrently by other processes
-     * @param ?Future<null> $exited    Completes once the worker process exits: if it exits without starting the server, the web runner is tried
+     * @param float $startTime When the server was started, to recognize servers started concurrently by other processes
      */
-    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e, ?Cancellation $cancellation, ?Future $exited): bool|Throwable
+    private static function monitor(SessionPaths $session, int $id, float $startTime, bool $started, ?\Throwable $e, ?Cancellation $cancellation): bool|Throwable
     {
         if (!$started) {
             Logger::log("It looks like the server couldn't be started, trying to connect anyway...");
@@ -197,16 +193,6 @@ abstract class AbstractServer extends Loop
                 // Another process started the server concurrently, overwriting our startup ID
                 Logger::log('IPC server started successfully by another process!');
                 return true;
-            } elseif ($exited?->isComplete()) {
-                // The worker exited without reporting its state: it crashed, or it found the session served (or
-                // locked) by another process.
-                $exited = null;
-                if (!self::isListening($session) && !Serialization::isLockedByAnotherProcess($session)) {
-                    Logger::log('The IPC worker process exited without starting the server, trying with the web runner...');
-                    [$started, $e] = self::startWeb($session, $id, $e);
-                    $count = 0;
-                    continue;
-                }
             } elseif (!$started && $count > 0 && $count > 2*($state ? 3 : 1)) {
                 return new Exception("We couldn't start the IPC server, please check the logs!", previous: $e);
             } elseif ($count > 0 && $count % 2 === 0 && self::isListening($session)) {

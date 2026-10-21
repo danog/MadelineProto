@@ -383,12 +383,7 @@ abstract class Serialization
      */
     public static function isLockedByAnotherProcess(SessionPaths $session): bool
     {
-        try {
-            // MadelineProto's error handler throws even when silenced (the session directory may not exist)
-            $res = @fopen($session->getLockPath(), 'c');
-        } catch (Throwable) {
-            return false;
-        }
+        $res = @fopen($session->getLockPath(), 'c');
         if (!$res) {
             return false;
         }
