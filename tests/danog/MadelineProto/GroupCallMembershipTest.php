@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\TimeoutException;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\DataCenter;
@@ -203,6 +204,101 @@ final class GroupCallMembershipTest extends TestCase
         $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall'], $this->calls);
         $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
         $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * A rejoin that fails for a reason that may not last (here a timeout) doesn't leave us out of the call for
+     * good: the call stays tracked, is kept across restarts, and the rejoin is retried until the call ends.
+     */
+    public function testATransientRejoinFailureIsRetried(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        $watcher = new ReflectionProperty($controller, 'rejoinWatcher');
+        $this->answer = static fn (string $method) => match ($method) {
+            'phone.checkGroupCall' => [],
+            'phone.joinGroupCall' => throw new TimeoutException('Timeout while waiting for phone.joinGroupCall'),
+        };
+
+        self::check($controller);
+
+        $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::NOT_JOINED, $controller->getCallState());
+        $this->assertSame([1], array_keys($API->getAllGroupCalls()));
+        $this->assertNotNull($watcher->getValue($controller));
+        $this->assertFalse($controller->forgetIfUnjoined(), 'A call we are rejoining is resumed after a restart');
+
+        $this->answer = static fn () => throw RPCErrorException::make('GROUPCALL_INVALID', 400, '');
+        (fn () => $this->retryRejoin())->call($controller);
+
+        $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall', 'phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
+        $this->assertNull($watcher->getValue($controller));
+        $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * A rejoin refused for another reason (we may not be in the call anymore, e.g. we were banned from its chat)
+     * leaves the call, instead of keeping it tracked but not joined.
+     */
+    public function testARefusedRejoinLeavesTheCall(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        $this->answer = static fn (string $method) => match ($method) {
+            'phone.checkGroupCall' => [],
+            'phone.joinGroupCall' => throw RPCErrorException::make('CHANNEL_PRIVATE', 400, ''),
+        };
+
+        self::check($controller);
+
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
+        $this->assertNull((new ReflectionProperty($controller, 'rejoinWatcher'))->getValue($controller));
+        $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * Leaving a call we're trying to rejoin stops the retries.
+     */
+    public function testLeavingStopsTheRejoin(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        $this->answer = static fn (string $method) => match ($method) {
+            'phone.checkGroupCall' => [],
+            'phone.joinGroupCall' => throw new Exception('Network error'),
+        };
+        self::check($controller);
+
+        $controller->leave();
+
+        $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
+        $this->assertNull((new ReflectionProperty($controller, 'rejoinWatcher'))->getValue($controller));
+        $this->assertSame([], $API->getAllGroupCalls());
+        // A retry already queued does nothing.
+        (fn () => $this->retryRejoin())->call($controller);
+        $controller->rejoin();
+        $this->assertSame(['phone.checkGroupCall', 'phone.joinGroupCall'], $this->calls);
+    }
+
+    /**
+     * A call we were trying to rejoin when the process stopped is rejoined after a restart.
+     */
+    public function testARejoinIsResumedAfterARestart(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        (new ReflectionProperty($controller, 'callState'))->setValue($controller, GroupCallState::NOT_JOINED);
+        (new ReflectionProperty($controller, 'rejoining'))->setValue($controller, true);
+        (new ReflectionProperty($controller, 'resumePending'))->setValue($controller, true);
+        $this->answer = static fn () => throw RPCErrorException::make('GROUPCALL_FORBIDDEN', 403, '');
+
+        $this->assertFalse($controller->forgetIfUnjoined());
+        $controller->resumeAfterRestart();
+
+        $this->assertSame(['phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
     }
 
     /**
