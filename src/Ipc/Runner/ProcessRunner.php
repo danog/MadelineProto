@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\ByteStream\ReadableResourceStream;
+use Amp\Future;
 use Amp\Process\Internal\Posix\Runner;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -80,6 +81,18 @@ final class ProcessRunner extends RunnerAbstract
      */
     #[\Override]
     public static function start(string $session, int $startupId): bool
+    {
+        self::startProcess($session, $startupId)->ignore();
+        return true;
+    }
+    /**
+     * Start a worker process.
+     *
+     * @param string $session Session path
+     *
+     * @return Future<null> Completes once the worker exited (once it closed its output)
+     */
+    public static function startProcess(string $session, int $startupId): Future
     {
         if (PHP_SAPI === 'cli') {
             $binary = PHP_BINARY;
@@ -148,11 +161,10 @@ final class ProcessRunner extends RunnerAbstract
         $stdout = new ReadableResourceStream($pipes[1]);
         $stderr = new ReadableResourceStream($pipes[2]);
 
-        EventLoop::queue(static function () use ($id, $stdout, $stderr): void {
+        return async(static function () use ($id, $stdout, $stderr): void {
             await([async(self::readUnref(...), $stdout), async(self::readUnref(...), $stderr)]);
             self::reap($id);
         });
-        return true;
     }
     /**
      * Release the handle of a worker that closed its output, once it exits, without keeping the loop alive.
@@ -229,7 +241,7 @@ final class ProcessRunner extends RunnerAbstract
         $result = [];
 
         foreach ($options as $option => $value) {
-            $result[] = \sprintf('-d%s=%s', $option, $value);
+            $result[] = sprintf('-d%s=%s', $option, $value);
         }
 
         return $result;

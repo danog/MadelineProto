@@ -21,12 +21,14 @@ namespace danog\MadelineProto\Test;
 use Amp\Ipc\Sync\ChannelException;
 use ArrayObject;
 use danog\MadelineProto\Ipc\Client;
+use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 use function Amp\async;
 use function Amp\delay;
@@ -222,6 +224,25 @@ final class IpcReconnectTest extends TestCase
         }
         flock($lock, LOCK_UN);
         fclose($lock);
+    }
+
+    /**
+     * Only one runner starts a worker: the web runner is a fallback for a worker process that dies without reporting
+     * its state (in the CLI there's no web runner, so the startup fails as soon as the worker exits).
+     */
+    public function testStartupFailsOnceTheWorkerDies(): void
+    {
+        $this->captureLogs();
+        // The worker exits right away, without reporting its state: the session doesn't exist
+        $paths = new SessionPaths($this->session);
+        exec('rm -rf '.escapeshellarg($this->session));
+        self::assertFileDoesNotExist($this->session);
+        $start = microtime(true);
+        $result = Server::startMe($paths)->await(Tools::getTimeoutCancellation(30.0));
+        self::assertInstanceOf(Throwable::class, $result);
+        self::assertStringContainsString("We couldn't start the IPC server", $result->getMessage());
+        // It used to wait for STARTUP_TIMEOUT (30 seconds)
+        self::assertLessThan(10.0, microtime(true) - $start);
     }
 
     /**
