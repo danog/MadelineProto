@@ -21,7 +21,6 @@ use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RichMessage\OutputConverter;
 use danog\MadelineProto\RichMessage\TextConverter;
-use danog\MadelineProto\StrTools;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
@@ -41,6 +40,8 @@ use ReflectionProperty;
  */
 final class RichMessage implements JsonSerializable
 {
+    use HtmlTrait;
+
     /**
      * Plain text version of the rich message.
      *
@@ -93,27 +94,6 @@ final class RichMessage implements JsonSerializable
             static fn (int $userId): array => ['id' => $userId],
         );
         return new self($converted['blocks'], $converted['is_rtl'] ?? false, $converted['is_part'] ?? false);
-    }
-
-    protected readonly string $html;
-    protected readonly string $htmlTelegram;
-
-    /**
-     * Get an HTML version of the rich message (of $message and $entities).
-     *
-     * @psalm-suppress InaccessibleProperty
-     *
-     * @param bool $allowTelegramTags Whether to allow telegram-specific tags like tg-spoiler, tg-emoji, mention links and so on...
-     */
-    public function getHTML(bool $allowTelegramTags = false): string
-    {
-        if (!$this->entities) {
-            return StrTools::htmlEscape($this->message);
-        }
-        if ($allowTelegramTags) {
-            return $this->htmlTelegram ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
-        }
-        return $this->html ??= StrTools::entitiesToHtml($this->message, $this->entities, $allowTelegramTags);
     }
 
     /** @internal */

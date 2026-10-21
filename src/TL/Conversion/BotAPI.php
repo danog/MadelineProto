@@ -461,6 +461,9 @@ trait BotAPI
                 $arguments['rich_message'] = $this->toInputRichMessage(
                     $richMessage,
                     \is_int($peer) || \is_string($peer) ? $peer : null,
+                    // New files are uploaded for the destination chat: inline messages and drafts have none
+                    allowUploads: $peer !== null,
+                    cancellation: $arguments['cancellation'] ?? null,
                 );
             }
         }
