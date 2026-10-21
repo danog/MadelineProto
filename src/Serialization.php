@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -55,6 +56,14 @@ use function Amp\Ipc\connect;
  */
 abstract class Serialization
 {
+    /**
+     * How long an IPC worker waits for the process holding the session lock to serve the session, in seconds.
+     */
+    private const WORKER_LOCK_TIMEOUT = 60;
+    /**
+     * How long to wait for a server to answer, in seconds.
+     */
+    private const SERVED_TIMEOUT = 10;
     /**
      * Unserialize session.
      *
@@ -136,7 +145,8 @@ abstract class Serialization
         $lockWait = new DeferredCancellation;
         $canContinue = true;
         $ipcSocket = null;
-        $alreadyServed = false;
+        // For IPC workers: true if the lock holder serves the session, false if it didn't for WORKER_LOCK_TIMEOUT seconds
+        $alreadyServed = null;
         $cancelFull = static function () use (&$cancelFlock): void {
             if ($cancelFlock !== null) {
                 $copy = $cancelFlock;
@@ -187,10 +197,19 @@ abstract class Serialization
             // clients, or by the process and the web runner of the same client): if the lock holder serves the
             // session, this worker is redundant and must exit, without reporting an error.
             // Only a server that answers counts: one that is shutting down may still have its socket bound.
+            // A holder that never serves (it drops connections, or it's stuck) must not keep the worker (a process,
+            // or a web server worker) around forever: if the holder serves the session eventually (it's still
+            // loading it), its clients connect to it anyway.
             $failureCb = static function () use ($session, $cancelFull, $lockWait, &$alreadyServed): void {
+                $deadline = microtime(true) + self::WORKER_LOCK_TIMEOUT;
                 while (!$lockWait->isCancelled()) {
                     if (self::isServed($session->getIpcPath(), $lockWait->getCancellation())) {
                         $alreadyServed = true;
+                        $cancelFull();
+                        return;
+                    }
+                    if (microtime(true) >= $deadline) {
+                        $alreadyServed = false;
                         $cancelFull();
                         return;
                     }
@@ -247,6 +266,9 @@ abstract class Serialization
         if (!$unlock) { // Canceled, don't have lock
             if ($alreadyServed) {
                 throw new AlreadyServedException("Another process is already serving the session {$session->getSessionDirectoryPath()}");
+            }
+            if ($alreadyServed === false) {
+                throw new AlreadyServedException("Another process holds the lock of the session {$session->getSessionDirectoryPath()} without serving it for ".self::WORKER_LOCK_TIMEOUT." seconds");
             }
             return $ipcSocket;
         }
@@ -396,8 +418,12 @@ abstract class Serialization
         }
         try {
             $socket->send(['isIpcWorker', []]);
-            // The server answers once it has loaded the session
-            $res = async($socket->receive(...))->await($cancellation);
+            // The server answers once it has loaded the session (it only listens then): one that doesn't answer
+            // within a few seconds doesn't serve it, it must not hang the caller.
+            $res = async($socket->receive(...))->await(new CompositeCancellation(
+                $cancellation,
+                Tools::getTimeoutCancellation(self::SERVED_TIMEOUT, "The IPC server didn't answer"),
+            ));
             return \is_array($res);
         } catch (Throwable) {
             return false;

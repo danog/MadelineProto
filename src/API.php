@@ -28,6 +28,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
+use danog\MadelineProto\Ipc\AlreadyServedException;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
@@ -346,6 +347,11 @@ final class API extends AbstractAPI
             // IPC server error
             throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
+            if (Magic::$isIpcWorker) {
+                // A worker is only useful as the server: as a client, it would wait for a shutdown forever.
+                $unserialized->disconnect();
+                throw new AlreadyServedException("Another process is already serving the session {$this->session->getSessionDirectoryPath()}");
+            }
             // Success, IPC client
             Server::warnIfOverTcp($this->session);
             $this->wrapper->setAPI($client = new Client($unserialized, $this->session, Logger::$default));
