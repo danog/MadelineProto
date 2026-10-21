@@ -36,9 +36,11 @@ final class WebContextRunner
     /**
      * Run the context with the given ID.
      *
+     * @param int $endpoint The endpoint of the webserver the request was sent to, reported to the parent.
+     *
      * @return bool Whether the context ran (false if the request is invalid, or was already served).
      */
-    public static function run(string $id): bool
+    public static function run(string $id, int $endpoint = 0): bool
     {
         if (!preg_match('/^[0-9a-f]{32}$/', $id)) {
             error_log("MadelineProto web context: invalid ID");
@@ -55,7 +57,7 @@ final class WebContextRunner
         $umask = umask(0o077);
         try {
             $socket = connect($request['uri'], new TimeoutCancellation($request['timeout']));
-            $socket->send($request['key']);
+            $socket->send(['key' => $request['key'], 'endpoint' => $endpoint]);
         } catch (Throwable $e) {
             error_log("MadelineProto web context: could not connect to the parent: $e");
             return false;

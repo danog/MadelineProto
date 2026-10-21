@@ -90,7 +90,10 @@ use Webmozart\Assert\Assert;
     }
     if (MADELINE_WORKER_TYPE === 'madeline-parallel') {
         // A context of amphp/parallel started by WebContextFactory
-        WebContextRunner::run((string) MADELINE_WORKER_ARGS[0]);
+        // The arguments come from the query string: anyone can request this script
+        $id = MADELINE_WORKER_ARGS[0];
+        $endpoint = MADELINE_WORKER_ARGS[1] ?? 0;
+        WebContextRunner::run(\is_string($id) ? $id : '', is_numeric($endpoint) ? (int) $endpoint : 0);
     } elseif (MADELINE_WORKER_TYPE === 'madeline-ipc') {
         $session = MADELINE_WORKER_ARGS[0];
         if (!file_exists($session)) {
