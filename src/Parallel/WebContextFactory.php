@@ -130,12 +130,119 @@ final class WebContextFactory implements ContextFactory
         if (is_link($path) || !file_exists($path)) {
             return false;
         }
-        $uid = \function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
+        $uid = self::getUid();
         if (fileowner($path) !== $uid || (fileperms($path) & 0o077) !== 0) {
             Logger::log("$path is not private to user $uid", Logger::ERROR);
             return false;
         }
         return true;
+    }
+
+    private static ?int $uid = null;
+
+    /**
+     * The user ID of the files this process creates: its effective user ID.
+     *
+     * Without ext-posix, it's the owner of a temporary file this process creates: getmyuid() is the owner of the
+     * script, not the user running it (www-data with mod_php, or with a PHP-FPM pool running the scripts of
+     * several users).
+     *
+     * @internal
+     */
+    public static function getUid(): int
+    {
+        if (self::$uid !== null) {
+            return self::$uid;
+        }
+        if (\function_exists('posix_geteuid')) {
+            return self::$uid = posix_geteuid();
+        }
+        try {
+            $file = tmpfile();
+        } catch (Throwable $e) {
+            throw new ContextException('Could not create a temporary file to get the user ID of this process', previous: $e);
+        }
+        if ($file === false) {
+            throw new ContextException('Could not create a temporary file to get the user ID of this process');
+        }
+        try {
+            return self::$uid = fstat($file)['uid'];
+        } finally {
+            fclose($file);
+        }
+    }
+
+    /**
+     * Create a directory only the user of the webserver can access.
+     *
+     * mkdir() fails if anything exists at the path, a symlink included: what it creates belongs to this user.
+     */
+    private static function createPrivateDirectory(string $path): void
+    {
+        $umask = umask(0o077);
+        try {
+            mkdir($path, 0o700);
+        } catch (Throwable $e) {
+            throw new ContextException("Could not create the private directory $path", previous: $e);
+        } finally {
+            umask($umask);
+        }
+        if (!self::isPrivate($path)) {
+            self::remove($path);
+            throw new ContextException("Could not create the private directory $path");
+        }
+    }
+
+    /**
+     * The longest path of a UNIX socket: sun_path is 108 bytes long on Linux, 104 on macOS and the BSDs, NUL
+     * included.
+     */
+    private const MAX_SOCKET_PATH = PHP_OS_FAMILY === 'Linux' ? 107 : 103;
+
+    /**
+     * Listen on the IPC endpoint of a context, in its private directory.
+     *
+     * Not on TCP: anyone could connect, and the key is checked after unserializing.
+     *
+     * The path of a UNIX socket can't be longer than MAX_SOCKET_PATH, which the directory of a context may exceed (in
+     * the temporary directory of macOS, the endpoint is 104 characters long): the socket is then in a private
+     * directory of its own in /tmp. FIFOs (used on Linux only) have no such limit: they're used if /tmp can't be.
+     *
+     * @return array{IpcServer, ?string} The server, and the directory created for its socket.
+     */
+    private static function listen(string $dir): array
+    {
+        $path = $dir.DIRECTORY_SEPARATOR.'ipc';
+        $socketDir = null;
+        if (\strlen($path) > self::MAX_SOCKET_PATH) {
+            try {
+                self::createPrivateDirectory($socketDir = '/tmp/madeline-'.bin2hex(random_bytes(8)));
+                $path = "$socketDir/ipc";
+            } catch (ContextException $e) {
+                if (PHP_OS_FAMILY !== 'Linux') {
+                    throw new ContextException(
+                        "The temporary directory is too long for the UNIX socket of the context, and /tmp can't be used: set a shorter sys_temp_dir",
+                        previous: $e,
+                    );
+                }
+                $socketDir = null;
+            }
+        }
+        $umask = umask(0o077);
+        try {
+            $server = new IpcServer(
+                $path,
+                \strlen($path) > self::MAX_SOCKET_PATH ? IpcServer::TYPE_FIFO : IpcServer::TYPE_UNIX | IpcServer::TYPE_FIFO,
+            );
+        } catch (Throwable $e) {
+            if ($socketDir !== null) {
+                self::remove($socketDir);
+            }
+            throw new ContextException('Could not create the IPC server of the context', previous: $e);
+        } finally {
+            umask($umask);
+        }
+        return [$server, $socketDir];
     }
 
     /**
@@ -158,20 +265,12 @@ final class WebContextFactory implements ContextFactory
         $dir = self::getDirectory($id);
         $request = self::getRequestPath($id);
 
-        $umask = umask(0o077);
+        self::createPrivateDirectory($dir);
         try {
-            if (!mkdir($dir, 0o700) || !self::isPrivate($dir)) {
-                throw new ContextException("Could not create the private directory $dir");
-            }
-            // Not TCP: anyone could connect, and the key is checked after unserializing
-            $server = new IpcServer($dir.DIRECTORY_SEPARATOR.'ipc', IpcServer::TYPE_UNIX | IpcServer::TYPE_FIFO);
+            [$server, $socketDir] = self::listen($dir);
         } catch (Throwable $e) {
             self::remove($dir);
-            throw $e instanceof ContextException
-                ? $e
-                : new ContextException('Could not create the IPC server of the context', previous: $e);
-        } finally {
-            umask($umask);
+            throw $e;
         }
         try {
             self::writeRequest($request, [
@@ -194,6 +293,9 @@ final class WebContextFactory implements ContextFactory
             // The request didn't get to read it
             self::remove($request);
             self::remove($dir);
+            if ($socketDir !== null) {
+                self::remove($socketDir);
+            }
             // The request already ignores the abort (or it never came)
             foreach ($requests ?? [] as $connection) {
                 $connection->map(static fn (?Socket $socket) => $socket?->close())->ignore();

@@ -86,13 +86,52 @@ final class WebContextTest extends TestCase
         }
     }
 
-    public function testContextsAndWorkersRunInWebserverRequests(): void
+    /**
+     * Without ext-posix, the user ID is still the one of the process, not the owner of the script (getmyuid()),
+     * which is another user with mod_php or a shared PHP-FPM pool: here, the script is /dev/null, owned by root.
+     */
+    public function testTheUserIdIsTheOneOfTheProcessWithoutPosix(): void
+    {
+        if (!\function_exists('posix_geteuid') || PHP_OS_FAMILY === 'Windows') {
+            self::markTestSkipped('posix is needed to know the user ID');
+        }
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-uid-'.bin2hex(random_bytes(8)).'.php';
+        file_put_contents($script, '<?php require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+            .'echo json_encode([function_exists("posix_geteuid"), getmyuid(), '.WebContextFactory::class.'::getUid()]);'
+            .'exit(0);');
+        try {
+            exec(
+                escapeshellarg(PHP_BINARY).' -d disable_functions=posix_geteuid -d auto_prepend_file='.escapeshellarg($script).' /dev/null',
+                $output,
+                $code,
+            );
+        } finally {
+            unlink($script);
+        }
+        self::assertSame(0, $code, implode("\n", $output));
+        self::assertSame([false, fileowner('/dev/null'), posix_geteuid()], json_decode(implode("\n", $output), true));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideTemporaryDirectories(): iterable
+    {
+        yield 'the temporary directory' => [sys_get_temp_dir().'/madeline-webcontext-test-'];
+        // The IPC endpoint of a context is then too long for a UNIX socket on every system
+        yield 'a long temporary directory' => [sys_get_temp_dir().'/madeline-webcontext-test-'.str_repeat('long-', 12)];
+    }
+
+    /**
+     * @dataProvider provideTemporaryDirectories
+     */
+    public function testContextsAndWorkersRunInWebserverRequests(string $tmp): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
             self::markTestSkipped('The built-in webserver serves one request at a time on Windows');
         }
         // Its own temporary directory, to check that nothing is left behind
-        $tmp = sys_get_temp_dir().'/madeline-webcontext-test-'.bin2hex(random_bytes(8));
+        $tmp .= bin2hex(random_bytes(8));
         mkdir($tmp, 0o700);
         // The context, its workers and the request that starts them each take a webserver worker
         [$server, $port] = self::startServer($tmp, ['PHP_CLI_SERVER_WORKERS' => '6', 'TMPDIR' => $tmp]);
