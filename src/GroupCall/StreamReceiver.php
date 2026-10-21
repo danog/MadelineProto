@@ -195,7 +195,7 @@ final class StreamReceiver
                     // Polled faster than the server allows (FLOOD_WAIT_3 while the livestream has no media): wait
                     // as long as it asks, and poll at that pace from now on, until the stream starts.
                     $this->channelsRetry = max($this->channelsRetry, (float) $e->getWaitTime());
-                    $this->call->log("Waiting {$e->getWaitTime()} seconds to fetch the stream channels of {$this->call} again", Logger::VERBOSE);
+                    $this->call->log("Waiting {$e->getWaitTime()} seconds to fetch the stream channels of {$this->call} again", Logger::ULTRA_VERBOSE);
                     delay((float) $e->getWaitTime());
                     continue;
                 } catch (Throwable $e) {
