@@ -79,7 +79,7 @@ RUN set -eux; \
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.11 php
+	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.12 php
 
 RUN set -eux; \
 	\
@@ -232,7 +232,7 @@ RUN set -eux; \
 	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
 
 COPY tests/dockerfiles/docker-php-* /usr/local/bin/
-ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.11/.gdbinit /root/.gdbinit
+ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.12/.gdbinit /root/.gdbinit
 
 RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libuv1 libuv1-dev libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get clean && rm -rf /var/lib/apt/lists/*
 
