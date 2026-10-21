@@ -36,9 +36,10 @@ if [ "$(gh pr view "$pr" --json headRefName --jq .headRefName)" == docker-php ];
     fi
     git fetch -q origin "+refs/heads/v8:refs/remotes/origin/v8" "$HEAD_SHA"
     base=$(git merge-base origin/v8 "$HEAD_SHA")
-    files=$(git diff --no-renames --name-only "$base" "$HEAD_SHA")
-    for file in $files; do
-        case $file in
+    # Fails before the loop, rather than in its input, if the diff fails.
+    git diff -z --no-renames --name-only "$base" "$HEAD_SHA" > /dev/null
+    while IFS= read -r -d '' file; do
+        case "$file" in
             tests/dockerfiles/Dockerfile|src/API.php) ;;
             *)
                 echo "Not merging #$pr: an update of PHP that changes $file"
@@ -51,7 +52,7 @@ if [ "$(gh pr view "$pr" --json headRefName --jq .headRefName)" == docker-php ];
             echo "Not merging #$pr: an update of PHP that changes more than the versions of $file"
             exit 0
         fi
-    done
+    done < <(git diff -z --no-renames --name-only "$base" "$HEAD_SHA")
 fi
 
 pending=$(gh pr checks "$pr" --json name,bucket --jq '[.[] | select(.bucket != "pass" and .bucket != "skipping") | .name] | join(", ")')
