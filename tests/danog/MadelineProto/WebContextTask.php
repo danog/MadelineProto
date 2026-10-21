@@ -29,12 +29,22 @@ use function Amp\delay;
  *
  * @internal
  *
- * @implements Task<array{pid: int, sapi: string, context: string, value: int, reply: mixed}, mixed, mixed>
+ * @implements Task<array{pid: int, contextId: string, sapi: string, context: string, value: int, reply: mixed}, mixed, mixed>
  */
 final class WebContextTask implements Task
 {
-    public function __construct(private readonly int $value, private readonly bool $throw = false)
-    {
+    /** Random ID of the context running the task: every context is a request of its own, with its own statics */
+    private static ?string $contextId = null;
+
+    /**
+     * @param bool $talk Whether to send the value to the parent and wait for its reply, then wait for the tasks
+     *                   submitted together to run in other workers.
+     */
+    public function __construct(
+        private readonly int $value,
+        private readonly bool $throw = false,
+        private readonly bool $talk = true,
+    ) {
     }
 
     #[\Override]
@@ -43,12 +53,16 @@ final class WebContextTask implements Task
         if ($this->throw) {
             throw new \RuntimeException("Task {$this->value} failed");
         }
-        $channel->send($this->value);
-        $reply = $channel->receive($cancellation);
-        // Long enough for the tasks submitted together to run in different workers
-        delay(0.5);
+        $reply = null;
+        if ($this->talk) {
+            $channel->send($this->value);
+            $reply = $channel->receive($cancellation);
+            // Long enough for the tasks submitted together to run in different workers
+            delay(0.5);
+        }
         return [
             'pid' => getmypid(),
+            'contextId' => self::$contextId ??= bin2hex(random_bytes(8)),
             'sapi' => PHP_SAPI,
             'context' => \AMP_CONTEXT,
             'value' => $this->value,

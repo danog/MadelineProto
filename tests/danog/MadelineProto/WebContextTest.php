@@ -132,6 +132,7 @@ final class WebContextTest extends TestCase
             $result = self::request($port, 'contexts');
 
             self::assertTrue($result['installed']);
+            self::assertTrue($result['web'], 'Not started with requests to the webserver, though proc_open is disabled');
             self::assertSame([1, null, 'two', [3]], $result['echoed']);
             self::assertSame('cli-server', $result['joined']['sapi']);
             self::assertNotSame($result['pid'], $result['joined']['pid'], 'The context ran in the request that started it');
@@ -147,6 +148,9 @@ final class WebContextTest extends TestCase
             self::assertNotContains($result['pid'], array_column($tasks, 'pid'));
 
             self::assertSame('Task 4 failed', $result['taskFailure']);
+            // The idle workers were stopped, ending their requests
+            self::assertSame($result['started'], $result['done'], 'The requests of idle workers did not end');
+            self::assertNotContains($result['afterIdle']['contextId'], array_column($tasks, 'contextId'));
             self::assertTrue($result['shutdown']);
 
             self::assertSame([], glob("$tmp/madeline-parallel-*"), 'Request files or IPC endpoints were left behind');
@@ -162,6 +166,30 @@ final class WebContextTest extends TestCase
                 preg_match_all('/\]: [A-Z]+ \//', $log),
                 'A connection to the webserver sent no request',
             );
+        }, ['-d', 'disable_functions=proc_open']);
+    }
+
+    /**
+     * Where processes can be started, contexts are processes, as without MadelineProto.
+     */
+    public function testContextsAreProcessesWhereTheyCanBe(): void
+    {
+        self::withServer(sys_get_temp_dir().'/madeline-webcontext-test-', ['PHP_CLI_SERVER_WORKERS' => '2'], static function (int $port): void {
+            $result = self::request($port, 'process');
+            self::assertSame('cli', $result['joined']['sapi']);
+            self::assertFalse($result['web']);
+        });
+    }
+
+    /**
+     * The context factory and worker pool set before MadelineProto starts are kept.
+     */
+    public function testTheGlobalsSetByTheUserAreKept(): void
+    {
+        self::withServer(sys_get_temp_dir().'/madeline-webcontext-test-', [], static function (int $port): void {
+            $result = self::request($port, 'userset');
+            self::assertTrue($result['factoryKept']);
+            self::assertTrue($result['poolKept']);
         });
     }
 
@@ -209,8 +237,9 @@ final class WebContextTest extends TestCase
      *
      * @param array<string, string>        $environment
      * @param \Closure(int, string): void $test Called with the port of the webserver and its temporary directory.
+     * @param list<string>                 $options     Options of PHP.
      */
-    private static function withServer(string $tmp, array $environment, \Closure $test): void
+    private static function withServer(string $tmp, array $environment, \Closure $test, array $options = []): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
             self::markTestSkipped('The built-in webserver serves one request at a time on Windows');
@@ -218,7 +247,7 @@ final class WebContextTest extends TestCase
         $tmp .= bin2hex(random_bytes(8));
         mkdir($tmp, 0o700);
         try {
-            [$server, $port] = self::startServer($tmp, ['TMPDIR' => $tmp] + $environment);
+            [$server, $port] = self::startServer($tmp, ['TMPDIR' => $tmp] + $environment, $options);
             try {
                 $test($port, $tmp);
             } catch (\Throwable $e) {
@@ -241,9 +270,10 @@ final class WebContextTest extends TestCase
      * would keep open.
      *
      * @param array<string, string> $environment
-     * @return array{resource, int}
+     * @param list<string>          $options     Options of PHP.
+     * @return array{array{resource, int}, int}
      */
-    private static function startServer(string $tmp, array $environment): array
+    private static function startServer(string $tmp, array $environment, array $options): array
     {
         if (!\function_exists('posix_setpgid') || !\function_exists('pcntl_exec')) {
             self::markTestSkipped('posix and pcntl are needed to stop the workers of the webserver');
@@ -256,7 +286,7 @@ final class WebContextTest extends TestCase
         $process = proc_open(
             [
                 PHP_BINARY, '-r', 'posix_setpgid(0, 0); pcntl_exec(PHP_BINARY, \array_slice($argv, 1));', '--',
-                '-d', 'opcache.enable_cli=0', '-S', "127.0.0.1:$port", '-t', self::ROOT,
+                '-d', 'opcache.enable_cli=0', ...$options, '-S', "127.0.0.1:$port", '-t', self::ROOT,
             ],
             [['file', '/dev/null', 'r'], ['file', $log, 'a'], ['file', $log, 'a']],
             $pipes,
