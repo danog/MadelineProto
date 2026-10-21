@@ -223,7 +223,12 @@ final class ReadLoop extends Loop
                     throw new NothingInTheSocketException();
                 }
                 $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
-                $this->connection->msgIdHandler->checkIncomingMessageId($message_id);
+                if (!$this->connection->msgIdHandler->checkIncomingPacketId($message_id)) {
+                    // Acknowledged all the same, as TDLib does: the server stops sending it again
+                    $this->connection->ack_queue []= $message_id;
+                    $this->connection->flush(true);
+                    return null;
+                }
                 $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
                 $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {

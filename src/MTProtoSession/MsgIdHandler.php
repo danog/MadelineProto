@@ -97,9 +97,61 @@ final class MsgIdHandler
         if (!($newMessageId % 2)) {
             throw new Exception('message id mod 4 != 1 or 3');
         }
-        // Not checked against the previous ones: the server can send a message before a container it created
-        // earlier (with lower message IDs), and the IDs of the messages of a container precede its own.
         $this->maxIncomingId = max($this->maxIncomingId, $newMessageId);
+    }
+    /**
+     * How many message IDs of received packets are kept to reject replays.
+     */
+    private const RECEIVED_PACKETS = 1000;
+    /**
+     * The message IDs of the last packets received, in increasing order (up to twice RECEIVED_PACKETS).
+     *
+     * @var list<int>
+     */
+    private array $receivedPacketIds = [];
+    /**
+     * Check the message ID of a received encrypted packet: whether it must be processed, or ignored as a replay.
+     *
+     * The packets aren't required to arrive in the order of their IDs: the server can send a message before a
+     * container it created earlier, with lower IDs. As the security guidelines say, the IDs of the last N packets
+     * are kept, and a packet whose ID is lower than all of them or equal to one of them is ignored
+     * (https://core.telegram.org/mtproto/security_guidelines#checking-msg-id, as TDLib's
+     * check_message_id_duplicates). Nested messages are checked with checkIncomingMessageId only: their IDs precede
+     * the one of their container, which is checked here.
+     */
+    public function checkIncomingPacketId(int $newMessageId): bool
+    {
+        $this->checkIncomingMessageId($newMessageId);
+        $ids = &$this->receivedPacketIds;
+        $count = \count($ids);
+        if ($count >= 2 * self::RECEIVED_PACKETS) {
+            $ids = \array_slice($ids, -self::RECEIVED_PACKETS);
+            $count = self::RECEIVED_PACKETS;
+        }
+        if ($count === 0 || $newMessageId > $ids[$count - 1]) {
+            $ids[] = $newMessageId;
+            return true;
+        }
+        if ($count >= self::RECEIVED_PACKETS && $newMessageId < $ids[$count - self::RECEIVED_PACKETS]) {
+            $this->session->API->logger->logger("Ignoring packet $newMessageId, older than the last ".self::RECEIVED_PACKETS." received", Logger::WARNING);
+            return false;
+        }
+        $low = 0;
+        $high = $count;
+        while ($low < $high) {
+            $mid = ($low + $high) >> 1;
+            if ($ids[$mid] < $newMessageId) {
+                $low = $mid + 1;
+            } else {
+                $high = $mid;
+            }
+        }
+        if ($ids[$low] === $newMessageId) {
+            $this->session->API->logger->logger("Ignoring packet $newMessageId, already received", Logger::WARNING);
+            return false;
+        }
+        array_splice($ids, $low, 0, [$newMessageId]);
+        return true;
     }
     /**
      * Generate message ID.
