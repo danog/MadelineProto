@@ -1,0 +1,43 @@
+name: Auto-merge
+
+# Merges the pull requests of Dependabot, and the updates of PHP of the docker image (see tests/update_docker.sh), once
+# all of their checks (pull-request.yml, pr-labels.yml: whichever finishes last merges) passed on their last commit:
+# see tests/automerge.sh. The ruleset of the main branch requires no review nor status check, so GitHub's own
+# auto-merge would merge them before their checks run.
+#
+# On workflow_run, this runs the workflow of the main branch, with its secrets: only the main branch is checked out,
+# never the code of the pull request.
+
+on:
+  workflow_run:
+    workflows:
+      - Pull request
+      - Pull request labels
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.event.workflow_run.actor.login == 'dependabot[bot]' || github.event.workflow_run.actor.login == 'madelineproto-autobuild[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          # The history, without the files, to compare an update of PHP with the main branch.
+          fetch-depth: 0
+          filter: blob:none
+      - name: Merge the pull request
+        env:
+          # Of an admin: Dependabot updates workflows too, which the token of a job can't merge, and the ruleset of the
+          # main branch only lets the admins merge the pull requests of the app of the autobuild.
+          GH_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: tests/automerge.sh

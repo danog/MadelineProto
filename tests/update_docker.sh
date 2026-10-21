@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
 # Update the version of PHP of the docker image (tests/dockerfiles/Dockerfile) to the latest release of its
-# major version (new minor versions too), submitting the change as a pull request: once merged, the CI rebuilds the
-# image, before running in it.
+# major version (new minor versions too), submitting the change as a pull request of its own, with a patch release
+# (so that the latest image is rebuilt with it too: its changelog is empty, the change is internal, so it's not
+# announced): once its checks passed, automerge.yml merges it, and the CI rebuilds the image before running in it.
 #
 # Needs GITHUB_TOKEN, able to push branches and to open pull requests (not to push to the main branch), and
 # RUN_URL, linked by the pull request.
@@ -28,5 +29,7 @@ git config --global user.email "${GIT_EMAIL:-autobuild@madelineproto.xyz}"
 gh auth setup-git
 
 perl -pi -e "s/php-\Q$current\E\b/php-$latest/g" "$dockerfile"
-git add "$dockerfile"
+source tests/release_version.sh
+echo "RELEASE: $(bump_release_constant release:fix)"
+git add "$dockerfile" src/API.php
 submit_pr . "${GH_REPO:-danog/MadelineProto}" docker-php "Update PHP to $latest in the docker image" "PHP $latest was released: https://www.php.net/ChangeLog-${latest%%.*}.php#$latest" release:internal

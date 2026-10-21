@@ -1,12 +1,14 @@
 name: Pull request labels
 
-# Every pull request needs a release label, which sorts it in the release notes: see ../release.yml.
+# Every pull request needs a release label, which sorts it in the release notes (see ../release.yml), and must bump
+# the RELEASE constant as its label requires (see tests/release_check.sh).
 
 on:
   pull_request:
     types: [opened, reopened, labeled, unlabeled, synchronize]
 
 permissions:
+  contents: read
   pull-requests: read
 
 jobs:
@@ -18,3 +20,16 @@ jobs:
           mode: minimum
           count: 1
           labels: "release:fix, release:feature, release:layer, release:internal"
+
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      # The merge commit of the pull request with the main branch.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check the bump of the RELEASE constant
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+        # Split on purpose: the release labels have no spaces.
+        run: tests/release_check.sh $LABELS

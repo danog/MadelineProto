@@ -8,7 +8,8 @@
  * Usage: php tests/announce_release.php <tag>. Needs GITHUB_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN
  * (the bot that sends the phars to @madelineprotophar, see tests/send_phar.sh; a member of the chats of CHATS, an
  * admin allowed to post in the channels and to pin messages where the changelog is pinned).
- * Does nothing if the release is still a draft or a pre-release, or was already announced; if it fails midway,
+ * Does nothing if the release is still a draft or a pre-release, or was already announced, or if the changelog is
+ * empty (only internal changes or updates of dependabot); if it fails midway,
  * running it again sends the rest (the steps done, messages sent and pins, are counted in the body of the release).
  *
  * With DRY_RUN=1, prints the messages instead (of any release, PHAR_BOT_TOKEN is not needed).
@@ -154,6 +155,23 @@ foreach (array_reverse($filtered) as $line) {
         $content = true;
     }
     $kept[] = $line;
+}
+
+// Nothing to announce if only internal changes were released (an update of PHP of the docker image, for example):
+// only the release is marked as announced.
+$empty = true;
+foreach ($kept as $line) {
+    if (trim($line) !== '' && !preg_match('/^#{1,6}\s/', $line) && !str_starts_with($line, '**Full Changelog**')) {
+        $empty = false;
+        break;
+    }
+}
+if ($empty) {
+    echo "The changelog of $tag is empty (internal changes only): not announced".PHP_EOL;
+    if (!$dryRun) {
+        github('PATCH', "repos/$repository/releases/{$release['id']}", ['body' => rtrim(preg_replace(DONE, '', $body))."\n".ANNOUNCED."\n"]);
+    }
+    exit(0);
 }
 
 $lines = ['*'.EntityTools::markdownEscape("MadelineProto {$release['name']}").'*', inline($release['html_url'])];

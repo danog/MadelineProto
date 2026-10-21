@@ -37,10 +37,11 @@ source tests/submit_pr.sh
 
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
-# The release label of the pull request of MadelineProto, see .github/release.yml.
-label=release:internal
+# The release labels of the pull request of MadelineProto (see .github/release.yml): a new layer is a feature, which
+# bumps the minor version (see tests/release_check.sh).
+labels=release:internal
 if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
-    label=release:layer
+    labels=release:layer,release:feature
 fi
 
 # The pull requests of this build, and their bodies, to link them to each other once all of them are submitted.
@@ -64,6 +65,11 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
 done
 submodules=${#urls[@]}
 
+source tests/release_version.sh
+if [ "$labels" != release:internal ]; then
+    echo "RELEASE: $(bump_release_constant ${labels//,/ })"
+fi
+
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
@@ -76,7 +82,7 @@ else
 
 It points to the commits of the other pull requests of this build. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
     fi
-    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
+    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$labels"
     if [ -n "$PR_URL" ]; then
         urls+=("$PR_URL")
         bodies+=("$body")
