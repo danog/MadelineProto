@@ -383,8 +383,9 @@ abstract class Serialization
      */
     public static function isLockedByAnotherProcess(SessionPaths $session): bool
     {
-        $res = @fopen($session->getLockPath(), 'c');
-        if (!$res) {
+        try {
+            $res = fopen($session->getLockPath(), 'c');
+        } catch (Throwable) {
             return false;
         }
         try {
