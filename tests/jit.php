@@ -11,7 +11,7 @@ foreach (['pcntl', 'uv', 'ffi', 'pgsql', 'memprof', 'intl', 'gmp', 'mbstring', '
 $status = opcache_get_status();
 var_dump($status);
 
-if (!$status["jit"]["on"] && trim(`uname -m`) !== 'riscv64') {
+if (!$status["jit"]["on"]) {
     echo "JIT is not enabled!".PHP_EOL;
     die(1);
 }

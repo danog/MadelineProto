@@ -142,8 +142,6 @@ app_test.json
 app.json
 config.json
 
-/Dockerfile
-
 /docker-compose.yml
 /Caddyfile
 /tt.php

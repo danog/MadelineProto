@@ -25,7 +25,11 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     env:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
       GITHUB_TOKEN: ${{ github.token }}
