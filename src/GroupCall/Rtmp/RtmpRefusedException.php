@@ -20,8 +20,10 @@ use danog\MadelineProto\Exception;
 
 /**
  * The RTMP server answered a command (connect, createStream) with an _error, or refused to publish
- * the stream (an onStatus of level error, e.g. NetStream.Publish.BadName for an invalid key): unlike
- * a dropped connection, retrying with the same URL and key gets the same answer.
+ * the stream (an onStatus of level error, e.g. NetStream.Publish.BadName for an invalid key). The
+ * publisher retries it with a backoff, like a dropped connection: the key Telegram gives is the same
+ * until an admin revokes it, so a refusal of it may be transient (e.g. the ingest still holding a
+ * previous session of ours).
  *
  * @internal
  */

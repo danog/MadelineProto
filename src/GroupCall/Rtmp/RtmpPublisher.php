@@ -22,6 +22,7 @@ use Amp\DeferredFuture;
 use Closure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\CallRecorder;
@@ -47,9 +48,9 @@ use function Amp\delay;
  * the stream stays live. The RTMP ingest of Telegram drops a publisher that sends no media for 10
  * seconds, as when nothing is played (an empty playlist without hold files, or paused playback):
  * then the connection is only reopened once something is played again. A server that keeps closing
- * the connection while media flows is retried with an exponential backoff, and a server that refuses
- * the stream key (even a freshly fetched one) or a key that can't be fetched anymore (e.g. the admin
- * rights were lost) stops publishing.
+ * the connection while media flows, or refuses the stream, is retried with an exponential backoff
+ * (the key is fetched again each time, which only changes if an admin revoked it: it's never revoked
+ * here); a key that can't be fetched anymore (e.g. the admin rights were lost) stops publishing.
  *
  * @internal
  */
@@ -109,7 +110,7 @@ final class RtmpPublisher
     private ?DeferredFuture $frameWaiter = null;
 
     /**
-     * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first).
+     * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
      * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
      * @param float                                         $idle     See {@see self::IDLE}.
      */
@@ -234,24 +235,11 @@ final class RtmpPublisher
     private function connectionLoop(): void
     {
         $delay = self::MIN_RECONNECT_DELAY;
-        /** @var ?array{string, string} The URL and key that the server refused last. */
-        $refused = null;
         while ($this->running) {
             try {
-                // A fresh key every time: it may have been revoked meanwhile.
+                // Fetched every time (never revoking it): the same key unless an admin revoked it meanwhile.
                 ['url' => $url, 'key' => $key] = ($this->ingest)(false);
-                try {
-                    $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation());
-                } catch (RtmpRefusedException $e) {
-                    if ($refused === [$url, $key]) {
-                        // Refused again, with the key Telegram has just given: no retry will fix it.
-                        $this->giveUp($e);
-                        return;
-                    }
-                    $refused = [$url, $key];
-                    throw $e;
-                }
-                $refused = null;
+                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation());
                 if (!$this->running) {
                     $client->close();
                     return;
@@ -302,6 +290,13 @@ final class RtmpPublisher
                     $this->giveUp($e);
                     return;
                 }
+                if ($e instanceof RateLimitError) {
+                    // A flood wait longer than the flood timeout of the call: wait as long as the server asks.
+                    $delay = max($delay, (float) $e->getWaitTime());
+                }
+                // Including a refused stream (RtmpRefusedException): the key Telegram gives is the same until an
+                // admin revokes it, so a refusal of it isn't proof that it can't work (e.g. the ingest still
+                // holding our previous session after a network drop), and the key is fetched again each time.
                 $this->call->log("Could not publish to the RTMP livestream of {$this->call}: {$e->getMessage()}, retrying in {$delay} seconds...", Logger::ERROR);
             } finally {
                 $this->client = null;

@@ -22,7 +22,6 @@ use danog\MadelineProto\GroupCall\Rtmp\Amf0;
 use danog\MadelineProto\GroupCall\Rtmp\Amf0EcmaArray;
 use danog\MadelineProto\GroupCall\Rtmp\FlvTags;
 use danog\MadelineProto\GroupCall\Rtmp\RtmpPublisher;
-use danog\MadelineProto\GroupCall\Rtmp\RtmpRefusedException;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
@@ -285,42 +284,41 @@ final class RtmpTest extends TestCase
     }
 
     /**
-     * A refused stream key is fetched again: a new one (revoked meanwhile) is used, while the same
-     * one refused again stops publishing instead of retrying forever.
+     * A refused stream is retried with a backoff, fetching the key again each time (the same one
+     * until an admin revokes it): a refusal isn't treated as definitive, it may be transient.
      */
-    public function testARefusedKeyStopsPublishingUnlessItChanged(): void
+    public function testARefusedStreamIsRetriedWithABackoff(): void
     {
         $server = new FakeRtmpServer(validKey: 'good');
         $call = self::call();
         $dj = new DjLoop($call, rtmp: true);
         self::assertTrue($dj->start());
-        $keys = ['old', 'good'];
-        $publisher = new RtmpPublisher($call, $dj, static function (bool $revoke) use ($server, &$keys): array {
-            return ['url' => $server->getUrl(), 'key' => array_shift($keys) ?? 'good'];
-        });
-        try {
-            delay(1.5);
-            self::assertSame(['old', 'good'], $server->keys, implode("\n", $call->logs));
-            self::assertTrue($publisher->isConnected());
-        } finally {
-            $publisher->stop();
-        }
-
+        $keys = ['bad', 'bad'];
+        $revoked = false;
         $gaveUp = null;
         $publisher = new RtmpPublisher(
             $call,
             $dj,
-            static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'bad'],
+            static function (bool $revoke) use ($server, &$keys, &$revoked): array {
+                $revoked = $revoked || $revoke;
+                return ['url' => $server->getUrl(), 'key' => array_shift($keys) ?? 'good'];
+            },
             static function (Throwable $e) use (&$gaveUp): void {
                 $gaveUp = $e;
             },
         );
         try {
-            delay(4);
-            self::assertSame(['old', 'good', 'bad', 'bad'], $server->keys, implode("\n", $call->logs));
-            self::assertInstanceOf(RtmpRefusedException::class, $gaveUp);
-            self::assertStringContainsString('NetStream.Publish.BadName', $gaveUp->getMessage());
+            delay(1.5);
+            // Refused at once, then again after 1 second.
+            self::assertSame(['bad', 'bad'], $server->keys, implode("\n", $call->logs));
             self::assertFalse($publisher->isConnected());
+            self::assertStringContainsString('NetStream.Publish.BadName', implode("\n", $call->logs));
+            delay(2.5);
+            // Then 2 seconds later, with the key an admin changed meanwhile.
+            self::assertSame(['bad', 'bad', 'good'], $server->keys, implode("\n", $call->logs));
+            self::assertTrue($publisher->isConnected());
+            self::assertNull($gaveUp);
+            self::assertFalse($revoked, 'The key must never be revoked by the publisher');
         } finally {
             $publisher->stop();
             $dj->discard();
