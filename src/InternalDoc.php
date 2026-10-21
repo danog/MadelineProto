@@ -908,7 +908,7 @@ abstract class InternalDoc
      *
      * @param array $config Current config
      */
-    final public function getConfig(array $config = [
+    final public function getConfig(array $config =  [
     ]): array
     {
         return $this->wrapper->getAPI()->getConfig($config);
@@ -1253,7 +1253,7 @@ abstract class InternalDoc
      *
      * @psalm-external-mutation-free
      */
-    final public function getPromCounter(string $namespace, string $name, string $help, array $labels = [
+    final public function getPromCounter(string $namespace, string $name, string $help, array $labels =  [
     ]): ?\danog\BetterPrometheus\BetterCounter
     {
         return $this->wrapper->getAPI()->getPromCounter($namespace, $name, $help, $labels);
@@ -1267,7 +1267,7 @@ abstract class InternalDoc
      *
      * @psalm-external-mutation-free
      */
-    final public function getPromGauge(string $namespace, string $name, string $help, array $labels = [
+    final public function getPromGauge(string $namespace, string $name, string $help, array $labels =  [
     ]): ?\danog\BetterPrometheus\BetterGauge
     {
         return $this->wrapper->getAPI()->getPromGauge($namespace, $name, $help, $labels);
@@ -1282,7 +1282,7 @@ abstract class InternalDoc
      *
      * @psalm-external-mutation-free
      */
-    final public function getPromHistogram(string $namespace, string $name, string $help, array $labels = [
+    final public function getPromHistogram(string $namespace, string $name, string $help, array $labels =  [
     ], ?array $buckets = null): ?\danog\BetterPrometheus\BetterHistogram
     {
         return $this->wrapper->getAPI()->getPromHistogram($namespace, $name, $help, $labels, $buckets);
@@ -1297,7 +1297,7 @@ abstract class InternalDoc
      *
      * @psalm-external-mutation-free
      */
-    final public function getPromSummary(string $namespace, string $name, string $help, array $labels = [
+    final public function getPromSummary(string $namespace, string $name, string $help, array $labels =  [
     ], int $maxAgeSeconds = 600, ?array $quantiles = null): ?\danog\BetterPrometheus\BetterSummary
     {
         return $this->wrapper->getAPI()->getPromSummary($namespace, $name, $help, $labels, $maxAgeSeconds, $quantiles);
@@ -1425,7 +1425,7 @@ abstract class InternalDoc
      * @param  ?Cancellation                                     $cancellation Cancellation: once cancelled, the wait stops with a CancelledException
      * @return list<array{update_id: mixed, update: mixed}>
      */
-    final public function getUpdates(array $params = [
+    final public function getUpdates(array $params =  [
     ], ?\Amp\Cancellation $cancellation = null): array
     {
         return $this->wrapper->getAPI()->getUpdates($params, $cancellation);
@@ -2445,7 +2445,7 @@ abstract class InternalDoc
      * @param Cancellation                                                  $cancellation           Cancellation.
      *
      */
-    final public function sendSticker(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $mimeType, string $emoji = '', array $stickerSet = [
+    final public function sendSticker(string|int $peer, \danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $mimeType, string $emoji = '', array $stickerSet =  [
         '_' => 'inputStickerSetEmpty',
     ], ?callable $callback = null, ?string $fileName = null, ?int $ttl = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Message
     {
@@ -2602,11 +2602,11 @@ abstract class InternalDoc
      * @param bool|null                 $messagesEnabled       Whether viewers may comment with in-call messages.
      * @param int|null                  $sendPaidMessagesStars The minimum Telegram Stars donation required to comment, if any.
      */
-    final public function startLive(string|int $peer, ?string $caption = null, ?\danog\MadelineProto\ParseMode $parseMode = null, array $privacyRules = [
+    final public function startLive(string|int $peer, ?string $caption = null, ?\danog\MadelineProto\ParseMode $parseMode = null, array $privacyRules =  [
         0 =>
-        [
-            '_' => 'inputPrivacyValueAllowAll',
-        ],
+         [
+             '_' => 'inputPrivacyValueAllowAll',
+         ],
     ], bool $pinned = false, bool $noForwards = false, bool $rtmpStream = false, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): \danog\MadelineProto\EventHandler\Calls\LiveStory
     {
         return $this->wrapper->getAPI()->startLive($peer, $caption, $parseMode, $privacyRules, $pinned, $noForwards, $rtmpStream, $messagesEnabled, $sendPaidMessagesStars);
@@ -3044,7 +3044,7 @@ abstract class InternalDoc
      * @param Cancellation                                                  $cancellation           Cancellation.
      *
      */
-    final public function uploadSticker(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $mimeType, string|int|null $peer = null, string $emoji = '', array $stickerSet = [
+    final public function uploadSticker(\danog\MadelineProto\EventHandler\Message|\danog\MadelineProto\EventHandler\Media|\danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\danog\MadelineProto\BotApiFileId|\Amp\ByteStream\ReadableStream $file, string $mimeType, string|int|null $peer = null, string $emoji = '', array $stickerSet =  [
         '_' => 'inputStickerSetEmpty',
     ], ?callable $callback = null, ?string $fileName = null, ?int $replyToMsgId = null, ?int $topMsgId = null, ?array $replyMarkup = null, string|int|null $sendAs = null, ?int $scheduleDate = null, bool $silent = false, bool $noForwards = false, bool $background = false, bool $clearDraft = false, bool $updateStickersetsOrder = false, bool $forceResend = false, ?\Amp\Cancellation $cancellation = null): \danog\MadelineProto\EventHandler\Media
     {
