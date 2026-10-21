@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Get a token of the app
         id: app
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.AUTOBUILD_APP_ID }}
           private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
@@ -109,7 +109,7 @@ jobs:
 
       - name: Get a token of the app
         id: app
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.AUTOBUILD_APP_ID }}
           private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
