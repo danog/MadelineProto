@@ -7,8 +7,16 @@
 #
 # Needs GH_TOKEN, able to merge pull requests that update workflows (not the token of a job), and HEAD_SHA.
 
+set -o pipefail
+
 repository=${GH_REPO:-danog/MadelineProto}
 export GH_REPO="$repository"
+
+# Without the versions of PHP and the RELEASE constant.
+normalize_versions()
+{
+    sed -E "s/php-[0-9]+\.[0-9]+\.[0-9]+\b/php-VERSION/g; s/^(    public const RELEASE = )'[0-9]+\.[0-9]+\.[0-9]+';\$/\1'VERSION';/"
+}
 
 pr=$(gh pr list --state open --json number,headRefOid,headRefName,author --jq ".[] | select(.headRefOid == \"$HEAD_SHA\") | select(.author.login == \"app/dependabot\" or (.author.login == \"app/madelineproto-autobuild\" and .headRefName == \"docker-php\")) | .number")
 if [ -z "$pr" ]; then
@@ -18,21 +26,32 @@ fi
 
 # An update of PHP is merged with the token of an admin, but the token of the app is also in the jobs of the autobuild
 # that run the code of the dependencies: only if the app made all of its commits, and it only changes what
-# tests/update_docker.sh changes, the versions of PHP of the Dockerfile and the RELEASE constant (the lines removed and
-# added are the same without them).
+# tests/update_docker.sh changes, the versions of PHP of the Dockerfile and the RELEASE constant (the files are the
+# same as in the main branch without them).
 if [ "$(gh pr view "$pr" --json headRefName --jq .headRefName)" == docker-php ]; then
     others=$(gh pr view "$pr" --json commits --jq '[.commits[].authors[].login | select(. != "madelineproto-autobuild[bot]")] | unique | join(", ")')
-    files=$(gh pr view "$pr" --json files --jq '[.files[].path | select(. != "tests/dockerfiles/Dockerfile" and . != "src/API.php")] | join(", ")')
-    if [ -n "$others" ] || [ -n "$files" ]; then
-        echo "Not merging #$pr: an update of PHP with commits of others (${others:-none}) or other files (${files:-none})"
+    if [ -n "$others" ]; then
+        echo "Not merging #$pr: an update of PHP with commits of others ($others)"
         exit 0
     fi
-    diff=$(gh pr diff "$pr" | grep -E '^[-+]' | grep -vE '^(\+\+\+|---) ' | \
-        sed -E "s/php-[0-9]+\.[0-9]+\.[0-9]+\b/php-VERSION/g; s/^([-+]    public const RELEASE = )'[0-9]+\.[0-9]+\.[0-9]+';\$/\1'VERSION';/")
-    if [ "$(grep '^-' <<< "$diff" | cut -c2- | sort)" != "$(grep '^+' <<< "$diff" | cut -c2- | sort)" ]; then
-        echo "Not merging #$pr: an update of PHP that changes more than the versions"
-        exit 0
-    fi
+    git fetch -q origin "+refs/heads/v8:refs/remotes/origin/v8" "$HEAD_SHA"
+    base=$(git merge-base origin/v8 "$HEAD_SHA")
+    files=$(git diff --no-renames --name-only "$base" "$HEAD_SHA")
+    for file in $files; do
+        case $file in
+            tests/dockerfiles/Dockerfile|src/API.php) ;;
+            *)
+                echo "Not merging #$pr: an update of PHP that changes $file"
+                exit 0
+                ;;
+        esac
+        old=$(git show "$base:$file" | normalize_versions)
+        new=$(git show "$HEAD_SHA:$file" | normalize_versions)
+        if [ "$old" != "$new" ]; then
+            echo "Not merging #$pr: an update of PHP that changes more than the versions of $file"
+            exit 0
+        fi
+    done
 fi
 
 pending=$(gh pr checks "$pr" --json name,bucket --jq '[.[] | select(.bucket != "pass" and .bucket != "skipping") | .name] | join(", ")')
