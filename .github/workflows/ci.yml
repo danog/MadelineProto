@@ -111,9 +111,11 @@ jobs:
       - name: Test the web UI, and check that its committed bundle is up to date
         run: tests/webui.sh
 
-  # The whole test suite, with the secrets.
+  # The whole test suite, with the secrets. Not for the tags: they're the commits of the main branch whose CI passed
+  # (see tests/prerelease.sh), whose tests would only compete for the sessions with the ones of the main branch.
   test:
     needs: docker-merge
+    if: github.ref_type != 'tag'
     runs-on: ubuntu-latest
     container:
       image: danog/madelineproto:next
@@ -122,7 +124,7 @@ jobs:
       credentials:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    # Rather than the default 6 hours if a test hangs, holding the user sessions (the daily build waits for them).
+    # Rather than the default 6 hours if a test hangs, holding the user sessions (the hourly build waits for them).
     timeout-minutes: 60
     # The user sessions (and the one of the bot) must not be used by two jobs at once.
     concurrency:
@@ -254,10 +256,10 @@ jobs:
           if-no-files-found: error
 
   release:
-    # Once every test passed. Skipped for the main branch: it needs the results of this run, so it can't be in a
-    # workflow of its own.
+    # Once every test passed (the test job is skipped for tags). Skipped for the main branch: it needs the results of
+    # this run, so it can't be in a workflow of its own.
     needs: [cs, webui, test, handshake, build]
-    if: github.ref_type == 'tag'
+    if: ${{ !cancelled() && !failure() && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
       # To upload the phar to the release of a tag.

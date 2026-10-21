@@ -1,8 +1,8 @@
-name: Release draft
+name: Pre-release
 
-# Keeps the draft of the next release up to date with what's pushed to the main branch (the version, the
-# RELEASE constant, the notes): see tests/release_draft.sh. The release is published by hand, from the draft.
-# Disabled until the RELEASE_DRAFT variable of the repository is set to true.
+# Releases every push to the main branch once its CI succeeded: bumps the RELEASE constant (pushed to the main
+# branch), then, once the CI of the bump succeeded too, tags it as a pre-release, which the CI of the tag builds,
+# tests and makes final: see tests/prerelease.sh. Only the last push is released, if several were pushed at once.
 
 on:
   # Once the CI of a push to the main branch succeeded, rather than on the push: pushing the RELEASE constant
@@ -19,12 +19,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-draft
+  group: prerelease
   cancel-in-progress: true
 
 jobs:
-  draft:
-    if: vars.RELEASE_DRAFT == 'true' && github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
+  prerelease:
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     container: danog/madelineproto:next
     steps:
@@ -37,12 +37,13 @@ jobs:
         with:
           # The tags, for the last release.
           fetch-depth: 0
+          # Of an admin, to push the RELEASE constant to the main branch, and so that the push and the tag run the CI
+          # (the events of the token of a job don't).
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-      - name: Update the draft
+      - name: Bump the version, or release it
         env:
-          # Of an admin, to push the RELEASE constant to the main branch.
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           # The commit the CI succeeded on.
           CI_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: tests/test.sh release-draft
+        run: tests/test.sh prerelease
