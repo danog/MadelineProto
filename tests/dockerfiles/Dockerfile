@@ -79,7 +79,7 @@ RUN set -eux; \
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.11 php
+	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.12 php
 
 RUN set -eux; \
 	\
