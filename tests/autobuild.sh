@@ -37,12 +37,6 @@ source tests/submit_pr.sh
 
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
-# The release labels of the pull request of MadelineProto (see .github/release.yml): a new layer is a feature.
-labels=release:internal
-if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
-    labels=release:layer,release:feature
-fi
-
 # The pull requests of this build, and their bodies, to link them to each other once all of them are submitted.
 urls=()
 bodies=()
@@ -67,8 +61,14 @@ submodules=${#urls[@]}
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
-# Released (see tests/release_check.sh): a new layer as a minor version, other changes that ship (the generated code,
-# the web UI) as a patch one.
+# The release labels of the pull request (see .github/release.yml): a change of the schema of the API is a feature,
+# a new layer or not (Telegram changes the schema of a layer too).
+labels=release:internal
+if git diff --cached --name-only | grep -qE '^src/(TL_[^/]*\.tl|Settings/TLSchema\.php)$'; then
+    labels=release:layer,release:feature
+fi
+# Released (see tests/release_check.sh): a change of the schema as a minor version, other changes that ship (the
+# generated code, the web UI) as a patch one.
 source tests/release_version.sh
 if [ "$labels" != release:internal ] || git diff --cached --name-only | ships; then
     echo "RELEASE: $(bump_release_constant ${labels//,/ } release:fix)"
