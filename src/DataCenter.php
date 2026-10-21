@@ -375,7 +375,7 @@ final class DataCenter
                                 $subdomain .= '-1';
                             }
                             $path = $settings->getTestMode() ? 'apiw_test1' : 'apiw1';
-                            $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                            $uri = 'tcp://'.$subdomain.'.'.$settings->getSslDomain().':'.$port.'/'.$path;
                         } elseif ($stream === HttpStream::class) {
                             $uri = 'tcp://'.$address.':'.$port.'/api';
                         } else {
@@ -401,7 +401,7 @@ final class DataCenter
                                         $subdomain .= '-1';
                                     }
                                     $path = $settings->getTestMode() ? 'apiws_test' : 'apiws';
-                                    $uri = 'tcp://'.$subdomain.'.web.telegram.org:'.$port.'/'.$path;
+                                    $uri = 'tcp://'.$subdomain.'.'.$settings->getSslDomain().':'.$port.'/'.$path;
                                 } else {
                                     $path = $settings->getTestMode() ? 'apiws_test' : 'apiws';
                                     $uri = 'tcp://'.$address.':'.$port.'/'.$path;
