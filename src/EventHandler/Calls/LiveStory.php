@@ -119,6 +119,7 @@ final class LiveStory extends AbstractGroupCall
     #[\Override]
     public function __toString(): string
     {
-        return "live story {$this->id}";
+        $chat = $this->peerId !== null ? " of {$this->peerId}" : '';
+        return "live story {$this->id}$chat";
     }
 }

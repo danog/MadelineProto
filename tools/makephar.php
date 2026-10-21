@@ -1,5 +1,5 @@
 #!/usr/bin/env php
-<?php
+<?php declare(strict_types=1);
 /*
 Copyright 2016-2020 Daniil Gentili
 (https://daniil.it)
@@ -19,7 +19,10 @@ if (!isset($argv[3])) {
 @unlink($argv[2]);
 
 $p = new Phar(__DIR__.'/../'.$argv[2], 0, $argv[2]);
-$p->buildFromDirectory(realpath($argv[1]), '/^((?!tests).)*(\.php|\.py|\.exe|\.html|\.tl|\.json|\.dat|\.h|\.wav)$/i');
+$root = realpath($argv[1]);
+$p->buildFromDirectory($root, '/^((?!tests).)*(\.php|\.py|\.exe|\.html|\.tl|\.json|\.dat|\.h|\.wav)$/i');
+// MadelineProto's own resources (like the templates and assets of the web UI) go in whatever their extension
+$p->buildFromDirectory($root, '~^'.preg_quote($root, '~').'/vendor/danog/madelineproto/src/~');
 
 $p->setStub('<?php
 

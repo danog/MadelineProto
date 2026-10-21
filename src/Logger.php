@@ -117,6 +117,16 @@ final class Logger
      */
     private ?string $rotateId = null;
     /**
+     * Log rotation loop ID of each log file, by real path.
+     *
+     * @var array<string, string>
+     */
+    private static array $rotations = [];
+    /**
+     * Real path of the log file, in file mode.
+     */
+    private ?string $realPath = null;
+    /**
      * PSR logger.
      */
     private readonly PsrLogger $psr;
@@ -291,10 +301,17 @@ final class Logger
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
             $stdout = new WritableResourceStream(fopen($this->optional, 'a'));
+            // Only the last logger of a file rotates it: a logger that was replaced (by MTProto::setupLogger) may stay
+            // alive, through the reference cycle with its PSR logger or whoever holds that, and would keep truncating
+            // the file at its own maximum size.
+            $this->realPath = realpath($this->optional) ?: $this->optional;
+            if (isset(self::$rotations[$this->realPath])) {
+                EventLoop::cancel(self::$rotations[$this->realPath]);
+                unset(self::$rotations[$this->realPath]);
+            }
             if ($maxSize !== -1) {
                 $optional = $this->optional;
-                $stdout = $stdout;
-                $this->rotateId = EventLoop::repeat(
+                $this->rotateId = self::$rotations[$this->realPath] = EventLoop::repeat(
                     10,
                     static function () use ($maxSize, $optional, $stdout): void {
                         clearstatcache(true, $optional);
@@ -307,7 +324,7 @@ final class Logger
                 EventLoop::unreference($this->rotateId);
             }
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
-            $result = @\ini_get('error_log');
+            $result = \ini_get('error_log');
             if ($result === 'syslog') {
                 $stdout = getStderr();
             } elseif ($result) {
@@ -356,7 +373,7 @@ final class Logger
 
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['light_gray'], self::SET['bold'], self::BACKGROUND['blue']]);
             if (Lang::$currentPercentage !== 100) {
-                $this->logger(sprintf(Lang::$current_lang['translate_madelineproto_cli'], Lang::$currentPercentage));
+                $this->logger(\sprintf(Lang::$current_lang['translate_madelineproto_cli'], Lang::$currentPercentage));
             }
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
@@ -388,6 +405,9 @@ final class Logger
     {
         if ($this->rotateId) {
             EventLoop::cancel($this->rotateId);
+            if ($this->realPath !== null && (self::$rotations[$this->realPath] ?? null) === $this->rotateId) {
+                unset(self::$rotations[$this->realPath]);
+            }
         }
     }
     /**

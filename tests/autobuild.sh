@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 # Run composer build (usually, to pick up a new layer of the schema), and submit what changed as pull
-# requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto.
+# requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto, with the bundle of the web UI
+# that .github/workflows/autobuild.yml rebuilt (tests/webui.sh --update) in a job without secrets.
 #
 # Run by tests/test.sh build, once it set up the tools and the dependencies. Needs:
 # - GITHUB_TOKEN, able to push branches to the three repositories and to open pull requests (but not to
@@ -36,12 +37,6 @@ source tests/submit_pr.sh
 
 layer=$(grep -o 'layer = [0-9]*' src/Settings/TLSchema.php | grep -o '[0-9]*')
 title="Automatic build (layer $layer)"
-# The release label of the pull request of MadelineProto, see .github/release.yml.
-label=release:internal
-if ! git show HEAD:src/Settings/TLSchema.php | grep -q "layer = $layer\b"; then
-    label=release:layer
-fi
-
 # The pull requests of this build, and their bodies, to link them to each other once all of them are submitted.
 urls=()
 bodies=()
@@ -54,28 +49,45 @@ for submodule in schemas:danog/schemas docs:danog/MadelineProtoDocs; do
         echo "Nothing changed in $repository"
         continue
     fi
-    body="The daily \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
+    body="The hourly \`composer build\` of MadelineProto: the pull request of danog/MadelineProto points to this one."
     submit_pr "$dir" "$repository" "$BRANCH" "$title" "$body"
-    urls+=("$PR_URL")
-    bodies+=("$body")
+    if [ -n "$PR_URL" ]; then
+        urls+=("$PR_URL")
+        bodies+=("$body")
+    fi
 done
 submodules=${#urls[@]}
 
 # Only the generated files, besides the ones that were already there: not what the CI left around.
 git add -u
 git add -A src
+# The release labels of the pull request (see .github/release.yml): a change of the schema of the API is a feature,
+# a new layer or not (Telegram changes the schema of a layer too).
+labels=release:internal
+if git diff --cached --name-only | grep -qE '^src/(TL_[^/]*\.tl|Settings/TLSchema\.php)$'; then
+    labels=release:layer,release:feature
+fi
+# Released (see tests/release_check.sh): a change of the schema as a minor version, other changes that ship (the
+# generated code, the web UI) as a patch one.
+source tests/release_version.sh
+if [ "$labels" != release:internal ] || git diff --cached --name-only | ships; then
+    echo "RELEASE: $(bump_release_constant ${labels//,/ } release:fix)"
+    git add src/API.php
+fi
 if git diff --cached --quiet; then
     echo "Nothing changed in danog/MadelineProto"
 else
-    body="The daily \`composer build\`."
+    body="The hourly \`composer build\`, and build of the web UI."
     if [ "$submodules" -ne 0 ]; then
         body="$body
 
 It points to the commits of the other pull requests of this build. Merge them first, with a merge commit (not a squash or a rebase), or the commits this points to would be lost."
     fi
-    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$label"
-    urls+=("$PR_URL")
-    bodies+=("$body")
+    submit_pr . danog/MadelineProto "$BRANCH" "$title" "$body" "$labels"
+    if [ -n "$PR_URL" ]; then
+        urls+=("$PR_URL")
+        bodies+=("$body")
+    fi
 fi
 
 if [ ${#urls[@]} -gt 1 ]; then

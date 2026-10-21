@@ -268,6 +268,12 @@ trait Login
         }
         $this->logger->logger(Lang::$current_lang['login_auth_key'], Logger::NOTICE);
 
+        // The connections made before (to the DC of the config, at least) go with their auth keys: closed, and no
+        // longer following the login state, which would otherwise copy the authorization to them once logged in.
+        foreach ($this->datacenter->getDataCenterConnections() as $dataCenterConnection) {
+            $dataCenterConnection->disconnect();
+            $this->loginState->unsubscribe($dataCenterConnection->auth);
+        }
         $this->datacenter = new DataCenter($this);
         // Not the default DC 1, which doesn't exist on the test servers (whose DCs are 10001-10003).
         $this->datacenter->currentDatacenter = $mainDcID;

@@ -43,7 +43,7 @@ final class EventHandlerIssue
      */
     public function __toString(): string
     {
-        return sprintf(
+        return \sprintf(
             Lang::$current_lang[$this->severe ? 'static_analysis_severe' : 'static_analysis_minor'],
             "{$this->file}:{$this->line}",
             $this->message

@@ -56,7 +56,10 @@ abstract class RunnerAbstract
         Logger::log("Copied IPC bootstrap file to $scriptPath");
 
         register_shutdown_function(static function () use ($alternateTmpDir): void {
-            @unlink(self::$pharScriptPath[$alternateTmpDir]);
+            try {
+                unlink(self::$pharScriptPath[$alternateTmpDir]);
+            } catch (\Throwable) {
+            }
         });
 
         return $scriptPath;

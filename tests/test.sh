@@ -44,8 +44,8 @@ if [ "$1" == "release-notes" ]; then
     exit 0
 fi
 
-if [ "$1" == "release-draft" ]; then
-    tests/release_draft.sh
+if [ "$1" == "prerelease" ]; then
+    tests/prerelease.sh
     exit 0
 fi
 

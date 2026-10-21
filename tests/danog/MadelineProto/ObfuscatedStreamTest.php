@@ -19,7 +19,6 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 /**
  * The encodings of MTProxy secrets.
@@ -46,7 +45,7 @@ final class ObfuscatedStreamTest extends TestCase
      */
     public function testSecretsAreDecoded(string $secret): void
     {
-        self::assertSame(self::KEY, self::decode($secret));
+        self::assertSame(self::KEY, ObfuscatedStream::decodeSecret($secret)['key']);
     }
 
     /**
@@ -54,7 +53,7 @@ final class ObfuscatedStreamTest extends TestCase
      */
     public static function invalidSecrets(): iterable
     {
-        yield 'fake TLS' => ['ee'.bin2hex(self::KEY).bin2hex('example.com')];
+        yield 'dd prefix with a domain' => ['dd'.bin2hex(self::KEY).bin2hex('example.com')];
         yield 'neither hex nor base64' => ['not a secret!'];
         yield 'too short' => [bin2hex(substr(self::KEY, 0, 4))];
     }
@@ -65,11 +64,6 @@ final class ObfuscatedStreamTest extends TestCase
     public function testInvalidSecretsAreRefused(string $secret): void
     {
         $this->expectException(Exception::class);
-        self::decode($secret);
-    }
-
-    private static function decode(string $secret): string
-    {
-        return (string) (new ReflectionMethod(ObfuscatedStream::class, 'decodeSecret'))->invoke(null, $secret);
+        ObfuscatedStream::decodeSecret($secret);
     }
 }

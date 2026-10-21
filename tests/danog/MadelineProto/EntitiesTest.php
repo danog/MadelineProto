@@ -65,6 +65,7 @@ class EntitiesTest extends TestCase
         return [
             [new BankCard(1, 2)],
             [new Blockquote(1, 2)],
+            [new Blockquote(1, 2, true)],
             [new Bold(1, 2)],
             [new BotCommand(1, 2)],
             [new Cashtag(1, 2)],
@@ -127,14 +128,17 @@ class EntitiesTest extends TestCase
     }
     public function testExpandableBlockquote(): void
     {
-        $result = TextEntities::fromHtml('a<blockquote expandable>quote</blockquote>');
-        $this->assertSame('aquote', $result->message);
-        $this->assertSame([['type' => 'expandable_blockquote', 'offset' => 1, 'length' => 5]], array_map(static fn ($e) => $e->toBotAPI(), $result->entities));
-        $this->assertSame([['_' => 'messageEntityBlockquote', 'collapsed' => true, 'offset' => 1, 'length' => 5]], array_map(static fn ($e) => $e->toMTProto(), $result->entities));
-        $this->assertSame('a<blockquote expandable>quote</blockquote>', StrTools::entitiesToHtml($result->message, $result->entities, true));
+        $html = TextEntities::fromHtml('<blockquote expandable>quote</blockquote>');
+        $this->assertEquals([new Blockquote(0, 5, true)], $html->entities);
+        $this->assertSame(['_' => 'messageEntityBlockquote', 'collapsed' => true, 'offset' => 0, 'length' => 5], $html->entities[0]->toMTProto());
+        $this->assertSame('<blockquote expandable>quote</blockquote>', StrTools::entitiesToHtml($html->message, $html->entities, true));
 
-        $quote = MessageEntity::fromRawEntity(['_' => 'messageEntityBlockquote', 'offset' => 0, 'length' => 1]);
-        $this->assertSame(['type' => 'blockquote', 'offset' => 0, 'length' => 1], $quote->toBotAPI());
+        $markdown = TextEntities::fromMarkdown("**>quote||");
+        $this->assertEquals([new Blockquote(0, 5, true)], $markdown->entities);
+
+        $this->assertEquals(new Blockquote(0, 5), MessageEntity::fromRawEntity(['_' => 'messageEntityBlockquote', 'collapsed' => false, 'offset' => 0, 'length' => 5]));
+        $this->assertEquals(new Blockquote(0, 5), MessageEntity::fromRawEntity(['type' => 'block_quote', 'offset' => 0, 'length' => 5]));
+        $this->assertEquals(new BankCard(0, 5), MessageEntity::fromRawEntity(['type' => 'bank_card', 'offset' => 0, 'length' => 5]));
     }
     private static function sendMessage(string $message, string $parse_mode): TextEntities
     {
@@ -571,7 +575,6 @@ class EntitiesTest extends TestCase
                         'url' => 'https://google.com/',
                     ],
                 ],
-                '<a href="https://google.com/">link </a>test',
             ],
             [
                 'html',

@@ -26,6 +26,7 @@ use Amp\DeferredFuture;
 use Amp\Future;
 use Closure;
 use danog\MadelineProto\Connection;
+use danog\MadelineProto\Exception;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -118,6 +119,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         public readonly ?int $takeoutId = null,
         public readonly ?string $businessConnectionId = null,
         private ?DeferredFuture $resultDeferred = null,
+        /**
+         * Whether the body embeds the message ID and session ID it is sent with (auth.bindTempAuthKey):
+         * it can't be sent again with another message ID or in another session.
+         */
+        public readonly bool $sessionBound = false,
     ) {
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
 
@@ -242,6 +248,24 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             EventLoop::cancel($this->checkTimer);
             $this->checkTimer = null;
         }
+    }
+    /**
+     * Prepare the message to be sent again with a new message ID (in a new session, or on another connection).
+     *
+     * A session-bound message can't be: it fails instead, so that its caller builds it again.
+     *
+     * @return bool Whether the message can be sent again.
+     */
+    public function resetForResend(): bool
+    {
+        if ($this->sessionBound) {
+            $constructor = $this->constructor;
+            $this->reply(static fn () => new Exception("$constructor can't be sent again with a new message ID"));
+            return false;
+        }
+        $this->setMsgId(null);
+        $this->setSeqNo(null);
+        return true;
     }
     private function check(): void
     {

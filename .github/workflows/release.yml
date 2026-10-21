@@ -1,7 +1,7 @@
 name: Release
 
 # When a release is published, its notes are generated (see tests/release_notes.sh); once it's fully released
-# (not a pre-release anymore), its changelog is sent to @danogentili on Telegram (see tests/announce_release.php).
+# (not a pre-release anymore), its changelog is sent to Telegram (see tests/announce_release.php).
 # Both only once.
 
 on:
@@ -25,7 +25,11 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     env:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
       GITHUB_TOKEN: ${{ github.token }}
@@ -36,7 +40,7 @@ jobs:
         run: |
           apt-get update && apt-get install -y git jq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The tags, for the layer of the previous release.
           fetch-depth: 0
@@ -47,7 +51,7 @@ jobs:
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: tests/send_phar.sh "$TAG"
-      - name: Send the changelog to @danogentili
+      - name: Send the changelog to Telegram
         if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}

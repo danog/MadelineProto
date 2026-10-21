@@ -784,6 +784,33 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private ?string $tmpDbPrefix = null;
 
     /**
+     * Called by IPC clients loaded with madeline.php when they connect, see GarbageCollector::syncIpcClientPhar.
+     *
+     * @internal
+     */
+    public function syncIpcClientPhar(string $release, string $phar, string $versionFile, string $loader): void
+    {
+        // Queued: a worker shuts down to update by throwing out of the event loop
+        EventLoop::queue(function () use ($release, $phar, $versionFile, $loader): void {
+            try {
+                GarbageCollector::syncIpcClientPhar(
+                    $release,
+                    $phar,
+                    $versionFile,
+                    $loader,
+                    \defined('MADELINE_PHAR') ? \MADELINE_PHAR : null,
+                    \defined('MADELINE_PHAR_VERSION') ? \MADELINE_PHAR_VERSION : null,
+                    \defined('MADELINE_PHP') ? \MADELINE_PHP : null,
+                );
+            } catch (SignalException $e) {
+                throw $e;
+            } catch (Throwable $e) {
+                $this->logger->logger("Could not sync the phar of an IPC client: $e", Logger::ERROR);
+            }
+        });
+    }
+
+    /**
      * @internal
      *
      * @psalm-external-mutation-free
@@ -816,7 +843,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     public function __sleep(): array
     {
-        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         return [
             // Databases
             'referenceDatabase',
@@ -918,10 +944,20 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * unserialization, which recreates the removed ones as dynamic properties (allowed, see the class: else a
      * deprecation). __sleep() lists the declared ones, so they're never saved again.
      *
+     * The removed properties whose state is migrated are read first, here: once dropped, they're gone.
+     *
      * @internal
      */
     public function __wakeup(): void
     {
+        // Sessions saved before the reactive login state (8.4.7): the defaults are those of the removed properties.
+        if (!isset($this->loginState)) {
+            /** @psalm-suppress UndefinedThisPropertyFetch */
+            $this->loginState = new Publisher(new LoginState(
+                $this->authorized ?? API::NOT_LOGGED_IN,
+                $this->authorized_dc ?? null,
+            ));
+        }
         foreach (get_object_vars($this) as $name => $_) {
             // A private property of a class that is no longer an ancestor keeps its mangled name ("\0Class\0name"),
             // which can't be unset: unreachable by any code, it's dropped by the next save
@@ -1095,7 +1131,6 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 throw new Exception("Memory profiling is not enabled, set the MEMPROF_PROFILE=1 environment variable or GET parameter to enable it.");
             }
         }
-        $this->loginState ??= new Publisher(new LoginState($this->authorized, $this->authorized_dc));
         $info = $this->getPromGauge("MadelineProto", "version", "Info about the MadelineProto instance");
         $info?->set(1, [
             'php_version' => PHP_VERSION,
@@ -1393,6 +1428,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         } catch (Throwable $e) {
             try {
                 $this->report((string) $e);
+            } catch (Throwable) {
+            }
+            // The session lock is released when the exception leaves the API constructor: stop the IPC server
+            // and drop the instance from the references (serialized at shutdown), so nothing touches the session
+            // without holding the lock (a client changing the database settings deleted the session from the
+            // database while the next worker was loading it).
+            try {
+                $this->unreference();
             } catch (Throwable) {
             }
             throw $e;
@@ -1956,23 +1999,23 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         Magic::start(light: false);
         $alerts = [];
         if (API::RELEASE !== Magic::$latest_release) {
-            $alerts[] = Alert::error(sprintf(
+            $alerts[] = Alert::error(\sprintf(
                 Lang::$current_lang['update_madelineproto'],
                 API::RELEASE,
                 Magic::$latest_release,
             ));
         }
         if (!Magic::$hasOpenssl) {
-            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
+            $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
         }
         if (!\extension_loaded('gmp')) {
-            $alerts[] = Alert::warning(sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
+            $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
         }
         if (!\extension_loaded('uv')) {
-            $alerts[] = Alert::info(sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
+            $alerts[] = Alert::info(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
         }
         if (Lang::$currentPercentage !== 100) {
-            $alerts[] = Alert::info(new SafeHtml(sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
+            $alerts[] = Alert::info(new SafeHtml(\sprintf(Lang::$current_lang['translate_madelineproto_web'], Lang::$currentPercentage)));
         }
         return $alerts;
     }

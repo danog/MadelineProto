@@ -79,7 +79,7 @@ trait Start
     private function APIStartCli(Settings $settings): array
     {
         $stdout = getStdout();
-        $stdout->write(sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
+        $stdout->write(\sprintf(Lang::$current_lang['apiChooseManualAutoTip'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html').PHP_EOL);
         $stdout->write(Lang::$current_lang['apiChooseManualAuto'].PHP_EOL);
         if (!str_contains(strtolower(Tools::readLine(Lang::$current_lang['apiChoosePrompt'])), 'm')) {
             $app = $this->APIStartCliAuto($settings, $stdout);
@@ -247,7 +247,7 @@ trait Start
     private static function getAutoErrorAlert(\Throwable $e): Alert
     {
         return Alert::error(
-            sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!')),
+            \sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!')),
             Lang::$current_lang['apiAutoErrorTitle'],
         );
     }
@@ -358,7 +358,7 @@ trait Start
         return new Page(
             title: Lang::$current_lang['apiManualWeb'],
             view: 'api.manual',
-            lead: new SafeHtml(sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html')),
+            lead: new SafeHtml(\sprintf(Lang::$current_lang['apiChooseManualAutoTipWeb'], 'https://docs.madelineproto.xyz/docs/SETTINGS.html')),
             step: Step::APP,
             fields: [
                 new Field(

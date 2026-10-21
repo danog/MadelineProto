@@ -114,6 +114,11 @@ final class Connection extends SettingsAbstract
     protected bool $retry = true;
 
     /**
+     * Whether to connect directly when the proxies fail.
+     */
+    protected bool $directFallback = false;
+
+    /**
      * Whether to use DNS over HTTPS.
      */
     protected bool $useDoH = true;
@@ -498,6 +503,31 @@ final class Connection extends SettingsAbstract
     public function setRetry(bool $retry): self
     {
         $this->retry = $retry;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to connect directly when the proxies fail.
+     */
+    public function getDirectFallback(): bool
+    {
+        return $this->directFallback;
+    }
+
+    /**
+     * Set whether to connect directly (without the proxies) when the proxies fail.
+     *
+     * Off by default: when proxies are set, Telegram and the URLs requested over HTTP are only ever
+     * reached through them.
+     *
+     * @param bool $directFallback Whether to connect directly when the proxies fail.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function setDirectFallback(bool $directFallback): self
+    {
+        $this->directFallback = $directFallback;
 
         return $this;
     }

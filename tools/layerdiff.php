@@ -18,7 +18,8 @@ If not, see <http://www.gnu.org/licenses/>.
  */
 
 require 'vendor/autoload.php';
-$logger = new Logger(new SettingsLogger);
+// The diff is printed on stdout (tests/release_notes.sh adds it to the release notes): log to stderr.
+$logger = new Logger((new SettingsLogger)->setType(Logger::FILE_LOGGER)->setExtra('php://stderr'));
 
 set_error_handler(['\danog\MadelineProto\Exception', 'ExceptionErrorHandler']);
 
@@ -57,23 +58,33 @@ function getUrl($constructor, $type)
 $old = getTL($args[0]);
 $new = getTL($args[1]);
 $res = '';
+/**
+ * A section of the diff, empty if it has no entries.
+ *
+ * @internal
+ */
+function section(string $title, string $entries): string
+{
+    return $entries === '' ? '' : "\n\n$title:\n$entries";
+}
 
 foreach (['methods', 'constructors'] as $type) {
     $finder = $type === 'methods' ? 'findByMethod' : 'findByPredicate';
     $key = $type === 'methods' ? 'method' : 'predicate';
 
     // New constructors
-    $res .= "\n\nNew ".ucfirst($type).":\n";
+    $entries = '';
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$old[$type]->$finder($name)) {
             $name = getUrl($name, $type);
-            $res .= "- $name\n";
+            $entries .= "- $name\n";
         }
     }
+    $res .= section('New '.ucfirst($type), $entries);
 
     // Changed constructors
-    $res .= "\n\nChanged ".ucfirst($type).":\n";
+    $entries = '';
     foreach ($new[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if ($old[$type]->$finder($name)) {
@@ -92,27 +103,29 @@ foreach (['methods', 'constructors'] as $type) {
             foreach ($final_new_args as $name => $ttype) {
                 if (!isset($final_old_args[$name]) && $name !== 'flags' && $name !== 'flags2') {
                     $name = Tools::markdownEscape($name);
-                    $res .= "- Added $name param to $url\n";
+                    $entries .= "- Added $name param to $url\n";
                 }
             }
             foreach ($final_old_args as $name => $ttype) {
                 if (!isset($final_new_args[$name]) && $name !== 'flags' && $name !== 'flags2') {
                     $name = Tools::markdownEscape($name);
-                    $res .= "- Removed $name param from $url\n";
+                    $entries .= "- Removed $name param from $url\n";
                 }
             }
         }
     }
+    $res .= section('Changed '.ucfirst($type), $entries);
 
     // Deleted constructors
-    $res .= "\n\nDeleted ".ucfirst($type).":\n";
+    $entries = '';
     foreach ($old[$type]->by_id as $constructor) {
         $name = $constructor[$key];
         if (!$new[$type]->$finder($name)) {
             $name = Tools::markdownEscape($name);
-            $res .= "- $name\n";
+            $entries .= "- $name\n";
         }
     }
+    $res .= section('Deleted '.ucfirst($type), $entries);
 }
 
 echo $res."\n\n";

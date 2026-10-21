@@ -7,15 +7,19 @@ namespace danog\MadelineProto\EventHandler\Message\Entities;
  */
 final class Blockquote extends MessageEntity
 {
+    /**
+     * @psalm-mutation-free
+     */
     public function __construct(
         /** Offset of message entity within message (in UTF-16 code units) */
-        int $offset,
+        public readonly int $offset,
+
         /** Length of message entity within message (in UTF-16 code units) */
-        int $length,
-        /** Whether the quote is collapsed (expandable) */
-        public readonly bool $collapsed = false,
+        public readonly int $length,
+
+        /** Whether the quote is collapsed by default (an expandable block quote) */
+        public readonly bool $collapsed = false
     ) {
-        parent::__construct($offset, $length);
     }
 
     /**

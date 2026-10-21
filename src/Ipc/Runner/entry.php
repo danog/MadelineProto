@@ -59,7 +59,8 @@ use Webmozart\Assert\Assert;
         \define('MADELINE_WORKER_ARGS', $arguments);
     }
 
-    if (\defined('SIGHUP')) {
+    // Not under a web server SAPI: the process belongs to the web server, which handles the signals itself
+    if (\defined('SIGHUP') && PHP_SAPI === 'cli') {
         try {
             pcntl_signal(SIGHUP, static fn () => null);
         } catch (\Throwable $e) {

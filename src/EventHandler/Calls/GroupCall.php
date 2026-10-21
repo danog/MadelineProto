@@ -164,6 +164,7 @@ final class GroupCall extends AbstractGroupCall
     public function __toString(): string
     {
         $title = $this->title !== null ? " \"{$this->title}\"" : '';
-        return "group call {$this->id}$title";
+        $chat = $this->peerId !== null ? " of chat {$this->peerId}" : '';
+        return "group call {$this->id}$title$chat";
     }
 }

@@ -64,13 +64,13 @@ class Exception extends \Exception
     public static function extension(string $extensionName): self
     {
         if ($extensionName === 'libtgvoip') {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
         } elseif ($extensionName === 'prime') {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
         } else {
-            $additional = sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
         }
-        $message = sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
+        $message = \sprintf(Lang::$current_lang['extensionRequired'], $extensionName, $additional);
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             echo htmlentities($message).'<br>';
         }
@@ -86,9 +86,9 @@ class Exception extends \Exception
     public static function exceptionErrorHandler($errno = 0, $errstr = null, $errfile = null, $errline = null): bool
     {
         $errfileReplaced = $errfile ?? '';
-        // If error is suppressed with @, don't throw an exception
-        // (since PHP 8, @ doesn't set error_reporting to 0, but to the fatal errors, which never reach this handler)
-        if (!(error_reporting() & $errno)
+        // Warnings throw, @ included (it doesn't clear error_reporting() since PHP 8): catch them instead.
+        // Only a script that turned error reporting off entirely gets none.
+        if (error_reporting() === 0
             || strpos($errstr, 'headers already sent')
             || str_contains($errstr, 'Creation of dynamic property')
             || str_contains($errstr, 'Legacy nullable type detected')
@@ -136,9 +136,9 @@ class Exception extends \Exception
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
-            $print(sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
-            $print(sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
-            $print(sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart1'], $maps));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart2'], 'echo 262144 | sudo tee /proc/sys/vm/max_map_count'));
+            $print(\sprintf(Lang::$current_lang['mmapErrorPart3'], 'echo vm.max_map_count=262144 | sudo tee /etc/sysctl.d/40-madelineproto.conf'));
             $print(Lang::$current_lang['mmapErrorPart4']);
             $print(Lang::$current_lang['manualAdminActionRequired']);
             $print(Lang::$current_lang['manualAdminActionRequired']);

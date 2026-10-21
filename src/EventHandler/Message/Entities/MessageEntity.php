@@ -62,11 +62,11 @@ abstract class MessageEntity implements JsonSerializable
             'cashtag', 'messageEntityCashtag' => new Cashtag($entity['offset'], $entity['length']),
             'underline', 'messageEntityUnderline' => new Underline($entity['offset'], $entity['length']),
             'strikethrough', 'messageEntityStrike' => new Strike($entity['offset'], $entity['length']),
-            // block_quote: the name used by telegram-entities before 1.1.0
+            // block_quote and bank_card are the names used before Bot API 10
             'blockquote', 'block_quote' => new Blockquote($entity['offset'], $entity['length']),
-            'expandable_blockquote' => new Blockquote($entity['offset'], $entity['length'], collapsed: true),
+            'expandable_blockquote' => new Blockquote($entity['offset'], $entity['length'], true),
             'messageEntityBlockquote' => new Blockquote($entity['offset'], $entity['length'], $entity['collapsed'] ?? false),
-            'bank_card', 'messageEntityBankCard' => new BankCard($entity['offset'], $entity['length']),
+            'bank_card_number', 'bank_card', 'messageEntityBankCard' => new BankCard($entity['offset'], $entity['length']),
             'spoiler', 'messageEntitySpoiler' => new Spoiler($entity['offset'], $entity['length']),
             'custom_emoji', 'messageEntityCustomEmoji' => new CustomEmoji($entity['offset'], $entity['length'], $entity['document_id'] ?? $entity['custom_emoji_id']),
             /** @psalm-suppress MixedArgument */

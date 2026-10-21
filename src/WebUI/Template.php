@@ -249,7 +249,7 @@ final class Template
     public static function translate(string $key, string|int|float ...$args): string
     {
         $string = Lang::$current_lang[$key] ?? Lang::$lang['en'][$key] ?? $key;
-        return $args ? sprintf($string, ...$args) : $string;
+        return $args ? \sprintf($string, ...$args) : $string;
     }
 
     private function includeTemplate(string $__file, array $__data): void

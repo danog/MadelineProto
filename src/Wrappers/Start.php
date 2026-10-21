@@ -172,7 +172,7 @@ trait Start
             $step();
         } catch (RPCErrorException|Exception $e) {
             $this->webEcho(
-                Alert::error(sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))),
+                Alert::error(\sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))),
                 $e instanceof RPCErrorException ? $e->rpc : null,
             );
             return;
@@ -325,7 +325,7 @@ trait Start
                             name: 'password',
                             label: Lang::$current_lang['loginPasswordLabelWeb'],
                             type: FieldType::PASSWORD,
-                            hint: $hint === '' ? '' : sprintf(Lang::$current_lang['loginUserPassHint'], $hint),
+                            hint: $hint === '' ? '' : \sprintf(Lang::$current_lang['loginUserPassHint'], $hint),
                             autofocus: true,
                         ),
                     ],
@@ -370,6 +370,6 @@ trait Start
         $hint = $this->getHint();
         return $hint === ''
             ? Lang::$current_lang['loginUserPassWeb']
-            : sprintf(Lang::$current_lang['loginUserPass'], $hint);
+            : \sprintf(Lang::$current_lang['loginUserPass'], $hint);
     }
 }

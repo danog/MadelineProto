@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Ipc;
 
+use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Ipc\Sync\ChannelException;
@@ -30,6 +32,8 @@ use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 
+use function Amp\delay;
+
 /**
  * IPC client.
  *
@@ -37,6 +41,23 @@ use const DEBUG_BACKTRACE_IGNORE_ARGS;
  */
 abstract class ClientAbstract
 {
+    /**
+     * Delay before the second reconnection in a row that didn't get any answer, in seconds: it doubles with each
+     * further one, up to MAX_RECONNECT_DELAY.
+     */
+    private const RECONNECT_DELAY = 1.0;
+    /**
+     * Maximum delay between reconnections, in seconds.
+     */
+    private const MAX_RECONNECT_DELAY = 30.0;
+    /**
+     * An idle connection that lasted this long (in seconds) was a working one: losing it doesn't delay reconnecting.
+     */
+    private const STABLE_CONNECTION = 10.0;
+    /**
+     * Number of connections a call is sent on without getting an answer before giving up.
+     */
+    private const MAX_SENDS = 5;
     /**
      * IPC server socket.
      */
@@ -47,9 +68,13 @@ abstract class ClientAbstract
     /**
      * Requests promise array.
      *
-     * @var array<int, list{string|int, array|Wrapper, DeferredFuture}>
+     * @var array<int, list{string|int, array|Wrapper, DeferredFuture, int}> Function, arguments, result, number of connections it was sent on
      */
     private array $requests = [];
+    /**
+     * Cancels the reconnection in progress, if any.
+     */
+    private ?DeferredCancellation $reconnecting = null;
     /**
      * Whether to run loop.
      */
@@ -84,7 +109,12 @@ abstract class ClientAbstract
      */
     protected function loopInternal(): void
     {
+        // Reconnections in a row that didn't get any answer
+        $failures = 0;
+        $connectedAt = microtime(true);
+        $failure = null;
         do {
+            $answered = false;
             while (true) {
                 $payload = null;
                 try {
@@ -96,6 +126,7 @@ abstract class ClientAbstract
                     Logger::log("Disconnected from IPC server!");
                     break;
                 }
+                $answered = true;
                 [$id, $payload] = $payload;
                 if (!isset($this->requests[$id])) {
                     Logger::log("Got response for non-existing ID $id!");
@@ -119,20 +150,48 @@ abstract class ClientAbstract
                         $this->server->disconnect();
                     } catch (Throwable $e) {
                     }
+                    // A server that answered, or an idle connection that lasted, was a working one. Otherwise the
+                    // server dropped us (it's shutting down with its socket still bound, it fails to handle our
+                    // calls, ...): reconnecting right away would spin on it, so wait longer and longer.
+                    if ($answered || (!$this->requests && microtime(true) - $connectedAt >= self::STABLE_CONNECTION)) {
+                        $failures = 0;
+                    } else {
+                        $failures++;
+                    }
                     $requests = [];
+                    $this->reconnecting = new DeferredCancellation;
                     try {
-                        // Connect as soon as any server is listening, even if it was started by another process
-                        [$server] = Serialization::tryConnect($this->session->getIpcPath(), Server::startMe($this->session), waitStartup: true);
+                        $cancellation = $this->reconnecting->getCancellation();
+                        // Calls sent on several connections in a row, each dropped before answering them, would be
+                        // sent again forever.
+                        $calls = [];
+                        foreach ($this->requests as [$function, , , $sends]) {
+                            if ($sends >= self::MAX_SENDS) {
+                                $calls[] = $function;
+                            }
+                        }
+                        if ($calls) {
+                            throw new ChannelException("The IPC server of {$this->session} dropped the connection ".self::MAX_SENDS." times in a row without answering ".implode(', ', array_unique($calls)).", giving up: please check the logs of the IPC server (or of the instance running the session)!");
+                        }
+                        if ($failures > 1) {
+                            $wait = min(self::RECONNECT_DELAY * 2 ** ($failures - 2), self::MAX_RECONNECT_DELAY);
+                            $this->logger("The IPC server dropped the connection without answering, reconnecting in $wait seconds...", Logger::WARNING);
+                            delay($wait, true, $cancellation);
+                        }
+                        // Connects to the server of the session if there's one (or an instance loading it), only
+                        // starting one if there's none.
+                        [$server] = Serialization::reconnect($this->session, $cancellation);
                         if (!$server instanceof ChannelledSocket) {
                             throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
                         }
                         $this->server = $server;
+                        $connectedAt = microtime(true);
                         $this->logger('Reconnected to IPC server!');
                         $requests = $this->requests;
                         $this->requests = [];
                         $this->id = 0;
                         while ($requests) {
-                            [$function, $arguments, $deferred] = array_shift($requests);
+                            [$function, $arguments, $deferred, $sends] = array_shift($requests);
                             if ($arguments instanceof Wrapper) {
                                 // Its callbacks were connected to the previous server, which can't call them anymore.
                                 // (Interrupted uploads and sends are resumed by the server on its own.)
@@ -141,16 +200,30 @@ abstract class ClientAbstract
                                 continue;
                             }
                             $id = $this->id++;
-                            $this->requests[$id] = [$function, $arguments, $deferred];
-                            $this->server->send([$function, $arguments]);
+                            $this->requests[$id] = [$function, $arguments, $deferred, $sends + 1];
+                            try {
+                                $this->server->send([$function, $arguments]);
+                            } catch (Throwable $e) {
+                                // Dropped already: the calls are sent again on the next connection (or failed)
+                                $this->logger("Could not send $function to the IPC server: $e");
+                                foreach ($requests as $request) {
+                                    $this->requests[$this->id++] = $request;
+                                }
+                                break;
+                            }
                         }
                         $f->complete();
                         $this->serverFuture = null;
                         $this->logger('Resumed IPC queries!');
                     } catch (Throwable $e) {
-                        $this->logger("Could not reconnect to IPC server: $e", Logger::FATAL_ERROR);
+                        if ($e instanceof CancelledException && !$this->run) {
+                            $e = new ChannelException("Disconnected from the IPC server while reconnecting to it");
+                        } else {
+                            $this->logger("Could not reconnect to IPC server: $e", Logger::FATAL_ERROR);
+                        }
+                        $failure = $e;
                         // The requests that were not sent again yet are failed below, too
-                        /** @var array<int, list{string|int, array|Wrapper, DeferredFuture}> $requests */
+                        /** @var array<int, list{string|int, array|Wrapper, DeferredFuture, int}> $requests */
                         foreach ($requests as $request) {
                             $this->requests[] = $request;
                         }
@@ -158,6 +231,8 @@ abstract class ClientAbstract
                         $f->getFuture()->ignore();
                         $f->error($e);
                         $this->run = false;
+                    } finally {
+                        $this->reconnecting = null;
                     }
                 } else {
                     try {
@@ -176,7 +251,7 @@ abstract class ClientAbstract
                 // (late progress notifications, cancellation waits) belong to nobody, so they're dropped.
                 $deferred->complete(null);
             } else {
-                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!"));
+                $deferred->error(new ChannelException("Disconnected from IPC server while calling $function!", previous: $failure));
             }
         }
     }
@@ -186,6 +261,7 @@ abstract class ClientAbstract
     public function disconnect(): void
     {
         $this->run = false;
+        $this->reconnecting?->cancel();
         $this->server->disconnect();
         foreach ($this->requests as [, $args, $promise]) {
             if ($args instanceof Wrapper) {
@@ -209,8 +285,14 @@ abstract class ClientAbstract
 
         $deferred = new DeferredFuture;
         $id = $this->id++;
-        $this->requests[$id] = [$function, $arguments, $deferred];
-        $this->server->send([$function, $arguments]);
+        $this->requests[$id] = [$function, $arguments, $deferred, 1];
+        try {
+            $this->server->send([$function, $arguments]);
+        } catch (Throwable $e) {
+            // The connection is lost: the main loop sends the call again once reconnected, or fails it.
+            // (Throwing here left the call pending, its result unhandled.)
+            $this->logger("Could not send $function to the IPC server: $e");
+        }
         $result = $deferred->getFuture()->await();
         if ($result instanceof ExitFailure) {
             throw $result->getException();

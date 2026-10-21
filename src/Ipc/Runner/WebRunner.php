@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Ipc\Runner;
 
+use Amp\ByteStream\ReadableResourceStream;
 use Amp\Future;
 use Amp\Parallel\Context\ContextException;
 use Amp\Socket\ClientTlsContext;
@@ -26,6 +27,7 @@ use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
+use Revolt\EventLoop;
 use Throwable;
 
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -43,11 +45,6 @@ final class WebRunner extends RunnerAbstract
 {
     /** @var string|null Cached path to the runner script. */
     private static ?string $runPath = null;
-
-    /**
-     * Resources.
-     */
-    private static array $resources = [];
 
     /**
      * Start.
@@ -185,7 +182,8 @@ final class WebRunner extends RunnerAbstract
 
     public static function selfStart(string $uri): void
     {
-        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\n\r\n";
+        // Without Connection: close, the server keeps the connection open after the response, until its idle timeout
+        $payload = "GET $uri HTTP/1.1\r\nHost: {$_SERVER['SERVER_NAME']}\r\nConnection: close\r\n\r\n";
 
         foreach (self::getSelfStartEndpoints() as [$proto, $port]) {
             try {
@@ -196,13 +194,30 @@ final class WebRunner extends RunnerAbstract
                 // We don't care for results or timeouts here, PHP doesn't count IOwait time as execution time anyway
                 // Blocking on purpose: this also runs in shutdown functions, where the event loop doesn't run
                 fwrite($res, $payload);
-                self::$resources []= $res;
+                // Closing the connection could abort the request of the worker: it's closed once the response
+                // ends (the worker exited, or another server answered).
+                EventLoop::queue(self::drain(...), new ReadableResourceStream($res));
             } catch (Throwable $e) {
                 Logger::log("Error while sending to {$address}:{$port}: $e");
             }
         }
         if (!isset($res)) {
             throw new Exception('Could not connect to ourselves, please check the server configuration!');
+        }
+    }
+
+    /**
+     * Read the response to a self-request until it ends without keeping the loop alive, then close it.
+     */
+    private static function drain(ReadableResourceStream $stream): void
+    {
+        $stream->unreference();
+        try {
+            while ($stream->read() !== null);
+        } catch (Throwable $e) {
+            Logger::log("An error occurred while reading the response to a self-request: $e");
+        } finally {
+            $stream->close();
         }
     }
 }

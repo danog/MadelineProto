@@ -187,12 +187,14 @@ final class SessionPaths
      */
     private static function fsync(string $path): void
     {
-        $f = @fopen($path, 'r+');
-        if ($f === false) {
+        try {
+            $f = fopen($path, 'r+');
+        } catch (\Throwable) {
             return;
         }
         try {
-            @fsync($f);
+            fsync($f);
+        } catch (\Throwable) {
         } finally {
             fclose($f);
         }
@@ -289,6 +291,24 @@ final class SessionPaths
     public function getIpcPath(): string
     {
         return $this->ipcPath;
+    }
+
+    /**
+     * Whether the IPC server of the session listens on TCP (on 127.0.0.1), because UNIX sockets are unavailable:
+     * unlike UNIX sockets and FIFOs, any program running on the machine can connect to it.
+     */
+    public function isIpcOverTcp(): bool
+    {
+        // danog/ipc stores TCP endpoints (and the UNIX sockets of Windows) in a regular file at the IPC path.
+        clearstatcache(true, $this->ipcPath);
+        if (!is_file($this->ipcPath)) {
+            return false;
+        }
+        try {
+            return str_starts_with((string) file_get_contents($this->ipcPath, length: 6), 'tcp://');
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

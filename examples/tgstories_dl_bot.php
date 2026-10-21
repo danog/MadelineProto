@@ -22,10 +22,13 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Broadcast\Progress;
 use danog\MadelineProto\Broadcast\Status;
 use danog\MadelineProto\EventHandler\Filter\FilterCommand;
+use danog\MadelineProto\EventHandler\Filter\FilterRegex;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Query\ChatButtonQuery;
 use danog\MadelineProto\EventHandler\SimpleFilter\FromAdmin;
 use danog\MadelineProto\EventHandler\SimpleFilter\Incoming;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SimpleEventHandler;
 
 // MadelineProto is already loaded
@@ -59,6 +62,8 @@ final class StoriesEventHandler extends SimpleEventHandler
     private const HELP = "Telegram stories downloader bot, powered by @MadelineProto!\n\nUsage:\n/dlStories @danogentili - Download all the stories of a @username!\n\n[Source code](https://github.com/danog/MadelineProto/blob/v8/examples/tgstories_dl_bot.php) powered by @MadelineProto";
     // Username of the admin of the bot
     private const ADMIN = "@danogentili";
+
+    private const PAGE_SIZE = 10;
 
     private API $userInstance;
     public function onStart(): void
@@ -107,7 +112,7 @@ final class StoriesEventHandler extends SimpleEventHandler
     }
 
     /**
-     * Downloads all telegram stories of a user (including protected ones).
+     * Lists the telegram stories of a user, a page at a time, with download links (except for protected ones).
      *
      * The bot must be started via web for this command to work.
      *
@@ -120,33 +125,117 @@ final class StoriesEventHandler extends SimpleEventHandler
             $message->reply("You must specify the @username or the Telegram ID of a user to download their stories!");
             return;
         }
+        $peer = $this->userInstance->getId($message->commandArgs[0]);
 
-        $stories = $this->userInstance->stories->getPeerStories(peer: $message->commandArgs[0])['stories']['stories'];
-        $last = null;
-        do {
-            $res = $this->userInstance->stories->getPinnedStories(peer: $message->commandArgs[0], offset_id: $last)['stories'];
-            $last = $res ? end($res)['id'] : null;
-            $stories = array_merge($res, $stories);
-        } while ($last);
-        // Skip deleted stories
-        $stories = array_filter($stories, static fn (array $s): bool => $s['_'] === 'storyItem');
-        // Skip protected stories
-        $stories = array_filter($stories, static fn (array $s): bool => !$s['noforwards']);
-        // Sort by date
-        usort($stories, static fn ($a, $b) => $a['date'] <=> $b['date']);
-
-        $message = $message->reply("Total stories: ".count($stories));
-        foreach (array_chunk($stories, 10) as $sub) {
-            $result = '';
-            foreach ($sub as $story) {
-                $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
-                if (isset($story['caption'])) {
-                    $cur .= ', "'.self::markdownEscape($story['caption']).'"';
-                }
-                $result .= "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
-            }
-            $message = $message->reply($result, parseMode: ParseMode::MARKDOWN);
+        // The active stories that aren't posted to the profile, which stories.getPinnedStories doesn't return
+        $active = $this->userInstance->stories->getPeerStories(peer: $peer)['stories']['stories'];
+        // Active stories may be returned as storyItemSkipped, fetch them in full
+        $skipped = array_column(array_filter($active, static fn (array $s): bool => $s['_'] === 'storyItemSkipped'), 'id');
+        if ($skipped) {
+            $active = array_merge(
+                array_filter($active, static fn (array $s): bool => $s['_'] !== 'storyItemSkipped'),
+                $this->userInstance->stories->getStoriesByID(peer: $peer, id: $skipped)['stories'],
+            );
         }
+        $active = array_filter($active, static fn (array $s): bool => $s['_'] === 'storyItem' && !$s['pinned']);
+        usort($active, static fn (array $a, array $b): int => $b['id'] <=> $a['id']);
+
+        [$text, $markup] = $this->renderStoriesPage($peer, 0, $active);
+        $message->reply($text, parseMode: ParseMode::MARKDOWN, replyMarkup: $markup, noWebpage: true);
+    }
+
+    /**
+     * Loads the next page of the stories of a user, when its button is pressed.
+     */
+    #[FilterRegex('/^stories:(-?\d+):(\d+)$/')]
+    public function storiesPageQuery(ChatButtonQuery $query): void
+    {
+        // Remove the button first, so that the page is loaded once even if it's pressed again
+        try {
+            // Without reply_markup: Telegram rejects an empty inline keyboard (REPLY_MARKUP_INVALID)
+            $this->messages->editMessage(peer: $query->chatId, id: $query->messageId);
+        } catch (RPCErrorException $e) {
+            if ($e->rpc !== 'MESSAGE_NOT_MODIFIED') {
+                throw $e;
+            }
+            // Already pressed
+            $query->answer(cacheTime: 0);
+            return;
+        }
+        $query->answer(cacheTime: 0);
+
+        $peer = (int) $query->matches[1];
+        $offset = (int) $query->matches[2];
+        try {
+            [$text, $markup] = $this->renderStoriesPage($peer, $offset, []);
+        } catch (Throwable $e) {
+            // Give the button back, to retry
+            $query->editReplyMarkup(self::nextPageMarkup($peer, $offset));
+            throw $e;
+        }
+        $this->sendMessage(peer: $query->chatId, message: $text, parseMode: ParseMode::MARKDOWN, replyMarkup: $markup, noWebpage: true);
+    }
+
+    /**
+     * Renders a page of the profile stories of a peer (newest first, the ones pinned to the top on the first page),
+     * fetching only that page, after some other stories to list first.
+     *
+     * Protected stories are listed without a link.
+     *
+     * @param int  $offset ID of the last story of the previous page, 0 for the first page
+     * @param list<array> $before Stories to list before the page
+     *
+     * @return array{string, ?array}
+     */
+    private function renderStoriesPage(int $peer, int $offset, array $before): array
+    {
+        $res = $this->userInstance->stories->getPinnedStories(peer: $peer, offset_id: $offset, limit: self::PAGE_SIZE);
+        $pinnedToTop = $res['pinned_to_top'] ?? [];
+        $stories = $before;
+        $next = 0;
+        foreach ($res['stories'] as $story) {
+            if (in_array($story['id'], $pinnedToTop, true)) {
+                // Listed first on the first page whatever their ID, they can't be used as offset
+                if ($offset !== 0) {
+                    continue;
+                }
+            } else {
+                $next = $next === 0 ? $story['id'] : min($next, $story['id']);
+            }
+            // Skip deleted stories
+            if ($story['_'] === 'storyItem') {
+                $stories[] = $story;
+            }
+        }
+
+        $result = '';
+        foreach ($stories as $story) {
+            $cur = "- ID {$story['id']}, posted ".date(DATE_RFC850, $story['date']);
+            if (isset($story['caption']) && $story['caption'] !== '') {
+                $caption = mb_strlen($story['caption']) > 100 ? mb_substr($story['caption'], 0, 100).'…' : $story['caption'];
+                $cur .= ', "'.self::markdownEscape($caption).'"';
+            }
+            $result .= $story['noforwards']
+                ? "$cur; protected, can't be downloaded\n"
+                : "$cur; [click here to download »]({$this->userInstance->getDownloadLink($story)})\n";
+        }
+        if ($offset === 0) {
+            $result = $result === ''
+                ? "This user has no stories!"
+                : "Stories ({$res['count']} in the profile):\n\n$result";
+        } elseif ($result === '') {
+            $result = "No more stories!";
+        }
+
+        // A full page: there may be more
+        $more = $next !== 0 && count($res['stories']) >= self::PAGE_SIZE;
+        return [$result, $more ? self::nextPageMarkup($peer, $next) : null];
+    }
+
+    private static function nextPageMarkup(int $peer, int $offset): array
+    {
+        // Bot API style: MadelineProto converts it to the constructors of the current layer
+        return ['inline_keyboard' => [[['text' => 'Next page »', 'callback_data' => "stories:$peer:$offset"]]]];
     }
 }
 

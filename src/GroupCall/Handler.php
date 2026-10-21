@@ -1003,7 +1003,9 @@ trait Handler
     public function getGroupCallStreamChannels(int $id): array
     {
         $controller = $this->getGroupCallController($id);
-        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall()], $this->groupCallStreamDc($controller));
+        // A flood wait is thrown, not waited for here: the stream receiver polls this while the livestream has no
+        // media yet, and waits as long as the server asks itself.
+        $result = $this->methodCallAsyncRead('phone.getGroupCallStreamChannels', ['call' => $controller->getInputCall(), 'floodWaitLimit' => 0], $this->groupCallStreamDc($controller));
         $channels = [];
         foreach ($result['channels'] as $channel) {
             $channels[] = ['channel' => (int) $channel['channel'], 'scale' => (int) $channel['scale'], 'last_timestamp_ms' => (int) $channel['last_timestamp_ms']];
@@ -1388,13 +1390,22 @@ trait Handler
                     // not, and so does every session of an account in it: never start tracking (let
                     // alone resume) a call from its updates, or this session would own a controller
                     // of a call joined by another session. Only remember how to track it on first use.
+                    $peerId = isset($update['peer']) ? $this->getIdInternal($update['peer']) : null;
                     if ($call['_'] !== 'groupCall' || ($call['conference'] ?? false)) {
+                        if ($call['_'] === 'groupCallDiscarded') {
+                            $peerId ??= $this->seenGroupCalls[$id][1] ?? null;
+                            $this->logger->logger("Group call $id of chat ".($peerId ?? 'unknown').', which we are not in, ended', Logger::VERBOSE);
+                        }
                         unset($this->seenGroupCalls[$id]);
                     } else {
+                        if (!isset($this->seenGroupCalls[$id])) {
+                            $title = isset($call['title']) ? " \"{$call['title']}\"" : '';
+                            $this->logger->logger("Group call $id$title of chat ".($peerId ?? 'unknown').' is running, we are not in it', Logger::VERBOSE);
+                        }
                         $this->rememberGroupCall(
                             $id,
                             $call['access_hash'],
-                            isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
+                            $peerId,
                             (bool) ($update['live_story'] ?? false),
                         );
                     }
@@ -1416,7 +1427,7 @@ trait Handler
                     return;
                 }
                 if (!isset($this->groupCalls[$id])) {
-                    $this->logger->logger("Ignoring participants update for untracked group call $id", Logger::VERBOSE);
+                    $this->logger->logger("Ignoring participants update for untracked group call $id of chat ".($this->seenGroupCalls[$id][1] ?? 'unknown'), Logger::VERBOSE);
                     return;
                 }
                 EventLoop::queue(

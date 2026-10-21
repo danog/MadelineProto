@@ -89,6 +89,12 @@ trait RestoresDeclaredProperties
             return null;
         }
         $property = new ReflectionProperty($class, $name);
-        return $property->isStatic() ? null : $property;
+        if ($property->isStatic()) {
+            return null;
+        }
+        // setValue() writes from the scope of the class the reflection was created for: before PHP 8.4,
+        // a readonly property can only be initialized from the class declaring it.
+        $declaring = $property->getDeclaringClass()->name;
+        return $declaring === $class ? $property : new ReflectionProperty($declaring, $name);
     }
 }

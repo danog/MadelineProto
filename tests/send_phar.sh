@@ -1,13 +1,14 @@
 #!/bin/bash -e
 
 # Send the phar of a release to the @madelineprotophar channel, with a link to its changelog, once it's fully
-# released (marked in the body of the release, so that running it again doesn't send it twice).
+# released (marked in the body of the release with the ID of the message, so that running it again doesn't send it
+# twice, and tests/announce_release.php links it).
 #
 # Usage: tests/send_phar.sh <tag>. Needs GH_TOKEN (able to edit the releases) and PHAR_BOT_TOKEN.
 
 tag=$1
 repository=${GH_REPO:-danog/MadelineProto}
-marker='<!-- phar sent -->'
+marker='<!-- phar sent'
 
 release=$(gh api "repos/$repository/releases/tags/$tag")
 if [ "$(jq -r '.draft or .prerelease' <<< "$release")" == "true" ]; then
@@ -37,11 +38,12 @@ curl --fail-with-body --silent --show-error \
 Changelog: https://github.com/$repository/releases/tag/$tag" \
     "https://api.telegram.org/bot$PHAR_BOT_TOKEN/sendDocument" > "$dir/response" \
     || { cat "$dir/response"; echo; echo "Could not send the phar of $tag to @madelineprotophar!"; exit 1; }
+id=$(jq -r .result.message_id "$dir/response")
 rm -rf "$dir"
 
 # The body again: the other steps of release.yml edit it too.
 body=$(gh api "repos/$repository/releases/tags/$tag" --jq '.body // ""')
 gh api -X PATCH "repos/$repository/releases/$(jq -r .id <<< "$release")" -f body="${body%"${body##*[![:space:]]}"}
-$marker
+$marker $id -->
 " > /dev/null
 echo "Sent the phar of $tag to @madelineprotophar"

@@ -1,0 +1,52 @@
+name: Pre-release
+
+# Releases the version of the RELEASE constant (bumped by the pull requests themselves, see tests/release_check.sh)
+# once the CI of a push to the main branch succeeded, if it isn't released yet: tags it as a pre-release, which the CI
+# of the tag builds, tests and makes final (see tests/prerelease.sh). Only the last push is released, if several were
+# pushed at once.
+
+on:
+  # Once the CI of a push to the main branch succeeded, rather than on the push: only what passed is released.
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - v8
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prerelease
+  cancel-in-progress: true
+
+jobs:
+  prerelease:
+    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          apt-get update && apt-get install -y git jq
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v7
+        with:
+          # The tags, for the last release.
+          fetch-depth: 0
+          # So that the tag runs the CI (the events of the token of a job don't).
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+      - name: Release the version
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          # The commit the CI succeeded on.
+          CI_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: tests/test.sh prerelease

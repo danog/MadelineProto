@@ -65,7 +65,6 @@ abstract class MediaStory extends IpcCapable implements JsonSerializable // for 
      * Get story.
      *
      * @psalm-suppress InaccessibleProperty
-     * @return ?AbstractStory
      */
     public function getStory(): ?AbstractStory
     {

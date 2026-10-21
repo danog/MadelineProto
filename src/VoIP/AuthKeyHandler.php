@@ -89,7 +89,7 @@ trait AuthKeyHandler
         $this->pendingCalls[$user] = $deferred->getFuture();
 
         try {
-            $this->logger->logger(sprintf('Calling %s...', $user), Logger::VERBOSE);
+            $this->logger->logger(\sprintf('Calling %s...', $user), Logger::VERBOSE);
             $dh_config = ($this->getDhConfig());
             $this->logger->logger('Generating a...', Logger::VERBOSE);
             $a = BigInteger::randomRange(Magic::$two, $dh_config['p']->subtract(Magic::$two));

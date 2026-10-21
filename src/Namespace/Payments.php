@@ -624,14 +624,14 @@ interface Payments
      * Convert a [collectible gift »](https://core.telegram.org/api/gifts) to an NFT on the TON blockchain.
      *
      * @param array{_: 'inputSavedStarGiftUser', msg_id?: int}|array{_: 'inputSavedStarGiftChat', peer?: array|int|string, saved_id?: int}|array{_: 'inputSavedStarGiftSlug', slug?: string} $stargift The collectible gift to export. @see https://docs.madelineproto.xyz/API_docs/types/InputSavedStarGift.html
-     * @param string|array $password The current user's 2FA password, passed as [specified here »](https://core.telegram.org/api/srp). @see https://docs.madelineproto.xyz/API_docs/types/InputCheckPasswordSRP.html
+     * @param string $tmp_password 
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
      * @param ?\Amp\Cancellation $cancellation Cancellation
      * @return array{_: 'payments.starGiftWithdrawalUrl', url: string} @see https://docs.madelineproto.xyz/API_docs/types/payments.StarGiftWithdrawalUrl.html
      * @psalm-impure
      */
-    public function getStarGiftWithdrawalUrl(array $stargift, string|array $password, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function getStarGiftWithdrawalUrl(array $stargift, string|null $tmp_password = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Enables or disables the reception of notifications every time a [gift »](https://core.telegram.org/api/gifts) is received by the specified channel, can only be invoked by admins with `post_messages` [admin rights](https://docs.madelineproto.xyz/API_docs/constructors/chatAdminRights.html).
@@ -1009,4 +1009,57 @@ interface Payments
      * @psalm-impure
      */
     public function createOnrampSession(string|null $provider = '', string|null $crypto_currency = '', string|null $address = '', string|null $payment_method = null, string|null $base_currency = null, string|null $base_amount = null, string|null $memo = null, string|null $theme = null, string|null $success_return_url = null, string|null $fail_return_url = null, string|null $crypto_amount = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param array{_: 'inputSavedStarGiftUser', msg_id?: int}|array{_: 'inputSavedStarGiftChat', peer?: array|int|string, saved_id?: int}|array{_: 'inputSavedStarGiftSlug', slug?: string} $stargift @see https://docs.madelineproto.xyz/API_docs/types/InputSavedStarGift.html
+     * @param bool $keep_on_profile 
+     * @param string $tmp_password 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function withdrawStarGift(array $stargift, bool|null $keep_on_profile = null, string|null $tmp_password = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     * 
+     *
+     * @param bool $hide_sender 
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param string $slug 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return array{_: 'payments.starGiftDepositPayload', nft_address: string, payload: string, amount: int} @see https://docs.madelineproto.xyz/API_docs/types/payments.StarGiftDepositPayload.html
+     * @psalm-impure
+     */
+    public function depositStarGift(bool|null $hide_sender = null, array|int|string|null $peer = null, string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param string $slug 
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function displayStarGift(array|int|string|null $peer = null, string|null $slug = '', ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
+
+    /**
+     * 
+     *
+     * @param array{_: 'inputSavedStarGiftUser', msg_id?: int}|array{_: 'inputSavedStarGiftChat', peer?: array|int|string, saved_id?: int}|array{_: 'inputSavedStarGiftSlug', slug?: string} $stargift @see https://docs.madelineproto.xyz/API_docs/types/InputSavedStarGift.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function deleteStarGift(array $stargift, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }

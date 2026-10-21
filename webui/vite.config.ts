@@ -2,6 +2,9 @@ import {fileURLToPath} from 'node:url';
 import solidPlugin from 'vite-plugin-solid';
 import {defineConfig} from 'vitest/config';
 
+// vite's root defaults to the working directory: run from the repository root, it found no tests and left its
+// caches (node_modules/.vite, node_modules/.vitest-cache) there
+const root = fileURLToPath(new URL('.', import.meta.url));
 const src = fileURLToPath(new URL('./src', import.meta.url));
 const outDir = fileURLToPath(new URL('../src/WebUI/templates/assets/tweb', import.meta.url));
 
@@ -21,6 +24,7 @@ const alias = {
 // so the fonts are inlined in the stylesheet, and there are no chunks. The monkeys' animations are the only
 // other files (tgs/*.json, copied from tweb), fetched with the asset URL of the state.
 export default defineConfig(({command, mode}) => ({
+  root,
   plugins: [solidPlugin({dev: mode !== 'production' && command === 'serve'})],
   publicDir: false,
   resolve: {

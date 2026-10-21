@@ -142,8 +142,6 @@ app_test.json
 app.json
 config.json
 
-/Dockerfile
-
 /docker-compose.yml
 /Caddyfile
 /tt.php
@@ -163,7 +161,7 @@ woodpecker.lock
 /ci-lanes/
 /paratest.log
 
-# Web UI dependencies
-webui/node_modules/
+# Web UI dependencies (and the caches of vite and vitest)
+node_modules/
 # the vendored code of the web UI (the "vendor" rule above is for Composer)
 !webui/src/vendor/

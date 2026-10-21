@@ -279,7 +279,7 @@ trait AuthKeyHandler
                  */
                 $server_time = $server_DH_inner_data['server_time'];
                 $this->time_delta = $server_time - time();
-                $this->API->logger(sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
+                $this->API->logger(\sprintf('Server-client time delta = %.1f s', $this->time_delta), Logger::VERBOSE);
                 Crypt::checkPG($dh_prime, $g);
                 Crypt::checkG($g_a, $dh_prime);
                 for ($retry_id = 0; $retry_id <= $this->API->settings->getAuth()->getMaxAuthTries(); $retry_id++) {
