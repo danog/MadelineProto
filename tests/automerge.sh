@@ -16,13 +16,21 @@ if [ -z "$pr" ]; then
     exit 0
 fi
 
-# An update of PHP is merged with the token of an admin: only if the app made all of its commits, and it only changes
-# what tests/update_docker.sh changes.
+# An update of PHP is merged with the token of an admin, but the token of the app is also in the jobs of the autobuild
+# that run the code of the dependencies: only if the app made all of its commits, and it only changes what
+# tests/update_docker.sh changes, the versions of PHP of the Dockerfile and the RELEASE constant (the lines removed and
+# added are the same without them).
 if [ "$(gh pr view "$pr" --json headRefName --jq .headRefName)" == docker-php ]; then
     others=$(gh pr view "$pr" --json commits --jq '[.commits[].authors[].login | select(. != "madelineproto-autobuild[bot]")] | unique | join(", ")')
     files=$(gh pr view "$pr" --json files --jq '[.files[].path | select(. != "tests/dockerfiles/Dockerfile" and . != "src/API.php")] | join(", ")')
     if [ -n "$others" ] || [ -n "$files" ]; then
         echo "Not merging #$pr: an update of PHP with commits of others (${others:-none}) or other files (${files:-none})"
+        exit 0
+    fi
+    diff=$(gh pr diff "$pr" | grep -E '^[-+]' | grep -vE '^(\+\+\+|---) ' | \
+        sed -E "s/php-[0-9]+\.[0-9]+\.[0-9]+\b/php-VERSION/g; s/^([-+]    public const RELEASE = )'[0-9]+\.[0-9]+\.[0-9]+';\$/\1'VERSION';/")
+    if [ "$(grep '^-' <<< "$diff" | cut -c2- | sort)" != "$(grep '^+' <<< "$diff" | cut -c2- | sort)" ]; then
+        echo "Not merging #$pr: an update of PHP that changes more than the versions"
         exit 0
     fi
 fi
