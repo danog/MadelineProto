@@ -139,7 +139,7 @@ trait ResponseHandler
         $tmp = new SplQueue;
         $tmp->setIteratorMode(SplQueue::IT_MODE_DELETE);
         foreach ($message->read()['messages'] as $msg) {
-            $this->msgIdHandler->checkIncomingMessageId($msg['msg_id'], true);
+            $this->msgIdHandler->checkIncomingMessageId($msg['msg_id']);
             $newMessage = new MTProtoIncomingMessage(
                 $this,
                 $msg['body'],
@@ -164,7 +164,7 @@ trait ResponseHandler
         /*if (isset($this->incoming_messages[$referencedMsgId])) {
             $this->incoming_messages[$referencedMsgId]->ack();
         } else {*/
-        $this->msgIdHandler->checkIncomingMessageId($referencedMsgId, true);
+        $this->msgIdHandler->checkIncomingMessageId($referencedMsgId);
         $message = new MTProtoIncomingMessage(
             $this,
             $content['orig_message'],
@@ -371,7 +371,6 @@ trait ResponseHandler
                             return null;
                         }
                         $this->session_id = null;
-                        $this->session_in_seq_no = 0;
                         $this->session_out_seq_no = 0;
                         $this->shared->auth->setAuthKey(null);
                         $this->API->logger("Auth key not registered in DC {$this->datacenter} with RPC error {$response['error_message']}, resetting temporary and permanent auth keys...", Logger::ERROR);

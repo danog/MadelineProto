@@ -121,7 +121,6 @@ trait Session
     {
         $this->API->logger("Resetting session in DC {$this->datacenterId} due to $why...", Logger::WARNING);
         $this->session_id = Tools::random(8);
-        $this->session_in_seq_no = 0;
         $this->session_out_seq_no = 0;
         $this->msgIdHandler ??= new MsgIdHandler($this);
         if (!isset($this->new_incoming)) {
