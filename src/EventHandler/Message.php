@@ -150,6 +150,14 @@ abstract class Message extends AbstractMessage
         if (isset($rawMessage['decrypted_message'])) {
             $this->protected = true;
             $rawMessage = $rawMessage['decrypted_message'];
+            // Like TDLib, show the media caption after the message text (official clients send media
+            // with an empty message, the caption in the media and its entities in the message).
+            $caption = $rawMessage['media']['caption'] ?? '';
+            if ($caption !== '') {
+                $rawMessage['message'] = $rawMessage['message'] === ''
+                    ? $caption
+                    : $rawMessage['message']."\n\n".$caption;
+            }
         } else {
             $this->protected = $rawMessage['noforwards'];
         }
