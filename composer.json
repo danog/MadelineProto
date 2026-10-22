@@ -158,6 +158,7 @@
         "docs": "php tools/build_docs.php",
         "fuzz": "php tools/fuzzer.php",
         "file_ref_map": "php tools/gen_filerefmap.php",
+        "file_ref_map_docs": "php tools/gen_filerefmap_docs.php",
         "docs-fix": "tools/fix_docs.sh",
         "paratest": "@php -dzend.assertions=1 ./vendor/bin/paratest -v --exclude-group session",
         "test-session": "tests/session_tests.sh",

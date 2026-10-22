@@ -1263,6 +1263,10 @@ trait UpdateHandler
     public function saveUpdate(array $update): void
     {
         $this->logger->logger("Saving update of type {$update['_']}", Logger::VERBOSE);
+        if ($this->referenceDatabase !== null && $this->settings->getDb()->getEnableFileReferenceDb()) {
+            // Extracted, deduplicated and reordered by the update system, short updates converted to updates.
+            $this->referenceDatabase->onUpdate($update);
+        }
         if ($update['_'] === 'updateConfig') {
             $this->config['expires'] = 0;
             $this->getConfig();

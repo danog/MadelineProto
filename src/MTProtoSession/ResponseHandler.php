@@ -281,6 +281,15 @@ trait ResponseHandler
             }
         }
 
+        if ($this->API->referenceDatabase !== null
+            && !$this->shared->auth->isCdn
+            && $this->API->getSettings()->getDb()->getEnableFileReferenceDb()
+        ) {
+            // Before replying, which frees the body: the file references must be stored by the time the caller
+            // gets the result (refreshes compare them, downloads use them).
+            $this->API->referenceDatabase->onMethodResult($request->constructor, $request->getBodyOrEmpty(), $response);
+        }
+
         $this->requestResponse?->inc([
             'method' => $request->constructor,
             'error_message' => 'OK',
@@ -309,9 +318,11 @@ trait ResponseHandler
         }
         if (str_starts_with($response['error_message'], 'FILE_REFERENCE_')
             && $request->specialMethodType !== SpecialMethodType::FILEREF_RELATED
+            && !$request->refreshedFileReferences
+            && $this->API->getSettings()->getDb()->getEnableFileReferenceDb()
         ) {
             $this->API->logger("Got {$response['error_message']}, refreshing file reference and repeating method call...");
-            $this->methodRecall($request, $this->datacenter, $request->refreshReferences());
+            $this->methodRecall($request, $this->datacenter, $request->refreshReferences($response['error_message'], $response['error_code']));
             return null;
         }
 

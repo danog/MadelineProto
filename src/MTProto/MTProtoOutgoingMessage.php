@@ -27,6 +27,7 @@ use Amp\Future;
 use Closure;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -92,6 +93,11 @@ class MTProtoOutgoingMessage extends MTProtoMessage
 
     private ?string $checkTimer = null;
     private readonly ?string $cancelSubscription;
+
+    /**
+     * Whether its file references were already refreshed once: a second FILE_REFERENCE_* error is not retried.
+     */
+    public bool $refreshedFileReferences = false;
 
     /**
      * Create outgoing message.
@@ -428,16 +434,31 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         return $this;
     }
 
-    public function refreshReferences(): Future
+    /**
+     * Refresh the file references of the arguments, after the call failed with a FILE_REFERENCE_* error.
+     *
+     * @param string $error The error
+     * @param int    $code  Its code
+     *
+     * @return Future<?Closure(): Throwable> Resolves to null if the call can be repeated, to the error otherwise.
+     */
+    public function refreshReferences(string $error, int $code): Future
     {
         $this->serializedBody = null;
-        // To avoid endless loops
-        $this->specialMethodType = SpecialMethodType::FILEREF_RELATED;
+        // Refreshed at most once.
+        $this->refreshedFileReferences = true;
+        $API = $this->connection->API;
+        $method = $this->constructor;
 
-        return async(function (): ?Closure {
-            $this->connection->API->referenceDatabase->refreshNextEnable();
-            $this->connection->API->getTL()->serializeMethod($this->constructor, $this->body);
-            return $this->connection->API->referenceDatabase->refreshNextDisable();
+        return async(function () use ($API, $method, $error, $code): ?Closure {
+            $body = $this->body === null
+                ? null
+                : $API->referenceDatabase?->refreshMethodCall($method, $this->body, $error);
+            if ($body === null) {
+                return static fn (): Throwable => RPCErrorException::make($error, $code, $method);
+            }
+            $this->body = $body;
+            return null;
         });
     }
 

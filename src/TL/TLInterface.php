@@ -68,6 +68,12 @@ interface TLInterface
      */
     public function serializeMethod(string $method, mixed $arguments);
     /**
+     * Convert a value passed for an object of a TL type to a constructor of that type, as done when serializing it.
+     *
+     * @psalm-impure
+     */
+    public function convertTypeMismatch(string $type, mixed $object): mixed;
+    /**
      * Get length of TL payload.
      *
      * @param resource|string $stream Stream
