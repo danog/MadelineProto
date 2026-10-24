@@ -58,7 +58,7 @@ abstract class MessageEntity implements JsonSerializable
             'text_link', 'messageEntityTextUrl' => new TextUrl($entity['offset'], $entity['length'], $entity['url']),
             'text_mention', 'messageEntityMentionName' => new MentionName($entity['offset'], $entity['length'], $entity['user_id'] ?? $entity['user']['id']),
             'inputMessageEntityMentionName' => new InputMentionName($entity['offset'], $entity['length'], $entity['user_id']),
-            'phone_number', 'messageEntityPhone' => new Phone($entity['offset'], $entity['length']),
+            'phone_number', 'phone', 'messageEntityPhone' => new Phone($entity['offset'], $entity['length']),
             'cashtag', 'messageEntityCashtag' => new Cashtag($entity['offset'], $entity['length']),
             'underline', 'messageEntityUnderline' => new Underline($entity['offset'], $entity['length']),
             'strikethrough', 'messageEntityStrike' => new Strike($entity['offset'], $entity['length']),
@@ -82,6 +82,10 @@ abstract class MessageEntity implements JsonSerializable
                 $entity['long_date'] ?? false,
                 $entity['day_of_week'] ?? false,
             ),
+            'diff_insert', 'messageEntityDiffInsert' => new DiffInsert($entity['offset'], $entity['length']),
+            'diff_delete', 'messageEntityDiffDelete' => new DiffDelete($entity['offset'], $entity['length']),
+            'diff_replace', 'messageEntityDiffReplace' => new DiffReplace($entity['offset'], $entity['length'], $entity['old_text']),
+            'ton_address', 'messageEntityTonAddress' => new TonAddress($entity['offset'], $entity['length']),
             'unknown', 'messageEntityUnknown' => new Unknown($entity['offset'], $entity['length']),
             // Entity types added in newer layers must not prevent wrapping the message they're in.
             default => isset($entity['_']) && str_starts_with($entity['_'], 'messageEntity')
