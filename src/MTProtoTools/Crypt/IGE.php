@@ -44,6 +44,9 @@ abstract class IGE
      */
     public static function getInstance(string $key, string $iv): IGE
     {
+        if (IGEEVP::isAvailable()) {
+            return new IGEEVP($key, $iv);
+        }
         if (IGEFFI::isAvailable()) {
             return new IGEFFI($key, $iv);
         }

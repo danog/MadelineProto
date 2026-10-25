@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\MTProtoTools\Crypt\IGEEVP;
 use PHPUnit\Framework\TestCase;
 
 final class IGETest extends TestCase
@@ -45,6 +46,39 @@ final class IGETest extends TestCase
         self::assertSame($plain, Crypt::igeDecrypt($encrypted, $key, $iv));
         self::assertSame($encrypted, IGE::getInstance($key, $iv)->encrypt($plain));
         self::assertSame($plain, IGE::getInstance($key, $iv)->decrypt($encrypted));
+    }
+
+    public function testAvailableEvpBackendIsPreferred(): void
+    {
+        if (!IGEEVP::isAvailable()) {
+            self::markTestSkipped('The optional EVP-IGE helper is not available');
+        }
+        self::assertInstanceOf(IGEEVP::class, IGE::getInstance(hex2bin(self::KEY), hex2bin(self::IV)));
+    }
+
+    /** @return iterable<string, array{bool}> */
+    public static function directions(): iterable
+    {
+        yield 'encrypt' => [false];
+        yield 'decrypt' => [true];
+    }
+
+    /** @dataProvider directions */
+    public function testRejectedPartPreservesTransferState(bool $decrypt): void
+    {
+        if (!IGEEVP::isAvailable()) {
+            self::markTestSkipped('The optional EVP-IGE helper is not available');
+        }
+        $iv = hex2bin(self::IV);
+        $cipher = IGE::getInstance(hex2bin(self::KEY), $iv);
+        $method = $decrypt ? 'decrypt' : 'encrypt';
+        try {
+            $cipher->$method(str_repeat('x', 15));
+            self::fail('An incomplete AES block must be rejected');
+        } catch (\ValueError) {
+            self::assertSame($iv, $cipher->getState());
+        }
+        self::assertSame(hex2bin($decrypt ? self::PLAIN : self::ENCRYPTED), $cipher->$method(hex2bin($decrypt ? self::ENCRYPTED : self::PLAIN)));
     }
 
     /** @return iterable<string, array{bool}> */
@@ -89,5 +123,8 @@ final class IGETest extends TestCase
         $iv = hex2bin(self::IV);
         self::assertSame('', Crypt::igeEncrypt('', $key, $iv));
         self::assertSame('', Crypt::igeDecrypt('', $key, $iv));
+        $cipher = IGE::getInstance($key, $iv);
+        self::assertSame('', $cipher->encrypt('').$cipher->decrypt(''));
+        self::assertSame($iv, $cipher->getState());
     }
 }

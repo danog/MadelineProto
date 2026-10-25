@@ -6,4 +6,20 @@ If you have an issue, please *always* upload MadelineProto logs from when the er
 
 To bump the layer to the latest one, clone the repo (with all submodules) and run `composer build`.  
 
+## Optional native AES-IGE
+
+With FFI enabled, MadelineProto prefers the optional EVP-IGE helper, followed by libcrypto IGE through FFI, ext-openssl, and phpseclib.
+The helper uses OpenSSL EVP to select the AES implementation available on the CPU.
+
+Build it from the MadelineProto package directory using CMake, a C compiler, and OpenSSL development headers (OpenSSL 1.1 or newer):
+
+```bash
+cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Release
+cmake --build native/build --config Release
+```
+
+The library in `native/build` is detected automatically. Restart long-running PHP processes after installing the helper. Alternatively, set `MADELINE_IGE_LIBRARY` to the absolute path of a compatible shared library, or install it in the system library search path.
+Build the helper for each target OS and architecture. If it cannot be loaded, FFI is restricted, or EVP cannot initialize AES, the next available backend is used automatically.
+No compiler is needed at runtime; the helper is never compiled or downloaded automatically.
+
 Bye :)
