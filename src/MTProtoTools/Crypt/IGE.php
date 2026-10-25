@@ -44,6 +44,9 @@ abstract class IGE
      */
     public static function getInstance(string $key, string $iv): IGE
     {
+        if (IGEFFI::isAvailable()) {
+            return new IGEFFI($key, $iv);
+        }
         if (Magic::$hasOpenssl) {
             return new IGEOpenssl($key, $iv);
         }
