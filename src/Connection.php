@@ -288,48 +288,57 @@ final class Connection
                 return $this;
             }
             $this->createSession();
-            foreach ($this->shared->getCtxs() as $ctx) {
-                $this->API->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
-                try {
-                    $this->stream = $ctx->getStream();
-                } catch (\Throwable $e) {
-                    $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::ERROR);
-                    continue;
-                }
-                $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
-                $this->chosenCtx = $ctx;
-
-                if ($ctx->getIpv6()) {
-                    Magic::setIpv6(true);
-                }
-                if ($this->needsReconnect) {
-                    $this->needsReconnect = false;
-                }
-                $this->httpReqCount = 0;
-                $this->httpResCount = 0;
-                $this->writer ??= new WriteLoop($this);
-                $this->reader ??= new ReadLoop($this);
-                $this->cleanup ??= new CleanupLoop($this);
-                $this->handler ??= new GenericLoop(function (): void {
-                    $this->handleMessages($this->new_incoming);
-                    if ($this->ack_queue) {
-                        $this->flush(true); // Flush acks
+            while (true) {
+                foreach ($this->shared->getCtxs() as $ctx) {
+                    $this->API->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
+                    try {
+                        $stream = $this->stream = $ctx->getStream();
+                    } catch (\Throwable $e) {
+                        $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::ERROR);
+                        continue;
                     }
-                }, "Handler loop");
-                if (!isset($this->pinger) && !$this->shared->auth->isMedia && !$this->shared->auth->isCdn && !$this->isHttp()) {
-                    $this->pinger = new PingLoop($this);
-                }
-                foreach ($this->unencrypted_new_outgoing as $message) {
-                    $message->reply(static fn () => new Exception('Restart because we were reconnected'));
-                }
-                Assert::true($this->writer->start(), "Could not start writer stream");
-                Assert::true($this->reader->start(), "Could not start reader stream");
-                Assert::true($this->cleanup->start(), "Could not start cleanup stream");
-                $this->handler->start();
+                    $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
+                    $this->chosenCtx = $ctx;
 
-                return $this;
+                    if ($ctx->getIpv6()) {
+                        Magic::setIpv6(true);
+                    }
+                    if ($this->needsReconnect) {
+                        $this->needsReconnect = false;
+                    }
+                    $this->httpReqCount = 0;
+                    $this->httpResCount = 0;
+                    $this->writer ??= new WriteLoop($this);
+                    $this->reader ??= new ReadLoop($this);
+                    $this->cleanup ??= new CleanupLoop($this);
+                    $this->handler ??= new GenericLoop(function (): void {
+                        $this->handleMessages($this->new_incoming);
+                        if ($this->ack_queue) {
+                            $this->flush(true); // Flush acks
+                        }
+                    }, "Handler loop");
+                    if (!isset($this->pinger) && !$this->shared->auth->isMedia && !$this->shared->auth->isCdn && !$this->isHttp()) {
+                        $this->pinger = new PingLoop($this);
+                    }
+                    foreach ($this->unencrypted_new_outgoing as $message) {
+                        $message->reply(static fn () => new Exception('Restart because we were reconnected'));
+                    }
+                    Assert::true($this->writer->start(), "Could not start writer stream");
+                    Assert::true($this->reader->start(), "Could not start reader stream");
+                    Assert::true($this->cleanup->start(), "Could not start cleanup stream");
+                    $this->handler->start();
+
+                    if ($this->stream !== $stream) {
+                        // Disconnected meanwhile (this fiber can suspend after publishing the stream: logging, a loop
+                        // waiting for its previous run to exit): disconnect() couldn't stop the loops started after it.
+                        $this->API->logger("Disconnected from DC {$this->datacenterId} while connecting, connecting again", Logger::WARNING);
+                        $this->stopLoops();
+                        continue 2;
+                    }
+                    return $this;
+                }
+                throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
             }
-            throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
         } finally {
             EventLoop::queue($lock->release(...));
         }
@@ -662,15 +671,19 @@ final class Connection
             }
         }
 
-        $this->reader?->stop();
-        $this->writer?->stop();
-        $this->pinger?->stop();
-        $this->cleanup?->stop();
+        $this->stopLoops();
 
         if (!$temporary) {
             $this->shared->signalDisconnect($this->id);
         }
         $this->API->logger("Disconnected from DC {$this->datacenterId}");
+    }
+    private function stopLoops(): void
+    {
+        $this->reader?->stop();
+        $this->writer?->stop();
+        $this->pinger?->stop();
+        $this->cleanup?->stop();
     }
     /**
      * Reconnect to DC.
