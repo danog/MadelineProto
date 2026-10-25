@@ -92,6 +92,9 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     private int $tries = 0;
 
+    /** Connection accounting for this logical request until reply(), across retries. */
+    private ?Connection $pendingConnection = null;
+
     private ?string $checkTimer = null;
     private readonly ?string $cancelSubscription;
 
@@ -199,6 +202,13 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      */
     public function trySend(): void
     {
+        if ($this->isMethod && !$this->hasReply() && $this->pendingConnection !== $this->connection) {
+            if ($this->pendingConnection !== null) {
+                $this->pendingConnection->requestFinished();
+            }
+            $this->pendingConnection = $this->connection;
+            $this->pendingConnection->requestStarted();
+        }
         if (!isset($this->sendDeferred)) {
             $this->sendDeferred = new DeferredFuture;
         }
@@ -319,6 +329,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             //throw new Exception("Trying to double reply to message $this!");
             // It can happen, no big deal
             return;
+        }
+        if ($this->pendingConnection !== null) {
+            $this->pendingConnection->requestFinished();
+            $this->pendingConnection = null;
         }
         $this->sent(false);
         if ($this->checkTimer !== null) {

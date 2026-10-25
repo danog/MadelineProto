@@ -82,7 +82,7 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     private ?ContextIterator $ctx = null;
     /**
-     * Loop to keep weights at sane value.
+     * Loop to close idle media sockets.
      */
     private ?PeriodicLoopInternal $robinLoop = null;
     /**
@@ -349,7 +349,7 @@ final class DataCenterConnection implements SimpleSubscriber
                 $this->robinLoop = new PeriodicLoopInternal(
                     $this->API,
                     $this->even(...),
-                    "robin loop DC {$this->datacenter}",
+                    "media idle loop DC {$this->datacenter}",
                     $this->API->getSettings()->getConnection()->getRobinPeriod()
                 );
             }
@@ -509,6 +509,22 @@ final class DataCenterConnection implements SimpleSubscriber
         if ($id >= 0) {
             return $this->connections[$id];
         }
+        if ($this->auth->isMedia || $this->auth->isCdn) {
+            $loads = array_map(static fn (Connection $connection): int => $connection->getPendingRequestCount(), $this->connections);
+            $min = min($loads);
+            if ($min > 0 && \count($loads) < $this->API->getSettings()->getConnection()->getMaxMediaSocketCount()) {
+                $this->connectMore(1);
+                return $this->connections[array_key_last($this->connections)];
+            }
+            $key = array_search($min, $loads, true);
+            foreach ($loads as $id => $load) {
+                if ($load === $min && $this->connections[$id]->stream) {
+                    $key = $id;
+                    break;
+                }
+            }
+            return $this->connections[$key];
+        }
         if (\count($this->availableConnections) <= 1) {
             return $this->connections[0];
         }
@@ -519,27 +535,12 @@ final class DataCenterConnection implements SimpleSubscriber
         return $this->connections[$key];
     }
     /**
-     * Even out round robin values.
+     * Close idle media sockets, retaining sessions for lazy reconnection.
      */
     public function even(): void
     {
-        if (!$this->availableConnections) {
-            return;
-        }
-        $min = min($this->availableConnections);
-        if ($min < 50) {
-            foreach ($this->availableConnections as &$count) {
-                $count += 50;
-            }
-        } elseif ($min < 100) {
-            $max = $this->auth->isMedia || $this->auth->isCdn ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
-            if (\count($this->availableConnections) < $max) {
-                $this->connectMore(2);
-            } else {
-                foreach ($this->availableConnections as &$value) {
-                    $value += 1000;
-                }
-            }
+        foreach ($this->connections as $connection) {
+            $connection->closeIfIdle();
         }
     }
     /**

@@ -69,9 +69,8 @@ final class ReadLoop extends Loop
             }
             EventLoop::queue(function () use ($e): void {
                 if ($e instanceof NothingInTheSocketException
-                    && !$this->connection->unencrypted_new_outgoing
-                    && !$this->connection->new_outgoing
-                    && $this->connection->getShared()->auth->isMedia
+                    && !$this->connection->getPendingRequestCount()
+                    && ($this->shared->auth->isMedia || $this->shared->auth->isCdn)
                     && !$this->connection->isWriting()
                 ) {
                     $this->API->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
