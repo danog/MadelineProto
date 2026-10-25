@@ -255,7 +255,6 @@ final class ReadLoop extends Loop
                 }
             } finally {
                 $this->API->minDatabase->reset();
-                $this->API->referenceDatabase->reset();
             }
 
             $message = new MTProtoIncomingMessage(

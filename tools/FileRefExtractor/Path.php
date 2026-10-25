@@ -154,13 +154,14 @@ final readonly class Path
                 Assert::eq($type, 'InputPeer');
                 $type = 'long';
             } elseif ($extractor === 'extractChannelIdFromChannelAndStore') {
-                Assert::eq($type, 'Channel');
+                // A channel constructor is of type Chat: there is no Channel type.
+                Assert::eq($type, 'Chat');
                 $type = 'long';
             } elseif ($extractor === 'extractChannelIdFromInputChannelAndStore') {
                 Assert::eq($type, 'InputChannel');
                 $type = 'long';
             } elseif ($extractor === 'extractUserIdFromUserAndStore') {
-                Assert::eq($type, 'Channel');
+                Assert::eq($type, 'User');
                 $type = 'long';
             } elseif ($extractor === 'extractUserIdFromInputUserAndStore') {
                 Assert::eq($type, 'InputUser');
