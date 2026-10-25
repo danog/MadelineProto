@@ -79,12 +79,12 @@ final class RtmpClient
     private ?Throwable $error = null;
     /** @var DeferredFuture<null> Completed when the connection is closed. */
     private readonly DeferredFuture $closedDeferred;
-    /** When the server started accepting what we publish (microtime). */
-    private ?float $publishedAt = null;
+    /** When the server started accepting what we publish (hrtime, in nanoseconds). */
+    private ?int $publishedAt = null;
     /** How many audio and video messages were sent. */
     private int $mediaMessages = 0;
-    /** When the last audio or video message was sent (microtime). */
-    private ?float $lastMediaAt = null;
+    /** When the last audio or video message was sent (hrtime, in nanoseconds). */
+    private ?int $lastMediaAt = null;
     /** The last onStatus the server sent after accepting the stream, if any. */
     private ?string $lastStatus = null;
 
@@ -145,7 +145,7 @@ final class RtmpClient
             $client->publishing = new DeferredFuture;
             $client->notify('publish', null, $key, 'live');
             $client->publishing->getFuture()->await($cancellation);
-            $client->publishedAt = microtime(true);
+            $client->publishedAt = hrtime(true);
         } catch (Throwable $e) {
             $client->close();
             throw $e;
@@ -231,7 +231,7 @@ final class RtmpClient
     {
         $this->writeMessage($type === self::TYPE_AUDIO ? self::CHUNK_STREAM_AUDIO : self::CHUNK_STREAM_VIDEO, $type, $this->stream, $timestamp, $body);
         $this->mediaMessages++;
-        $this->lastMediaAt = microtime(true);
+        $this->lastMediaAt = hrtime(true);
     }
 
     /**
@@ -250,13 +250,13 @@ final class RtmpClient
      */
     public function describe(): string
     {
-        $now = microtime(true);
+        $now = hrtime(true);
         $result = $this->publishedAt === null
             ? 'before publishing'
-            : \sprintf('%.1f seconds after publishing', $now - $this->publishedAt);
+            : \sprintf('%.1f seconds after publishing', ($now - $this->publishedAt) / 1e9);
         $result .= ", {$this->mediaMessages} audio/video messages sent";
         if ($this->lastMediaAt !== null) {
-            $result .= \sprintf(' (the last one %.1f seconds before)', $now - $this->lastMediaAt);
+            $result .= \sprintf(' (the last one %.1f seconds before)', ($now - $this->lastMediaAt) / 1e9);
         }
         if ($this->lastStatus !== null) {
             $result .= ", last status: {$this->lastStatus}";

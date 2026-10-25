@@ -22,6 +22,7 @@ use Amp\DeferredFuture;
 use Closure;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MediaClock;
 use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
@@ -62,18 +63,18 @@ final class RtmpPublisher
      * reference frame decoded before them.
      */
     private const REORDER_DEPTH = 2;
-    /** How far the timestamps of a track may drift from the wall clock before re-anchoring it, in milliseconds. */
-    private const MAX_DRIFT_MS = 1000;
+    /** How far the timestamps of a track may drift from the clock before re-anchoring it, in nanoseconds. */
+    private const MAX_DRIFT_NS = 1_000_000_000;
     private const MIN_RECONNECT_DELAY = 1.0;
     private const MAX_RECONNECT_DELAY = 30.0;
-    /** How long a connection must stay up to reset the backoff, in seconds. */
-    private const STABLE_CONNECTION = 60.0;
+    /** How long a connection must stay up to reset the backoff, in nanoseconds. */
+    private const STABLE_CONNECTION_NS = 60_000_000_000;
     /**
-     * For how long nothing must have been played, in seconds, for a closed connection to count as
+     * For how long nothing must have been played, in nanoseconds, for a closed connection to count as
      * dropped for idleness: well below the 10 seconds after which the ingest of Telegram drops a
      * publisher sending no media.
      */
-    private const IDLE = 5.0;
+    private const IDLE_NS = 5_000_000_000;
 
     private readonly OpusPlaybackTrack $audioTrack;
     private readonly VideoPlaybackTrack $videoTrack;
@@ -84,10 +85,10 @@ final class RtmpPublisher
     private ?RtmpClient $client = null;
     private bool $running = true;
     private readonly DeferredCancellation $stopping;
-    /** Wall clock time (milliseconds) at which the current connection started: the zero of its timestamps. */
-    private float $epoch = 0.0;
+    /** When the current connection started (hrtime, in nanoseconds): the zero of its timestamps. */
+    private int $epoch = 0;
 
-    /** @var array<string, array{wall: float, timestamp: int}|null> The anchor of the timeline of each track, by kind. */
+    /** @var array<string, array{at: int, timestamp: int}|null> The anchor of the timeline of each track (hrtime in nanoseconds, and media timestamp), by kind. */
     private array $anchors = ['audio' => null, 'video' => null];
     private ?string $avcConfig = null;
     private ?string $aacConfig = null;
@@ -102,24 +103,24 @@ final class RtmpPublisher
     private bool $warnedAudio = false;
     /** The onMetaData sent on this connection, if any. */
     private ?string $metadata = null;
-    /** When audio started waiting for the metadata of the first video keyframe (wall clock, seconds). */
-    private ?float $awaitingVideoSince = null;
-    /** When the tracks last offered a frame to publish (wall clock, seconds), connected or not. */
-    private float $lastFrameAt = 0.0;
+    /** When audio started waiting for the metadata of the first video keyframe (hrtime, in nanoseconds). */
+    private ?int $awaitingVideoSince = null;
+    /** When the tracks last offered a frame to publish (hrtime, in nanoseconds), connected or not. */
+    private int $lastFrameAt = 0;
     /** @var ?DeferredFuture<null> Completed when there is something to publish again, see {@see self::wake()}. */
     private ?DeferredFuture $frameWaiter = null;
 
     /**
      * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
      * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
-     * @param float                                         $idle     See {@see self::IDLE}.
+     * @param int                                           $idle     In nanoseconds, see {@see self::IDLE_NS}.
      */
     public function __construct(
         private readonly CallControllerInterface $call,
         private readonly DjLoop $dj,
         private readonly Closure $ingest,
         private readonly ?Closure $onGiveUp = null,
-        private readonly float $idle = self::IDLE,
+        private readonly int $idle = self::IDLE_NS,
     ) {
         $this->stopping = new DeferredCancellation;
         $this->pending = new SplMinHeap;
@@ -201,7 +202,7 @@ final class RtmpPublisher
      */
     private function onFrame(): void
     {
-        $this->lastFrameAt = microtime(true);
+        $this->lastFrameAt = hrtime(true);
         if ($this->frameWaiter !== null) {
             $this->wake();
         }
@@ -245,7 +246,7 @@ final class RtmpPublisher
                     return;
                 }
                 // Each connection starts a fresh timeline, with its own sequence headers.
-                $this->epoch = microtime(true) * 1000.0;
+                $this->epoch = hrtime(true);
                 $this->anchors = ['audio' => null, 'video' => null];
                 $this->avcConfig = null;
                 $this->aacConfig = null;
@@ -259,14 +260,14 @@ final class RtmpPublisher
                 $this->awaitingVideoSince = null;
                 $this->client = $client;
                 $this->call->log("Publishing to the RTMP livestream of {$this->call}", Logger::NOTICE);
-                $connectedAt = microtime(true);
+                $connectedAt = hrtime(true);
                 $client->awaitClose($this->stopping->getCancellation());
                 if (!$this->running) {
                     return;
                 }
                 $this->client = null;
                 $reason = ($client->getError()?->getMessage() ?? 'by the server').' ('.$client->describe().')';
-                if (microtime(true) - $this->lastFrameAt >= $this->idle) {
+                if (hrtime(true) - $this->lastFrameAt >= $this->idle) {
                     // The ingest drops a publisher that sends no media: reconnecting now would only get
                     // dropped again 10 seconds later, in a loop, until something is played.
                     $this->call->log("The RTMP connection of {$this->call} was closed while nothing was played: $reason, reconnecting once something is played...", Logger::NOTICE);
@@ -274,7 +275,7 @@ final class RtmpPublisher
                     $this->awaitSomethingToPlay();
                     continue;
                 }
-                if (microtime(true) - $connectedAt >= self::STABLE_CONNECTION) {
+                if (hrtime(true) - $connectedAt >= self::STABLE_CONNECTION_NS) {
                     $this->call->log("The RTMP connection of {$this->call} was closed: $reason, reconnecting...", Logger::WARNING);
                     $delay = self::MIN_RECONNECT_DELAY;
                     continue;
@@ -321,16 +322,16 @@ final class RtmpPublisher
      */
     private function timestamp(string $kind, int $timestamp, int $clockRate): int
     {
-        $now = microtime(true) * 1000.0;
+        $now = hrtime(true);
         $anchor = $this->anchors[$kind];
         if ($anchor !== null) {
-            $media = $anchor['wall'] + ($timestamp - $anchor['timestamp']) * 1000.0 / $clockRate;
-            if (abs($media - $now) <= self::MAX_DRIFT_MS) {
-                return max(0, (int) round($media - $this->epoch));
+            $media = $anchor['at'] + MediaClock::ticksToNs($timestamp - $anchor['timestamp'], $clockRate);
+            if (abs($media - $now) <= self::MAX_DRIFT_NS) {
+                return max(0, intdiv($media - $this->epoch, 1_000_000));
             }
         }
-        $this->anchors[$kind] = ['wall' => $now, 'timestamp' => $timestamp];
-        return max(0, (int) round($now - $this->epoch));
+        $this->anchors[$kind] = ['at' => $now, 'timestamp' => $timestamp];
+        return max(0, intdiv($now - $this->epoch, 1_000_000));
     }
 
     /**
@@ -359,8 +360,8 @@ final class RtmpPublisher
             if ($this->metadata === null) {
                 // The ingest sizes the livestream from the onMetaData (16:9 without dimensions), so it
                 // waits for the first keyframe of a file with video, for at most a second.
-                $this->awaitingVideoSince ??= microtime(true);
-                if ($this->dj->getVideoCodec() !== null && microtime(true) - $this->awaitingVideoSince < 1) {
+                $this->awaitingVideoSince ??= hrtime(true);
+                if ($this->dj->getVideoCodec() !== null && hrtime(true) - $this->awaitingVideoSince < 1_000_000_000) {
                     return true;
                 }
                 $this->sendMetadata($client, null, null);

@@ -28,7 +28,8 @@ namespace danog\MadelineProto\MTProtoTools;
  */
 final class TransferProgress
 {
-    private readonly float $start;
+    /** When the transfer started (hrtime, in nanoseconds). */
+    private readonly int $start;
     private int $parts = 0;
     private int $bytes = 0;
 
@@ -38,7 +39,7 @@ final class TransferProgress
      */
     public function __construct(private readonly \Closure $cb, private readonly int $totalParts)
     {
-        $this->start = microtime(true);
+        $this->start = hrtime(true);
     }
 
     /**
@@ -56,7 +57,7 @@ final class TransferProgress
     /** Seconds elapsed since the transfer started. */
     public function getTime(): float
     {
-        return microtime(true) - $this->start;
+        return (hrtime(true) - $this->start) / 1e9;
     }
 
     /** Average speed of the bytes transferred so far, in mbps. */

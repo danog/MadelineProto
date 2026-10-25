@@ -151,6 +151,7 @@ trait TD
                         $newparams[$td] = $params['ttl'] ?? 0;
                         break;
                     case 'choose_ttl_expires_in':
+                        // A Unix timestamp: the wall clock
                         $newparams[$td] = $newparams['ttl'] - microtime(true);
                         break;
                     case 'choose_message_content':

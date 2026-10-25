@@ -42,6 +42,7 @@ final class IpcState
      */
     public function __construct(int $startupId, ?Throwable $exception = null)
     {
+        // The wall clock, not hrtime: compared by another process, maybe with a state left before a reboot
         $this->startupTime = microtime(true);
         $this->startupId = $startupId;
         $this->exception = $exception ? new ExitFailure($exception) : null;

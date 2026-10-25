@@ -69,8 +69,8 @@ final class CallRecorder
     /** Every slot, as {@see CallStream} flags. */
     private const SLOTS = [CallStream::AUDIO, CallStream::VIDEO, CallStream::SCREEN];
 
-    /** Grace period (seconds) to wait for an expected stream before committing a file without it. */
-    private const GRACE = 2.0;
+    /** Grace period (nanoseconds) to wait for an expected stream before committing a file without it. */
+    private const GRACE_NS = 2_000_000_000;
 
     private ?MatroskaWriter $writer = null;
     private bool $closed = false;
@@ -78,8 +78,8 @@ final class CallRecorder
     private bool $started = false;
     /** How many segments were rolled so far (series mode; 0: still on the base file). */
     private int $segment = 0;
-    /** Wall clock of the first frame buffered for the file being opened, for the grace period. */
-    private ?float $waitingSince = null;
+    /** When the first frame was buffered for the file being opened (hrtime, in nanoseconds), for the grace period. */
+    private ?int $waitingSinceNs = null;
 
     /**
      * Which streams the party is currently sending, as far as signaling tells: true expected, false
@@ -214,6 +214,11 @@ final class CallRecorder
     {
         // Synchronous state restoration only — no async work here (see resume()).
         $this->restoreDeclaredProperties($data);
+        // An hrtime reading, meaningless after a reboot: the grace starts again (null would leave a pending roll
+        // waiting forever)
+        if ($this->waitingSinceNs !== null) {
+            $this->waitingSinceNs = hrtime(true);
+        }
         if (!isset($this->out) && $this->file !== null) {
             $this->out = $this->file;
         }
@@ -253,7 +258,7 @@ final class CallRecorder
             $this->writer = null;
             $this->currentOut = null;
             $this->started = false;
-            $this->waitingSince = null;
+            $this->waitingSinceNs = null;
             $this->rollPending = false;
         }
     }
@@ -291,7 +296,7 @@ final class CallRecorder
         } elseif ($this->series) {
             // Something stopped or started: re-evaluate the segment as soon as the state is stable.
             $this->rollPending = true;
-            $this->waitingSince = microtime(true);
+            $this->waitingSinceNs = hrtime(true);
             $this->maybeRoll();
         }
         // A fixed file just stops (or resumes) writing the stream: nothing to do.
@@ -436,7 +441,7 @@ final class CallRecorder
             if (!$this->rollPending) {
                 // The segment lacks this stream: it just (re)appeared, so a new segment is due.
                 $this->rollPending = true;
-                $this->waitingSince = microtime(true);
+                $this->waitingSinceNs = hrtime(true);
                 $this->maybeRoll();
                 if ($this->started && $this->writer !== null && $this->inSegment($slot)) {
                     $this->write($slot, $data, $ms, $keyframe);
@@ -448,7 +453,7 @@ final class CallRecorder
             return;
         }
         $this->buffers[$slot][] = ['data' => $data, 'ms' => $ms, 'keyframe' => $keyframe];
-        $this->waitingSince ??= microtime(true);
+        $this->waitingSinceNs ??= hrtime(true);
         $this->maybeBegin();
     }
 
@@ -541,7 +546,7 @@ final class CallRecorder
 
     private function graceExpired(): bool
     {
-        return $this->waitingSince !== null && microtime(true) - $this->waitingSince > self::GRACE;
+        return $this->waitingSinceNs !== null && hrtime(true) - $this->waitingSinceNs > self::GRACE_NS;
     }
 
     /**
@@ -608,7 +613,7 @@ final class CallRecorder
             // Everything stopped: close the segment; the next one opens when something arrives.
             $this->closeWriter();
             $this->started = false;
-            $this->waitingSince = null;
+            $this->waitingSinceNs = null;
             return;
         }
         $this->openSegment($wanted);
@@ -633,7 +638,7 @@ final class CallRecorder
             $this->segment++;
         }
         $this->started = true;
-        $this->waitingSince = null;
+        $this->waitingSinceNs = null;
         $this->rollPending = false;
         $this->writer = new MatroskaWriter($out, $this->format->docType());
         $this->currentOut = $out;

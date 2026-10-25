@@ -201,14 +201,14 @@ abstract class Serialization
             // or a web server worker) around forever: if the holder serves the session eventually (it's still
             // loading it), its clients connect to it anyway.
             $failureCb = static function () use ($session, $cancelFull, $lockWait, &$alreadyServed): void {
-                $deadline = microtime(true) + self::WORKER_LOCK_TIMEOUT;
+                $deadline = hrtime(true) + self::WORKER_LOCK_TIMEOUT * 1_000_000_000;
                 while (!$lockWait->isCancelled()) {
                     if (self::isServed($session->getIpcPath(), $lockWait->getCancellation())) {
                         $alreadyServed = true;
                         $cancelFull();
                         return;
                     }
-                    if (microtime(true) >= $deadline) {
+                    if (hrtime(true) >= $deadline) {
                         $alreadyServed = false;
                         $cancelFull();
                         return;
