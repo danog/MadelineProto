@@ -27,6 +27,7 @@ use Amp\Future;
 use Closure;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Logger;
 use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 use Throwable;
@@ -98,6 +99,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Whether its file references were already refreshed once: a second FILE_REFERENCE_* error is not retried.
      */
     public bool $refreshedFileReferences = false;
+    /**
+     * The file references sent by the last serialization, by FileId key.
+     *
+     * @var array<string, string>
+     */
+    public array $sentFileReferences = [];
 
     /**
      * Create outgoing message.
@@ -450,10 +457,16 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         $API = $this->connection->API;
         $method = $this->constructor;
 
+        // Never fails: methodRecall() only handles futures resolving to null or to a closure.
         return async(function () use ($API, $method, $error, $code): ?Closure {
-            $body = $this->body === null
-                ? null
-                : $API->referenceDatabase?->refreshMethodCall($method, $this->body, $error);
+            try {
+                $body = $this->body === null
+                    ? null
+                    : $API->referenceDatabase?->refreshMethodCall($method, $this->body, $error, $this->sentFileReferences);
+            } catch (Throwable $e) {
+                $API->logger("Could not refresh the file references of $method: $e", Logger::ERROR);
+                $body = null;
+            }
             if ($body === null) {
                 return static fn (): Throwable => RPCErrorException::make($error, $code, $method);
             }

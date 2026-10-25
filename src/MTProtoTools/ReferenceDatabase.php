@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools;
 
 use Amp\Sync\LocalKeyedMutex;
+use Closure;
 use danog\AsyncOrm\Annotations\OrmMappedArray;
 use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\KeyType;
@@ -34,8 +35,11 @@ use danog\MadelineProto\MTProtoTools\FileRef\FileRefMap;
 use danog\MadelineProto\MTProtoTools\FileRef\FileRefTraversal;
 use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\TL\TLCallback;
+use Fiber;
 use Revolt\EventLoop;
+use stdClass;
 use Throwable;
+use WeakMap;
 
 /**
  * File reference database, driven by the file reference map (https://core.telegram.org/api/file-references).
@@ -94,12 +98,27 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
 
     private LocalKeyedMutex $flushMutex;
     private LocalKeyedMutex $refreshMutex;
+    /**
+     * The file references written into the calls being serialized, by FileId key, per fiber: serializing a call can
+     * suspend (database reads, uploads), and other calls are serialized meanwhile.
+     *
+     * @var WeakMap<object, array<string, string>>
+     */
+    private WeakMap $serializing;
+    /** Stands for the main context, which isn't a fiber. */
+    private stdClass $mainContext;
 
     public function __construct(private MTProto $API)
     {
+        $this->v = self::V;
+        $this->initRuntimeState();
+    }
+    private function initRuntimeState(): void
+    {
         $this->flushMutex = new LocalKeyedMutex;
         $this->refreshMutex = new LocalKeyedMutex;
-        $this->v = self::V;
+        $this->serializing = new WeakMap;
+        $this->mainContext = new stdClass;
     }
     /**
      * @psalm-pure
@@ -112,8 +131,7 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
     {
         // Drops the state of version 1 (pendingDb).
         $this->restoreDeclaredProperties($data);
-        $this->flushMutex = new LocalKeyedMutex;
-        $this->refreshMutex = new LocalKeyedMutex;
+        $this->initRuntimeState();
     }
     public function init(): void
     {
@@ -126,7 +144,10 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
             $this->pendingSources = [];
             $this->v = self::V;
         }
-        foreach (array_keys($this->pendingReferences + $this->pendingSources) as $key) {
+        foreach ($this->pendingReferences as $key => $_) {
+            EventLoop::queue($this->flush(...), (string) $key);
+        }
+        foreach ($this->pendingSources as $key => $_) {
             EventLoop::queue($this->flush(...), (string) $key);
         }
     }
@@ -185,7 +206,10 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
     {
         foreach ($commits as ['fileId' => $fileId, 'reference' => $reference, 'sources' => $sources]) {
             $key = FileRefMap::getFileIdKey($fileId);
-            $this->pendingReferences[$key] = $reference;
+            // An empty file reference can't be used: keep the last one seen.
+            if ($reference !== '') {
+                $this->pendingReferences[$key] = $reference;
+            }
             if ($sources) {
                 $this->pendingSources[$key] = self::mergeSources($this->pendingSources[$key] ?? [], $sources);
             }
@@ -298,7 +322,38 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
         } else {
             $location['file_reference'] ??= '';
         }
+        $context = Fiber::getCurrent() ?? $this->mainContext;
+        if (isset($this->serializing[$context])) {
+            $sent = $this->serializing[$context];
+            $sent[FileRefMap::getFileIdKey(['_' => $type, 'id' => (int) $location['id']])] = FileRefMap::getBytes($location['file_reference']) ?? '';
+            $this->serializing[$context] = $sent;
+        }
         return $location;
+    }
+
+    /**
+     * Serialize a call, returning the file references written into it as well.
+     *
+     * @template T
+     * @param Closure(): T $serialize
+     * @return array{T, array<string, string>} The result and the file references sent, by FileId key
+     */
+    public function serializeCall(Closure $serialize): array
+    {
+        $context = Fiber::getCurrent() ?? $this->mainContext;
+        // Calls serialized while serializing this one (in the same fiber) have their own.
+        $outer = $this->serializing[$context] ?? null;
+        $this->serializing[$context] = [];
+        try {
+            $result = $serialize();
+            return [$result, $this->serializing[$context]];
+        } finally {
+            if ($outer === null) {
+                unset($this->serializing[$context]);
+            } else {
+                $this->serializing[$context] = $outer;
+            }
+        }
     }
 
     /**
@@ -308,9 +363,12 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
      *                      index %d of the first vector of media in the arguments (multi_media of
      *                      messages.sendMultiMedia, extended_media of inputMediaPaidMedia)
      *
+     * @param array<string, string> $sent The file references the failed call sent, by FileId key: not necessarily
+     *                                     the ones of its arguments, see {@see self::populateReference()}
+     *
      * @return ?array The arguments with the new file references, null if none could be refreshed.
      */
-    public function refreshMethodCall(string $method, array $args, string $error): ?array
+    public function refreshMethodCall(string $method, array $args, string $error, array $sent = []): ?array
     {
         $map = self::getMap();
         $TL = $this->API->getTL();
@@ -337,7 +395,7 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
             if (\array_key_exists($key, $references)) {
                 continue;
             }
-            $references[$key] = $this->refreshFileId($location['fileId'], $location['reference']);
+            $references[$key] = $this->refreshFileId($location['fileId'], $sent[$key] ?? $location['reference']);
         }
         $references = array_filter($references, static fn (?string $reference): bool => $reference !== null);
         if (!$references) {
@@ -349,8 +407,9 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
     /**
      * Refresh the file reference of a FileId using its file sources.
      *
-     * Tries the sources from the most recently seen one, stopping as soon as the file reference changes.
-     * Concurrent refreshes of the same FileId wait for the first one, and use its result.
+     * Tries the sources from the most recently seen one, stopping as soon as the file reference differs from the one
+     * the failed call used. If the stored one already differs (seen or refreshed after the call was sent, e.g. by a
+     * concurrent refresh), it's used without refreshing.
      *
      * @param array{_: string, id: int} $fileId
      * @param ?string                   $used   The file reference the failed call used, if known
@@ -360,12 +419,12 @@ final class ReferenceDatabase implements TLCallback, FileRefEnvironment
     public function refreshFileId(array $fileId, ?string $used): ?string
     {
         $key = FileRefMap::getFileIdKey($fileId);
-        $before = $this->getStoredReference($key) ?? $used;
+        $before = $used ?? $this->getStoredReference($key);
         $lock = $this->refreshMutex->acquire($key);
         try {
             $current = $this->getStoredReference($key);
             if ($current !== null && $current !== $before) {
-                // Refreshed while waiting for the lock.
+                // Newer than the one of the failed call.
                 return $current;
             }
             $sources = array_reverse($this->getSources($key));

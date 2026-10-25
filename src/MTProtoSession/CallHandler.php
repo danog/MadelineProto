@@ -36,6 +36,7 @@ use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
 use Revolt\EventLoop;
+use Throwable;
 
 use function Amp\async;
 use function Amp\Future\await;
@@ -81,7 +82,7 @@ trait CallHandler
         }
         $request->unlink();
         if ($defer) {
-            $defer->catch($request->reply(...));
+            $defer->catch(static fn (Throwable $e) => $request->reply(static fn (): Throwable => $e));
             $defer->map(function ($result) use ($request, $forceDatacenter): void {
                 if ($result instanceof Closure) {
                     $request->reply($result);

@@ -255,10 +255,10 @@ final class ReferenceDatabaseTest extends TestCase
         $this->assertSame('old100', $args['media']['extended_media'][0]['id']['file_reference']);
         $this->assertSame('new200', $args['media']['extended_media'][1]['id']['file_reference']);
 
-        // Without an index, all of them.
+        // Without an index, all of them (the call sent the stored file references).
         $this->calls = [];
         $this->answers['messages.getSavedGifs'] = static fn () => self::savedGifs([self::document(200, 'newer200')]);
-        $args = $this->db->refreshMethodCall('messages.sendMedia', $paid, 'FILE_REFERENCE_EXPIRED');
+        $args = $this->db->refreshMethodCall('messages.sendMedia', $paid, 'FILE_REFERENCE_EXPIRED', ['fileIdPhoto:100' => 'old100', 'fileIdDocument:200' => 'new200']);
         $this->assertSame(['photos.getUserPhotos', 'messages.getSavedGifs'], $this->methods());
         $this->assertSame(['_' => 'inputUserSelf'], $this->calls[0][1]['user_id']);
         $this->assertSame('new100', $args['media']['extended_media'][0]['id']['file_reference']);
@@ -288,6 +288,62 @@ final class ReferenceDatabaseTest extends TestCase
         $error = $error();
         $this->assertInstanceOf(FileReferenceExpiredError::class, $error);
         $this->assertSame('FILE_REFERENCE_EXPIRED', $error->rpc);
+    }
+
+    /**
+     * methodRecall() only handles a refresh future resolving to null or to a closure: a failed one gave the caller
+     * the exception as its result, and failed an unobserved future.
+     */
+    public function testAFailingRefreshFailsWithTheErrorOfTheCall(): void
+    {
+        $API = $this->client();
+        $this->db->onMethodResult('messages.getSavedGifs', [], self::savedGifs([self::document(200, 'old')]));
+        // As a database read error would.
+        (new ReflectionProperty($this->db, 'sources'))->setValue($this->db, new class([]) extends MemoryArray {
+            public function get(string|int $key): mixed
+            {
+                throw new \RuntimeException('Database error');
+            }
+        });
+        (new ReflectionProperty($this->db, 'pendingSources'))->setValue($this->db, []);
+        $connection = $this->createMock(Connection::class);
+        $connection->API = $API;
+        $location = ['_' => 'inputDocumentFileLocation', 'id' => 200, 'access_hash' => 22, 'file_reference' => 'old', 'thumb_size' => ''];
+        $message = new MTProtoOutgoingMessage($connection, ['location' => $location, 'offset' => 0, 'limit' => 1024], 'upload.getFile', 'upload.File', true, false, SpecialMethodType::FILE_RELATED, null);
+
+        $error = $message->refreshReferences('FILE_REFERENCE_EXPIRED', 400)->await();
+        $this->assertInstanceOf(\Closure::class, $error);
+        $this->assertInstanceOf(FileReferenceExpiredError::class, $error());
+    }
+
+    /**
+     * The file reference changed after the call was sent (a concurrent refresh, e.g. of another chunk of a
+     * download): the stored one is newer than the one that failed, and is used without refreshing. Compared to the
+     * stored one instead, the refresh found no change and the call failed.
+     */
+    public function testAReferenceStoredAfterTheCallWasSentIsUsed(): void
+    {
+        $this->client();
+        $this->db->onMethodResult('messages.getSavedGifs', [], self::savedGifs([self::document(200, 'old')]));
+        $location = ['_' => 'inputDocumentFileLocation', 'id' => 200, 'access_hash' => 22, 'file_reference' => 'stale', 'thumb_size' => ''];
+        [, $sent] = $this->db->serializeCall(fn () => $this->API->getTL()->serializeMethod('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1024]));
+        // The stored one was sent, not the one of the arguments.
+        $this->assertSame(['fileIdDocument:200' => 'old'], $sent);
+        $this->db->onMethodResult('messages.getSavedGifs', [], self::savedGifs([self::document(200, 'new')]));
+
+        $args = $this->db->refreshMethodCall('upload.getFile', ['location' => $location, 'offset' => 0, 'limit' => 1024], 'FILE_REFERENCE_EXPIRED', $sent);
+        $this->assertSame('new', $args['location']['file_reference']);
+        $this->assertSame([], $this->methods());
+    }
+
+    public function testAnEmptyFileReferenceKeepsTheLastOne(): void
+    {
+        $this->client();
+        $this->db->onMethodResult('messages.getSavedGifs', [], self::savedGifs([self::document(200, 'last')]));
+        $this->db->onMethodResult('help.getPremiumPromo', [], self::premiumPromo([self::document(200, '')]));
+        $this->assertSame('last', $this->db->getReference(ReferenceDatabase::DOCUMENT, self::document(200, 'other')));
+        // Still a source.
+        $this->assertSame(['fileSourceSavedGifs', 'fileSourcePremiumPromo'], array_column($this->sources('fileIdDocument:200'), '_'));
     }
 
     public function testConcurrentRefreshesOfAFileShareTheResult(): void
