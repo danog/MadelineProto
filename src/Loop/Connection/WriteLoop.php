@@ -423,7 +423,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                 $padding += 16;
             }
             $padding = Tools::random($padding);
-            $message_key_large = hash('sha256', $auth->getTempAuthKeyForHash().$plaintext.$padding, true);
+            $message_key_large = Crypt::sha256($auth->getTempAuthKeyForHash().$plaintext.$padding);
             $message_key = substr($message_key_large, 8, 16);
             //$ack = unpack('V', substr($message_key_large, 0, 4))[1] | (1 << 31);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $auth->getTempAuthKey());

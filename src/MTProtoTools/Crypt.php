@@ -35,6 +35,17 @@ use const OPENSSL_RAW_DATA;
 final class Crypt
 {
     /**
+     * Compute a binary SHA-256 digest, preferring OpenSSL when available.
+     *
+     * @psalm-pure
+     */
+    public static function sha256(string $data): string
+    {
+        $digest = \function_exists('openssl_digest') ? \openssl_digest($data, 'sha256', true) : false;
+        return $digest === false ? hash('sha256', $data, true) : $digest;
+    }
+
+    /**
      * AES KDF function for MTProto v2.
      *
      * @param string  $msg_key   Message key
