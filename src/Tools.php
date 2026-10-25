@@ -106,11 +106,11 @@ abstract class Tools extends AsyncTools
     {
         try {
             if (file_exists('/proc/self/maps')) {
-                return substr_count(@file_get_contents('/proc/self/maps'), "\n")-1;
+                return substr_count(file_get_contents('/proc/self/maps'), "\n")-1;
             }
             $pid = getmypid();
             if (file_exists("/proc/$pid/maps")) {
-                return substr_count(@file_get_contents("/proc/$pid/maps"), "\n")-1;
+                return substr_count(file_get_contents("/proc/$pid/maps"), "\n")-1;
             }
         } catch (\Throwable) {
         }
@@ -124,7 +124,7 @@ abstract class Tools extends AsyncTools
     {
         try {
             if (file_exists('/proc/sys/vm/max_map_count')) {
-                return ((int) @file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
+                return ((int) file_get_contents('/proc/sys/vm/max_map_count')) ?: null;
             }
         } catch (\Throwable) {
         }
@@ -503,7 +503,12 @@ abstract class Tools extends AsyncTools
         if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || isset($GLOBALS['exited']) || isset($_GET['MadelineSelfRestart']) || Magic::$isIpcWorker) {
             return;
         }
-        $buffer = @ob_get_clean() ?: '';
+        try {
+            $buffer = ob_get_clean() ?: '';
+        } catch (\Throwable) {
+            // No output buffer
+            $buffer = '';
+        }
         $buffer .= $message;
         ignore_user_abort(true);
         // Output may already have been sent (an echo in onStart, a displayed warning): the request must end anyway,

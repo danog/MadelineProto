@@ -64,7 +64,7 @@ final class DoHConnector implements SocketConnector
         if ($host[0] === '[') {
             $host = substr($host, 1, -1);
         }
-        if ($port === 0 || @inet_pton($host)) {
+        if ($port === 0 || inet_pton($host)) {
             // Host is already an IP address or file path.
             $uris = [$uri];
         } else {
@@ -113,8 +113,14 @@ final class DoHConnector implements SocketConnector
         foreach ($uris as $builtUri) {
             try {
                 $streamContext = stream_context_create($socketContext->withoutTlsContext()->toStreamContextArray());
-                /** @psalm-suppress NullArgument */
-                if (!($socket = @stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext))) {
+                try {
+                    /** @psalm-suppress NullArgument */
+                    $socket = stream_socket_client($builtUri, $errno, $errstr, null, $flags, $streamContext);
+                } catch (\Throwable) {
+                    // Synchronous failures (no route to the host) warn: $errno and $errstr are set all the same
+                    $socket = false;
+                }
+                if (!$socket) {
                     throw new ConnectException(\sprintf('Connection to %s failed: [Error #%d] %s%s', (string) $uri, $errno, $errstr, $failures ? '; previous attempts: '.implode('', $failures) : ''), $errno);
                 }
                 stream_set_blocking($socket, false);

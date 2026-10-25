@@ -1390,13 +1390,22 @@ trait Handler
                     // not, and so does every session of an account in it: never start tracking (let
                     // alone resume) a call from its updates, or this session would own a controller
                     // of a call joined by another session. Only remember how to track it on first use.
+                    $peerId = isset($update['peer']) ? $this->getIdInternal($update['peer']) : null;
                     if ($call['_'] !== 'groupCall' || ($call['conference'] ?? false)) {
+                        if ($call['_'] === 'groupCallDiscarded') {
+                            $peerId ??= $this->seenGroupCalls[$id][1] ?? null;
+                            $this->logger->logger("Group call $id of chat ".($peerId ?? 'unknown').', which we are not in, ended', Logger::VERBOSE);
+                        }
                         unset($this->seenGroupCalls[$id]);
                     } else {
+                        if (!isset($this->seenGroupCalls[$id])) {
+                            $title = isset($call['title']) ? " \"{$call['title']}\"" : '';
+                            $this->logger->logger("Group call $id$title of chat ".($peerId ?? 'unknown').' is running, we are not in it', Logger::VERBOSE);
+                        }
                         $this->rememberGroupCall(
                             $id,
                             $call['access_hash'],
-                            isset($update['peer']) ? $this->getIdInternal($update['peer']) : null,
+                            $peerId,
                             (bool) ($update['live_story'] ?? false),
                         );
                     }
@@ -1418,7 +1427,7 @@ trait Handler
                     return;
                 }
                 if (!isset($this->groupCalls[$id])) {
-                    $this->logger->logger("Ignoring participants update for untracked group call $id", Logger::VERBOSE);
+                    $this->logger->logger("Ignoring participants update for untracked group call $id of chat ".($this->seenGroupCalls[$id][1] ?? 'unknown'), Logger::VERBOSE);
                     return;
                 }
                 EventLoop::queue(

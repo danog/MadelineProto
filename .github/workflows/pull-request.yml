@@ -21,7 +21,11 @@ jobs:
   cs:
     runs-on: ubuntu-latest
     # The image of the main branch, pulled anonymously: without the secrets.
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     steps:
       # Before the checkout: without git, it downloads the sources without the repository.
       - name: Install git
@@ -47,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Test the web UI, and check that its committed bundle is up to date
@@ -56,7 +60,11 @@ jobs:
   # The tests that don't need any secret.
   test_light:
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.
@@ -75,7 +83,11 @@ jobs:
 
   handshake:
     runs-on: ubuntu-latest
-    container: danog/madelineproto:next
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
     steps:
       - name: Install git
         # The checkout belongs to the user of the runner, not to the one of the container: trust it.

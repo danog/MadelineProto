@@ -30,6 +30,7 @@ use const PATH_SEPARATOR;
 use const PHP_BINARY;
 use const PHP_BINDIR;
 use const PHP_OS;
+use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 
 use function Amp\async;
@@ -126,17 +127,14 @@ final class ProcessRunner extends RunnerAbstract
             ],
         );
 
-        $process = proc_open(
-            $command,
-            [
-                ["pipe", "r"],
-                ["pipe", "w"],
-                ["pipe", "w"],
-            ],
-            $pipes,
-            null,
-            $envVars
-        );
+        $descriptors = self::getWorkerDescriptors();
+        try {
+            $process = proc_open($command, $descriptors, $pipes, null, $envVars);
+        } catch (Throwable $e) {
+            // proc_open dup()s one descriptor per hidden one: it can fail close to the descriptor limit
+            Logger::log("Could not hide the descriptors of this process from the IPC worker, starting it with them: $e", Logger::WARNING);
+            $process = proc_open($command, \array_slice($descriptors, 0, 3, true), $pipes, null, $envVars);
+        }
         if ($process === false) {
             throw new Error("Could not start the IPC worker process!");
         }
@@ -153,6 +151,43 @@ final class ProcessRunner extends RunnerAbstract
             self::reap($id);
         });
         return true;
+    }
+    /**
+     * The descriptors of an IPC worker: pipes for its standard streams, and /dev/null in place of every other
+     * descriptor open in this process.
+     *
+     * proc_open passes every open descriptor on to the child (PHP opens none with close-on-exec), and the worker
+     * outlives the process that starts it. It would keep the listening sockets of this process (the metrics server:
+     * "Address already in use" when it's started again; php-fpm's), its connections (the FastCGI request, the
+     * Telegram connections, which a close here no longer ends), and its flock()ed files (the session lock).
+     *
+     * @internal
+     *
+     * @return array<int, list<string>>
+     */
+    public static function getWorkerDescriptors(): array
+    {
+        $descriptors = [
+            ['pipe', 'r'],
+            ['pipe', 'w'],
+            ['pipe', 'w'],
+        ];
+        if (PHP_OS_FAMILY === 'Windows') {
+            return $descriptors;
+        }
+        try {
+            // On Linux, a link to /proc/self/fd
+            $fds = scandir('/dev/fd');
+        } catch (Throwable) {
+            $fds = false;
+        }
+        foreach ($fds ?: [] as $fd) {
+            // Includes the descriptor of the listed directory, closed since: /dev/null takes its place all the same
+            if (ctype_digit($fd) && (int) $fd > 2) {
+                $descriptors[(int) $fd] = ['null'];
+            }
+        }
+        return $descriptors;
     }
     /**
      * Release the handle of a worker that closed its output, once it exits, without keeping the loop alive.

@@ -22,4 +22,12 @@
       <exclude>tests/danog/MadelineProto/FileIdTest.php</exclude>
     </testsuite>
   </testsuites>
+  <extensions>
+    <!-- Fails a test that waits forever, after dumping where it waits: see tests/danog/MadelineProto/Watchdog.php -->
+    <extension class="danog\MadelineProto\Test\Watchdog">
+      <arguments>
+        <integer>300</integer>
+      </arguments>
+    </extension>
+  </extensions>
 </phpunit>

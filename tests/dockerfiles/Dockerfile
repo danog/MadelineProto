@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # Not alpine, due to possible performance issues of MUSL malloc.
 #
 # In theory this should not be relevant because PHP uses its own allocator,
@@ -77,7 +79,7 @@ RUN set -eux; \
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.11 php
+	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.12 php
 
 RUN set -eux; \
 	\
@@ -130,7 +132,6 @@ RUN set -eux; \
 # https://github.com/docker-library/php/issues/822
 		--with-pic \
 		\
-# --enable-mbstring is included here because otherwise there's no way to get pecl to use it properly (see https://github.com/docker-library/php/issues/195)
 		--enable-mbstring \
 # --enable-mysqlnd is included here because it's harder to compile after the fact than extensions are (since it's a plugin for several extensions, not an extension in itself)
 		--enable-mysqlnd \
@@ -148,9 +149,8 @@ RUN set -eux; \
 		--with-readline \
 		--with-zlib --with-ffi --enable-intl --with-gmp --with-pdo-mysql --with-zip --enable-gd --with-tidy \
 		\
-# in PHP 7.4+, the pecl/pear installers are officially deprecated (requiring an explicit "--with-pear")
-		--with-pear \
-		\
+# No pear/pecl (deprecated since PHP 7.4): the extensions are installed with PIE (see below), and pear's installer
+# is downloaded from pear.php.net while installing PHP, which would make the build depend on it being up.
 		--disable-cgi \
 		--disable-phpdbg \
 		--enable-pcntl \
@@ -183,10 +183,6 @@ RUN set -eux; \
 	; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/*; \
-	\
-# update pecl channel definitions https://github.com/docker-library/php/issues/443
-	pecl update-channels; \
-	rm -rf /tmp/pear ~/.pearrc; \
 	\
 # smoke test
 	php --version
@@ -236,11 +232,29 @@ RUN set -eux; \
 	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
 
 COPY tests/dockerfiles/docker-php-* /usr/local/bin/
-ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.11/.gdbinit /root/.gdbinit
+ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.12/.gdbinit /root/.gdbinit
 
 RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libuv1 libuv1-dev libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pecl install igbinary uv-beta memprof
+# The extensions are installed with PIE (https://github.com/php/pie), from their packages on Packagist (built from
+# the sources of the tagged release on GitHub), pinned: not with pecl, which made the build fail whenever
+# pecl.php.net was down. PIE stays in the image, to install other extensions (as root, with the build tools).
+ENV PIE_VERSION=1.5.2
+ENV PIE_SHA256=fe70c59738cf56ec00a818cf9cb9593da171aac86f5f1f859995b8839dfd2cc7
+RUN set -eux; \
+	curl -fsSL -o /usr/local/bin/pie "https://github.com/php/pie/releases/download/$PIE_VERSION/pie.phar"; \
+	echo "$PIE_SHA256  /usr/local/bin/pie" | sha256sum -c -; \
+	chmod +x /usr/local/bin/pie
+
+# The sources are downloaded from the GitHub API, whose anonymous rate limit (60 requests per hour per IP) the CI's
+# runners share: the CI passes its token as the github_token secret (optional).
+# Enabled by tests/dockerfiles/php.ini, not by PIE.
+RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
+	set -eux; \
+	for package in igbinary/igbinary:3.2.17RC1 amphp/uv:0.3.1 arnaud-lb/memprof:3.1.0; do \
+		pie install --no-interaction --skip-enable-extension "$package"; \
+	done; \
+	rm -rf /root/.composer/cache
 
 RUN apt-get -y remove libuv1-dev libjudy-dev $PHPIZE_DEPS
 
@@ -249,6 +263,17 @@ ADD tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s "$(dpkg -L libjemalloc2 | grep libjemalloc.so | head -1)" /usr/lib/libjemalloc.so
+
+# The unprivileged user the image runs as by default (see USER below), with a fixed UID and GID (1000, the first
+# user of most distributions, so that the files it writes to bind mounts belong to them), owning its home (and so
+# its own composer home, ~/.composer) and /app. Run with --user root (or user: root in compose) for the rest.
+# Nothing it can write may be in the PATH, which root uses too (/composer/vendor/bin, in it, can only be created by
+# root): so it doesn't share root's composer home, and the binaries it installs globally aren't in the PATH.
+RUN set -eux; \
+	groupadd --gid 1000 madeline; \
+	useradd --uid 1000 --gid madeline --create-home --home-dir /home/madeline --shell /bin/bash madeline; \
+	mkdir -p /app; \
+	chown madeline:madeline /app
 
 FROM scratch
 
@@ -269,6 +294,8 @@ ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
 RUN php -v
+
+USER madeline:madeline
 
 STOPSIGNAL SIGTERM
 

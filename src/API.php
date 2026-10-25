@@ -28,6 +28,7 @@ use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\SignalException;
 use Amp\TimeoutException;
 use danog\MadelineProto\ApiWrappers\Start;
+use danog\MadelineProto\Ipc\AlreadyServedException;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Ipc as SettingsIpc;
@@ -53,7 +54,7 @@ final class API extends AbstractAPI
      *
      * @var string
      */
-    public const RELEASE = '8.11.3';
+    public const RELEASE = '8.11.12';
     /**
      * We're not logged in.
      *
@@ -286,7 +287,8 @@ final class API extends AbstractAPI
                         }
                         $this->wrapper->logger("Restarting to full instance: error in stop loop $e");
                     }
-                    EventLoop::queue($cb);
+                    // Repeated until we get the session, but not right away: it spun as long as a server accepted connections without stopping
+                    EventLoop::delay(1.0, static fn () => $cb());
                 }
             };
             EventLoop::queue($cb);
@@ -346,6 +348,11 @@ final class API extends AbstractAPI
             // IPC server error
             throw $unserialized;
         } elseif ($unserialized instanceof ChannelledSocket) {
+            if (Magic::$isIpcWorker) {
+                // A worker is only useful as the server: as a client, it would wait for a shutdown forever.
+                $unserialized->disconnect();
+                throw new AlreadyServedException("Another process is already serving the session {$this->session->getSessionDirectoryPath()}");
+            }
             // Success, IPC client
             Server::warnIfOverTcp($this->session);
             $this->wrapper->setAPI($client = new Client($unserialized, $this->session, Logger::$default));

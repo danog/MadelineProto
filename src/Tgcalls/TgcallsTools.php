@@ -63,12 +63,18 @@ final class TgcallsTools
         }
 
         if ($data[0] === \chr(0x1f) && $data[1] === \chr(0x8b)) {
-            $result = @gzdecode($data);
-            return $result === false ? $data : $result;
+            try {
+                return gzdecode($data);
+            } catch (\Throwable) {
+                return $data;
+            }
         }
         if ($data[0] === \chr(0x78) && $data[1] === \chr(0x9c)) {
-            $result = @gzuncompress($data);
-            return $result === false ? $data : $result;
+            try {
+                return gzuncompress($data);
+            } catch (\Throwable) {
+                return $data;
+            }
         }
         return $data;
     }

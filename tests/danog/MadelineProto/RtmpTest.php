@@ -27,6 +27,8 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use PHPUnit\Framework\TestCase;
+use Throwable;
+use Webrtc\Codecs\EncodedPacket;
 
 use function Amp\async;
 use function Amp\ByteStream\buffer;
@@ -202,6 +204,125 @@ final class RtmpTest extends TestCase
             self::assertStringContainsString('V_VP8', implode("\n", $call->logs));
         } finally {
             exec('rm -rf '.escapeshellarg($dir));
+        }
+    }
+
+    /**
+     * The ingest drops a publisher that sends no media (Telegram's after 10 seconds): while nothing
+     * is played, the connection must not be reopened (and dropped again) in a loop, only once
+     * something is played again.
+     */
+    public function testAnIdlePublisherReconnectsOnlyOnceSomethingIsPlayed(): void
+    {
+        $server = new FakeRtmpServer(idleTimeout: 0.5);
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key'], idle: 0.25);
+        try {
+            // Nothing is played: dropped after 0.5 seconds, and not reconnected.
+            delay(3);
+            self::assertSame(1, $server->connections, implode("\n", $call->logs));
+            self::assertFalse($publisher->isConnected());
+            self::assertStringContainsString('closed while nothing was played', implode("\n", $call->logs));
+
+            // Something is played: reconnected, and kept connected while it plays.
+            $timestamp = 0;
+            $feed = static function (float $seconds) use ($publisher, &$timestamp): void {
+                for ($end = microtime(true) + $seconds; microtime(true) < $end;) {
+                    $publisher->onAudio(new EncodedPacket(FlvTags::adtsHeader("\x11\x90", 5).'12345', $timestamp += 960, false));
+                    delay(0.02);
+                }
+            };
+            $feed(1.5);
+            self::assertSame(2, $server->connections, implode("\n", $call->logs));
+            self::assertTrue($publisher->isConnected());
+            self::assertGreaterThan(0, $server->mediaMessages);
+
+            // Dropped again once nothing is played, and woken up by the next play().
+            delay(1.5);
+            self::assertFalse($publisher->isConnected());
+            self::assertSame(2, $server->connections);
+            $publisher->wake();
+            delay(0.3);
+            self::assertSame(3, $server->connections);
+            self::assertTrue($publisher->isConnected());
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
+        }
+    }
+
+    /**
+     * A server that closes the connection right after accepting the stream, while media flows, is
+     * retried with an exponential backoff, rather than in a loop.
+     */
+    public function testAServerThatKeepsClosingIsRetriedWithBackoff(): void
+    {
+        $server = new FakeRtmpServer(closeAfterPublish: true);
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key']);
+        try {
+            $timestamp = 0;
+            for ($end = microtime(true) + 4.5; microtime(true) < $end;) {
+                $publisher->onAudio(new EncodedPacket(FlvTags::adtsHeader("\x11\x90", 5).'12345', $timestamp += 960, false));
+                delay(0.02);
+            }
+            // Connected at once, then after 1 and 2 more seconds: the next one is due 4 seconds later.
+            self::assertSame(3, $server->publishes, implode("\n", $call->logs));
+            $gaps = [$server->publishedAt[1] - $server->publishedAt[0], $server->publishedAt[2] - $server->publishedAt[1]];
+            self::assertEqualsWithDelta(1.0, $gaps[0], 0.5);
+            self::assertEqualsWithDelta(2.0, $gaps[1], 0.5);
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
+        }
+    }
+
+    /**
+     * A refused stream is retried with a backoff, fetching the key again each time (the same one
+     * until an admin revokes it): a refusal isn't treated as definitive, it may be transient.
+     */
+    public function testARefusedStreamIsRetriedWithABackoff(): void
+    {
+        $server = new FakeRtmpServer(validKey: 'good');
+        $call = self::call();
+        $dj = new DjLoop($call, rtmp: true);
+        self::assertTrue($dj->start());
+        $keys = ['bad', 'bad'];
+        $revoked = false;
+        $gaveUp = null;
+        $publisher = new RtmpPublisher(
+            $call,
+            $dj,
+            static function (bool $revoke) use ($server, &$keys, &$revoked): array {
+                $revoked = $revoked || $revoke;
+                return ['url' => $server->getUrl(), 'key' => array_shift($keys) ?? 'good'];
+            },
+            static function (Throwable $e) use (&$gaveUp): void {
+                $gaveUp = $e;
+            },
+        );
+        try {
+            delay(1.5);
+            // Refused at once, then again after 1 second.
+            self::assertSame(['bad', 'bad'], $server->keys, implode("\n", $call->logs));
+            self::assertFalse($publisher->isConnected());
+            self::assertStringContainsString('NetStream.Publish.BadName', implode("\n", $call->logs));
+            delay(2.5);
+            // Then 2 seconds later, with the key an admin changed meanwhile.
+            self::assertSame(['bad', 'bad', 'good'], $server->keys, implode("\n", $call->logs));
+            self::assertTrue($publisher->isConnected());
+            self::assertNull($gaveUp);
+            self::assertFalse($revoked, 'The key must never be revoked by the publisher');
+        } finally {
+            $publisher->stop();
+            $dj->discard();
+            $server->close();
         }
     }
 

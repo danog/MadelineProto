@@ -222,7 +222,11 @@ final class GarbageCollector
             move("$path.temp.php", $path);
             // With opcache.validate_timestamps=0 (php-fpm), the old loader would run until a restart
             if (\function_exists('opcache_invalidate')) {
-                @opcache_invalidate($path, true);
+                try {
+                    opcache_invalidate($path, true);
+                } catch (Throwable) {
+                    // Restricted by opcache.restrict_api
+                }
             }
         } finally {
             $unlock();

@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto;
 
+use Closure;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -76,13 +77,13 @@ abstract class SettingsAbstract
                 && (
                     !\array_key_exists($name, $defaults)
                     || (
-                        $other->{$name} !== $defaults[$name]  // Isn't equal to the default value
-                        || $other->{$name} !== $this->{$name} // Is equal, but current value is not the default one
+                        !self::same($other->{$name}, $defaults[$name])  // Isn't equal to the default value
+                        || !self::same($other->{$name}, $this->{$name}) // Is equal, but current value is not the default one
                     )
                 )
                 && (
                     !isset($this->{$name})
-                    || $other->{$name} !== $this->{$name}
+                    || !self::same($other->{$name}, $this->{$name})
                 )
             ) {
                 if ($uc === 'Proxy') {
@@ -92,6 +93,19 @@ abstract class SettingsAbstract
                 $this->changed = true;
             }
         }
+    }
+    /**
+     * Whether two setting values are the same: value objects (a SocketAddress) by value, since every client builds
+     * its own (an identity check marked them as changed on every merge, restarting the metrics server).
+     *
+     * @psalm-pure
+     */
+    private static function same(mixed $a, mixed $b): bool
+    {
+        if (\is_object($a) && \is_object($b) && !$a instanceof Closure && $a::class === $b::class) {
+            return $a == $b;
+        }
+        return $a === $b;
     }
     /**
      * Convert array of legacy array property names to new camel case names.

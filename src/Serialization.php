@@ -22,6 +22,7 @@ namespace danog\MadelineProto;
 
 use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
@@ -55,6 +56,14 @@ use function Amp\Ipc\connect;
  */
 abstract class Serialization
 {
+    /**
+     * How long an IPC worker waits for the process holding the session lock to serve the session, in seconds.
+     */
+    private const WORKER_LOCK_TIMEOUT = 60;
+    /**
+     * How long to wait for a server to answer, in seconds.
+     */
+    private const SERVED_TIMEOUT = 10;
     /**
      * Unserialize session.
      *
@@ -136,7 +145,8 @@ abstract class Serialization
         $lockWait = new DeferredCancellation;
         $canContinue = true;
         $ipcSocket = null;
-        $alreadyServed = false;
+        // For IPC workers: true if the lock holder serves the session, false if it didn't for WORKER_LOCK_TIMEOUT seconds
+        $alreadyServed = null;
         $cancelFull = static function () use (&$cancelFlock): void {
             if ($cancelFlock !== null) {
                 $copy = $cancelFlock;
@@ -166,18 +176,10 @@ abstract class Serialization
                     // long it takes to load the session, unless we get the lock first.
                     while (!$lockWait->isCancelled()) {
                         Logger::log('MadelineProto is starting, please wait...');
-                        try {
-                            clearstatcache(true, $session->getIpcPath());
-                            $socket = connect($session->getIpcPath());
-                            Logger::log('Connected to IPC socket!');
+                        if ($socket = self::connectIfListening($session->getIpcPath())) {
                             $ipcSocket = [$socket, null];
                             $cancelFull();
                             return;
-                        } catch (Throwable $e) {
-                            $e = $e->getMessage();
-                            if ($e !== 'The endpoint does not exist!') {
-                                Logger::log("$e while connecting to IPC socket");
-                            }
                         }
                         try {
                             delay(1.0, true, $lockWait->getCancellation());
@@ -195,10 +197,19 @@ abstract class Serialization
             // clients, or by the process and the web runner of the same client): if the lock holder serves the
             // session, this worker is redundant and must exit, without reporting an error.
             // Only a server that answers counts: one that is shutting down may still have its socket bound.
+            // A holder that never serves (it drops connections, or it's stuck) must not keep the worker (a process,
+            // or a web server worker) around forever: if the holder serves the session eventually (it's still
+            // loading it), its clients connect to it anyway.
             $failureCb = static function () use ($session, $cancelFull, $lockWait, &$alreadyServed): void {
+                $deadline = microtime(true) + self::WORKER_LOCK_TIMEOUT;
                 while (!$lockWait->isCancelled()) {
                     if (self::isServed($session->getIpcPath(), $lockWait->getCancellation())) {
                         $alreadyServed = true;
+                        $cancelFull();
+                        return;
+                    }
+                    if (microtime(true) >= $deadline) {
+                        $alreadyServed = false;
                         $cancelFull();
                         return;
                     }
@@ -255,6 +266,9 @@ abstract class Serialization
         if (!$unlock) { // Canceled, don't have lock
             if ($alreadyServed) {
                 throw new AlreadyServedException("Another process is already serving the session {$session->getSessionDirectoryPath()}");
+            }
+            if ($alreadyServed === false) {
+                throw new AlreadyServedException("Another process holds the lock of the session {$session->getSessionDirectoryPath()} without serving it for ".self::WORKER_LOCK_TIMEOUT." seconds");
             }
             return $ipcSocket;
         }
@@ -369,8 +383,9 @@ abstract class Serialization
      */
     public static function isLockedByAnotherProcess(SessionPaths $session): bool
     {
-        $res = @fopen($session->getLockPath(), 'c');
-        if (!$res) {
+        try {
+            $res = fopen($session->getLockPath(), 'c');
+        } catch (Throwable) {
             return false;
         }
         try {
@@ -399,8 +414,12 @@ abstract class Serialization
         }
         try {
             $socket->send(['isIpcWorker', []]);
-            // The server answers once it has loaded the session
-            $res = async($socket->receive(...))->await($cancellation);
+            // The server answers once it has loaded the session (it only listens then): one that doesn't answer
+            // within a few seconds doesn't serve it, it must not hang the caller.
+            $res = async($socket->receive(...))->await(new CompositeCancellation(
+                $cancellation,
+                Tools::getTimeoutCancellation(self::SERVED_TIMEOUT, "The IPC server didn't answer"),
+            ));
             return \is_array($res);
         } catch (Throwable) {
             return false;
@@ -409,6 +428,58 @@ abstract class Serialization
                 $socket->disconnect();
             } catch (Throwable) {
             }
+        }
+    }
+
+    /**
+     * Connect to the IPC server of a session if something listens on its socket.
+     */
+    private static function connectIfListening(string $ipcPath): ?ChannelledSocket
+    {
+        try {
+            clearstatcache(true, $ipcPath);
+            $socket = connect($ipcPath);
+            Logger::log('Connected to IPC socket!');
+            return $socket;
+        } catch (Throwable $e) {
+            $e = $e->getMessage();
+            if ($e !== 'The endpoint does not exist!') {
+                Logger::log("$e while connecting to IPC socket");
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Connect again to the IPC server of a session, after losing the connection to it.
+     *
+     * Like unserialize(), only starts a server if nobody can serve the session: if something listens, that's the
+     * server (if it drops us, the client backs off and gives up eventually); if another process holds the session
+     * lock, it's an instance loading the session (it listens once it's done) or releasing it, so wait for it.
+     * Starting a server anyway spawned a worker (and sent requests to the web server) on every attempt, all of them
+     * waiting for a lock that the live holder never releases.
+     *
+     * @internal
+     *
+     * @param  Cancellation                                      $cancellation Stops waiting for the lock holder
+     * @return array{0: (ChannelledSocket|Throwable|0), 1: null}
+     */
+    public static function reconnect(SessionPaths $session, Cancellation $cancellation): array
+    {
+        $ipcPath = $session->getIpcPath();
+        $waiting = false;
+        while (true) {
+            if ($socket = self::connectIfListening($ipcPath)) {
+                return [$socket, null];
+            }
+            if (!self::isLockedByAnotherProcess($session)) {
+                return self::startServerAndConnect($session);
+            }
+            if (!$waiting) {
+                Logger::log('The session is locked by another process (loading or releasing it), waiting for it...');
+                $waiting = true;
+            }
+            delay(1.0, true, $cancellation);
         }
     }
 
