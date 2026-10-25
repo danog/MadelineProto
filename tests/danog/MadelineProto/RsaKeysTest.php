@@ -27,9 +27,9 @@ use ReflectionMethod;
 use ReflectionProperty;
 
 /**
- * The RSA keys come from the settings, not from the session: a session saved before rsa_keys was renamed to rsaKeys
- * (8.6.2) woke up without keys, and kept failing the handshakes ("Couldn't find any of our keys in the
- * server_public_key_fingerprints vector") until a version or settings change loaded them again.
+ * A session saved before rsa_keys was renamed to rsaKeys (8.6.2) woke up without keys, and kept failing the handshakes
+ * ("Couldn't find any of our keys in the server_public_key_fingerprints vector") until a version or settings change
+ * parsed them again: they're checked against the settings on each wakeup, and parsed again only if they differ.
  *
  * @internal
  */
@@ -38,23 +38,50 @@ final class RsaKeysTest extends TestCase
     /** Fingerprint of Telegram's production key, as sent in resPQ. */
     private const PRODUCTION_FINGERPRINT = -3414540481677951611;
 
-    public function testTheKeysAreLoadedFromTheSettingsNotFromTheSession(): void
+    private function api(Settings $settings): MTProto
     {
         $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
-        (new ReflectionProperty($API, 'settings'))->setValue($API, $settings = new Settings);
+        (new ReflectionProperty($API, 'settings'))->setValue($API, $settings);
         $TL = new TL($API);
         $TL->init($settings->getSchema());
         (new ReflectionProperty($API, 'TL'))->setValue($API, $TL);
+        return $API;
+    }
 
-        $this->assertNotContains('rsaKeys', $API->__sleep());
-        $this->assertNotContains('testRsaKeys', $API->__sleep());
+    private static function load(MTProto $API): void
+    {
+        (new ReflectionMethod($API, 'loadRsaKeys'))->invoke($API);
+    }
 
+    public function testASessionWithoutKeysGetsThem(): void
+    {
         // As woken up from such a session.
+        $API = $this->api(new Settings);
         $fps = [pack('q', self::PRODUCTION_FINGERPRINT)];
         $this->assertNull($API->findRsaKey($fps, false, false));
 
-        (new ReflectionMethod($API, 'loadRsaKeys'))->invoke($API);
+        self::load($API);
         $this->assertNotNull($API->findRsaKey($fps, false, false));
         $this->assertNull($API->findRsaKey($fps, true, false));
+
+        // Saved with what they were parsed from.
+        foreach (['rsaKeys', 'testRsaKeys', 'rsaKeysSource'] as $property) {
+            $this->assertContains($property, $API->__sleep());
+        }
+    }
+
+    public function testTheKeysAreOnlyParsedAgainWhenTheSettingsChange(): void
+    {
+        $API = $this->api($settings = new Settings);
+        $fps = [pack('q', self::PRODUCTION_FINGERPRINT)];
+        self::load($API);
+        $key = $API->findRsaKey($fps, false, false);
+
+        self::load($API);
+        $this->assertSame($key, $API->findRsaKey($fps, false, false));
+
+        $settings->getConnection()->setRsaKeys([]);
+        self::load($API);
+        $this->assertNull($API->findRsaKey($fps, false, false));
     }
 }
