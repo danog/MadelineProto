@@ -40,7 +40,6 @@ final class SrtpTest extends TestCase
         $masterSalt = hex2bin('0EC675AD498AFEEBB6960B3AABE6');
 
         $derive = new ReflectionMethod(Session::class, 'derive');
-        $derive->setAccessible(true);
 
         $this->assertSame(
             'c61e7a93744f39ee10734afe3ff7a087',

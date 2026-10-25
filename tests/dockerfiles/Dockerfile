@@ -234,7 +234,32 @@ RUN set -eux; \
 COPY tests/dockerfiles/docker-php-* /usr/local/bin/
 ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.12/.gdbinit /root/.gdbinit
 
-RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libuv1 libuv1-dev libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# libuv for ext-uv (Revolt's UvDriver), from its sources: bookworm's 1.44 runs the due timers before polling in
+# uv_run(UV_RUN_ONCE), then blocks with nothing left to wake it while a handle stays active (MadelineProto's signal
+# handlers). A timer due when the UvDriver enters its blocking run (a short delay(), often) was only run at the next I/O
+# event, or never: the event loop hung. Fixed in 1.45.0 ("win,unix: change execution order of timers"), see
+# tests/danog/MadelineProto/EventLoopTimerTest.php.
+ENV LIBUV_VERSION=1.53.0
+ENV LIBUV_SHA256=cb0d6dd2128d5a95bd242c6cc982a24fe608fa93da57b6b4ec763b0018c53e64
+RUN set -eux; \
+	apt-get update; \
+	apt-get -y --no-install-recommends install cmake; \
+	curl -fsSL -o /tmp/libuv.tar.gz "https://dist.libuv.org/dist/v$LIBUV_VERSION/libuv-v$LIBUV_VERSION.tar.gz"; \
+	echo "$LIBUV_SHA256  /tmp/libuv.tar.gz" | sha256sum -c -; \
+	mkdir /tmp/libuv; \
+	tar -xzf /tmp/libuv.tar.gz -C /tmp/libuv --strip-components=1; \
+	cmake -S /tmp/libuv -B /tmp/libuv/build -DCMAKE_BUILD_TYPE=Release -DLIBUV_BUILD_TESTS=OFF -DLIBUV_BUILD_BENCH=OFF \
+		-DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_INSTALL_LIBDIR=lib; \
+	cmake --build /tmp/libuv/build -j"$(nproc)"; \
+	cmake --install /tmp/libuv/build; \
+	ldconfig; \
+	rm -rf /tmp/libuv /tmp/libuv.tar.gz; \
+	apt-get -y purge cmake; \
+	apt-get -y autoremove; \
+	apt-get clean; \
+	rm -rf /var/lib/apt/lists/*
 
 # The extensions are installed with PIE (https://github.com/php/pie), from their packages on Packagist (built from
 # the sources of the tagged release on GitHub), pinned: not with pecl, which made the build fail whenever
@@ -256,7 +281,7 @@ RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	done; \
 	rm -rf /root/.composer/cache
 
-RUN apt-get -y remove libuv1-dev libjudy-dev $PHPIZE_DEPS
+RUN apt-get -y remove libjudy-dev $PHPIZE_DEPS
 
 ADD tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
