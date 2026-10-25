@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\ByteStream\ClosedException;
 use Amp\DeferredFuture;
 use Closure;
 use danog\Loop\Loop;
@@ -62,10 +63,13 @@ abstract class FakeMTProtoStream implements MTProtoBufferInterface, BufferedStre
  */
 final class ConnectRaceTest extends TestCase
 {
-    /** Suspends the logging of the next "Connected to DC" line until completed. */
-    private ?DeferredFuture $suspendConnected = null;
+    /** Suspends the logging of the next line starting with $suspendAt until completed. */
+    private ?DeferredFuture $suspend = null;
+    private string $suspendAt = '';
     /** @var list<MTProtoBufferInterface> */
     private array $streams = [];
+    /** @var list<int> Indexes of the streams disconnected. */
+    private array $closed = [];
 
     protected function setUp(): void
     {
@@ -77,9 +81,9 @@ final class ConnectRaceTest extends TestCase
         $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
         $logger = $this->createMock(Logger::class);
         $logger->method('logger')->willReturnCallback(function (mixed $param): void {
-            if (\is_string($param) && str_starts_with($param, 'Connected to DC') && $this->suspendConnected) {
-                $suspend = $this->suspendConnected;
-                $this->suspendConnected = null;
+            if (\is_string($param) && $this->suspend && str_starts_with($param, $this->suspendAt)) {
+                $suspend = $this->suspend;
+                $this->suspend = null;
                 $suspend->getFuture()->await();
             }
         });
@@ -93,8 +97,14 @@ final class ConnectRaceTest extends TestCase
         $ctx->method('__toString')->willReturn('fake');
         $ctx->method('getStream')->willReturnCallback(function (): MTProtoBufferInterface {
             $stream = $this->getMockForAbstractClass(FakeMTProtoStream::class);
-            // Nothing is ever received.
-            $stream->method('getReadBuffer')->willReturnCallback(static fn () => (new DeferredFuture)->getFuture()->await());
+            // Nothing is received until it's disconnected, which fails the pending reads.
+            $closed = new DeferredFuture;
+            $stream->method('getReadBuffer')->willReturnCallback(static fn () => $closed->getFuture()->await());
+            $index = \count($this->streams);
+            $stream->method('disconnect')->willReturnCallback(function () use ($index, $closed): void {
+                $this->closed[] = $index;
+                $closed->error(new ClosedException('Disconnected'));
+            });
             return $this->streams[] = $stream;
         });
 
@@ -124,7 +134,25 @@ final class ConnectRaceTest extends TestCase
         return $loops;
     }
 
-    public function testADisconnectWhileConnectingStopsTheLoopsStartedAfterIt(): void
+    /**
+     * Where the first reconnection suspends, and the error of the second one before the fix.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function suspensionPoints(): array
+    {
+        return [
+            // Before starting any loop: "Could not start writer stream".
+            'after publishing the stream' => ['Connected to DC'],
+            // Once the writer and the reader are started: "Could not start cleanup stream", as on magnaluna.
+            'after starting the reader' => ['Started read loop'],
+        ];
+    }
+
+    /**
+     * @dataProvider suspensionPoints
+     */
+    public function testADisconnectWhileConnectingStopsTheLoopsStartedAfterIt(string $suspendAt): void
     {
         $connection = $this->connection();
         $connection->reconnect();
@@ -133,7 +161,8 @@ final class ConnectRaceTest extends TestCase
         }
 
         // The first reconnection suspends after publishing its stream, the second one disconnects it meanwhile.
-        $this->suspendConnected = $suspend = new DeferredFuture;
+        $this->suspendAt = $suspendAt;
+        $this->suspend = $suspend = new DeferredFuture;
         $first = async($connection->reconnect(...));
         delay(0.01);
         $second = async($connection->reconnect(...));
@@ -141,7 +170,10 @@ final class ConnectRaceTest extends TestCase
         $suspend->complete();
         await([$first, $second]);
 
-        $this->assertSame(end($this->streams), $connection->stream);
+        // The first reconnection connected again, the second one found it connected.
+        $this->assertCount(3, $this->streams);
+        $this->assertSame($this->streams[2], $connection->stream);
+        $this->assertSame([0, 1], $this->closed);
         foreach (self::loops($connection) as $name => $loop) {
             $this->assertTrue($loop->isRunning(), $name);
         }
