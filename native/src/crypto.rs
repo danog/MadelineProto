@@ -41,8 +41,15 @@ impl Drop for Buffer {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Operation {
+    Encrypt,
+    Decrypt,
+    Decode,
+}
+
 pub struct Message {
-    pub operation: u8,
+    pub operation: Operation,
     pub input: Buffer,
     pub output: Buffer,
     pub key: Zeroizing<[u8; 32]>,
@@ -60,7 +67,7 @@ impl Output {
         &self.message.output[self.offset..self.offset + self.length]
     }
     pub fn state(&self) -> &[u8] {
-        if self.message.operation == 4 {
+        if self.message.operation == Operation::Decode {
             &self.message.output[8..28]
         } else {
             &self.message.iv[..]
@@ -76,7 +83,7 @@ fn hash(a: &[u8], b: &[u8]) -> Zeroizing<[u8; 32]> {
 }
 impl Message {
     pub fn prepare(&mut self) {
-        if self.operation != 4 {
+        if self.operation != Operation::Decode {
             return;
         }
         let a = hash(&self.message_key, &self.auth[8..44]);
@@ -89,7 +96,7 @@ impl Message {
         self.iv[24..].copy_from_slice(&b[24..]);
     }
     pub fn finish(self) -> Result<Output> {
-        if self.operation != 4 {
+        if self.operation != Operation::Decode {
             let length = self.output.len();
             return Ok(Output {
                 message: self,
@@ -139,7 +146,7 @@ pub fn batch(messages: &mut [Message]) -> Result<()> {
         // are validated before admission. Each Message owns disjoint buffers.
         #[cfg(any(target_arch = "aarch64", target_arch = "x86_64"))]
         unsafe {
-            crate::hardware::batch(messages);
+            crate::hardware::batch(messages, 0);
             // The hardware kernel writes every byte of each validated message.
             for message in messages.iter_mut() {
                 message.output.set_len(message.input.len());
@@ -155,7 +162,7 @@ pub fn batch(messages: &mut [Message]) -> Result<()> {
 pub(crate) fn evp(message: &mut Message) -> Result<()> {
     // EVP uses safe mutable slices; initialize only its fallback output.
     message.output.resize(message.input.len(), 0);
-    let encrypt = message.operation == 1;
+    let encrypt = message.operation == Operation::Encrypt;
     let mode = if encrypt {
         Mode::Encrypt
     } else {

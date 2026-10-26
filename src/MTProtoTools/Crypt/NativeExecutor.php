@@ -28,22 +28,21 @@ final class NativeExecutor
     private $stream;
     private string $watcher;
     private bool $closed = false;
-    private bool $closing = false;
     private int $active = 0;
     private readonly int $pid;
 
-    public static function initialize(int $capacity = 128, int $byteLimit = 134217728, int $windowUs = 5000, int $fixedWidth = 0): void
+    public static function initialize(int $capacity = 128, int $byteLimit = 134217728, int $windowUs = 5000): void
     {
         if (self::$instance !== null) {
             return;
         }
         self::$instance = false;
         if (!\extension_loaded('madeline_crypto') || !class_exists(Crypto::class, false)
-            || Crypto::version() !== '0.1.0') {
+            || Crypto::version() !== '0.2.0') {
             return;
         }
         try {
-            $fd = Crypto::init($capacity, $byteLimit, $windowUs, $fixedWidth);
+            $fd = Crypto::init($capacity, $byteLimit, $windowUs);
             self::$instance = new self($fd);
             register_shutdown_function(self::$instance->close(...));
         } catch (Throwable) {
@@ -54,7 +53,7 @@ final class NativeExecutor
     public static function get(): ?self
     {
         $instance = self::$instance;
-        return $instance instanceof self && !$instance->closed && !$instance->closing
+        return $instance instanceof self && !$instance->closed
             && $instance->pid === getmypid() && Crypto::available()
             ? $instance : null;
     }
@@ -81,7 +80,7 @@ final class NativeExecutor
      */
     public function run(\Closure $operation): array
     {
-        if ($this->closed || $this->closing || $this->pid !== getmypid()) {
+        if ($this->closed || $this->pid !== getmypid()) {
             throw new RuntimeException('Native executor is closed');
         }
         $this->active++;
@@ -97,10 +96,10 @@ final class NativeExecutor
 
     public function close(): void
     {
-        if ($this->closed || $this->closing || $this->pid !== getmypid()) {
+        if ($this->closed || $this->pid !== getmypid()) {
             return;
         }
-        $this->closing = true;
+        $this->closed = true;
         Crypto::stop(); // Finish accepted work; wake and reject admission waiters.
         while ($this->active) {
             Crypto::wakeup();
@@ -110,6 +109,5 @@ final class NativeExecutor
         EventLoop::cancel($this->watcher);
         $stream = $this->stream;
         fclose($stream);
-        $this->closed = true;
     }
 }
