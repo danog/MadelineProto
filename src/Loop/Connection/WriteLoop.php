@@ -60,8 +60,6 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
 
     private readonly bool $isHttp;
 
-    private int $resendTimeout;
-
     private LinkedList $queue;
     private ?ConnectionState $pendingState = null;
 
@@ -71,7 +69,6 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
     public function __construct(Connection $connection)
     {
         $this->init2($connection);
-        $this->resendTimeout = $this->API->getSettings()->getRpc()->getRpcResendTimeout();
         $connection->getState()->subscribe($this);
     }
 
@@ -264,14 +261,9 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                                         } elseif ($chr & 64) {
                                             $this->API->logger("Message $message received by server and was already processed.", Logger::ERROR);
                                         } elseif ($chr & 32) {
-                                            if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
-                                                if (!$message->cancellation?->isRequested()) {
-                                                    $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                                    $this->connection->methodRecall($message);
-                                                }
-                                            } else {
-                                                $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
-                                            }
+                                            // Never send it again: the server would execute it twice (e.g. RANDOM_ID_DUPLICATE),
+                                            // and the answer to this copy would be dropped.
+                                            $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         } else {
                                             $this->API->logger("Message $message received by server, waiting...", Logger::ERROR);
                                         }
