@@ -416,8 +416,11 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             unset($MTmessages);
 
             $auth = $this->shared->auth;
+            $generation = $this->connection->getGeneration();
+            $session = $this->connection->session_id;
+            $authKey = $auth->getTempAuthKey();
 
-            $plaintext = $auth->getServerSalt().$this->connection->session_id.Tools::packSignedLong($message_id).pack('VV', $seq_no, $message_data_length).$message_data;
+            $plaintext = $auth->getServerSalt().$session.Tools::packSignedLong($message_id).pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
                 $padding += 16;
@@ -426,8 +429,24 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             $message_key_large = Crypt::sha256($auth->getTempAuthKeyForHash().$plaintext.$padding);
             $message_key = substr($message_key_large, 8, 16);
             //$ack = unpack('V', substr($message_key_large, 0, 4))[1] | (1 << 31);
-            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $auth->getTempAuthKey());
+            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $authKey);
             $message = $auth->getTempID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
+            // IGE can suspend. Leave unsent requests queued for the current context.
+            $contextChanged = $session !== $this->connection->session_id
+                || $authKey !== $this->shared->auth->getTempAuthKey();
+            if ($generation !== $this->connection->getGeneration() || $this->connection->shouldReconnect() || $contextChanged) {
+                if ($contextChanged) {
+                    foreach ($messages as $unsent) {
+                        if (!$unsent->hasReply()) {
+                            $unsent->resetForNewSession();
+                        }
+                    }
+                }
+                if ($generation !== $this->connection->getGeneration() || $this->connection->shouldReconnect()) {
+                    return;
+                }
+                continue;
+            }
             $buffer = $this->connection->stream->getWriteBuffer($total_len = \strlen($message));
             $buffer->bufferWrite($message);
             $this->connection->httpSent();

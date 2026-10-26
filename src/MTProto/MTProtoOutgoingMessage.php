@@ -571,6 +571,17 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     }
 
     /**
+     * Discard unsent transport metadata prepared for a replaced session or key.
+     * @psalm-external-mutation-free
+     */
+    public function resetForNewSession(): void
+    {
+        $this->msgId = null;
+        $this->seqNo = null;
+        $this->container = null;
+    }
+
+    /**
      * Reset sent time to trigger resending.
      *
      * @psalm-external-mutation-free

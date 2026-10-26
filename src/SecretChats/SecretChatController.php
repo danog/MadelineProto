@@ -365,7 +365,7 @@ final class SecretChatController implements Stringable
             'chat_id' => $this->id,
         ]; // Not sent
         $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-        $body['seq'] = $seq = $this->out_seq_no++; // Not sent
+        $body['seq'] = $seq = $this->out_seq_no; // Committed after encryption, which can suspend.
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
@@ -383,6 +383,7 @@ final class SecretChatController implements Stringable
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
         $body['data'] = $this->key['fingerprint'].$message_key.Crypt::igeEncrypt($message, $aes_key, $aes_iv);
+        $this->out_seq_no++;
         $this->outgoing[$seq] = $body;
         $this->randomIdMap[$randomId] = [$seq, true];
     }

@@ -420,7 +420,8 @@ final class Endpoint
     public function write(string $payload): bool
     {
         $this->connectFuture?->getFuture()?->await();
-        if ($this->socket === null) {
+        $socket = $this->socket;
+        if ($socket === null) {
             return false;
         }
         $plaintext = pack('v', \strlen($payload)).$payload;
@@ -433,14 +434,19 @@ final class Endpoint
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->authKey, $this->creator);
         $payload = $message_key.Crypt::igeEncrypt($plaintext, $aes_key, $aes_iv);
 
+        if ($socket !== $this->socket) {
+            return false;
+        }
         if ($this->handler->peerVersion < 9 || $this->reflector) {
             $payload = $this->peerTag.$payload;
         }
 
         try {
-            $this->socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
+            $socket->getWriteBuffer(\strlen($payload))->bufferWrite($payload);
         } catch (ClosedException) {
-            $this->socket = null;
+            if ($this->socket === $socket) {
+                $this->socket = null;
+            }
             return false;
         }
         return true;
