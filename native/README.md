@@ -27,7 +27,10 @@ before releasing the next operation.
 Inbound MTProto v2 decoding moves KDF, AES-IGE, msg_key authentication and payload
 bounds checks into C. Session, connection generation and message-ID checks stay
 in ReadLoop, followed by TL deserialization. Secret chat KDFs and validation stay
-in PHP and can use the shared IGE executor.
+in PHP and can use the shared IGE executor. Outgoing packets recheck their
+connection context after encryption. Secret chat sequence numbers are committed
+after encryption, so a snapshot taken during the wait cannot persist a sequence
+without its encrypted message.
 
 CPU capabilities select ARM AES or x86 AES-NI; unsupported CPUs use EVP inside
 the worker. Independent chains are interleaved on that single worker. Similar
@@ -61,6 +64,6 @@ Run the PHP behavior tests with the helper selected:
 ```sh
 MADELINE_IGE_LIBRARY="$PWD/native/build/libmadeline-ige.so" \
   php -d ffi.enable=1 vendor/bin/phpunit -c phpunit-light.xml \
-  --filter 'IGETest|NativeCryptoTest|MessageDecoderTest|ReadLoopCryptoTest'
+  --filter 'IGETest|NativeCryptoTest|MessageDecoderTest|ConnectionCryptoTest|SecretChatCryptoTest'
 ```
 
