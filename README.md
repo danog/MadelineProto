@@ -304,6 +304,7 @@ Some of MadelineProto's core components are also available as separate, standalo
   * [Group calls (video chats and livestreams)](https://docs.madelineproto.xyz/docs/CALLS.html#group-calls-video-chats-and-livestreams)
     * [Livestreams, RTMP and stream mode](https://docs.madelineproto.xyz/docs/CALLS.html#livestreams-rtmp-and-stream-mode)
     * [Live stories](https://docs.madelineproto.xyz/docs/CALLS.html#live-stories)
+    * [Streaming to a profile or livestream from its RTMP URL](https://docs.madelineproto.xyz/docs/CALLS.html#streaming-to-a-profile-or-livestream-from-its-rtmp-url)
   * [Conference calls](https://docs.madelineproto.xyz/docs/CALLS.html#conference-calls)
   * [Restarts](https://docs.madelineproto.xyz/docs/CALLS.html#restarts)
   * [PrivateCall](https://docs.madelineproto.xyz/PHP/danog/MadelineProto/EventHandler/Calls/PrivateCall.html): a one-to-one voice or video call (`danog\MadelineProto\VoIP` is an alias kept for backwards compatibility)
