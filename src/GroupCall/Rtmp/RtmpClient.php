@@ -18,6 +18,8 @@ namespace danog\MadelineProto\GroupCall\Rtmp;
 
 use Amp\Cancellation;
 use Amp\DeferredFuture;
+use Amp\Dns\DnsException;
+use Amp\Dns\DnsRecord;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket;
@@ -25,6 +27,7 @@ use danog\MadelineProto\Exception;
 use Revolt\EventLoop;
 use Throwable;
 
+use function Amp\Dns\resolve;
 use function Amp\Socket\connect;
 
 /**
@@ -104,12 +107,14 @@ final class RtmpClient
     /**
      * Connect to an RTMP(S) server and start publishing a stream.
      *
-     * @param string $url The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`.
-     * @param string $key The stream key.
+     * @param string $url        The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`.
+     * @param string $key        The stream key.
+     * @param bool   $publicOnly Whether to connect only to a server on the internet, see {@see self::resolvePublic()}.
      *
-     * @throws Exception If the server refuses the stream.
+     * @throws Exception            If the server refuses the stream.
+     * @throws RtmpAddressException If the server isn't on the internet, with $publicOnly.
      */
-    public static function publish(string $url, string $key, ?Cancellation $cancellation = null): self
+    public static function publish(string $url, #[\SensitiveParameter] string $key, ?Cancellation $cancellation = null, bool $publicOnly = false): self
     {
         $parts = parse_url($url);
         if (!isset($parts['scheme'], $parts['host']) || !\in_array($parts['scheme'], ['rtmp', 'rtmps'], true)) {
@@ -123,7 +128,12 @@ final class RtmpClient
         if ($tls) {
             $context = $context->withTlsContext(new ClientTlsContext($host));
         }
-        $socket = connect("tcp://$host:$port", $context, $cancellation);
+        // With $publicOnly, connected to the address that was checked: the name isn't resolved again in between.
+        $address = $publicOnly ? self::resolvePublic($host, $cancellation) : $host;
+        if (str_contains($address, ':')) {
+            $address = "[$address]";
+        }
+        $socket = connect("tcp://$address:$port", $context, $cancellation);
         if ($tls) {
             $socket->setupTls($cancellation);
         }
@@ -151,6 +161,41 @@ final class RtmpClient
             throw $e;
         }
         return $client;
+    }
+
+    /**
+     * The address to connect to for a host, if it's on the internet: every address its name resolves to must be global
+     * (no loopback, private, link-local, shared or reserved address), so that whoever chooses the URL can't make us
+     * connect into our network. IPv4 if possible: not every network has IPv6.
+     *
+     * @throws RtmpAddressException If it isn't.
+     */
+    public static function resolvePublic(string $host, ?Cancellation $cancellation = null): string
+    {
+        $host = trim($host, '[]');
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            $addresses = [$host];
+        } else {
+            try {
+                $addresses = array_map(static fn (DnsRecord $record): string => $record->getValue(), resolve($host, cancellation: $cancellation));
+            } catch (DnsException $e) {
+                throw new RtmpAddressException("Could not resolve $host: {$e->getMessage()}", 0, $e);
+            }
+        }
+        if ($addresses === []) {
+            throw new RtmpAddressException("Could not resolve $host");
+        }
+        foreach ($addresses as $address) {
+            if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_GLOBAL_RANGE) === false) {
+                throw new RtmpAddressException("$host is not on the internet: it resolves to $address");
+            }
+        }
+        foreach ($addresses as $address) {
+            if (!str_contains($address, ':')) {
+                return $address;
+            }
+        }
+        return $addresses[0];
     }
 
     /**

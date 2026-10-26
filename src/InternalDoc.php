@@ -2744,12 +2744,15 @@ abstract class InternalDoc
      * publishing (reconnecting if needed, and across restarts) until {@see RtmpStream::close()}d; publishing
      * again to the same URL and key returns the same stream.
      *
-     * @param string  $url The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
-     * @param ?string $key The stream key.
+     * @param string  $url        The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
+     * @param ?string $key        The stream key.
+     * @param bool    $publicOnly Whether to connect only to a server on the internet (every address its name resolves to, checked at each connection, must be global): when whoever chooses the URL must not make us connect into our network. Otherwise, the stream is closed.
+     *
+     * @throws RtmpAddressException If the server isn't on the internet, with $publicOnly.
      */
-    final public function startRtmpStream(string $url, ?string $key = null): \danog\MadelineProto\EventHandler\Calls\RtmpStream
+    final public function startRtmpStream(string $url, ?string $key = null, bool $publicOnly = false): \danog\MadelineProto\EventHandler\Calls\RtmpStream
     {
-        return $this->wrapper->getAPI()->startRtmpStream($url, $key);
+        return $this->wrapper->getAPI()->startRtmpStream($url, $key, $publicOnly);
     }
     /**
      * Stop update loop.

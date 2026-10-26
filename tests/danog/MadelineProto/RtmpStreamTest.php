@@ -21,6 +21,9 @@ namespace danog\MadelineProto\Test;
 use AssertionError;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpAddressException;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpClient;
+use danog\MadelineProto\GroupCall\RtmpStreamController;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
@@ -213,6 +216,55 @@ final class RtmpStreamTest extends TestCase
             }
             $server->close();
         }
+    }
+
+    public function testPublicOnlyRefusesAServerInOurNetwork(): void
+    {
+        $API = $this->api();
+        $server = new FakeRtmpServer;
+        try {
+            try {
+                $API->startRtmpStream($server->getUrl(), 'key', publicOnly: true);
+                $this->fail('Started a stream to 127.0.0.1');
+            } catch (RtmpAddressException) {
+            }
+            $this->assertSame([], $API->getRtmpStreams());
+
+            // Also at each connection (the name may resolve elsewhere by then): the stream closes, without connecting.
+            $controller = new RtmpStreamController($API, 1, $server->getUrl(), 'key', publicOnly: true);
+            for ($i = 0; $i < 40 && !$controller->isClosed(); $i++) {
+                delay(0.05);
+            }
+            $this->assertTrue($controller->isClosed(), implode("\n", $this->logs));
+            $this->assertSame(0, $server->connections);
+        } finally {
+            $server->close();
+        }
+    }
+
+    /** @return iterable<string, array{string, ?string}> */
+    public static function hosts(): iterable
+    {
+        yield 'loopback' => ['127.0.0.1', null];
+        yield 'loopback name' => ['localhost', null];
+        yield 'private' => ['192.168.1.1', null];
+        yield 'link-local (cloud metadata)' => ['169.254.169.254', null];
+        yield 'shared (CGNAT)' => ['100.64.0.1', null];
+        yield 'IPv6 loopback' => ['[::1]', null];
+        yield 'unspecified' => ['0.0.0.0', null];
+        yield 'public' => ['1.1.1.1', '1.1.1.1'];
+        yield 'public IPv6' => ['[2606:4700:4700::1111]', '2606:4700:4700::1111'];
+    }
+
+    /**
+     * @dataProvider hosts
+     */
+    public function testOnlyPublicAddressesAreResolved(string $host, ?string $address): void
+    {
+        if ($address === null) {
+            $this->expectException(RtmpAddressException::class);
+        }
+        $this->assertSame($address, RtmpClient::resolvePublic($host));
     }
 
     /** @return iterable<string, array{string}> */

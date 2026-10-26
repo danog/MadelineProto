@@ -118,6 +118,7 @@ final class RtmpPublisher
      * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
      * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
      * @param int                                           $idle     In nanoseconds, see {@see self::IDLE_NS}.
+     * @param bool                                          $publicOnly Whether to connect only to a server on the internet, see {@see RtmpClient::resolvePublic()}.
      */
     public function __construct(
         private readonly CallControllerInterface $call,
@@ -125,6 +126,7 @@ final class RtmpPublisher
         private readonly Closure $ingest,
         private readonly ?Closure $onGiveUp = null,
         private readonly int $idle = self::IDLE_NS,
+        private readonly bool $publicOnly = false,
     ) {
         $this->stopping = new DeferredCancellation;
         $this->connected = new DeferredFuture;
@@ -231,10 +233,14 @@ final class RtmpPublisher
 
     /**
      * Whether retrying can't help: Telegram refused to give a stream key (an RPC error that is not
-     * a flood wait or an internal error, e.g. CHAT_ADMIN_REQUIRED after losing the admin rights).
+     * a flood wait or an internal error, e.g. CHAT_ADMIN_REQUIRED after losing the admin rights), or the server
+     * isn't on the internet, when publishing only to public servers.
      */
     private static function isDefinitive(Throwable $e): bool
     {
+        if ($e instanceof RtmpAddressException) {
+            return true;
+        }
         if ($e instanceof RPCErrorException) {
             $code = $e->getCode();
             return $code >= 400 && $code < 500 && $code !== 420;
@@ -261,7 +267,7 @@ final class RtmpPublisher
             try {
                 // Fetched every time (never revoking it): the same key unless an admin revoked it meanwhile.
                 ['url' => $url, 'key' => $key] = ($this->ingest)(false);
-                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation());
+                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation(), $this->publicOnly);
                 if (!$this->running) {
                     $client->close();
                     return;

@@ -24,6 +24,7 @@ use Amp\DeferredFuture;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\EventHandler\Calls\RtmpStream;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpClient;
 use danog\MadelineProto\GroupCall\Rtmp\RtmpPublisher;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -58,6 +59,8 @@ final class RtmpStreamController implements CallControllerInterface
         private readonly string $url,
         #[\SensitiveParameter]
         private readonly string $key,
+        /** Whether to connect only to a server on the internet, see {@see RtmpClient::resolvePublic()}. */
+        private readonly bool $publicOnly = false,
     ) {
         $this->public = new RtmpStream($API, $id, $url);
         $this->diskJockey = new DjLoop($this, rtmp: true);
@@ -78,7 +81,16 @@ final class RtmpStreamController implements CallControllerInterface
     {
         // The key is fixed: a refused stream is retried with a backoff (the server may still hold our previous
         // session after a network drop) until the stream is closed.
-        return new RtmpPublisher($this, $this->diskJockey, fn (bool $revoke): array => ['url' => $this->url, 'key' => $this->key]);
+        return new RtmpPublisher(
+            $this,
+            $this->diskJockey,
+            fn (bool $revoke): array => ['url' => $this->url, 'key' => $this->key],
+            // A server that isn't on the internet, with $publicOnly.
+            function (): void {
+                $this->close();
+            },
+            publicOnly: $this->publicOnly,
+        );
     }
 
     public function __serialize(): array
@@ -177,6 +189,11 @@ final class RtmpStreamController implements CallControllerInterface
     public function getCurrent(MediaDestination $dest): LocalFile|RemoteUrl|string|null
     {
         return $dest === MediaDestination::Camera ? $this->diskJockey->getCurrent() : null;
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->closed;
     }
 
     public function isConnected(): bool

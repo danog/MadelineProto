@@ -30,6 +30,8 @@ use danog\MadelineProto\EventHandler\Calls\GroupCallStars;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Calls\RtmpStream;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpAddressException;
+use danog\MadelineProto\GroupCall\Rtmp\RtmpClient;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -1240,10 +1242,13 @@ trait Handler
      * publishing (reconnecting if needed, and across restarts) until {@see RtmpStream::close()}d; publishing
      * again to the same URL and key returns the same stream.
      *
-     * @param string  $url The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
-     * @param ?string $key The stream key.
+     * @param string  $url        The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
+     * @param ?string $key        The stream key.
+     * @param bool    $publicOnly Whether to connect only to a server on the internet (every address its name resolves to, checked at each connection, must be global): when whoever chooses the URL must not make us connect into our network. Otherwise, the stream is closed.
+     *
+     * @throws RtmpAddressException If the server isn't on the internet, with $publicOnly.
      */
-    public function startRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null): RtmpStream
+    public function startRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null, bool $publicOnly = false): RtmpStream
     {
         if ($key === null) {
             [$url, $key] = self::splitRtmpUrl($url);
@@ -1259,10 +1264,14 @@ trait Handler
         if ($existing !== null) {
             return $existing;
         }
+        if ($publicOnly) {
+            // At once, to tell the caller; checked again at each connection, see RtmpClient::publish().
+            RtmpClient::resolvePublic($parts['host']);
+        }
         do {
             $id = random_int(1, PHP_INT_MAX);
         } while (isset($this->rtmpStreams[$id]));
-        $stream = new RtmpStreamController($this, $id, $url, $key);
+        $stream = new RtmpStreamController($this, $id, $url, $key, $publicOnly);
         $this->rtmpStreams[$id] = $stream;
         return $stream->public;
     }
@@ -1280,12 +1289,25 @@ trait Handler
         if ($key === null) {
             [$url, $key] = self::splitRtmpUrl($url);
         }
+        $this->forgetClosedRtmpStreams();
         foreach ($this->rtmpStreams as $stream) {
             if ($stream->publishesTo($url, $key)) {
                 return $stream->public;
             }
         }
         return null;
+    }
+
+    /**
+     * Forget the RTMP streams that closed by themselves (their server isn't on the internet, with $publicOnly).
+     */
+    private function forgetClosedRtmpStreams(): void
+    {
+        foreach ($this->rtmpStreams as $id => $stream) {
+            if ($stream->isClosed()) {
+                unset($this->rtmpStreams[$id]);
+            }
+        }
     }
 
     /**
@@ -1314,6 +1336,7 @@ trait Handler
      */
     public function getRtmpStreams(): array
     {
+        $this->forgetClosedRtmpStreams();
         return array_map(static fn (RtmpStreamController $c): RtmpStream => $c->public, $this->rtmpStreams);
     }
 
