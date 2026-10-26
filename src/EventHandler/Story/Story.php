@@ -68,8 +68,11 @@ final class Story extends AbstractStory
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for story caption */
     public readonly array $entities;
 
-    /** Attached media. */
-    public readonly Gif|Photo|Video $media;
+    /** Attached media: null for a live story, see {@see self::$liveStoryCallId}. */
+    public readonly Gif|Photo|Video|null $media;
+
+    /** For a live story, the ID of its group call (a {@see \danog\MadelineProto\EventHandler\Calls\LiveStory}), to join it. */
+    public readonly ?int $liveStoryCallId;
 
     /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
@@ -125,7 +128,14 @@ final class Story extends AbstractStory
         $this->date = $rawStory['date'];
         $this->expireDate = $rawStory['expire_date'];
 
-        $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
+        if ($rawStory['media']['_'] === 'messageMediaVideoStream') {
+            // A live story: a group call, no file.
+            $this->media = null;
+            $this->liveStoryCallId = $rawStory['media']['call']['id'] ?? null;
+        } else {
+            $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
+            $this->liveStoryCallId = null;
+        }
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
         $this->privacy = array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
 

@@ -1222,12 +1222,18 @@ trait Handler
         }
         $updates = $this->methodCallAsyncRead('stories.startLive', $params);
         foreach ($updates['updates'] ?? [] as $update) {
-            if ($update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall') {
-                $inputCall = ['_' => 'inputGroupCall', 'id' => $update['call']['id'], 'access_hash' => $update['call']['access_hash']];
-                $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer), liveStory: true);
-                if ($controller !== null && $controller->public instanceof LiveStory) {
-                    return $controller->public;
-                }
+            // The server returns the story (whose media is the call), maybe without an updateGroupCall.
+            $inputCall = match (true) {
+                $update['_'] === 'updateGroupCall' && $update['call']['_'] === 'groupCall' => ['_' => 'inputGroupCall', 'id' => $update['call']['id'], 'access_hash' => $update['call']['access_hash']],
+                $update['_'] === 'updateStory' && ($update['story']['media']['_'] ?? null) === 'messageMediaVideoStream' => $update['story']['media']['call'],
+                default => null,
+            };
+            if ($inputCall === null) {
+                continue;
+            }
+            $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer), liveStory: true);
+            if ($controller !== null && $controller->public instanceof LiveStory) {
+                return $controller->public;
             }
         }
         throw new AssertionError('The server did not return the started live story!');
