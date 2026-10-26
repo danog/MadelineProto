@@ -1,0 +1,114 @@
+<?php declare(strict_types=1);
+
+/**
+ * This file is part of MadelineProto.
+ * MadelineProto is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * MadelineProto is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with MadelineProto.
+ * If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Daniil Gentili <daniil@daniil.it>
+ * @copyright 2016-2025 Daniil Gentili <daniil@daniil.it>
+ * @license   https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ * @link https://docs.madelineproto.xyz MadelineProto documentation
+ */
+
+namespace danog\MadelineProto\EventHandler;
+
+use Amp\ByteStream\ReadableStream;
+use danog\MadelineProto\LocalFile;
+use danog\MadelineProto\MediaDestination;
+use danog\MadelineProto\RemoteUrl;
+use Stringable;
+
+/**
+ * Plays files with a playlist: every {@see Call}, and {@see Calls\RtmpStream} (publishing to any RTMP server).
+ *
+ * Every playlist control takes a {@see MediaDestination} selecting the stream it acts on: the main
+ * camera+mic stream (default) or, in calls, a separate presentation (screen-share) stream, which is
+ * started on first use.
+ */
+interface MediaPlayer extends Stringable
+{
+    /**
+     * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
+     *
+     * A WebM/Matroska file with VP8, VP9, H.264 or H.265 video (or AV1, in a one-to-one call with an app
+     * that supports it) has its video transmitted too; any other
+     * file (or a raw audio stream) is played as audio only. Frames are demuxed in pure PHP and sent
+     * as-is where possible, so no transcoding (and thus no FFI extension) is required for pre-encoded
+     * WebM/OGG-OPUS input. `$dest` selects the camera or the presentation (screencast) stream.
+     *
+     * @psalm-impure
+     */
+    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Play a file like {@see self::play()}, but block until it has finished playing if a stream was passed.
+     *
+     * @psalm-impure
+     */
+    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Add a file to the playlist, to be played once the current one finishes.
+     *
+     * @psalm-impure
+     */
+    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Set the files to play, on loop, while the given stream's main playlist is empty.
+     *
+     * A hold file being played is replaced right away by the new ones (or stopped, if none are passed).
+     *
+     * @psalm-impure
+     */
+    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static;
+
+    /**
+     * Skip to the next file in the playlist.
+     *
+     * @psalm-impure
+     */
+    public function skip(MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Stop playing all files, clearing the main and the hold playlist.
+     *
+     * @psalm-impure
+     */
+    public function stop(MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Pause playback of the current file.
+     *
+     * @psalm-impure
+     */
+    public function pause(MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * Whether playback of the current file is paused.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool;
+
+    /**
+     * Resume playback of the current file.
+     *
+     * @psalm-impure
+     */
+    public function resume(MediaDestination $dest = MediaDestination::Camera): static;
+
+    /**
+     * The file or stream currently being played, if any.
+     *
+     * Returns a string with the object ID of the stream if a stream is playing, otherwise the related
+     * {@see LocalFile} or {@see RemoteUrl}.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null;
+}

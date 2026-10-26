@@ -16,7 +16,9 @@
 
 namespace danog\MadelineProto\GroupCall\Rtmp;
 
+use Amp\Cancellation;
 use Amp\CancelledException;
+use Amp\CompositeCancellation;
 use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Closure;
@@ -25,6 +27,7 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaClock;
 use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\RtmpServers;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\CallRecorder;
 use danog\MadelineProto\Tgcalls\OpusPlaybackTrack;
@@ -109,11 +112,14 @@ final class RtmpPublisher
     private int $lastFrameAt = 0;
     /** @var ?DeferredFuture<null> Completed when there is something to publish again, see {@see self::wake()}. */
     private ?DeferredFuture $frameWaiter = null;
+    /** @var DeferredFuture<null> Completed when connected, see {@see self::awaitConnection()}. */
+    private DeferredFuture $connected;
 
     /**
      * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
      * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
      * @param int                                           $idle     In nanoseconds, see {@see self::IDLE_NS}.
+     * @param RtmpServers                                   $servers  Which servers it may connect to, see {@see RtmpClient::checkServer()}.
      */
     public function __construct(
         private readonly CallControllerInterface $call,
@@ -121,8 +127,10 @@ final class RtmpPublisher
         private readonly Closure $ingest,
         private readonly ?Closure $onGiveUp = null,
         private readonly int $idle = self::IDLE_NS,
+        private readonly RtmpServers $servers = RtmpServers::Any,
     ) {
         $this->stopping = new DeferredCancellation;
+        $this->connected = new DeferredFuture;
         $this->pending = new SplMinHeap;
         $publisher = $this;
         $this->audioSink = new class($publisher) implements MediaStreamTrackSink {
@@ -159,12 +167,15 @@ final class RtmpPublisher
             return;
         }
         $this->running = false;
-        $this->stopping->cancel();
         $this->frameWaiter = null;
         $this->audioTrack->stop();
         $this->videoTrack->stop();
+        // Flushed while the connection loop still holds the client: once cancelled, it lets it go (closing it, see
+        // connectionLoop()), maybe while the flush waits to write.
+        $client = $this->client;
         $this->flushVideo();
-        $this->client?->close();
+        $this->stopping->cancel();
+        $client?->close();
         $this->client = null;
     }
 
@@ -176,6 +187,19 @@ final class RtmpPublisher
     public function isConnected(): bool
     {
         return $this->client !== null && !$this->client->isClosed();
+    }
+
+    /**
+     * Wait until connected to the RTMP server, unless stopped meanwhile: what is played before is dropped, and a file
+     * whose first keyframe was dropped has no video until its next one.
+     */
+    public function awaitConnection(?Cancellation $cancellation = null): void
+    {
+        if (!$this->running || $this->isConnected()) {
+            return;
+        }
+        $stopping = $this->stopping->getCancellation();
+        $this->connected->getFuture()->await($cancellation === null ? $stopping : new CompositeCancellation($cancellation, $stopping));
     }
 
     /**
@@ -210,10 +234,14 @@ final class RtmpPublisher
 
     /**
      * Whether retrying can't help: Telegram refused to give a stream key (an RPC error that is not
-     * a flood wait or an internal error, e.g. CHAT_ADMIN_REQUIRED after losing the admin rights).
+     * a flood wait or an internal error, e.g. CHAT_ADMIN_REQUIRED after losing the admin rights), or the server
+     * isn't on the internet, when publishing only to public servers.
      */
     private static function isDefinitive(Throwable $e): bool
     {
+        if ($e instanceof RtmpAddressException) {
+            return true;
+        }
         if ($e instanceof RPCErrorException) {
             $code = $e->getCode();
             return $code >= 400 && $code < 500 && $code !== 420;
@@ -240,7 +268,7 @@ final class RtmpPublisher
             try {
                 // Fetched every time (never revoking it): the same key unless an admin revoked it meanwhile.
                 ['url' => $url, 'key' => $key] = ($this->ingest)(false);
-                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation());
+                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation(), $this->servers);
                 if (!$this->running) {
                     $client->close();
                     return;
@@ -259,6 +287,7 @@ final class RtmpPublisher
                 $this->metadata = null;
                 $this->awaitingVideoSince = null;
                 $this->client = $client;
+                $this->connected->complete();
                 $this->call->log("Publishing to the RTMP livestream of {$this->call}", Logger::NOTICE);
                 $connectedAt = hrtime(true);
                 $client->awaitClose($this->stopping->getCancellation());
@@ -300,7 +329,14 @@ final class RtmpPublisher
                 // holding our previous session after a network drop), and the key is fetched again each time.
                 $this->call->log("Could not publish to the RTMP livestream of {$this->call}: {$e->getMessage()}, retrying in {$delay} seconds...", Logger::ERROR);
             } finally {
+                if (!$this->running) {
+                    // Stopped while connected: closed here too, whether stop() still had the client or not.
+                    $this->client?->close();
+                }
                 $this->client = null;
+                if ($this->connected->isComplete()) {
+                    $this->connected = new DeferredFuture;
+                }
             }
             try {
                 delay($delay, cancellation: $this->stopping->getCancellation());

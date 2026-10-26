@@ -46,6 +46,8 @@ final class FakeRtmpServer
     public array $publishedAt = [];
     /** @var list<string> The stream keys published to. */
     public array $keys = [];
+    /** How many connections the publisher closed. */
+    public int $disconnections = 0;
 
     private readonly ServerSocket $server;
     /** @var list<Socket> */
@@ -140,6 +142,7 @@ final class FakeRtmpServer
             while (true) {
                 $header = $read(1);
                 if ($header === null) {
+                    $this->disconnections++;
                     return;
                 }
                 $format = \ord($header) >> 6;

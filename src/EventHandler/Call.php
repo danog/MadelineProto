@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\EventHandler;
 
-use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
@@ -24,9 +23,7 @@ use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\RecordingFormat;
-use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\VoIP\CallState;
-use Stringable;
 
 /**
  * Common interface implemented by every call type: one-to-one {@see Calls\PrivateCall} calls, and the
@@ -37,7 +34,7 @@ use Stringable;
  *  - the lifecycle ({@see self::join()}, {@see self::discard()}, {@see self::isJoined()}, {@see self::getCallState()}),
  *  - who is in a multi-party call ({@see MultiCall::getParticipants()}) and, for end-to-end encrypted calls, the
  *    key verification emojis ({@see self::getVisualization()}),
- *  - the playlist/DJ playback controls and the mute controls,
+ *  - the playlist/DJ playback controls ({@see MediaPlayer}) and the mute controls,
  *  - screen sharing ({@see self::enablePresentation()} and friends) and
  *  - recording ({@see self::setOutput()} and {@see self::setOutputFolder()}).
  *
@@ -47,7 +44,7 @@ use Stringable;
  *
  * @psalm-import-type StreamMask from CallStream
  */
-interface Call extends Stringable
+interface Call extends MediaPlayer
 {
     /**
      * Join the call: accept an incoming one-to-one call, or join a multi-party call.
@@ -95,87 +92,6 @@ interface Call extends Stringable
      * @psalm-mutation-free
      */
     public function getVisualization(): ?array;
-
-    /**
-     * Play a file, transmitting its audio and, if it carries a transmittable one, its video.
-     *
-     * A WebM/Matroska file with VP8, VP9, H.264 or H.265 video (or AV1, in a one-to-one call with an app
-     * that supports it) has its video transmitted too; any other
-     * file (or a raw audio stream) is played as audio only. Frames are demuxed in pure PHP and sent
-     * as-is where possible, so no transcoding (and thus no FFI extension) is required for pre-encoded
-     * WebM/OGG-OPUS input. `$dest` selects the camera or the presentation (screencast) stream.
-     *
-     * @psalm-impure
-     */
-    public function play(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Play a file like {@see self::play()}, but block until it has finished playing if a stream was passed.
-     *
-     * @psalm-impure
-     */
-    public function playBlocking(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Add a file to the playlist, to be played once the current one finishes.
-     *
-     * @psalm-impure
-     */
-    public function then(LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Set the files to play, on loop, while the given stream's main playlist is empty.
-     *
-     * A hold file being played is replaced right away by the new ones (or stopped, if none are passed).
-     *
-     * @psalm-impure
-     */
-    public function playOnHold(MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): static;
-
-    /**
-     * Skip to the next file in the playlist.
-     *
-     * @psalm-impure
-     */
-    public function skip(MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Stop playing all files, clearing the main and the hold playlist.
-     *
-     * @psalm-impure
-     */
-    public function stop(MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Pause playback of the current file.
-     *
-     * @psalm-impure
-     */
-    public function pause(MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * Whether playback of the current file is paused.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function isPaused(MediaDestination $dest = MediaDestination::Camera): bool;
-
-    /**
-     * Resume playback of the current file.
-     *
-     * @psalm-impure
-     */
-    public function resume(MediaDestination $dest = MediaDestination::Camera): static;
-
-    /**
-     * The file or stream currently being played, if any.
-     *
-     * Returns a string with the object ID of the stream if a stream is playing, otherwise the related
-     * {@see LocalFile} or {@see RemoteUrl}.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function getCurrent(MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null;
 
     /**
      * Mute or unmute our own outgoing audio.

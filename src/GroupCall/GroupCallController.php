@@ -19,7 +19,9 @@
 namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\WritableStream;
+use Amp\CancelledException;
 use Amp\Sync\LocalMutex;
+use Amp\TimeoutCancellation;
 use danog\DialogId\DialogId;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\EventHandler\Call;
@@ -246,21 +248,24 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->publishing) {
             // Publishing does not depend on being joined (as a viewer).
             $this->log("Resumed publishing to $this after a restart of the process.");
-            $this->diskJockey->resumeReader();
             $this->rtmpPublisher = $this->createPublisher(null);
+            EventLoop::queue(function (): void {
+                $this->awaitPublisher();
+                $this->diskJockey->resumeReader();
+            });
         }
         if ($this->callState === GroupCallState::JOINING) {
             // The process died in the middle of join(): its phone.joinGroupCall and the payload it
             // carried are gone with it, and join() itself is a no-op while JOINING, so start over.
             $this->log("Resumed $this in the middle of a join, joining again...", Logger::WARNING);
             // What was played resumes with the new join (see below for why the reader is restarted).
-            $this->diskJockey->resumeReader();
+            $this->resumeDiskJockey();
             $this->rejoin();
             return;
         }
         if ($this->rejoining) {
             $this->log("Resumed $this, which we were trying to rejoin, rejoining...", Logger::WARNING);
-            $this->diskJockey->resumeReader();
+            $this->resumeDiskJockey();
             $this->rejoin();
             return;
         }
@@ -274,7 +279,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->startChecking();
         // Restart the demuxers/readers too (DjLoop::__unserialize() deliberately leaves them dormant),
         // or nothing is transmitted after a restart.
-        $this->diskJockey->resumeReader();
+        $this->resumeDiskJockey();
         $this->presentationDj?->resumeReader();
         $this->connection?->resume();
         $this->presentationConnection?->resume();
@@ -974,6 +979,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->publishing) {
             // Reconnect right away, if the ingest dropped the connection while nothing was played.
             $this->rtmpPublisher?->wake();
+            $this->awaitPublisher();
             return;
         }
         if ($this->callState === GroupCallState::LEFT) {
@@ -994,6 +1000,34 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->publishing && $this->rtmpPublisher === null) {
             $this->log("Publishing what is played to the RTMP livestream $this", Logger::NOTICE);
             $this->rtmpPublisher = $this->createPublisher($ingest);
+        }
+        $this->awaitPublisher();
+    }
+
+    /**
+     * Restart reading what is played, after a restart: when publishing it, only once connected to the RTMP ingest,
+     * see {@see self::resumeAfterRestart()}.
+     */
+    private function resumeDiskJockey(): void
+    {
+        if (!$this->publishing) {
+            $this->diskJockey->resumeReader();
+        }
+    }
+
+    /** How long play() waits for the connection to the RTMP ingest, in seconds. */
+    private const PUBLISHER_CONNECTION_TIMEOUT = 10;
+
+    /**
+     * Wait for the connection to the RTMP ingest: what is played before is dropped, with it the first keyframe,
+     * and the video until the next one.
+     */
+    private function awaitPublisher(): void
+    {
+        try {
+            $this->rtmpPublisher?->awaitConnection(new TimeoutCancellation(self::PUBLISHER_CONNECTION_TIMEOUT));
+        } catch (CancelledException) {
+            $this->log("Not connected to the RTMP ingest of $this after ".self::PUBLISHER_CONNECTION_TIMEOUT." seconds: playing anyway, published once connected", Logger::WARNING);
         }
     }
 
