@@ -24,12 +24,6 @@ use function Amp\async;
  */
 final class NativeExecutorTest extends TestCase
 {
-    private static function submit(NativeExecutor $executor, bool $encrypt, string $data, string $key, string $iv, ?\Amp\Cancellation $cancellation = null): \Amp\Future
-    {
-        $cancellation?->throwIfRequested();
-        return async(static fn (): array => $executor->run(static fn (): array => \danog\MadelineProto\Native\Crypto::ige($data, $key, $iv, $encrypt)));
-    }
-
     private function reference(string $data, string $key, string $iv): string
     {
         $cipher = (new \ReflectionClass(\danog\MadelineProto\MTProtoTools\Crypt\IGEOpenssl::class))->newInstanceWithoutConstructor();
@@ -102,23 +96,23 @@ final class NativeExecutorTest extends TestCase
 
     public function testCancellingAWaiterDoesNotCancelAcceptedWork(): void
     {
-        $executor = NativeExecutor::get();
         $key = random_bytes(32);
         $iv = random_bytes(32);
         $plain = random_bytes(65536);
         $expected = $this->reference($plain, $key, $iv);
-        $future = self::submit($executor, true, $plain, $key, $iv);
+        $cipher = IGE::getInstance($key, $iv);
+        $future = async($cipher->encrypt(...), $plain);
         $cancel = new DeferredCancellation;
         $cancel->cancel();
         try {
             $future->await($cancel->getCancellation());
             self::fail('Cancelled waiter returned a result');
         } catch (CancelledException) {
-            self::assertSame($expected, $future->await()[0]);
+            self::assertSame($expected, $future->await());
         }
     }
 
-    public function testCancelledWaitUnderQueuePressureDoesNotBreakTheChain(): void
+    public function testCancelledWaitDoesNotBreakTheChain(): void
     {
         $key = random_bytes(32);
         $iv = random_bytes(32);
@@ -145,14 +139,16 @@ final class NativeExecutorTest extends TestCase
         $iv = random_bytes(32);
         $plain = random_bytes(65536);
         $expected = $this->reference($plain.$plain, $key, $iv);
-        $first = self::submit($executor, true, $plain, $key, $iv);
-        $second = self::submit($executor, false, str_repeat("\0", 16), $key, $iv);
+        $encoder = IGE::getInstance($key, $iv);
+        $decoder = IGE::getInstance($key, $iv);
+        $first = async($encoder->encrypt(...), $plain);
+        $second = async($decoder->decrypt(...), substr($expected, 0, 16));
         \Amp\delay(0); // Let both operations enter the native bridge before shutdown.
         $executor->close();
         $result = $first->await();
-        self::assertSame(16, \strlen($second->await()[0]));
+        self::assertSame(substr($plain, 0, 16), $second->await());
         self::assertNull(NativeExecutor::get());
-        self::assertSame($expected, $result[0].IGE::getInstance($key, $result[1])->encrypt($plain));
+        self::assertSame($expected, $result.$encoder->encrypt($plain));
         $executor->close();
     }
 }

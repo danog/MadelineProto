@@ -9,7 +9,7 @@ use std::{
     future::Future,
     io::{Read, Write},
     os::fd::{AsRawFd, FromRawFd},
-    sync::mpsc,
+    sync::{mpsc, Arc},
 };
 use tokio::runtime::{Builder, Runtime};
 
@@ -18,7 +18,7 @@ struct Bridge {
     pid: u32,
     runtime: Runtime,
     reader: File,
-    writer: File,
+    writer: Arc<File>,
     sender: mpsc::Sender<u64>,
     receiver: mpsc::Receiver<u64>,
     suspensions: HashMap<u64, Zval>,
@@ -55,7 +55,7 @@ impl EventLoop {
                     pid: std::process::id(),
                     runtime,
                     reader,
-                    writer,
+                    writer: Arc::new(writer),
                     sender,
                     receiver,
                     suspensions: HashMap::new(),
@@ -89,7 +89,7 @@ impl EventLoop {
                 .ok_or("Suspension IDs exhausted")?;
             let id = bridge.next;
             let sender = bridge.sender.clone();
-            let mut writer = bridge.writer.try_clone().map_err(|e| e.to_string())?;
+            let writer = bridge.writer.clone();
             bridge.suspensions.insert(id, suspension);
             Ok((
                 id,
@@ -97,6 +97,7 @@ impl EventLoop {
                     let result = future.await;
                     // Only integer IDs cross threads, never a PHP value.
                     let _ = sender.send(id);
+                    let mut writer = &*writer;
                     loop {
                         match writer.write(&[0]) {
                             Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,

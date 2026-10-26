@@ -1,11 +1,13 @@
 // Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
 // SPDX-License-Identifier: AGPL-3.0-only
 use crate::{
-    crypto::{self, Message, Output, Result},
+    crypto::{self, Message, Operation, Output, Result},
     policy::Policy,
 };
 use std::{
     collections::{HashMap, VecDeque},
+    future::Future,
+    pin::Pin,
     sync::{Arc, Condvar, Mutex},
     thread::{self, JoinHandle},
     time::{Duration, Instant},
@@ -16,9 +18,13 @@ pub struct Lease {
     _jobs: OwnedSemaphorePermit,
     _bytes: OwnedSemaphorePermit,
 }
+pub enum Admission {
+    Ready(Lease),
+    Waiting(Pin<Box<dyn Future<Output = Result<Lease>> + Send>>),
+}
 pub struct Reply {
-    pub value: Result<Output>,
-    pub _lease: Lease,
+    pub result: Result<Output>,
+    _lease: Lease,
 }
 struct Job {
     message: Message,
@@ -38,7 +44,6 @@ struct Shared {
     capacity: usize,
     byte_limit: usize,
     window: Duration,
-    fixed: usize,
 }
 pub struct Executor {
     shared: Arc<Shared>,
@@ -48,7 +53,7 @@ pub struct Executor {
 fn bucket(size: usize) -> u32 {
     usize::BITS - size.saturating_sub(1).leading_zeros()
 }
-fn class(message: &Message) -> (u32, u8) {
+fn class(message: &Message) -> (u32, Operation) {
     (bucket(message.input.len()), message.operation)
 }
 fn cpu_ns() -> u64 {
@@ -63,10 +68,9 @@ fn cpu_ns() -> u64 {
     time.tv_sec as u64 * 1_000_000_000 + time.tv_nsec as u64
 }
 impl Executor {
-    pub fn new(capacity: usize, byte_limit: usize, window_us: u64, fixed: usize) -> Result<Self> {
+    pub fn new(capacity: usize, byte_limit: usize, window_us: u64) -> Result<Self> {
         if capacity == 0
             || capacity > 4096
-            || fixed > capacity
             || byte_limit < 4096
             || byte_limit > u32::MAX as usize
             || window_us > 1_000_000
@@ -84,7 +88,6 @@ impl Executor {
             capacity,
             byte_limit,
             window: Duration::from_micros(window_us),
-            fixed,
         });
         let state = shared.clone();
         let worker = thread::Builder::new()
@@ -102,33 +105,34 @@ impl Executor {
     }
     // Acquire before copying PHP input. Waiting Fibers retain their PHP strings,
     // and allocate no Rust message buffers until both limits admit the operation.
-    pub fn reserve(
-        &self,
-        size: usize,
-    ) -> Result<impl std::future::Future<Output = Result<Lease>> + Send + 'static> {
+    pub fn reserve(&self, size: usize) -> Result<Admission> {
         if !self.is_open() {
             return Err("Crypto executor is closed or inherited across fork".into());
         }
-        // Account input/output, key schedules, variable tail workspace, metadata
-        // and result construction. Permits live until PHP consumes the result.
+        // Input, output and the PHP result copy; keep both quotas through consumption.
         let cost = size
-            .checked_mul(4)
+            .checked_mul(3)
             .and_then(|n| n.checked_add(4096))
-            .ok_or("Crypto input too large")?;
-        if cost > self.shared.byte_limit {
-            return Err("Crypto input exceeds queue memory limit".into());
+            .filter(|cost| *cost <= self.shared.byte_limit)
+            .ok_or("Crypto input exceeds queue memory limit")?;
+        let slots = &self.shared.jobs;
+        let memory = &self.shared.bytes;
+        if let (Ok(jobs), Ok(bytes)) = (
+            slots.clone().try_acquire_owned(),
+            memory.clone().try_acquire_many_owned(cost as u32),
+        ) {
+            return Ok(Admission::Ready(Lease {
+                _jobs: jobs,
+                _bytes: bytes,
+            }));
         }
-        let shared = self.shared.clone();
-        Ok(async move {
-            let jobs = shared
-                .jobs
-                .clone()
+        let (slots, memory) = (slots.clone(), memory.clone());
+        Ok(Admission::Waiting(Box::pin(async move {
+            let jobs = slots
                 .acquire_owned()
                 .await
                 .map_err(|_| "Crypto executor is closed")?;
-            let bytes = shared
-                .bytes
-                .clone()
+            let bytes = memory
                 .acquire_many_owned(cost as u32)
                 .await
                 .map_err(|_| "Crypto executor is closed")?;
@@ -136,24 +140,7 @@ impl Executor {
                 _jobs: jobs,
                 _bytes: bytes,
             })
-        })
-    }
-    pub fn try_reserve(&self, size: usize) -> Option<Lease> {
-        if !self.is_open() {
-            return None;
-        }
-        let cost = size.checked_mul(4)?.checked_add(4096)?;
-        let jobs = self.shared.jobs.clone().try_acquire_owned().ok()?;
-        let bytes = self
-            .shared
-            .bytes
-            .clone()
-            .try_acquire_many_owned(u32::try_from(cost).ok()?)
-            .ok()?;
-        Some(Lease {
-            _jobs: jobs,
-            _bytes: bytes,
-        })
+        })))
     }
     pub fn enqueue(&self, message: Message, lease: Lease) -> Result<oneshot::Receiver<Reply>> {
         if self.pid != std::process::id() {
@@ -178,6 +165,9 @@ impl Executor {
         if self.pid != std::process::id() {
             return;
         }
+        let Some(worker) = self.worker.take() else {
+            return;
+        };
         {
             let mut q = self.shared.queue.lock().unwrap();
             q.closed = true;
@@ -185,9 +175,7 @@ impl Executor {
         }
         self.shared.jobs.close();
         self.shared.bytes.close();
-        if let Some(worker) = self.worker.take() {
-            let _ = worker.join();
-        }
+        let _ = worker.join();
     }
 }
 impl Drop for Executor {
@@ -196,7 +184,8 @@ impl Drop for Executor {
     }
 }
 fn run(shared: Arc<Shared>) {
-    let mut policies: HashMap<(u32, u8), Policy> = HashMap::new();
+    let mut policies: HashMap<(u32, Operation), Policy> = HashMap::new();
+    let hardware = crypto::hardware_available();
     loop {
         let mut q = shared.queue.lock().unwrap();
         while q.jobs.is_empty() && !q.closed {
@@ -208,13 +197,7 @@ fn run(shared: Arc<Shared>) {
         let group = class(&first.message);
         let deadline = first.queued + shared.window;
         let policy = policies.entry(group).or_default();
-        let target = if !crypto::hardware_available() {
-            1
-        } else if shared.fixed != 0 {
-            shared.fixed
-        } else {
-            policy.target()
-        };
+        let target = if hardware { policy.target() } else { 1 };
         while !q.closed
             && q.jobs
                 .iter()
@@ -229,26 +212,20 @@ fn run(shared: Arc<Shared>) {
             }
             q = shared.ready.wait_timeout(q, deadline - now).unwrap().0;
         }
-        let mut selected = Vec::with_capacity(target);
+        let mut messages = Vec::with_capacity(target);
+        let mut replies = Vec::with_capacity(target);
         let mut i = 0;
-        while i < q.jobs.len() && selected.len() < target {
+        while i < q.jobs.len() && messages.len() < target {
             if class(&q.jobs[i].message) == group {
-                selected.push(q.jobs.remove(i).unwrap());
+                let job = q.jobs.remove(i).unwrap();
+                messages.push(job.message);
+                replies.push((job.sender, job.lease));
             } else {
                 i += 1;
             }
         }
         drop(q);
-        let measure = shared.fixed == 0
-            && !policy.locked
-            && selected.len() == target
-            && crypto::hardware_available();
-        let mut messages = Vec::with_capacity(selected.len());
-        let mut replies = Vec::with_capacity(selected.len());
-        for job in selected {
-            messages.push(job.message);
-            replies.push((job.sender, job.lease));
-        }
+        let measure = hardware && !policy.locked && messages.len() == target;
         let bytes = messages.iter().map(|j| j.input.len()).sum();
         let start = if measure { cpu_ns() } else { 0 };
         let result = crypto::batch(&mut messages);
@@ -271,7 +248,7 @@ fn run(shared: Arc<Shared>) {
             // A dropped waiter still runs to completion; dropping the unsent reply
             // releases its permits and zeroizes its plaintext on this thread.
             let _ = sender.send(Reply {
-                value,
+                result: value,
                 _lease: lease,
             });
         }

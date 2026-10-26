@@ -1,8 +1,9 @@
 # Optional Rust cryptography extension
 
 The Docker image includes `madeline_crypto`. Other installations use
-IGEFFI with system libcrypto, then ext-openssl and phpseclib when it is absent. CTR and CDN keep their existing PHP
-implementations. The Rust extension needs no library paths, FFI permissions or runtime compilation.
+IGEFFI with system libcrypto, then ext-openssl and phpseclib. CTR and CDN keep
+their existing PHP implementations. The extension needs no library paths, FFI
+permissions or runtime compilation.
 The optional IGEFFI fallback requires enabled FFI and compatible libcrypto symbols;
 it has no dependency on the removed C helper.
 
@@ -12,7 +13,8 @@ The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
 Build for the target PHP version, architecture and debug ABI.
 Install that PHP's development headers and `php-config`, OpenSSL development
 headers, a linker, pkg-config and libclang. Rust 1.92.0 is pinned by
-`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies.
+`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.2 accepts queue count,
+byte limit and batch window; width is always selected adaptively.
 
 ```sh
 cd native
@@ -34,7 +36,7 @@ The MTProto owner initializes the extension and php-tokio bridge at startup.
 IPC-only clients do not start it. PHP adapters retain only bridge lifecycle and
 IGE per-instance sequencing. There is no PHP submit/collect/release protocol.
 The extension exports `danog\MadelineProto\Native\Crypto`; factories check the
-extension, API version before selecting it. Validation errors
+extension and API version before selecting it. Validation errors
 never trigger backend retries.
 
 Each initialized process has exactly one crypto worker and one Tokio scheduler
@@ -45,7 +47,7 @@ changes are documented in `php-tokio/UPSTREAM.md`.
 
 The queue defaults to 128 live jobs and 128 MiB of accounted native storage.
 Admission reserves both count and byte permits before copying input. Accounting
-covers input, output, tail workspace, key schedules, result copies and metadata;
+covers input, output, the PHP result copy, key schedules and metadata;
 permits are held through result consumption. Oversized jobs fail explicitly.
 Waiting for admission suspends the Fiber. Cancelling an external Amp wait does
 not cancel its underlying operation: accepted work completes, commits IGE state
@@ -66,7 +68,7 @@ retain their own PHP KDF and verification while using the IGE interface.
 
 Independent chains of the same operation and size bucket are interleaved at each
 AES round. Unequal lengths share their common prefix and finish their short tails
-with the continued IV. Hardware AES is detected at runtime (`std::arch` ARM AES /
+with the continued IV directly in the original buffers. Hardware AES is detected at runtime (`std::arch` ARM AES /
 x86 AES-NI); unsupported CPUs use EVP inside the same executor.
 
 Each operation/size bucket starts at width N=1. Complete batches alternate N and
