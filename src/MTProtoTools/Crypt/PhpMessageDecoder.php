@@ -29,7 +29,7 @@ final class PhpMessageDecoder implements MessageDecoder
         if (!hash_equals($messageKey, substr(Crypt::sha256(substr($authKey, 96, 32).$plain), 8, 16))) {
             throw new SecurityException('msg_key mismatch');
         }
-        $length = unpack('V', substr($plain, 28, 4))[1];
+        $length = (int) unpack('V', substr($plain, 28, 4))[1];
         if ($length % 4 || $length > \strlen($plain) - 32) {
             throw new SecurityException('Invalid message_data_length');
         }
@@ -40,7 +40,7 @@ final class PhpMessageDecoder implements MessageDecoder
         return new DecodedMessage(
             substr($plain, 32, $length),
             Tools::unpackSignedLong(substr($plain, 16, 8)),
-            unpack('V', substr($plain, 24, 4))[1],
+            (int) unpack('V', substr($plain, 24, 4))[1],
             substr($plain, 8, 8),
         );
     }

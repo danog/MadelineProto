@@ -22,7 +22,11 @@ use Revolt\EventLoop;
 use RuntimeException;
 use Throwable;
 
-/** One native worker shared by all crypto adapters in this process. @internal */
+/**
+ * One native worker shared by all crypto adapters in this process.
+ * @internal
+ * @psalm-type CryptoOutput = array{data: string, iv: string, sessionId: string, messageId: string, seqNo: int}
+ */
 final class NativeCrypto
 {
     use ForbidCloning;
@@ -32,7 +36,7 @@ final class NativeCrypto
     public const DECRYPT = 2;
     public const DECODE_V2 = 4;
     private static self|false|null $instance = null;
-    /** @var array<int, DeferredFuture<array>> */
+    /** @var array<int, DeferredFuture<CryptoOutput>> */
     private array $pending = [];
     private ?DeferredFuture $space = null;
     /** @var resource */
@@ -64,10 +68,11 @@ final class NativeCrypto
                 if ($ffi->madeline_crypto_abi() !== 1) {
                     continue;
                 }
-                $operations = $ffi->madeline_crypto_operations();
+                $operations = (int) $ffi->madeline_crypto_operations();
                 if (($operations & 3) !== 3) {
                     continue;
                 }
+                /** @var CData $pool */
                 $pool = $ffi->madeline_crypto_create($capacity, $byteLimit, $windowUs, $fixedWidth);
                 if (FFI::isNull($pool)) {
                     continue;
@@ -95,7 +100,7 @@ final class NativeCrypto
 
     private function __construct(private readonly FFI $ffi, private readonly CData $pool, private readonly int $operations)
     {
-        $fd = $ffi->madeline_crypto_notification_fd($pool);
+        $fd = (int) $ffi->madeline_crypto_notification_fd($pool);
         if ($fd < 0) {
             throw new RuntimeException('Could not open crypto notification descriptor');
         }
@@ -117,7 +122,7 @@ final class NativeCrypto
 
     /**
      * Input is copied by C before returning. Accepted work is not cancelled by its waiter.
-     * @return Future<array{data: string, iv: string, sessionId: string, messageId: string, seqNo: int}>
+     * @return Future<CryptoOutput>
      */
     public function submit(int $operation, string $data, string $key, string $iv, ?Cancellation $cancellation = null): Future
     {
@@ -130,9 +135,9 @@ final class NativeCrypto
             if ($this->closed || $this->failed) {
                 throw new RuntimeException('Native crypto executor is closed');
             }
-            $id = $operation === self::DECODE_V2
+            $id = (int) ($operation === self::DECODE_V2
                 ? $this->ffi->madeline_crypto_submit_message($this->pool, $data, \strlen($data), $key, $iv)
-                : $this->ffi->madeline_crypto_submit($this->pool, $operation, $data, \strlen($data), $key, $iv);
+                : $this->ffi->madeline_crypto_submit($this->pool, $operation, $data, \strlen($data), $key, $iv));
             if ($id > 0) {
                 break;
             }
@@ -142,6 +147,7 @@ final class NativeCrypto
             $this->space ??= new DeferredFuture;
             $this->space->getFuture()->await($cancellation);
         }
+        /** @var DeferredFuture<CryptoOutput> $deferred */
         $deferred = new DeferredFuture;
         $this->pending[$id] = $deferred;
         EventLoop::reference($this->watcher);
@@ -152,8 +158,11 @@ final class NativeCrypto
     {
         while (($bytes = fread($this->stream, 8192)) !== false && $bytes !== '') {
         }
-        $result = $this->ffi->new('CryptoResult');
-        while ($this->ffi->madeline_crypto_collect($this->pool, FFI::addr($result))) {
+        $buffer = $this->ffi->new('CryptoResult');
+        $address = FFI::addr($buffer);
+        /** @var object{handle: CData, id: int, data: CData, size: non-negative-int, iv: CData, session_id: CData, message_id: CData, seq_no: int, status: int} $result */
+        $result = $buffer;
+        while ($this->ffi->madeline_crypto_collect($this->pool, $address)) {
             $deferred = $this->pending[$result->id];
             unset($this->pending[$result->id]);
             try {
@@ -169,19 +178,15 @@ final class NativeCrypto
                     'iv' => FFI::string($result->iv, 32),
                     'sessionId' => FFI::string($result->session_id, 8),
                     'messageId' => FFI::string($result->message_id, 8),
-                    'seqNo' => (int) $result->seq_no,
+                    'seqNo' => $result->seq_no,
                 ];
             } catch (Throwable $e) {
-                $error = $e;
+                $deferred->error($e);
+                continue;
             } finally {
                 $this->ffi->madeline_crypto_release($this->pool, $result->handle);
             }
-            if (isset($error)) {
-                $deferred->error($error);
-                unset($error);
-            } else {
-                $deferred->complete($value);
-            }
+            $deferred->complete($value);
         }
         if ($this->space) {
             $space = $this->space;
@@ -202,12 +207,12 @@ final class NativeCrypto
         if ($this->closed || $bytes < 0) {
             return null;
         }
-        $width = $this->ffi->new('unsigned');
-        $locked = $this->ffi->new('int');
-        if (!$this->ffi->madeline_crypto_policy($this->pool, $operation, $bytes, FFI::addr($width), FFI::addr($locked))) {
+        $width = $this->ffi->new('unsigned[1]');
+        $locked = $this->ffi->new('int[1]');
+        if (!$this->ffi->madeline_crypto_policy($this->pool, $operation, $bytes, $width, $locked)) {
             return null;
         }
-        return ['width' => $width->cdata, 'locked' => (bool) $locked->cdata];
+        return ['width' => (int) $width[0], 'locked' => (bool) $locked[0]];
     }
 
     public function close(): void
@@ -219,7 +224,8 @@ final class NativeCrypto
         $this->ffi->madeline_crypto_stop($this->pool);
         $this->collect();
         EventLoop::cancel($this->watcher);
-        fclose($this->stream);
+        $stream = $this->stream;
+        fclose($stream);
         $this->ffi->madeline_crypto_destroy($this->pool);
     }
 }
