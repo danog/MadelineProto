@@ -51,7 +51,7 @@ least 1% advances to the next pair with fresh samples; otherwise width N is lock
 until executor restart. Partial batches do useful work without advancing the
 comparison. Resource limits also stop growth. The default accumulation deadline
 is 5 ms from the oldest job and is never extended by arrivals. Low traffic can
-leave calibration incomplete. `NativeCrypto::initialize()` accepts queue limits,
+leave calibration incomplete. `NativeExecutor::initialize()` accepts queue limits,
 the window in microseconds and an optional fixed width for controlled benchmarks;
 normal startup uses adaptive selection.
 
@@ -64,6 +64,6 @@ Run the PHP behavior tests with the helper selected:
 ```sh
 MADELINE_IGE_LIBRARY="$PWD/native/build/libmadeline-ige.so" \
   php -d ffi.enable=1 vendor/bin/phpunit -c phpunit-light.xml \
-  --filter 'IGETest|NativeCryptoTest|MessageDecoderTest|ConnectionCryptoTest|SecretChatCryptoTest'
+  --filter 'IGETest|NativeExecutorTest|MessageDecoderTest|ConnectionCryptoTest|SecretChatCryptoTest'
 ```
 

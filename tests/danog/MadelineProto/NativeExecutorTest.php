@@ -15,7 +15,7 @@ use Amp\DeferredCancellation;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\MTProtoTools\Crypt\IGENative;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use PHPUnit\Framework\TestCase;
 use function Amp\async;
 
@@ -23,16 +23,21 @@ use function Amp\async;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-final class NativeCryptoTest extends TestCase
+final class NativeExecutorTest extends TestCase
 {
+    private static function submit(NativeExecutor $executor, int $operation, string $data, string $key, string $iv, ?\Amp\Cancellation $cancellation = null): \Amp\Future
+    {
+        return $executor->submit(static fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit($pool, $operation, $data, \strlen($data), $key, $iv), $cancellation);
+    }
+
     public static function setUpBeforeClass(): void
     {
-        NativeCrypto::initialize(2, 4 * 1024 * 1024, 1000);
+        NativeExecutor::initialize(2, 4 * 1024 * 1024, 1000);
     }
 
     protected function setUp(): void
     {
-        if (!NativeCrypto::get(3)) {
+        if (!NativeExecutor::get(3)) {
             self::markTestSkipped('Optional native crypto executor is unavailable');
         }
     }
@@ -89,12 +94,12 @@ final class NativeCryptoTest extends TestCase
 
     public function testCancellingAWaiterDoesNotCancelAcceptedWork(): void
     {
-        $executor = NativeCrypto::get(3);
+        $executor = NativeExecutor::get(3);
         $key = random_bytes(32);
         $iv = random_bytes(32);
         $plain = random_bytes(65536);
         $expected = Crypt::igeEncrypt($plain, $key, $iv);
-        $future = $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv);
+        $future = self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv);
         $cancel = new DeferredCancellation;
         $cancel->cancel();
         try {
@@ -107,15 +112,15 @@ final class NativeCryptoTest extends TestCase
 
     public function testCancellingSubmissionIntoAFullQueuePreservesOtherJobs(): void
     {
-        $executor = NativeCrypto::get(3);
+        $executor = NativeExecutor::get(3);
         $key = random_bytes(32);
         $iv = random_bytes(32);
         $plain = random_bytes(65536);
         $expected = Crypt::igeEncrypt($plain, $key, $iv);
-        $first = $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv);
-        $second = $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv);
+        $first = self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv);
+        $second = self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv);
         $cancel = new DeferredCancellation;
-        $waiting = async(static fn () => $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv, $cancel->getCancellation())->await());
+        $waiting = async(static fn () => self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv, $cancel->getCancellation())->await());
         \Revolt\EventLoop::queue($cancel->cancel(...));
         try {
             $waiting->await();
@@ -124,22 +129,22 @@ final class NativeCryptoTest extends TestCase
             self::assertSame($expected, $first->await()['data']);
             self::assertSame($expected, $second->await()['data']);
         }
-        self::assertSame($expected, $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv)->await()['data']);
+        self::assertSame($expected, self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv)->await()['data']);
     }
 
     public function testShutdownCompletesAcceptedWorkAndAllowsSynchronousContinuation(): void
     {
-        $executor = NativeCrypto::get(3);
+        $executor = NativeExecutor::get(3);
         $key = random_bytes(32);
         $iv = random_bytes(32);
         $plain = random_bytes(65536);
         $expected = Crypt::igeEncrypt($plain.$plain, $key, $iv);
-        $first = $executor->submit(NativeCrypto::ENCRYPT, $plain, $key, $iv);
-        $second = $executor->submit(NativeCrypto::DECRYPT, str_repeat("\0", 16), $key, $iv);
+        $first = self::submit($executor, NativeExecutor::ENCRYPT, $plain, $key, $iv);
+        $second = self::submit($executor, NativeExecutor::DECRYPT, str_repeat("\0", 16), $key, $iv);
         $executor->close();
         $result = $first->await();
         self::assertSame(16, \strlen($second->await()['data']));
-        self::assertNull(NativeCrypto::get(3));
+        self::assertNull(NativeExecutor::get(3));
         self::assertSame($expected, $result['data'].IGE::getInstance($key, $result['iv'])->encrypt($plain));
         $executor->close();
     }
