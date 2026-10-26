@@ -297,7 +297,7 @@ final class StreamReceiver
     }
 
     /**
-     * The local clock in milliseconds.
+     * The local clock in milliseconds: the wall clock, as the timestamps of the chunks.
      */
     private static function nowMs(): int
     {

@@ -52,16 +52,17 @@ final class EncryptedConnection
     private const EMPTY_ID = 254;
     private const CUSTOM_ID = 127;
 
-    private const MIN_DELAY_BEFORE_MESSAGE_RESEND = 3.0;
+    private const MIN_DELAY_BEFORE_MESSAGE_RESEND_NS = 3_000_000_000;
     private const MAX_DELAY_BEFORE_MESSAGE_RESEND = 5.0;
     private const MAX_DELAY_BEFORE_ACK_RESEND = 5.0;
 
     private int $counter = 0;
 
     /**
-     * Messages we sent that were not ACKed yet, as `[serialized, lastSentTimestamp]`.
+     * Messages we sent that were not ACKed yet, as `[serialized, when they were last sent]` (hrtime, in nanoseconds; 0
+     * to send them at once).
      *
-     * @var list<array{string, float}>
+     * @var list<array{string, int}>
      */
     private array $notYetAckedMessages = [];
     /**
@@ -114,6 +115,12 @@ final class EncryptedConnection
     {
         $this->sendAcksTimerActive = false;
         $this->resendTimerActive = false;
+        // When they were last sent: hrtime readings, meaningless after a reboot (or saved as Unix times before
+        // 8.12.1). Resent at once.
+        foreach ($this->notYetAckedMessages as &$message) {
+            $message[1] = 0;
+        }
+        unset($message);
         if ($this->haveAdditionalMessages()) {
             $this->resendTimerActive = true;
             $this->scheduleService(self::MAX_DELAY_BEFORE_MESSAGE_RESEND, self::SERVICE_CAUSE_RESEND);
@@ -150,7 +157,7 @@ final class EncryptedConnection
         if (!$sendEnqueued) {
             $withAdditional = $this->appendAdditionalMessages($serialized);
         }
-        $this->notYetAckedMessages[] = [$serialized, microtime(true)];
+        $this->notYetAckedMessages[] = [$serialized, hrtime(true)];
         if (!$sendEnqueued) {
             \assert(isset($withAdditional));
             return $this->encryptPrepared($withAdditional);
@@ -393,10 +400,10 @@ final class EncryptedConnection
             return $buffer;
         }
 
-        $now = microtime(true);
+        $now = hrtime(true);
         foreach ($this->notYetAckedMessages as &$resending) {
             [$data, $lastSent] = $resending;
-            $when = $lastSent > 0.0 ? $lastSent + self::MIN_DELAY_BEFORE_MESSAGE_RESEND : 0.0;
+            $when = $lastSent > 0 ? $lastSent + self::MIN_DELAY_BEFORE_MESSAGE_RESEND_NS : 0;
             if ($when > $now) {
                 break;
             }

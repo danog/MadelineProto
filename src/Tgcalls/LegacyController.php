@@ -58,8 +58,10 @@ final class LegacyController
     private Endpoint $bestEndpoint;
     private ?string $pendingPing = null;
     private ?string $timeoutWatcher = null;
-    private float $lastIncomingTimestamp = 0.0;
-    private float $lastOutgoingTimestamp = 0.0;
+    /** When a packet was last received (hrtime, in nanoseconds). */
+    private int $lastIncomingAtNs = 0;
+    /** When a packet was last sent (hrtime, in nanoseconds). */
+    private int $lastOutgoingAtNs = 0;
     private int $opusTimestamp = 0;
     private bool $muted = true;
     private bool $closed = false;
@@ -107,6 +109,8 @@ final class LegacyController
         $this->pendingPing = null;
         $this->timeoutWatcher = null;
         $this->restoreDeclaredProperties($data);
+        // An hrtime reading, meaningless after a reboot: the reconnection below gets the grace of a new one
+        $this->lastIncomingAtNs = hrtime(true);
         if ($this->closed) {
             return;
         }
@@ -300,7 +304,7 @@ final class LegacyController
     private function connectToAll(): void
     {
         $this->timeoutWatcher = EventLoop::repeat(10, function (): void {
-            if (microtime(true) - $this->lastIncomingTimestamp > 10) {
+            if (hrtime(true) - $this->lastIncomingAtNs > 10_000_000_000) {
                 $this->call->onConnectionFailed();
             }
         });
@@ -416,7 +420,7 @@ final class LegacyController
                 if (!$payload) {
                     break;
                 }
-                $this->lastIncomingTimestamp = microtime(true);
+                $this->lastIncomingAtNs = hrtime(true);
                 EventLoop::queue($this->handlePacket(...), $endpoint, $payload);
             }
             $this->call->log("Exiting VoIP read loop in $endpoint, {$this->call}!");
@@ -427,8 +431,9 @@ final class LegacyController
     {
         $this->setVoipState(VoIPState::ESTABLISHED);
 
-        $delay = $this->muted ? 0.2 : 0.06;
-        $t = microtime(true) + $delay;
+        // Nanoseconds between two packets
+        $delay = $this->muted ? 200_000_000 : 60_000_000;
+        $t = hrtime(true) + $delay;
         while (true) {
             if ($packet = $this->dj->pullPacket()) {
                 if ($this->muted) {
@@ -442,7 +447,7 @@ final class LegacyController
                         return;
                     }
                     $this->muted = false;
-                    $delay = 0.06;
+                    $delay = 60_000_000;
                     $this->opusTimestamp = 0;
                 }
                 $packet = $this->messageHandler->encryptPacket([
@@ -464,17 +469,17 @@ final class LegacyController
                         return;
                     }
                     $this->muted = true;
-                    $delay = 0.2;
+                    $delay = 200_000_000;
                 }
                 $packet = $this->messageHandler->encryptPacket([
                     '_' => self::PKT_NOP,
                 ]);
             }
             //$this->call->log("Writing {$this->opusTimestamp} in {$this->call}!");
-            $cur = microtime(true);
+            $cur = hrtime(true);
             $diff = $t - $cur;
             if ($diff > 0) {
-                delay($diff);
+                delay($diff / 1e9);
             }
 
             if (!$this->bestEndpoint->write($packet)) {
@@ -485,7 +490,7 @@ final class LegacyController
             if ($diff > 0) {
                 $cur += $diff;
             }
-            $this->lastOutgoingTimestamp = $cur;
+            $this->lastOutgoingAtNs = $cur;
 
             $t += $delay;
         }

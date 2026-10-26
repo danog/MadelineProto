@@ -51,9 +51,9 @@ abstract class ClientAbstract
      */
     private const MAX_RECONNECT_DELAY = 30.0;
     /**
-     * An idle connection that lasted this long (in seconds) was a working one: losing it doesn't delay reconnecting.
+     * An idle connection that lasted this long (in nanoseconds) was a working one: losing it doesn't delay reconnecting.
      */
-    private const STABLE_CONNECTION = 10.0;
+    private const STABLE_CONNECTION_NS = 10_000_000_000;
     /**
      * Number of connections a call is sent on without getting an answer before giving up.
      */
@@ -111,7 +111,7 @@ abstract class ClientAbstract
     {
         // Reconnections in a row that didn't get any answer
         $failures = 0;
-        $connectedAt = microtime(true);
+        $connectedAt = hrtime(true);
         $failure = null;
         do {
             $answered = false;
@@ -153,7 +153,7 @@ abstract class ClientAbstract
                     // A server that answered, or an idle connection that lasted, was a working one. Otherwise the
                     // server dropped us (it's shutting down with its socket still bound, it fails to handle our
                     // calls, ...): reconnecting right away would spin on it, so wait longer and longer.
-                    if ($answered || (!$this->requests && microtime(true) - $connectedAt >= self::STABLE_CONNECTION)) {
+                    if ($answered || (!$this->requests && hrtime(true) - $connectedAt >= self::STABLE_CONNECTION_NS)) {
                         $failures = 0;
                     } else {
                         $failures++;
@@ -185,7 +185,7 @@ abstract class ClientAbstract
                             throw $server instanceof Throwable ? $server : new ChannelException("Could not reconnect to the IPC server, please check the logs!");
                         }
                         $this->server = $server;
-                        $connectedAt = microtime(true);
+                        $connectedAt = hrtime(true);
                         $this->logger('Reconnected to IPC server!');
                         $requests = $this->requests;
                         $this->requests = [];

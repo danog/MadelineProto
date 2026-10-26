@@ -127,10 +127,10 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
     /** @var list<array<string, mixed>> Structured offers received before InitialSetup. */
     private array $pendingV2Messages = [];
     /**
-     * Until when (unix time) our own re-offers are held back after an exchange, to leave the peer's
+     * Until when (hrtime, in nanoseconds) our own re-offers are held back after an exchange, to leave the peer's
      * offer room to arrive first: see {@see self::flushRenegotiation()}.
      */
-    private float $holdOffUntil = 0.0;
+    private int $holdOffUntilNs = 0;
     /** Whether a delayed flush of a held-back re-offer is already scheduled. */
     private bool $flushScheduled = false;
     /** Whether {@see self::start()} was called: no offer goes out before. */
@@ -191,11 +191,11 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
      */
     private bool $dropVp8FromOffer = false;
     /**
-     * How long (seconds) to hold our re-offers after an exchange, for the peer's offer to arrive
+     * How long (nanoseconds) to hold our re-offers after an exchange, for the peer's offer to arrive
      * first (see {@see self::flushRenegotiation()}): a signaling round trip through Telegram takes
      * up to a couple of seconds.
      */
-    private const PEER_OFFER_GRACE = 3.0;
+    private const PEER_OFFER_GRACE_NS = 3_000_000_000;
     /** The SCTP association carrying signaling, for the versions that use one. */
     private ?SignalingSctpTransport $sctp = null;
     /** Last mute state we told the peer about, so media state updates stay consistent. */
@@ -401,6 +401,8 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         // happens in resume(), called once the call graph is whole.
         $this->signalingMutex = new LocalMutex;
         $this->restoreDeclaredProperties($data);
+        // An hrtime reading, meaningless after a reboot
+        $this->holdOffUntilNs = 0;
     }
 
     /**
@@ -1361,12 +1363,12 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
         if (!$this->renegotiatePending || $this->peerConnection->getSignalingState() !== SignalingState::stable || $this->closed) {
             return;
         }
-        $wait = $this->holdOffUntil - microtime(true);
+        $wait = $this->holdOffUntilNs - hrtime(true);
         if ($wait > 0) {
             // Held back to let the peer's offer arrive first (see onV2Negotiation()); retry then.
             if (!$this->flushScheduled) {
                 $this->flushScheduled = true;
-                EventLoop::delay($wait, function (): void {
+                EventLoop::delay($wait / 1e9, function (): void {
                     $this->flushScheduled = false;
                     $this->flushRenegotiation();
                 });
@@ -1455,7 +1457,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             // and our answer to the discarded offer would be taken for a fresh offer, rebinding the
             // peer's incoming channels to nonsense (our own media goes silent for it). So leave the
             // peer's offer room to arrive before re-offering anything.
-            $this->holdOffUntil = microtime(true) + self::PEER_OFFER_GRACE;
+            $this->holdOffUntilNs = hrtime(true) + self::PEER_OFFER_GRACE_NS;
             $this->dropStalePeerOffers();
             $this->flushRenegotiation();
             return;
@@ -1524,7 +1526,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
             $this->renegotiatePending = true;
         }
         // The peer's offer is in: nothing to wait for before re-offering.
-        $this->holdOffUntil = 0.0;
+        $this->holdOffUntilNs = 0;
         $this->flushRenegotiation();
     }
 

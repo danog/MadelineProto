@@ -19,6 +19,7 @@ namespace danog\MadelineProto\Tgcalls;
 use Amp\Pipeline\DisposedException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MediaClock;
 use Revolt\EventLoop;
 use Webrtc\Codecs\EncodedPacket;
 use Webrtc\RTP\Enum\MediaKind;
@@ -45,17 +46,17 @@ final class VideoPlaybackTrack extends MediaStreamTrack
      * How often to re-check the source while no file's cadence is yet known — i.e. before the
      * first two frames of a file have been seen, or while idle between files. This is a poll for
      * *work*, never a pace for *media*: once a file is flowing, every wait is derived from that
-     * file's own frame timestamps (see {@see self::$frameInterval}), so playback speed never
+     * file's own frame timestamps (see {@see self::$frameTicks}), so playback speed never
      * depends on a hardcoded duration.
      */
-    private const IDLE_POLL = 0.02;
-    /** The frame interval assumed when a file ends before its cadence was measured. */
-    private const DEFAULT_FRAME_INTERVAL = 1 / 30;
-    /** How late a frame may be released, in seconds, before the track resynchronizes instead of catching up. */
-    private const MAX_LATENESS = 1.0;
+    private const IDLE_POLL_NS = 20_000_000;
+    /** The frame interval assumed when a file ends before its cadence was measured, in ticks of the RTP clock (30 fps). */
+    private const DEFAULT_FRAME_TICKS = DjLoop::VIDEO_CLOCK_RATE / 30;
+    /** How late a frame may be released, in nanoseconds, before the track resynchronizes instead of catching up. */
+    private const MAX_LATENESS_NS = 1_000_000_000;
 
-    /** Wall clock time corresponding to the first frame we released. */
-    private ?float $startedAt = null;
+    /** When the first frame was released (hrtime, in nanoseconds). */
+    private ?int $startedAtNs = null;
     /** Source timestamp of the first frame, used to rebase onto our own RTP clock. */
     private ?int $baseTimestamp = null;
     /** RTP timestamp offset, so restarting a file does not rewind the clock. */
@@ -66,12 +67,12 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     private int $lastTimestamp = 0;
     /** Source timestamp of the previously released frame, used to measure the file's cadence. */
     private ?int $prevSourceTimestamp = null;
-    /** The current file's real inter-frame interval in seconds, measured from its own timestamps. */
-    private ?float $frameInterval = null;
+    /** The current file's real inter-frame interval in ticks of the RTP clock, measured from its own timestamps. */
+    private ?int $frameTicks = null;
     /** The DJ loop's ID of the file whose frames are being played, see {@see DjLoop::$videoQueue}. */
     private ?int $file = null;
-    /** Wall clock time at which the producer should next attempt to emit a frame. */
-    private ?float $nextDue = null;
+    /** When the producer should next attempt to emit a frame (hrtime, in nanoseconds). */
+    private ?int $nextDueNs = null;
     /** Whether the frame to produce next isn't queued yet: the producer waits for it to be. */
     private bool $starved = false;
 
@@ -115,6 +116,9 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         // call graph has deserialized): starting it here could run it mid-deserialization if a nested
         // resume suspends the fiber. The call's deserializer calls {@see self::resume()} when ready.
         parent::__unserialize($data);
+        // hrtime readings, meaningless after a reboot: the next frame starts the pacing again
+        $this->startedAtNs = null;
+        $this->nextDueNs = null;
         $this->producing = false;
     }
 
@@ -163,13 +167,14 @@ final class VideoPlaybackTrack extends MediaStreamTrack
                 }
                 // Sleep reactively until the next frame is due (its media cadence), rather than
                 // polling for work at a fixed interval.
-                $wait = ($this->nextDue ?? microtime(true)) - microtime(true);
+                $now = hrtime(true);
+                $wait = ($this->nextDueNs ?? $now) - $now;
                 if ($wait > 0) {
                     if ($this->starved) {
                         // Played as soon as it's queued, if it's late.
-                        $this->source->awaitFrame($wait);
+                        $this->source->awaitFrame($wait / 1e9);
                     } else {
-                        delay($wait);
+                        delay($wait / 1e9);
                     }
                 }
             }
@@ -191,7 +196,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         }
         $this->transportReady = $transportReady;
         if (!$transportReady) {
-            $this->nextDue = microtime(true) + self::IDLE_POLL;
+            $this->nextDueNs = hrtime(true) + self::IDLE_POLL_NS;
         }
     }
 
@@ -218,11 +223,11 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         $this->call->log("Finished playing video in {$this->call}");
         // Keep the clock advancing so a new file starts one frame after, not on top of, this one:
         // receivers assemble frames by RTP timestamp.
-        $this->timestampOffset = $this->lastTimestamp + (int) (($this->frameInterval ?? self::DEFAULT_FRAME_INTERVAL) * DjLoop::VIDEO_CLOCK_RATE);
-        $this->startedAt = null;
+        $this->timestampOffset = $this->lastTimestamp + ($this->frameTicks ?? self::DEFAULT_FRAME_TICKS);
+        $this->startedAtNs = null;
         $this->baseTimestamp = null;
         $this->prevSourceTimestamp = null;
-        $this->frameInterval = null;
+        $this->frameTicks = null;
     }
 
     /**
@@ -232,7 +237,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     {
         $this->starved = false;
         if (!$this->transportReady) {
-            $this->nextDue = microtime(true) + self::IDLE_POLL;
+            $this->nextDueNs = hrtime(true) + self::IDLE_POLL_NS;
             return null;
         }
         $frame = $this->pending ?? $this->source->pullVideo();
@@ -246,7 +251,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             // we are still buffering the first frames or sitting idle between files, there is no
             // media rate to honor yet, so fall back to a plain poll.
             $this->starved = true;
-            $this->nextDue = microtime(true) + ($this->frameInterval ?? self::IDLE_POLL);
+            $this->nextDueNs = hrtime(true) + ($this->frameTicks === null ? self::IDLE_POLL_NS : MediaClock::ticksToNs($this->frameTicks, DjLoop::VIDEO_CLOCK_RATE));
             return null;
         }
 
@@ -254,27 +259,26 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             // The next file was queued right behind this one, without the queue ever running dry.
             $this->finishFile();
         }
-        $now = microtime(true);
-        if ($this->startedAt === null || $this->baseTimestamp === null) {
+        $now = hrtime(true);
+        if ($this->startedAtNs === null || $this->baseTimestamp === null) {
             $this->file = $frame['file'];
-            $this->startedAt = $now;
+            $this->startedAtNs = $now;
             $this->baseTimestamp = $frame['timestamp'];
             $this->playing = true;
             $this->call->log("Started playing video in {$this->call}");
         }
 
         // Release the frame only once its presentation time has arrived.
-        $elapsed = (float) ($frame['timestamp'] - $this->baseTimestamp) / (float) DjLoop::VIDEO_CLOCK_RATE;
-        $due = $this->startedAt + $elapsed;
+        $due = $this->startedAtNs + MediaClock::ticksToNs($frame['timestamp'] - $this->baseTimestamp, DjLoop::VIDEO_CLOCK_RATE);
         if ($now < $due) {
             $this->pending = $frame;
-            $this->nextDue = $due;
+            $this->nextDueNs = $due;
             return null;
         }
-        if ($now - $due > self::MAX_LATENESS) {
+        if ($now - $due > self::MAX_LATENESS_NS) {
             // We fell way behind (nobody took the frames until the call connected, or the process was
             // suspended): resynchronize instead of bursting out all of the video we're late with.
-            $this->startedAt = $now - $elapsed;
+            $this->startedAtNs += $now - $due;
         }
 
         $timestamp = $this->timestampOffset + ($frame['timestamp'] - $this->baseTimestamp);
@@ -284,7 +288,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         if ($this->prevSourceTimestamp !== null) {
             $delta = $frame['timestamp'] - $this->prevSourceTimestamp;
             if ($delta > 0) {
-                $this->frameInterval = $delta / DjLoop::VIDEO_CLOCK_RATE;
+                $this->frameTicks = $delta;
             }
         }
         $this->prevSourceTimestamp = $frame['timestamp'];
@@ -293,7 +297,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
             $frame['file'],
         );
         // Pull and hold the next frame right away so its own presentation time paces us.
-        $this->nextDue = $now;
+        $this->nextDueNs = $now;
 
         if ($this->suppressed) {
             return null;

@@ -408,7 +408,7 @@ trait Files
             return ['file_id' => $file_id, 'file_part' => $part_num, 'file_total_parts' => $part_total_num, 'bytes' => $bytes];
         };
         $resPromises = [];
-        $start = microtime(true);
+        $start = hrtime(true);
         /** @var ?FloodPremiumWaitError */
         $floodWaitError = null;
         try {
@@ -521,7 +521,7 @@ trait Files
         if ($totalSize === 0) {
             throw new AssertionError('You uploaded an empty file!');
         }
-        $time = microtime(true) - $start;
+        $time = (hrtime(true) - $start) / 1e9;
         $speed = (int) ($totalSize * 8 / $time) / 1000000;
         if (!$size) {
             $cb(100, $speed, $time);
@@ -1499,7 +1499,7 @@ trait Files
             }
         }
         $params[0]['previous_promise'] = true;
-        $start = microtime(true);
+        $start = hrtime(true);
         $progress = new TransferProgress($cb, $count);
         $size = $this->downloadPart($messageMedia, $cdn, $datacenter, $old_dc, $ige, $progress->partDone(...), $initParam = array_shift($params), $callable, $seekable, $cancellation);
         if ($initParam['part_end_at'] - $initParam['part_start_at'] !== $size) {
@@ -1541,7 +1541,7 @@ trait Files
                 await($promises, $cancellation);
             }
         }
-        $time = microtime(true) - $start;
+        $time = (hrtime(true) - $start) / 1e9;
         $speed = (int) ($size * 8 / $time) / 1000000;
         $this->logger->logger("Total download time: {$time}");
         $this->logger->logger("Total download speed: {$speed} mbps");

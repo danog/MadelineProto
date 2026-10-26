@@ -218,7 +218,7 @@ final class RtmpTest extends TestCase
         $call = self::call();
         $dj = new DjLoop($call, rtmp: true);
         self::assertTrue($dj->start());
-        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key'], idle: 0.25);
+        $publisher = new RtmpPublisher($call, $dj, static fn (bool $revoke): array => ['url' => $server->getUrl(), 'key' => 'key'], idle: 250_000_000);
         try {
             // Nothing is played: dropped after 0.5 seconds, and not reconnected.
             delay(3);
