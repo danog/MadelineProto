@@ -99,3 +99,6 @@ cargo test --release --locked --no-default-features --features const-widths
 PHP tests cover known vectors, continuation/IV, independent and ordered chains,
 validation failures, queue pressure, cancellation, shutdown, connection freshness
 and PHP fallbacks. Run the same suite with and without the extension enabled.
+
+The extension release is reported by `phpversion("madeline_crypto")`.
+`Crypto::version()` reports the PHP API version, which remains `0.2.0`.
