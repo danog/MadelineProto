@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
-/** Authenticated transport payload; connection state is checked by ReadLoop. @internal */
+/**
+ * Authenticated transport payload; connection state is checked by ReadLoop.
+ * @internal
+ * @psalm-immutable
+ */
 final class DecodedMessage
 {
     public function __construct(
