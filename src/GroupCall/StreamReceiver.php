@@ -63,6 +63,10 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
+    /** How long to keep fetching a chunk still being written before resynchronizing, in milliseconds. */
+    private const PARTIAL_RETRY_MS = 5000;
+    /** How many times in a row the chunk was still being written, see {@see self::PARTIAL_RETRY_MS}. */
+    private int $partialRetries = 0;
     /** How long to wait before fetching the stream channels again when they have no usable timestamp, in seconds. */
     private const CHANNELS_RETRY = 1.0;
     /** How many audio-only chunks of an RTMP stream are held, waiting for its video, before recording only its audio. */
@@ -245,6 +249,17 @@ final class StreamReceiver
                 $this->nextTimestamp = null;
                 delay(self::RETRY_MS / 1000);
                 continue;
+            } catch (StreamChunkNotReadyException) {
+                // The live edge (an RTMP stream is fetched as soon as the server accepts a chunk): retry it, like a
+                // chunk not available yet, rather than demuxing what was written so far. A chunk never completed
+                // (the stream stopped mid-chunk): resynchronize.
+                if (++$this->partialRetries * self::RETRY_MS >= self::PARTIAL_RETRY_MS) {
+                    $this->call->log("Chunk $timestamp of {$this->call} is still being written after ".self::PARTIAL_RETRY_MS." ms, resynchronizing", Logger::NOTICE);
+                    $this->partialRetries = 0;
+                    $this->nextTimestamp = null;
+                }
+                delay(self::RETRY_MS / 1000);
+                continue;
             } catch (Throwable $e) {
                 $this->call->log("Could not download a chunk of {$this->call}: $e", Logger::WARNING);
                 delay(1.0);
@@ -256,6 +271,7 @@ final class StreamReceiver
                 delay(self::RETRY_MS / 1000);
                 continue;
             }
+            $this->partialRetries = 0;
             $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes)', Logger::ULTRA_VERBOSE);
             $this->nextTimestamp = $timestamp + self::SEGMENT_MS;
             $this->lastTimestamp = $timestamp;

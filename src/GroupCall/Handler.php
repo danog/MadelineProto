@@ -1027,6 +1027,8 @@ trait Handler
      * Download one media chunk of a group call in stream mode (upload.getFile with an
      * inputGroupCallStream location) from its stream DC, or null on a CDN redirect.
      *
+     * @throws StreamChunkNotReadyException If the chunk is still being written (storage.filePartial).
+     *
      * @internal
      */
     public function downloadGroupCallStreamChunk(int $id, int $timeMs, int $scale = 0, ?int $videoChannel = null, ?int $videoQuality = null): ?string
@@ -1047,6 +1049,10 @@ trait Handler
         ], $dc);
         if ($result['_'] !== 'upload.file') {
             return null;
+        }
+        if (($result['type']['_'] ?? null) === 'storage.filePartial') {
+            // The chunk of the live edge, still being written: what it has so far, truncated.
+            throw new StreamChunkNotReadyException("Chunk $timeMs of group call $id is still being written");
         }
         return (string) $result['bytes'];
     }
