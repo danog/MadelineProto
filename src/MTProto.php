@@ -952,6 +952,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             'callsByPeer',
             'groupCalls',
             'seenGroupCalls',
+            'rtmpStreams',
             'conferenceCalls',
             'snitch',
 
@@ -1445,6 +1446,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 foreach ([...$this->calls, ...$this->groupCalls, ...$this->conferenceCalls] as $call) {
                     EventLoop::queue($call->resumeAfterRestart(...));
                 }
+            }
+            // Publishing to an RTMP server doesn't need to be logged in.
+            foreach ($this->rtmpStreams as $stream) {
+                EventLoop::queue($stream->resumeAfterRestart(...));
             }
 
             foreach ($this->calls as $id => $call) {

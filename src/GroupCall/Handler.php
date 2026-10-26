@@ -29,6 +29,7 @@ use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\EventHandler\Calls\GroupCallStars;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\EventHandler\Calls\LiveStory;
+use danog\MadelineProto\EventHandler\Calls\RtmpStream;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
@@ -63,6 +64,12 @@ trait Handler
      * @var array<int, GroupCallController>
      */
     private array $groupCalls = [];
+    /**
+     * What we publish to RTMP servers, see {@see self::startRtmpStream()}.
+     *
+     * @var array<int, RtmpStreamController>
+     */
+    private array $rtmpStreams = [];
     /**
      * The group calls we got updates about but do not track: ID => [access hash, peer ID, live story].
      *
@@ -1221,6 +1228,165 @@ trait Handler
             }
         }
         throw new AssertionError('The server did not return the started live story!');
+    }
+
+    /**
+     * Publish what is played to an RTMP server, as an RTMP encoder would (OBS, ffmpeg...): to the RTMP
+     * livestream or live story of any group, channel or user that gave us its URL and stream key (shown by
+     * the Telegram apps when starting one "with another app"), to YouTube, Twitch, or any other RTMP(S) server.
+     *
+     * Only H.264 video and AAC audio can be published, in MP4 or Matroska (WebM) files. The stream keeps
+     * publishing (reconnecting if needed, and across restarts) until {@see RtmpStream::close()}d; publishing
+     * again to the same URL and key returns the same stream.
+     *
+     * @param string  $url The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
+     * @param ?string $key The stream key.
+     */
+    public function startRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null): RtmpStream
+    {
+        if ($key === null) {
+            [$url, $key] = self::splitRtmpUrl($url);
+        }
+        $parts = parse_url($url);
+        if (!isset($parts['scheme'], $parts['host']) || !\in_array($parts['scheme'], ['rtmp', 'rtmps'], true)) {
+            throw new AssertionError("Not an RTMP URL: $url");
+        }
+        if ($key === '') {
+            throw new AssertionError("No stream key given for $url");
+        }
+        foreach ($this->rtmpStreams as $stream) {
+            if ($stream->publishesTo($url, $key)) {
+                return $stream->public;
+            }
+        }
+        do {
+            $id = random_int(1, PHP_INT_MAX);
+        } while (isset($this->rtmpStreams[$id]));
+        $stream = new RtmpStreamController($this, $id, $url, $key);
+        $this->rtmpStreams[$id] = $stream;
+        return $stream->public;
+    }
+
+    /**
+     * Split an RTMP URL followed by its stream key (the last segment of its path) into both.
+     *
+     * @return array{string, string}
+     */
+    private static function splitRtmpUrl(#[\SensitiveParameter] string $url): array
+    {
+        // The key follows the last slash, after the application: rtmps://host/app/key
+        $scheme = strpos($url, '://');
+        $hostEnd = $scheme === false ? false : strpos($url, '/', $scheme + 3);
+        $slash = strrpos($url, '/');
+        if ($hostEnd === false || $slash === $hostEnd || $slash === \strlen($url) - 1) {
+            throw new AssertionError('Not an RTMP URL followed by a stream key, e.g. rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf');
+        }
+        return [substr($url, 0, $slash + 1), substr($url, $slash + 1)];
+    }
+
+    /**
+     * What we publish to RTMP servers, see {@see self::startRtmpStream()}.
+     *
+     * @return array<int, RtmpStream>
+     */
+    public function getRtmpStreams(): array
+    {
+        return array_map(static fn (RtmpStreamController $c): RtmpStream => $c->public, $this->rtmpStreams);
+    }
+
+    private function getRtmpStreamController(int $id): RtmpStreamController
+    {
+        return $this->rtmpStreams[$id] ?? throw new AssertionError("RTMP stream $id was closed, or never started");
+    }
+
+    /**
+     * Play a file to an RTMP stream, see {@see RtmpStream::play()}.
+     */
+    public function rtmpStreamPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->play($file, $dest);
+    }
+
+    /**
+     * Play a file to an RTMP stream, blocking until it has finished playing if a stream was passed, see {@see RtmpStream::playBlocking()}.
+     */
+    public function rtmpStreamPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->playBlocking($file, $dest);
+    }
+
+    /**
+     * Set the files to play on loop to an RTMP stream while its playlist is empty, see {@see RtmpStream::playOnHold()}.
+     */
+    public function rtmpStreamPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
+    {
+        $this->getRtmpStreamController($id)->playOnHold($dest, ...$files);
+    }
+
+    /**
+     * Skip to the next file played to an RTMP stream, see {@see RtmpStream::skip()}.
+     */
+    public function rtmpStreamSkipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->skip($dest);
+    }
+
+    /**
+     * Stop playing all files to an RTMP stream, clearing its playlists, see {@see RtmpStream::stop()}.
+     */
+    public function rtmpStreamStopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->stop($dest);
+    }
+
+    /**
+     * Pause the file played to an RTMP stream, see {@see RtmpStream::pause()}.
+     */
+    public function rtmpStreamPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->pause($dest);
+    }
+
+    /**
+     * Resume the file played to an RTMP stream, see {@see RtmpStream::resume()}.
+     */
+    public function rtmpStreamResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
+    {
+        $this->getRtmpStreamController($id)->resume($dest);
+    }
+
+    /**
+     * Whether the file played to an RTMP stream is paused, see {@see RtmpStream::isPaused()}.
+     */
+    public function isRtmpStreamPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
+    {
+        return $this->getRtmpStreamController($id)->isPaused($dest);
+    }
+
+    /**
+     * The file played to an RTMP stream, see {@see RtmpStream::getCurrent()}.
+     */
+    public function rtmpStreamGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
+    {
+        return $this->getRtmpStreamController($id)->getCurrent($dest);
+    }
+
+    /**
+     * Whether we are connected to the server of an RTMP stream right now, see {@see RtmpStream::isConnected()}.
+     */
+    public function isRtmpStreamConnected(int $id): bool
+    {
+        return $this->getRtmpStreamController($id)->isConnected();
+    }
+
+    /**
+     * Stop publishing to an RTMP stream for good, see {@see RtmpStream::close()}.
+     */
+    public function closeRtmpStream(int $id): void
+    {
+        $stream = $this->rtmpStreams[$id] ?? null;
+        unset($this->rtmpStreams[$id]);
+        $stream?->close();
     }
 
     /**
