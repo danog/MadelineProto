@@ -7,6 +7,8 @@
 # - latest, <major>.<minor> and <major> (e.g. 8.11 and 8): once the release of a tag passed and was published, if it's
 #   the newest release (of its minor/major version).
 # Each is a manifest of the images of each architecture, <tag>-debian-<arch>, built by the jobs of each architecture.
+# Along with it, the image the tests run in, <tag>-test (from tests/dockerfiles/Dockerfile.test: the same plus what only
+# the tests use, e.g. mtg), never published as latest or a version.
 #
 # Usage:
 #   tests/docker_image.sh build <arch>  Build and push the image of an architecture (amd64, arm64).
@@ -44,11 +46,11 @@ if [ -n "$DOCKER_USERNAME" ] && [ -z "$DRY_RUN" ]; then
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 fi
 
-# Pushes $1 as the manifest of the images of the architectures of $base.
+# Pushes $1 as the manifest of the images of the architectures of $base (of the test images, with $2 = -test).
 manifest() {
     local images=()
     for arch in "${arches[@]}"; do
-        images+=("$image:$base-debian-$arch")
+        images+=("$image:$base$2-debian-$arch")
     done
     # With docker manifest, which reads the images as the account logged in: docker buildx imagetools create read
     # some of them anonymously, failing with the rate limit of anonymous pulls (429).
@@ -83,13 +85,20 @@ case "$1" in
         run docker buildx build --platform "linux/$arch" . -f tests/dockerfiles/Dockerfile \
             -t "$image:$base-debian-$arch" "${args[@]}" --cache-to type=inline \
             --provenance=false --sbom=false --push
+        # The test image, from the one just pushed.
+        run docker buildx build --platform "linux/$arch" tests/dockerfiles -f tests/dockerfiles/Dockerfile.test \
+            --build-arg "BASE=$image:$base-debian-$arch" -t "$image:$base-test-debian-$arch" \
+            --cache-from "$image:$base-test-debian-$arch" --cache-to type=inline \
+            --provenance=false --sbom=false --push
         ;;
     merge)
         if [ -n "$tag" ]; then
             manifest "$tag"
+            manifest "$tag-test" -test
         else
             manifest next
             manifest debian
+            manifest next-test -test
         fi
         ;;
     release)
