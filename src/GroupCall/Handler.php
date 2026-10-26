@@ -1027,11 +1027,14 @@ trait Handler
      * Download one media chunk of a group call in stream mode (upload.getFile with an
      * inputGroupCallStream location) from its stream DC, or null on a CDN redirect.
      *
-     * @throws StreamChunkNotReadyException If the chunk is still being written (storage.filePartial).
+     * A partial chunk (storage.filePartial) is cut short: still being written (at the live edge), or for good (a gap in
+     * what the publisher sent, which official clients play as it is).
+     *
+     * @return ?array{bytes: string, partial: bool}
      *
      * @internal
      */
-    public function downloadGroupCallStreamChunk(int $id, int $timeMs, int $scale = 0, ?int $videoChannel = null, ?int $videoQuality = null): ?string
+    public function downloadGroupCallStreamChunk(int $id, int $timeMs, int $scale = 0, ?int $videoChannel = null, ?int $videoQuality = null): ?array
     {
         $controller = $this->getGroupCallController($id);
         $location = ['_' => 'inputGroupCallStream', 'call' => $controller->getInputCall(), 'time_ms' => $timeMs, 'scale' => $scale];
@@ -1050,11 +1053,7 @@ trait Handler
         if ($result['_'] !== 'upload.file') {
             return null;
         }
-        if (($result['type']['_'] ?? null) === 'storage.filePartial') {
-            // The chunk of the live edge, still being written: what it has so far, truncated.
-            throw new StreamChunkNotReadyException("Chunk $timeMs of group call $id is still being written");
-        }
-        return (string) $result['bytes'];
+        return ['bytes' => (string) $result['bytes'], 'partial' => ($result['type']['_'] ?? null) === 'storage.filePartial'];
     }
 
     /**
