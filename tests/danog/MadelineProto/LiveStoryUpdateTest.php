@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\APIWrapper;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\SessionPaths;
@@ -27,8 +28,8 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
- * The story of a live story has no file: its media is the group call (messageMediaVideoStream). Wrapping it failed
- * with a TypeError (Story::$media wasn't nullable), reported for every live story started.
+ * The story of a live story has no file: its media is the group call (messageMediaVideoStream), wrapped as the
+ * LiveStory. Wrapping it failed with a TypeError (Story::$media could only hold a file), for every live story started.
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -64,8 +65,15 @@ final class LiveStoryUpdateTest extends TestCase
                 'albums' => [],
             ],
         ]);
-        $this->assertNull($story->media);
-        $this->assertSame(-242034023406921188, $story->liveStoryCallId);
         $this->assertSame(29, $story->id);
+        // The live story itself, built without any request: its call is fetched once it's used.
+        $this->assertInstanceOf(LiveStory::class, $story->media);
+        $this->assertSame(-242034023406921188, $story->media->id);
+        $this->assertSame(-146673423005999272, $story->media->accessHash);
+        $this->assertSame(783732906, $story->media->peerId);
+        $this->assertSame(
+            [-242034023406921188 => [-146673423005999272, 783732906, true]],
+            (new \ReflectionProperty($API, 'seenGroupCalls'))->getValue($API),
+        );
     }
 }

@@ -1095,6 +1095,44 @@ trait Handler
     }
 
     /**
+     * The live story of a story (its messageMediaVideoStream media): the tracked one, or one built from the story alone,
+     * without any request (a story update must not fetch its call), whose call is fetched and tracked once used.
+     *
+     * @internal
+     */
+    public function wrapLiveStoryMedia(array $media, ?int $peerId): LiveStory
+    {
+        $input = $media['call'];
+        if ($input['_'] !== 'inputGroupCall') {
+            $controller = $this->getGroupCallByInput($input, $peerId, liveStory: true);
+            \assert($controller !== null && $controller->public instanceof LiveStory, 'The live story has ended');
+            return $controller->public;
+        }
+        $tracked = ($this->groupCalls[$input['id']] ?? null)?->public;
+        if ($tracked instanceof LiveStory) {
+            return $tracked;
+        }
+        $this->rememberGroupCall($input['id'], $input['access_hash'], $peerId, true);
+        // What a story says about its call: the rest are the defaults until it's fetched.
+        return new LiveStory($this, [
+            '_' => 'groupCall',
+            'id' => $input['id'],
+            'access_hash' => $input['access_hash'],
+            'participants_count' => 0,
+            'join_muted' => false,
+            'can_change_join_muted' => false,
+            'join_date_asc' => false,
+            'can_start_video' => false,
+            'rtmp_stream' => $media['rtmp_stream'] ?? false,
+            'listeners_hidden' => false,
+            'creator' => false,
+            'messages_enabled' => false,
+            'can_change_messages_enabled' => false,
+            'unmuted_video_limit' => 0,
+        ], $peerId);
+    }
+
+    /**
      * Remember the access hash of a group call we saw but do not track, see {@see self::getGroupCallController()}.
      */
     private function rememberGroupCall(int $id, int $accessHash, ?int $peerId, bool $liveStory): void

@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Story;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
@@ -68,11 +69,11 @@ final class Story extends AbstractStory
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for story caption */
     public readonly array $entities;
 
-    /** Attached media: null for a live story, see {@see self::$liveStoryCallId}. */
-    public readonly Gif|Photo|Video|null $media;
-
-    /** For a live story, the ID of its group call (a {@see \danog\MadelineProto\EventHandler\Calls\LiveStory}), to join it. */
-    public readonly ?int $liveStoryCallId;
+    /**
+     * Attached media: for a live story, the live story itself (its details are those of the story until it's used, e.g.
+     * joined, which fetches the call).
+     */
+    public readonly Gif|Photo|Video|LiveStory $media;
 
     /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
@@ -128,14 +129,10 @@ final class Story extends AbstractStory
         $this->date = $rawStory['date'];
         $this->expireDate = $rawStory['expire_date'];
 
-        if ($rawStory['media']['_'] === 'messageMediaVideoStream') {
+        $this->media = $rawStory['media']['_'] === 'messageMediaVideoStream'
             // A live story: a group call, no file.
-            $this->media = null;
-            $this->liveStoryCallId = $rawStory['media']['call']['id'] ?? null;
-        } else {
-            $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
-            $this->liveStoryCallId = null;
-        }
+            ? $API->wrapLiveStoryMedia($rawStory['media'], $this->senderId)
+            : $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
         $this->privacy = array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
 
