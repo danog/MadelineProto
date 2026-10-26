@@ -1260,13 +1260,19 @@ trait Handler
         if ($key === '') {
             throw new AssertionError("No stream key given for $url");
         }
-        $existing = $this->getRtmpStream($url, $key);
-        if ($existing !== null) {
-            return $existing;
-        }
         if ($publicOnly) {
             // At once, to tell the caller; checked again at each connection, see RtmpClient::publish().
             RtmpClient::resolvePublic($parts['host']);
+        }
+        $this->forgetClosedRtmpStreams();
+        foreach ($this->rtmpStreams as $stream) {
+            if ($stream->publishesTo($url, $key)) {
+                if ($publicOnly && !$stream->isPublicOnly()) {
+                    // It may connect anywhere: not to be handed to whoever may only stream to the internet.
+                    throw new RtmpAddressException("Already publishing to $url, without connecting only to servers on the internet");
+                }
+                return $stream->public;
+            }
         }
         do {
             $id = random_int(1, PHP_INT_MAX);

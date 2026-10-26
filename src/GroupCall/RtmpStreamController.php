@@ -191,6 +191,14 @@ final class RtmpStreamController implements CallControllerInterface
         return $dest === MediaDestination::Camera ? $this->diskJockey->getCurrent() : null;
     }
 
+    /**
+     * Whether it connects only to a server on the internet.
+     */
+    public function isPublicOnly(): bool
+    {
+        return $this->publicOnly;
+    }
+
     public function isClosed(): bool
     {
         return $this->closed;

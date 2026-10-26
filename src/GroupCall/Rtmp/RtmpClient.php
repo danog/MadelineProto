@@ -186,7 +186,7 @@ final class RtmpClient
             throw new RtmpAddressException("Could not resolve $host");
         }
         foreach ($addresses as $address) {
-            if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_GLOBAL_RANGE) === false) {
+            if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_GLOBAL_RANGE) === false || self::embedsIpv4($address)) {
                 throw new RtmpAddressException("$host is not on the internet: it resolves to $address");
             }
         }
@@ -196,6 +196,43 @@ final class RtmpClient
             }
         }
         return $addresses[0];
+    }
+
+    /**
+     * IPv6 prefixes that embed an IPv4 address, which may not be global: IPv4-mapped (::ffff:0:0/96), IPv4-compatible
+     * (::/96), NAT64 (64:ff9b::/96, 64:ff9b:1::/48), 6to4 (2002::/16), Teredo (2001::/32). As prefix => bits.
+     */
+    private const IPV4_EMBEDDING_PREFIXES = [
+        '::ffff:0:0' => 96,
+        '::' => 96,
+        '64:ff9b::' => 96,
+        '64:ff9b:1::' => 48,
+        '2002::' => 16,
+        '2001::' => 32,
+    ];
+
+    /**
+     * Whether an IPv6 address embeds an IPv4 one, see {@see self::IPV4_EMBEDDING_PREFIXES}: refused rather than
+     * checked, as where it leads depends on the network.
+     */
+    private static function embedsIpv4(string $address): bool
+    {
+        if (!str_contains($address, ':')) {
+            return false;
+        }
+        $binary = inet_pton($address);
+        if ($binary === false) {
+            return true;
+        }
+        foreach (self::IPV4_EMBEDDING_PREFIXES as $prefix => $bits) {
+            $prefix = inet_pton($prefix);
+            \assert($prefix !== false);
+            $bytes = intdiv($bits, 8);
+            if (substr($binary, 0, $bytes) === substr($prefix, 0, $bytes)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

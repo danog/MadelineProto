@@ -230,13 +230,25 @@ final class RtmpStreamTest extends TestCase
             }
             $this->assertSame([], $API->getRtmpStreams());
 
+            // Nor gets a stream started without the check.
+            $API->startRtmpStream($server->getUrl(), 'key');
+            try {
+                $API->startRtmpStream($server->getUrl(), 'key', publicOnly: true);
+                $this->fail('Got a stream to 127.0.0.1');
+            } catch (RtmpAddressException) {
+            }
+            foreach ($API->getRtmpStreams() as $s) {
+                $API->closeRtmpStream($s->id);
+            }
+
             // Also at each connection (the name may resolve elsewhere by then): the stream closes, without connecting.
+            $connections = $server->connections;
             $controller = new RtmpStreamController($API, 1, $server->getUrl(), 'key', publicOnly: true);
             for ($i = 0; $i < 40 && !$controller->isClosed(); $i++) {
                 delay(0.05);
             }
             $this->assertTrue($controller->isClosed(), implode("\n", $this->logs));
-            $this->assertSame(0, $server->connections);
+            $this->assertSame($connections, $server->connections);
         } finally {
             $server->close();
         }
@@ -252,6 +264,10 @@ final class RtmpStreamTest extends TestCase
         yield 'shared (CGNAT)' => ['100.64.0.1', null];
         yield 'IPv6 loopback' => ['[::1]', null];
         yield 'unspecified' => ['0.0.0.0', null];
+        yield 'IPv4-mapped loopback' => ['[::ffff:127.0.0.1]', null];
+        yield 'NAT64 of a private address' => ['[64:ff9b::c0a8:101]', null];
+        yield '6to4' => ['[2002:c0a8:101::1]', null];
+        yield 'Teredo' => ['[2001:0:4136:e378:8000:63bf:3fff:fdd2]', null];
         yield 'public' => ['1.1.1.1', '1.1.1.1'];
         yield 'public IPv6' => ['[2606:4700:4700::1111]', '2606:4700:4700::1111'];
     }
