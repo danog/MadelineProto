@@ -167,7 +167,7 @@ final class PasswordCalculator
      *
      * @psalm-mutation-free
      */
-    public function hashPassword(string $password, string $client_salt, string $server_salt): string
+    public function hashPassword(#[\SensitiveParameter] string $password, string $client_salt, string $server_salt): string
     {
         $buf = $this->hashSha256($password, $client_salt);
         $buf = $this->hashSha256($buf, $server_salt);
@@ -180,7 +180,7 @@ final class PasswordCalculator
      * @param  string $password The password
      * @return array  InputCheckPassword object
      */
-    public function getCheckPassword(string $password): array
+    public function getCheckPassword(#[\SensitiveParameter] string $password): array
     {
         if ($password === '' || !$this->current_algo) {
             return ['_' => 'inputCheckPasswordEmpty'];

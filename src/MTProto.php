@@ -2426,7 +2426,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $this->methodCallAsyncRead('account.getPassword', ['specialMethodType' => SpecialMethodType::USER_RELATED]);
     }
     /** @internal */
-    public function getPasswordSRP(string $password): array
+    public function getPasswordSRP(#[\SensitiveParameter] string $password): array
     {
         return (new PasswordCalculator($this->getPassword()))->getCheckPassword($password);
     }

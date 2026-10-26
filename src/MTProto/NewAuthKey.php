@@ -106,7 +106,7 @@ final class NewAuthKey implements SimpleSubscriber
         }
     }
 
-    public function setAuthKey(?string $authKey): void
+    public function setAuthKey(#[\SensitiveParameter] ?string $authKey): void
     {
         $this->authKey = $authKey;
         if ($authKey === null) {
@@ -116,7 +116,7 @@ final class NewAuthKey implements SimpleSubscriber
         }
         $this->setTempAuthKey(null, null);
     }
-    public function setTempAuthKey(?string $authKey, ?string $serverSalt): void
+    public function setTempAuthKey(#[\SensitiveParameter] ?string $authKey, #[\SensitiveParameter] ?string $serverSalt): void
     {
         $this->tempAuthKey = $authKey;
         $this->serverSalt = $serverSalt;

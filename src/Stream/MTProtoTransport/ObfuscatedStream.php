@@ -101,7 +101,7 @@ final class ObfuscatedStream extends CtrStream implements BufferedProxyStreamInt
      *
      * @psalm-pure
      */
-    public static function decodeSecret(string $secret): array
+    public static function decodeSecret(#[\SensitiveParameter] string $secret): array
     {
         if (\strlen($secret) !== 16) {
             $decoded = preg_match('/^(?:[a-f0-9]{2})+$/i', $secret)

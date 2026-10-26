@@ -42,7 +42,7 @@ abstract class IGE
     /**
      * Instantiate appropriate handler.
      */
-    public static function getInstance(string $key, string $iv): IGE
+    public static function getInstance(#[\SensitiveParameter] string $key, string $iv): IGE
     {
         if (Magic::$hasOpenssl) {
             return new IGEOpenssl($key, $iv);
@@ -63,7 +63,7 @@ abstract class IGE
     }
 
     /** @psalm-impure */
-    abstract protected function __construct(string $key, string $iv);
+    abstract protected function __construct(#[\SensitiveParameter] string $key, string $iv);
     /** @psalm-impure */
     abstract public function encrypt(string $plaintext): string;
     /** @psalm-impure */

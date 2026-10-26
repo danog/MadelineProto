@@ -30,7 +30,7 @@ use phpseclib4\Crypt\AES;
 final class IGEPhpseclib extends IGE
 {
     private AES $instance;
-    protected function __construct(string $key, string $iv)
+    protected function __construct(#[\SensitiveParameter] string $key, string $iv)
     {
         $this->instance = new AES('ecb');
         $this->instance->setKey($key);

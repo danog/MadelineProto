@@ -143,7 +143,7 @@ final class MyTelegramOrgWrapper
      *
      * @param string $password The login code sent to the Telegram app
      */
-    public function completeLogin(string $password): bool
+    public function completeLogin(#[\SensitiveParameter] string $password): bool
     {
         if ($this->logged) {
             throw new Exception('Already logged in!');

@@ -85,7 +85,7 @@ final class Crypto
      *
      * @psalm-pure
      */
-    public static function kdfExpand(string $secret, string $info): string
+    public static function kdfExpand(#[\SensitiveParameter] string $secret, string $info): string
     {
         return hash_hmac('sha512', $info, $secret, true);
     }
@@ -100,7 +100,7 @@ final class Crypto
      * @return array{0: string, 1: string} `[output, largeMsgId]` where output is `msgId(16) || AES-CBC`
      *         and largeMsgId is the full 32-byte HMAC-SHA256 (used as the media-packet signing input).
      */
-    public static function encryptData(string $payload, string $secret, string $extra = ''): array
+    public static function encryptData(string $payload, #[\SensitiveParameter] string $secret, string $extra = ''): array
     {
         self::assertAvailable();
         // Padding is a prefix whose first byte is its own length, sized so prefix+payload is a
@@ -127,7 +127,7 @@ final class Crypto
     /**
      * Decrypt and authenticate the output of {@see self::encryptData()}, throwing on any mismatch.
      */
-    public static function decryptData(string $encrypted, string $secret, string $extra = ''): string
+    public static function decryptData(string $encrypted, #[\SensitiveParameter] string $secret, string $extra = ''): string
     {
         return self::decryptDataWithMsgId($encrypted, $secret, $extra)[0];
     }
@@ -138,7 +138,7 @@ final class Crypto
      *
      * @return array{0: string, 1: string} `[plaintext, largeMsgId]`
      */
-    public static function decryptDataWithMsgId(string $encrypted, string $secret, string $extra = ''): array
+    public static function decryptDataWithMsgId(string $encrypted, #[\SensitiveParameter] string $secret, string $extra = ''): array
     {
         self::assertAvailable();
         if (\strlen($encrypted) < 16 || (\strlen($encrypted) - 16) % 16 !== 0) {
@@ -175,7 +175,7 @@ final class Crypto
      * Wrap a 32-byte header keyed to a secret and bound to an already-encrypted message (via its
      * leading 16-byte msg id). Returns exactly 32 bytes.
      */
-    public static function encryptHeader(string $header, string $encryptedMessage, string $secret): string
+    public static function encryptHeader(string $header, string $encryptedMessage, #[\SensitiveParameter] string $secret): string
     {
         self::assertAvailable();
         if (\strlen($header) !== 32 || \strlen($encryptedMessage) < 16) {
@@ -189,7 +189,7 @@ final class Crypto
     /**
      * Reverse {@see self::encryptHeader()}, returning the 32-byte header.
      */
-    public static function decryptHeader(string $encryptedHeader, string $encryptedMessage, string $secret): string
+    public static function decryptHeader(string $encryptedHeader, string $encryptedMessage, #[\SensitiveParameter] string $secret): string
     {
         self::assertAvailable();
         $encKey = substr(self::kdfExpand($secret, 'tde2e_encrypt_header'), 0, 32);
@@ -206,14 +206,14 @@ final class Crypto
      *
      * @psalm-pure
      */
-    private static function aesFromHash(string $hashKey, string $msgId): array
+    private static function aesFromHash(#[\SensitiveParameter] string $hashKey, string $msgId): array
     {
         $kv = hash_hmac('sha512', $msgId, $hashKey, true);
         return [substr($kv, 0, 32), substr($kv, 32, 16)];
     }
 
     /** AES-256-CBC encrypt without padding (input is already block-aligned): openssl, else phpseclib. */
-    private static function aesEncrypt(string $key, string $iv, string $data): string
+    private static function aesEncrypt(#[\SensitiveParameter] string $key, string $iv, string $data): string
     {
         if (\extension_loaded('openssl')) {
             $out = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
@@ -228,7 +228,7 @@ final class Crypto
     }
 
     /** AES-256-CBC decrypt without padding: openssl, else phpseclib. Returns false on failure. */
-    private static function aesDecrypt(string $key, string $iv, string $data): string|false
+    private static function aesDecrypt(#[\SensitiveParameter] string $key, string $iv, string $data): string|false
     {
         if (\extension_loaded('openssl')) {
             return openssl_decrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
@@ -259,7 +259,7 @@ final class Crypto
     }
 
     /** The 32-byte Ed25519 public key of a 32-byte seed. */
-    public static function publicKey(string $seed): string
+    public static function publicKey(#[\SensitiveParameter] string $seed): string
     {
         if (self::backend() === 'sodium') {
             return sodium_crypto_sign_publickey(sodium_crypto_sign_seed_keypair($seed));
@@ -275,7 +275,7 @@ final class Crypto
     }
 
     /** Ed25519-sign a message with a 32-byte seed, returning the 64-byte signature. */
-    public static function sign(string $seed, string $message): string
+    public static function sign(#[\SensitiveParameter] string $seed, string $message): string
     {
         if (self::backend() === 'sodium') {
             return sodium_crypto_sign_detached($message, sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed)));
@@ -324,7 +324,7 @@ final class Crypto
      * The tde2e shared secret between our seed and a peer's Ed25519 public key: X25519 over the keys
      * converted to Montgomery form, then `HMAC-SHA512(key = "tde2e_shared_secret", msg = x25519)[0:32]`.
      */
-    public static function computeSharedSecret(string $seed, string $peerPublicKey): string
+    public static function computeSharedSecret(#[\SensitiveParameter] string $seed, string $peerPublicKey): string
     {
         if (self::backend() === 'sodium') {
             $secretKey = sodium_crypto_sign_secretkey(sodium_crypto_sign_seed_keypair($seed));
@@ -391,7 +391,7 @@ final class Crypto
      *
      * @psalm-pure
      */
-    private static function edSeedToX25519(string $seed): string
+    private static function edSeedToX25519(#[\SensitiveParameter] string $seed): string
     {
         $s = substr(hash('sha512', $seed, true), 0, 32);
         $s[0] = \chr(\ord($s[0]) & 248);
@@ -479,7 +479,7 @@ final class Crypto
      *
      * @psalm-pure
      */
-    public static function deriveGroupKey(string $rawSharedKey, string $blockHash): string
+    public static function deriveGroupKey(#[\SensitiveParameter] string $rawSharedKey, string $blockHash): string
     {
         return substr(hash_hmac('sha512', $blockHash, $rawSharedKey, true), 0, 32);
     }

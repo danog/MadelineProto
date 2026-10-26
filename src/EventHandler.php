@@ -172,7 +172,7 @@ abstract class EventHandler extends AbstractAPI
      * @param string            $token    Bot token
      * @param ?SettingsAbstract $settings Settings
      */
-    final public static function startAndLoopBot(string $session, string $token, ?SettingsAbstract $settings = null): void
+    final public static function startAndLoopBot(string $session, #[\SensitiveParameter] string $token, ?SettingsAbstract $settings = null): void
     {
         if (self::$includingPlugins) {
             return;

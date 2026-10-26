@@ -92,7 +92,7 @@ final class RtmpClient
     /** The last onStatus the server sent after accepting the stream, if any. */
     private ?string $lastStatus = null;
 
-    private function __construct(private readonly Socket $socket, private readonly string $key)
+    private function __construct(private readonly Socket $socket, #[\SensitiveParameter] private readonly string $key)
     {
         $this->closedDeferred = new DeferredFuture;
     }

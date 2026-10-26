@@ -36,7 +36,7 @@ final class Verification
      *
      * @return array{nonce: string, commit: array<string, mixed>, reveal: array<string, mixed>}
      */
-    public static function makeNonce(int $userId, int $chainHeight, string $chainHash, string $seed): array
+    public static function makeNonce(int $userId, int $chainHeight, string $chainHash, #[\SensitiveParameter] string $seed): array
     {
         $nonce = random_bytes(32);
         $commit = [
@@ -69,7 +69,7 @@ final class Verification
      *
      * @return array<string, mixed>
      */
-    private static function sign(array $broadcast, string $seed): array
+    private static function sign(array $broadcast, #[\SensitiveParameter] string $seed): array
     {
         $codec = new BlockCodec();
         $payload = $broadcast;

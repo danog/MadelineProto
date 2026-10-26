@@ -340,7 +340,7 @@ final class Connection extends SettingsAbstract
      *
      * @psalm-external-mutation-free
      */
-    public function addProxy(string $proxy, array $extra = []): self
+    public function addProxy(string $proxy, #[\SensitiveParameter] array $extra = []): self
     {
         if (!isset(class_implements($proxy)[StreamInterface::class])) {
             throw new Exception('An invalid proxy class was specified!');
@@ -368,7 +368,7 @@ final class Connection extends SettingsAbstract
      *
      * @psalm-external-mutation-free
      */
-    public function setProxies(array $proxies): self
+    public function setProxies(#[\SensitiveParameter] array $proxies): self
     {
         foreach ($proxies as $proxy => $_) {
             if (!isset(class_implements($proxy)[StreamInterface::class])) {

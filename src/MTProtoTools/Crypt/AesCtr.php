@@ -41,7 +41,7 @@ final class AesCtr
     /** How many bytes of the keystream of the current block were already used. */
     private int $offset = 0;
 
-    public function __construct(private readonly string $key, string $iv)
+    public function __construct(#[\SensitiveParameter] private readonly string $key, string $iv)
     {
         $this->cipher = 'aes-'.(\strlen($key) * 8).'-ctr';
         $this->counter = $iv;

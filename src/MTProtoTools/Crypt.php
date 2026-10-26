@@ -46,7 +46,7 @@ final class Crypt
      *
      * @psalm-pure
      */
-    public static function kdf(string $msg_key, string $auth_key, bool $to_server = true): array
+    public static function kdf(string $msg_key, #[\SensitiveParameter] string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
@@ -71,7 +71,7 @@ final class Crypt
      *
      * @psalm-pure
      */
-    public static function voipKdf(string $msg_key, string $auth_key, int $x): array
+    public static function voipKdf(string $msg_key, #[\SensitiveParameter] string $auth_key, int $x): array
     {
         $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
         $sha256_b = hash('sha256', substr($auth_key, 40 + $x, 36).$msg_key, true);
@@ -90,7 +90,7 @@ final class Crypt
      *
      * @psalm-pure
      */
-    public static function oldKdf(string $msg_key, string $auth_key, bool $to_server = true): array
+    public static function oldKdf(string $msg_key, #[\SensitiveParameter] string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
         $sha1_a = sha1($msg_key.substr($auth_key, $x, 32), true);
@@ -109,7 +109,7 @@ final class Crypt
      * @param string $iv      IV
      * @internal
      */
-    public static function ctrEncrypt(string $message, string $key, string $iv): string
+    public static function ctrEncrypt(string $message, #[\SensitiveParameter] string $key, string $iv): string
     {
         if (Magic::$hasOpenssl) {
             $result = openssl_encrypt($message, 'aes-'.(\strlen($key) * 8).'-ctr', $key, OPENSSL_RAW_DATA, $iv);
@@ -129,7 +129,7 @@ final class Crypt
      * @param string $iv        IV
      * @internal
      */
-    public static function igeEncrypt(string $plaintext, string $key, string $iv): string
+    public static function igeEncrypt(string $plaintext, #[\SensitiveParameter] string $key, string $iv): string
     {
         if (Magic::$hasOpenssl) {
             $iv_part_1 = substr($iv, 0, 16);
@@ -158,7 +158,7 @@ final class Crypt
      * @param string $iv         IV
      * @internal
      */
-    public static function igeDecrypt(string $ciphertext, string $key, string $iv): string
+    public static function igeDecrypt(string $ciphertext, #[\SensitiveParameter] string $key, string $iv): string
     {
         if (Magic::$hasOpenssl) {
             $iv_part_1 = substr($iv, 0, 16);

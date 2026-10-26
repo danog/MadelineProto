@@ -59,7 +59,7 @@ trait Login
      *
      * @param string $token Bot token
      */
-    public function botLogin(string $token): array|null
+    public function botLogin(#[\SensitiveParameter] string $token): array|null
     {
         if ($this->loginState->getState()->state === \danog\MadelineProto\API::LOGGED_IN) {
             return null;
@@ -217,7 +217,7 @@ trait Login
      *
      * @param string $code Login code
      */
-    public function completePhoneLogin(string $code): array
+    public function completePhoneLogin(#[\SensitiveParameter] string $code): array
     {
         if ($this->loginState->getState()->state !== \danog\MadelineProto\API::WAITING_CODE) {
             throw new Exception(Lang::$current_lang['login_code_uncalled']);
@@ -261,7 +261,7 @@ trait Login
      * @param array<int, string> $authorization Authorization info
      * @param int                $mainDcID      Main DC ID
      */
-    public function importAuthorization(array $authorization, int $mainDcID): array
+    public function importAuthorization(#[\SensitiveParameter] array $authorization, int $mainDcID): array
     {
         if ($this->loginState->getState()->state === \danog\MadelineProto\API::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
@@ -338,7 +338,7 @@ trait Login
      *
      * @param string $password Password
      */
-    public function complete2faLogin(string $password): array
+    public function complete2faLogin(#[\SensitiveParameter] string $password): array
     {
         if ($this->loginState->getState()->state !== \danog\MadelineProto\API::WAITING_PASSWORD) {
             throw new Exception(Lang::$current_lang['2fa_uncalled']);
