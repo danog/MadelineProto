@@ -24,6 +24,7 @@ use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\RtmpServers;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -109,12 +110,12 @@ final class RtmpClient
      *
      * @param string $url        The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`.
      * @param string $key        The stream key.
-     * @param bool   $publicOnly Whether to connect only to a server on the internet, see {@see self::resolvePublic()}.
+     * @param RtmpServers $servers Which servers it may connect to, see {@see self::checkServer()}.
      *
      * @throws Exception            If the server refuses the stream.
-     * @throws RtmpAddressException If the server isn't on the internet, with $publicOnly.
+     * @throws RtmpAddressException If the server isn't one of $servers.
      */
-    public static function publish(string $url, #[\SensitiveParameter] string $key, ?Cancellation $cancellation = null, bool $publicOnly = false): self
+    public static function publish(string $url, #[\SensitiveParameter] string $key, ?Cancellation $cancellation = null, RtmpServers $servers = RtmpServers::Any): self
     {
         $parts = parse_url($url);
         if (!isset($parts['scheme'], $parts['host']) || !\in_array($parts['scheme'], ['rtmp', 'rtmps'], true)) {
@@ -128,8 +129,8 @@ final class RtmpClient
         if ($tls) {
             $context = $context->withTlsContext(new ClientTlsContext($host));
         }
-        // With $publicOnly, connected to the address that was checked: the name isn't resolved again in between.
-        $address = $publicOnly ? self::resolvePublic($host, $cancellation) : $host;
+        // Connected to the address that was checked: the name isn't resolved again in between.
+        $address = self::checkServer($host, $servers, $cancellation);
         if (str_contains($address, ':')) {
             $address = "[$address]";
         }
@@ -167,6 +168,22 @@ final class RtmpClient
      * The address to connect to for a host, if it's on the internet: every address its name resolves to must be global
      * (no loopback, private, link-local, shared or reserved address), so that whoever chooses the URL can't make us
      * connect into our network. IPv4 if possible: not every network has IPv6.
+     *
+     * @throws RtmpAddressException If it isn't.
+     */
+    public static function checkServer(string $host, RtmpServers $servers, ?Cancellation $cancellation = null): string
+    {
+        if ($servers === RtmpServers::Any) {
+            return $host;
+        }
+        if ($servers === RtmpServers::Telegram && !str_ends_with(strtolower($host), '.rtmp.t.me')) {
+            throw new RtmpAddressException("$host is not a Telegram RTMP server (*.rtmp.t.me)");
+        }
+        return self::resolvePublic($host, $cancellation);
+    }
+
+    /**
+     * The address of a host on the internet, see {@see RtmpServers::Internet}.
      *
      * @throws RtmpAddressException If it isn't.
      */

@@ -28,6 +28,7 @@ use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RtmpServers;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings;
 use DG\BypassFinals;
@@ -224,7 +225,7 @@ final class RtmpStreamTest extends TestCase
         $server = new FakeRtmpServer;
         try {
             try {
-                $API->startRtmpStream($server->getUrl(), 'key', publicOnly: true);
+                $API->startRtmpStream($server->getUrl(), 'key', servers: RtmpServers::Internet);
                 $this->fail('Started a stream to 127.0.0.1');
             } catch (RtmpAddressException) {
             }
@@ -233,7 +234,7 @@ final class RtmpStreamTest extends TestCase
             // Nor gets a stream started without the check.
             $API->startRtmpStream($server->getUrl(), 'key');
             try {
-                $API->startRtmpStream($server->getUrl(), 'key', publicOnly: true);
+                $API->startRtmpStream($server->getUrl(), 'key', servers: RtmpServers::Internet);
                 $this->fail('Got a stream to 127.0.0.1');
             } catch (RtmpAddressException) {
             }
@@ -243,7 +244,7 @@ final class RtmpStreamTest extends TestCase
 
             // Also at each connection (the name may resolve elsewhere by then): the stream closes, without connecting.
             $connections = $server->connections;
-            $controller = new RtmpStreamController($API, 1, $server->getUrl(), 'key', publicOnly: true);
+            $controller = new RtmpStreamController($API, 1, $server->getUrl(), 'key', servers: RtmpServers::Internet);
             for ($i = 0; $i < 40 && !$controller->isClosed(); $i++) {
                 delay(0.05);
             }
@@ -252,6 +253,20 @@ final class RtmpStreamTest extends TestCase
         } finally {
             $server->close();
         }
+    }
+
+    public function testTelegramOnlyRefusesOtherServers(): void
+    {
+        $this->expectException(RtmpAddressException::class);
+        $this->expectExceptionMessage('not a Telegram RTMP server');
+        $this->api()->startRtmpStream('rtmp://a.rtmp.youtube.com/live2/key', servers: RtmpServers::Telegram);
+    }
+
+    public function testTelegramServersAreAllowed(): void
+    {
+        $this->assertNotSame('', RtmpClient::checkServer('dc4-1.rtmp.t.me', RtmpServers::Telegram));
+        $this->expectException(RtmpAddressException::class);
+        RtmpClient::checkServer('rtmp.t.me.evil.example', RtmpServers::Telegram);
     }
 
     /** @return iterable<string, array{string, ?string}> */

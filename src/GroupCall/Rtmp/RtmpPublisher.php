@@ -27,6 +27,7 @@ use danog\MadelineProto\Loop\VoIP\DjLoop;
 use danog\MadelineProto\MediaClock;
 use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
+use danog\MadelineProto\RtmpServers;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\CallRecorder;
 use danog\MadelineProto\Tgcalls\OpusPlaybackTrack;
@@ -118,7 +119,7 @@ final class RtmpPublisher
      * @param Closure(bool): array{url: string, key: string} $ingest   Get the URL and key to publish to (true to revoke the key first: never passed by the publisher, as revoking would cut off the other encoders using it).
      * @param ?Closure(Throwable): void                     $onGiveUp Called once publishing stopped for good, see {@see self::giveUp()}.
      * @param int                                           $idle     In nanoseconds, see {@see self::IDLE_NS}.
-     * @param bool                                          $publicOnly Whether to connect only to a server on the internet, see {@see RtmpClient::resolvePublic()}.
+     * @param RtmpServers                                   $servers  Which servers it may connect to, see {@see RtmpClient::checkServer()}.
      */
     public function __construct(
         private readonly CallControllerInterface $call,
@@ -126,7 +127,7 @@ final class RtmpPublisher
         private readonly Closure $ingest,
         private readonly ?Closure $onGiveUp = null,
         private readonly int $idle = self::IDLE_NS,
-        private readonly bool $publicOnly = false,
+        private readonly RtmpServers $servers = RtmpServers::Any,
     ) {
         $this->stopping = new DeferredCancellation;
         $this->connected = new DeferredFuture;
@@ -267,7 +268,7 @@ final class RtmpPublisher
             try {
                 // Fetched every time (never revoking it): the same key unless an admin revoked it meanwhile.
                 ['url' => $url, 'key' => $key] = ($this->ingest)(false);
-                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation(), $this->publicOnly);
+                $client = RtmpClient::publish($url, $key, $this->stopping->getCancellation(), $this->servers);
                 if (!$this->running) {
                     $client->close();
                     return;

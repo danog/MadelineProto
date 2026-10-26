@@ -2746,13 +2746,13 @@ abstract class InternalDoc
      *
      * @param string  $url        The URL of the RTMP application, e.g. `rtmps://dc4-1.rtmp.t.me/s/`, or, without `$key`, the URL followed by the stream key, e.g. `rtmps://dc4-1.rtmp.t.me/s/123456:AbCdEf`.
      * @param ?string $key        The stream key.
-     * @param bool    $publicOnly Whether to connect only to a server on the internet (every address its name resolves to, checked at each connection, must be global): when whoever chooses the URL must not make us connect into our network. Otherwise, the stream is closed.
+     * @param RtmpServers $servers Which servers it may connect to, checked at each connection: when whoever chooses the URL must not make us connect anywhere (into our network, say). Otherwise, the stream is closed.
      *
-     * @throws RtmpAddressException If the server isn't on the internet, with $publicOnly.
+     * @throws RtmpAddressException If the server isn't one of $servers.
      */
-    final public function startRtmpStream(string $url, ?string $key = null, bool $publicOnly = false): \danog\MadelineProto\EventHandler\Calls\RtmpStream
+    final public function startRtmpStream(string $url, ?string $key = null, \danog\MadelineProto\RtmpServers $servers = \danog\MadelineProto\RtmpServers::Any): \danog\MadelineProto\EventHandler\Calls\RtmpStream
     {
-        return $this->wrapper->getAPI()->startRtmpStream($url, $key, $publicOnly);
+        return $this->wrapper->getAPI()->startRtmpStream($url, $key, $servers);
     }
     /**
      * Stop update loop.

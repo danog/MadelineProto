@@ -33,6 +33,7 @@ use danog\MadelineProto\MediaDestination;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RestoresDeclaredProperties;
+use danog\MadelineProto\RtmpServers;
 use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use Webmozart\Assert\Assert;
 
@@ -59,8 +60,8 @@ final class RtmpStreamController implements CallControllerInterface
         private readonly string $url,
         #[\SensitiveParameter]
         private readonly string $key,
-        /** Whether to connect only to a server on the internet, see {@see RtmpClient::resolvePublic()}. */
-        private readonly bool $publicOnly = false,
+        /** Which servers it may connect to, see {@see RtmpClient::checkServer()}. */
+        private readonly RtmpServers $servers = RtmpServers::Any,
     ) {
         $this->public = new RtmpStream($API, $id, $url);
         $this->diskJockey = new DjLoop($this, rtmp: true);
@@ -85,11 +86,11 @@ final class RtmpStreamController implements CallControllerInterface
             $this,
             $this->diskJockey,
             fn (bool $revoke): array => ['url' => $this->url, 'key' => $this->key],
-            // A server that isn't on the internet, with $publicOnly.
+            // A server that isn't one of $servers.
             function (): void {
                 $this->close();
             },
-            publicOnly: $this->publicOnly,
+            servers: $this->servers,
         );
     }
 
@@ -192,11 +193,11 @@ final class RtmpStreamController implements CallControllerInterface
     }
 
     /**
-     * Whether it connects only to a server on the internet.
+     * Which servers it may connect to.
      */
-    public function isPublicOnly(): bool
+    public function getServers(): RtmpServers
     {
-        return $this->publicOnly;
+        return $this->servers;
     }
 
     public function isClosed(): bool
