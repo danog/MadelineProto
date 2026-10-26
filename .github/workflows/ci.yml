@@ -118,8 +118,8 @@ jobs:
     if: github.ref_type != 'tag'
     runs-on: ubuntu-latest
     container:
-      # The image of the version, for a tag.
-      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use, e.g. mtg).
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}-test
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
       # caches are written to directories of the runner, mounted in the container.
       options: --user root

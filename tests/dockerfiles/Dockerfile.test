@@ -1,0 +1,27 @@
+# The image the tests of the CI run in: the one of the bots (tests/dockerfiles/Dockerfile), of the same architecture,
+# plus what only the tests use, so that it isn't in the published image. Built and tagged <tag>-test by
+# tests/docker_image.sh.
+ARG BASE=danog/madelineproto:next
+FROM ${BASE}
+
+USER root
+
+# mtg (https://github.com/9seconds/mtg), the fake TLS MTProxy of tests/danog/MadelineProto/MtProxyTest.php: here,
+# rather than downloaded from GitHub by every run of the tests (a 504 of GitHub failed them). Pinned, with the sha256
+# of the release archives (mtg publishes no checksums), as in the test.
+ENV MTG_VERSION=2.2.8
+RUN set -eux; \
+	arch="$(dpkg --print-architecture)"; \
+	case "$arch" in \
+		amd64) sha256=7ef19d079d85f4e00d4f8334ec1f3f3c8718e3d0ed1f3109ea9a8673138a2102 ;; \
+		arm64) sha256=562a94dd4cafcb8f179b76cfeafb76da12747c8e230bc76235bf8746cc189644 ;; \
+		*) echo "No mtg build for $arch"; exit 1 ;; \
+	esac; \
+	curl -fsSL --retry 5 -o /tmp/mtg.tar.gz "https://github.com/9seconds/mtg/releases/download/v$MTG_VERSION/mtg-$MTG_VERSION-linux-$arch.tar.gz"; \
+	echo "$sha256  /tmp/mtg.tar.gz" | sha256sum -c -; \
+	tar -xzf /tmp/mtg.tar.gz -C /tmp; \
+	install -m 755 "/tmp/mtg-$MTG_VERSION-linux-$arch/mtg" /usr/local/bin/mtg; \
+	rm -rf /tmp/mtg.tar.gz "/tmp/mtg-$MTG_VERSION-linux-$arch"; \
+	mtg --version
+
+USER madeline:madeline
