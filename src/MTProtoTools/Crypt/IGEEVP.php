@@ -47,12 +47,12 @@ final class IGEEVP extends IGE
             return false;
         }
         $name = match (PHP_OS_FAMILY) {
-            'Darwin' => 'libmadeline-ige.dylib',
-            'Windows' => 'madeline-ige.dll',
-            default => 'libmadeline-ige.so',
+            'Darwin' => 'libmadeline-crypto.dylib',
+            'Windows' => 'madeline-crypto.dll',
+            default => 'libmadeline-crypto.so',
         };
         $build = \dirname(__DIR__, 3).'/native/build/';
-        foreach (array_filter([getenv('MADELINE_IGE_LIBRARY'), $build.$name, $build.'Release/'.$name, $name]) as $library) {
+        foreach (array_filter([getenv('MADELINE_CRYPTO_LIBRARY'), $build.$name, $build.'Release/'.$name, $name]) as $library) {
             try {
                 $ffi = FFI::cdef(self::CDEF, $library);
                 // Check that this library can initialize EVP with the current OpenSSL provider configuration.

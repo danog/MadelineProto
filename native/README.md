@@ -1,7 +1,7 @@
 # Optional native cryptography
 
-The supplied Docker image builds `libmadeline-ige` automatically. Composer and
-PHAR installations can use `MADELINE_IGE_LIBRARY` to select a compatible build:
+The supplied Docker image builds `libmadeline-crypto` automatically. Composer and
+PHAR installations can use `MADELINE_CRYPTO_LIBRARY` to select a compatible build:
 
 ```sh
 cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Release
@@ -9,7 +9,7 @@ cmake --build native/build
 ctest --test-dir native/build --output-on-failure
 ```
 
-Use `libmadeline-ige.dylib` instead of `.so` on macOS.
+Use `libmadeline-crypto.dylib` instead of `.so` on macOS.
 OpenSSL development headers and a C compiler are required to build the helper.
 The synchronous EVP interface also builds on Windows. The asynchronous executor
 currently supports POSIX systems with pthreads and `php://fd`; other environments
@@ -62,8 +62,11 @@ Authentication failures are propagated and never retried through another backend
 Run the PHP behavior tests with the helper selected:
 
 ```sh
-MADELINE_IGE_LIBRARY="$PWD/native/build/libmadeline-ige.so" \
+MADELINE_CRYPTO_LIBRARY="$PWD/native/build/libmadeline-crypto.so" \
   php -d ffi.enable=1 vendor/bin/phpunit -c phpunit-light.xml \
   --filter 'IGETest|NativeExecutorTest|MessageDecoderTest|ConnectionCryptoTest|SecretChatCryptoTest'
 ```
 
+ABI 2 returns a data buffer and opaque state bytes. Codec adapters interpret the
+state: IGE commits its IV; MessageDecoder parses its transport metadata. The
+executor owns submission, buffers, notifications and backpressure.

@@ -246,7 +246,7 @@ static void *run(void *opaque)
         notify(p);
     }
 }
-unsigned madeline_crypto_abi(void) { return 1; }
+unsigned madeline_crypto_abi(void) { return 2; }
 unsigned madeline_crypto_operations(void) { return 7; }
 CryptoExecutor *madeline_crypto_create(unsigned capacity, size_t byte_limit, unsigned window_us, unsigned fixed_width)
 {
@@ -353,17 +353,20 @@ int madeline_crypto_collect(CryptoExecutor *p, CryptoResult *result)
         j->next = NULL;
         memset(result, 0, sizeof(*result));
         result->handle = j; result->id = j->id;
-        result->data = j->output; result->size = j->size;
+        result->data = j->status == 1 ? j->output : NULL; result->size = j->status == 1 ? j->size : 0;
         if (j->operation == 4) {
             result->size = 0;
             if (j->status == 1) {
                 result->data += 32; result->size = j->body_size;
-                memcpy(result->session_id, j->output + 8, 8);
-                memcpy(result->message_id, j->output + 16, 8);
-                result->seq_no = read_u32(j->output + 24);
+                memcpy(result->state, j->output + 8, 20);
+                result->state_size = 20;
             }
         }
-        memcpy(result->iv, j->iv, 32); result->status = j->status;
+        if (j->operation != 4 && j->status == 1) {
+            memcpy(result->state, j->iv, 32);
+            result->state_size = 32;
+        }
+        result->status = j->status;
     }
     pthread_mutex_unlock(&p->lock);
     return j != NULL;

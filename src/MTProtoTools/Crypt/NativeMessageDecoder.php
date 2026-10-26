@@ -28,6 +28,6 @@ final class NativeMessageDecoder implements MessageDecoder
             return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
         }
         $result = $executor->submit(static fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit_message($pool, $ciphertext, \strlen($ciphertext), $authKey, $messageKey))->await();
-        return new DecodedMessage($result['data'], Tools::unpackSignedLong($result['messageId']), $result['seqNo'], $result['sessionId']);
+        return new DecodedMessage($result['data'], Tools::unpackSignedLong(substr($result['state'], 8, 8)), (int) unpack('V', substr($result['state'], 16, 4))[1], substr($result['state'], 0, 8));
     }
 }
