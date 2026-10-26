@@ -1,72 +1,99 @@
-# Optional native cryptography
+# Optional Rust cryptography extension
 
-The supplied Docker image builds `libmadeline-crypto` automatically. Composer and
-PHAR installations can use `MADELINE_CRYPTO_LIBRARY` to select a compatible build:
+The Docker image includes `madeline_crypto`. Other installations use
+IGEFFI with system libcrypto, then ext-openssl and phpseclib when it is absent. CTR and CDN keep their existing PHP
+implementations. The Rust extension needs no library paths, FFI permissions or runtime compilation.
+The optional IGEFFI fallback requires enabled FFI and compatible libcrypto symbols;
+it has no dependency on the removed C helper.
 
-```sh
-cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Release
-cmake --build native/build
-ctest --test-dir native/build --output-on-failure
-```
+## Build
 
-Use `libmadeline-crypto.dylib` instead of `.so` on macOS.
-OpenSSL development headers and a C compiler are required to build the helper.
-The synchronous EVP interface also builds on Windows. The asynchronous executor
-currently supports POSIX systems with pthreads and `php://fd`; other environments
-retain the synchronous backends. FFI remains optional.
-
-The MTProto owner initializes one executor per process at startup. IPC-only
-clients do not start a crypto worker. The executor is never serialized. It uses
-one worker, a bounded queue (128 jobs / 128 MiB including results by default), and
-a nonblocking notification pipe. Input is copied into owned C memory; results
-are copied into PHP strings before their native buffers are securely freed.
-Queue saturation suspends submission. Cancelling a waiter does not free accepted
-work. Continuous IGE operations are serialized per cipher and commit their IV
-before releasing the next operation.
-
-Inbound MTProto v2 decoding moves KDF, AES-IGE, msg_key authentication and payload
-bounds checks into C. Session, connection generation and message-ID checks stay
-in ReadLoop, followed by TL deserialization. Secret chat KDFs and validation stay
-in PHP and can use the shared IGE executor. Outgoing packets recheck their
-connection context after encryption. Secret chat sequence numbers are committed
-after encryption, so a snapshot taken during the wait cannot persist a sequence
-without its encrypted message.
-
-CPU capabilities select ARM AES or x86 AES-NI; unsupported CPUs use EVP inside
-the worker. Independent chains are interleaved on that single worker. Similar
-message sizes share a batched prefix and finish their remaining blocks with their
-own continued IVs. Widths above 32 use a dynamic kernel, not a fixed eight-lane cap.
-
-Each operation and size bucket starts at width 1. Calibration alternates full
-batches of N and N+1 and compares median worker CPU nanoseconds per byte over the
-entire native operation, excluding queue waits. Initial samples per variant are
-`3*(N+1)`. With the improvement `gain` expressed as a percentage:
-
-```
-required = ceil(3*(N+1) * clamp(2/max(0.25, abs(gain-1)), 1, 8))
-```
-
-Measurements continue until both variants have enough samples. A gain of at
-least 1% advances to the next pair with fresh samples; otherwise width N is locked
-until executor restart. Partial batches do useful work without advancing the
-comparison. Resource limits also stop growth. The default accumulation deadline
-is 5 ms from the oldest job and is never extended by arrivals. Low traffic can
-leave calibration incomplete. `NativeExecutor::initialize()` accepts queue limits,
-the window in microseconds and an optional fixed width for controlled benchmarks;
-normal startup uses adaptive selection.
-
-An unavailable executor retains `IGEEVP → IGEFFI → ext-openssl → phpseclib`.
-An unavailable full-message operation can use PHP decoding with native IGE.
-Authentication failures are propagated and never retried through another backend.
-
-Run the PHP behavior tests with the helper selected:
+The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
+Build for the target PHP version, architecture and debug ABI.
+Install that PHP's development headers and `php-config`, OpenSSL development
+headers, a linker, pkg-config and libclang. Rust 1.92.0 is pinned by
+`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies.
 
 ```sh
-MADELINE_CRYPTO_LIBRARY="$PWD/native/build/libmadeline-crypto.so" \
-  php -d ffi.enable=1 vendor/bin/phpunit -c phpunit-light.xml \
-  --filter 'IGETest|NativeExecutorTest|MessageDecoderTest|ConnectionCryptoTest|SecretChatCryptoTest'
+cd native
+cargo build --release --locked
+install -m 755 target/release/libmadeline_crypto.so "$(php-config --extension-dir)/madeline_crypto.so"
+printf 'extension=madeline_crypto.so\n' > /path/to/php/conf.d/madeline-crypto.ini
+php --ri madeline_crypto
 ```
 
-ABI 2 returns a data buffer and opaque state bytes. Codec adapters interpret the
-state: IGE commits its IV; MessageDecoder parses its transport metadata. The
-executor owns submission, buffers, notifications and backpressure.
+On macOS Cargo produces a `.dylib`; install it under the same `.so` extension
+name. The bridge currently targets Unix. Restart PHP processes after installation.
+Rust/Cargo/libclang exist only in the Docker build stage. TAS reuses a compatible
+base extension or builds against the base image's PHP; its sources are mirrored
+in `dev/crypto`.
+
+## Execution and ownership
+
+The MTProto owner initializes the extension and php-tokio bridge at startup.
+IPC-only clients do not start it. PHP adapters retain only bridge lifecycle and
+IGE per-instance sequencing. There is no PHP submit/collect/release protocol.
+The extension exports `danog\MadelineProto\Native\Crypto`; factories check the
+extension, API version before selecting it. Validation errors
+never trigger backend retries.
+
+Each initialized process has exactly one crypto worker and one Tokio scheduler
+thread for completion/admission futures. No Tokio blocking jobs are spawned.
+The scheduler never invokes PHP. PHP values and suspended Revolt contexts stay
+on the PHP thread. The vendored php-tokio bridge and its upstream revision/local
+changes are documented in `php-tokio/UPSTREAM.md`.
+
+The queue defaults to 128 live jobs and 128 MiB of accounted native storage.
+Admission reserves both count and byte permits before copying input. Accounting
+covers input, output, tail workspace, key schedules, result copies and metadata;
+permits are held through result consumption. Oversized jobs fail explicitly.
+Waiting for admission suspends the Fiber. Cancelling an external Amp wait does
+not cancel its underlying operation: accepted work completes, commits IGE state
+under its instance mutex, then releases buffers. Native secrets and unsuccessful
+plaintext are zeroized on drop.
+
+Shutdown stops admission, finishes accepted jobs, resumes waiting callers, drains
+the bridge, joins the crypto thread and destroys Tokio. Initialize **after** any
+fork; an inherited initialized executor is rejected, and factories use PHP.
+Live extension objects are never serialized with MTProto sessions.
+
+Inbound transport v2 performs KDF, IGE, constant-time msg_key verification,
+length/alignment and padding checks before exposing body and metadata. ReadLoop
+retains connection/key freshness, session/message ID and TL checks. Secret chats
+retain their own PHP KDF and verification while using the IGE interface.
+
+## Adaptive batching
+
+Independent chains of the same operation and size bucket are interleaved at each
+AES round. Unequal lengths share their common prefix and finish their short tails
+with the continued IV. Hardware AES is detected at runtime (`std::arch` ARM AES /
+x86 AES-NI); unsupported CPUs use EVP inside the same executor.
+
+Each operation/size bucket starts at width N=1. Complete batches alternate N and
+N+1. Measure crypto worker thread CPU nanoseconds per byte, including KDF and
+verification for transport messages. Incomplete batches execute normally and do
+not enter the comparison. After at least `3*(N+1)` samples on **each** side,
+compare medians and calculate:
+
+```
+gain = 100 * (median_N - median_N_plus_1) / median_N
+checks = ceil(3 * (N+1) * clamp(2 / max(0.25, abs(gain-1)), 1, 8))
+```
+
+Keep alternating until both sides meet that count. At gain >=1%, advance N by
+one and start a fresh comparison; otherwise permanently lock the smaller width.
+There is no width-8 ceiling: the configured live-job capacity is the resource
+limit. The oldest compatible job waits at most 5 ms for its batch; shutdown
+flushes partial batches immediately. Const-generic widths 1–32 are enabled by
+default; larger widths use the dynamic kernel.
+
+## Verification
+
+```sh
+cargo test --release --locked --no-default-features
+cargo test --release --locked --no-default-features --features const-widths
+```
+
+PHP tests cover known vectors, continuation/IV, independent and ordered chains,
+validation failures, queue pressure, cancellation, shutdown, connection freshness
+and PHP fallbacks. Run the same suite with and without the extension enabled.

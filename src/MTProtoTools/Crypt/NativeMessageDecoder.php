@@ -23,11 +23,18 @@ final class NativeMessageDecoder implements MessageDecoder
             || \strlen($ciphertext) < 48 || \strlen($ciphertext) % 16) {
             throw new SecurityException('Invalid encrypted transport message size');
         }
-        $executor = NativeExecutor::get(NativeExecutor::DECODE_V2);
+        $executor = NativeExecutor::get();
         if (!$executor) {
             return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
         }
-        $result = $executor->submit(static fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit_message($pool, $ciphertext, \strlen($ciphertext), $authKey, $messageKey))->await();
-        return new DecodedMessage($result['data'], Tools::unpackSignedLong(substr($result['state'], 8, 8)), (int) unpack('V', substr($result['state'], 16, 4))[1], substr($result['state'], 0, 8));
+        try {
+            $result = $executor->run(static fn (): array => \danog\MadelineProto\Native\Crypto::decode($ciphertext, $authKey, $messageKey));
+        } catch (\Exception $e) {
+            if (str_starts_with($e->getMessage(), 'Invalid MTProto')) {
+                throw new SecurityException($e->getMessage(), 0, $e);
+            }
+            throw $e;
+        }
+        return new DecodedMessage($result[0], Tools::unpackSignedLong(substr($result[1], 8, 8)), (int) unpack('V', substr($result[1], 16, 4))[1], substr($result[1], 0, 8));
     }
 }
