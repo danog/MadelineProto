@@ -34,6 +34,7 @@ use Webmozart\Assert\Assert;
 use function Amp\async;
 use function Amp\ByteStream\getStderr;
 use function Amp\ByteStream\pipe;
+use function Amp\ByteStream\splitLines;
 use function Amp\File\openFile;
 use function count;
 
@@ -401,13 +402,16 @@ final class Ogg
                 ->ignore()
                 ->finally($proc->getStdin()->close(...));
         }
-        // Forwarded to our stderr, its end kept to explain a failure.
-        $errors = '';
+        // Forwarded to our stderr, its last lines kept to explain a failure.
+        $errors = [];
         $stderr = async(static function () use ($proc, &$errors, $cancellation): void {
             $out = getStderr();
-            while (($chunk = $proc->getStderr()->read($cancellation)) !== null) {
-                $out->write($chunk);
-                $errors = substr($errors.$chunk, -self::FFMPEG_ERROR_BYTES);
+            foreach (splitLines($proc->getStderr(), $cancellation) as $line) {
+                $out->write("$line\n");
+                $errors[] = $line;
+                if (\count($errors) > self::FFMPEG_ERROR_LINES) {
+                    array_shift($errors);
+                }
             }
         });
         $stderr->ignore();
@@ -419,7 +423,7 @@ final class Ogg
             $code = $proc->join($cancellation);
             $stderr->await($cancellation);
             $what = $in instanceof ReadableStream ? 'the stream' : $inFile;
-            throw new AssertionError("ffmpeg could not convert $what (exit code $code): ".trim($errors));
+            throw new AssertionError("ffmpeg could not convert $what (exit code $code): ".trim(implode("\n", $errors)));
         }
         self::convertWav(new ReadableIterableStream((static function () use ($first, $stdout, $cancellation): \Generator {
             yield $first;
@@ -429,8 +433,8 @@ final class Ogg
         })()), $oggOut, $cancellation);
     }
 
-    /** How much of the end of ffmpeg's error output to report when it fails. */
-    private const FFMPEG_ERROR_BYTES = 2048;
+    /** How many of the last lines of ffmpeg's error output to report when it fails. */
+    private const FFMPEG_ERROR_LINES = 10;
 
     /**
      * Validate that the specified OGG OPUS file can be played directly by MadelineProto, without doing any conversion.
