@@ -13,7 +13,7 @@ namespace danog\MadelineProto\Test;
 use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use danog\MadelineProto\SecretChats\SecretChat;
 use danog\MadelineProto\SecretChats\SecretChatController;
 use danog\MadelineProto\TL\TLInterface;
@@ -39,8 +39,8 @@ final class SecretChatCryptoTest extends TestCase
     /** @dataProvider versions */
     public function testSerializationCannotPersistASequenceWithoutItsEncryptedMessage(int $version): void
     {
-        NativeCrypto::initialize();
-        if (!NativeCrypto::get(3)) {
+        NativeExecutor::initialize();
+        if (!NativeExecutor::get(3)) {
             self::markTestSkipped('Optional native IGE unavailable');
         }
         BypassFinals::enable();

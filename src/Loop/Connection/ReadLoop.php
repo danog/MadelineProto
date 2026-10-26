@@ -27,9 +27,7 @@ use danog\Loop\Loop;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeMessageDecoder;
-use danog\MadelineProto\MTProtoTools\Crypt\PhpMessageDecoder;
+use danog\MadelineProto\MTProtoTools\Crypt\MessageDecoderFactory;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -209,8 +207,7 @@ final class ReadLoop extends Loop
                     $this->connection->incomingBytesCtr?->incBy($left);
                     $buffer->bufferRead($left);
                 }
-                $decoder = NativeCrypto::get(NativeCrypto::DECODE_V2)
-                    ? new NativeMessageDecoder : new PhpMessageDecoder;
+                $decoder = MessageDecoderFactory::create();
                 try {
                     $decoded = $decoder->decode($ciphertext, $authKey, $message_key);
                 } finally {

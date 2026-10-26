@@ -27,7 +27,7 @@ use Throwable;
  * @internal
  * @psalm-type CryptoOutput = array{data: string, iv: string, sessionId: string, messageId: string, seqNo: int}
  */
-final class NativeCrypto
+final class NativeExecutor
 {
     use ForbidCloning;
     use ForbidSerialization;
@@ -120,30 +120,31 @@ final class NativeCrypto
         }
     }
 
+    /** Access the loaded ABI for adapter-owned resources. @internal */
+    public function bind(\Closure $factory): mixed
+    {
+        if ($this->closed || $this->failed) {
+            throw new RuntimeException('Native executor is closed');
+        }
+        return $factory($this->ffi, $this->pool);
+    }
+
     /**
-     * Input is copied by C before returning. Accepted work is not cancelled by its waiter.
+     * Retry submission on backpressure. The adapter owns argument validation and marshalling.
+     * Accepted work is not cancelled by its waiter; C owns all submitted buffers.
+     * @param \Closure(FFI, CData): int $enqueue
      * @return Future<CryptoOutput>
      */
-    public function submit(int $operation, string $data, string $key, string $iv, ?Cancellation $cancellation = null): Future
+    public function submit(\Closure $enqueue, ?Cancellation $cancellation = null): Future
     {
-        if (\strlen($key) !== ($operation === self::DECODE_V2 ? 256 : 32)
-            || \strlen($iv) !== ($operation === self::DECODE_V2 ? 16 : 32) || \strlen($data) % 16) {
-            throw new \ValueError('Invalid native crypto input sizes');
-        }
         while (true) {
             $cancellation?->throwIfRequested();
             if ($this->closed || $this->failed) {
-                throw new RuntimeException('Native crypto executor is closed');
+                throw new RuntimeException('Native executor is closed');
             }
-            $id = (int) ($operation === self::DECODE_V2
-                ? $this->ffi->madeline_crypto_submit_message($this->pool, $data, \strlen($data), $key, $iv)
-                : $this->ffi->madeline_crypto_submit($this->pool, $operation, $data, \strlen($data), $key, $iv));
-            if ($id > 0) {
-                break;
-            }
-            if ($id < 0) {
-                throw new RuntimeException('Native crypto submission failed: '.$id);
-            }
+            $id = $enqueue($this->ffi, $this->pool);
+            if ($id > 0) break;
+            if ($id < 0) throw new RuntimeException('Native submission failed: '.$id);
             $this->space ??= new DeferredFuture;
             $this->space->getFuture()->await($cancellation);
         }

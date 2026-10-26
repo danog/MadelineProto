@@ -766,7 +766,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         // Initialize needed stuffs
         Magic::start(light: false);
-        MTProtoTools\Crypt\NativeCrypto::initialize();
+        MTProtoTools\Crypt\NativeExecutor::initialize();
         // Parse and store settings
         $this->updateSettingsInternal($settings, false);
         // Actually instantiate needed classes like a boss
@@ -1345,7 +1345,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     {
         // Setup one-time stuffs
         Magic::start(light: false);
-        MTProtoTools\Crypt\NativeCrypto::initialize();
+        MTProtoTools\Crypt\NativeExecutor::initialize();
 
         // Set API wrapper
         $this->wrapper = $wrapper;

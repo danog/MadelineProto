@@ -12,7 +12,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\MessageDecoder;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use danog\MadelineProto\MTProtoTools\Crypt\NativeMessageDecoder;
 use danog\MadelineProto\MTProtoTools\Crypt\PhpMessageDecoder;
 use danog\MadelineProto\SecurityException;
@@ -39,8 +39,8 @@ final class MessageDecoderTest extends TestCase
     /** @dataProvider packets */
     public function testAuthenticatedPayloads(string $class, int $size, int $padding, ?int $declared, string $damage): void
     {
-        NativeCrypto::initialize();
-        if ($class === NativeMessageDecoder::class && !NativeCrypto::get(NativeCrypto::DECODE_V2)) {
+        NativeExecutor::initialize();
+        if ($class === NativeMessageDecoder::class && !NativeExecutor::get(NativeExecutor::DECODE_V2)) {
             self::markTestSkipped('Optional native decoder unavailable');
         }
         $auth = random_bytes(256);
@@ -76,8 +76,8 @@ final class MessageDecoderTest extends TestCase
 
     public function testConcurrentMessagesWithDifferentPaddingRemainIndependent(): void
     {
-        NativeCrypto::initialize();
-        if (!NativeCrypto::get(NativeCrypto::DECODE_V2)) {
+        NativeExecutor::initialize();
+        if (!NativeExecutor::get(NativeExecutor::DECODE_V2)) {
             self::markTestSkipped('Optional native decoder unavailable');
         }
         $tasks = [];

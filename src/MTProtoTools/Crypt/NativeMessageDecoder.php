@@ -23,11 +23,11 @@ final class NativeMessageDecoder implements MessageDecoder
             || \strlen($ciphertext) < 48 || \strlen($ciphertext) % 16) {
             throw new SecurityException('Invalid encrypted transport message size');
         }
-        $executor = NativeCrypto::get(NativeCrypto::DECODE_V2);
+        $executor = NativeExecutor::get(NativeExecutor::DECODE_V2);
         if (!$executor) {
             return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
         }
-        $result = $executor->submit(NativeCrypto::DECODE_V2, $ciphertext, $authKey, $messageKey)->await();
+        $result = $executor->submit(static fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit_message($pool, $ciphertext, \strlen($ciphertext), $authKey, $messageKey))->await();
         return new DecodedMessage($result['data'], Tools::unpackSignedLong($result['messageId']), $result['seqNo'], $result['sessionId']);
     }
 }
