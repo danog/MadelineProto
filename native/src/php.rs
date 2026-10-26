@@ -19,7 +19,7 @@ pub struct Crypto;
 #[php_impl]
 impl Crypto {
     pub fn version() -> &'static str {
-        env!("CARGO_PKG_VERSION")
+        "0.2.0" // PHP API compatibility, independent of the extension release.
     }
     pub fn init(capacity: i64, byte_limit: i64, window_us: i64) -> PhpResult<i64> {
         if ext_php_rs::PHP_ZTS {
