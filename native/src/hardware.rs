@@ -193,6 +193,8 @@ unsafe fn kernel<const N: usize>(
     size: usize,
     start: usize,
 ) {
+    let jobs: &mut [Message; N] = jobs.try_into().expect("fixed batch width mismatch");
+    let round = &round[..15 * N];
     let mut buffers = [[zero(); N]; 4];
     let [previous_out, previous_in, input, state] = &mut buffers;
     body!(
