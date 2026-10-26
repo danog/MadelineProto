@@ -431,7 +431,9 @@ abstract class InternalDoc
         \danog\MadelineProto\Tools::closeConnection($message);
     }
     /**
-     * Stop publishing to an RTMP stream for good, see {@see RtmpStream::close()}.
+     * Stop publishing to an RTMP stream for good.
+     *
+     * See {@see RtmpStream::close()}.
      */
     final public function closeRtmpStream(int $id): void
     {
@@ -1337,7 +1339,9 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPwrChat($id, $fullfetch);
     }
     /**
-     * What we publish to an RTMP server with a URL and stream key, if anything, see {@see self::startRtmpStream()}.
+     * What we publish to an RTMP server with a URL and stream key, if anything.
+     *
+     * See {@see self::startRtmpStream()}.
      *
      * @param string  $url The URL of the RTMP application, or, without `$key`, the URL followed by the stream key.
      * @param ?string $key The stream key.
@@ -1347,7 +1351,9 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getRtmpStream($url, $key);
     }
     /**
-     * What we publish to RTMP servers, see {@see self::startRtmpStream()}.
+     * What we publish to RTMP servers.
+     *
+     * See {@see self::startRtmpStream()}.
      *
      * @return array<int, RtmpStream>
      */
@@ -1757,14 +1763,18 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->isPremium();
     }
     /**
-     * Whether we are connected to the server of an RTMP stream right now, see {@see RtmpStream::isConnected()}.
+     * Whether we are connected to the server of an RTMP stream right now.
+     *
+     * See {@see RtmpStream::isConnected()}.
      */
     final public function isRtmpStreamConnected(int $id): bool
     {
         return $this->wrapper->getAPI()->isRtmpStreamConnected($id);
     }
     /**
-     * Whether the file played to an RTMP stream is paused, see {@see RtmpStream::isPaused()}.
+     * Whether the file played to an RTMP stream is paused.
+     *
+     * See {@see RtmpStream::isPaused()}.
      */
     final public function isRtmpStreamPlayPaused(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): bool
     {
@@ -2259,56 +2269,72 @@ abstract class InternalDoc
         return \danog\MadelineProto\Tools::rleEncode($string);
     }
     /**
-     * The file played to an RTMP stream, see {@see RtmpStream::getCurrent()}.
+     * The file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::getCurrent()}.
      */
     final public function rtmpStreamGetCurrent(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): \danog\MadelineProto\RemoteUrl|\danog\MadelineProto\LocalFile|string|null
     {
         return $this->wrapper->getAPI()->rtmpStreamGetCurrent($id, $dest);
     }
     /**
-     * Pause the file played to an RTMP stream, see {@see RtmpStream::pause()}.
+     * Pause the file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::pause()}.
      */
     final public function rtmpStreamPausePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
         $this->wrapper->getAPI()->rtmpStreamPausePlay($id, $dest);
     }
     /**
-     * Play a file to an RTMP stream, see {@see RtmpStream::play()}.
+     * Play a file to an RTMP stream.
+     *
+     * See {@see RtmpStream::play()}.
      */
     final public function rtmpStreamPlay(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
         $this->wrapper->getAPI()->rtmpStreamPlay($id, $file, $dest);
     }
     /**
-     * Play a file to an RTMP stream, blocking until it has finished playing if a stream was passed, see {@see RtmpStream::playBlocking()}.
+     * Play a file to an RTMP stream, blocking until it has finished playing if a stream was passed.
+     *
+     * See {@see RtmpStream::playBlocking()}.
      */
     final public function rtmpStreamPlayBlocking(int $id, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream $file, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
         $this->wrapper->getAPI()->rtmpStreamPlayBlocking($id, $file, $dest);
     }
     /**
-     * Set the files to play on loop to an RTMP stream while its playlist is empty, see {@see RtmpStream::playOnHold()}.
+     * Set the files to play on loop to an RTMP stream while its playlist is empty.
+     *
+     * See {@see RtmpStream::playOnHold()}.
      */
     final public function rtmpStreamPlayOnHold(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera, \danog\MadelineProto\LocalFile|\danog\MadelineProto\RemoteUrl|\Amp\ByteStream\ReadableStream ...$files): void
     {
         $this->wrapper->getAPI()->rtmpStreamPlayOnHold($id, $dest, ...$files);
     }
     /**
-     * Resume the file played to an RTMP stream, see {@see RtmpStream::resume()}.
+     * Resume the file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::resume()}.
      */
     final public function rtmpStreamResumePlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
         $this->wrapper->getAPI()->rtmpStreamResumePlay($id, $dest);
     }
     /**
-     * Skip to the next file played to an RTMP stream, see {@see RtmpStream::skip()}.
+     * Skip to the next file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::skip()}.
      */
     final public function rtmpStreamSkipPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
         $this->wrapper->getAPI()->rtmpStreamSkipPlay($id, $dest);
     }
     /**
-     * Stop playing all files to an RTMP stream, clearing its playlists, see {@see RtmpStream::stop()}.
+     * Stop playing all files to an RTMP stream, clearing its playlists.
+     *
+     * See {@see RtmpStream::stop()}.
      */
     final public function rtmpStreamStopPlay(int $id, \danog\MadelineProto\MediaDestination $dest = \danog\MadelineProto\MediaDestination::Camera): void
     {
@@ -2709,9 +2735,10 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->startLive($peer, $caption, $parseMode, $privacyRules, $pinned, $noForwards, $rtmpStream, $messagesEnabled, $sendPaidMessagesStars);
     }
     /**
-     * Publish what is played to an RTMP server, as an RTMP encoder would (OBS, ffmpeg...): to the RTMP
-     * livestream or live story of any group, channel or user that gave us its URL and stream key (shown by
-     * the Telegram apps when starting one "with another app"), to YouTube, Twitch, or any other RTMP(S) server.
+     * Publish what is played to an RTMP server, as an RTMP encoder would (OBS, ffmpeg...).
+     *
+     * To the RTMP livestream or live story of any group, channel or user that gave us its URL and stream key (shown
+     * by the Telegram apps when starting one "with another app"), to YouTube, Twitch, or any other RTMP(S) server.
      *
      * Only H.264 video and AAC audio can be published, in MP4 or Matroska (WebM) files. The stream keeps
      * publishing (reconnecting if needed, and across restarts) until {@see RtmpStream::close()}d; publishing

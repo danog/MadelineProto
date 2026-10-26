@@ -1231,9 +1231,10 @@ trait Handler
     }
 
     /**
-     * Publish what is played to an RTMP server, as an RTMP encoder would (OBS, ffmpeg...): to the RTMP
-     * livestream or live story of any group, channel or user that gave us its URL and stream key (shown by
-     * the Telegram apps when starting one "with another app"), to YouTube, Twitch, or any other RTMP(S) server.
+     * Publish what is played to an RTMP server, as an RTMP encoder would (OBS, ffmpeg...).
+     *
+     * To the RTMP livestream or live story of any group, channel or user that gave us its URL and stream key (shown
+     * by the Telegram apps when starting one "with another app"), to YouTube, Twitch, or any other RTMP(S) server.
      *
      * Only H.264 video and AAC audio can be published, in MP4 or Matroska (WebM) files. The stream keeps
      * publishing (reconnecting if needed, and across restarts) until {@see RtmpStream::close()}d; publishing
@@ -1267,7 +1268,9 @@ trait Handler
     }
 
     /**
-     * What we publish to an RTMP server with a URL and stream key, if anything, see {@see self::startRtmpStream()}.
+     * What we publish to an RTMP server with a URL and stream key, if anything.
+     *
+     * See {@see self::startRtmpStream()}.
      *
      * @param string  $url The URL of the RTMP application, or, without `$key`, the URL followed by the stream key.
      * @param ?string $key The stream key.
@@ -1303,7 +1306,9 @@ trait Handler
     }
 
     /**
-     * What we publish to RTMP servers, see {@see self::startRtmpStream()}.
+     * What we publish to RTMP servers.
+     *
+     * See {@see self::startRtmpStream()}.
      *
      * @return array<int, RtmpStream>
      */
@@ -1318,7 +1323,9 @@ trait Handler
     }
 
     /**
-     * Play a file to an RTMP stream, see {@see RtmpStream::play()}.
+     * Play a file to an RTMP stream.
+     *
+     * See {@see RtmpStream::play()}.
      */
     public function rtmpStreamPlay(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1326,7 +1333,9 @@ trait Handler
     }
 
     /**
-     * Play a file to an RTMP stream, blocking until it has finished playing if a stream was passed, see {@see RtmpStream::playBlocking()}.
+     * Play a file to an RTMP stream, blocking until it has finished playing if a stream was passed.
+     *
+     * See {@see RtmpStream::playBlocking()}.
      */
     public function rtmpStreamPlayBlocking(int $id, LocalFile|RemoteUrl|ReadableStream $file, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1334,7 +1343,9 @@ trait Handler
     }
 
     /**
-     * Set the files to play on loop to an RTMP stream while its playlist is empty, see {@see RtmpStream::playOnHold()}.
+     * Set the files to play on loop to an RTMP stream while its playlist is empty.
+     *
+     * See {@see RtmpStream::playOnHold()}.
      */
     public function rtmpStreamPlayOnHold(int $id, MediaDestination $dest = MediaDestination::Camera, LocalFile|RemoteUrl|ReadableStream ...$files): void
     {
@@ -1342,7 +1353,9 @@ trait Handler
     }
 
     /**
-     * Skip to the next file played to an RTMP stream, see {@see RtmpStream::skip()}.
+     * Skip to the next file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::skip()}.
      */
     public function rtmpStreamSkipPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1350,7 +1363,9 @@ trait Handler
     }
 
     /**
-     * Stop playing all files to an RTMP stream, clearing its playlists, see {@see RtmpStream::stop()}.
+     * Stop playing all files to an RTMP stream, clearing its playlists.
+     *
+     * See {@see RtmpStream::stop()}.
      */
     public function rtmpStreamStopPlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1358,7 +1373,9 @@ trait Handler
     }
 
     /**
-     * Pause the file played to an RTMP stream, see {@see RtmpStream::pause()}.
+     * Pause the file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::pause()}.
      */
     public function rtmpStreamPausePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1366,7 +1383,9 @@ trait Handler
     }
 
     /**
-     * Resume the file played to an RTMP stream, see {@see RtmpStream::resume()}.
+     * Resume the file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::resume()}.
      */
     public function rtmpStreamResumePlay(int $id, MediaDestination $dest = MediaDestination::Camera): void
     {
@@ -1374,7 +1393,9 @@ trait Handler
     }
 
     /**
-     * Whether the file played to an RTMP stream is paused, see {@see RtmpStream::isPaused()}.
+     * Whether the file played to an RTMP stream is paused.
+     *
+     * See {@see RtmpStream::isPaused()}.
      */
     public function isRtmpStreamPlayPaused(int $id, MediaDestination $dest = MediaDestination::Camera): bool
     {
@@ -1382,7 +1403,9 @@ trait Handler
     }
 
     /**
-     * The file played to an RTMP stream, see {@see RtmpStream::getCurrent()}.
+     * The file played to an RTMP stream.
+     *
+     * See {@see RtmpStream::getCurrent()}.
      */
     public function rtmpStreamGetCurrent(int $id, MediaDestination $dest = MediaDestination::Camera): RemoteUrl|LocalFile|string|null
     {
@@ -1390,7 +1413,9 @@ trait Handler
     }
 
     /**
-     * Whether we are connected to the server of an RTMP stream right now, see {@see RtmpStream::isConnected()}.
+     * Whether we are connected to the server of an RTMP stream right now.
+     *
+     * See {@see RtmpStream::isConnected()}.
      */
     public function isRtmpStreamConnected(int $id): bool
     {
@@ -1398,7 +1423,9 @@ trait Handler
     }
 
     /**
-     * Stop publishing to an RTMP stream for good, see {@see RtmpStream::close()}.
+     * Stop publishing to an RTMP stream for good.
+     *
+     * See {@see RtmpStream::close()}.
      */
     public function closeRtmpStream(int $id): void
     {
