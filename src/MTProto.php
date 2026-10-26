@@ -2174,6 +2174,58 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return $result;
     }
     /**
+     * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to all report peers (admins of the bot), see sendRichMessage.
+     *
+     * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param RichParseMode $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
+     * @param array|null    $replyMarkup  Keyboard information.
+     * @param integer|null  $scheduleDate Schedule date.
+     * @param boolean       $silent       Whether to send the message silently, without triggering notifications.
+     * @param boolean       $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
+     * @param boolean       $background   Send this message as background message
+     * @param boolean       $clearDraft   Clears the draft field
+     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
+     * @param boolean       $rtl          Whether the text is right-to-left
+     * @param boolean       $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     * @param ?Cancellation $cancellation Cancellation
+     *
+     * @return list<\danog\MadelineProto\EventHandler\Message>
+     */
+    public function sendRichMessageToAdmins(
+        string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message,
+        RichParseMode $parseMode = RichParseMode::TEXT,
+        ?array $replyMarkup = null,
+        ?int $scheduleDate = null,
+        bool $silent = false,
+        bool $noForwards = false,
+        bool $background = false,
+        bool $clearDraft = false,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+        ?Cancellation $cancellation = null
+    ): array {
+        $result = [];
+        foreach ($this->admins as $report) {
+            $result []= $this->sendRichMessage(
+                peer: $report,
+                message: $message,
+                parseMode: $parseMode,
+                replyMarkup: $replyMarkup,
+                scheduleDate: $scheduleDate,
+                silent: $silent,
+                noForwards: $noForwards,
+                background: $background,
+                clearDraft: $clearDraft,
+                media: $media,
+                rtl: $rtl,
+                noAutolink: $noAutolink,
+                cancellation: $cancellation
+            );
+        }
+        return $result;
+    }
+    /**
      * Report an error to the previously set peer.
      *
      * @param string $message   Error to report

@@ -387,6 +387,9 @@ final class Connection
                 || (isset($arguments['peer']) && \is_int($arguments['peer']) && DialogId::isSecretChat($arguments['peer']))
             )
         ) {
+            if (isset($arguments['rich_message'])) {
+                throw new Exception("Rich messages can't be sent to secret chats");
+            }
             $method = 'messages.sendEncrypted';
             $arguments = ['peer' => $arguments['peer'], 'message' => $arguments];
             if (!isset($arguments['message']['_'])) {

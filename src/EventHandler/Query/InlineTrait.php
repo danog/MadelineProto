@@ -16,8 +16,11 @@
 
 namespace danog\MadelineProto\EventHandler\Query;
 
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
+use danog\MadelineProto\RichMessage\InputConverter;
+use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\Tools;
 
 /** @internal */
@@ -73,6 +76,36 @@ trait InlineTrait
                 'reply_markup' => $replyMarkup,
                 'parse_mode' => $parseMode,
                 'no_webpage' => $noWebpage,
+            ],
+        );
+    }
+
+    /**
+     * Edit the message, replacing it with a [rich message](https://core.telegram.org/bots/api#sendrichmessage).
+     *
+     * Media must have already been uploaded (e.g. with uploadPhoto, uploadVideo, uploadDocument and so on).
+     *
+     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param array|null               $replyMarkup  Reply markup for inline keyboards
+     * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
+     * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).
+     * @param boolean                  $rtl          Whether the text is right-to-left
+     * @param boolean                  $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
+     */
+    public function editRich(
+        string|array|RichMessage $message,
+        ?array $replyMarkup = null,
+        RichParseMode $parseMode = RichParseMode::TEXT,
+        array $media = [],
+        bool $rtl = false,
+        bool $noAutolink = false,
+    ): void {
+        $this->getClient()->methodCallAsyncRead(
+            'messages.editInlineBotMessage',
+            [
+                'id' => $this->rawId,
+                'rich_message' => InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+                'reply_markup' => $replyMarkup,
             ],
         );
     }

@@ -23,8 +23,10 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RichMessage\OutputConverter;
 use danog\MadelineProto\StrTools;
 use danog\MadelineProto\Tools;
 use Throwable;
@@ -266,6 +268,9 @@ trait BotAPI
                 if (isset($data['media']) && $data['media']['_'] !== 'messageMediaWebPage') {
                     $newd = array_merge($newd, $this->MTProtoToBotAPI($data['media']));
                 }
+                if (isset($data['rich_message'])) {
+                    $newd['rich_message'] = $this->richMessageToBotAPI($data['rich_message']);
+                }
                 return $newd;
             case 'messageEntityMentionName':
             case 'inputMessageEntityMentionName':
@@ -445,7 +450,41 @@ trait BotAPI
         if (isset($arguments['parse_mode'])) {
             $arguments = $this->parseMode($arguments);
         }
+        if (isset($arguments['rich_message'])) {
+            $richMessage = $arguments['rich_message'];
+            if (\is_string($richMessage)) {
+                // JSON-serialized, as passed to the Bot API
+                $richMessage = json_decode($richMessage, true, flags: JSON_THROW_ON_ERROR);
+            }
+            if ($richMessage instanceof RichMessage || (\is_array($richMessage) && !isset($richMessage['_']))) {
+                $peer = $arguments['peer'] ?? null;
+                $arguments['rich_message'] = $this->toInputRichMessage(
+                    $richMessage,
+                    \is_int($peer) || \is_string($peer) ? $peer : null,
+                    // New files are uploaded for the destination chat: inline messages and drafts have none
+                    allowUploads: $peer !== null,
+                    cancellation: $arguments['cancellation'] ?? null,
+                );
+            }
+        }
         return $arguments;
+    }
+    /**
+     * Convert an MTProto richMessage to a Bot API RichMessage.
+     *
+     * @internal
+     */
+    public function richMessageToBotAPI(array $richMessage): array
+    {
+        return OutputConverter::convert(
+            $richMessage,
+            function (array $media, string $type): array {
+                $converted = $this->MTProtoToBotAPI($media);
+                unset($converted['caption']);
+                return $converted[$type] ?? reset($converted);
+            },
+            fn (int $userId): array => $this->getPwrChat($userId, false),
+        );
     }
     /**
      * Convert markdown and HTML messages.
