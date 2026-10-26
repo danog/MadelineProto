@@ -259,6 +259,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      */
     private array $cdnRsaKeys = [];
     /**
+     * The keys of the settings that rsaKeys and testRsaKeys were parsed from.
+     *
+     * @var ?array{list<string>, list<string>}
+     */
+    private ?array $rsaKeysSource = null;
+    /**
      * Diffie-hellman config.
      *
      */
@@ -559,6 +565,36 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         return null;
     }
     /**
+     * Parse the RSA keys of the settings, unless the ones of the session were parsed from them.
+     *
+     * Also on each wakeup: a session saved before rsa_keys was renamed to rsaKeys (8.6.2) woke up with none, and
+     * they were only parsed again on a version or settings change.
+     */
+    private function loadRsaKeys(): void
+    {
+        $source = [
+            $this->settings->getConnection()->getRSAKeys(),
+            $this->settings->getConnection()->getTestRSAKeys(),
+        ];
+        if ($this->rsaKeysSource === $source
+            && \count($this->rsaKeys) === \count($source[0])
+            && \count($this->testRsaKeys) === \count($source[1])
+        ) {
+            return;
+        }
+        $this->rsaKeysSource = $source;
+        $this->rsaKeys = [];
+        foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
+            $key = RSA::load($this->TL, $key);
+            $this->rsaKeys[$key->fp] = $key;
+        }
+        $this->testRsaKeys = [];
+        foreach ($this->settings->getConnection()->getTestRSAKeys() as $key) {
+            $key = RSA::load($this->TL, $key);
+            $this->testRsaKeys[$key->fp] = $key;
+        }
+    }
+    /**
      * Serialize all instances.
      *
      * CALLED ONLY ON SHUTDOWN.
@@ -735,17 +771,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         // Actually instantiate needed classes like a boss
         $this->cleanupProperties();
         $this->datacenter->applySettings();
-        // Load rsa keys
-        $this->rsaKeys = [];
-        foreach ($this->settings->getConnection()->getRSAKeys() as $key) {
-            $key = RSA::load($this->TL, $key);
-            $this->rsaKeys[$key->fp] = $key;
-        }
-        $this->testRsaKeys = [];
-        foreach ($this->settings->getConnection()->getTestRSAKeys() as $key) {
-            $key = RSA::load($this->TL, $key);
-            $this->testRsaKeys[$key->fp] = $key;
-        }
+        $this->loadRsaKeys();
         // (re)-initialize TL
         $callbacks = [$this, $this->peerDatabase];
         if ($this->settings->getDb()->getEnableFileReferenceDb()) {
@@ -895,6 +921,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             // Authorization cache
             'rsaKeys',
             'testRsaKeys',
+            'rsaKeysSource',
             'cdnRsaKeys',
             'dh_config',
 
@@ -936,7 +963,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
 
     /**
      * Drop the properties removed since the session was saved (e.g. rsa_keys and test_rsa_keys, renamed to
-     * rsaKeys and testRsaKeys: the keys are refetched).
+     * rsaKeys and testRsaKeys, which loadRsaKeys() parses again on wakeup).
      *
      * Not with __unserialize(): PHP calls it once the whole session is unserialized, after the __wakeup() of the
      * objects in it, which read the MTProto instance (DataCenter its settings, the databases its database settings,
@@ -1329,6 +1356,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         try {
             // Setup logger
             $this->setupLogger();
+
+            // Before cleanupProperties(), whose database setup may already generate auth keys
+            $this->loadRsaKeys();
 
             // Cleanup old properties, init new stuffs
             $this->cleanupProperties();
