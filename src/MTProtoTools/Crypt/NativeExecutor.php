@@ -25,7 +25,7 @@ use Throwable;
 /**
  * One native worker shared by all crypto adapters in this process.
  * @internal
- * @psalm-type CryptoOutput = array{data: string, iv: string, sessionId: string, messageId: string, seqNo: int}
+ * @psalm-type CryptoOutput = array{data: string, state: string}
  */
 final class NativeExecutor
 {
@@ -42,6 +42,8 @@ final class NativeExecutor
     /** @var resource */
     private $stream;
     private string $watcher;
+    private readonly CData $result;
+    private readonly CData $resultAddress;
     private bool $closed = false;
     private bool $failed = false;
 
@@ -55,21 +57,21 @@ final class NativeExecutor
         if (!\extension_loaded('ffi') || PHP_OS_FAMILY === 'Windows') {
             return;
         }
-        $name = PHP_OS_FAMILY === 'Darwin' ? 'libmadeline-ige.dylib' : 'libmadeline-ige.so';
+        $name = PHP_OS_FAMILY === 'Darwin' ? 'libmadeline-crypto.dylib' : 'libmadeline-crypto.so';
         $build = \dirname(__DIR__, 3).'/native/';
         $header = @file_get_contents($build.'crypto.h');
         if ($header === false) {
             return;
         }
         $declarations = str_replace('unsigned char', 'char', preg_replace('/^#.*$/m', '', $header));
-        foreach (array_filter([getenv('MADELINE_IGE_LIBRARY'), $build.'build/'.$name, $build.'build/Release/'.$name, $name]) as $library) {
+        foreach (array_filter([getenv('MADELINE_CRYPTO_LIBRARY'), $build.'build/'.$name, $build.'build/Release/'.$name, $name]) as $library) {
             try {
                 $ffi = FFI::cdef($declarations, $library);
-                if ($ffi->madeline_crypto_abi() !== 1) {
+                if ($ffi->madeline_crypto_abi() !== 2) {
                     continue;
                 }
                 $operations = (int) $ffi->madeline_crypto_operations();
-                if (($operations & 3) !== 3) {
+                if (($operations & 7) === 0) {
                     continue;
                 }
                 /** @var CData $pool */
@@ -109,6 +111,9 @@ final class NativeExecutor
             throw new RuntimeException('Could not open crypto notification stream');
         }
         $this->stream = $stream;
+        $buffer = $ffi->new('CryptoResult');
+        $this->resultAddress = FFI::addr($buffer);
+        $this->result = $buffer;
         stream_set_blocking($stream, false);
         stream_set_read_buffer($stream, 0);
         try {
@@ -118,15 +123,6 @@ final class NativeExecutor
             fclose($stream);
             throw $e;
         }
-    }
-
-    /** Access the loaded ABI for adapter-owned resources. @internal */
-    public function bind(\Closure $factory): mixed
-    {
-        if ($this->closed || $this->failed) {
-            throw new RuntimeException('Native executor is closed');
-        }
-        return $factory($this->ffi, $this->pool);
     }
 
     /**
@@ -143,8 +139,12 @@ final class NativeExecutor
                 throw new RuntimeException('Native executor is closed');
             }
             $id = $enqueue($this->ffi, $this->pool);
-            if ($id > 0) break;
-            if ($id < 0) throw new RuntimeException('Native submission failed: '.$id);
+            if ($id > 0) {
+                break;
+            }
+            if ($id < 0) {
+                throw new RuntimeException('Native submission failed: '.$id);
+            }
             $this->space ??= new DeferredFuture;
             $this->space->getFuture()->await($cancellation);
         }
@@ -159,16 +159,16 @@ final class NativeExecutor
     {
         while (($bytes = fread($this->stream, 8192)) !== false && $bytes !== '') {
         }
-        $buffer = $this->ffi->new('CryptoResult');
-        $address = FFI::addr($buffer);
-        /** @var object{handle: CData, id: int, data: CData, size: non-negative-int, iv: CData, session_id: CData, message_id: CData, seq_no: int, status: int} $result */
+        $buffer = $this->result;
+        $address = $this->resultAddress;
+        /** @var object{handle: CData, id: int, data: CData, size: non-negative-int, state: CData, state_size: non-negative-int, status: int} $result */
         $result = $buffer;
         while ($this->ffi->madeline_crypto_collect($this->pool, $address)) {
             $deferred = $this->pending[$result->id];
             unset($this->pending[$result->id]);
             try {
                 if ($result->status <= -10) {
-                    throw new SecurityException('Invalid encrypted transport message: '.$result->status);
+                    throw new SecurityException('Native data validation failed: '.$result->status);
                 }
                 if ($result->status !== 1 || $this->failed) {
                     $this->failed = true;
@@ -176,10 +176,7 @@ final class NativeExecutor
                 }
                 $value = [
                     'data' => FFI::string($result->data, $result->size),
-                    'iv' => FFI::string($result->iv, 32),
-                    'sessionId' => FFI::string($result->session_id, 8),
-                    'messageId' => FFI::string($result->message_id, 8),
-                    'seqNo' => $result->seq_no,
+                    'state' => $result->state_size ? FFI::string($result->state, $result->state_size) : '',
                 ];
             } catch (Throwable $e) {
                 $deferred->error($e);

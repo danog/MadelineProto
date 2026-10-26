@@ -70,7 +70,7 @@ final class IGENative extends IGE
                 return $output;
             }
             $result = $executor->submit(fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit($pool, $operation, $data, \strlen($data), $this->key, $this->iv))->await();
-            $this->iv = $result['iv'];
+            $this->iv = $result['state'];
             return $result['data'];
         } finally {
             $lock->release();
