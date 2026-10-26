@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @author Alexander Pankratov <s.pankratoff@gmail.com>
+ * @copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
+ * @license https://opensource.org/licenses/AGPL-3.0 AGPLv3
+ */
+
+namespace danog\MadelineProto\MTProtoTools\Crypt;
+
+use Amp\ForbidSerialization;
+use Amp\Sync\LocalMutex;
+use ValueError;
+
+/** Continuous IGE using the process-wide native executor. @internal */
+final class IGENative extends IGE
+{
+    use ForbidSerialization;
+
+    private readonly LocalMutex $mutex;
+
+    protected function __construct(private readonly string $key, private string $iv)
+    {
+        if (\strlen($key) !== 32 || \strlen($iv) !== 32) {
+            throw new ValueError('AES-256-IGE requires a 32-byte key and IV');
+        }
+        $this->mutex = new LocalMutex;
+    }
+
+    #[\Override]
+    public function getState(): string
+    {
+        return $this->iv;
+    }
+
+    #[\Override]
+    public function encrypt(string $plaintext): string
+    {
+        return $this->process($plaintext, NativeCrypto::ENCRYPT);
+    }
+
+    #[\Override]
+    public function decrypt(string $ciphertext): string
+    {
+        return $this->process($ciphertext, NativeCrypto::DECRYPT);
+    }
+
+    private function process(string $data, int $operation): string
+    {
+        if (\strlen($data) % 16) {
+            throw new ValueError('AES-IGE data length must be a multiple of 16');
+        }
+        $lock = $this->mutex->acquire();
+        try {
+            if ($data === '') {
+                return '';
+            }
+            $executor = NativeCrypto::get($operation);
+            if (!$executor) {
+                // The last committed IV is sufficient to continue after executor shutdown.
+                $fallback = IGE::getInstance($this->key, $this->iv);
+                $output = $operation === NativeCrypto::ENCRYPT ? $fallback->encrypt($data) : $fallback->decrypt($data);
+                $this->iv = $fallback->getState();
+                return $output;
+            }
+            $result = $executor->submit($operation, $data, $this->key, $this->iv)->await();
+            $this->iv = $result['iv'];
+            return $result['data'];
+        } finally {
+            $lock->release();
+        }
+    }
+}
