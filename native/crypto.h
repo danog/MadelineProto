@@ -14,12 +14,12 @@ typedef struct {
     uint64_t id;
     const unsigned char *data;
     size_t size;
-    unsigned char iv[32], session_id[8], message_id[8];
-    uint32_t seq_no;
+    unsigned char state[32];
+    size_t state_size;
     int status;
 } CryptoResult;
 
-/* ABI 1: operation bits 1/2 = IGE encrypt/decrypt, 4 = inbound MTProto v2. */
+/* ABI 2: operation bits 1/2 = IGE encrypt/decrypt, 4 = inbound MTProto v2. */
 unsigned madeline_crypto_abi(void);
 unsigned madeline_crypto_operations(void);
 CryptoExecutor *madeline_crypto_create(unsigned capacity, size_t byte_limit, unsigned window_us, unsigned fixed_width);

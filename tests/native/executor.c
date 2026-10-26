@@ -36,7 +36,7 @@ int main(void)
         assert(result.id == (uint64_t)(i ? second : first));
         assert(result.status == 1 && result.size == 16);
         assert(!memcmp(result.data, expected, 16));
-        assert(!memcmp(result.iv, state, 32));
+        assert(!memcmp(result.state, state, 32));
         madeline_crypto_release(p, result.handle);
     }
     assert(!madeline_crypto_collect(p, &result));
@@ -47,7 +47,7 @@ int main(void)
     assert(p && madeline_crypto_submit(p, 2, plain, 0, key, iv) > 0);
     madeline_crypto_stop(p);
     assert(madeline_crypto_collect(p, &result));
-    assert(result.status == 1 && result.size == 0 && !memcmp(result.iv, iv, 32));
+    assert(result.status == 1 && result.size == 0 && !memcmp(result.state, iv, 32));
     madeline_crypto_release(p, result.handle);
     madeline_crypto_destroy(p);
     puts("Bounded queue, ordered results, IVs, empty input and graceful shutdown passed");

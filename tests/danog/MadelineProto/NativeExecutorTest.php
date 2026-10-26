@@ -145,7 +145,7 @@ final class NativeExecutorTest extends TestCase
         $result = $first->await();
         self::assertSame(16, \strlen($second->await()['data']));
         self::assertNull(NativeExecutor::get(3));
-        self::assertSame($expected, $result['data'].IGE::getInstance($key, $result['iv'])->encrypt($plain));
+        self::assertSame($expected, $result['data'].IGE::getInstance($key, $result['state'])->encrypt($plain));
         $executor->close();
     }
 }
