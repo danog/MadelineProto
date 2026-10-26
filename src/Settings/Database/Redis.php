@@ -89,7 +89,7 @@ final class Redis extends DriverDatabaseAbstract
      * @psalm-external-mutation-free
      */
     #[\Override]
-    public function setUri(string $uri): static
+    public function setUri(#[\SensitiveParameter] string $uri): static
     {
         $this->uri = $uri;
 

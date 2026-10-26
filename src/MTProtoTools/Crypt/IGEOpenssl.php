@@ -33,7 +33,7 @@ final class IGEOpenssl extends IGE
     /**
      * @psalm-mutation-free
      */
-    protected function __construct(private string $key, string $iv)
+    protected function __construct(#[\SensitiveParameter] private string $key, string $iv)
     {
         $this->iv_part_1 = substr($iv, 0, 16);
         $this->iv_part_2 = substr($iv, 16);

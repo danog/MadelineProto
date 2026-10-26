@@ -103,7 +103,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
      *
      * @internal
      */
-    public static function generateClientHello(string $domain, string $key, int $time): string
+    public static function generateClientHello(string $domain, #[\SensitiveParameter] string $key, int $time): string
     {
         $grease = array_map(static fn (int $c): int => ($c & 0xF0) + 0x0A, array_values(unpack('C*', Tools::random(7))));
         for ($i = 1; $i < 7; $i += 2) {
@@ -159,7 +159,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
      *
      * @internal
      */
-    public static function checkServerHello(string $key, string $clientRandom, string $response): bool
+    public static function checkServerHello(#[\SensitiveParameter] string $key, string $clientRandom, string $response): bool
     {
         if (\strlen($response) < 11 + 32) {
             return false;

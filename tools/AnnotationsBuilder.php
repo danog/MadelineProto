@@ -517,6 +517,10 @@ final class Blacklist {
             $paramList = '';
             $hasCancellation = false;
             foreach ($method->getParameters() as $param) {
+                // Kept out of the stack traces of the wrapper too.
+                if ($param->getAttributes(\SensitiveParameter::class)) {
+                    $doc .= '#[\\SensitiveParameter] ';
+                }
                 if ($type = $param->getType()) {
                     $doc .= $this->typeToStr($type).' ';
                 } else {

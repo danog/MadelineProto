@@ -362,7 +362,7 @@ final class PrivateCallController implements CallControllerInterface
      *
      * @return list{string, string, string, string}
      */
-    private static function computeVisualization(string $key, string $g_a): array
+    private static function computeVisualization(#[\SensitiveParameter] string $key, string $g_a): array
     {
         $visualization = [];
         $length = new BigInteger(\count(Magic::$emojis));

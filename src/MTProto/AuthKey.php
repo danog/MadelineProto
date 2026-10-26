@@ -71,7 +71,7 @@ abstract class AuthKey implements JsonSerializable
      *
      * @psalm-external-mutation-free
      */
-    public function setAuthKey(string $authKey): void
+    public function setAuthKey(#[\SensitiveParameter] string $authKey): void
     {
         $this->authKey = $authKey;
         $this->id = substr(sha1($authKey, true), -8);

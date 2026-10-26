@@ -269,7 +269,7 @@ abstract class InternalDoc
      *
      * @param string $token Bot token
      */
-    final public function botLogin(string $token): ?array
+    final public function botLogin(#[\SensitiveParameter] string $token): ?array
     {
         return $this->wrapper->getAPI()->botLogin($token);
     }
@@ -444,7 +444,7 @@ abstract class InternalDoc
      *
      * @param string $password Password
      */
-    final public function complete2faLogin(string $password): array
+    final public function complete2faLogin(#[\SensitiveParameter] string $password): array
     {
         return $this->wrapper->getAPI()->complete2faLogin($password);
     }
@@ -453,7 +453,7 @@ abstract class InternalDoc
      *
      * @param string $code Login code
      */
-    final public function completePhoneLogin(string $code): array
+    final public function completePhoneLogin(#[\SensitiveParameter] string $code): array
     {
         return $this->wrapper->getAPI()->completePhoneLogin($code);
     }
@@ -1346,7 +1346,7 @@ abstract class InternalDoc
      * @param string  $url The URL of the RTMP application, or, without `$key`, the URL followed by the stream key.
      * @param ?string $key The stream key.
      */
-    final public function getRtmpStream(string $url, ?string $key = null): ?\danog\MadelineProto\EventHandler\Calls\RtmpStream
+    final public function getRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null): ?\danog\MadelineProto\EventHandler\Calls\RtmpStream
     {
         return $this->wrapper->getAPI()->getRtmpStream($url, $key);
     }
@@ -1634,7 +1634,7 @@ abstract class InternalDoc
      * @param array<int, string> $authorization Authorization info
      * @param int                $mainDcID      Main DC ID
      */
-    final public function importAuthorization(array $authorization, int $mainDcID): array
+    final public function importAuthorization(#[\SensitiveParameter] array $authorization, int $mainDcID): array
     {
         return $this->wrapper->getAPI()->importAuthorization($authorization, $mainDcID);
     }
@@ -2750,7 +2750,7 @@ abstract class InternalDoc
      *
      * @throws RtmpAddressException If the server isn't one of $servers.
      */
-    final public function startRtmpStream(string $url, ?string $key = null, \danog\MadelineProto\RtmpServers $servers = \danog\MadelineProto\RtmpServers::Any): \danog\MadelineProto\EventHandler\Calls\RtmpStream
+    final public function startRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null, \danog\MadelineProto\RtmpServers $servers = \danog\MadelineProto\RtmpServers::Any): \danog\MadelineProto\EventHandler\Calls\RtmpStream
     {
         return $this->wrapper->getAPI()->startRtmpStream($url, $key, $servers);
     }

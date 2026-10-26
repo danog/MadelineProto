@@ -171,7 +171,7 @@ final class AppInfo extends SettingsAbstract
      *
      * @psalm-external-mutation-free
      */
-    public function setApiHash(string $apiHash): self
+    public function setApiHash(#[\SensitiveParameter] string $apiHash): self
     {
         $this->apiHash = $apiHash;
 

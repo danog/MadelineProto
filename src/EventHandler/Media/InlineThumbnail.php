@@ -133,7 +133,7 @@ final class InlineThumbnail extends AbstractThumbnail
      *
      * @return ?array{name: string, ext: string, mime: string, size: int, InputFileLocation: array, data: string}
      */
-    public static function unpackFileId(string $fileId, string $key): ?array
+    public static function unpackFileId(string $fileId, #[\SensitiveParameter] string $key): ?array
     {
         if (!self::isFileId($fileId)) {
             return null;
@@ -169,13 +169,13 @@ final class InlineThumbnail extends AbstractThumbnail
      *
      * @internal
      */
-    public static function getUniqueFileId(string $fileId, string $key): ?string
+    public static function getUniqueFileId(string $fileId, #[\SensitiveParameter] string $key): ?string
     {
         $info = self::unpackFileId($fileId, $key);
         return $info === null ? null : self::FILE_ID_PREFIX.self::hash($info['data']);
     }
 
-    private static function mac(string $payload, string $key): string
+    private static function mac(string $payload, #[\SensitiveParameter] string $key): string
     {
         return substr(hash_hmac('sha256', $payload, $key, true), 0, self::MAC_LENGTH);
     }

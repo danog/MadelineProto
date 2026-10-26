@@ -152,7 +152,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      *
      * @psalm-external-mutation-free
      */
-    public function setPassword(string $password): static
+    public function setPassword(#[\SensitiveParameter] string $password): static
     {
         $this->password = $password;
 
@@ -175,7 +175,7 @@ abstract class DriverDatabaseAbstract extends DatabaseAbstract
      * Set database URI.
      * @psalm-impure
      */
-    abstract public function setUri(string $uri): static;
+    abstract public function setUri(#[\SensitiveParameter] string $uri): static;
 
     public function getSerializer(): ?SerializerType
     {

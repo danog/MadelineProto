@@ -49,7 +49,7 @@ final class CallPacket
      * @param string                                 $seed       Our Ed25519 signing seed.
      * @param string                                 $unencryptedPrefix Bytes kept in the clear at the front.
      */
-    public static function encrypt(int $channelId, int $seqno, string $plaintext, array $epochs, string $seed, string $unencryptedPrefix = ''): string
+    public static function encrypt(int $channelId, int $seqno, string $plaintext, array $epochs, #[\SensitiveParameter] string $seed, string $unencryptedPrefix = ''): string
     {
         if ($channelId < 0 || $channelId > self::MAX_CHANNEL_ID) {
             throw new \InvalidArgumentException('channel id out of range');
