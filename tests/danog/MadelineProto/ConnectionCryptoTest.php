@@ -20,7 +20,7 @@ use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProto\NewAuthKey;
 use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use danog\MadelineProto\MTProtoTools\Crypt;
-use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
@@ -51,8 +51,8 @@ final class ConnectionCryptoTest extends TestCase
     /** @dataProvider changes */
     public function testResultsCannotModifyAReplacementConnection(string $change, bool $damaged): void
     {
-        NativeCrypto::initialize();
-        if (!NativeCrypto::get(NativeCrypto::DECODE_V2)) {
+        NativeExecutor::initialize();
+        if (!NativeExecutor::get(NativeExecutor::DECODE_V2)) {
             self::markTestSkipped('Optional native decoder unavailable');
         }
         BypassFinals::enable();
@@ -135,8 +135,8 @@ final class ConnectionCryptoTest extends TestCase
     /** @dataProvider outgoingChanges */
     public function testUnsentMessagesSurviveConnectionChangesDuringEncryption(string $change): void
     {
-        NativeCrypto::initialize();
-        if (!NativeCrypto::get(3)) {
+        NativeExecutor::initialize();
+        if (!NativeExecutor::get(3)) {
             self::markTestSkipped('Optional native IGE unavailable');
         }
         BypassFinals::enable();

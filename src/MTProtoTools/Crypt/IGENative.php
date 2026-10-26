@@ -42,13 +42,13 @@ final class IGENative extends IGE
     #[\Override]
     public function encrypt(string $plaintext): string
     {
-        return $this->process($plaintext, NativeCrypto::ENCRYPT);
+        return $this->process($plaintext, NativeExecutor::ENCRYPT);
     }
 
     #[\Override]
     public function decrypt(string $ciphertext): string
     {
-        return $this->process($ciphertext, NativeCrypto::DECRYPT);
+        return $this->process($ciphertext, NativeExecutor::DECRYPT);
     }
 
     private function process(string $data, int $operation): string
@@ -61,15 +61,15 @@ final class IGENative extends IGE
             if ($data === '') {
                 return '';
             }
-            $executor = NativeCrypto::get($operation);
+            $executor = NativeExecutor::get($operation);
             if (!$executor) {
                 // The last committed IV is sufficient to continue after executor shutdown.
                 $fallback = IGE::getInstance($this->key, $this->iv);
-                $output = $operation === NativeCrypto::ENCRYPT ? $fallback->encrypt($data) : $fallback->decrypt($data);
+                $output = $operation === NativeExecutor::ENCRYPT ? $fallback->encrypt($data) : $fallback->decrypt($data);
                 $this->iv = $fallback->getState();
                 return $output;
             }
-            $result = $executor->submit($operation, $data, $this->key, $this->iv)->await();
+            $result = $executor->submit(fn (\FFI $ffi, \FFI\CData $pool): int => (int) $ffi->madeline_crypto_submit($pool, $operation, $data, \strlen($data), $this->key, $this->iv))->await();
             $this->iv = $result['iv'];
             return $result['data'];
         } finally {
