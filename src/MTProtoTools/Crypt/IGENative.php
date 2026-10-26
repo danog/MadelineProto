@@ -14,7 +14,11 @@ use Amp\ForbidSerialization;
 use Amp\Sync\LocalMutex;
 use ValueError;
 
-/** Continuous IGE using the process-wide native executor. @internal */
+/**
+ * Continuous IGE using the process-wide native executor.
+ * @internal
+ * @psalm-suppress PropertyNotSetInConstructor getState() replaces the legacy parent's split IV storage.
+ */
 final class IGENative extends IGE
 {
     use ForbidSerialization;

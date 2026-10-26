@@ -47,6 +47,7 @@ final class Crypt
 
     /**
      * AES KDF function for MTProto v2.
+     * @return array{string, string}
      *
      * @param string  $msg_key   Message key
      * @param string  $auth_key  Auth key

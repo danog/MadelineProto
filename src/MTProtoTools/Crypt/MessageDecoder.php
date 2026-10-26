@@ -13,5 +13,6 @@ namespace danog\MadelineProto\MTProtoTools\Crypt;
 /** Stateless decoding of inbound encrypted MTProto v2 messages. @internal */
 interface MessageDecoder
 {
+    /** @psalm-impure */
     public function decode(string $ciphertext, string $authKey, string $messageKey): DecodedMessage;
 }
