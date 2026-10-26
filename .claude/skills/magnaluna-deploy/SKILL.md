@@ -27,7 +27,10 @@ line and every trace say which), which `madeline.php` fetches when the process s
   `docker stop homedaniilit-magnaluna-1`, then
   `docker run --rm --user $(id -u):$(id -g) -e COMPOSER_HOME=/tmp/composer -v /media/storage/persist/magnaluna:/app -w /app danog/madelineproto:next composer update danog/madelineproto --with-dependencies --no-interaction`
   (`--with-dependencies` to pick up new php-rtc releases), then `docker start homedaniilit-magnaluna-1`.
-  Remove `vendor/` again to go back to the released phar.
+  To go back to the released phar once the fix is released, stop the bot and remove `vendor/` **and
+  `madeline.version`**: that file still names the phar loaded before (`madeline.php` loads it without checking for a
+  newer one), which can't load a session the newer code saved (e.g. `Class 'danog\MadelineProto\RtmpServers' does
+  not exist`): the bot crash-loops.
 
 ## Every bot loads the phar
 
