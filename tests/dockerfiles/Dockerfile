@@ -11,7 +11,7 @@
 # PHP is compiled from scratch to build it with -O3, debug symbols (see the .gdbinit below) and capstone (to
 # disassemble the JIT's output), and jemalloc is used instead of the system malloc.
 
-FROM debian:trixie-slim
+FROM debian:trixie-slim AS php-runtime
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -280,21 +280,23 @@ RUN set -eux; \
 	mkdir -p /app; \
 	chown madeline:madeline /app
 
-# Build the optional EVP-IGE helper for the target architecture, independently of PHP.
-FROM debian:bookworm-slim AS crypto-build
-
+# Build against the exact PHP headers and ABI shipped in the runtime.
+FROM php-runtime AS crypto-build
+USER root
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends cmake gcc libc6-dev make libssl-dev \
+    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-
 COPY native/ /usr/src/madeline-crypto/
-RUN cmake -S /usr/src/madeline-crypto -B /tmp/crypto-build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
-    && cmake --build /tmp/crypto-build --config Release \
-    && install -D /tmp/crypto-build/libmadeline-crypto.so /artifacts/usr/local/lib/libmadeline-crypto.so
+WORKDIR /usr/src/madeline-crypto
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
+    && /root/.cargo/bin/cargo build --release --locked \
+    && install -D target/release/libmadeline_crypto.so "/artifacts$(php-config --extension-dir)/madeline_crypto.so" \
+    && mkdir -p "/artifacts$PHP_INI_DIR/conf.d" \
+    && echo 'extension=madeline_crypto.so' > "/artifacts$PHP_INI_DIR/conf.d/madeline-crypto.ini"
 
 FROM scratch
 
-COPY --from=0 / /
+COPY --from=php-runtime / /
 COPY --from=crypto-build /artifacts/ /
 
 LABEL "repository"="http://github.com/danog/MadelineProto"
@@ -306,13 +308,13 @@ LABEL "org.opencontainers.image.description"=" Async PHP client API for the tele
 LABEL "org.opencontainers.image.licenses"=AGPL-3.0-only
 
 ENV PHP_INI_DIR /usr/local/etc/php
-ENV MADELINE_CRYPTO_LIBRARY=/usr/local/lib/libmadeline-crypto.so
 ENV PATH=/composer/vendor/bin:${PATH}
 
 ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
-RUN php -v && php -r '$ffi = FFI::cdef("int madeline_ige_crypt(const char *in, char *out, size_t size, const char *key, char *iv, int encrypt); unsigned madeline_crypto_abi(void); unsigned madeline_crypto_operations(void);", getenv("MADELINE_CRYPTO_LIBRARY")); if ($ffi->madeline_crypto_abi() !== 2 || ($ffi->madeline_crypto_operations() & 7) !== 7 || $ffi->madeline_ige_crypt("", $ffi->new("char[1]"), 0, str_repeat("\0", 32), $ffi->new("char[32]"), 1) !== 1) { throw new RuntimeException("EVP-IGE initialization failed"); }'
+RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || \danog\MadelineProto\Native\Crypto::version() !== "0.1.0") { throw new RuntimeException("Native crypto extension unavailable"); }'
+
 
 USER madeline:madeline
 

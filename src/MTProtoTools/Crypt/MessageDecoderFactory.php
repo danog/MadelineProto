@@ -15,6 +15,6 @@ final class MessageDecoderFactory
 {
     public static function create(): MessageDecoder
     {
-        return NativeExecutor::get(NativeExecutor::DECODE_V2) ? new NativeMessageDecoder : new PhpMessageDecoder;
+        return NativeExecutor::get() ? new NativeMessageDecoder : new PhpMessageDecoder;
     }
 }
