@@ -3,6 +3,7 @@
  * Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+#define _DARWIN_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #include "crypto.h"
 #include "policy.h"
@@ -21,6 +22,7 @@
 #include <string.h>
 #include <time.h>
 #include <openssl/crypto.h>
+#include <openssl/evp.h>
 
 extern int madeline_ige_crypt(const unsigned char *, unsigned char *, size_t,
     const unsigned char *, unsigned char *, int);
@@ -54,6 +56,8 @@ struct Job {
     unsigned operation;
     size_t size, cost;
     unsigned char *input, *output, key[32], iv[32];
+    unsigned char auth_key[256], msg_key[16];
+    size_t body_size;
     int status;
     Job *next, *all_next;
 };
@@ -62,7 +66,7 @@ struct CryptoExecutor {
     pthread_cond_t ready;
     pthread_t worker;
     int notification[2], closing, joined;
-    unsigned capacity, live;
+    unsigned capacity, live, fixed_width;
     size_t byte_limit, bytes;
     uint64_t next_id, window_ns;
     Job *head, *tail, *done_head, *done_tail, *all;
@@ -98,7 +102,7 @@ static unsigned size_bucket(size_t size)
 }
 static int compatible(const Job *a, const Job *b)
 {
-    return a->size == b->size && a->operation == b->operation;
+    return size_bucket(a->size) == size_bucket(b->size) && a->operation == b->operation;
 }
 static unsigned available(Job *first, unsigned target)
 {
@@ -106,6 +110,48 @@ static unsigned available(Job *first, unsigned target)
     for (Job *j = first; j && n < target; j = j->next)
         if (compatible(first, j)) n++;
     return n;
+}
+static int digest_pair(const unsigned char *a, size_t an, const unsigned char *b, size_t bn,
+    unsigned char hash[32])
+{
+    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+    if (!ctx) return 0;
+    unsigned size = 0;
+    int ok = EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) && EVP_DigestUpdate(ctx, a, an)
+        && EVP_DigestUpdate(ctx, b, bn) && EVP_DigestFinal_ex(ctx, hash, &size) && size == 32;
+    EVP_MD_CTX_free(ctx);
+    return ok;
+}
+static int derive(Job *j)
+{
+    unsigned char a[32], b[32];
+    int ok = digest_pair(j->msg_key, 16, j->auth_key + 8, 36, a)
+        && digest_pair(j->auth_key + 48, 36, j->msg_key, 16, b);
+    if (ok) {
+        memcpy(j->key, a, 8); memcpy(j->key + 8, b + 8, 16); memcpy(j->key + 24, a + 24, 8);
+        memcpy(j->iv, b, 8); memcpy(j->iv + 8, a + 8, 16); memcpy(j->iv + 24, b + 24, 8);
+    }
+    OPENSSL_cleanse(a, 32); OPENSSL_cleanse(b, 32);
+    return ok;
+}
+static uint32_t read_u32(const unsigned char *p)
+{
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
+}
+static int verify(Job *j)
+{
+    unsigned char hash[32];
+    if (!digest_pair(j->auth_key + 96, 32, j->output, j->size, hash)) return -1;
+    int match = CRYPTO_memcmp(hash + 8, j->msg_key, 16) == 0;
+    OPENSSL_cleanse(hash, sizeof(hash));
+    if (!match) return -11;
+    if (j->size < 32) return -12;
+    uint32_t length = read_u32(j->output + 28);
+    if (length % 4 || length > j->size - 32) return -13;
+    size_t padding = j->size - 32 - length;
+    if (padding < 12 || padding > 1024) return -14;
+    j->body_size = length;
+    return 1;
 }
 static void process(CryptoExecutor *p, Job **jobs, unsigned count, CryptoPolicy *policy)
 {
@@ -115,19 +161,38 @@ static void process(CryptoExecutor *p, Job **jobs, unsigned count, CryptoPolicy 
         inputs[i] = jobs[i]->input; outputs[i] = jobs[i]->output;
         keys[i] = jobs[i]->key; ivs[i] = jobs[i]->iv;
     }
-    uint64_t start = policy->stopped ? 0 : clock_ns(CLOCK_THREAD_CPUTIME_ID);
+    int measure = p->crypt && !p->fixed_width && !policy->stopped && count == policy_target(policy);
+    uint64_t start = measure ? clock_ns(CLOCK_THREAD_CPUTIME_ID) : 0;
+    size_t common = jobs[0]->size, bytes = 0;
+    for (unsigned i = 0; i < count; i++) {
+        if (jobs[i]->size < common) common = jobs[i]->size;
+        bytes += jobs[i]->size;
+    }
+    for (unsigned i = 0; i < count; i++)
+        jobs[i]->status = jobs[i]->operation != 4 || derive(jobs[i]) ? 1 : -1;
     if (p->crypt) {
-        int ok = p->crypt(inputs, outputs, jobs[0]->size, keys, ivs, count, jobs[0]->operation == 1);
-        for (unsigned i = 0; i < count; i++) jobs[i]->status = ok ? 1 : -1;
+        int ok = p->crypt(inputs, outputs, common, keys, ivs, count, jobs[0]->operation == 1);
+        // MTProto padding makes otherwise similar message sizes differ. Batch the
+        // common prefix, then finish the short tails with their continued IVs.
+        for (unsigned i = 0; ok && i < count; i++) {
+            if (jobs[i]->size == common) continue;
+            const unsigned char *input = inputs[i] + common;
+            unsigned char *output = outputs[i] + common;
+            ok = p->crypt(&input, &output, jobs[i]->size - common, keys + i, ivs + i, 1, jobs[i]->operation == 1);
+        }
+        for (unsigned i = 0; i < count; i++)
+            if (!ok) jobs[i]->status = -1;
     } else {
         for (unsigned i = 0; i < count; i++)
-            jobs[i]->status = madeline_ige_crypt(inputs[i], outputs[i], jobs[i]->size,
-                keys[i], ivs[i], jobs[i]->operation == 1) ? 1 : -1;
+            if (jobs[i]->status == 1 && !madeline_ige_crypt(inputs[i], outputs[i], jobs[i]->size,
+                keys[i], ivs[i], jobs[i]->operation == 1)) jobs[i]->status = -1;
     }
+    for (unsigned i = 0; i < count; i++)
+        if (jobs[i]->operation == 4 && jobs[i]->status == 1) jobs[i]->status = verify(jobs[i]);
     int valid = 1;
     for (unsigned i = 0; i < count; i++) if (jobs[i]->status != 1) valid = 0;
-    if (valid && !policy->stopped)
-        policy_observe(policy, count, count * jobs[0]->size,
+    if (valid && measure)
+        policy_observe(policy, count, bytes,
             clock_ns(CLOCK_THREAD_CPUTIME_ID) - start, p->capacity);
 }
 static void *run(void *opaque)
@@ -142,17 +207,20 @@ static void *run(void *opaque)
             return NULL;
         }
         Job *first = p->head;
-        CryptoPolicy *policy = &p->policies[size_bucket(first->size)][first->operation - 1];
-        unsigned target = p->crypt ? policy_target(policy) : 1;
+        CryptoPolicy *policy = &p->policies[size_bucket(first->size)][first->operation == 4 ? 2 : first->operation - 1];
+        unsigned target = p->crypt ? (p->fixed_width ? p->fixed_width : policy_target(policy)) : 1;
         uint64_t deadline = first->queued_ns + p->window_ns;
         while (!p->closing && available(first, target) < target) {
             uint64_t now = clock_ns(CLOCK_MONOTONIC);
             if (now >= deadline) break;
-            /* POSIX default condvar clock is realtime; recompute from the monotonic
-             * deadline after every wakeup (also supported by macOS). */
-            uint64_t until = clock_ns(CLOCK_REALTIME) + deadline - now;
-            struct timespec t = {(time_t)(until / 1000000000), (long)(until % 1000000000)};
+#ifdef __APPLE__
+            uint64_t remaining = deadline - now;
+            struct timespec t = {(time_t)(remaining / 1000000000), (long)(remaining % 1000000000)};
+            pthread_cond_timedwait_relative_np(&p->ready, &p->lock, &t);
+#else
+            struct timespec t = {(time_t)(deadline / 1000000000), (long)(deadline % 1000000000)};
             pthread_cond_timedwait(&p->ready, &p->lock, &t);
+#endif
         }
         unsigned count = 0;
         Job **cursor = &p->head;
@@ -179,10 +247,10 @@ static void *run(void *opaque)
     }
 }
 unsigned madeline_crypto_abi(void) { return 1; }
-unsigned madeline_crypto_operations(void) { return 3; }
-CryptoExecutor *madeline_crypto_create(unsigned capacity, size_t byte_limit, unsigned window_us)
+unsigned madeline_crypto_operations(void) { return 7; }
+CryptoExecutor *madeline_crypto_create(unsigned capacity, size_t byte_limit, unsigned window_us, unsigned fixed_width)
 {
-    if (!capacity || capacity > 4096 || byte_limit < sizeof(Job) + 2 || window_us > 1000000)
+    if (!capacity || capacity > 4096 || fixed_width > capacity || byte_limit < sizeof(Job) + 2 || window_us > 1000000)
         return NULL;
     CryptoExecutor *p = calloc(1, sizeof(*p));
     if (!p) return NULL;
@@ -192,8 +260,18 @@ CryptoExecutor *madeline_crypto_create(unsigned capacity, size_t byte_limit, uns
             fcntl(p->notification[i], F_SETFL, O_NONBLOCK) < 0) goto fail_pipe;
     }
     if (pthread_mutex_init(&p->lock, NULL)) goto fail_pipe;
-    if (pthread_cond_init(&p->ready, NULL)) goto fail_mutex;
+    pthread_condattr_t attr;
+    if (pthread_condattr_init(&attr)) goto fail_mutex;
+#ifndef __APPLE__
+    if (pthread_condattr_setclock(&attr, CLOCK_MONOTONIC)) {
+        pthread_condattr_destroy(&attr); goto fail_mutex;
+    }
+#endif
+    int cond_error = pthread_cond_init(&p->ready, &attr);
+    pthread_condattr_destroy(&attr);
+    if (cond_error) goto fail_mutex;
     p->capacity = capacity;
+    p->fixed_width = fixed_width;
     p->byte_limit = byte_limit;
     p->window_ns = (uint64_t)window_us * 1000;
     p->crypt = select_batch();
@@ -211,15 +289,12 @@ fail_pipe:
 }
 int madeline_crypto_notification_fd(CryptoExecutor *p)
 {
-    if (!p) return -1;
-    int fd = dup(p->notification[0]);
-    if (fd >= 0 && fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) { close(fd); return -1; }
-    return fd;
+    return p ? p->notification[0] : -1;
 }
-int64_t madeline_crypto_submit(CryptoExecutor *p, unsigned operation,
+static int64_t submit(CryptoExecutor *p, unsigned operation,
     const unsigned char *data, size_t size, const unsigned char *key, const unsigned char *iv)
 {
-    if (!p || (operation != 1 && operation != 2) || !key || !iv ||
+    if (!p || (operation != 1 && operation != 2 && operation != 4) || !key || !iv ||
         (size && !data) || size % 16 || size > (SIZE_MAX - sizeof(Job) - 2) / 2)
         return -1;
     size_t cost = sizeof(Job) + (size ? 2 * size : 2);
@@ -240,7 +315,11 @@ int64_t madeline_crypto_submit(CryptoExecutor *p, unsigned operation,
         pthread_mutex_unlock(&p->lock); return -4;
     }
     if (size) memcpy(j->input, data, size);
-    memcpy(j->key, key, 32); memcpy(j->iv, iv, 32);
+    if (operation == 4) {
+        memcpy(j->auth_key, key, 256); memcpy(j->msg_key, iv, 16);
+    } else {
+        memcpy(j->key, key, 32); memcpy(j->iv, iv, 32);
+    }
     j->operation = operation; j->cost = cost;
     j->id = ++p->next_id; j->queued_ns = clock_ns(CLOCK_MONOTONIC);
     j->all_next = p->all; p->all = j;
@@ -250,6 +329,18 @@ int64_t madeline_crypto_submit(CryptoExecutor *p, unsigned operation,
     pthread_cond_signal(&p->ready);
     pthread_mutex_unlock(&p->lock);
     return (int64_t)id;
+}
+int64_t madeline_crypto_submit(CryptoExecutor *p, unsigned operation,
+    const unsigned char *data, size_t size, const unsigned char *key, const unsigned char *iv)
+{
+    if (operation != 1 && operation != 2) return -1;
+    return submit(p, operation, data, size, key, iv);
+}
+int64_t madeline_crypto_submit_message(CryptoExecutor *p,
+    const unsigned char *data, size_t size, const unsigned char *auth_key, const unsigned char *msg_key)
+{
+    if (size < 48) return -1;
+    return submit(p, 4, data, size, auth_key, msg_key);
 }
 int madeline_crypto_collect(CryptoExecutor *p, CryptoResult *result)
 {
@@ -263,6 +354,15 @@ int madeline_crypto_collect(CryptoExecutor *p, CryptoResult *result)
         memset(result, 0, sizeof(*result));
         result->handle = j; result->id = j->id;
         result->data = j->output; result->size = j->size;
+        if (j->operation == 4) {
+            result->size = 0;
+            if (j->status == 1) {
+                result->data += 32; result->size = j->body_size;
+                memcpy(result->session_id, j->output + 8, 8);
+                memcpy(result->message_id, j->output + 16, 8);
+                result->seq_no = read_u32(j->output + 24);
+            }
+        }
         memcpy(result->iv, j->iv, 32); result->status = j->status;
     }
     pthread_mutex_unlock(&p->lock);
@@ -280,6 +380,19 @@ void madeline_crypto_release(CryptoExecutor *p, void *handle)
     }
     pthread_mutex_unlock(&p->lock);
     if (j) free_job(j);
+}
+int madeline_crypto_policy(CryptoExecutor *p, unsigned operation, size_t size, unsigned *width, int *locked)
+{
+    if (!p || !width || !locked || (operation != 1 && operation != 2 && operation != 4)) return 0;
+    pthread_mutex_lock(&p->lock);
+    int idle = p->live == 0;
+    if (idle) {
+        CryptoPolicy *policy = &p->policies[size_bucket(size)][operation == 4 ? 2 : operation - 1];
+        *width = p->crypt ? (p->fixed_width ? p->fixed_width : (policy->width ? policy->width : 1)) : 1;
+        *locked = !p->crypt || p->fixed_width || policy->stopped;
+    }
+    pthread_mutex_unlock(&p->lock);
+    return idle;
 }
 void madeline_crypto_stop(CryptoExecutor *p)
 {
