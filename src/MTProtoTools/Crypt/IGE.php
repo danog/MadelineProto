@@ -44,11 +44,8 @@ abstract class IGE
      */
     public static function getInstance(string $key, string $iv): IGE
     {
-        if (\Fiber::getCurrent() !== null && NativeExecutor::get(NativeExecutor::ENCRYPT | NativeExecutor::DECRYPT)) {
+        if (NativeExecutor::get()) {
             return new IGENative($key, $iv);
-        }
-        if (IGEEVP::isAvailable()) {
-            return new IGEEVP($key, $iv);
         }
         if (IGEFFI::isAvailable()) {
             return new IGEFFI($key, $iv);

@@ -21,7 +21,8 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
-use danog\MadelineProto\MTProtoTools\Crypt\IGEEVP;
+use danog\MadelineProto\MTProtoTools\Crypt\IGENative;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use PHPUnit\Framework\TestCase;
 
 final class IGETest extends TestCase
@@ -34,6 +35,7 @@ final class IGETest extends TestCase
     protected function setUp(): void
     {
         Magic::start(light: false);
+        NativeExecutor::initialize();
     }
 
     public function testKnownCiphertextCanBeReadAndWritten(): void
@@ -48,12 +50,45 @@ final class IGETest extends TestCase
         self::assertSame($plain, IGE::getInstance($key, $iv)->decrypt($encrypted));
     }
 
-    public function testAvailableEvpBackendIsPreferred(): void
+    public function testAvailableNativeBackendIsPreferred(): void
     {
-        if (!IGEEVP::isAvailable()) {
-            self::markTestSkipped('The optional EVP-IGE helper is not available');
+        if (!NativeExecutor::get()) {
+            self::markTestSkipped('The optional Rust extension is not available');
         }
-        self::assertInstanceOf(IGEEVP::class, IGE::getInstance(hex2bin(self::KEY), hex2bin(self::IV)));
+        self::assertInstanceOf(IGENative::class, IGE::getInstance(hex2bin(self::KEY), hex2bin(self::IV)));
+    }
+
+    /** @return iterable<string, array{class-string<IGE>}> */
+    public static function backends(): iterable
+    {
+        yield 'openssl' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEOpenssl::class];
+        yield 'phpseclib' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEPhpseclib::class];
+        yield 'ffi' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEFFI::class];
+    }
+
+    /** @dataProvider backends */
+    public function testFallbackCanResumeBothDirections(string $class): void
+    {
+        if ($class === \danog\MadelineProto\MTProtoTools\Crypt\IGEFFI::class
+            && !\danog\MadelineProto\MTProtoTools\Crypt\IGEFFI::isAvailable()) {
+            self::markTestSkipped('System libcrypto FFI is unavailable');
+        }
+        $key = hex2bin(self::KEY);
+        $iv = hex2bin(self::IV);
+        $create = static function (string $iv) use ($class, $key): IGE {
+            $cipher = (new \ReflectionClass($class))->newInstanceWithoutConstructor();
+            (new \ReflectionMethod($cipher, '__construct'))->invoke($cipher, $key, $iv);
+            return $cipher;
+        };
+        $encoder = $create($iv);
+        $first = $encoder->encrypt(substr(hex2bin(self::PLAIN), 0, 16));
+        $encoder = $create($encoder->getState());
+        self::assertSame(hex2bin(self::ENCRYPTED), $first.$encoder->encrypt(substr(hex2bin(self::PLAIN), 16)));
+        $decoder = $create($iv);
+        $first = $decoder->decrypt(substr(hex2bin(self::ENCRYPTED), 0, 32));
+        $decoder = $create($decoder->getState());
+        self::assertSame(hex2bin(self::PLAIN), $first.$decoder->decrypt(substr(hex2bin(self::ENCRYPTED), 32)));
+        self::assertSame($encoder->getState(), $decoder->getState());
     }
 
     /** @return iterable<string, array{bool}> */
@@ -66,8 +101,8 @@ final class IGETest extends TestCase
     /** @dataProvider directions */
     public function testRejectedPartPreservesTransferState(bool $decrypt): void
     {
-        if (!IGEEVP::isAvailable()) {
-            self::markTestSkipped('The optional EVP-IGE helper is not available');
+        if (!NativeExecutor::get()) {
+            self::markTestSkipped('The optional Rust extension is not available');
         }
         $iv = hex2bin(self::IV);
         $cipher = IGE::getInstance(hex2bin(self::KEY), $iv);

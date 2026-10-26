@@ -8,19 +8,9 @@ To bump the layer to the latest one, clone the repo (with all submodules) and ru
 
 ## Optional native cryptography
 
-The optional C/FFI helper shares one worker between IGE and transport message decoding.
-Factories retain the PHP/OpenSSL/phpseclib backends when the corresponding native operation is unavailable.
-See [native/README.md](native/README.md) for executor behavior and tests.
-
-Build it from the MadelineProto package directory using CMake, a C compiler, and OpenSSL development headers (OpenSSL 1.1 or newer):
-
-```bash
-cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Release
-cmake --build native/build --config Release
-```
-
-The library in `native/build` is detected automatically. Restart long-running PHP processes after installing the helper. Alternatively, set `MADELINE_CRYPTO_LIBRARY` to the absolute path of a compatible shared library, or install it in the system library search path.
-Build the helper for each target OS and architecture. If it cannot be loaded, FFI is restricted, or EVP cannot initialize AES, the next available backend is used automatically.
-No compiler is needed at runtime; the helper is never compiled or downloaded automatically.
+The optional Rust extension shares one crypto worker between IGE and transport message decoding.
+Factories retain IGEFFI (system libcrypto), ext-openssl and phpseclib fallbacks when the extension is unavailable.
+The Docker image includes it; see [native/README.md](native/README.md) for building
+against your PHP version, executor behavior, tests and tests.
 
 Bye :)

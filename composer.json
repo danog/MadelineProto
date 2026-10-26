@@ -103,7 +103,8 @@
     },
     "suggest": {
         "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
-        "ext-ffi": "Install FFI with libcrypto for faster AES-IGE, and with libopus, libvpx and ffmpeg for realtime audio/video transcoding; not required to play and record video and audio inside calls",
+        "ext-madeline_crypto": "Optional Rust acceleration for AES-IGE and MTProto v2 transport decoding",
+        "ext-ffi": "Install FFI with libcrypto for the AES-IGE fallback, and with libopus, libvpx and ffmpeg for realtime audio/video transcoding; not required to play and record video and audio inside calls",
         "ext-pdo": "Install the pdo extension to store session data on MySQL",
         "ext-openssl": "Install the openssl extension for faster crypto",
         "ext-sodium": "Install the sodium extension for faster crypto",

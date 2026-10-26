@@ -10,220 +10,106 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
-use Amp\Cancellation;
-use Amp\DeferredFuture;
 use Amp\ForbidCloning;
 use Amp\ForbidSerialization;
-use Amp\Future;
-use danog\MadelineProto\SecurityException;
-use FFI;
-use FFI\CData;
+use danog\MadelineProto\Native\Crypto;
 use Revolt\EventLoop;
 use RuntimeException;
 use Throwable;
 
-/**
- * One native worker shared by all crypto adapters in this process.
- * @internal
- * @psalm-type CryptoOutput = array{data: string, state: string}
- */
+/** Lifecycle of the Rust/php-tokio bridge, initialized only by the MTProto owner. @internal */
 final class NativeExecutor
 {
     use ForbidCloning;
     use ForbidSerialization;
 
-    public const ENCRYPT = 1;
-    public const DECRYPT = 2;
-    public const DECODE_V2 = 4;
     private static self|false|null $instance = null;
-    /** @var array<int, DeferredFuture<CryptoOutput>> */
-    private array $pending = [];
-    private ?DeferredFuture $space = null;
     /** @var resource */
     private $stream;
     private string $watcher;
-    private readonly CData $result;
-    private readonly CData $resultAddress;
     private bool $closed = false;
-    private bool $failed = false;
+    private bool $closing = false;
+    private int $active = 0;
+    private readonly int $pid;
 
-    /** Called by the MTProto owner at startup, never by an IPC-only client. */
     public static function initialize(int $capacity = 128, int $byteLimit = 134217728, int $windowUs = 5000, int $fixedWidth = 0): void
     {
         if (self::$instance !== null) {
             return;
         }
         self::$instance = false;
-        if (!\extension_loaded('ffi') || PHP_OS_FAMILY === 'Windows') {
+        if (!\extension_loaded('madeline_crypto') || !class_exists(Crypto::class, false)
+            || Crypto::version() !== '0.1.0') {
             return;
         }
-        $name = PHP_OS_FAMILY === 'Darwin' ? 'libmadeline-crypto.dylib' : 'libmadeline-crypto.so';
-        $build = \dirname(__DIR__, 3).'/native/';
-        $header = @file_get_contents($build.'crypto.h');
-        if ($header === false) {
-            return;
-        }
-        $declarations = str_replace('unsigned char', 'char', preg_replace('/^#.*$/m', '', $header));
-        foreach (array_filter([getenv('MADELINE_CRYPTO_LIBRARY'), $build.'build/'.$name, $build.'build/Release/'.$name, $name]) as $library) {
-            try {
-                $ffi = FFI::cdef($declarations, $library);
-                if ($ffi->madeline_crypto_abi() !== 2) {
-                    continue;
-                }
-                $operations = (int) $ffi->madeline_crypto_operations();
-                if (($operations & 7) === 0) {
-                    continue;
-                }
-                /** @var CData $pool */
-                $pool = $ffi->madeline_crypto_create($capacity, $byteLimit, $windowUs, $fixedWidth);
-                if (FFI::isNull($pool)) {
-                    continue;
-                }
-                try {
-                    self::$instance = new self($ffi, $pool, $operations);
-                } catch (Throwable $e) {
-                    $ffi->madeline_crypto_destroy($pool);
-                    throw $e;
-                }
-                register_shutdown_function(self::$instance->close(...));
-                return;
-            } catch (Throwable) {
-                // Restricted FFI, incompatible helper or unavailable worker: retain synchronous backends.
-            }
+        try {
+            $fd = Crypto::init($capacity, $byteLimit, $windowUs, $fixedWidth);
+            self::$instance = new self($fd);
+            register_shutdown_function(self::$instance->close(...));
+        } catch (Throwable) {
+            Crypto::shutdown();
         }
     }
 
-    public static function get(int $operation): ?self
+    public static function get(): ?self
     {
         $instance = self::$instance;
-        return $instance instanceof self && !$instance->closed && !$instance->failed && ($instance->operations & $operation) === $operation
+        return $instance instanceof self && !$instance->closed && !$instance->closing
+            && $instance->pid === getmypid() && Crypto::available()
             ? $instance : null;
     }
 
-    private function __construct(private readonly FFI $ffi, private readonly CData $pool, private readonly int $operations)
+    private function __construct(int $fd)
     {
-        $fd = (int) $ffi->madeline_crypto_notification_fd($pool);
-        if ($fd < 0) {
-            throw new RuntimeException('Could not open crypto notification descriptor');
-        }
+        $this->pid = getmypid();
         $stream = @fopen('php://fd/'.$fd, 'r');
         if (!$stream) {
             throw new RuntimeException('Could not open crypto notification stream');
         }
         $this->stream = $stream;
-        $buffer = $ffi->new('CryptoResult');
-        $this->resultAddress = FFI::addr($buffer);
-        $this->result = $buffer;
         stream_set_blocking($stream, false);
         stream_set_read_buffer($stream, 0);
-        try {
-            $this->watcher = EventLoop::onReadable($stream, $this->collect(...));
-            EventLoop::unreference($this->watcher);
-        } catch (Throwable $e) {
-            fclose($stream);
-            throw $e;
-        }
+        $this->watcher = EventLoop::onReadable($stream, static fn () => Crypto::wakeup());
+        EventLoop::unreference($this->watcher);
     }
 
     /**
-     * Retry submission on backpressure. The adapter owns argument validation and marshalling.
-     * Accepted work is not cancelled by its waiter; C owns all submitted buffers.
-     * @param \Closure(FFI, CData): int $enqueue
-     * @return Future<CryptoOutput>
+     * Keep Revolt alive while php-tokio suspends the caller. No PHP job/result queue.
+     * @template T of array
+     * @param \Closure(): T $operation
+     * @return T
      */
-    public function submit(\Closure $enqueue, ?Cancellation $cancellation = null): Future
+    public function run(\Closure $operation): array
     {
-        while (true) {
-            $cancellation?->throwIfRequested();
-            if ($this->closed || $this->failed) {
-                throw new RuntimeException('Native executor is closed');
-            }
-            $id = $enqueue($this->ffi, $this->pool);
-            if ($id > 0) {
-                break;
-            }
-            if ($id < 0) {
-                throw new RuntimeException('Native submission failed: '.$id);
-            }
-            $this->space ??= new DeferredFuture;
-            $this->space->getFuture()->await($cancellation);
+        if ($this->closed || $this->closing || $this->pid !== getmypid()) {
+            throw new RuntimeException('Native executor is closed');
         }
-        /** @var DeferredFuture<CryptoOutput> $deferred */
-        $deferred = new DeferredFuture;
-        $this->pending[$id] = $deferred;
+        $this->active++;
         EventLoop::reference($this->watcher);
-        return $deferred->getFuture()->ignore();
-    }
-
-    private function collect(): void
-    {
-        while (($bytes = fread($this->stream, 8192)) !== false && $bytes !== '') {
-        }
-        $buffer = $this->result;
-        $address = $this->resultAddress;
-        /** @var object{handle: CData, id: int, data: CData, size: non-negative-int, state: CData, state_size: non-negative-int, status: int} $result */
-        $result = $buffer;
-        while ($this->ffi->madeline_crypto_collect($this->pool, $address)) {
-            $deferred = $this->pending[$result->id];
-            unset($this->pending[$result->id]);
-            try {
-                if ($result->status <= -10) {
-                    throw new SecurityException('Native data validation failed: '.$result->status);
-                }
-                if ($result->status !== 1 || $this->failed) {
-                    $this->failed = true;
-                    throw new RuntimeException('Native crypto operation failed: '.$result->status);
-                }
-                $value = [
-                    'data' => FFI::string($result->data, $result->size),
-                    'state' => $result->state_size ? FFI::string($result->state, $result->state_size) : '',
-                ];
-            } catch (Throwable $e) {
-                $deferred->error($e);
-                continue;
-            } finally {
-                $this->ffi->madeline_crypto_release($this->pool, $result->handle);
+        try {
+            return $operation();
+        } finally {
+            if (!--$this->active) {
+                EventLoop::unreference($this->watcher);
             }
-            $deferred->complete($value);
         }
-        if ($this->space) {
-            $space = $this->space;
-            $this->space = null;
-            $space->complete();
-        }
-        if (!$this->pending) {
-            EventLoop::unreference($this->watcher);
-        }
-        if ($this->failed && !$this->closed) {
-            $this->close();
-        }
-    }
-
-    /** @return array{width: int, locked: bool}|null Available when the executor is idle. */
-    public function getPolicy(int $operation, int $bytes): ?array
-    {
-        if ($this->closed || $bytes < 0) {
-            return null;
-        }
-        $width = $this->ffi->new('unsigned[1]');
-        $locked = $this->ffi->new('int[1]');
-        if (!$this->ffi->madeline_crypto_policy($this->pool, $operation, $bytes, $width, $locked)) {
-            return null;
-        }
-        return ['width' => (int) $width[0], 'locked' => (bool) $locked[0]];
     }
 
     public function close(): void
     {
-        if ($this->closed) {
+        if ($this->closed || $this->closing || $this->pid !== getmypid()) {
             return;
         }
-        $this->closed = true;
-        $this->ffi->madeline_crypto_stop($this->pool);
-        $this->collect();
+        $this->closing = true;
+        Crypto::stop(); // Finish accepted work; wake and reject admission waiters.
+        while ($this->active) {
+            Crypto::wakeup();
+            \Amp\delay(0);
+        }
+        Crypto::shutdown();
         EventLoop::cancel($this->watcher);
         $stream = $this->stream;
         fclose($stream);
-        $this->ffi->madeline_crypto_destroy($this->pool);
+        $this->closed = true;
     }
 }
