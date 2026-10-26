@@ -313,7 +313,7 @@ ENV PATH=/composer/vendor/bin:${PATH}
 ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
-RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || \danog\MadelineProto\Native\Crypto::version() !== "0.1.0") { throw new RuntimeException("Native crypto extension unavailable"); }'
+RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || \danog\MadelineProto\Native\Crypto::version() !== "0.2.0") { throw new RuntimeException("Native crypto extension unavailable"); }'
 
 
 USER madeline:madeline

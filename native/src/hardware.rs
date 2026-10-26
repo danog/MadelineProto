@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Hardware kernels are entered only after runtime feature detection.
 #![allow(unsafe_op_in_unsafe_fn)]
-use crate::crypto::{Buffer, Message};
+use crate::crypto::{Message, Operation};
 #[cfg(target_arch = "aarch64")]
 use std::arch::aarch64::*;
 #[cfg(target_arch = "x86_64")]
@@ -149,13 +149,13 @@ unsafe fn expand(key: &[u8; 32], round: &mut [V], lane: usize, stride: usize, en
     words.zeroize();
 }
 macro_rules! body {
-    ($jobs:ident,$round:ident,$previous_out:ident,$previous_in:ident,$input:ident,$state:ident,$n:expr,$enc:ident,$size:ident) => {{
+    ($jobs:ident,$round:ident,$previous_out:ident,$previous_in:ident,$input:ident,$state:ident,$n:expr,$enc:ident,$size:ident,$start:ident) => {{
         let n = $n;
         for c in 0..n {
             $previous_out[c] = load($jobs[c].iv.as_ptr().add(if $enc { 0 } else { 16 }));
             $previous_in[c] = load($jobs[c].iv.as_ptr().add(if $enc { 16 } else { 0 }));
         }
-        for offset in (0..$size).step_by(16) {
+        for offset in ($start..$size).step_by(16) {
             for c in 0..n {
                 $input[c] = load($jobs[c].input.as_ptr().add(offset));
                 $state[c] = initial(xor($input[c], $previous_out[c]), $round[c]);
@@ -186,11 +186,15 @@ macro_rules! body {
 }
 #[cfg(feature = "const-widths")]
 #[target_feature(enable = "aes")]
-unsafe fn kernel<const N: usize>(jobs: &mut [Message], round: &[V], enc: bool, size: usize) {
-    let mut previous_out = [zero(); N];
-    let mut previous_in = [zero(); N];
-    let mut input = [zero(); N];
-    let mut state = [zero(); N];
+unsafe fn kernel<const N: usize>(
+    jobs: &mut [Message],
+    round: &[V],
+    enc: bool,
+    size: usize,
+    start: usize,
+) {
+    let mut buffers = [[zero(); N]; 4];
+    let [previous_out, previous_in, input, state] = &mut buffers;
     body!(
         jobs,
         round,
@@ -200,23 +204,21 @@ unsafe fn kernel<const N: usize>(jobs: &mut [Message], round: &[V], enc: bool, s
         state,
         N,
         enc,
-        size
+        size,
+        start
     );
-    wipe(&mut previous_out);
-    wipe(&mut previous_in);
-    wipe(&mut input);
-    wipe(&mut state);
+    wipe(buffers.as_flattened_mut());
 }
 unsafe fn wipe(v: &mut [V]) {
     std::slice::from_raw_parts_mut(v.as_mut_ptr().cast::<u8>(), std::mem::size_of_val(v)).zeroize();
 }
 #[target_feature(enable = "aes")]
-unsafe fn dynamic(jobs: &mut [Message], round: &[V], enc: bool, size: usize) {
+unsafe fn dynamic(jobs: &mut [Message], round: &[V], enc: bool, size: usize, start: usize) {
     let n = jobs.len();
-    let mut previous_out = vec![zero(); n];
-    let mut previous_in = vec![zero(); n];
-    let mut input = vec![zero(); n];
-    let mut state = vec![zero(); n];
+    let mut buffers = vec![zero(); 4 * n];
+    let (previous_out, rest) = buffers.split_at_mut(n);
+    let (previous_in, rest) = rest.split_at_mut(n);
+    let (input, state) = rest.split_at_mut(n);
     body!(
         jobs,
         round,
@@ -226,87 +228,43 @@ unsafe fn dynamic(jobs: &mut [Message], round: &[V], enc: bool, size: usize) {
         state,
         n,
         enc,
-        size
+        size,
+        start
     );
-    wipe(&mut previous_out);
-    wipe(&mut previous_in);
-    wipe(&mut input);
-    wipe(&mut state);
+    wipe(&mut buffers);
 }
 #[target_feature(enable = "aes")]
-pub unsafe fn batch(jobs: &mut [Message]) {
+pub unsafe fn batch(jobs: &mut [Message], start: usize) {
     if jobs.is_empty() {
         return;
     }
     let n = jobs.len();
-    let enc = jobs[0].operation == 1;
+    let enc = jobs[0].operation == Operation::Encrypt;
     let common = jobs.iter().map(|j| j.input.len()).min().unwrap();
     let mut round = vec![zero(); 15 * n];
     for (c, job) in jobs.iter().enumerate() {
         expand(&job.key, &mut round, c, n, enc);
     }
     #[cfg(feature = "const-widths")]
-    match n {
-        1 => kernel::<1>(jobs, &round, enc, common),
-        2 => kernel::<2>(jobs, &round, enc, common),
-        3 => kernel::<3>(jobs, &round, enc, common),
-        4 => kernel::<4>(jobs, &round, enc, common),
-        5 => kernel::<5>(jobs, &round, enc, common),
-        6 => kernel::<6>(jobs, &round, enc, common),
-        7 => kernel::<7>(jobs, &round, enc, common),
-        8 => kernel::<8>(jobs, &round, enc, common),
-        9 => kernel::<9>(jobs, &round, enc, common),
-        10 => kernel::<10>(jobs, &round, enc, common),
-        11 => kernel::<11>(jobs, &round, enc, common),
-        12 => kernel::<12>(jobs, &round, enc, common),
-        13 => kernel::<13>(jobs, &round, enc, common),
-        14 => kernel::<14>(jobs, &round, enc, common),
-        15 => kernel::<15>(jobs, &round, enc, common),
-        16 => kernel::<16>(jobs, &round, enc, common),
-        17 => kernel::<17>(jobs, &round, enc, common),
-        18 => kernel::<18>(jobs, &round, enc, common),
-        19 => kernel::<19>(jobs, &round, enc, common),
-        20 => kernel::<20>(jobs, &round, enc, common),
-        21 => kernel::<21>(jobs, &round, enc, common),
-        22 => kernel::<22>(jobs, &round, enc, common),
-        23 => kernel::<23>(jobs, &round, enc, common),
-        24 => kernel::<24>(jobs, &round, enc, common),
-        25 => kernel::<25>(jobs, &round, enc, common),
-        26 => kernel::<26>(jobs, &round, enc, common),
-        27 => kernel::<27>(jobs, &round, enc, common),
-        28 => kernel::<28>(jobs, &round, enc, common),
-        29 => kernel::<29>(jobs, &round, enc, common),
-        30 => kernel::<30>(jobs, &round, enc, common),
-        31 => kernel::<31>(jobs, &round, enc, common),
-        32 => kernel::<32>(jobs, &round, enc, common),
-        _ => dynamic(jobs, &round, enc, common),
+    {
+        macro_rules! dispatch {
+            ($($width:literal),*) => { match n {
+                $($width => kernel::<$width>(jobs, &round, enc, common, start),)*
+                _ => dynamic(jobs, &round, enc, common, start),
+            }};
+        }
+        dispatch!(
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+            25, 26, 27, 28, 29, 30, 31, 32
+        );
     }
     #[cfg(not(feature = "const-widths"))]
-    dynamic(jobs, &round, enc, common);
+    dynamic(jobs, &round, enc, common, start);
     wipe(&mut round);
     // Continue uneven MTProto padding tails using each chain's final IV.
     for job in jobs {
-        if job.input.len() == common {
-            continue;
+        if job.input.len() > common {
+            batch(std::slice::from_mut(job), common);
         }
-        let tail = job.input[common..].to_vec();
-        let mut rest = Message {
-            operation: job.operation,
-            input: Buffer::new(tail),
-            output: Buffer::new(vec![0; job.input.len() - common]),
-            key: job.key.clone(),
-            iv: job.iv.clone(),
-            auth: zeroize::Zeroizing::new([0; 256]),
-            message_key: [0; 16],
-        };
-        batch(std::slice::from_mut(&mut rest));
-        // The main output is not exposed as an initialized slice until all
-        // prefix and tail bytes have been written.
-        std::ptr::copy_nonoverlapping(
-            rest.output.as_ptr(),
-            job.output.as_mut_ptr().add(common),
-            rest.output.len(),
-        );
-        job.iv.copy_from_slice(&rest.iv[..]);
     }
 }
