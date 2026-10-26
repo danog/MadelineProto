@@ -15,6 +15,7 @@ use Amp\DeferredFuture;
 use Amp\ForbidCloning;
 use Amp\ForbidSerialization;
 use Amp\Future;
+use danog\MadelineProto\SecurityException;
 use FFI;
 use FFI\CData;
 use Revolt\EventLoop;
@@ -38,9 +39,10 @@ final class NativeCrypto
     private $stream;
     private string $watcher;
     private bool $closed = false;
+    private bool $failed = false;
 
     /** Called by the MTProto owner at startup, never by an IPC-only client. */
-    public static function initialize(): void
+    public static function initialize(int $capacity = 128, int $byteLimit = 134217728, int $windowUs = 5000, int $fixedWidth = 0): void
     {
         if (self::$instance !== null) {
             return;
@@ -51,8 +53,12 @@ final class NativeCrypto
         }
         $name = PHP_OS_FAMILY === 'Darwin' ? 'libmadeline-ige.dylib' : 'libmadeline-ige.so';
         $build = \dirname(__DIR__, 3).'/native/';
-        $declarations = str_replace('unsigned char', 'char', preg_replace('/^#.*$/m', '', file_get_contents($build.'crypto.h')));
-        foreach (array_filter([getenv('MADELINE_IGE_LIBRARY'), $build.'build/'.$name, $name]) as $library) {
+        $header = @file_get_contents($build.'crypto.h');
+        if ($header === false) {
+            return;
+        }
+        $declarations = str_replace('unsigned char', 'char', preg_replace('/^#.*$/m', '', $header));
+        foreach (array_filter([getenv('MADELINE_IGE_LIBRARY'), $build.'build/'.$name, $build.'build/Release/'.$name, $name]) as $library) {
             try {
                 $ffi = FFI::cdef($declarations, $library);
                 if ($ffi->madeline_crypto_abi() !== 1) {
@@ -62,7 +68,7 @@ final class NativeCrypto
                 if (($operations & 3) !== 3) {
                     continue;
                 }
-                $pool = $ffi->madeline_crypto_create(128, 128 * 1024 * 1024, 5000);
+                $pool = $ffi->madeline_crypto_create($capacity, $byteLimit, $windowUs, $fixedWidth);
                 if (FFI::isNull($pool)) {
                     continue;
                 }
@@ -83,7 +89,7 @@ final class NativeCrypto
     public static function get(int $operation): ?self
     {
         $instance = self::$instance;
-        return $instance instanceof self && !$instance->closed && ($instance->operations & $operation) === $operation
+        return $instance instanceof self && !$instance->closed && !$instance->failed && ($instance->operations & $operation) === $operation
             ? $instance : null;
     }
 
@@ -93,7 +99,7 @@ final class NativeCrypto
         if ($fd < 0) {
             throw new RuntimeException('Could not open crypto notification descriptor');
         }
-        $stream = fopen('php://fd/'.$fd, 'r');
+        $stream = @fopen('php://fd/'.$fd, 'r');
         if (!$stream) {
             throw new RuntimeException('Could not open crypto notification stream');
         }
@@ -115,15 +121,18 @@ final class NativeCrypto
      */
     public function submit(int $operation, string $data, string $key, string $iv, ?Cancellation $cancellation = null): Future
     {
-        if (\strlen($key) !== 32 || \strlen($iv) !== 32 || \strlen($data) % 16) {
-            throw new \ValueError('AES-256-IGE requires a 32-byte key and IV and complete blocks');
+        if (\strlen($key) !== ($operation === self::DECODE_V2 ? 256 : 32)
+            || \strlen($iv) !== ($operation === self::DECODE_V2 ? 16 : 32) || \strlen($data) % 16) {
+            throw new \ValueError('Invalid native crypto input sizes');
         }
         while (true) {
             $cancellation?->throwIfRequested();
-            if ($this->closed) {
+            if ($this->closed || $this->failed) {
                 throw new RuntimeException('Native crypto executor is closed');
             }
-            $id = $this->ffi->madeline_crypto_submit($this->pool, $operation, $data, \strlen($data), $key, $iv);
+            $id = $operation === self::DECODE_V2
+                ? $this->ffi->madeline_crypto_submit_message($this->pool, $data, \strlen($data), $key, $iv)
+                : $this->ffi->madeline_crypto_submit($this->pool, $operation, $data, \strlen($data), $key, $iv);
             if ($id > 0) {
                 break;
             }
@@ -148,7 +157,11 @@ final class NativeCrypto
             $deferred = $this->pending[$result->id];
             unset($this->pending[$result->id]);
             try {
-                if ($result->status !== 1) {
+                if ($result->status <= -10) {
+                    throw new SecurityException('Invalid encrypted transport message: '.$result->status);
+                }
+                if ($result->status !== 1 || $this->failed) {
+                    $this->failed = true;
                     throw new RuntimeException('Native crypto operation failed: '.$result->status);
                 }
                 $value = [
@@ -178,6 +191,23 @@ final class NativeCrypto
         if (!$this->pending) {
             EventLoop::unreference($this->watcher);
         }
+        if ($this->failed && !$this->closed) {
+            $this->close();
+        }
+    }
+
+    /** @return array{width: int, locked: bool}|null Available when the executor is idle. */
+    public function getPolicy(int $operation, int $bytes): ?array
+    {
+        if ($this->closed || $bytes < 0) {
+            return null;
+        }
+        $width = $this->ffi->new('unsigned');
+        $locked = $this->ffi->new('int');
+        if (!$this->ffi->madeline_crypto_policy($this->pool, $operation, $bytes, FFI::addr($width), FFI::addr($locked))) {
+            return null;
+        }
+        return ['width' => $width->cdata, 'locked' => (bool) $locked->cdata];
     }
 
     public function close(): void

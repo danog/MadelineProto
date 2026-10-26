@@ -140,6 +140,13 @@ final class Connection
      *
      */
     private bool $needsReconnect = false;
+    /** Changes whenever the transport is disconnected, including temporary reconnects. */
+    private int $generation = 0;
+
+    public function getGeneration(): int
+    {
+        return $this->generation;
+    }
     /**
      * Indicate if this socket needs to be reconnected.
      *
@@ -709,6 +716,7 @@ final class Connection
      */
     public function disconnect(bool $temporary = false): void
     {
+        $this->generation++;
         $this->API->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
         if ($this->stream) {

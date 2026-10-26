@@ -27,7 +27,9 @@ use danog\Loop\Loop;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
-use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeCrypto;
+use danog\MadelineProto\MTProtoTools\Crypt\NativeMessageDecoder;
+use danog\MadelineProto\MTProtoTools\Crypt\PhpMessageDecoder;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -197,50 +199,40 @@ final class ReadLoop extends Loop
                 }
             } elseif ($auth_key_id === $auth->getTempID()) {
                 $message_key = $buffer->bufferRead(16);
-                [$aes_key, $aes_iv] = Crypt::kdf($message_key, $auth->getTempAuthKey(), false);
+                $generation = $this->connection->getGeneration();
+                $session = $this->connection->session_id;
+                $authKey = $auth->getTempAuthKey();
                 $payload_length -= 24;
                 $left = $payload_length & 15;
-                $payload_length -= $left;
-                $decrypted_data = Crypt::igeDecrypt($buffer->bufferRead($payload_length), $aes_key, $aes_iv);
+                $ciphertext = $buffer->bufferRead($payload_length - $left);
                 if ($left) {
                     $this->connection->incomingBytesCtr?->incBy($left);
                     $buffer->bufferRead($left);
                 }
-                if ($message_key != substr(Crypt::sha256(substr($auth->getTempAuthKey(), 96, 32).$decrypted_data), 8, 16)) {
-                    throw new SecurityException('msg_key mismatch');
+                $decoder = NativeCrypto::get(NativeCrypto::DECODE_V2)
+                    ? new NativeMessageDecoder : new PhpMessageDecoder;
+                try {
+                    $decoded = $decoder->decode($ciphertext, $authKey, $message_key);
+                } finally {
+                    // Decoding can suspend even through the PHP decoder's IGE backend.
+                    // Stale success and stale validation errors must not affect a new session.
+                    if ($generation !== $this->connection->getGeneration()
+                        || $this->connection->shouldReconnect()
+                        || $session !== $this->connection->session_id
+                        || $authKey !== $this->shared->auth->getTempAuthKey()
+                    ) {
+                        return null;
+                    }
                 }
-                /*
-                                $server_salt = substr($decrypted_data, 0, 8);
-                                if ($server_salt != $this->shared->getTempAuthKey()->getServerSalt()) {
-                                $this->API->logger('WARNING: Server salt mismatch (my server salt '.$this->shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
-                                }
-                */
-                $session_id = substr($decrypted_data, 8, 8);
-                if ($session_id !== $this->connection->session_id) {
+                if ($decoded->sessionId !== $session) {
                     $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
                     $this->connection->resetSession("session ID mismatch");
                     throw new NothingInTheSocketException();
                 }
-                $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
+                $message_id = $decoded->messageId;
                 $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
-                $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
-                $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
-                if ($message_data_length > \strlen($decrypted_data)) {
-                    throw new SecurityException('message_data_length is too big');
-                }
-                if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
-                    throw new SecurityException('padding is too small');
-                }
-                if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
-                    throw new SecurityException('padding is too big');
-                }
-                if ($message_data_length < 0) {
-                    throw new SecurityException('message_data_length not positive');
-                }
-                if ($message_data_length % 4 != 0) {
-                    throw new SecurityException('message_data_length not divisible by 4');
-                }
-                $message_data = substr($decrypted_data, 32, $message_data_length);
+                $seq_no = $decoded->seqNo;
+                $message_data = $decoded->body;
             } else {
                 $this->API->logger('Got unknown auth_key id', Logger::ERROR);
                 return -404;
