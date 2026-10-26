@@ -94,6 +94,8 @@ final class RtmpStreamTest extends TestCase
 
             // Publishing again to the same URL and key gives the same stream.
             $this->assertSame($stream->id, $API->startRtmpStream($server->getUrl(), '123456:AbCdEf')->id);
+            $this->assertSame($stream->id, $API->getRtmpStream($server->getUrl().'123456:AbCdEf')?->id);
+            $this->assertNull($API->getRtmpStream($server->getUrl(), 'unknown'));
             $this->assertSame([$stream->id], array_keys($API->getRtmpStreams()));
 
             $other = $API->startRtmpStream($server->getUrl(), 'other');

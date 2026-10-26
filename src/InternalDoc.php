@@ -1337,6 +1337,16 @@ abstract class InternalDoc
         return $this->wrapper->getAPI()->getPwrChat($id, $fullfetch);
     }
     /**
+     * What we publish to an RTMP server with a URL and stream key, if anything, see {@see self::startRtmpStream()}.
+     *
+     * @param string  $url The URL of the RTMP application, or, without `$key`, the URL followed by the stream key.
+     * @param ?string $key The stream key.
+     */
+    final public function getRtmpStream(string $url, ?string $key = null): ?\danog\MadelineProto\EventHandler\Calls\RtmpStream
+    {
+        return $this->wrapper->getAPI()->getRtmpStream($url, $key);
+    }
+    /**
      * What we publish to RTMP servers, see {@see self::startRtmpStream()}.
      *
      * @return array<int, RtmpStream>

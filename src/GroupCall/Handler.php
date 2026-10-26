@@ -1254,10 +1254,9 @@ trait Handler
         if ($key === '') {
             throw new AssertionError("No stream key given for $url");
         }
-        foreach ($this->rtmpStreams as $stream) {
-            if ($stream->publishesTo($url, $key)) {
-                return $stream->public;
-            }
+        $existing = $this->getRtmpStream($url, $key);
+        if ($existing !== null) {
+            return $existing;
         }
         do {
             $id = random_int(1, PHP_INT_MAX);
@@ -1265,6 +1264,25 @@ trait Handler
         $stream = new RtmpStreamController($this, $id, $url, $key);
         $this->rtmpStreams[$id] = $stream;
         return $stream->public;
+    }
+
+    /**
+     * What we publish to an RTMP server with a URL and stream key, if anything, see {@see self::startRtmpStream()}.
+     *
+     * @param string  $url The URL of the RTMP application, or, without `$key`, the URL followed by the stream key.
+     * @param ?string $key The stream key.
+     */
+    public function getRtmpStream(string $url, #[\SensitiveParameter] ?string $key = null): ?RtmpStream
+    {
+        if ($key === null) {
+            [$url, $key] = self::splitRtmpUrl($url);
+        }
+        foreach ($this->rtmpStreams as $stream) {
+            if ($stream->publishesTo($url, $key)) {
+                return $stream->public;
+            }
+        }
+        return null;
     }
 
     /**
