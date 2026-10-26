@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\ByteStream\ReadableIterableStream;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableStream;
 use Amp\Cancellation;
@@ -400,9 +401,36 @@ final class Ogg
                 ->ignore()
                 ->finally($proc->getStdin()->close(...));
         }
-        async(pipe(...), $proc->getStderr(), getStderr(), $cancellation)->ignore();
-        self::convertWav($proc->getStdout(), $oggOut, $cancellation);
+        // Forwarded to our stderr, its end kept to explain a failure.
+        $errors = '';
+        $stderr = async(static function () use ($proc, &$errors, $cancellation): void {
+            $out = getStderr();
+            while (($chunk = $proc->getStderr()->read($cancellation)) !== null) {
+                $out->write($chunk);
+                $errors = substr($errors.$chunk, -self::FFMPEG_ERROR_BYTES);
+            }
+        });
+        $stderr->ignore();
+        $stdout = $proc->getStdout();
+        $first = $stdout->read($cancellation);
+        if ($first === null) {
+            // ffmpeg couldn't read the input (not media, unreachable...): its exit code and error, not the WAV
+            // parser's complaint about an empty file.
+            $code = $proc->join($cancellation);
+            $stderr->await($cancellation);
+            $what = $in instanceof ReadableStream ? 'the stream' : $inFile;
+            throw new AssertionError("ffmpeg could not convert $what (exit code $code): ".trim($errors));
+        }
+        self::convertWav(new ReadableIterableStream((static function () use ($first, $stdout, $cancellation): \Generator {
+            yield $first;
+            while (($chunk = $stdout->read($cancellation)) !== null) {
+                yield $chunk;
+            }
+        })()), $oggOut, $cancellation);
     }
+
+    /** How much of the end of ffmpeg's error output to report when it fails. */
+    private const FFMPEG_ERROR_BYTES = 2048;
 
     /**
      * Validate that the specified OGG OPUS file can be played directly by MadelineProto, without doing any conversion.
