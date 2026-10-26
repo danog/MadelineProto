@@ -18,6 +18,7 @@ namespace danog\MadelineProto\EventHandler\Story;
 
 use AssertionError;
 use danog\MadelineProto\EventHandler\AbstractStory;
+use danog\MadelineProto\EventHandler\Calls\LiveStory;
 use danog\MadelineProto\EventHandler\Media\Gif;
 use danog\MadelineProto\EventHandler\Media\Photo;
 use danog\MadelineProto\EventHandler\Media\Video;
@@ -68,8 +69,11 @@ final class Story extends AbstractStory
     /** @var list<MessageEntity> Message [entities](https://core.telegram.org/api/entities) for story caption */
     public readonly array $entities;
 
-    /** Attached media. */
-    public readonly Gif|Photo|Video $media;
+    /**
+     * Attached media: for a live story, the live story itself (its details are those of the story until it's used, e.g.
+     * joined, which fetches the call).
+     */
+    public readonly Gif|Photo|Video|LiveStory $media;
 
     /** A set of physical coordinates associated to this story */
     //public readonly ?array $mediaAreas; //!
@@ -125,7 +129,10 @@ final class Story extends AbstractStory
         $this->date = $rawStory['date'];
         $this->expireDate = $rawStory['expire_date'];
 
-        $this->media = $API->wrapMedia($rawStory['media'], $this->protected);
+        $this->media = $rawStory['media']['_'] === 'messageMediaVideoStream'
+            // A live story: a group call, no file.
+            ? $API->wrapLiveStoryMedia($rawStory['media'], $this->senderId)
+            : $API->wrapMedia($rawStory['media'], $this->protected);
         $this->entities = MessageEntity::fromRawEntities($rawStory['entities'] ?? []);
         $this->privacy = array_map(RuleDestination::fromRawRule(...), $rawStory['privacy'] ?? []);
 
