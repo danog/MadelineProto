@@ -182,7 +182,8 @@ final class ReferenceDatabaseTest extends TestCase
         $this->client();
         $this->seenInThreePlaces();
         $this->answers = [
-            'help.getPremiumPromo' => static fn () => throw new RPCErrorException('PREMIUM_ACCOUNT_REQUIRED', 400),
+            // Built in its scope: the constructor is protected, and make() would report the error over the network.
+            'help.getPremiumPromo' => static fn () => throw \Closure::bind(static fn () => new RPCErrorException('PREMIUM_ACCOUNT_REQUIRED', 'Telegram Premium is required', 400, 'help.getPremiumPromo'), null, RPCErrorException::class)(),
             'messages.getSavedGifs' => static fn () => self::savedGifs([]),
             'messages.getStickerSet' => static fn () => self::stickerSet([self::document(200, 'old')]),
         ];

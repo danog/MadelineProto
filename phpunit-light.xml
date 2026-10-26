@@ -20,6 +20,7 @@
       <directory>tests</directory>
       <exclude>tests/danog/MadelineProto/DataCenterTest.php</exclude>
       <exclude>tests/danog/MadelineProto/FileIdTest.php</exclude>
+      <exclude>tests/danog/MadelineProto/EventLoopTimerTest.php</exclude>
     </testsuite>
   </testsuites>
   <extensions>
