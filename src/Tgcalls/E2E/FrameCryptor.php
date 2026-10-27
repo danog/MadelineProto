@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Tgcalls\E2E;
 
+use Webrtc\RTP\Crypto\DropFrameException;
 use danog\MadelineProto\Tgcalls\BitReader;
 use Webrtc\RTP\Crypto\FrameCryptorInterface;
 use Webrtc\RTP\Enum\MediaKind;
@@ -90,7 +91,10 @@ final class FrameCryptor implements FrameCryptorInterface
                         return $packet;
                     }
                 }
-                throw new \RuntimeException('Could not encrypt an H.264 frame without producing a start code in the ciphertext');
+                // The start code may be in the header of the packet, the same for every attempt: with one epoch, its
+                // block count (01 00 00 00) before a block hash starting with 0x01. The frame is dropped, as tgcalls
+                // does; thrown as a failure to send, it stopped the sender for good after 100 of them.
+                throw new DropFrameException('Could not encrypt an H.264 frame without producing a start code in the packet');
             case 'VP8':
                 $prefix = self::vp8PlaintextHeader($frame);
                 break;

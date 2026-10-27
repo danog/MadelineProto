@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Test;
 
+use Webrtc\RTP\Crypto\DropFrameException;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
 use danog\MadelineProto\Tgcalls\E2E\CallPacket;
@@ -382,7 +383,9 @@ final class E2EConferenceTest extends TestCase
     {
         $this->requireCrypto();
         [$senderSeed, $senderPublic] = Crypto::generateKeyPair();
-        $epoch = ['hash' => random_bytes(32), 'secret' => random_bytes(32)];
+        // Not random: a block hash starting with 0x01 puts a start code in the header of every H.264 packet (see
+        // testAnEpochWithAStartCodeInTheHeaderDropsTheH264Frames), which failed this test once in 256 runs.
+        $epoch = ['hash' => str_repeat("\xaa", 32), 'secret' => random_bytes(32)];
         $secrets = [$epoch['hash'] => $epoch['secret']];
         $sender = new FrameCryptor(self::keyProvider($senderSeed, [$epoch], null));
         $receiver = new FrameCryptor(self::keyProvider(random_bytes(32), [$epoch], [5 => $senderPublic]));
@@ -421,6 +424,22 @@ final class E2EConferenceTest extends TestCase
         $this->assertFalse(strpos($wire, "\x00\x00\x01", $prefixLen - 2), 'no start code in the ciphertext');
         // What the receiver decrypts is the widened frame, i.e. what a WebRTC depacketizer rebuilds.
         $this->assertSame($widened, $receiver->decryptFrame(MediaKind::Video, 5, $wire));
+    }
+
+    /**
+     * The header of a packet (its epoch count, 01 00 00 00, then the block hashes) is the same for every attempt: with
+     * a block hash starting with 0x01 it holds a start code, and no H.264 frame can be sent during that epoch. The
+     * frames are dropped, as tgcalls does, instead of failing to send (which stopped the sender for good).
+     */
+    public function testAnEpochWithAStartCodeInTheHeaderDropsTheH264Frames(): void
+    {
+        $this->requireCrypto();
+        [$senderSeed] = Crypto::generateKeyPair();
+        $epoch = ['hash' => "\x01".random_bytes(31), 'secret' => random_bytes(32)];
+        $sender = new FrameCryptor(self::keyProvider($senderSeed, [$epoch], null));
+        $sender->setOutgoingVideoCodec('H264');
+        $this->expectException(DropFrameException::class);
+        $sender->encryptFrame(MediaKind::Video, 5, "\x00\x00\x01\x65\x88\x84\x00\x10".random_bytes(300));
     }
 
     public function testFrameCryptorRejectsReplay(): void
