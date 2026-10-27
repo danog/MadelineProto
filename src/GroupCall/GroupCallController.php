@@ -775,11 +775,34 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     /**
      * The call ended, or we may not be in it anymore (GROUPCALL_FORBIDDEN or GROUPCALL_INVALID): leave it, as
      * TDLib does.
+     *
+     * A call that ended (GROUPCALL_INVALID) is reported to the event handler as discarded, as if we got its
+     * groupCallDiscarded: we may never get one (a live story ends with an updateStory deleting it).
      */
     private function onEnded(string $rpc): void
     {
         $this->log("$this ended, or we may not be in it anymore ($rpc): leaving it.", Logger::NOTICE);
+        $discarded = $this->public->discarded;
         $this->cleanup();
+        if ($rpc !== 'GROUPCALL_INVALID' || $discarded) {
+            return;
+        }
+        $update = [
+            '_' => 'updateGroupCall',
+            'call' => ['_' => 'groupCallDiscarded', 'id' => $this->public->id, 'access_hash' => $this->public->accessHash, 'duration' => 0],
+        ];
+        if ($this->public instanceof LiveStory) {
+            $update['live_story'] = true;
+        }
+        $peerId = $this->public->peerId;
+        if ($peerId !== null) {
+            $update['peer'] = match (true) {
+                DialogId::isUser($peerId) => ['_' => 'peerUser', 'user_id' => $peerId],
+                DialogId::isChat($peerId) => ['_' => 'peerChat', 'chat_id' => DialogId::toChatId($peerId)],
+                default => ['_' => 'peerChannel', 'channel_id' => DialogId::toSupergroupOrChannelId($peerId)],
+            };
+        }
+        $this->API->saveUpdate($update);
     }
 
     /**

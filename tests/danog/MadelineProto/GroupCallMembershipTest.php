@@ -33,7 +33,6 @@ use danog\MadelineProto\Settings\Logger as LoggerSettings;
 use DG\BypassFinals;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use ReflectionProperty;
 
 use function Amp\delay;
@@ -64,12 +63,18 @@ final class GroupCallMembershipTest extends TestCase
         BypassFinals::enable();
     }
 
+    /** @var list<array> The updates saved. */
+    private array $updates = [];
+
     private function client(): MTProto
     {
-        $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
+        $API = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()->onlyMethods(['saveUpdate'])->getMock();
+        $API->method('saveUpdate')->willReturnCallback(function (array $update): void {
+            $this->updates[] = $update;
+        });
         $API->logger = new Logger((new LoggerSettings)->setType(Logger::ECHO_LOGGER)->setLevel(Logger::FATAL_ERROR));
         $API->wrapper = new APIWrapper(new SessionPaths(sys_get_temp_dir().'/madeline-group-call-membership'));
-        (new ReflectionProperty($API, 'settings'))->setValue($API, new Settings);
+        (new ReflectionProperty(MTProto::class, 'settings'))->setValue($API, new Settings);
         $connection = $this->createMock(Connection::class);
         $connection->method('methodCallAsyncRead')->willReturnCallback(function (string $method, array $args): mixed {
             $this->calls[] = $method;
@@ -82,7 +87,7 @@ final class GroupCallMembershipTest extends TestCase
         return $API;
     }
 
-    private function joinedCall(MTProto $API): GroupCallController
+    private function joinedCall(MTProto $API, ?int $peerId = null, bool $liveStory = false): GroupCallController
     {
         $controller = new GroupCallController($API, [
             '_' => 'groupCall',
@@ -103,10 +108,10 @@ final class GroupCallMembershipTest extends TestCase
             'record_video_active' => false,
             'conference' => false,
             'version' => 1,
-        ]);
+        ], $peerId, $liveStory);
         (new ReflectionProperty($controller, 'callState'))->setValue($controller, GroupCallState::JOINED);
         (new ReflectionProperty($controller, 'source'))->setValue($controller, self::SOURCE);
-        (new ReflectionProperty($API, 'groupCalls'))->setValue($API, [1 => $controller]);
+        (new ReflectionProperty(MTProto::class, 'groupCalls'))->setValue($API, [1 => $controller]);
         return $controller;
     }
 
@@ -141,6 +146,40 @@ final class GroupCallMembershipTest extends TestCase
         $this->assertSame(['phone.checkGroupCall'], $this->calls);
         $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
         $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * A call that ended is reported to the event handler as discarded: a live story ends with an updateStory, without
+     * the groupCallDiscarded the event handler waits for (magnaluna didn't start its live story again).
+     */
+    public function testAnEndedCallIsReportedAsDiscarded(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API, 783732906, liveStory: true);
+        $this->answer = static fn () => throw RPCErrorException::make('GROUPCALL_INVALID', 400, '');
+
+        self::check($controller);
+
+        $this->assertSame([[
+            '_' => 'updateGroupCall',
+            'call' => ['_' => 'groupCallDiscarded', 'id' => 1, 'access_hash' => 1234, 'duration' => 0],
+            'live_story' => true,
+            'peer' => ['_' => 'peerUser', 'user_id' => 783732906],
+        ]], $this->updates);
+    }
+
+    /**
+     * A call we may just not be in anymore didn't end: it isn't reported as discarded.
+     */
+    public function testAForbiddenCallIsNotReportedAsDiscarded(): void
+    {
+        $controller = $this->joinedCall($this->client(), -1001412768105);
+        $this->answer = static fn () => throw RPCErrorException::make('GROUPCALL_FORBIDDEN', 403, '');
+
+        self::check($controller);
+
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
+        $this->assertSame([], $this->updates);
     }
 
     /**
