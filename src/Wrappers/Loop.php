@@ -103,8 +103,10 @@ trait Loop
         $this->logger->logger('Starting event loop');
         $this->initSelfRestart();
         $this->logger->logger('Started update loop', Logger::NOTICE);
+        // Already completed if stop() or restart() was called before (e.g. from onStart).
         $this->stopDeferred ??= new DeferredFuture;
         $this->stopDeferred->getFuture()->await();
+        $this->stopDeferred = null;
         $this->logger->logger('Exiting update loop!', Logger::NOTICE);
     }
     /**
@@ -129,8 +131,11 @@ trait Loop
             }
             return;
         }
-        $deferred = $this->stopDeferred ?? new DeferredFuture;
-        $this->stopDeferred = null;
-        $deferred->complete();
+        // Kept completed if the loop didn't start yet: the event handler runs onStart before loop(), and a stop
+        // from there was lost (a new future was completed and dropped, and loop() then waited forever).
+        $this->stopDeferred ??= new DeferredFuture;
+        if (!$this->stopDeferred->isComplete()) {
+            $this->stopDeferred->complete();
+        }
     }
 }
