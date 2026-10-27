@@ -21,7 +21,6 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\GroupCall\GroupCallController;
-use danog\MadelineProto\GroupCall\StreamChunkNotReadyException;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings;
 use DG\BypassFinals;
@@ -30,9 +29,8 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /**
- * A chunk of a stream fetched at the live edge (as the chunks of RTMP livestreams are) can still be being written:
- * the server answers storage.filePartial, with what it has so far. Demuxed, it failed with "Unexpected end of MP4
- * file" (on magnaluna, every few minutes in each livestream it was in): it's not ready, to be fetched again.
+ * A chunk of a stream can be cut short (storage.filePartial): still being written, at the live edge, or for good (a gap
+ * in what the publisher sent). Its bytes are returned, flagged, for the receiver to fetch it again or take it as it is.
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -64,16 +62,15 @@ final class StreamChunkTest extends TestCase
         return $API;
     }
 
-    public function testAChunkStillBeingWrittenIsNotReady(): void
+    public function testAChunkCutShortIsFlagged(): void
     {
         $API = $this->api(['_' => 'upload.file', 'type' => ['_' => 'storage.filePartial'], 'mtime' => 0, 'bytes' => 'truncated']);
-        $this->expectException(StreamChunkNotReadyException::class);
-        $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2);
+        $this->assertSame(['bytes' => 'truncated', 'partial' => true], $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
     }
 
     public function testACompleteChunkIsReturned(): void
     {
         $API = $this->api(['_' => 'upload.file', 'type' => ['_' => 'storage.fileMp4'], 'mtime' => 0, 'bytes' => 'complete']);
-        $this->assertSame('complete', $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
+        $this->assertSame(['bytes' => 'complete', 'partial' => false], $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
     }
 }

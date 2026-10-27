@@ -47,8 +47,8 @@ use function Amp\File\openFile;
  * each publisher's video as separate MP4 chunks: recording into a directory writes the mixed audio to
  * `stream.ogg` and every publisher's video to `video-<endpoint>.mkv`.
  *
- * As official clients do, the stream is followed one 1000 ms segment at a time, 2 seconds behind the
- * live edge; a chunk that is not ready yet (`TIME_TOO_BIG`, a flood wait) is retried after 100 ms, any
+ * As official clients do, the stream is followed one 1000 ms segment at a time, in real time, 2 seconds behind the
+ * live edge; a chunk that is not ready yet (`TIME_TOO_BIG`, a flood wait, cut short) is retried after 100 ms, any
  * other error resynchronizes to the live edge, and being told we are not in the call any more
  * (`GROUPCALL_JOIN_MISSING` / `GROUPCALL_FORBIDDEN`) rejoins it.
  *
@@ -63,10 +63,20 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
-    /** How long to keep fetching a chunk still being written before resynchronizing, in milliseconds. */
-    private const PARTIAL_RETRY_MS = 5000;
-    /** How many times in a row the chunk was still being written, see {@see self::PARTIAL_RETRY_MS}. */
+    /**
+     * How long to keep fetching a chunk cut short (storage.filePartial) before taking it as it is, in milliseconds: it
+     * may still be being written (at the live edge, if the stream lags behind real time), else it stays cut short.
+     */
+    private const PARTIAL_RETRY_MS = 1000;
+    /** How many times in a row the chunk was cut short, see {@see self::PARTIAL_RETRY_MS}. */
     private int $partialRetries = 0;
+    /**
+     * When the chunks of an RTMP stream are due: its timeline doesn't follow the server clock, so it's paced from the
+     * chunk it was resynchronized at and when (hrtime(), in nanoseconds).
+     *
+     * @var ?array{int, int}
+     */
+    private ?array $pace = null;
     /** How long to wait before fetching the stream channels again when they have no usable timestamp, in seconds. */
     private const CHANNELS_RETRY = 1.0;
     /** How many audio-only chunks of an RTMP stream are held, waiting for its video, before recording only its audio. */
@@ -220,16 +230,27 @@ final class StreamReceiver
                     $edge = $this->lastTimestamp + self::SEGMENT_MS;
                 }
                 $this->nextTimestamp = $edge;
+                $this->pace = [$edge, hrtime(true)];
             }
             $timestamp = $this->nextTimestamp;
             // Stay behind the live edge: never ask for a chunk that cannot be complete yet. The
-            // timeline of an RTMP stream starts with the stream, not the server clock: its chunks
-            // that are not ready yet fail with TIME_TOO_BIG instead.
-            $due = $timestamp + self::SEGMENT_MS + self::BUFFER_MS;
-            $now = self::nowMs();
-            if (!$this->rtmp && $due > $now) {
-                delay(($due - $now) / 1000);
-                continue;
+            // timeline of an RTMP stream starts with the stream, not the server clock: it's followed in
+            // real time from where it was resynchronized, as tgcalls does (fetched as soon as the server
+            // accepts them, its chunks were those of the live edge, cut short while being written).
+            if ($this->rtmp) {
+                [$paceTimestamp, $paceStart] = $this->pace ?? [$timestamp, hrtime(true)];
+                $wait = $paceStart + ($timestamp - $paceTimestamp) * 1_000_000 - hrtime(true);
+                if ($wait > 0) {
+                    delay($wait / 1_000_000_000);
+                    continue;
+                }
+            } else {
+                $due = $timestamp + self::SEGMENT_MS + self::BUFFER_MS;
+                $now = self::nowMs();
+                if ($due > $now) {
+                    delay(($due - $now) / 1000);
+                    continue;
+                }
             }
             $chunk = null;
             try {
@@ -241,23 +262,17 @@ final class StreamReceiver
                     $this->call->rejoin();
                     return;
                 }
+                if ($e->rpc === 'TIME_TOO_BIG' && $this->rtmp) {
+                    // The RTMP stream lags behind real time: we caught up with its live edge. Fall back behind it.
+                    $this->pace = [$timestamp, hrtime(true) + self::BUFFER_MS * 1_000_000];
+                    continue;
+                }
                 if ($e->rpc === 'TIME_TOO_BIG' || $e instanceof RateLimitError) {
                     delay(self::RETRY_MS / 1000);
                     continue;
                 }
                 $this->call->log("Resynchronizing the stream of {$this->call} after {$e->rpc}", Logger::WARNING);
                 $this->nextTimestamp = null;
-                delay(self::RETRY_MS / 1000);
-                continue;
-            } catch (StreamChunkNotReadyException) {
-                // The live edge (an RTMP stream is fetched as soon as the server accepts a chunk): retry it, like a
-                // chunk not available yet, rather than demuxing what was written so far. A chunk never completed
-                // (the stream stopped mid-chunk): resynchronize.
-                if (++$this->partialRetries * self::RETRY_MS >= self::PARTIAL_RETRY_MS) {
-                    $this->call->log("Chunk $timestamp of {$this->call} is still being written after ".self::PARTIAL_RETRY_MS." ms, resynchronizing", Logger::NOTICE);
-                    $this->partialRetries = 0;
-                    $this->nextTimestamp = null;
-                }
                 delay(self::RETRY_MS / 1000);
                 continue;
             } catch (Throwable $e) {
@@ -271,14 +286,22 @@ final class StreamReceiver
                 delay(self::RETRY_MS / 1000);
                 continue;
             }
+            ['bytes' => $chunk, 'partial' => $partial] = $chunk;
+            if ($partial && ++$this->partialRetries * self::RETRY_MS < self::PARTIAL_RETRY_MS) {
+                delay(self::RETRY_MS / 1000);
+                continue;
+            }
             $this->partialRetries = 0;
-            $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes)', Logger::ULTRA_VERBOSE);
+            $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes'.($partial ? ', cut short' : '').')', Logger::ULTRA_VERBOSE);
             $this->nextTimestamp = $timestamp + self::SEGMENT_MS;
             $this->lastTimestamp = $timestamp;
             try {
                 $this->consume($chunk, $timestamp);
             } catch (Throwable $e) {
-                $this->call->log("Could not demux a chunk of {$this->call}: $e", Logger::WARNING);
+                // A chunk cut short ends mid-frame: what's before the cut was recorded.
+                $partial
+                    ? $this->call->log("Recorded the chunk $timestamp of {$this->call} up to where it was cut short: {$e->getMessage()}", Logger::VERBOSE)
+                    : $this->call->log("Could not demux a chunk of {$this->call}: $e", Logger::WARNING);
             }
             if (!$this->rtmp && $this->outputDir !== null) {
                 $this->consumePublishersVideo($timestamp);
@@ -323,7 +346,10 @@ final class StreamReceiver
     /**
      * Download one chunk, or null on a CDN redirect.
      */
-    private function fetch(int $timestamp): ?string
+    /**
+     * @return ?array{bytes: string, partial: bool}
+     */
+    private function fetch(int $timestamp): ?array
     {
         return $this->call->API->downloadGroupCallStreamChunk(
             $this->call->public->id,
@@ -342,7 +368,7 @@ final class StreamReceiver
     private function fetchVideo(int $timestamp, int $channel): ?string
     {
         try {
-            return $this->call->API->downloadGroupCallStreamChunk($this->call->public->id, $timestamp, 0, $channel, 2);
+            return $this->call->API->downloadGroupCallStreamChunk($this->call->public->id, $timestamp, 0, $channel, 2)['bytes'] ?? null;
         } catch (Throwable $e) {
             $this->call->log("Could not download video chunk $channel of {$this->call}: $e", Logger::VERBOSE);
             return null;
