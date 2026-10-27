@@ -283,12 +283,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->presentationDj?->resumeReader();
         $this->connection?->resume();
         $this->presentationConnection?->resume();
-        if ($this->streamMode) {
-            // The stream receiver does not survive a restart (its recording does not either):
-            // follow the stream again from the live edge.
-            $this->streamReceiver = new StreamReceiver($this);
-            $this->streamReceiver->start($this->rtmpMode);
-        }
+        // The stream receiver does not survive a restart, and neither does its recording: it's started again when a
+        // recording is set, see setOutput().
         EventLoop::queue($this->refetch(...));
     }
 
@@ -414,8 +410,9 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             );
             $this->connection?->close();
             $this->connection = null;
-            $this->streamReceiver ??= new StreamReceiver($this);
-            $this->streamReceiver->start($parsed['rtmp']);
+            // Only to record: without a recording, it downloaded every chunk for nothing, and the flood waits of
+            // downloading a few streams at once made it fall behind (TIME_TOO_SMALL), see setOutput().
+            $this->streamReceiver?->start($parsed['rtmp']);
             return;
         }
         if ($parsed['transport'] === null) {
@@ -1117,6 +1114,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         CallStream::checkAvailable($streams, $available, 'The stream');
         $this->streamReceiver ??= new StreamReceiver($this);
         $this->streamReceiver->setOutput($file, $format);
+        $this->streamReceiver->start($this->rtmpMode);
         return $available;
     }
 
@@ -1136,6 +1134,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         }
         $this->streamReceiver ??= new StreamReceiver($this);
         $this->streamReceiver->setOutputDirectory($dir, $format);
+        $this->streamReceiver->start($this->rtmpMode);
         return $this;
     }
 
