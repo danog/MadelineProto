@@ -48,8 +48,16 @@ final class IpcWorkerDescriptorsTest extends TestCase
             fclose($server);
 
             $pid = proc_get_status($worker)['pid'];
+            // Until it execs sleep, the child is a fork of this process, with all of its descriptors, which the exec
+            // then closes: listing them meanwhile saw them vanish (readlink(): No such file or directory).
+            $deadline = hrtime(true) + 5_000_000_000;
+            while (!str_starts_with((string) @file_get_contents("/proc/$pid/cmdline"), "sleep\0")) {
+                self::assertLessThan($deadline, hrtime(true), 'The worker did not start');
+                usleep(1000);
+            }
+            // sleep may still open and close files of its own (locales): those vanish, an inherited socket doesn't.
             $sockets = array_filter(
-                array_map(readlink(...), glob("/proc/$pid/fd/*") ?: []),
+                array_map(static fn (string $fd): string|false => @readlink($fd), glob("/proc/$pid/fd/*") ?: []),
                 static fn ($link): bool => str_starts_with((string) $link, 'socket:'),
             );
             self::assertSame([], $sockets, 'The worker inherited sockets');
