@@ -1275,7 +1275,8 @@ trait Handler
             if ($inputCall === null) {
                 continue;
             }
-            $controller = $this->getGroupCallByInput($inputCall, $this->getIdInternal($peer), liveStory: true);
+            // getId(), not getIdInternal(), which doesn't resolve 'me' (the live story then had no peer).
+            $controller = $this->getGroupCallByInput($inputCall, $this->getId($peer), liveStory: true);
             if ($controller !== null && $controller->public instanceof LiveStory) {
                 return $controller->public;
             }
