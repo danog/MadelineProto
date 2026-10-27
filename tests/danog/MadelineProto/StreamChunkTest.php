@@ -39,14 +39,21 @@ use ReflectionProperty;
  */
 final class StreamChunkTest extends TestCase
 {
-    private function api(array $response): MTProto
+    /** @var list<int> The offsets requested. */
+    private array $offsets = [];
+
+    /**
+     * @param array|\Closure(int): array $response The response, or a function of the offset returning it.
+     */
+    private function api(array|\Closure $response): MTProto
     {
         BypassFinals::enable();
         $API = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()->onlyMethods(['methodCallAsyncRead'])->getMock();
         $API->method('methodCallAsyncRead')->willReturnCallback(function (string $method, array $args, ?int $dc) use ($response): array {
             $this->assertSame('upload.getFile', $method);
             $this->assertSame('inputGroupCallStream', $args['location']['_']);
-            return $response;
+            $this->offsets[] = $args['offset'];
+            return $response instanceof \Closure ? $response($args['offset']) : $response;
         });
         (new ReflectionProperty(MTProto::class, 'settings'))->setValue($API, new Settings);
         $datacenter = $this->createMock(DataCenter::class);
@@ -66,6 +73,26 @@ final class StreamChunkTest extends TestCase
     {
         $API = $this->api(['_' => 'upload.file', 'type' => ['_' => 'storage.filePartial'], 'mtime' => 0, 'bytes' => 'truncated']);
         $this->assertSame(['bytes' => 'truncated', 'partial' => true], $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
+    }
+
+    /**
+     * A chunk bigger than the 1 MB a request returns (the one of a keyframe at a high bitrate) was cut at 1 MB,
+     * without its moov ("Unexpected end of MP4 file" at every file change of a stream played by magnaluna).
+     */
+    public function testABigChunkIsFetchedWhole(): void
+    {
+        $chunk = random_bytes(1024 * 1024 + 300);
+        $API = $this->api(static fn (int $offset): array => ['_' => 'upload.file', 'type' => ['_' => 'storage.filePartial'], 'mtime' => 0, 'bytes' => substr($chunk, $offset, 1024 * 1024)]);
+        $this->assertSame(['bytes' => $chunk, 'partial' => true], $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
+        $this->assertSame([0, 1024 * 1024], $this->offsets);
+    }
+
+    public function testAChunkOfExactlyOnePartIsCompletedByAnEmptyPart(): void
+    {
+        $chunk = random_bytes(1024 * 1024);
+        $API = $this->api(static fn (int $offset): array => ['_' => 'upload.file', 'type' => ['_' => 'storage.fileMp4'], 'mtime' => 0, 'bytes' => substr($chunk, $offset, 1024 * 1024)]);
+        $this->assertSame(['bytes' => $chunk, 'partial' => false], $API->downloadGroupCallStreamChunk(1, 1000, 0, 1, 2));
+        $this->assertSame([0, 1024 * 1024], $this->offsets);
     }
 
     public function testACompleteChunkIsReturned(): void

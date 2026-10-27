@@ -57,6 +57,8 @@ use Revolt\EventLoop;
  */
 trait Handler
 {
+    /** The most upload.getFile returns at once: a chunk of a stream may be made of several parts. */
+    private const STREAM_CHUNK_PART = 1024 * 1024;
     /** How many untracked group calls to remember, see {@see self::$seenGroupCalls}. */
     private const SEEN_GROUP_CALLS_MAX = 1000;
 
@@ -1043,17 +1045,26 @@ trait Handler
             $location['video_quality'] = $videoQuality ?? 0;
         }
         $dc = $this->groupCallStreamDc($controller);
-        $result = $this->methodCallAsyncRead('upload.getFile', [
-            'location' => $location,
-            'offset' => 0,
-            'limit' => 1024 * 1024,
-            'floodWaitLimit' => 0,
-            'specialMethodType' => SpecialMethodType::FILE_RELATED,
-        ], $dc);
-        if ($result['_'] !== 'upload.file') {
-            return null;
-        }
-        return ['bytes' => (string) $result['bytes'], 'partial' => ($result['type']['_'] ?? null) === 'storage.filePartial'];
+        // A chunk can be bigger than the 1 MB a request returns (the one of a keyframe at a high bitrate): its parts
+        // are fetched until one is shorter. Fetched with a single request, it was cut at 1 MB, without its moov.
+        $bytes = '';
+        $partial = false;
+        do {
+            $result = $this->methodCallAsyncRead('upload.getFile', [
+                'location' => $location,
+                'offset' => \strlen($bytes),
+                'limit' => self::STREAM_CHUNK_PART,
+                'floodWaitLimit' => 0,
+                'specialMethodType' => SpecialMethodType::FILE_RELATED,
+            ], $dc);
+            if ($result['_'] !== 'upload.file') {
+                return null;
+            }
+            $part = (string) $result['bytes'];
+            $bytes .= $part;
+            $partial = $partial || ($result['type']['_'] ?? null) === 'storage.filePartial';
+        } while (\strlen($part) === self::STREAM_CHUNK_PART);
+        return ['bytes' => $bytes, 'partial' => $partial];
     }
 
     /**
