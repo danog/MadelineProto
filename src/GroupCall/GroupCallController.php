@@ -692,8 +692,11 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         if ($this->callState !== GroupCallState::JOINED) {
             return;
         }
-        $this->log("The WebRTC connection of $this failed, checking whether we are still joined...", Logger::WARNING);
-        EventLoop::queue($this->checkJoined(...));
+        // A failed connection never recovers (there is no ICE restart without joining again), whatever the server says
+        // about our source: after a network outage, waiting for checkGroupCall to say we were dropped left every call
+        // sending nothing for hours.
+        $this->log("The WebRTC connection of $this failed, rejoining...", Logger::WARNING);
+        EventLoop::queue($this->rejoin(...));
     }
 
     /**

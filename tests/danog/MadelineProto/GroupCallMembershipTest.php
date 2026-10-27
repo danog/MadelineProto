@@ -36,6 +36,8 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 
+use function Amp\delay;
+
 /**
  * A joined group call checks whether we're still in it, as TDLib does: its WebRTC connection can't tell, as the
  * SFU keeps the endpoint of a call that ended (or that dropped us) for as long as we send it media.
@@ -139,6 +141,27 @@ final class GroupCallMembershipTest extends TestCase
         $this->assertSame(['phone.checkGroupCall'], $this->calls);
         $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
         $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * A failed WebRTC connection is rejoined right away, even if the server still lists our source: it never
+     * recovers by itself (after a network outage, every call of a bot stayed failed for hours, sending nothing).
+     * An ended call is left, as with any rejoin.
+     */
+    public function testAFailedConnectionIsRejoined(): void
+    {
+        $API = $this->client();
+        $controller = $this->joinedCall($API);
+        $this->answer = static fn (string $method) => match ($method) {
+            'phone.checkGroupCall' => [self::SOURCE],
+            'phone.joinGroupCall' => throw RPCErrorException::make('GROUPCALL_INVALID', 400, ''),
+        };
+
+        $controller->onConnectionFailed();
+        delay(0.1);
+
+        $this->assertSame(['phone.joinGroupCall'], $this->calls);
+        $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
     }
 
     public function testACallWeAreStillInIsKept(): void
