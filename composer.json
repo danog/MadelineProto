@@ -71,7 +71,7 @@
         "danog/php-rtc-ice": "^2.0.18",
         "danog/php-rtc-ntp": "^1.1.14",
         "danog/php-rtc-rtcp": "^1.1.11",
-        "danog/php-rtc-rtp": "^2.0.23",
+        "danog/php-rtc-rtp": "^2.0.24",
         "danog/php-rtc-sctp": "^2.0.14",
         "danog/php-rtc-srtp": "^1.1.16",
         "danog/php-rtc-stun": "^2.0.18",
