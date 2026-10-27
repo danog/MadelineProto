@@ -16,7 +16,6 @@
 
 namespace danog\MadelineProto\Test;
 
-use Webrtc\RTP\Crypto\DropFrameException;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Tgcalls\E2E\BlockCodec;
 use danog\MadelineProto\Tgcalls\E2E\CallPacket;
@@ -27,6 +26,7 @@ use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptorState;
 use danog\MadelineProto\Tgcalls\E2E\Verification;
 use PHPUnit\Framework\TestCase;
+use Webrtc\RTP\Crypto\DropFrameException;
 use Webrtc\RTP\Enum\MediaKind;
 
 /**
