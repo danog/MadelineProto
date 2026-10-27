@@ -24,6 +24,8 @@ use danog\MadelineProto\Connection;
 use danog\MadelineProto\DataCenter;
 use danog\MadelineProto\EventHandler\Calls\GroupCallState;
 use danog\MadelineProto\GroupCall\GroupCallController;
+use danog\MadelineProto\GroupCall\StreamReceiver;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
@@ -146,6 +148,23 @@ final class GroupCallMembershipTest extends TestCase
         $this->assertSame(['phone.checkGroupCall'], $this->calls);
         $this->assertSame(GroupCallState::LEFT, $controller->getCallState());
         $this->assertSame([], $API->getAllGroupCalls());
+    }
+
+    /**
+     * In stream mode, the chunks of the stream are only downloaded to record them: without a recording, magnaluna
+     * downloaded the RTMP livestreams it plays to for nothing, drew flood waits, and fell behind their live edge.
+     */
+    public function testTheStreamIsOnlyDownloadedToRecordIt(): void
+    {
+        $controller = $this->joinedCall($this->client());
+        $receiver = new ReflectionProperty(GroupCallController::class, 'streamReceiver');
+        (fn () => $this->applyConnectionParams(['stream' => true, 'rtmp' => true]))->call($controller);
+        $this->assertNull($receiver->getValue($controller), 'Not downloaded without a recording');
+
+        $controller->setOutput(new LocalFile(sys_get_temp_dir().'/madeline-stream-on-demand.mkv'));
+        $this->assertNotNull($receiver->getValue($controller));
+        $this->assertTrue((new ReflectionProperty(StreamReceiver::class, 'running'))->getValue($receiver->getValue($controller)), 'Downloaded to record it');
+        $receiver->getValue($controller)->stop();
     }
 
     /**
