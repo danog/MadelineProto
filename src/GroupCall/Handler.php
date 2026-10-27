@@ -1027,8 +1027,8 @@ trait Handler
      * Download one media chunk of a group call in stream mode (upload.getFile with an
      * inputGroupCallStream location) from its stream DC, or null on a CDN redirect.
      *
-     * A partial chunk (storage.filePartial) is cut short: still being written (at the live edge), or for good (a gap in
-     * what the publisher sent, which official clients play as it is).
+     * Whether it's partial (storage.filePartial) says little: the chunks of a stream are flagged so even behind its live
+     * edge, where they're complete. The chunk of the live edge itself is cut short while being written.
      *
      * @return ?array{bytes: string, partial: bool}
      *
