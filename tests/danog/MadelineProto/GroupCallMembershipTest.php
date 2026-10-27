@@ -33,7 +33,6 @@ use danog\MadelineProto\Settings\Logger as LoggerSettings;
 use DG\BypassFinals;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use ReflectionProperty;
 
 /**
