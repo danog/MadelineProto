@@ -22,6 +22,7 @@ use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\GroupCall\GroupCallController;
 use danog\MadelineProto\GroupCall\StreamReceiver;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\RPCError\RateLimitError;
 use DG\BypassFinals;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -32,7 +33,8 @@ use function Amp\delay;
 /**
  * The chunks of an RTMP livestream were fetched as soon as the server accepted them: those of its live edge, cut short
  * (storage.filePartial) while being written ("Unexpected end of MP4 file"). As tgcalls, the receiver follows the stream
- * in real time, 2 seconds behind its edge, and takes a chunk cut short for good as it is.
+ * in real time, 2 seconds behind its edge, and takes the chunks as they are, whatever their flag (all of them are
+ * flagged partial, even behind the edge: fetched again, it fell behind until TIME_TOO_SMALL).
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -47,19 +49,24 @@ final class StreamReceiverPacingTest extends TestCase
     private array $logs = [];
 
     /**
-     * Follow an RTMP stream whose live edge is at 10.5 s for $seconds, the chunks being cut short if $partial says so.
+     * Follow an RTMP stream whose live edge is at 10.5 s for $seconds, the chunks being cut short if $partial says so,
+     * or failing with what $error returns.
      *
      * @param \Closure(int): bool $partial
+     * @param ?\Closure(int): ?\Throwable $error
      */
-    private function follow(float $seconds, \Closure $partial): void
+    private function follow(float $seconds, \Closure $partial, ?\Closure $error = null): void
     {
         BypassFinals::enable();
         $start = hrtime(true);
         $API = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()
             ->onlyMethods(['getGroupCallStreamChannels', 'downloadGroupCallStreamChunk'])->getMock();
         $API->method('getGroupCallStreamChannels')->willReturn([['channel' => 1, 'scale' => 0, 'last_timestamp_ms' => 10_500]]);
-        $API->method('downloadGroupCallStreamChunk')->willReturnCallback(function (int $id, int $timeMs) use ($start, $partial): array {
+        $API->method('downloadGroupCallStreamChunk')->willReturnCallback(function (int $id, int $timeMs) use ($start, $partial, $error): array {
             $this->fetched[] = [$timeMs, intdiv(hrtime(true) - $start, 1_000_000)];
+            if ($error !== null && ($e = $error($timeMs)) !== null) {
+                throw $e;
+            }
             return ['bytes' => 'not a chunk', 'partial' => $partial($timeMs)];
         });
         $public = (new ReflectionClass(GroupCall::class))->newInstanceWithoutConstructor();
@@ -91,14 +98,27 @@ final class StreamReceiverPacingTest extends TestCase
         }
     }
 
-    public function testAChunkCutShortForGoodIsTakenAsItIs(): void
+    public function testTheChunksCutShortAreTakenAsTheyAre(): void
     {
-        $this->follow(1.8, static fn (int $timeMs): bool => $timeMs === 8000);
-        $chunks = array_count_values(array_column($this->fetched, 0));
-        // Fetched again for a second, in case it was still being written, then recorded as it is.
-        $this->assertGreaterThanOrEqual(8, $chunks[8000]);
-        $this->assertLessThanOrEqual(11, $chunks[8000]);
-        $this->assertSame(1, $chunks[9000] ?? null);
+        $this->follow(1.5, static fn (int $timeMs): bool => true);
+        // Each fetched once, on time, and recorded up to the cut.
+        $this->assertSame([8000, 9000], array_column($this->fetched, 0));
+        $this->assertLessThan(500, $this->fetched[1][1] - 1000);
         $this->assertNotEmpty(preg_grep('~^Recorded the chunk 8000 of the call up to where it was cut short~', $this->logs));
+    }
+
+    public function testAFloodWaitIsWaitedOut(): void
+    {
+        $flooded = false;
+        $this->follow(1.5, static fn (int $timeMs): bool => false, static function (int $timeMs) use (&$flooded): ?\Throwable {
+            if ($flooded) {
+                return null;
+            }
+            $flooded = true;
+            return new RateLimitError('FLOOD_WAIT_1', 1, 420, 'upload.getFile');
+        });
+        // Fetched again a second later, not every 100 ms.
+        $this->assertSame([8000, 8000], array_column(\array_slice($this->fetched, 0, 2), 0));
+        $this->assertGreaterThanOrEqual(950, $this->fetched[1][1] - $this->fetched[0][1]);
     }
 }

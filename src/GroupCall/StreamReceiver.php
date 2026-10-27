@@ -48,7 +48,8 @@ use function Amp\File\openFile;
  * `stream.ogg` and every publisher's video to `video-<endpoint>.mkv`.
  *
  * As official clients do, the stream is followed one 1000 ms segment at a time, in real time, 2 seconds behind the
- * live edge; a chunk that is not ready yet (`TIME_TOO_BIG`, a flood wait, cut short) is retried after 100 ms, any
+ * live edge; a chunk that is not ready yet (`TIME_TOO_BIG`) is retried after 100 ms (2 seconds later for an RTMP
+ * stream), after a flood wait as long as it says, any
  * other error resynchronizes to the live edge, and being told we are not in the call any more
  * (`GROUPCALL_JOIN_MISSING` / `GROUPCALL_FORBIDDEN`) rejoins it.
  *
@@ -63,13 +64,6 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
-    /**
-     * How long to keep fetching a chunk cut short (storage.filePartial) before taking it as it is, in milliseconds: it
-     * may still be being written (at the live edge, if the stream lags behind real time), else it stays cut short.
-     */
-    private const PARTIAL_RETRY_MS = 1000;
-    /** How many times in a row the chunk was cut short, see {@see self::PARTIAL_RETRY_MS}. */
-    private int $partialRetries = 0;
     /**
      * When the chunks of an RTMP stream are due: its timeline doesn't follow the server clock, so it's paced from the
      * chunk it was resynchronized at and when (hrtime(), in nanoseconds).
@@ -267,7 +261,13 @@ final class StreamReceiver
                     $this->pace = [$timestamp, hrtime(true) + self::BUFFER_MS * 1_000_000];
                     continue;
                 }
-                if ($e->rpc === 'TIME_TOO_BIG' || $e instanceof RateLimitError) {
+                if ($e instanceof RateLimitError) {
+                    // Retried every 100 ms, a stalled stream (TIME_TOO_BIG, then FLOOD_WAIT_3) got a flood wait
+                    // about 3 times a second.
+                    delay((float) $e->getWaitTime());
+                    continue;
+                }
+                if ($e->rpc === 'TIME_TOO_BIG') {
                     delay(self::RETRY_MS / 1000);
                     continue;
                 }
@@ -286,12 +286,12 @@ final class StreamReceiver
                 delay(self::RETRY_MS / 1000);
                 continue;
             }
+            // Taken as it is even if cut short, as tgcalls (and TDLib) do: the chunks of a stream are flagged so
+            // (storage.filePartial) even well behind its live edge, where they never change. Fetched again until
+            // they weren't, each chunk took seconds (10 more requests) and the receiver fell a minute behind,
+            // until the server no longer had its chunk (TIME_TOO_SMALL). Staying behind the edge keeps the chunks
+            // complete.
             ['bytes' => $chunk, 'partial' => $partial] = $chunk;
-            if ($partial && ++$this->partialRetries * self::RETRY_MS < self::PARTIAL_RETRY_MS) {
-                delay(self::RETRY_MS / 1000);
-                continue;
-            }
-            $this->partialRetries = 0;
             $this->call->log("Got the chunk $timestamp of {$this->call} (".\strlen($chunk).' bytes'.($partial ? ', cut short' : '').')', Logger::ULTRA_VERBOSE);
             $this->nextTimestamp = $timestamp + self::SEGMENT_MS;
             $this->lastTimestamp = $timestamp;
