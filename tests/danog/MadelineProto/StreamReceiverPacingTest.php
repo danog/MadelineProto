@@ -58,11 +58,11 @@ final class StreamReceiverPacingTest extends TestCase
     private function follow(float $seconds, \Closure $partial, ?\Closure $error = null): void
     {
         BypassFinals::enable();
-        $start = hrtime(true);
+        $start = null;
         $API = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()
             ->onlyMethods(['getGroupCallStreamChannels', 'downloadGroupCallStreamChunk'])->getMock();
         $API->method('getGroupCallStreamChannels')->willReturn([['channel' => 1, 'scale' => 0, 'last_timestamp_ms' => 10_500]]);
-        $API->method('downloadGroupCallStreamChunk')->willReturnCallback(function (int $id, int $timeMs) use ($start, $partial, $error): array {
+        $API->method('downloadGroupCallStreamChunk')->willReturnCallback(function (int $id, int $timeMs) use (&$start, $partial, $error): array {
             $this->fetched[] = [$timeMs, intdiv(hrtime(true) - $start, 1_000_000)];
             if ($error !== null && ($e = $error($timeMs)) !== null) {
                 throw $e;
@@ -80,6 +80,8 @@ final class StreamReceiverPacingTest extends TestCase
         (new ReflectionProperty(GroupCallController::class, 'public'))->setValue($call, $public);
 
         $receiver = new StreamReceiver($call);
+        // From here: building the mocks above can take a second on a loaded machine.
+        $start = hrtime(true);
         $receiver->start(true);
         delay($seconds);
         $receiver->stop();
@@ -91,8 +93,10 @@ final class StreamReceiverPacingTest extends TestCase
     {
         $this->follow(2.5, static fn (int $timeMs): bool => false);
         $this->assertSame([8000, 9000, 10000], array_column($this->fetched, 0));
+        $this->assertLessThan(500, $this->fetched[0][1], 'The first chunk is fetched right away');
         foreach ($this->fetched as [$timeMs, $at]) {
             // Each chunk once it's due: a second after the previous one.
+            $at -= $this->fetched[0][1];
             $this->assertGreaterThanOrEqual($timeMs - 8000 - 50, $at, "Chunk $timeMs fetched too early");
             $this->assertLessThan($timeMs - 8000 + 500, $at, "Chunk $timeMs fetched too late");
         }
@@ -103,7 +107,7 @@ final class StreamReceiverPacingTest extends TestCase
         $this->follow(1.5, static fn (int $timeMs): bool => true);
         // Each fetched once, on time, and recorded up to the cut.
         $this->assertSame([8000, 9000], array_column($this->fetched, 0));
-        $this->assertLessThan(500, $this->fetched[1][1] - 1000);
+        $this->assertLessThan(500, $this->fetched[1][1] - $this->fetched[0][1] - 1000);
         $this->assertNotEmpty(preg_grep('~^Recorded the chunk 8000 of the call up to where it was cut short~', $this->logs));
     }
 
