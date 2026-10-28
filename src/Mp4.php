@@ -623,14 +623,16 @@ final class Mp4
                 }
             }
         }
-        // Composition offsets: the timestamps are presentation timestamps, like those of Matroska.
+        // Composition offsets: the timestamps are presentation timestamps, like those of Matroska. Signed
+        // whatever the version of the box: encoders write negative offsets in version 0 boxes too (unsigned
+        // according to the spec), and read as unsigned they make B-frames due 13 hours later. ffmpeg reads them
+        // as signed, too.
         $compositionOffsets = [];
         if (isset($tables['ctts'])) {
-            $signed = \ord($tables['ctts'][0]) === 1;
             $count = self::u32($tables['ctts'], 4);
             for ($i = 0; $i < $count; $i++) {
                 $n = self::u32($tables['ctts'], 8 + $i * 8);
-                $offset = $signed ? self::s32($tables['ctts'], 12 + $i * 8) : self::u32($tables['ctts'], 12 + $i * 8);
+                $offset = self::s32($tables['ctts'], 12 + $i * 8);
                 for ($j = 0; $j < $n; $j++) {
                     $compositionOffsets[] = $offset;
                 }
@@ -767,8 +769,8 @@ final class Mp4
                     }
                     $compositionOffset = 0;
                     if ($flags & self::TRUN_SAMPLE_CTS) {
-                        // Signed in version 1.
-                        $compositionOffset = \ord($run[0]) === 1 ? self::s32($run, $pos) : self::u32($run, $pos);
+                        // Signed whatever the version, like those of the ctts box.
+                        $compositionOffset = self::s32($run, $pos);
                         $pos += 4;
                     }
                     $samples[$offset] = [

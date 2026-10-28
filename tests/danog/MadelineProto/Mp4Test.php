@@ -27,21 +27,25 @@ use PHPUnit\Framework\TestCase;
 final class Mp4Test extends TestCase
 {
     /**
-     * @return iterable<string, array{list<string>}>
+     * @return iterable<string, array{list<string>, 1?: bool}>
      */
     public static function layouts(): iterable
     {
         yield 'moov first' => [['-movflags', '+faststart']];
         yield 'moov last' => [[]];
         yield 'fragmented' => [['-movflags', '+frag_keyframe+empty_moov+default_base_moof']];
+        // Negative composition offsets in version 0 boxes, where they're unsigned according to the spec,
+        // as Telegram's clients write them.
+        yield 'negative offsets' => [['-movflags', '+faststart+negative_cts_offsets'], true];
     }
 
     /**
      * @dataProvider layouts
      *
      * @param list<string> $flags
+     * @param bool $version0 Whether to rewrite the version of the boxes of the composition offsets to 0.
      */
-    public function testEveryFrameIsDemuxedWithItsPresentationTimestamp(array $flags): void
+    public function testEveryFrameIsDemuxedWithItsPresentationTimestamp(array $flags, bool $version0 = false): void
     {
         exec('ffmpeg -hide_banner -encoders 2>/dev/null', $encoders, $code);
         if ($code !== 0 || !str_contains(implode("\n", $encoders), 'libx264')) {
@@ -56,8 +60,22 @@ final class Mp4Test extends TestCase
                 ...$flags, $file,
             ])), $output, $code);
             self::assertSame(0, $code, implode("\n", $output));
+            $data = (string) file_get_contents($file);
+            if ($version0) {
+                $boxes = 0;
+                foreach (['ctts', 'trun'] as $type) {
+                    for ($pos = strpos($data, $type); $pos !== false; $pos = strpos($data, $type, $pos + 1)) {
+                        if ($data[$pos + 4] === "\1") {
+                            $data[$pos + 4] = "\0";
+                            $boxes++;
+                        }
+                    }
+                }
+                self::assertGreaterThan(0, $boxes, 'No version 1 box of composition offsets');
+                file_put_contents($file, $data);
+            }
 
-            $mp4 = new Mp4(new ReadableBuffer((string) file_get_contents($file)));
+            $mp4 = new Mp4(new ReadableBuffer($data));
             $video = [];
             $audio = 0;
             foreach ($mp4->frames as $frame) {
