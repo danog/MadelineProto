@@ -186,6 +186,8 @@
     "loginTitleWeb": "Вхід у Telegram",
     "loginLeadWeb": "Виберіть обліковий запис або бота, від імені якого працюватиме цей екземпляр MadelineProto.",
     "loginTypeWeb": "Увійти як",
+    "loginSessionWeb": "Сесія",
+    "loginSessionSwitchWeb": "Перемкнути",
     "loginUserPhoneHintWeb": "З кодом країни, наприклад +39 123 456 7890.",
     "loginBotTokenHintWeb": "Токен, який видав @BotFather під час створення бота.",
     "loginCodeTitleWeb": "Введіть код входу",

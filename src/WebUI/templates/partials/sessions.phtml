@@ -1,0 +1,26 @@
+<?php
+/**
+ * The choice of the session to log in, when several aren't logged in yet: a form that loads the page of another.
+ *
+ * @var \danog\MadelineProto\WebUI\Template $this
+ * @var \danog\MadelineProto\WebUI\Page $page
+ */
+use danog\MadelineProto\WebUI\WebUI;
+
+?>
+<form method="get" class="sessions" action="<?= $this->e(WebUI::getSelfUrl()) ?>">
+    <?php foreach (WebUI::getQueryParameters([WebUI::SESSION_PARAMETER]) as [$name, $value]): ?>
+        <input type="hidden"<?= $this->attrs(['name' => $name, 'value' => $value]) ?>>
+    <?php endforeach ?>
+    <div class="field">
+        <label for="f-madeline-session"><?= $this->t('loginSessionWeb') ?></label>
+        <div class="sessions-row">
+            <select id="f-madeline-session"<?= $this->attrs(['name' => WebUI::SESSION_PARAMETER]) ?>>
+                <?php foreach ($page->sessions as $key => $name): ?>
+                    <option<?= $this->attrs(['value' => (string) $key, 'selected' => (string) $key === $page->session]) ?>><?= $this->e($name) ?></option>
+                <?php endforeach ?>
+            </select>
+            <button type="submit" class="btn btn-quiet"><?= $this->t('loginSessionSwitchWeb') ?></button>
+        </div>
+    </div>
+</form>

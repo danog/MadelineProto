@@ -186,6 +186,8 @@
     "loginTitleWeb": "Telegram にログイン",
     "loginLeadWeb": "この MadelineProto インスタンスで使用するアカウントまたはボットを選択してください。",
     "loginTypeWeb": "ログインの種類",
+    "loginSessionWeb": "セッション",
+    "loginSessionSwitchWeb": "切り替え",
     "loginUserPhoneHintWeb": "国番号を含めて入力してください (例: +39 123 456 7890)。",
     "loginBotTokenHintWeb": "ボットの作成時に @BotFather から受け取ったトークンです。",
     "loginCodeTitleWeb": "ログインコードを入力",

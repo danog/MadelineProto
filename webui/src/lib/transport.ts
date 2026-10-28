@@ -64,6 +64,13 @@ export async function submitForm(fields: Record<string, string>): Promise<Submit
   }
 }
 
+/** Load the page with a parameter of its query set (the session to log in...). */
+export function loadPageWith(param: string, value: string) {
+  const url = new URL(pageUrl());
+  url.searchParams.set(param, value);
+  window.location.assign(url.href);
+}
+
 /** Reload the page with a GET request (a reload could submit a POST again). */
 export function reloadPage() {
   window.location.replace(pageUrl());

@@ -186,6 +186,8 @@
     "loginTitleWeb": "Telegram'da oturum açın",
     "loginLeadWeb": "Bu MadelineProto örneğinin hangi hesap veya bot olarak çalışacağını seçin.",
     "loginTypeWeb": "Şu olarak oturum aç",
+    "loginSessionWeb": "Oturum",
+    "loginSessionSwitchWeb": "Değiştir",
     "loginUserPhoneHintWeb": "Ülke koduyla birlikte, örneğin +39 123 456 7890.",
     "loginBotTokenHintWeb": "Botu oluşturduğunuzda @BotFather'ın size verdiği token.",
     "loginCodeTitleWeb": "Giriş kodunu girin",

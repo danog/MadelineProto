@@ -42,6 +42,10 @@ final class Page implements JsonSerializable
      * @param string                   $template     Template used to render the page on the server
      * @param string                   $view         View used to render the page in the web app
      * @param array<string, mixed>     $data         Additional variables for custom templates
+     * @param array<string, string>    $sessions     The sessions to choose from (key => name), on the login pages of
+     *                                               {@see \danog\MadelineProto\API::startAndLoopMulti()}: those not
+     *                                               logged in yet
+     * @param ?string                  $session      Key of the session of the page, among $sessions
      */
     public function __construct(
         public string $title,
@@ -56,6 +60,8 @@ final class Page implements JsonSerializable
         public string $template = 'page',
         public string $view = 'setup',
         public array $data = [],
+        public array $sessions = [],
+        public ?string $session = null,
     ) {
     }
 
@@ -74,6 +80,17 @@ final class Page implements JsonSerializable
             'instructions' => $this->instructions,
             'qrEndpoint' => $this->qrEndpoint,
             'data' => (object) $this->data,
+            'sessions' => $this->sessions === [] ? null : [
+                'param' => WebUI::SESSION_PARAMETER,
+                'label' => Template::translate('loginSessionWeb'),
+                'selected' => $this->session,
+                // A list: a JSON object would be reordered in the browser (integer keys first)
+                'options' => array_map(
+                    static fn (int|string $key, string $name): array => ['key' => (string) $key, 'name' => $name],
+                    array_keys($this->sessions),
+                    $this->sessions,
+                ),
+            ],
         ];
     }
 

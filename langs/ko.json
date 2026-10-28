@@ -186,6 +186,8 @@
     "loginTitleWeb": "Telegram에 로그인",
     "loginLeadWeb": "이 MadelineProto 인스턴스가 사용할 계정 또는 봇을 선택하십시오.",
     "loginTypeWeb": "로그인 유형",
+    "loginSessionWeb": "세션",
+    "loginSessionSwitchWeb": "전환",
     "loginUserPhoneHintWeb": "국가 코드를 포함하여 입력하십시오(예: +39 123 456 7890).",
     "loginBotTokenHintWeb": "봇을 만들 때 @BotFather가 알려 준 토큰입니다.",
     "loginCodeTitleWeb": "로그인 코드 입력",

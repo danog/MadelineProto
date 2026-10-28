@@ -186,6 +186,8 @@
     "loginTitleWeb": "登录 Telegram",
     "loginLeadWeb": "选择此 MadelineProto 实例要使用的帐户或机器人。",
     "loginTypeWeb": "登录身份",
+    "loginSessionWeb": "会话",
+    "loginSessionSwitchWeb": "切换",
     "loginUserPhoneHintWeb": "请包含国家代码，例如 +39 123 456 7890。",
     "loginBotTokenHintWeb": "创建机器人时 @BotFather 提供给您的令牌。",
     "loginCodeTitleWeb": "输入登录码",

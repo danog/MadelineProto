@@ -708,3 +708,48 @@ $corner-button-size: 2.5rem;
       inset 0 -2px 6px rgba(0, 0, 0, .12);
   }
 }
+
+// The choice of the session to log in (startAndLoopMulti()): a strip of clear glass above the card, with the
+// sessions in a well.
+.sessions {
+  @include glass.pane($tint: var(--glass-tint), $blur: var(--glass-blur-small), $shadow: var(--glass-shadow-small));
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  padding: .5rem .5rem .5rem 1.25rem;
+  border-radius: 1.25rem;
+
+  label {
+    color: var(--secondary-text-color);
+    font-size: var(--font-size-14);
+    white-space: nowrap;
+  }
+}
+
+.sessionsSelect {
+  @include glass.well();
+  flex: 1;
+  min-width: 0;
+  height: 2.5rem;
+  padding: 0 .75rem;
+  border: 1px solid var(--glass-well-border);
+  border-radius: .875rem;
+  color: var(--primary-text-color);
+  font: inherit;
+  font-size: var(--font-size-16);
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include glass.well-focus();
+    outline: none;
+  }
+
+  option {
+    // the native list isn't glass: legible on both themes
+    background-color: var(--surface-color);
+    color: var(--primary-text-color);
+  }
+}

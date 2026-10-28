@@ -314,6 +314,49 @@ final class WebUITest extends TestCase
         }
     }
 
+    public function testTheSessionToLogInIsChosenOnTheLoginPages(): void
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? null;
+        $_SERVER['REQUEST_URI'] = '/index.php?bot=a%20b&madelineSession=1&getQrCode';
+        try {
+            // A single session to log in: nothing to choose
+            WebUI::setSessions(['1' => 'b.madeline'], '1');
+            self::assertSame([], WebUI::addSessions(self::loginPage())->sessions);
+
+            WebUI::setSessions(['named' => 'named', '1' => 'b.madeline', 'x"><b>' => 'x"><b>'], '1');
+            $page = WebUI::addSessions(self::loginPage());
+            $html = WebUI::render(new Templates, $page);
+            self::assertSame(1, preg_match('~<form method="get" class="sessions" action="/index.php">(.*?)</form>~s', $html, $form));
+            // The other parameters of the page are kept, as is; not the one it sets, nor those of the web UI
+            self::assertStringContainsString('<input type="hidden" name="bot" value="a b">', $form[1]);
+            self::assertStringNotContainsString('getQrCode', $form[1]);
+            self::assertSame(1, substr_count($form[1], 'name="madelineSession"'));
+            self::assertSame(3, preg_match_all('~<option~', $form[1]));
+            self::assertStringContainsString('<option value="1" selected>b.madeline</option>', $form[1]);
+            self::assertStringContainsString('<option value="x&quot;&gt;&lt;b&gt;">x&quot;&gt;&lt;b&gt;</option>', $form[1]);
+
+            // In order, as a list (a JSON object would be reordered in the browser)
+            $state = WebUI::getStateArray($page);
+            self::assertSame([
+                'param' => 'madelineSession',
+                'label' => 'Session',
+                'selected' => '1',
+                'options' => [['key' => 'named', 'name' => 'named'], ['key' => '1', 'name' => 'b.madeline'], ['key' => 'x"><b>', 'name' => 'x"><b>']],
+            ], json_decode(json_encode($state['page'], JSON_THROW_ON_ERROR), true)['sessions']);
+
+            WebUI::setSessions([], null);
+            self::assertNull(json_decode(json_encode(WebUI::addSessions(self::loginPage()), JSON_THROW_ON_ERROR), true)['sessions']);
+            self::assertStringNotContainsString('class="sessions"', WebUI::render(new Templates, WebUI::addSessions(self::loginPage())));
+        } finally {
+            WebUI::setSessions([], null);
+            if ($uri === null) {
+                unset($_SERVER['REQUEST_URI']);
+            } else {
+                $_SERVER['REQUEST_URI'] = $uri;
+            }
+        }
+    }
+
     public function testSessionsOfTheLegacyTemplatesStillLoad(): void
     {
         $deprecations = [];

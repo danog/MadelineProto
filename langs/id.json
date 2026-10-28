@@ -186,6 +186,8 @@
     "loginTitleWeb": "Login ke Telegram",
     "loginLeadWeb": "Pilih akun atau bot yang akan digunakan untuk menjalankan instance MadelineProto ini.",
     "loginTypeWeb": "Login sebagai",
+    "loginSessionWeb": "Sesi",
+    "loginSessionSwitchWeb": "Ganti",
     "loginUserPhoneHintWeb": "Dengan kode negara, misalnya +39 123 456 7890.",
     "loginBotTokenHintWeb": "Token yang diberikan @BotFather saat Anda membuat bot.",
     "loginCodeTitleWeb": "Masukkan kode login",

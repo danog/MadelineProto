@@ -186,6 +186,8 @@
     "loginTitleWeb": "כניסה ל-Telegram",
     "loginLeadWeb": "בחר את החשבון או הבוט שבשמו יפעל מופע MadelineProto הזה.",
     "loginTypeWeb": "כניסה בתור",
+    "loginSessionWeb": "סשן",
+    "loginSessionSwitchWeb": "החלפה",
     "loginUserPhoneHintWeb": "עם קידומת המדינה, למשל +39 123 456 7890.",
     "loginBotTokenHintWeb": "הטוקן ש-@BotFather נתן לך כשיצרת את הבוט.",
     "loginCodeTitleWeb": "הזן את קוד הכניסה",

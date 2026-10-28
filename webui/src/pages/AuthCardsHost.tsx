@@ -40,6 +40,7 @@ import SignUpCard from '@/pages/cards/SignUpCard';
 import SignQRCard from '@/pages/cards/SignQRCard';
 import ApiFormCard from '@/pages/cards/ApiFormCard';
 import StatusCard from '@/pages/cards/StatusCard';
+import SessionSelect from '@/pages/SessionSelect';
 
 /* ------------------------------------------------------------------ */
 /* Host                                                               */
@@ -104,6 +105,7 @@ export default function AuthCardsHost(): JSX.Element {
         >
           <div class={classNames(styles.placeholder, styles.placeholderTop)} />
           <div class={styles.cardsContainer}>
+            <SessionSelect sessions={currentState()?.page.sessions ?? null} />
             <CardsTransition />
           </div>
           <div class={styles.placeholder} />

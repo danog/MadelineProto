@@ -186,6 +186,8 @@
     "loginTitleWeb": "Telegramga kirish",
     "loginLeadWeb": "Ushbu MadelineProto nusxasi qaysi akkaunt yoki bot sifatida ishlashini tanlang.",
     "loginTypeWeb": "Kim sifatida kirish",
+    "loginSessionWeb": "Seans",
+    "loginSessionSwitchWeb": "Almashtirish",
     "loginUserPhoneHintWeb": "Davlat kodi bilan, masalan +39 123 456 7890.",
     "loginBotTokenHintWeb": "Botni yaratganingizda @BotFather bergan token.",
     "loginCodeTitleWeb": "Kirish kodini kiriting",

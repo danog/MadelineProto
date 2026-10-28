@@ -40,6 +40,21 @@ interface Page {
     instructions: Text[];
     qrEndpoint: string | null;
     data: Record<string, unknown>;        // per-view data, see below; data.rpcError: RPC error type of the last POST
+    sessions: Sessions | null;            // the sessions to choose from, see below
+}
+```
+
+- `page.sessions`: on the login pages of `API::startAndLoopMulti()`, when more than one of its sessions isn't logged
+  in yet. Each session has its own pages, picked by a query parameter: choosing another one loads the page (GET)
+  with `param` set to its key, and the requests of that page (POSTs, QR code polls) keep it, since they go to the
+  URL of the page. Never while a form is being submitted.
+
+```ts
+interface Sessions {
+    param: string;                        // "madelineSession"
+    label: string;                        // localized label of the choice
+    selected: string;                     // key of the session of this page
+    options: {key: string; name: string}[];   // in order
 }
 ```
 
