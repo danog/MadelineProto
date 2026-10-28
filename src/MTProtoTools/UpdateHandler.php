@@ -953,6 +953,7 @@ trait UpdateHandler
      * @param boolean        $noWebpage              Set this flag to disable generation of the webpage preview
      * @param boolean        $updateStickersetsOrder Whether to move used stickersets to top
      * @param ?Cancellation  $cancellation           Cancellation
+     * @param integer|string|null $replyToPeer       Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      */
     public function sendMessage(
         int|string $peer,
@@ -969,7 +970,8 @@ trait UpdateHandler
         bool $clearDraft = false,
         bool $noWebpage = false,
         bool $updateStickersetsOrder = false,
-        ?Cancellation $cancellation = null
+        ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         $result = $this->methodCallAsyncRead(
             'messages.sendMessage',
@@ -981,6 +983,7 @@ trait UpdateHandler
                     '_' => 'inputReplyToMessage',
                     'reply_to_msg_id' => $replyToMsgId,
                     'top_msg_id' => $topMsgId,
+                    'reply_to_peer_id' => $replyToPeer,
                 ] : null,
                 'reply_markup' => $replyMarkup,
                 'send_as' => $sendAs,
