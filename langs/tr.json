@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Bu bot token'ı iptal edildi",
     "tweb.FIRSTNAME_INVALID": "Geçersiz ad",
     "tweb.LASTNAME_INVALID": "Geçersiz soyad",
-    "tweb.Close": "Kapat"
+    "tweb.Close": "Kapat",
+    "webBotStarted": "Bot başlatıldı!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "Henüz hiçbir uygulama oluşturulmadı!",
+    "myTelegramOrgCreateFailed": "Uygulama oluşturulamadı",
+    "myTelegramOrgNoCreationHash": "Uygulama oluşturma hash'i bulunamadı!",
+    "myTelegramOrgNoApiId": "my.telegram.org'daki uygulama sayfasında API ID ve API hash bulunamadı",
+    "myTelegramOrgUnexpected": "my.telegram.org'dan beklenmeyen yanıt",
+    "myTelegramOrgEmpty": "my.telegram.org'dan boş yanıt"
 }

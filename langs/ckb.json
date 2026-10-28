@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "ئەم تۆکنی بۆتە هەڵوەشێنراوەتەوە",
     "tweb.FIRSTNAME_INVALID": "ناوی یەکەم نادروستە",
     "tweb.LASTNAME_INVALID": "ناوی کۆتایی نادروستە",
-    "tweb.Close": "داخستن"
+    "tweb.Close": "داخستن",
+    "webBotStarted": "بۆتەکە دەستی پێکرد!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API هاش",
+    "myTelegramOrgNoApp": "هێشتا هیچ ئەپێک دروست نەکراوە!",
+    "myTelegramOrgCreateFailed": "دروستکردنی ئەپ سەرکەوتوو نەبوو",
+    "myTelegramOrgNoCreationHash": "هاشی دروستکردنی ئەپ نەدۆزرایەوە!",
+    "myTelegramOrgNoApiId": "API ID و هاش لە پەڕەی ئەپەکە لە my.telegram.org نەدۆزرانەوە",
+    "myTelegramOrgUnexpected": "وەڵامێکی چاوەڕواننەکراو لە my.telegram.org",
+    "myTelegramOrgEmpty": "وەڵامێکی بەتاڵ لە my.telegram.org"
 }

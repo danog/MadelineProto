@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "이 봇 토큰은 폐기되었습니다",
     "tweb.FIRSTNAME_INVALID": "잘못된 이름",
     "tweb.LASTNAME_INVALID": "잘못된 성",
-    "tweb.Close": "닫기"
+    "tweb.Close": "닫기",
+    "webBotStarted": "봇이 시작되었습니다!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "아직 생성된 앱이 없습니다!",
+    "myTelegramOrgCreateFailed": "앱 생성에 실패했습니다",
+    "myTelegramOrgNoCreationHash": "앱 생성 해시를 찾을 수 없습니다!",
+    "myTelegramOrgNoApiId": "my.telegram.org의 앱 페이지에서 API ID와 API hash를 찾을 수 없습니다",
+    "myTelegramOrgUnexpected": "my.telegram.org의 예기치 않은 응답",
+    "myTelegramOrgEmpty": "my.telegram.org의 빈 응답"
 }

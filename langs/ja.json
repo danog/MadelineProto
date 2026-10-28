@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "このボットトークンは無効化されています",
     "tweb.FIRSTNAME_INVALID": "無効な名です",
     "tweb.LASTNAME_INVALID": "無効な姓です",
-    "tweb.Close": "閉じる"
+    "tweb.Close": "閉じる",
+    "webBotStarted": "ボットが起動しました！",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "アプリはまだ作成されていません！",
+    "myTelegramOrgCreateFailed": "アプリの作成に失敗しました",
+    "myTelegramOrgNoCreationHash": "アプリ作成用のハッシュが見つかりません！",
+    "myTelegramOrgNoApiId": "my.telegram.org のアプリのページに API ID と API hash が見つかりません",
+    "myTelegramOrgUnexpected": "my.telegram.org からの予期しない応答",
+    "myTelegramOrgEmpty": "my.telegram.org からの応答が空です"
 }

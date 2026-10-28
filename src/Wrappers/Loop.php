@@ -24,6 +24,7 @@ use Amp\DeferredFuture;
 use Amp\SignalException;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
+use danog\MadelineProto\Lang;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Settings;
@@ -77,7 +78,7 @@ trait Loop
             }, 'restarter');
             $this->logger->logger("Added restart callback with ID $id!");
             $this->logger->logger('Done webhost init process!');
-            Tools::closeConnection($this->getWebMessage('The bot was started!'));
+            Tools::closeConnection($this->getWebMessage(Lang::$current_lang['webBotStarted']));
             $inited = true;
         } elseif (PHP_SAPI === 'cli') {
             try {

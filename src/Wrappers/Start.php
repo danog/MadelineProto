@@ -171,8 +171,13 @@ trait Start
         try {
             $step();
         } catch (RPCErrorException|Exception $e) {
+            // The description of an RPC error is in English (Telegram's database): the login errors are translated
+            // for the web app (tweb.<error>)
+            $message = $e instanceof RPCErrorException
+                ? Lang::$current_lang['tweb.'.$e->rpc] ?? $e->getMessage()
+                : $e->getMessage();
             $this->webEcho(
-                Alert::error(\sprintf(Lang::$current_lang['webError'], rtrim($e->getMessage(), '.!'))),
+                Alert::error(\sprintf(Lang::$current_lang['webError'], rtrim($message, '.!'))),
                 $e instanceof RPCErrorException ? $e->rpc : null,
             );
             return;

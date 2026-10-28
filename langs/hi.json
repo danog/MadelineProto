@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "यह बॉट टोकन रद्द कर दिया गया है",
     "tweb.FIRSTNAME_INVALID": "अमान्य पहला नाम",
     "tweb.LASTNAME_INVALID": "अमान्य उपनाम",
-    "tweb.Close": "बंद करें"
+    "tweb.Close": "बंद करें",
+    "webBotStarted": "बॉट शुरू हो गया!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "अभी तक कोई ऐप नहीं बनाया गया है!",
+    "myTelegramOrgCreateFailed": "ऐप बनाना विफल रहा",
+    "myTelegramOrgNoCreationHash": "ऐप बनाने का hash नहीं मिला!",
+    "myTelegramOrgNoApiId": "my.telegram.org पर ऐप के पेज में API ID और API hash नहीं मिले",
+    "myTelegramOrgUnexpected": "my.telegram.org से अप्रत्याशित जवाब",
+    "myTelegramOrgEmpty": "my.telegram.org से खाली जवाब"
 }
