@@ -363,14 +363,14 @@ trait Start
             fields: [
                 new Field(
                     name: 'api_id',
-                    label: 'API ID',
+                    label: Lang::$current_lang['apiIdLabelWeb'],
                     value: trim((string) ($_POST['api_id'] ?? '')),
                     placeholder: '1234567',
                     autofocus: true,
                 ),
                 new Field(
                     name: 'api_hash',
-                    label: 'API hash',
+                    label: Lang::$current_lang['apiHashLabelWeb'],
                     type: FieldType::PASSWORD,
                     value: trim((string) ($_POST['api_hash'] ?? '')),
                     autocomplete: 'off',

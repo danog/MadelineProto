@@ -471,6 +471,32 @@ final class WebUITest extends TestCase
         self::assertSame('Sorry, too many tries. Please try again later.', $error->invoke(null, '{"text":"Sorry, too many tries. Please try again later.","field":false}'));
         self::assertSame('ERROR', $error->invoke(null, "ERROR\n"));
         self::assertSame('Invalid confirmation code!', $error->invoke(null, 'Invalid confirmation code!'));
+        // What MadelineProto says itself is in the language of the session (my.telegram.org's own texts are English)
+        self::assertSame('Empty response from my.telegram.org', $error->invoke(null, ''));
+        Lang::$current_lang = Lang::$lang['it'];
+        self::assertSame('Risposta vuota da my.telegram.org', $error->invoke(null, ''));
+    }
+
+    public function testEveryStringUsedIsInTheLanguageFiles(): void
+    {
+        $english = json_decode((string) file_get_contents(__DIR__.'/../../../langs/en.json'), true, flags: JSON_THROW_ON_ERROR);
+        $used = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__.'/../../../src', \FilesystemIterator::SKIP_DOTS));
+        foreach ($files as $file) {
+            if (!preg_match('/\.(php|phtml)$/', $file->getFilename()) || $file->getFilename() === 'Lang.php') {
+                continue;
+            }
+            $code = (string) file_get_contents($file->getPathname());
+            preg_match_all('/Lang::\$(?:current_lang|lang\[\'en\'\])\[\'([A-Za-z0-9_.]+)\'\]|->t\(\'([A-Za-z0-9_.]+)\'|Template::translate\(\'([A-Za-z0-9_.]+)\'/', $code, $matches, PREG_SET_ORDER);
+            foreach ($matches as $match) {
+                $key = $match[1] ?: ($match[2] ?? '') ?: ($match[3] ?? '');
+                $used[$key][] = basename($file->getPathname());
+            }
+        }
+        self::assertNotEmpty($used);
+        foreach ($used as $key => $where) {
+            self::assertArrayHasKey($key, $english, "$key, used in ".implode(', ', array_unique($where)).", is not in langs/en.json");
+        }
     }
 
     public function testMyTelegramOrgStateSurvivesSerialization(): void

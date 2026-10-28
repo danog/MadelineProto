@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Este token del bot ha sido revocado",
     "tweb.FIRSTNAME_INVALID": "Nombre no válido",
     "tweb.LASTNAME_INVALID": "Apellidos no válidos",
-    "tweb.Close": "Cerrar"
+    "tweb.Close": "Cerrar",
+    "webBotStarted": "¡El bot se ha iniciado!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "¡Todavía no se ha creado ninguna app!",
+    "myTelegramOrgCreateFailed": "No se pudo crear la app",
+    "myTelegramOrgNoCreationHash": "¡No se encontró el hash de creación de la app!",
+    "myTelegramOrgNoApiId": "No se encontraron el API ID y el API hash en la página de la app en my.telegram.org",
+    "myTelegramOrgUnexpected": "Respuesta inesperada de my.telegram.org",
+    "myTelegramOrgEmpty": "Respuesta vacía de my.telegram.org"
 }

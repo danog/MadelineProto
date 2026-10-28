@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Token bot ini telah dicabut",
     "tweb.FIRSTNAME_INVALID": "Nama depan tidak valid",
     "tweb.LASTNAME_INVALID": "Nama belakang tidak valid",
-    "tweb.Close": "Tutup"
+    "tweb.Close": "Tutup",
+    "webBotStarted": "Bot telah dijalankan!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "Belum ada aplikasi yang dibuat!",
+    "myTelegramOrgCreateFailed": "Pembuatan aplikasi gagal",
+    "myTelegramOrgNoCreationHash": "Hash pembuatan aplikasi tidak ditemukan!",
+    "myTelegramOrgNoApiId": "API ID dan API hash tidak ditemukan di halaman aplikasi di my.telegram.org",
+    "myTelegramOrgUnexpected": "Respons tak terduga dari my.telegram.org",
+    "myTelegramOrgEmpty": "Respons kosong dari my.telegram.org"
 }

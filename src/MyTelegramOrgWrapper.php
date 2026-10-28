@@ -178,7 +178,7 @@ final class MyTelegramOrgWrapper
      */
     public function getApp(): array
     {
-        return $this->parseApps($this->getAppsPage()) ?? throw new Exception('No app was created yet!');
+        return $this->parseApps($this->getAppsPage()) ?? throw new Exception(Lang::$current_lang['myTelegramOrgNoApp']);
     }
     /**
      * Create an app.
@@ -206,7 +206,7 @@ final class MyTelegramOrgWrapper
         if (trim($result) !== '') {
             throw new Exception(self::getError($result));
         }
-        return $this->parseApps($this->getAppsPage()) ?? throw new Exception('App creation failed');
+        return $this->parseApps($this->getAppsPage()) ?? throw new Exception(Lang::$current_lang['myTelegramOrgCreateFailed']);
     }
     /**
      * Get the apps page.
@@ -228,7 +228,7 @@ final class MyTelegramOrgWrapper
         $title = preg_match('~<title>(.*?)</title>~s', $page, $matches) ? trim($matches[1]) : '';
         if ($title === 'Create new application') {
             if (!preg_match('~<input type="hidden" name="hash" value="([^"]+)"~', $page, $matches)) {
-                throw new Exception('Could not find the app creation hash!');
+                throw new Exception(Lang::$current_lang['myTelegramOrgNoCreationHash']);
             }
             $this->creation_hash = $matches[1];
             return null;
@@ -244,11 +244,11 @@ final class MyTelegramOrgWrapper
         }
         if ($title === 'App configuration') {
             // Logged in, with an app: its page changed again
-            throw new Exception('Could not find the API ID and hash in the page of the app on my.telegram.org');
+            throw new Exception(Lang::$current_lang['myTelegramOrgNoApiId']);
         }
         // Most likely, the login expired
         $this->logged = false;
-        throw new Exception($title === '' ? 'Unexpected response from my.telegram.org' : $title);
+        throw new Exception($title === '' ? Lang::$current_lang['myTelegramOrgUnexpected'] : $title);
     }
     /**
      * Make a request to my.telegram.org.
@@ -275,7 +275,7 @@ final class MyTelegramOrgWrapper
             $result = $json['text'];
         }
         $result = trim(html_entity_decode(strip_tags($result), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-        return $result === '' ? 'Empty response from my.telegram.org' : $result;
+        return $result === '' ? Lang::$current_lang['myTelegramOrgEmpty'] : $result;
     }
     /**
      * Function for generating curl request headers.

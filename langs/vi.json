@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Token bot này đã bị thu hồi",
     "tweb.FIRSTNAME_INVALID": "Tên không hợp lệ",
     "tweb.LASTNAME_INVALID": "Họ không hợp lệ",
-    "tweb.Close": "Đóng"
+    "tweb.Close": "Đóng",
+    "webBotStarted": "Bot đã được khởi động!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "Chưa có ứng dụng nào được tạo!",
+    "myTelegramOrgCreateFailed": "Tạo ứng dụng thất bại",
+    "myTelegramOrgNoCreationHash": "Không tìm thấy hash tạo ứng dụng!",
+    "myTelegramOrgNoApiId": "Không tìm thấy API ID và API hash trong trang ứng dụng trên my.telegram.org",
+    "myTelegramOrgUnexpected": "Phản hồi không mong đợi từ my.telegram.org",
+    "myTelegramOrgEmpty": "Phản hồi trống từ my.telegram.org"
 }

@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "此机器人令牌已被撤销",
     "tweb.FIRSTNAME_INVALID": "名字无效",
     "tweb.LASTNAME_INVALID": "姓氏无效",
-    "tweb.Close": "关闭"
+    "tweb.Close": "关闭",
+    "webBotStarted": "机器人已启动！",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "尚未创建任何应用！",
+    "myTelegramOrgCreateFailed": "创建应用失败",
+    "myTelegramOrgNoCreationHash": "找不到创建应用所需的哈希！",
+    "myTelegramOrgNoApiId": "在 my.telegram.org 的应用页面中找不到 API ID 和 API hash",
+    "myTelegramOrgUnexpected": "来自 my.telegram.org 的意外响应",
+    "myTelegramOrgEmpty": "来自 my.telegram.org 的空响应"
 }

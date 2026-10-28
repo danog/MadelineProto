@@ -272,5 +272,14 @@
     "tweb.ACCESS_TOKEN_EXPIRED": "Цей токен бота відкликано",
     "tweb.FIRSTNAME_INVALID": "Неприпустиме ім'я",
     "tweb.LASTNAME_INVALID": "Неприпустиме прізвище",
-    "tweb.Close": "Закрити"
+    "tweb.Close": "Закрити",
+    "webBotStarted": "Бота запущено!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "Застосунок ще не створено!",
+    "myTelegramOrgCreateFailed": "Не вдалося створити застосунок",
+    "myTelegramOrgNoCreationHash": "Не знайдено хеш для створення застосунку!",
+    "myTelegramOrgNoApiId": "Не вдалося знайти API ID та API hash на сторінці застосунку на my.telegram.org",
+    "myTelegramOrgUnexpected": "Неочікувана відповідь від my.telegram.org",
+    "myTelegramOrgEmpty": "Порожня відповідь від my.telegram.org"
 }

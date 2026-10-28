@@ -273,5 +273,14 @@
     "tweb.FIRSTNAME_INVALID": "Invalid first name",
     "tweb.LASTNAME_INVALID": "Invalid last name",
     "tweb.Close": "Close",
-    "ipc_tcp_warning": "UNIX sockets are not available, so the IPC server of the session listens on TCP (127.0.0.1) instead: any program running on this machine can connect to it, and control the session. On Windows 10 1803+, enable the sockets extension (extension=sockets in php.ini) to use UNIX sockets."
+    "ipc_tcp_warning": "UNIX sockets are not available, so the IPC server of the session listens on TCP (127.0.0.1) instead: any program running on this machine can connect to it, and control the session. On Windows 10 1803+, enable the sockets extension (extension=sockets in php.ini) to use UNIX sockets.",
+    "webBotStarted": "The bot was started!",
+    "apiIdLabelWeb": "API ID",
+    "apiHashLabelWeb": "API hash",
+    "myTelegramOrgNoApp": "No app was created yet!",
+    "myTelegramOrgCreateFailed": "App creation failed",
+    "myTelegramOrgNoCreationHash": "Could not find the app creation hash!",
+    "myTelegramOrgNoApiId": "Could not find the API ID and hash in the page of the app on my.telegram.org",
+    "myTelegramOrgUnexpected": "Unexpected response from my.telegram.org",
+    "myTelegramOrgEmpty": "Empty response from my.telegram.org"
 }
