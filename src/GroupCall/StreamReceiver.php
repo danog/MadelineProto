@@ -18,6 +18,8 @@ namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\WritableStream;
+use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -64,6 +66,13 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
+    /**
+     * How often a chunk is downloaded without a recording, in seconds: the server drops a listener that downloads
+     * nothing about a minute after it joined, see {@see self::keepAlive()}.
+     */
+    private const KEEPALIVE_INTERVAL = 20.0;
+    /** Cancels the wait between two keep-alive downloads, when a recording is set. */
+    private ?DeferredCancellation $keepAliveWait = null;
     /**
      * When the chunks of an RTMP stream are due: its timeline doesn't follow the server clock, so it's paced from the
      * chunk it was resynchronized at and when (hrtime(), in nanoseconds).
@@ -158,6 +167,7 @@ final class StreamReceiver
      */
     public function stop(): void
     {
+        $this->keepAliveWait?->cancel();
         $this->running = false;
         $this->generation++;
         $this->closeWriters();
@@ -169,6 +179,7 @@ final class StreamReceiver
      */
     public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
+        $this->keepAliveWait?->cancel();
         $this->closeWriters();
         $this->outputDir = null;
         $this->outputFile = $file;
@@ -182,6 +193,7 @@ final class StreamReceiver
      */
     public function setOutputDirectory(LocalDirectory $directory, ?RecordingFormat $format = null): void
     {
+        $this->keepAliveWait?->cancel();
         $dir = $directory->create();
         $format ??= RecordingFormat::Mkv;
         $extension = match ($format) {
@@ -196,6 +208,12 @@ final class StreamReceiver
     private function loop(int $generation): void
     {
         while ($this->running && $generation === $this->generation) {
+            if ($this->outputFile === null && $this->outputDir === null) {
+                if (!$this->keepAlive()) {
+                    return;
+                }
+                continue;
+            }
             if ($this->nextTimestamp === null) {
                 try {
                     $edge = $this->liveEdge();
@@ -307,6 +325,46 @@ final class StreamReceiver
                 $this->consumePublishersVideo($timestamp);
             }
         }
+    }
+
+    /**
+     * Without a recording, download a chunk of the live edge every {@see self::KEEPALIVE_INTERVAL} seconds, and
+     * throw it away: the server drops a listener that downloads nothing about a minute after it joined (magnaluna,
+     * in the RTMP livestreams it plays to, rejoined each of them every minute), while following the whole stream
+     * for nothing drew flood waits. The stream is followed from its live edge once a recording is set.
+     *
+     * @return bool Whether to go on (false: we're not in the call any more, it's rejoined).
+     */
+    private function keepAlive(): bool
+    {
+        $this->nextTimestamp = null;
+        try {
+            $edge = $this->liveEdge();
+            if ($edge !== null) {
+                $this->fetch($edge);
+            }
+        } catch (RateLimitError $e) {
+            delay((float) $e->getWaitTime());
+            return true;
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_JOIN_MISSING' || $e->rpc === 'GROUPCALL_FORBIDDEN') {
+                $this->call->log("Not in {$this->call} any more ({$e->rpc}), rejoining...", Logger::WARNING);
+                $this->running = false;
+                $this->call->rejoin();
+                return false;
+            }
+        } catch (Throwable $e) {
+            $this->call->log("Could not download a chunk of {$this->call}: $e", Logger::VERBOSE);
+        }
+        $this->keepAliveWait = new DeferredCancellation;
+        try {
+            delay(self::KEEPALIVE_INTERVAL, cancellation: $this->keepAliveWait->getCancellation());
+        } catch (CancelledException) {
+            // A recording was set.
+        } finally {
+            $this->keepAliveWait = null;
+        }
+        return true;
     }
 
     /**

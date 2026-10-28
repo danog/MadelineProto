@@ -21,6 +21,7 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\EventHandler\Calls\GroupCall;
 use danog\MadelineProto\GroupCall\GroupCallController;
 use danog\MadelineProto\GroupCall\StreamReceiver;
+use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCError\RateLimitError;
 use DG\BypassFinals;
@@ -55,7 +56,7 @@ final class StreamReceiverPacingTest extends TestCase
      * @param \Closure(int): bool $partial
      * @param ?\Closure(int): ?\Throwable $error
      */
-    private function follow(float $seconds, \Closure $partial, ?\Closure $error = null): void
+    private function follow(float $seconds, \Closure $partial, ?\Closure $error = null, bool $record = true): void
     {
         BypassFinals::enable();
         $start = null;
@@ -80,6 +81,9 @@ final class StreamReceiverPacingTest extends TestCase
         (new ReflectionProperty(GroupCallController::class, 'public'))->setValue($call, $public);
 
         $receiver = new StreamReceiver($call);
+        if ($record) {
+            $receiver->setOutput(new LocalFile(tempnam(sys_get_temp_dir(), 'madeline-pacing')));
+        }
         // From here: building the mocks above can take a second on a loaded machine.
         $start = hrtime(true);
         $receiver->start(true);
@@ -100,6 +104,17 @@ final class StreamReceiverPacingTest extends TestCase
             $this->assertGreaterThanOrEqual($timeMs - 8000 - 50, $at, "Chunk $timeMs fetched too early");
             $this->assertLessThan($timeMs - 8000 + 500, $at, "Chunk $timeMs fetched too late");
         }
+    }
+
+    /**
+     * Without a recording, a chunk of the live edge is downloaded every 20 seconds only: the server drops a listener
+     * that downloads nothing (magnaluna rejoined its RTMP livestreams every minute), while following the whole stream
+     * for nothing drew flood waits.
+     */
+    public function testWithoutARecordingAChunkIsDownloadedEvery20Seconds(): void
+    {
+        $this->follow(1.5, static fn (int $timeMs): bool => false, record: false);
+        $this->assertSame([8000], array_column($this->fetched, 0));
     }
 
     public function testTheChunksCutShortAreTakenAsTheyAre(): void

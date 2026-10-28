@@ -151,19 +151,19 @@ final class GroupCallMembershipTest extends TestCase
     }
 
     /**
-     * In stream mode, the chunks of the stream are only downloaded to record them: without a recording, magnaluna
-     * downloaded the RTMP livestreams it plays to for nothing, drew flood waits, and fell behind their live edge.
+     * In stream mode, the stream is received even without a recording, to keep us in the call (the server drops a
+     * listener that downloads nothing), and recorded once a recording is set.
      */
-    public function testTheStreamIsOnlyDownloadedToRecordIt(): void
+    public function testTheStreamIsReceivedWithOrWithoutARecording(): void
     {
         $controller = $this->joinedCall($this->client());
         $receiver = new ReflectionProperty(GroupCallController::class, 'streamReceiver');
         (fn () => $this->applyConnectionParams(['stream' => true, 'rtmp' => true]))->call($controller);
-        $this->assertNull($receiver->getValue($controller), 'Not downloaded without a recording');
+        $this->assertNotNull($receiver->getValue($controller), 'Received without a recording');
+        $this->assertTrue((new ReflectionProperty(StreamReceiver::class, 'running'))->getValue($receiver->getValue($controller)));
 
         $controller->setOutput(new LocalFile(sys_get_temp_dir().'/madeline-stream-on-demand.mkv'));
-        $this->assertNotNull($receiver->getValue($controller));
-        $this->assertTrue((new ReflectionProperty(StreamReceiver::class, 'running'))->getValue($receiver->getValue($controller)), 'Downloaded to record it');
+        $this->assertTrue((new ReflectionProperty(StreamReceiver::class, 'running'))->getValue($receiver->getValue($controller)), 'Recorded');
         $receiver->getValue($controller)->stop();
     }
 
