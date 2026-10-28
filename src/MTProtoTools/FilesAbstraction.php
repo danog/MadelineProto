@@ -141,6 +141,7 @@ trait FilesAbstraction
      * @param boolean                                                            $updateStickersetsOrder Whether to move used stickersets to top
      * @param boolean                                                            $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
      * @param Cancellation                                                       $cancellation           Cancellation.
+     * @param integer|string|null                                                $replyToPeer            Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendDocument(
@@ -166,6 +167,7 @@ trait FilesAbstraction
         bool $updateStickersetsOrder = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Document::class,
@@ -192,6 +194,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -294,6 +297,7 @@ trait FilesAbstraction
      * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
      * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
      * @param Cancellation                                                  $cancellation           Cancellation.
+     * @param integer|string|null                                           $replyToPeer            Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendPhoto(
@@ -317,6 +321,7 @@ trait FilesAbstraction
         bool $updateStickersetsOrder = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Photo::class,
@@ -343,6 +348,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -441,6 +447,7 @@ trait FilesAbstraction
      * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
      * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
      * @param Cancellation                                                  $cancellation           Cancellation.
+     * @param integer|string|null                                           $replyToPeer            Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendDocumentPhoto(
@@ -464,6 +471,7 @@ trait FilesAbstraction
         bool $updateStickersetsOrder = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: DocumentPhoto::class,
@@ -490,6 +498,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -587,6 +596,7 @@ trait FilesAbstraction
      * @param boolean                                                       $updateStickersetsOrder Whether to move used stickersets to top
      * @param boolean                                                       $forceResend            Whether to forcefully resend the file, even if its type and name are the same.
      * @param Cancellation                                                  $cancellation           Cancellation.
+     * @param integer|string|null                                           $replyToPeer            Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendSticker(
@@ -610,6 +620,7 @@ trait FilesAbstraction
         bool $updateStickersetsOrder = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Sticker::class,
@@ -636,6 +647,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -742,6 +754,7 @@ trait FilesAbstraction
      * @param boolean                                                       $clearDraft              Clears the draft field
      * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
      * @param Cancellation                                                  $cancellation            Cancellation.
+     * @param integer|string|null                                           $replyToPeer             Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendVideo(
@@ -774,6 +787,7 @@ trait FilesAbstraction
         bool $forceResend = false,
         bool $updateStickersetsOrder = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Video::class,
@@ -808,6 +822,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -934,6 +949,7 @@ trait FilesAbstraction
      * @param boolean                                                       $clearDraft              Clears the draft field
      * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
      * @param ?Cancellation                                                  $cancellation            Cancellation.
+     * @param integer|string|null                                            $replyToPeer             Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendGif(
@@ -961,6 +977,7 @@ trait FilesAbstraction
         bool $clearDraft = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Gif::class,
@@ -995,6 +1012,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false
         );
     }
@@ -1111,6 +1129,7 @@ trait FilesAbstraction
      * @param boolean                                                       $clearDraft              Clears the draft field
      * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
      * @param ?Cancellation                                                  $cancellation            Cancellation.
+     * @param integer|string|null                                            $replyToPeer             Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendAudio(
@@ -1137,6 +1156,7 @@ trait FilesAbstraction
         bool $clearDraft = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         return $this->sendMedia(
             type: Audio::class,
@@ -1167,6 +1187,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -1279,6 +1300,7 @@ trait FilesAbstraction
      * @param boolean                                                       $clearDraft              Clears the draft field
      * @param boolean                                                       $forceResend             Whether to forcefully resend the file, even if its type and name are the same.
      * @param ?Cancellation                                                  $cancellation            Cancellation.
+     * @param integer|string|null                                            $replyToPeer             Chat of the message to reply to, if not the destination chat (a cross-chat reply).
      *
      */
     public function sendVoice(
@@ -1302,6 +1324,7 @@ trait FilesAbstraction
         bool $clearDraft = false,
         bool $forceResend = false,
         ?Cancellation $cancellation = null,
+        int|string|null $replyToPeer = null,
     ): Message {
         $attributes = [
             'duration' => $duration,
@@ -1333,6 +1356,7 @@ trait FilesAbstraction
             sendAs: $sendAs,
             forceResend: $forceResend,
             cancellation: $cancellation,
+            replyToPeer: $replyToPeer,
             uploadOnly: false,
         );
     }
@@ -1451,6 +1475,7 @@ trait FilesAbstraction
         ?Cancellation $cancellation,
         bool $uploadOnly,
         ?int $randomId = null,
+        int|string|null $replyToPeer = null,
     ): Message|Media {
         $args = get_defined_vars();
         if (!$this instanceof MTProto) {
@@ -1502,6 +1527,7 @@ trait FilesAbstraction
         ?Cancellation $cancellation,
         bool $uploadOnly,
         ?int $randomId = null,
+        int|string|null $replyToPeer = null,
         ?string $resumableCall = null,
     ): Message|Media {
         if ($file instanceof Message) {
@@ -1857,6 +1883,7 @@ trait FilesAbstraction
                 '_' => 'inputReplyToMessage',
                 'reply_to_msg_id' => $replyToMsgId,
                 'top_msg_id' => $topMsgId,
+                'reply_to_peer_id' => $replyToPeer,
             ] : null,
             'message' => $caption,
             'reply_markup' => $replyMarkup,
