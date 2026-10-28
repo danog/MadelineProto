@@ -216,6 +216,58 @@ final class E2EConferenceTest extends TestCase
     }
 
     /**
+     * A non-participant only gets the last block of the chain (by its link): an empty chain starts from it, as tde2e's
+     * create_from_block() does, so that a rejoin after the first one is built on the right height.
+     */
+    public function testAnEmptyChainStartsFromTheLastBlock(): void
+    {
+        $this->requireCrypto();
+        [$seedA] = Crypto::generateKeyPair();
+        [$seedB] = Crypto::generateKeyPair();
+        [$seedC] = Crypto::generateKeyPair();
+        $alice = new ConferenceChain(1, $seedA);
+        $aPub = $alice->getSelfPublicKey();
+        $bPub = (new ConferenceChain(2, $seedB))->getSelfPublicKey();
+        $genesis = $alice->buildBlock(0, str_repeat("\0", 32), [
+            $alice->groupStateChange([[1, $aPub, ConferenceChain::PERMISSION_ADD_USERS | ConferenceChain::PERMISSION_REMOVE_USERS]]),
+        ]);
+        $alice->applyServerBlock($genesis['serialized']);
+        $second = $alice->buildBlock(1, $alice->getLastBlockHash(), [
+            $alice->groupStateChange([[1, $aPub, ConferenceChain::PERMISSION_ADD_USERS | ConferenceChain::PERMISSION_REMOVE_USERS], [2, $bPub, 0]]),
+        ]);
+        $alice->applyServerBlock($second['serialized']);
+
+        $carol = new ConferenceChain(3, $seedC);
+        $this->assertTrue($carol->applyServerBlock($second['serialized']));
+        $this->assertSame(1, $carol->getHeight());
+        $this->assertSame($alice->getLastBlockHash(), $carol->getLastBlockHash());
+        $this->assertSame([1, 2], array_keys($carol->getParticipants()));
+    }
+
+    /**
+     * A rejoin replays the chain with a fresh key: a shared key addressed to an earlier key of ours isn't for us. Tried
+     * with the fresh key, it threw, the block wasn't applied, and the rejoin's block was rejected as stale for good.
+     */
+    public function testASharedKeyForAnEarlierKeyOfOursIsSkipped(): void
+    {
+        $this->requireCrypto();
+        [$oldSeed] = Crypto::generateKeyPair();
+        [$newSeed] = Crypto::generateKeyPair();
+        $before = new ConferenceChain(1, $oldSeed);
+        $oldPub = $before->getSelfPublicKey();
+        $built = $before->buildBlock(0, str_repeat("\0", 32), [
+            $before->groupStateChange([[1, $oldPub, ConferenceChain::PERMISSION_ADD_USERS | ConferenceChain::PERMISSION_REMOVE_USERS]]),
+            ['_' => 'e2e.chain.changeSetSharedKey', 'shared_key' => $before->buildSharedKey(random_bytes(32), [[1, $oldPub]])],
+        ]);
+
+        $rejoined = new ConferenceChain(1, $newSeed);
+        $rejoined->applyServerBlock($built['serialized']);
+
+        $this->assertSame(0, $rejoined->getHeight(), 'The block is applied');
+        $this->assertNull($rejoined->getGroupKey(), 'Its key is not ours any more');
+    }
+
+    /**
      * Removing a participant drops them from the group state and rekeys: the remaining members share
      * a new key that the removed member's chain never receives.
      */

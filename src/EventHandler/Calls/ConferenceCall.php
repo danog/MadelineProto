@@ -116,12 +116,24 @@ final class ConferenceCall extends Update implements MultiCall
     #[\Override]
     public function join(bool $muted = false): static
     {
-        $this->getClient()->joinConferenceCall([
+        // Until we're a participant, the server only takes how the conference was found (its link or invitation).
+        $this->getClient()->joinConferenceCall($this->joinInput ?? [
             '_' => 'inputGroupCall',
             'id' => $this->id,
             'access_hash' => $this->accessHash,
         ], $muted);
         return $this;
+    }
+
+    /** How the conference was found, if not by its id (its link, or the message inviting us to it). */
+    private ?array $joinInput = null;
+
+    /**
+     * @internal
+     */
+    public function setJoinInput(array $input): void
+    {
+        $this->joinInput = $input;
     }
 
     /**
