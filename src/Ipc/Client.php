@@ -287,6 +287,7 @@ final class Client extends ClientAbstract
         ?Cancellation $cancellation,
         bool $uploadOnly,
         ?int $randomId = null,
+        int|string|null $replyToPeer = null,
     ): Message|Media {
         /** @var array<string, mixed> */
         $args = get_defined_vars();
@@ -482,7 +483,7 @@ final class Client extends ClientAbstract
      * @param boolean  $seekable  Whether chunks can be fetched out of order
      * @param boolean  $encrypted Whether to encrypt file for secret chats
      */
-    public function uploadFromCallable(callable $callable, int $size, ?string $mime, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
+    public function uploadFromCallable(callable $callable, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $seekable = true, bool $encrypted = false, ?Cancellation $cancellation = null)
     {
         if (\is_object($callable) && $callable instanceof FileCallbackInterface) {
             $cb = $callable;
@@ -520,7 +521,7 @@ final class Client extends ClientAbstract
      * @param string $method Method name
      * @param array  $args   Arguments
      */
-    public function methodCallAsyncRead(string $method, array $args, ?int $dcId = null)
+    public function methodCallAsyncRead(string $method, array $args, ?int $datacenter = null)
     {
         if ((
             $method === 'messages.editInlineBotMessage' ||
@@ -540,12 +541,12 @@ final class Client extends ClientAbstract
         // Identifies the call if it's resumed by the IPC server, and sent again after a restart.
         $args['resumableCallId'] ??= bin2hex(random_bytes(16));
         if (isset($args['cancellation']) && $args['cancellation'] instanceof Cancellation) {
-            $params = [$method, &$args, $dcId];
+            $params = [$method, &$args, $datacenter];
             $wrapper = Wrapper::create($params, $this->session, $this->logger);
             $wrapper->wrap($args['cancellation']);
             return $this->__call('methodCallAsyncRead', $wrapper);
         }
-        return $this->__call('methodCallAsyncRead', [$method, $args, $dcId]);
+        return $this->__call('methodCallAsyncRead', [$method, $args, $datacenter]);
     }
     /**
      * Download file to directory.
