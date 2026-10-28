@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use AssertionError;
 use CURLFile;
 use danog\Decoder\FileId;
 use danog\MadelineProto\EventHandler\Media\Photo;
@@ -118,12 +119,53 @@ class FileIdTest extends MadelineTestCase
         }
     }
 
-    public function provideFileIdsAndType(): Generator
+    /** @var ?list<array{string, string, string, array}> The file IDs sent by the bot, see {@see self::provideFileIdsAndType()}. */
+    private static ?array $fileIds = null;
+
+    /**
+     * The file IDs to test, sent by the bot once for every test that uses them.
+     *
+     * @return list<array{string, string, string, array}>
+     */
+    public function provideFileIdsAndType(): array
+    {
+        return self::$fileIds ??= iterator_to_array($this->sendFileIds(), false);
+    }
+
+    /**
+     * Call a method of the Bot API, retrying if the connection fails.
+     *
+     * @param array<string, mixed> $params
+     */
+    private static function botApi(string $method, array $params): array
+    {
+        $token = getenv('BOT_TOKEN');
+        for ($attempt = 1; ; $attempt++) {
+            $handle = curl_init("https://api.telegram.org/bot$token/$method");
+            curl_setopt($handle, CURLOPT_POST, true);
+            curl_setopt($handle, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($handle);
+            if (\is_string($response)) {
+                $result = json_decode($response, true, flags: JSON_THROW_ON_ERROR);
+                if (!$result['ok']) {
+                    throw new AssertionError("$method failed: $response");
+                }
+                return $result['result'];
+            }
+            // The connection failed (a TLS handshake reset by api.telegram.org failed the CI).
+            if ($attempt === 3) {
+                throw new AssertionError("$method failed: ".curl_error($handle));
+            }
+            sleep($attempt);
+        }
+    }
+
+    private function sendFileIds(): Generator
     {
         $dest = getenv('DEST');
-        $token = getenv('BOT_TOKEN');
         foreach ($this->provideChats() as $chat) {
-            $result = json_decode(file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chat"), true)['result']['photo'] ?? [];
+            $result = self::botApi('getChat', ['chat_id' => $chat])['photo'] ?? [];
             if (!$result) {
                 continue;
             }
@@ -143,20 +185,15 @@ class FileIdTest extends MadelineTestCase
         foreach ($this->provideUrls() as $type => $url) {
             if ($type === 'video_note') {
                 copy($url, basename($url));
-
-                $handle = curl_init("https://api.telegram.org/bot$token/sendVideoNote?chat_id=$dest");
-                curl_setopt($handle, CURLOPT_POST, true);
-                curl_setopt($handle, CURLOPT_POSTFIELDS, [
-                    $type => new CURLFile(basename($url)),
-                ]);
-                curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-                $botResult = json_decode(curl_exec($handle), true);
-
-                unlink(basename($url));
+                try {
+                    $botResult = self::botApi('sendVideoNote', ['chat_id' => $dest, $type => new CURLFile(basename($url))]);
+                } finally {
+                    unlink(basename($url));
+                }
             } else {
-                $botResult = json_decode(file_get_contents("https://api.telegram.org/bot$token/send$type?chat_id=$dest&$type=$url"), true, flags: JSON_THROW_ON_ERROR);
+                $botResult = self::botApi("send$type", ['chat_id' => $dest, $type => $url]);
             }
-            $botResult = $botResult['result'][$type];
+            $botResult = $botResult[$type];
             if ($type !== 'photo') {
                 $botResult = [$botResult];
             }
