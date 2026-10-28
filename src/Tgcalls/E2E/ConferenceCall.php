@@ -424,7 +424,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         $this->restartVerification();
         $this->ensureVerificationBroadcast();
         $this->refetchParticipants();
-        $this->log("Joined E2E conference $this", Logger::NOTICE);
+        $this->log("Joined $this", Logger::NOTICE);
         return $this;
     }
 
