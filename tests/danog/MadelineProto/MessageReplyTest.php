@@ -63,10 +63,8 @@ final class MessageReplyTest extends TestCase
                 if ($error === '') {
                     return ['messages' => []];
                 }
-                // Known, so that it isn't reported to the error database.
-                RPCErrorException::$descriptions[$error] ??= $error;
-                RPCErrorException::$errorMethodMap[400][$method][$error] = $error;
-                throw RPCErrorException::make($error, 400, $method);
+                // No method: not reported to the error database.
+                throw RPCErrorException::make($error, 400, '');
             }
             return ['messages' => [['_' => 'message', 'id' => $args['id'][0]['id']]]];
         });
