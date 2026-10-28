@@ -45,6 +45,7 @@ use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
 use function Amp\ByteStream\buffer;
+use function Amp\delay;
 
 /**
  * Connection class.
@@ -273,6 +274,10 @@ final class Connection
     }
 
     private ?LocalMutex $connectMutex = null;
+    /** Whether the connection was closed for good (not to reconnect it), see {@see self::reconnect()}. */
+    private bool $closed = false;
+    /** How many {@see self::reconnect()} are running: a message that can't be sent starts one if none is. */
+    private int $reconnecting = 0;
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      */
@@ -598,7 +603,17 @@ final class Connection
             $message->setSerializedBody($body);
             unset($body);
         }
-        $this->connect();
+        try {
+            $this->connect();
+        } catch (\Throwable $e) {
+            // No way to connect (the network is down): queued, it's sent once reconnected, or times out as usual.
+            // Thrown, it failed every request at once, and killed the event loop of a script when a background
+            // request failed (polls, cancellations).
+            $this->API->logger("Could not connect to DC {$this->datacenterId}, sending $message once reconnected: {$e->getMessage()}", Logger::WARNING);
+            if ($this->reconnecting === 0) {
+                EventLoop::queue($this->reconnect(...));
+            }
+        }
         if ($message->hasReply()) {
             // Replied to (e.g. cancelled) while connecting: its body was already freed, and it must not be sent.
             return;
@@ -661,6 +676,9 @@ final class Connection
     {
         $this->API->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
+        if (!$temporary) {
+            $this->closed = true;
+        }
         if ($this->stream) {
             try {
                 $stream = $this->stream;
@@ -690,10 +708,39 @@ final class Connection
      */
     public function reconnect(): void
     {
+        $this->reconnecting++;
+        try {
+            $this->reconnectLoop();
+        } finally {
+            $this->reconnecting--;
+        }
+    }
+    private function reconnectLoop(): void
+    {
         $this->API->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
         $this->shared->connect($this->id);
-        $this->connect();
+        $this->closed = false;
+        // Reconnections run in the background (a dead connection, a server error): every way to connect failing
+        // (the network is down) threw out of them as an unhandled future, killing the event loop of a script after
+        // a minute of outage. Try again until it's back, unless the connection is closed meanwhile.
+        $delay = 1.0;
+        while (true) {
+            try {
+                $this->connect();
+                return;
+            } catch (\Throwable $e) {
+                if ($this->closed) {
+                    return;
+                }
+                $this->API->logger("Could not reconnect to DC {$this->datacenterId}, retrying in $delay seconds: {$e->getMessage()}", Logger::WARNING);
+                delay($delay);
+                $delay = min($delay * 2, 30.0);
+                if ($this->closed) {
+                    return;
+                }
+            }
+        }
     }
     /**
      * Get name.
