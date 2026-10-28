@@ -381,6 +381,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         $this->joined = true;
         $this->joinGeneration++;
         $this->leaving = false;
+        $this->applyJoinBlocks($updates);
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         $this->startPolling();
         $this->restartVerification();
@@ -413,6 +414,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         $this->joined = true;
         $this->joinGeneration++;
         $this->leaving = false;
+        $this->applyJoinBlocks($updates);
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         // Re-sync so our own accepted block (and any concurrent ones) are applied in server order.
         $this->syncChain(self::SUBCHAIN_STATE);
@@ -659,6 +661,12 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             // The answer to a request sent before we rejoined: about the participant we were, not the one we are.
             // Taken for ours, it reset a join the server still had, whose rejoin was then rejected for good.
             $this->log("Ignoring a GROUPCALL_FORBIDDEN of $this from before we rejoined", Logger::VERBOSE);
+            return;
+        }
+        if (!$this->joined) {
+            // Not a participant (yet): joining, the chain is replayed and its verification fetched, which the server
+            // refuses to non-participants; taken for being removed, it reset the join in progress.
+            $this->log("Ignoring a GROUPCALL_FORBIDDEN of $this while not joined", Logger::VERBOSE);
             return;
         }
         $this->log("Forbidden from $this; resetting conference state", Logger::WARNING);
@@ -1561,6 +1569,29 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         }
     }
 
+    /**
+     * Apply the blocks of each subchain the join returned, as TDLib does: the verification subchain is followed from
+     * there, as the server refuses (GROUPCALL_FORBIDDEN) to give a participant the broadcasts from before it joined:
+     * fetched from the start after a rejoin, the refusal reset the rejoin.
+     *
+     * @param array<string, mixed> $updates
+     */
+    private function applyJoinBlocks(array $updates): void
+    {
+        foreach ($updates['updates'] ?? [] as $update) {
+            if ($update['_'] !== 'updateGroupCallChainBlocks') {
+                continue;
+            }
+            $subChainId = (int) $update['sub_chain_id'];
+            $blocks = array_values(array_map('strval', $update['blocks']));
+            $next = (int) $update['next_offset'];
+            if ($subChainId === self::SUBCHAIN_VERIFICATION) {
+                $this->chainOffset[$subChainId] = max($this->chainOffset[$subChainId], $next - \count($blocks));
+            }
+            $this->applyChainBlocks($subChainId, $blocks, $next, fromPoll: true);
+        }
+    }
+
     private function consumeUpdates(array $updates): void
     {
         foreach ($updates['updates'] ?? [] as $update) {
@@ -1595,7 +1626,18 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      */
     private function callInput(): array
     {
-        return $this->joined ? $this->getInputCall() : ($this->joinInput ?? $this->getInputCall());
+        if ($this->joined) {
+            return $this->getInputCall();
+        }
+        if ($this->joinInput !== null) {
+            return $this->joinInput;
+        }
+        // Its link, for a conference we created (or found by its id): once removed, the creator is refused the chain
+        // by id too, and its rejoin was built on an empty chain, rejected as stale for good.
+        if (preg_match('~/call/([\w-]+)~', (string) ($this->rawCall['invite_link'] ?? ''), $matches)) {
+            return ['_' => 'inputGroupCallSlug', 'slug' => $matches[1]];
+        }
+        return $this->getInputCall();
     }
 
     public function getChain(): ConferenceChain
@@ -1630,21 +1672,12 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         if (!$this->joined || $this->leaving) {
             return;
         }
-        // A failed connection never recovers (there is no ICE restart without joining again): leave, so that the
-        // server drops our old participant, and rejoin. Only logged, the conference stayed silent for good.
+        // A failed connection never recovers (there is no ICE restart without joining again): rejoin. Only logged,
+        // the conference stayed silent for good. Not left first: a leave sent while the network is down only reached
+        // the server once it was back, after the rejoin, and removed us again (its rejoin then rejected for good);
+        // the rejoin's block replaces our earlier entry, as tde2e's does.
         $this->log("The WebRTC connection of $this failed, rejoining...", Logger::WARNING);
-        $failed = $this->connection;
-        EventLoop::queue(function () use ($failed): void {
-            try {
-                $this->API->methodCallAsyncRead('phone.leaveGroupCall', ['call' => $this->getInputCall(), 'source' => $failed?->getAudioSource() ?? 0]);
-            } catch (Throwable $e) {
-                $this->log("Could not leave $this before rejoining: {$e->getMessage()}", Logger::NOTICE);
-            }
-            // Leaving can take until the network is back: meanwhile we may have been removed and rejoined already.
-            if ($this->connection === $failed && $this->joined) {
-                $this->resetAndRejoin();
-            }
-        });
+        $this->resetAndRejoin();
     }
 
     /**

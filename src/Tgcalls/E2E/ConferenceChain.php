@@ -238,13 +238,23 @@ final class ConferenceChain
         // Apply strictly in order and exactly once: the same block may reach us from both the push
         // update and the polling backstop. A block that is not the next one is ignored (the server
         // enforces the ordering, so this is not an error, just a duplicate/out-of-order delivery).
-        if ((int) $block['height'] !== $this->height + 1) {
+        // An empty chain starts from any block, as tde2e's create_from_block(): a non-participant (rejoining) only gets
+        // the last block of the chain, whose state is the whole group. Applied only from block 0, a rejoin after the
+        // first one was built on an empty chain, rejected as stale for good.
+        $bootstrap = $this->height === -1 && (int) $block['height'] > 0;
+        if (!$bootstrap && (int) $block['height'] !== $this->height + 1) {
             return false;
         }
         // Hash the block in its canonical (local-id) form, as tde2e does.
         $canonical = $this->codec->serialize($block);
+        $hasGroupState = false;
         foreach ($block['changes'] ?? [] as $change) {
+            $hasGroupState = $hasGroupState || ($change['_'] ?? '') === 'e2e.chain.changeSetGroupState';
             $this->applyChange($change);
+        }
+        if ($bootstrap && !$hasGroupState && isset($block['state_proof']['group_state'])) {
+            // A block without a group-state change carries the group in its state proof.
+            $this->applyChange(['_' => 'e2e.chain.changeSetGroupState', 'group_state' => $block['state_proof']['group_state']]);
         }
         $this->height = (int) $block['height'];
         $this->lastBlockHash = $this->codec->blockHash($canonical);
