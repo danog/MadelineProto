@@ -166,6 +166,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
                         ['req_msg_id' => $self->getMsgId()]
                     ));
                 } catch (CancelledException) {
+                } catch (\Throwable $e) {
+                    // Best effort, from the event loop: failing to connect (the network is down) killed the event
+                    // loop of a script, as an unhandled exception.
+                    $self->connection->API->logger("Could not cancel $self: {$e->getMessage()}", Logger::VERBOSE);
                 }
             }
         });
