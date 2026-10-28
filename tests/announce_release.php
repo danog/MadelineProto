@@ -22,9 +22,10 @@ require __DIR__.'/../vendor/autoload.php';
 
 // Chat => whether the first message of the changelog is pinned there.
 const CHATS = [
-    '@MadelineProto' => false,
+    '@madelineprotophar' => false,
     '@MadeLine_Farsi' => false,
     '@pwrtelegramgroupru' => true,
+    '-1001375152824' => true,
 ];
 const MAX_LENGTH = 4096;
 // More fail with ENTITIES_TOO_LONG.
