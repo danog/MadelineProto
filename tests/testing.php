@@ -282,9 +282,9 @@ if (!$peers) {
 }
 
 foreach ($media as &$inputMedia) {
-    $inputMedia['content'] = isset($inputMedia['file'])
-        ? read($inputMedia['file'])
-        : $MadelineProto->fileGetContents($inputMedia['url']);
+    // The files sent by URL are the ones in this directory: compare with those instead of downloading them on every
+    // run (a slow response from GitHub failed the CI).
+    $inputMedia['content'] = read($inputMedia['file'] ?? __DIR__.'/'.basename($inputMedia['url']));
 }
 // Otherwise, iterating on $media again with $inputMedia writes every media into the last one.
 unset($inputMedia);
