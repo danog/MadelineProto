@@ -165,7 +165,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $result = get_object_vars($this);
         // The WebRTC connection now serializes itself and resumes its SFU transport on wakeup, so it
         // is kept. The mutex and the two event-loop watcher IDs cannot survive and are recreated.
-        unset($result['joinMutex'], $result['checkWatcher'], $result['checking'], $result['gapWatcher'], $result['rejoinWatcher'], $result['streamReceiver'], $result['rtmpPublisher'], $result['resumePending']);
+        unset($result['joinMutex'], $result['checkWatcher'], $result['checking'], $result['gapWatcher'], $result['rejoinWatcher'], $result['rtmpPublisher'], $result['resumePending']);
         return $result;
     }
 
@@ -178,6 +178,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->rejoinWatcher = null;
         $this->streamReceiver = null;
         $this->rtmpPublisher = null;
+        // The stream receiver is kept, with its recording, see StreamReceiver::__serialize().
         $this->restoreDeclaredProperties($data);
         if (!isset($this->API->logger)) {
             $this->API->setupLogger();
@@ -283,8 +284,13 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->presentationDj?->resumeReader();
         $this->connection?->resume();
         $this->presentationConnection?->resume();
-        // The stream receiver does not survive a restart, and neither does its recording: it's started again when a
-        // recording is set, see setOutput().
+        if ($this->streamMode) {
+            // Follow the stream again from the live edge, continuing its recording, or keep us in it (see
+            // StreamReceiver::keepAlive()).
+            $this->streamReceiver ??= new StreamReceiver($this);
+            $this->streamReceiver->resume();
+            $this->streamReceiver->start($this->rtmpMode);
+        }
         EventLoop::queue($this->refetch(...));
     }
 
@@ -410,9 +416,10 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             );
             $this->connection?->close();
             $this->connection = null;
-            // Only to record: without a recording, it downloaded every chunk for nothing, and the flood waits of
-            // downloading a few streams at once made it fall behind (TIME_TOO_SMALL), see setOutput().
-            $this->streamReceiver?->start($parsed['rtmp']);
+            // Even without a recording: the server drops a listener that downloads nothing, see
+            // StreamReceiver::keepAlive().
+            $this->streamReceiver ??= new StreamReceiver($this);
+            $this->streamReceiver->start($parsed['rtmp']);
             return;
         }
         if ($parsed['transport'] === null) {

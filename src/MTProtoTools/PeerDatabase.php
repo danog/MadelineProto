@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools;
 
+use Amp\DeferredFuture;
+use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
 use Amp\Sync\LocalMutex;
 use AssertionError;
@@ -41,6 +43,7 @@ use danog\MadelineProto\TL\TLCallback;
 use danog\MadelineProto\Tools;
 use InvalidArgumentException;
 use Revolt\EventLoop;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -335,29 +338,48 @@ final class PeerDatabase implements TLCallback
         return $id;
     }
 
+    /** @var array<string, Future<?int>> The usernames being resolved. */
     private array $caching_simple_username = [];
     /**
+     * Resolve a username: the callers resolving a username already being resolved get the same result.
+     *
      * @param string $username Username
      */
     public function resolveUsername(string $username): ?int
+    {
+        return $this->resolveUsernameInternal($username, true);
+    }
+    /**
+     * @param bool $wait Whether to wait for the resolution of the same username already running: never while
+     *                   processing a peer, which a resolution itself may lead to resolve again (null then).
+     */
+    private function resolveUsernameInternal(string $username, bool $wait): ?int
     {
         $username = strtolower(str_replace('@', '', $username));
         if (!$username) {
             return null;
         }
         if (isset($this->caching_simple_username[$username])) {
-            // Used to avoid possible issues from addUser
-            return null;
+            return $wait ? $this->caching_simple_username[$username]->await() : null;
         }
-        $this->caching_simple_username[$username] = true;
+        $deferred = new DeferredFuture;
+        $this->caching_simple_username[$username] = $deferred->getFuture();
+        // Unhandled if no one else waits.
+        $deferred->getFuture()->ignore();
         $result = null;
         try {
             $result = $this->API->getIdInternal(
                 ($this->API->methodCallAsyncRead('contacts.resolveUsername', ['username' => $username]))['peer'],
             );
         } catch (UsernameNotOccupiedError) {
+        } catch (Throwable $e) {
+            $deferred->error($e);
+            throw $e;
         } finally {
             unset($this->caching_simple_username[$username]);
+            if (!$deferred->isComplete()) {
+                $deferred->complete($result);
+            }
         }
         foreach ($this->pendingDb as $key => $_) {
             if ($key < 0) {
@@ -422,7 +444,7 @@ final class PeerDatabase implements TLCallback
                         $this->API->logger("An error occurred while trying to fetch the missing access_hash for user {$user['id']}: {$e->getMessage()}", Logger::FATAL_ERROR);
                     }
                     foreach (self::getUsernames($user) as $username) {
-                        if (($this->resolveUsername($username)) === $user['id']) {
+                        if ($this->resolveUsernameInternal($username, false) === $user['id']) {
                             return;
                         }
                     }
@@ -612,7 +634,7 @@ final class PeerDatabase implements TLCallback
                         $this->API->logger("An error occurred while trying to fetch the missing access_hash for channel {$bot_api_id}: {$e->getMessage()}", Logger::FATAL_ERROR);
                     }
                     foreach (self::getUsernames($chat) as $username) {
-                        if (($this->resolveUsername($username)) === $bot_api_id) {
+                        if ($this->resolveUsernameInternal($username, false) === $bot_api_id) {
                             return;
                         }
                     }

@@ -18,6 +18,8 @@ namespace danog\MadelineProto\GroupCall;
 
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\WritableStream;
+use Amp\CancelledException;
+use Amp\DeferredCancellation;
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalDirectory;
 use danog\MadelineProto\LocalFile;
@@ -28,13 +30,13 @@ use danog\MadelineProto\Mp4;
 use danog\MadelineProto\OggWriter;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\RPCErrorException;
 use Revolt\EventLoop;
 use Throwable;
 
 use function Amp\delay;
-use function Amp\File\openFile;
 
 /**
  * Receives the media of a group call in [stream mode](https://core.telegram.org/api/group-calls#stream-mode)
@@ -57,6 +59,8 @@ use function Amp\File\openFile;
  */
 final class StreamReceiver
 {
+    use RestoresDeclaredProperties;
+
     /** Chunk length: official clients hardcode 1000 ms (the deprecated `scale` is ignored). */
     private const SEGMENT_MS = 1000;
     /** How far behind the live edge playback stays, so chunks are ready when asked for. */
@@ -64,6 +68,13 @@ final class StreamReceiver
     /** Header signature of a unified (RTMP) chunk, which is followed by a container name and events. */
     private const UNIFIED_SIGNATURE = 0xa12e810d;
     private const RETRY_MS = 100;
+    /**
+     * How often a chunk is downloaded without a recording, in seconds: the server drops a listener that downloads
+     * nothing about a minute after it joined, see {@see self::keepAlive()}.
+     */
+    private const KEEPALIVE_INTERVAL = 20.0;
+    /** Cancels the wait between two keep-alive downloads, when a recording is set. */
+    private ?DeferredCancellation $keepAliveWait = null;
     /**
      * When the chunks of an RTMP stream are due: its timeline doesn't follow the server clock, so it's paced from the
      * chunk it was resynchronized at and when (hrtime(), in nanoseconds).
@@ -114,7 +125,7 @@ final class StreamReceiver
     /**
      * Per-publisher video recorders in folder mode, by video channel.
      *
-     * @var array<int, array{endpoint: string, writer: MatroskaWriter, out: WritableStream, start: int, started: bool, file: string, codec: string}>
+     * @var array<int, array{endpoint: string, writer: MatroskaWriter, start: int, started: bool, file: string, codec: string}>
      */
     private array $videoWriters = [];
     private bool $unsupportedLogged = false;
@@ -127,6 +138,52 @@ final class StreamReceiver
     public function __construct(
         private readonly GroupCallController $call,
     ) {
+    }
+
+    /**
+     * Keep the recording across a restart, as the WebRTC recordings are kept: the stream is followed again from its
+     * live edge (what was missed in between is a gap in the recording), and the writers reopen their files (see
+     * {@see self::resume()}). A recording into a stream (not a file) can't survive, and ends.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['running'], $vars['generation'], $vars['nextTimestamp'], $vars['pace'], $vars['keepAliveWait'], $vars['audioOnlyChunks'], $vars['out'], $vars['channelsRetry'], $vars['partialRetries']);
+        if (!$this->outputFile instanceof LocalFile) {
+            unset($vars['outputFile'], $vars['outputDir'], $vars['outputFormat'], $vars['ogg'], $vars['mkv'], $vars['mainCodecs'], $vars['writtenMs'], $vars['recordingStart'], $vars['mainHasVideo'], $vars['videoWriters']);
+        }
+        return $vars;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        // Synchronous restoration only: the writers reopen their files in resume().
+        $this->restoreDeclaredProperties($data);
+    }
+
+    /**
+     * After a restart: reopen the files of the recording, ending what can't continue (a file deleted meanwhile).
+     */
+    public function resume(): void
+    {
+        if (($this->mkv !== null && !$this->mkv->resume()) || ($this->ogg !== null && !$this->ogg->resume())) {
+            $this->call->log("Could not continue the stream recording of {$this->call} after a restart: starting a new one", Logger::WARNING);
+            $this->ogg = null;
+            $this->mkv = null;
+            $this->mainHasVideo = false;
+            $this->mainCodecs = [];
+            $this->recordingStart = null;
+        }
+        foreach ($this->videoWriters as $channel => $writer) {
+            if (!$writer['writer']->resume()) {
+                unset($this->videoWriters[$channel]);
+            }
+        }
     }
 
     /**
@@ -158,6 +215,7 @@ final class StreamReceiver
      */
     public function stop(): void
     {
+        $this->keepAliveWait?->cancel();
         $this->running = false;
         $this->generation++;
         $this->closeWriters();
@@ -169,6 +227,7 @@ final class StreamReceiver
      */
     public function setOutput(LocalFile|WritableStream $file, ?RecordingFormat $format = null): void
     {
+        $this->keepAliveWait?->cancel();
         $this->closeWriters();
         $this->outputDir = null;
         $this->outputFile = $file;
@@ -182,6 +241,7 @@ final class StreamReceiver
      */
     public function setOutputDirectory(LocalDirectory $directory, ?RecordingFormat $format = null): void
     {
+        $this->keepAliveWait?->cancel();
         $dir = $directory->create();
         $format ??= RecordingFormat::Mkv;
         $extension = match ($format) {
@@ -196,6 +256,12 @@ final class StreamReceiver
     private function loop(int $generation): void
     {
         while ($this->running && $generation === $this->generation) {
+            if ($this->outputFile === null && $this->outputDir === null) {
+                if (!$this->keepAlive()) {
+                    return;
+                }
+                continue;
+            }
             if ($this->nextTimestamp === null) {
                 try {
                     $edge = $this->liveEdge();
@@ -307,6 +373,46 @@ final class StreamReceiver
                 $this->consumePublishersVideo($timestamp);
             }
         }
+    }
+
+    /**
+     * Without a recording, download a chunk of the live edge every {@see self::KEEPALIVE_INTERVAL} seconds, and
+     * throw it away: the server drops a listener that downloads nothing about a minute after it joined (magnaluna,
+     * in the RTMP livestreams it plays to, rejoined each of them every minute), while following the whole stream
+     * for nothing drew flood waits. The stream is followed from its live edge once a recording is set.
+     *
+     * @return bool Whether to go on (false: we're not in the call any more, it's rejoined).
+     */
+    private function keepAlive(): bool
+    {
+        $this->nextTimestamp = null;
+        try {
+            $edge = $this->liveEdge();
+            if ($edge !== null) {
+                $this->fetch($edge);
+            }
+        } catch (RateLimitError $e) {
+            delay((float) $e->getWaitTime());
+            return true;
+        } catch (RPCErrorException $e) {
+            if ($e->rpc === 'GROUPCALL_JOIN_MISSING' || $e->rpc === 'GROUPCALL_FORBIDDEN') {
+                $this->call->log("Not in {$this->call} any more ({$e->rpc}), rejoining...", Logger::WARNING);
+                $this->running = false;
+                $this->call->rejoin();
+                return false;
+            }
+        } catch (Throwable $e) {
+            $this->call->log("Could not download a chunk of {$this->call}: $e", Logger::VERBOSE);
+        }
+        $this->keepAliveWait = new DeferredCancellation;
+        try {
+            delay(self::KEEPALIVE_INTERVAL, cancellation: $this->keepAliveWait->getCancellation());
+        } catch (CancelledException) {
+            // A recording was set.
+        } finally {
+            $this->keepAliveWait = null;
+        }
+        return true;
     }
 
     /**
@@ -642,11 +748,12 @@ final class StreamReceiver
             $rate = 48000;
             $channels = OggDemuxer::opusChannels($audioPrivate);
         }
-        $this->out = $this->outputFile instanceof LocalFile ? openFile($this->outputFile->file, 'w') : $this->outputFile;
+        // Writing to the file itself (not a stream opened on it), the writers can reopen it after a restart.
+        $this->out = $this->outputFile instanceof LocalFile ? null : $this->outputFile;
         $this->writtenMs = 0;
         $format = $this->outputFormat ?? RecordingFormat::Opus;
         if ($format->isMatroska()) {
-            $this->mkv = new MatroskaWriter($this->out, $format->docType());
+            $this->mkv = new MatroskaWriter($this->outputFile, $format->docType());
             $this->mkv->setAudioTrack($audioCodec, $rate, max(1, $channels), $audioPrivate);
             $this->mainCodecs = [CallStream::AUDIO => $audioCodec];
             if ($video !== null && (int) ($video['width'] ?? 0) > 0) {
@@ -661,7 +768,7 @@ final class StreamReceiver
         if ($audioCodec !== 'A_OPUS') {
             throw new \RuntimeException("Only OPUS audio can be recorded to OGG; record this $audioCodec stream to a Matroska file instead.");
         }
-        $this->ogg = new OggWriter($this->out);
+        $this->ogg = new OggWriter($this->outputFile);
         $this->ogg->writeHeader($channels, 48000, 'livestream', $audioPrivate);
         $this->mainCodecs = [CallStream::AUDIO => $audioCodec];
         $this->reportMain(RecordingEvent::Started);
@@ -722,11 +829,10 @@ final class StreamReceiver
                     return;
                 }
                 $file = $dir.'/video-'.preg_replace('/[^A-Za-z0-9_.-]/', '_', $endpoint).'.mkv';
-                $out = openFile($file, 'w');
-                $mkv = new MatroskaWriter($out, RecordingFormat::Mkv->docType());
+                $mkv = new MatroskaWriter(new LocalFile($file), RecordingFormat::Mkv->docType());
                 $mkv->setVideoTrack((string) $track['codec'], (int) $track['width'], (int) ($track['height'] ?? 0), (string) ($track['private'] ?? ''));
                 $mkv->start();
-                $writer = ['endpoint' => $endpoint, 'writer' => $mkv, 'out' => $out, 'start' => $timestamp, 'started' => true, 'file' => $file, 'codec' => (string) $track['codec']];
+                $writer = ['endpoint' => $endpoint, 'writer' => $mkv, 'start' => $timestamp, 'started' => true, 'file' => $file, 'codec' => (string) $track['codec']];
                 $this->videoWriters[$channel] = $writer;
                 $this->call->onParticipantStreams(0, CallStream::VIDEO, [CallStream::VIDEO => $writer['codec']], RecordingEvent::Started, new LocalFile($file));
             }
