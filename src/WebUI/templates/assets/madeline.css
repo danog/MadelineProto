@@ -279,6 +279,20 @@ input:not([type="radio"]), textarea {
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 textarea { resize: vertical; min-height: 5.5rem; }
+select {
+    flex: 1;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+}
+select:focus { outline: none; border-color: var(--signal); box-shadow: var(--focus); }
+.sessions { margin-bottom: 1.15rem; }
+.sessions-row { display: flex; gap: 0.6rem; align-items: center; }
 input::placeholder, textarea::placeholder { color: var(--ink-faint); opacity: 1; }
 input:not([type="radio"]):focus, textarea:focus { outline: none; border-color: var(--signal); box-shadow: var(--focus); }
 .field.is-code input {

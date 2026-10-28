@@ -33,6 +33,7 @@ const base = (view: string, title: string, extra: Partial<Page> = {}): Page => (
   instructions: [],
   qrEndpoint: null,
   data: {},
+  sessions: null,
   ...extra
 });
 

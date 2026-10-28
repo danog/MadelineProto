@@ -186,6 +186,8 @@
     "loginTitleWeb": "Đăng nhập vào Telegram",
     "loginLeadWeb": "Chọn tài khoản hoặc bot sẽ được dùng để chạy phiên bản MadelineProto này.",
     "loginTypeWeb": "Đăng nhập với tư cách",
+    "loginSessionWeb": "Phiên",
+    "loginSessionSwitchWeb": "Chuyển",
     "loginUserPhoneHintWeb": "Kèm mã quốc gia, ví dụ +39 123 456 7890.",
     "loginBotTokenHintWeb": "Token mà @BotFather đã cung cấp khi bạn tạo bot.",
     "loginCodeTitleWeb": "Nhập mã đăng nhập",

@@ -186,6 +186,8 @@
     "loginTitleWeb": "تسجيل الدخول إلى Telegram",
     "loginLeadWeb": "اختر الحساب أو البوت الذي ستعمل به نسخة MadelineProto هذه.",
     "loginTypeWeb": "تسجيل الدخول كـ",
+    "loginSessionWeb": "الجلسة",
+    "loginSessionSwitchWeb": "تبديل",
     "loginUserPhoneHintWeb": "مع رمز الدولة، مثل +39 123 456 7890.",
     "loginBotTokenHintWeb": "التوكن الذي أعطاك إياه @BotFather عند إنشاء البوت.",
     "loginCodeTitleWeb": "أدخل رمز تسجيل الدخول",

@@ -186,6 +186,8 @@
     "loginTitleWeb": "ورود به Telegram",
     "loginLeadWeb": "حساب یا رباتی را انتخاب کنید که این نمونه MadelineProto با آن اجرا خواهد شد.",
     "loginTypeWeb": "ورود به عنوان",
+    "loginSessionWeb": "نشست",
+    "loginSessionSwitchWeb": "تغییر",
     "loginUserPhoneHintWeb": "همراه با کد کشور، مانند +39 123 456 7890.",
     "loginBotTokenHintWeb": "توکنی که @BotFather هنگام ساخت ربات به شما داد.",
     "loginCodeTitleWeb": "کد ورود را وارد کنید",

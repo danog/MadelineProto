@@ -35,6 +35,17 @@ export interface Action {
   value: string;
 }
 
+/** The sessions not logged in yet, on the login pages of `startAndLoopMulti()`: which one to log in. */
+export interface Sessions {
+  /** The query parameter that picks the session of the page. */
+  param: string;
+  label: string;
+  /** The key of the session of this page. */
+  selected: string;
+  /** In order. */
+  options: {key: string, name: string}[];
+}
+
 export interface Page {
   view: string;
   title: string;
@@ -53,6 +64,7 @@ export interface Page {
     rpcError?: string,
     [key: string]: unknown
   };
+  sessions: Sessions | null;
 }
 
 export interface State {

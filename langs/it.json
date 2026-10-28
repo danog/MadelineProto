@@ -186,6 +186,8 @@
     "loginTitleWeb": "Accedi a Telegram",
     "loginLeadWeb": "Scegli l'account o il bot con cui funzionerà questa istanza di MadelineProto.",
     "loginTypeWeb": "Accedi come",
+    "loginSessionWeb": "Sessione",
+    "loginSessionSwitchWeb": "Cambia",
     "loginUserPhoneHintWeb": "Con il prefisso internazionale, ad esempio +39 123 456 7890.",
     "loginBotTokenHintWeb": "Il token che ti ha dato @BotFather quando hai creato il bot.",
     "loginCodeTitleWeb": "Inserisci il codice di accesso",

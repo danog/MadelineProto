@@ -240,7 +240,7 @@ trait Start
         if ($rpcError !== null) {
             $page->data['rpcError'] = $rpcError;
         }
-        WebUI::write($this->getSettings()->getTemplates(), $page);
+        WebUI::write($this->getSettings()->getTemplates(), WebUI::addSessions($page));
     }
 
     /**

@@ -186,6 +186,8 @@
     "loginTitleWeb": "Telegram में लॉगिन करें",
     "loginLeadWeb": "वह अकाउंट या बॉट चुनें जिसके रूप में यह MadelineProto इंस्टेंस चलेगा।",
     "loginTypeWeb": "इस रूप में लॉगिन करें",
+    "loginSessionWeb": "सत्र",
+    "loginSessionSwitchWeb": "बदलें",
     "loginUserPhoneHintWeb": "देश कोड के साथ, जैसे +39 123 456 7890।",
     "loginBotTokenHintWeb": "बॉट बनाते समय @BotFather द्वारा दिया गया टोकन।",
     "loginCodeTitleWeb": "लॉगिन कोड दर्ज करें",

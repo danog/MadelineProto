@@ -36,6 +36,21 @@ final class WebUI
      * Query parameter of the asset route.
      */
     public const ASSET_PARAMETER = 'madelineAsset';
+    /**
+     * Query parameter selecting the session to log in, when {@see \danog\MadelineProto\API::startAndLoopMulti()}
+     * starts several.
+     */
+    public const SESSION_PARAMETER = 'madelineSession';
+    /**
+     * The sessions that aren't logged in yet, key => name, see {@see self::setSessions()}.
+     *
+     * @var array<string, string>
+     */
+    private static array $sessions = [];
+    /**
+     * The session whose login page is shown.
+     */
+    private static ?string $session = null;
     private const ASSET_TYPES = [
         'js' => 'text/javascript; charset=utf-8',
         'css' => 'text/css; charset=utf-8',
@@ -80,6 +95,64 @@ final class WebUI
             'state' => self::getState($page, $lang, $dir),
             'assetUrl' => self::getAssetUrl(),
         ]);
+    }
+
+    /**
+     * Set the sessions that aren't logged in yet, to choose the one to log in from the login pages (when
+     * {@see \danog\MadelineProto\API::startAndLoopMulti()} starts several), and the one whose page is shown.
+     *
+     * @param array<string, string> $sessions Key (the value of {@see self::SESSION_PARAMETER}) => name
+     */
+    public static function setSessions(array $sessions, ?string $session): void
+    {
+        self::$sessions = $sessions;
+        self::$session = $session;
+    }
+
+    /**
+     * Get the session chosen in the URL ({@see self::SESSION_PARAMETER}), if any.
+     */
+    public static function getRequestedSession(): ?string
+    {
+        $session = $_GET[self::SESSION_PARAMETER] ?? null;
+        return \is_string($session) ? $session : null;
+    }
+
+    /**
+     * Add the choice of the session to log in to a login page, if there's one to make.
+     */
+    public static function addSessions(Page $page): Page
+    {
+        if (\count(self::$sessions) > 1 && self::$session !== null) {
+            $page->sessions = self::$sessions;
+            $page->session = self::$session;
+        }
+        return $page;
+    }
+
+    /**
+     * Get the parameters of the query of the page, as is, except those of the web UI and the given ones: for a
+     * form that submits with GET, which replaces the query.
+     *
+     * @param list<string> $except
+     * @return list<array{string, string}> Name, value
+     */
+    public static function getQueryParameters(array $except = []): array
+    {
+        $query = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[1] ?? '';
+        $parameters = [];
+        foreach (explode('&', $query) as $pair) {
+            if ($pair === '') {
+                continue;
+            }
+            [$name, $value] = explode('=', $pair, 2) + [1 => ''];
+            $name = urldecode($name);
+            if (\in_array($name, ['getQrCode', 'waitQrCodeOrLogin', self::ASSET_PARAMETER, ...$except], true)) {
+                continue;
+            }
+            $parameters[] = [$name, urldecode($value)];
+        }
+        return $parameters;
     }
 
     /**

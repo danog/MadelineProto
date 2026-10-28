@@ -450,7 +450,28 @@ final class API extends AbstractAPI
     }
 
     /**
+     * The instances that aren't logged in yet, key => name: the key if it is a string, or the name of the session.
+     *
+     * @param array<API> $instances
+     * @return array<string, string>
+     */
+    private static function getSessionsToLogIn(array $instances): array
+    {
+        $sessions = [];
+        foreach ($instances as $k => $instance) {
+            if ($instance->getAuthorization() !== self::LOGGED_IN) {
+                // Never the path of the session, which the page would show to anyone
+                $sessions[(string) $k] = \is_string($k) ? $k : basename($instance->session->getSessionDirectoryPath());
+            }
+        }
+        return $sessions;
+    }
+
+    /**
      * Start multiple instances of MadelineProto and the event handlers (enables async).
+     *
+     * In the browser, the login pages let you choose which of the sessions that aren't logged in yet to log in
+     * (named by their key in $instances if it is a string, otherwise by their session).
      *
      * @param array<API>                                                   $instances    Instances of madeline
      * @param array<class-string<EventHandler>>|class-string<EventHandler> $eventHandler Event handler(s)
@@ -502,7 +523,25 @@ final class API extends AbstractAPI
 
         try {
             $promises = [];
-            foreach ($instances as $k => $instance) {
+            $order = $instances;
+            $web = PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg' && \count($instances) > 1;
+            if ($web) {
+                // In the browser, start() shows the login page of a session that isn't logged in, and ends the
+                // request: the one chosen on the page (or the first not logged in) is started first. It also
+                // answers the requests of its page (a QR code poll, which a session logged in would answer with a
+                // reload)
+                $requested = WebUI::getRequestedSession();
+                $first = $requested !== null && isset($instances[$requested])
+                    ? $requested
+                    : array_key_first(self::getSessionsToLogIn($instances));
+                if ($first !== null) {
+                    $order = [$first => $instances[$first]] + $instances;
+                }
+            }
+            foreach ($order as $k => $instance) {
+                if ($web) {
+                    WebUI::setSessions(self::getSessionsToLogIn($instances), (string) $k);
+                }
                 $instance->start();
                 $promises []= async(static function () use ($k, $instance, $eventHandler, &$started): void {
                     $instance->startAndLoopLogic($eventHandler[$k], $started[$k]);
@@ -510,6 +549,7 @@ final class API extends AbstractAPI
             }
             awaitFirst($promises);
         } finally {
+            WebUI::setSessions([], null);
             if (EventLoop::getErrorHandler() === $cb) {
                 EventLoop::setErrorHandler($prev);
             }

@@ -186,6 +186,8 @@
     "loginTitleWeb": "چوونەژوورەوە بۆ Telegram",
     "loginLeadWeb": "ئەو ئەکاونت یان بۆتە هەڵبژێرە کە ئەم نموونەیەی MadelineProto وەک ئەو کاردەکات.",
     "loginTypeWeb": "چوونەژوورەوە وەک",
+    "loginSessionWeb": "دانیشتن",
+    "loginSessionSwitchWeb": "گۆڕین",
     "loginUserPhoneHintWeb": "لەگەڵ کۆدی وڵات، وەک +39 123 456 7890.",
     "loginBotTokenHintWeb": "ئەو تۆکنەی @BotFather پێی دایت کاتێک بۆتەکەت دروست کرد.",
     "loginCodeTitleWeb": "کۆدی چوونەژوورەوە داخڵ بکە",

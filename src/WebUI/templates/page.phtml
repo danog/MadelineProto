@@ -36,6 +36,10 @@ $this->layout('layout', ['title' => $page->title]);
                     <?php endif ?>
                 </header>
 
+                <?php if ($page->sessions): ?>
+                    <?= $this->insert('partials/sessions', ['page' => $page]) ?>
+                <?php endif ?>
+
                 <?= $this->insert('partials/alerts', ['alerts' => $page->alerts]) ?>
 
                 <?php if ($page->instructions): ?>

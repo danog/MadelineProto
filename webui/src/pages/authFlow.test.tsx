@@ -41,9 +41,11 @@ vi.mock('qr-code-styling', () => ({
 }));
 
 const reloadPage = vi.hoisted(() => vi.fn());
+const loadPageWith = vi.hoisted(() => vi.fn());
 vi.mock('@lib/transport', async(importOriginal) => ({
   ...(await importOriginal<typeof import('@lib/transport')>()),
-  reloadPage
+  reloadPage,
+  loadPageWith
 }));
 
 import {pageToCardSpec, startAuth} from '@/pages/authFlow';
@@ -91,6 +93,7 @@ function clickButton(text: RegExp) {
 beforeEach(() => {
   painted.length = 0;
   reloadPage.mockReset();
+  loadPageWith.mockReset();
 });
 
 afterEach(() => {
@@ -309,10 +312,11 @@ describe('QR code login', () => {
 
   it('never reloads while a form is being submitted', async() => {
     let release: () => void;
+    let answer: (response: Response) => void;
     const pending = new Promise<void>((resolve) => release = resolve);
     vi.stubGlobal('fetch', vi.fn(async(url: string, init?: RequestInit) => {
       if(init?.method === 'POST') {
-        return new Promise<Response>(() => {});
+        return new Promise<Response>((resolve) => answer = resolve);
       }
       if(url.endsWith('getQrCode')) {
         return new Response(JSON.stringify({logged_in: false, link: 'tg://login?token=one'}), {headers: {'Content-Type': 'application/json'}});
@@ -326,10 +330,69 @@ describe('QR code login', () => {
 
     // a bot login submitted from another tab of the flow would change the authorization: here, a pending POST
     const {submitForm} = await import('@lib/transport');
-    submitForm({type: 'bot', token: '123:abc'});
+    const submission = submitForm({type: 'bot', token: '123:abc'});
     release();
     await sleep(50);
     expect(reloadPage).not.toHaveBeenCalled();
+
+    // the submission ends, for the next tests
+    answer(new Response(JSON.stringify({state: state('login.signIn')}), {headers: {'Content-Type': 'application/json'}}));
+    await submission;
+  });
+});
+
+describe('the sessions of startAndLoopMulti()', () => {
+  const sessions = {param: 'madelineSession', label: 'Session', selected: 'bot', options: [
+    {key: 'user', name: 'user'},
+    {key: 'bot', name: 'bot'},
+    {key: '2', name: 'other.madeline'}
+  ]};
+
+  it('no choice without several sessions to log in', () => {
+    mount('login.signIn');
+    expect(document.querySelector('#madeline-session')).toBeNull();
+  });
+
+  it('lists them over every login card, and loads the page of the one chosen', () => {
+    for(const view of ['login.signIn', 'login.code', 'login.password', 'login.signUp']) {
+      const s = state(view);
+      s.page.sessions = sessions;
+      startAuth(s);
+      render(() => <AuthCardsHost />);
+      const select = screen.getByLabelText('Session') as HTMLSelectElement;
+      expect([...select.options].map((option) => [option.value, option.textContent])).toEqual([['user', 'user'], ['bot', 'bot'], ['2', 'other.madeline']]);
+      expect(select.value).toBe('bot');
+      cleanup();
+    }
+
+    const s = state('login.code');
+    s.page.sessions = sessions;
+    startAuth(s);
+    render(() => <AuthCardsHost />);
+    const select = screen.getByLabelText('Session') as HTMLSelectElement;
+    select.value = 'user';
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+    expect(loadPageWith).toHaveBeenCalledWith('madelineSession', 'user');
+  });
+
+  it('never leaves the page while a form is being submitted', async() => {
+    let answer: (response: Response) => void;
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => answer = resolve)));
+    const s = state('login.code');
+    s.page.sessions = sessions;
+    startAuth(s);
+    render(() => <AuthCardsHost />);
+    const {submitForm} = await import('@lib/transport');
+    const submission = submitForm({phone_code: '12345'});
+
+    const select = screen.getByLabelText('Session') as HTMLSelectElement;
+    select.value = 'user';
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+    expect(loadPageWith).not.toHaveBeenCalled();
+    expect(select.value).toBe('bot');
+
+    answer(new Response(JSON.stringify({state: state('login.code')}), {headers: {'Content-Type': 'application/json'}}));
+    await submission;
   });
 });
 
