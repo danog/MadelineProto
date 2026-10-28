@@ -21,6 +21,8 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\WritableStream;
 use Webmozart\Assert\Assert;
 
+use function Amp\File\openFile;
+
 /**
  * Async OGG stream writer.
  *
@@ -98,14 +100,67 @@ final class OggWriter
     private int $granule = 0;
     private int $seqno = 0;
     public readonly int $streamId;
+    private WritableStream $out;
+    /** The file being written, kept so the writer can reopen it after a serialize/deserialize cycle. */
+    private ?LocalFile $localFile = null;
+    /** Whether the stream was ended (its last page written). */
+    private bool $closed = false;
     /**
      * Write an ogg OPUS file.
      */
     public function __construct(
-        private readonly WritableStream $out,
+        WritableStream|LocalFile $out,
         ?int $streamId = null
     ) {
+        if ($out instanceof LocalFile) {
+            $this->localFile = $out;
+            $this->out = openFile($out->file, 'w');
+        } else {
+            $this->out = $out;
+        }
         $this->streamId = $streamId ?? random_int(-(2**31), (2**31)-1);
+    }
+
+    /**
+     * Drop the (unserializable) file handle: {@see self::resume()} reopens the file to continue the stream, with the
+     * same serial number, page sequence and granule position.
+     */
+    public function __serialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['out']);
+        return $vars;
+    }
+
+    /**
+     * Restore the writer, to continue the stream once {@see self::resume()} reopened the file (never anything
+     * asynchronous here).
+     */
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+    }
+
+    /**
+     * Reopen the file at its end to continue the stream, after a restart. Returns false if it can't continue (it
+     * was ended, written to a stream, or the file no longer exists): the owner should then start a new one.
+     */
+    public function resume(): bool
+    {
+        if ($this->closed || $this->localFile === null) {
+            return false;
+        }
+        if (isset($this->out)) {
+            return true;
+        }
+        if (!is_file($this->localFile->file)) {
+            $this->closed = true;
+            return false;
+        }
+        $this->out = openFile($this->localFile->file, 'a');
+        return true;
     }
 
     private function writePage(int $header_type_flag, int $granule, string $packet): void
@@ -193,6 +248,7 @@ final class OggWriter
         );
 
         if ($eos) {
+            $this->closed = true;
             $this->out->close();
         }
     }
