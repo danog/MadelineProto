@@ -59,7 +59,7 @@ final class UsernameResolutionTest extends TestCase
             $this->requests++;
             delay(0.1);
             if ($error !== null) {
-                throw RPCErrorException::make($error, 420, $method);
+                throw RPCErrorException::make($error, 420, '');
             }
             return ['peer' => 101374607];
         });
