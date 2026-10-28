@@ -76,6 +76,13 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
 
     /** The inputGroupCall of this conference, set once it exists (after create/join). */
     private ?array $inputCall = null;
+    /**
+     * How the conference was found (its link, or the message inviting us to it), if not by its id: until we're a
+     * participant, the server only takes that (GROUPCALL_INVALID with the id and access hash).
+     */
+    private ?array $joinInput = null;
+    /** How many times we joined: the answers to requests sent before the last join are about an earlier participant. */
+    private int $joinGeneration = 0;
     private int $selfId;
     /** Our Ed25519 signing seed: signs both chain blocks and media/message packets. */
     private string $selfSeed;
@@ -226,10 +233,14 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     /**
      * Point this controller at an existing conference (its groupCall), before joining it.
      *
-     * @psalm-external-mutation-free
+     * Also takes how it was found (its link or invitation), see joinInput.
      */
     public function setCall(array $call): void
     {
+        if ($call['_'] === 'inputGroupCallSlug' || $call['_'] === 'inputGroupCallInviteMessage') {
+            $this->joinInput = $call;
+            $call = $this->API->methodCallAsyncRead('phone.getGroupCall', ['call' => $call, 'limit' => 1])['call'];
+        }
         $this->inputCall = [
             '_' => 'inputGroupCall',
             'id' => $call['id'],
@@ -368,6 +379,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         $this->chainOffset = [$this->chain->getHeight() + 1, 0];
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->joinGeneration++;
         $this->leaving = false;
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         $this->startPolling();
@@ -391,7 +403,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         $updates = $this->submitWithChainRetry(fn (): array => $this->API->methodCallAsyncRead('phone.joinGroupCall', [
             'muted' => $muted,
             'video_stopped' => true,
-            'call' => $this->inputCall,
+            'call' => $this->callInput(),
             'join_as' => ['_' => 'inputPeerSelf'],
             'public_key' => $this->chain->getSelfPublicKey(),
             'block' => $this->buildSelfAddBlock()['serialized'],
@@ -399,6 +411,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         ]));
         $this->consumeUpdates($updates);
         $this->joined = true;
+        $this->joinGeneration++;
         $this->leaving = false;
         $this->API->registerConferenceCall($this->getInputCall()['id'], $this);
         // Re-sync so our own accepted block (and any concurrent ones) are applied in server order.
@@ -640,10 +653,24 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      * participating so we neither poll nor apply further blocks, then — as official clients do — rejoin
      * transparently with a fresh key, unless we were leaving anyway.
      */
-    private function handleForbidden(): void
+    private function handleForbidden(?int $generation = null): void
+    {
+        if ($generation !== null && $generation !== $this->joinGeneration) {
+            // The answer to a request sent before we rejoined: about the participant we were, not the one we are.
+            // Taken for ours, it reset a join the server still had, whose rejoin was then rejected for good.
+            $this->log("Ignoring a GROUPCALL_FORBIDDEN of $this from before we rejoined", Logger::VERBOSE);
+            return;
+        }
+        $this->log("Forbidden from $this; resetting conference state", Logger::WARNING);
+        $this->resetAndRejoin();
+    }
+
+    /**
+     * Stop participating (no polling, no blocks applied), then rejoin with a fresh key, unless we were leaving.
+     */
+    private function resetAndRejoin(): void
     {
         $wasJoined = $this->joined;
-        $this->log("Forbidden from $this; resetting conference state", Logger::WARNING);
         $this->joined = false;
         if ($this->pollWatcher !== null) {
             EventLoop::cancel($this->pollWatcher);
@@ -666,23 +693,39 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     /**
      * Rejoin shortly, once, from the event loop (never from inside the failing request).
      */
-    private function scheduleRejoin(): void
+    private function scheduleRejoin(float $delay = 1.0): void
     {
         if ($this->rejoinScheduled) {
             return;
         }
         $this->rejoinScheduled = true;
-        EventLoop::delay(1.0, function (): void {
+        EventLoop::delay($delay, function () use ($delay): void {
             $this->rejoinScheduled = false;
             if ($this->leaving || $this->joined || $this->inputCall === null) {
                 return;
             }
             try {
                 $this->rejoin();
+            } catch (RPCErrorException $e) {
+                if ($e->rpc === 'GROUPCALL_INVALID' || $e->rpc === 'GROUPCALL_FORBIDDEN') {
+                    // It ended, or we may not be in it any more.
+                    $this->log("Could not rejoin $this ({$e->rpc}): leaving it", Logger::WARNING);
+                    $this->closeConnection();
+                    return;
+                }
+                $this->retryRejoin($delay, $e);
             } catch (Throwable $e) {
-                $this->log("Could not rejoin $this: $e", Logger::ERROR);
+                // E.g. a timeout while the network is down: one attempt gave up for good, leaving us out of the call.
+                $this->retryRejoin($delay, $e);
             }
         });
+    }
+
+    private function retryRejoin(float $delay, Throwable $e): void
+    {
+        $next = min(max($delay * 2, 5.0), 60.0);
+        $this->log("Could not rejoin $this, retrying in $next seconds: $e", Logger::WARNING);
+        $this->scheduleRejoin($next);
     }
 
     /**
@@ -713,15 +756,16 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     {
         do {
             try {
+                $generation = $this->joinGeneration;
                 $updates = $this->API->methodCallAsyncRead('phone.getGroupCallChainBlocks', [
-                    'call' => $this->inputCall,
+                    'call' => $this->callInput(),
                     'sub_chain_id' => $subChainId,
                     'offset' => $this->chainOffset[$subChainId],
                     'limit' => 50,
                 ]);
             } catch (RPCErrorException $e) {
                 if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
-                    $this->handleForbidden();
+                    $this->handleForbidden($generation);
                     return;
                 }
                 $this->log("Could not fetch chain $subChainId of $this: $e", Logger::WARNING);
@@ -980,6 +1024,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
      */
     private function broadcast(array $broadcast): void
     {
+        $generation = $this->joinGeneration;
         try {
             $this->API->methodCallAsyncRead('phone.sendConferenceCallBroadcast', [
                 'call' => $this->getInputCall(),
@@ -987,7 +1032,7 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
             ]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
-                $this->handleForbidden();
+                $this->handleForbidden($generation);
                 return;
             }
             $this->log("Could not send a verification broadcast for $this: $e", Logger::WARNING);
@@ -1412,11 +1457,12 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         }
         // Whoever was in the chain before we asked but is missing from the answer has left.
         $chainMembers = array_keys($this->chain->getParticipants());
+        $generation = $this->joinGeneration;
         try {
             $result = $this->API->methodCallAsyncRead('phone.getGroupCall', ['call' => $this->inputCall, 'limit' => 100]);
         } catch (RPCErrorException $e) {
             if ($e->rpc === 'GROUPCALL_FORBIDDEN') {
-                $this->handleForbidden();
+                $this->handleForbidden($generation);
                 return;
             }
             $this->log("Could not fetch the participants of $this: $e", Logger::WARNING);
@@ -1544,6 +1590,14 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
         return null;
     }
 
+    /**
+     * The conference for the requests made while we're not a participant (joining, rejoining): how it was found.
+     */
+    private function callInput(): array
+    {
+        return $this->joined ? $this->getInputCall() : ($this->joinInput ?? $this->getInputCall());
+    }
+
     public function getChain(): ConferenceChain
     {
         return $this->chain;
@@ -1556,7 +1610,9 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     #[\Override]
     public function log(string $message, int $level = Logger::NOTICE): void
     {
-        $this->API->logger->logger($message, $level);
+        // Not $this->API->logger: unset while the session is unserialized, when the disk jockey starts (it logs that
+        // it entered its loop): a session with a conference failed to load.
+        $this->API->logger($message, $level, 'ConferenceCall');
     }
 
     /**
@@ -1571,7 +1627,24 @@ final class ConferenceCall implements GroupConnectionOwner, E2EKeyProvider, Call
     #[\Override]
     public function onConnectionFailed(): void
     {
-        $this->log("The WebRTC connection of $this failed", Logger::WARNING);
+        if (!$this->joined || $this->leaving) {
+            return;
+        }
+        // A failed connection never recovers (there is no ICE restart without joining again): leave, so that the
+        // server drops our old participant, and rejoin. Only logged, the conference stayed silent for good.
+        $this->log("The WebRTC connection of $this failed, rejoining...", Logger::WARNING);
+        $failed = $this->connection;
+        EventLoop::queue(function () use ($failed): void {
+            try {
+                $this->API->methodCallAsyncRead('phone.leaveGroupCall', ['call' => $this->getInputCall(), 'source' => $failed?->getAudioSource() ?? 0]);
+            } catch (Throwable $e) {
+                $this->log("Could not leave $this before rejoining: {$e->getMessage()}", Logger::NOTICE);
+            }
+            // Leaving can take until the network is back: meanwhile we may have been removed and rejoined already.
+            if ($this->connection === $failed && $this->joined) {
+                $this->resetAndRejoin();
+            }
+        });
     }
 
     /**

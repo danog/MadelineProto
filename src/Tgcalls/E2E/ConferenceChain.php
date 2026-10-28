@@ -326,6 +326,12 @@ final class ConferenceChain
         if ($index === false) {
             return null;
         }
+        if (($this->participants[$this->selfUserId]['public_key'] ?? null) !== $this->getSelfPublicKey()) {
+            // Addressed to an earlier key of ours (the blocks before we rejoined with a fresh key): not for us. Tried
+            // with our key, it threw, the block wasn't applied, and the rejoin built its block on an empty chain,
+            // rejected as stale for good.
+            return null;
+        }
         // Deserialized `bytes`/`string` fields may arrive as TL Bytes objects; coerce to raw strings.
         $ek = (string) $sharedKey['ek'];
         $encryptedGroupKey = (string) $sharedKey['encrypted_shared_key'];

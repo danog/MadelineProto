@@ -413,7 +413,9 @@ trait Handler
         if (isset($this->conferenceCalls[$call['id']])) {
             return $this->conferenceCalls[$call['id']]->getPublic();
         }
-        return new ConferenceCallUpdate($this, $call);
+        $public = new ConferenceCallUpdate($this, $call);
+        $public->setJoinInput($inputCall);
+        return $public;
     }
 
     /**
