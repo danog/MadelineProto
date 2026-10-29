@@ -159,6 +159,46 @@ jobs:
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
+  # The tests that need no account, with the event loop drivers of Revolt other than ext-uv's (the image's default,
+  # tested above): ext-ev's, and PHP's own (stream_select, without any extension, as on most installations).
+  test_light:
+    name: test_light (${{ matrix.event-loop }})
+    needs: docker-merge
+    if: github.ref_type != 'tag'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        event-loop: [ev, select]
+    container:
+      image: danog/madelineproto:next
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    timeout-minutes: 60
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v7
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v6
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Run the light tests
+        env:
+          MADELINE_EVENT_LOOP: ${{ matrix.event-loop }}
+        run: tests/test.sh phpunit-light
+
   handshake:
     needs: docker-merge
     runs-on: ubuntu-latest
@@ -270,7 +310,7 @@ jobs:
   release:
     # Once every test passed (the test job is skipped for tags). Skipped for the main branch: it needs the results of
     # this run, so it can't be in a workflow of its own.
-    needs: [cs, webui, test, handshake, build]
+    needs: [cs, webui, test, test_light, handshake, build]
     if: ${{ !cancelled() && !failure() && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
