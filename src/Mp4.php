@@ -650,12 +650,15 @@ final class Mp4
         $sample = 0;
         $time = 0;
         $chunkCount = \count($chunkOffsets);
+        // The entries of the sample-to-chunk table are sorted by first chunk: walk them along with the chunks, rescanning
+        // the table for each chunk is quadratic (minutes of blocked event loop for a file with a long table).
+        $perChunk = 0;
+        $stscIndex = 0;
+        $stscCount = \count($stsc);
         foreach ($chunkOffsets as $chunkIndex => $chunkOffset) {
-            $perChunk = 0;
-            foreach ($stsc as [$firstChunk, $samplesPerChunk]) {
-                if ($firstChunk <= $chunkIndex + 1) {
-                    $perChunk = $samplesPerChunk;
-                }
+            while ($stscIndex < $stscCount && $stsc[$stscIndex][0] <= $chunkIndex + 1) {
+                $perChunk = $stsc[$stscIndex][1];
+                $stscIndex++;
             }
             $offset = $chunkOffset;
             for ($i = 0; $i < $perChunk && $sample < $sampleCount; $i++, $sample++) {
