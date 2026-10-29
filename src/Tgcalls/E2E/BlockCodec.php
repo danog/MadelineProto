@@ -16,6 +16,7 @@
 
 namespace danog\MadelineProto\Tgcalls\E2E;
 
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
 
@@ -102,12 +103,10 @@ final class BlockCodec
     /**
      * The SHA-256 hash of a serialized block, used as its identity and as `prev_block_hash` of the
      * next block.
-     *
-     * @psalm-pure
      */
     public function blockHash(string $serializedBlock): string
     {
-        return hash('sha256', $serializedBlock, true);
+        return Crypt::sha256($serializedBlock);
     }
 
     /**

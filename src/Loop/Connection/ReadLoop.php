@@ -207,7 +207,7 @@ final class ReadLoop extends Loop
                     $this->connection->incomingBytesCtr?->incBy($left);
                     $buffer->bufferRead($left);
                 }
-                if ($message_key != substr(hash('sha256', substr($auth->getTempAuthKey(), 96, 32).$decrypted_data, true), 8, 16)) {
+                if ($message_key != substr(Crypt::sha256(substr($auth->getTempAuthKey(), 96, 32).$decrypted_data), 8, 16)) {
                     throw new SecurityException('msg_key mismatch');
                 }
                 /*

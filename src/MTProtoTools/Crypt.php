@@ -35,6 +35,59 @@ use const OPENSSL_RAW_DATA;
 final class Crypt
 {
     /**
+     * Inputs of at least this many bytes are hashed with OpenSSL instead of PHP's hash extension.
+     */
+    private static ?int $opensslSha256From = null;
+
+    /**
+     * SHA-256, raw, with the faster of PHP's hash extension and OpenSSL for the input's size.
+     *
+     * Use it for inputs whose size depends on the data; fixed-size tiny inputs are faster with hash() directly.
+     */
+    public static function sha256(string $data): string
+    {
+        self::$opensslSha256From ??= self::opensslSha256From();
+        if (\strlen($data) >= self::$opensslSha256From) {
+            $digest = openssl_digest($data, 'sha256', true);
+            if ($digest !== false) {
+                return $digest;
+            }
+        }
+        return hash('sha256', $data, true);
+    }
+
+    /**
+     * HMAC-SHA256, raw, with the faster SHA-256 backend for the input's size (RFC 2104).
+     */
+    public static function hmacSha256(string $data, #[\SensitiveParameter] string $key): string
+    {
+        self::$opensslSha256From ??= self::opensslSha256From();
+        if (64 + \strlen($data) < self::$opensslSha256From) {
+            return hash_hmac('sha256', $data, $key, true);
+        }
+        if (\strlen($key) > 64) {
+            $key = self::sha256($key);
+        }
+        $key = str_pad($key, 64, "\0");
+        return self::sha256(($key ^ str_repeat("\x5c", 64)).self::sha256(($key ^ str_repeat("\x36", 64)).$data));
+    }
+
+    /**
+     * OpenSSL costs ~250-500 ns per call, then hashes with the CPU's SHA instructions. PHP's hash extension
+     * uses them on x86 (SHA-NI), where it is faster below ~16 KiB and OpenSSL only 3-15% faster above;
+     * elsewhere it is portable C (~2.6 ns per byte on an M1, against ~0.3 for OpenSSL), slower from ~64 bytes.
+     */
+    private static function opensslSha256From(): int
+    {
+        if (!\function_exists('openssl_digest')) {
+            return PHP_INT_MAX;
+        }
+        return match (php_uname('m')) {
+            'arm64', 'aarch64' => 64,
+            default => 16384,
+        };
+    }
+    /**
      * AES KDF function for MTProto v2.
      *
      * @param string  $msg_key   Message key

@@ -181,6 +181,40 @@ final class CryptoBackendsTest extends TestCase
         return $ciphertext;
     }
 
+    /** @return iterable<string, array{int}> */
+    public static function sha256Thresholds(): iterable
+    {
+        yield 'OpenSSL for every size' => [0];
+        yield 'hash() for every size' => [PHP_INT_MAX];
+        yield 'from 64 bytes, as on ARM' => [64];
+        yield 'from 16 KiB, as on x86' => [16384];
+    }
+
+    /**
+     * SHA-256 and HMAC-SHA256 pick OpenSSL or PHP's hash extension by input size: every split must give the same digests.
+     *
+     * @dataProvider sha256Thresholds
+     */
+    public function testSha256MatchesHashWithEitherBackend(int $threshold): void
+    {
+        $from = new \ReflectionProperty(Crypt::class, 'opensslSha256From');
+        $previous = $from->getValue();
+        $from->setValue(null, $threshold);
+        try {
+            foreach ([0, 1, 31, 32, 63, 64, 65, 100, 1200, 16319, 16320, 16383, 16384, 16385, 1 << 20] as $size) {
+                $data = $size ? random_bytes($size) : '';
+                self::assertSame(hash('sha256', $data, true), Crypt::sha256($data), "$size bytes");
+                // Keys shorter than, as long as, and longer than the 64-byte block.
+                foreach ([0, 32, 64, 65, 200] as $keySize) {
+                    $key = $keySize ? random_bytes($keySize) : '';
+                    self::assertSame(hash_hmac('sha256', $data, $key, true), Crypt::hmacSha256($data, $key), "$size bytes, $keySize-byte key");
+                }
+            }
+        } finally {
+            $from->setValue(null, $previous);
+        }
+    }
+
     public function testCtrEncryptMatchesPhpseclib(): void
     {
         $key = random_bytes(32);
