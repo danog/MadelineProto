@@ -26,6 +26,7 @@ const CHATS = [
     '@MadeLine_Farsi' => false,
     '@pwrtelegramgroupru' => true,
     '-1001375152824' => true,
+    '@danog_community' => false,
 ];
 const MAX_LENGTH = 4096;
 // More fail with ENTITIES_TOO_LONG.
