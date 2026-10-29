@@ -116,6 +116,12 @@ final class Magic
      */
     private static bool $initedLight = false;
     /**
+     * The filesystems of amphp/file replaced by start(), kept alive for the files opened through them.
+     *
+     * @var list<\Amp\File\Filesystem>
+     */
+    private static array $replacedFilesystems = [];
+    /**
      * Whether we've inited all static constants.
      *
      */
@@ -247,6 +253,10 @@ final class Magic
             } else {
                 $driver = new BlockingFilesystemDriver();
             }
+            // Files already opened through the filesystem being replaced keep using its driver: amphp/file's
+            // default one owns a pool of workers, holding the files, which its destruction killed, so a
+            // later close of those files failed in the event loop. Keep it alive.
+            self::$replacedFilesystems[] = filesystem();
             filesystem($driver);
 
             // Setup error reporting

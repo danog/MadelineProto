@@ -243,13 +243,20 @@ final class RtmpStreamTest extends TestCase
             }
 
             // Also at each connection (the name may resolve elsewhere by then): the stream closes, without connecting.
-            $connections = $server->connections;
-            $controller = new RtmpStreamController($API, 1, $server->getUrl(), 'key', servers: RtmpServers::Internet);
-            for ($i = 0; $i < 40 && !$controller->isClosed(); $i++) {
-                delay(0.05);
+            // To a server of its own: the stream started above may have connected (the kernel completes a loopback
+            // connection at once, before the stream was closed) without the server having accepted it yet, which
+            // happens in a later iteration of the event loop with some drivers (ev).
+            $other = new FakeRtmpServer;
+            try {
+                $controller = new RtmpStreamController($API, 1, $other->getUrl(), 'key', servers: RtmpServers::Internet);
+                for ($i = 0; $i < 40 && !$controller->isClosed(); $i++) {
+                    delay(0.05);
+                }
+                $this->assertTrue($controller->isClosed(), implode("\n", $this->logs));
+                $this->assertSame(0, $other->connections);
+            } finally {
+                $other->close();
             }
-            $this->assertTrue($controller->isClosed(), implode("\n", $this->logs));
-            $this->assertSame($connections, $server->connections);
         } finally {
             $server->close();
         }

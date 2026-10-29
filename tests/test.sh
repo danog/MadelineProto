@@ -90,6 +90,23 @@ if [ "$1" == "phpunit" ]; then
 fi
 
 if [ "$1" == "phpunit-light" ]; then
+    # The event loop driver of Revolt to test with: most installations have no ext-uv (the image's default).
+    case "${MADELINE_EVENT_LOOP:-uv}" in
+        uv) ;;
+        ev)
+            # Images built before ext-ev was added lack it: pull requests run in the image of the main branch.
+            if ! php -r 'exit(extension_loaded("ev") ? 0 : 1);'; then
+                apt-get install -y autoconf dpkg-dev file g++ gcc libc-dev make pkg-config re2c
+                pie install --no-interaction --skip-enable-extension osmanov/pecl-ev:1.2.4
+                echo extension=ev >> "$(php -r 'echo php_ini_loaded_file();')"
+            fi
+            export REVOLT_DRIVER='Revolt\EventLoop\Driver\EvDriver'
+            ;;
+        select) export REVOLT_DRIVER='Revolt\EventLoop\Driver\StreamSelectDriver' ;;
+        *) echo "Unknown event loop: $MADELINE_EVENT_LOOP"; exit 1 ;;
+    esac
+    # The driver in use, which falls back to another when unavailable.
+    php -r 'require "vendor/autoload.php"; echo get_class(Revolt\EventLoop::getDriver()), PHP_EOL;'
     composer test-light
     exit 0
 fi

@@ -57,9 +57,15 @@ jobs:
       - name: Test the web UI, and check that its committed bundle is up to date
         run: tests/webui.sh
 
-  # The tests that don't need any secret.
+  # The tests that don't need any secret, with each event loop driver of Revolt: ext-uv's (the image's default),
+  # ext-ev's and PHP's own (stream_select, without any extension, as on most installations).
   test_light:
+    name: test_light (${{ matrix.event-loop }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        event-loop: [uv, ev, select]
     container:
       image: danog/madelineproto:next
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
@@ -79,6 +85,10 @@ jobs:
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
           restore-keys: composer-
       - name: Run the light tests
+        env:
+          MADELINE_EVENT_LOOP: ${{ matrix.event-loop }}
+          # For PIE, if ext-ev must be installed (images built before it was added).
+          GITHUB_TOKEN: ${{ github.token }}
         run: tests/test.sh phpunit-light
 
   handshake:

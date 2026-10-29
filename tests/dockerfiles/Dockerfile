@@ -256,7 +256,7 @@ RUN set -eux; \
 # Enabled by tests/dockerfiles/php.ini, not by PIE.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:3.2.17RC1 amphp/uv:0.3.1 arnaud-lb/memprof:3.1.0; do \
+	for package in igbinary/igbinary:3.2.17RC1 amphp/uv:0.3.1 osmanov/pecl-ev:1.2.4 arnaud-lb/memprof:3.1.0; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
 	rm -rf /root/.composer/cache
