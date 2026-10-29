@@ -25,9 +25,9 @@ use PHPUnit\Framework\TestCase;
 
 final class DownloadRangeTest extends TestCase
 {
-    private function downloader(string $file, int $hashSize = 0, bool $corrupt = false, bool $redirectHashes = true): object
+    private function downloader(string $file, int $hashSize = 0, bool $corrupt = false, bool $redirectHashes = true, bool $fullLastHashLimit = false): object
     {
-        return new class($file, $hashSize, $corrupt, $redirectHashes) {
+        return new class($file, $hashSize, $corrupt, $redirectHashes, $fullLastHashLimit) {
             use Files;
             public Settings $settings;
             public object $datacenter;
@@ -39,7 +39,7 @@ final class DownloadRangeTest extends TestCase
             public bool $reupload = false;
             public ?int $truncate = null;
 
-            public function __construct(public string $file, private int $hashSize, private bool $corrupt, private bool $redirectHashes)
+            public function __construct(public string $file, private int $hashSize, private bool $corrupt, private bool $redirectHashes, private bool $fullLastHashLimit)
             {
                 $this->settings = new Settings;
                 $this->loginState = new class {
@@ -70,7 +70,8 @@ final class DownloadRangeTest extends TestCase
                 $hashes = [];
                 for ($offset = 0; $offset < \strlen($this->file); $offset += $this->hashSize) {
                     $block = substr($this->file, $offset, $this->hashSize);
-                    $hashes[] = ['offset' => $offset, 'limit' => \strlen($block), 'hash' => hash('sha256', $block, true)];
+                    // Telegram can advertise the full limit for the last, shorter block of the file.
+                    $hashes[] = ['offset' => $offset, 'limit' => $this->fullLastHashLimit ? $this->hashSize : \strlen($block), 'hash' => hash('sha256', $block, true)];
                 }
                 return $hashes;
             }
@@ -202,6 +203,21 @@ final class DownloadRangeTest extends TestCase
         $downloader = $this->downloader($file, 131072);
         $downloader->reupload = true;
         self::assertSame(substr($file, 0, 2), $this->download($downloader, 0, 2));
+    }
+
+    public static function shortLastBlocks(): iterable
+    {
+        yield 'full download' => [0, 300000];
+        yield 'range in the last block' => [299998, 2];
+        yield 'range across the last block' => [260000, 40000];
+    }
+
+    /** @dataProvider shortLastBlocks */
+    public function testCdnLastBlockCanBeShorterThanItsHashLimit(int $offset, int $length): void
+    {
+        $file = random_bytes(300000);
+        $downloader = $this->downloader($file, 131072, fullLastHashLimit: true);
+        self::assertSame(substr($file, $offset, $length), $this->download($downloader, $offset, $length));
     }
 
     public function testCdnRangeCanEndAtAnUnknownFileSize(): void
