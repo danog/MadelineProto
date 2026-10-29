@@ -1589,6 +1589,7 @@ trait Files
                     $requests = $this->getDownloadPartRequests($messageMedia, $offset, $cdn, $cancellation);
                     $requestOffset = $requests->current()['offset'];
                     $bytes = '';
+                    $eof = false;
                     foreach ($requests as $request) {
                         $cancellation?->throwIfRequested();
                         $res = $this->methodCallAsyncRead($cdn ? 'upload.getCdnFile' : 'upload.getFile', ['offset' => $request['offset'], 'limit' => $request['limit']] + $basic_param, $datacenter);
@@ -1597,6 +1598,7 @@ trait Files
                         }
                         $bytes .= substr((string) $res['bytes'], 0, $request['length']);
                         if (\strlen((string) $res['bytes']) < $request['limit']) {
+                            $eof = true;
                             break;
                         }
                     }
@@ -1664,7 +1666,7 @@ trait Files
                 }
                 $iv = substr($messageMedia['cdn_iv'], 0, 12).pack('N', $requestOffset >> 4);
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $iv);
-                $this->checkCdnHash($messageMedia['file_token'], $requestOffset, $res['bytes'], $cancellation);
+                $this->checkCdnHash($messageMedia['file_token'], $requestOffset, $res['bytes'], $eof, $cancellation);
                 $res['bytes'] = substr($res['bytes'], $offset['offset'] - $requestOffset, $offset['limit']);
             }
             if ($res['bytes'] === '') {
@@ -1746,11 +1748,14 @@ trait Files
         }
         throw new Exception('Could not fetch CDN hashes for offset '.$offset);
     }
-    private function checkCdnHash(string $file, int $offset, string $data, ?Cancellation $cancellation): void
+    /**
+     * @param bool $eof Whether $data ends at the end of the file, whose last block can be shorter than the limit of its hash (as in TDLib).
+     */
+    private function checkCdnHash(string $file, int $offset, string $data, bool $eof, ?Cancellation $cancellation): void
     {
         while (\strlen($data)) {
             $hash = $this->getCdnHash($file, $offset, $cancellation);
-            if ($hash['offset'] !== $offset || \strlen($data) < $hash['limit'] || Crypt::sha256(substr($data, 0, $hash['limit'])) !== $hash['hash']) {
+            if ($hash['offset'] !== $offset || (!$eof && \strlen($data) < $hash['limit']) || Crypt::sha256(substr($data, 0, $hash['limit'])) !== $hash['hash']) {
                 throw new SecurityException('CDN hash mismatch for offset '.$offset);
             }
             $data = substr($data, $hash['limit']);

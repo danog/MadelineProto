@@ -24,17 +24,20 @@ final class NativeMessageDecoder implements MessageDecoder
             throw new SecurityException('Invalid encrypted transport message size');
         }
         $executor = NativeExecutor::get();
-        if (!$executor) {
-            return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
-        }
-        try {
-            $result = $executor->run(static fn (): array => \danog\MadelineProto\Native\Crypto::decode($ciphertext, $authKey, $messageKey));
-        } catch (\Exception $e) {
-            if (str_starts_with($e->getMessage(), 'Invalid MTProto')) {
-                throw new SecurityException($e->getMessage(), 0, $e);
+        if ($executor) {
+            try {
+                $result = $executor->run(static fn (): array => \danog\MadelineProto\Native\Crypto::decode($ciphertext, $authKey, $messageKey));
+                return new DecodedMessage($result[0], Tools::unpackSignedLong(substr($result[1], 8, 8)), (int) unpack('V', substr($result[1], 16, 4))[1], substr($result[1], 0, 8));
+            } catch (\Exception $e) {
+                if (NativeExecutor::failedWith($e, NativeExecutor::INVALID)) {
+                    throw new SecurityException($e->getMessage(), 0, $e);
+                }
+                if (!NativeExecutor::failedWith($e, NativeExecutor::UNAVAILABLE)) {
+                    throw $e;
+                }
             }
-            throw $e;
         }
-        return new DecodedMessage($result[0], Tools::unpackSignedLong(substr($result[1], 8, 8)), (int) unpack('V', substr($result[1], 16, 4))[1], substr($result[1], 0, 8));
+        // Not decoded natively (no executor, or it was closed or could not take the message).
+        return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
     }
 }

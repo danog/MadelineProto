@@ -13,8 +13,8 @@ The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
 Build for the target PHP version, architecture and debug ABI.
 Install that PHP's development headers and `php-config`, OpenSSL development
 headers, a linker, pkg-config and libclang. Rust 1.92.0 is pinned by
-`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.2 accepts queue count,
-byte limit and batch window; width is always selected adaptively.
+`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.3 accepts queue count
+and byte limit; width is always selected adaptively.
 
 ```sh
 cd native
@@ -37,7 +37,8 @@ IPC-only clients do not start it. PHP adapters retain only bridge lifecycle and
 IGE per-instance sequencing. There is no PHP submit/collect/release protocol.
 The extension exports `danog\MadelineProto\Native\Crypto`; factories check the
 extension and API version before selecting it. Validation errors
-never trigger backend retries.
+never trigger backend retries; an operation the executor did not perform (closed,
+or too large for the queue) runs on the synchronous PHP backends instead.
 
 Each initialized process has exactly one crypto worker and one Tokio scheduler
 thread for completion/admission futures. No Tokio blocking jobs are spawned.
@@ -48,14 +49,17 @@ changes are documented in `php-tokio/UPSTREAM.md`.
 The queue defaults to 128 live jobs and 128 MiB of accounted native storage.
 Admission reserves both count and byte permits before copying input. Accounting
 covers input, output, the PHP result copy, key schedules and metadata;
-permits are held through result consumption. Oversized jobs fail explicitly.
+permits are held through result consumption. Oversized jobs use the PHP backends.
 Waiting for admission suspends the Fiber. Cancelling an external Amp wait does
 not cancel its underlying operation: accepted work completes, commits IGE state
 under its instance mutex, then releases buffers. Native secrets and unsuccessful
 plaintext are zeroized on drop.
 
-Shutdown stops admission, finishes accepted jobs, resumes waiting callers, drains
-the bridge, joins the crypto thread and destroys Tokio. Initialize **after** any
+Shutdown (a PHP shutdown function) stops admission, finishes accepted jobs, joins the
+crypto thread, resumes every suspended caller and destroys the bridge and Tokio,
+without running the event loop: if it runs again, the callers continue and admission
+waiters fall back to PHP. At RSHUTDOWN no PHP code runs: callers still suspended are
+released without being resumed. Initialize **after** any
 fork; an inherited initialized executor is rejected, and factories use PHP.
 Live extension objects are never serialized with MTProto sessions.
 
@@ -85,8 +89,8 @@ checks = ceil(3 * (N+1) * clamp(2 / max(0.25, abs(gain-1)), 1, 8))
 Keep alternating until both sides meet that count. At gain >=1%, advance N by
 one and start a fresh comparison; otherwise permanently lock the smaller width.
 There is no width-8 ceiling: the configured live-job capacity is the resource
-limit. The oldest compatible job waits at most 5 ms for its batch; shutdown
-flushes partial batches immediately. Const-generic widths 1–32 are enabled by
+limit. A batch takes only the compatible jobs already queued and never waits for
+more: jobs submitted while a batch runs form the next one, so a lone job never waits. Const-generic widths 1–32 are enabled by
 default; larger widths use the dynamic kernel.
 
 ## Verification

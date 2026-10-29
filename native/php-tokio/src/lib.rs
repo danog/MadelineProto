@@ -9,7 +9,8 @@ use std::{
     future::Future,
     io::{Read, Write},
     os::fd::{AsRawFd, FromRawFd},
-    sync::{mpsc, Arc},
+    sync::{mpsc, Arc, Mutex},
+    time::{Duration, Instant},
 };
 use tokio::runtime::{Builder, Runtime};
 
@@ -78,7 +79,10 @@ impl EventLoop {
         )
         .ok_or("Revolt is unavailable")?)?;
         let waiter = suspension.shallow_clone();
-        let (id, handle) = BRIDGE.with_borrow_mut(|bridge| -> PhpResult<_> {
+        // The result is handed over through this slot, not a JoinHandle: the caller can be
+        // resumed after the bridge (and its runtime) has been shut down.
+        let slot = Arc::new(Mutex::new(None));
+        let id = BRIDGE.with_borrow_mut(|bridge| -> PhpResult<_> {
             let bridge = bridge.as_mut().ok_or("Tokio bridge is not initialized")?;
             if bridge.pid != std::process::id() {
                 return Err("Crypto cannot be used after fork".into());
@@ -90,41 +94,37 @@ impl EventLoop {
             let id = bridge.next;
             let sender = bridge.sender.clone();
             let writer = bridge.writer.clone();
+            let result = slot.clone();
             bridge.suspensions.insert(id, suspension);
-            Ok((
-                id,
-                bridge.runtime.spawn(async move {
-                    let result = future.await;
-                    // Only integer IDs cross threads, never a PHP value.
-                    let _ = sender.send(id);
-                    let mut writer = &*writer;
-                    loop {
-                        match writer.write(&[0]) {
-                            Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
-                            _ => break, // A full pipe already has a pending wakeup.
-                        }
+            bridge.runtime.spawn(async move {
+                let value = future.await;
+                *result.lock().unwrap() = Some(value);
+                // Only integer IDs cross threads, never a PHP value.
+                let _ = sender.send(id);
+                let mut writer = &*writer;
+                loop {
+                    match writer.write(&[0]) {
+                        Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
+                        _ => break, // A full pipe already has a pending wakeup.
                     }
-                    result
-                }),
-            ))
+                }
+            });
+            Ok(id)
         })?;
         if let Err(error) = waiter.try_call_method("suspend", vec![]) {
             // The caller can be interrupted by an event-loop error. Detach the
             // Rust-only future: accepted work still completes and drops safely.
             BRIDGE.with_borrow_mut(|b| {
-                b.as_mut().unwrap().suspensions.remove(&id);
+                if let Some(b) = b.as_mut() {
+                    b.suspensions.remove(&id);
+                }
             });
             return Err(error.into());
         }
-        BRIDGE.with_borrow(|bridge| {
-            bridge
-                .as_ref()
-                .unwrap()
-                .runtime
-                .block_on(handle)
-                .map_err(|e| e.to_string().into())
-        })
+        let value = slot.lock().unwrap().take();
+        value.ok_or_else(|| "Tokio bridge was shut down before the operation completed".into())
     }
+    /// Resume every caller whose future has completed.
     pub fn wakeup() -> PhpResult<()> {
         let ready = BRIDGE.with_borrow_mut(|bridge| -> PhpResult<Vec<Zval>> {
             let bridge = bridge.as_mut().ok_or("Tokio bridge is closed")?;
@@ -136,11 +136,7 @@ impl EventLoop {
                 .filter_map(|id| bridge.suspensions.remove(&id))
                 .collect())
         })?;
-        // Drop the RefCell borrow before resuming PHP; resumption may re-enter us.
-        for suspension in ready {
-            suspension.try_call_method("resume", vec![])?;
-        }
-        Ok(())
+        resume(ready)
     }
     pub fn pending() -> usize {
         BRIDGE.with_borrow(|b| {
@@ -149,21 +145,54 @@ impl EventLoop {
                 .map_or(0, |b| b.suspensions.len())
         })
     }
-    pub fn shutdown() -> PhpResult<()> {
-        if Self::pending() != 0 {
-            return Err("Drain crypto operations before closing the bridge".into());
-        }
-        BRIDGE.with_borrow_mut(|b| {
-            if b.as_ref()
-                .is_some_and(|bridge| bridge.pid != std::process::id())
-            {
+    /// Wait up to `timeout` for the pending futures, which must be about to complete
+    /// (their work was finished or rejected), and resume their callers. This does not
+    /// run the PHP event loop: the callers continue only if it runs again.
+    pub fn drain(timeout: Duration) -> PhpResult<()> {
+        let deadline = Instant::now() + timeout;
+        let ready = BRIDGE.with_borrow_mut(|bridge| {
+            let mut ready = vec![];
+            let Some(bridge) = bridge.as_mut().filter(|b| b.pid == std::process::id()) else {
+                return ready;
+            };
+            while !bridge.suspensions.is_empty() {
+                let remaining = deadline.saturating_duration_since(Instant::now());
+                match bridge.receiver.recv_timeout(remaining) {
+                    Ok(id) => ready.extend(bridge.suspensions.remove(&id)),
+                    Err(_) => break,
+                }
+            }
+            let mut buffer = [0; 4096];
+            while bridge.reader.read(&mut buffer).is_ok_and(|n| n != 0) {}
+            ready
+        });
+        resume(ready)
+    }
+    /// Destroy the bridge. Callers still suspended are never resumed: their suspensions
+    /// are released here, on the PHP thread, and their futures are dropped with the runtime.
+    pub fn shutdown() {
+        let bridge = BRIDGE.with_borrow_mut(Option::take);
+        if let Some(mut bridge) = bridge {
+            if bridge.pid != std::process::id() {
                 // Threads and locks inherited across fork cannot be joined safely.
                 // The child never uses this bridge; the OS reclaims it on exit.
-                std::mem::forget(b.take());
-            } else {
-                b.take();
+                std::mem::forget(bridge);
+                return;
             }
-        });
-        Ok(())
+            bridge.suspensions.clear();
+        }
     }
+}
+/// Resume outside the RefCell borrow (resumption may re-enter the bridge), resuming
+/// every caller even if one of them fails.
+fn resume(ready: Vec<Zval>) -> PhpResult<()> {
+    let mut result = Ok(());
+    for suspension in ready {
+        if let Err(error) = suspension.try_call_method("resume", vec![]) {
+            if result.is_ok() {
+                result = Err(error.into());
+            }
+        }
+    }
+    result
 }
