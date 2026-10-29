@@ -35,7 +35,7 @@ use const OPENSSL_RAW_DATA;
 final class Crypt
 {
     /**
-     * Inputs of at least this many bytes are hashed with OpenSSL instead of PHP's hash extension.
+     * Inputs of at least this many bytes are hashed with OpenSSL instead of PHP's hash extension (measured).
      */
     private static ?int $opensslSha256From = null;
 
@@ -73,20 +73,42 @@ final class Crypt
     }
 
     /**
-     * OpenSSL costs ~250-500 ns per call, then hashes with the CPU's SHA instructions. PHP's hash extension
-     * uses them on x86 (SHA-NI), where it is faster below ~16 KiB and OpenSSL only 3-15% faster above;
-     * elsewhere it is portable C (~2.6 ns per byte on an M1, against ~0.3 for OpenSSL), slower from ~64 bytes.
+     * The smallest input size OpenSSL hashes faster than PHP's hash extension, measured once.
+     *
+     * OpenSSL costs ~250-500 ns per call, then hashes with the CPU's SHA instructions. PHP's hash
+     * extension uses them on x86 CPUs that have them (SHA-NI) and its builds that support it, and is
+     * portable C otherwise. Measured: on an M1, OpenSSL is as fast at 52 bytes and ~90% faster from
+     * 16 KiB; on an Intel N100 (SHA-NI), hash() is 3.6x faster at 52 bytes and OpenSSL only 3-15%
+     * faster from 16 KiB. The fixed cost makes the crossover a single size: probe upwards.
      */
     private static function opensslSha256From(): int
     {
         if (!\function_exists('openssl_digest')) {
             return PHP_INT_MAX;
         }
-        return match (php_uname('m')) {
-            'arm64', 'aarch64' => 64,
-            default => 16384,
-        };
+        foreach ([64, 256, 1024, 4096, 16384, 65536] as $size) {
+            $data = str_repeat("\x5c", $size);
+            $calls = max(2, intdiv(32768, $size));
+            $hash = $openssl = PHP_INT_MAX;
+            for ($round = 0; $round < 3; $round++) {
+                $start = hrtime(true);
+                for ($i = 0; $i < $calls; $i++) {
+                    hash('sha256', $data, true);
+                }
+                $hash = min($hash, hrtime(true) - $start);
+                $start = hrtime(true);
+                for ($i = 0; $i < $calls; $i++) {
+                    openssl_digest($data, 'sha256', true);
+                }
+                $openssl = min($openssl, hrtime(true) - $start);
+            }
+            if ($openssl < $hash) {
+                return $size;
+            }
+        }
+        return PHP_INT_MAX;
     }
+
     /**
      * AES KDF function for MTProto v2.
      *
