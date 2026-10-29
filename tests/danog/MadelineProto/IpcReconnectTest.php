@@ -27,6 +27,7 @@ use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as SettingsLogger;
 use danog\MadelineProto\Tools;
 use PHPUnit\Framework\TestCase;
+use Revolt\EventLoop;
 
 use function Amp\async;
 use function Amp\delay;
@@ -71,6 +72,11 @@ final class IpcReconnectTest extends TestCase
 
     public function testReconnectingToADyingServerDoesNotSpin(): void
     {
+        // The descriptors the event loop creates on first use are no leak: with EvDriver, libev opens its signal
+        // pipe (an eventfd on Linux) when the first signal handler starts, such as the one of the worker.
+        $signal = EventLoop::onSignal(\SIGUSR2, static fn () => null);
+        delay(0);
+        EventLoop::cancel($signal);
         $fds = self::countFds();
         $paths = new SessionPaths($this->session);
         $server = listen($paths->getIpcPath());
