@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 use ext_php_rs::{
     call_user_func,
+    convert::IntoZval,
+    exception::throw_object,
     prelude::*,
     types::Zval,
     zend::{ExecutorGlobals, Function},
@@ -198,13 +200,17 @@ impl EventLoop {
 /// Resume outside the RefCell borrow (resumption may re-enter the bridge), resuming
 /// every caller even if one of them fails.
 fn resume(ready: Vec<Zval>) -> PhpResult<()> {
-    let mut result = Ok(());
+    let mut first = None;
     for suspension in ready {
-        if let Err(error) = suspension.try_call_method("resume", vec![]) {
-            if result.is_ok() {
-                result = Err(error.into());
-            }
+        let _ = suspension.try_call_method("resume", vec![]);
+        // An exception thrown by resume() is left pending, and PHP calls nothing while one is:
+        // take it to resume the others, and rethrow the first one.
+        if let Some(exception) = ExecutorGlobals::take_exception() {
+            first.get_or_insert(exception);
         }
     }
-    result
+    if let Some(exception) = first {
+        throw_object(exception.into_zval(false)?)?;
+    }
+    Ok(())
 }
