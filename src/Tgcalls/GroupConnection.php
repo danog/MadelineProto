@@ -115,6 +115,13 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private array $orderedSources = [];
     /**
+     * The retransmission (RTX) SSRC of each remote video SSRC that has one, both unsigned: declared with it in the answer
+     * (as its FID group), so that the packets the SFU resends on it, when we report them lost, are received.
+     *
+     * @var array<int, int>
+     */
+    private array $retransmission = [];
+    /**
      * Which participant (by unsigned audio SSRC) each remote camera-video SSRC belongs to, so an
      * incoming video track is muxed into that participant's recorder.
      *
@@ -451,8 +458,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * transceiver of the matching kind is created for every new SSRC; the SFU forwards that
      * participant's media on it, demultiplexed by SSRC.
      *
-     * @param list<array{audio: int, muted?: bool, video: list<int>, presentation?: list<int>, videoEndpoint?: ?string, presentationEndpoint?: ?string}> $participants
-     *        Signed SSRCs and SFU endpoints per participant.
+     * @param list<array{audio: int, muted?: bool, video: list<int>, presentation?: list<int>, videoEndpoint?: ?string, presentationEndpoint?: ?string, rtx?: array<int, int>}> $participants
+     *        Signed SSRCs and SFU endpoints per participant, and the retransmission SSRC of each video SSRC that has one.
      */
     public function setRemoteSources(array $participants): void
     {
@@ -484,6 +491,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 $videoSsrcs[] = $unsigned;
                 $this->videoOwner[$unsigned] = $audio;
                 $added = $this->wireReceiver($unsigned, $known) || $added;
+                $added = $this->setRetransmission($unsigned, $participant['rtx'][$video] ?? null) || $added;
             }
             foreach ($participant['presentation'] ?? [] as $presentation) {
                 $unsigned = GroupSdp::toUnsignedSsrc($presentation);
@@ -492,6 +500,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                 }
                 $this->presentationOwner[$unsigned] = $audio;
                 $added = $this->wireReceiver($unsigned, $known) || $added;
+                $added = $this->setRetransmission($unsigned, $participant['rtx'][$presentation] ?? null) || $added;
             }
             // Collect the endpoints to subscribe to over the colibri data channel: the SFU forwards
             // a stream only for endpoints we ask for. We record at full quality.
@@ -589,6 +598,28 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function onDataChannelMessage(string $data): void
     {
         $this->call->log("Colibri message on {$this->call}: $data", Logger::VERBOSE);
+    }
+
+    /**
+     * Remember the retransmission SSRC (signed, if any) of a remote video SSRC.
+     *
+     * @return bool Whether it changed (so a renegotiation is needed).
+     */
+    private function setRetransmission(int $ssrc, ?int $rtx): bool
+    {
+        $rtx = $rtx === null ? 0 : GroupSdp::toUnsignedSsrc($rtx);
+        if ($rtx === 0) {
+            if (!isset($this->retransmission[$ssrc])) {
+                return false;
+            }
+            unset($this->retransmission[$ssrc]);
+            return true;
+        }
+        if (($this->retransmission[$ssrc] ?? null) === $rtx) {
+            return false;
+        }
+        $this->retransmission[$ssrc] = $rtx;
+        return true;
     }
 
     /**
@@ -813,6 +844,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
                     $this->sources,
                     $this->video,
                     $this->outgoingVideoCodec,
+                    $this->retransmission,
                 );
                 $this->peerConnection->setRemoteDescription(new RTCSessionDescription($answer, 'answer'));
             } while ($this->renegotiatePending && !$this->closed);

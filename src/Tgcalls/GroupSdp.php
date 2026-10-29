@@ -323,13 +323,17 @@ final class GroupSdp
      *                                      The video codec table the SFU announced, if any.
      * @param string $outgoingVideoCodec    Encoding name of the video we transmit, which our own
      *                                      m-line is pinned to. See {@see \danog\MadelineProto\Loop\VoIP\DjLoop::VIDEO_CODECS}.
+     * @param array<int, int> $retransmission The retransmission SSRC of each remote video SSRC that has one, declared
+     *                                      after it in its m-line with their FID group: the second SSRC of an
+     *                                      m-line is taken as the RTX stream of the first.
      */
     public static function buildAnswer(
         string $offer,
         array $transport,
         array $sources,
         ?array $video = null,
-        string $outgoingVideoCodec = 'VP8'
+        string $outgoingVideoCodec = 'VP8',
+        array $retransmission = [],
     ): string {
         $ufrag = (string) ($transport['ufrag'] ?? '');
         $pwd = (string) ($transport['pwd'] ?? '');
@@ -404,6 +408,12 @@ final class GroupSdp
             if ($ssrc !== null) {
                 $result[] = 'a=ssrc:'.$ssrc.' cname:tgcalls'.$ssrc;
                 $result[] = 'a=ssrc:'.$ssrc.' label:'.$kind.$ssrc;
+                $rtx = $kind === 'video' ? ($retransmission[$ssrc] ?? null) : null;
+                if ($rtx !== null) {
+                    $result[] = 'a=ssrc:'.$rtx.' cname:tgcalls'.$ssrc;
+                    $result[] = 'a=ssrc:'.$rtx.' label:'.$kind.$ssrc;
+                    $result[] = 'a=ssrc-group:FID '.$ssrc.' '.$rtx;
+                }
             }
         }
 

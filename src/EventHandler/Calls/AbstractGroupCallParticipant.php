@@ -71,6 +71,13 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
         public readonly ?int $raiseHandRating,
         /** Whether the participant's volume was set by an admin. */
         public readonly bool $volumeByAdmin,
+        /**
+         * The retransmission (RTX) SSRC of each of the {@see self::$videoSources} and {@see self::$presentationSources} that
+         * has one (the second source of its FID group), signed, by SSRC: the SFU resends the lost packets of the stream on it.
+         *
+         * @var array<int, int>
+         */
+        public readonly array $retransmissionSources = [],
     ) {
         parent::__construct($peerId);
     }
@@ -96,14 +103,20 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
         $presentation = self::videoSources($participant['presentation'] ?? null);
         $videoEndpoint = self::endpoint($participant['video'] ?? null);
         $presentationEndpoint = self::endpoint($participant['presentation'] ?? null);
+        $videoRtx = self::retransmissionSources($participant['video'] ?? null);
+        $presentationRtx = self::retransmissionSources($participant['presentation'] ?? null);
         if ($min && $cached !== null) {
+            // Participants saved by versions that didn't keep the retransmission sources have none.
+            $cachedRtx = $cached->retransmissionSources ?? [];
             if (!\is_array($participant['video'] ?? null)) {
                 $video = $cached->videoSources;
                 $videoEndpoint = $cached->videoEndpoint;
+                $videoRtx = array_intersect_key($cachedRtx, array_flip($video));
             }
             if (!\is_array($participant['presentation'] ?? null)) {
                 $presentation = $cached->presentationSources;
                 $presentationEndpoint = $cached->presentationEndpoint;
+                $presentationRtx = array_intersect_key($cachedRtx, array_flip($presentation));
             }
         }
         return [
@@ -125,6 +138,7 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
             'about' => $participant['about'] ?? null,
             'raiseHandRating' => $participant['raise_hand_rating'] ?? null,
             'volumeByAdmin' => $participant['volume_by_admin'],
+            'retransmissionSources' => $videoRtx + $presentationRtx,
         ];
     }
 
@@ -132,7 +146,7 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
      * Flatten the source SSRCs of a
      * [groupCallParticipantVideo](https://core.telegram.org/constructor/groupCallParticipantVideo),
      * taking each source group's primary (first) source and every simulcast layer, deduplicated.
-     * Retransmission (FID) pairs contribute only their main source, since we do not record rtx.
+     * Retransmission (FID) pairs contribute only their main source: the other is in {@see self::retransmissionSources()}.
      *
      * @param mixed $video The `video` or `presentation` field of a groupCallParticipant, if present.
      *
@@ -155,6 +169,30 @@ abstract class AbstractGroupCallParticipant extends MultiCallParticipant
             }
         }
         return array_values(array_keys($sources));
+    }
+
+    /**
+     * The retransmission SSRC of each SSRC of a groupCallParticipantVideo that has one: the second source of its FID
+     * group (tgcalls declares one per simulcast layer).
+     *
+     * @param mixed $video The `video` or `presentation` field of a groupCallParticipant, if present.
+     *
+     * @return array<int, int> Signed SSRCs, by signed SSRC.
+     *
+     * @psalm-pure
+     */
+    private static function retransmissionSources(mixed $video): array
+    {
+        if (!\is_array($video) || ($video['paused'] ?? false)) {
+            return [];
+        }
+        $sources = [];
+        foreach ($video['source_groups'] ?? [] as $group) {
+            if (($group['semantics'] ?? '') === 'FID' && isset($group['sources'][0], $group['sources'][1])) {
+                $sources[$group['sources'][0]] = $group['sources'][1];
+            }
+        }
+        return $sources;
     }
 
     /**

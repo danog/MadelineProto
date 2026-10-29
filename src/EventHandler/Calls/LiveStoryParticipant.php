@@ -28,6 +28,7 @@ final class LiveStoryParticipant extends AbstractGroupCallParticipant
      *
      * @param list<int> $videoSources
      * @param list<int> $presentationSources
+     * @param array<int, int> $retransmissionSources
      * @param int<1, 20000> $volume Playback volume, from 1 to 20000 where 10000 is 100%.
      *
      * @psalm-mutation-free
@@ -53,6 +54,7 @@ final class LiveStoryParticipant extends AbstractGroupCallParticipant
         bool $volumeByAdmin,
         /** Total Telegram Stars donated by this participant, if any. */
         public readonly ?int $paidStarsTotal,
+        array $retransmissionSources = [],
     ) {
         parent::__construct(
             $peerId,
@@ -73,6 +75,7 @@ final class LiveStoryParticipant extends AbstractGroupCallParticipant
             $about,
             $raiseHandRating,
             $volumeByAdmin,
+            $retransmissionSources,
         );
     }
 
