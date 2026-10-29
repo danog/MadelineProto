@@ -33,15 +33,19 @@ use ValueError;
  */
 final class IGEPhp extends IGE
 {
-    /** @var ?array{array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}} */
+    /** @var ?array{array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>}} */
     private static ?array $tables = null;
     /**
-     * Round keys in the order the rounds use them: the last one first, then the others.
+     * The expanded key, in natural order.
      *
      * @var ?list<int>
      */
     private ?array $encryptKeys = null;
-    /** @var ?list<int> */
+    /**
+     * Round keys of the equivalent inverse cipher, in the order the rounds use them: the last one first, then the others.
+     *
+     * @var ?list<int>
+     */
     private ?array $decryptKeys = null;
 
     protected function __construct(#[\SensitiveParameter] private readonly string $key, string $iv)
@@ -80,7 +84,7 @@ final class IGEPhp extends IGE
             return '';
         }
         $tables = self::tables();
-        $this->decryptKeys ??= self::decryptKeys($this->encryptKeys ?? self::encryptKeys($this->key, $tables[0][4]), $tables[0][4], $tables[1]);
+        $this->decryptKeys ??= self::decryptKeys($this->encryptKeys ?? self::encryptKeys($this->key, $tables[0][4]), $tables[2]);
         $plaintext = self::decryptBlocks($ciphertext, $this->decryptKeys, $this->iv_part_1, $this->iv_part_2, $tables[1]);
         $this->iv_part_1 = substr($ciphertext, -16);
         $this->iv_part_2 = substr($plaintext, -16);
@@ -88,72 +92,82 @@ final class IGEPhp extends IGE
     }
 
     /**
-     * phpseclib's encryption and decryption T-tables, each followed by its S-box.
+     * phpseclib's encryption and decryption T-tables, each followed by its S-box, and the
+     * InvMixColumns tables of the decryption key schedule.
      *
-     * @return array{array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}}
+     * @return array{array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>}, array{array<int, int>, array<int, int>, array<int, int>, array<int, int>}}
      */
     private static function tables(): array
     {
-        /** @psalm-suppress InaccessibleMethod, PossiblyInvalidFunctionCall */
-        return self::$tables ??= \Closure::bind(
-            fn (): array => [$this->getTables(), $this->getInvTables()],
-            new Rijndael('ecb'),
-            Rijndael::class,
-        )();
+        if (self::$tables === null) {
+            /** @psalm-suppress InaccessibleMethod, PossiblyInvalidFunctionCall */
+            [$encrypt, $decrypt] = \Closure::bind(
+                fn (): array => [$this->getTables(), $this->getInvTables()],
+                new Rijndael('ecb'),
+                Rijndael::class,
+            )();
+            // The inverse T-tables are InvMixColumns ∘ InvSubBytes: after SubBytes, they give InvMixColumns.
+            $invMixColumns = [];
+            foreach ([0, 1, 2, 3] as $i) {
+                foreach ($encrypt[4] as $byte => $substituted) {
+                    $invMixColumns[$i][$byte] = $decrypt[$i][$substituted];
+                }
+            }
+            self::$tables = [$encrypt, $decrypt, $invMixColumns];
+        }
+        return self::$tables;
     }
 
     /**
-     * AES-256 key expansion (FIPS-197 5.2), in round order with the last round key first.
+     * AES-256 key expansion (FIPS-197 5.2), in natural order: eight words per step.
      *
      * @param array<int, int> $sbox
      * @return list<int>
      */
     private static function encryptKeys(#[\SensitiveParameter] string $key, array $sbox): array
     {
-        $words = array_values(unpack('N8', $key));
-        $rcon = 0x01000000;
-        for ($i = 8; $i < 60; $i++) {
-            $word = $words[$i - 1];
-            if ($i % 8 === 0) {
-                $word = (($word << 8) & 0xffffff00) | ($word >> 24);
-                $word = self::subWord($word, $sbox) ^ $rcon;
-                $rcon <<= 1;
-            } elseif ($i % 8 === 4) {
-                $word = self::subWord($word, $sbox);
+        [1 => $w0, 2 => $w1, 3 => $w2, 4 => $w3, 5 => $w4, 6 => $w5, 7 => $w6, 8 => $w7] = unpack('N8', $key);
+        $words = [$w0, $w1, $w2, $w3, $w4, $w5, $w6, $w7];
+        for ($rcon = 0x01000000; ; $rcon <<= 1) {
+            // SubWord(RotWord(w7)) ^ rcon
+            $words[] = $w0 ^= ($sbox[($w7 >> 16) & 0xff] << 24) ^ ($sbox[($w7 >> 8) & 0xff] << 16) ^ ($sbox[$w7 & 0xff] << 8) ^ $sbox[$w7 >> 24] ^ $rcon;
+            $words[] = $w1 ^= $w0;
+            $words[] = $w2 ^= $w1;
+            $words[] = $w3 ^= $w2;
+            if ($rcon === 0x40000000) {
+                return $words;
             }
-            $words[] = $words[$i - 8] ^ $word;
+            // SubWord(w3)
+            $words[] = $w4 ^= ($sbox[$w3 >> 24] << 24) ^ ($sbox[($w3 >> 16) & 0xff] << 16) ^ ($sbox[($w3 >> 8) & 0xff] << 8) ^ $sbox[$w3 & 0xff];
+            $words[] = $w5 ^= $w4;
+            $words[] = $w6 ^= $w5;
+            $words[] = $w7 ^= $w6;
         }
-        return [...\array_slice($words, 56), ...\array_slice($words, 0, 56)];
     }
 
     /**
-     * Round keys of the equivalent inverse cipher (FIPS-197 5.3.5): the first round key, then the
-     * others from the last one, with InvMixColumns applied to all but the last.
+     * Round keys of the equivalent inverse cipher (FIPS-197 5.3.5): the first round key, the last
+     * one, then the others from the 13th, with InvMixColumns applied.
      *
-     * @param list<int> $keys Encryption round keys, in round order with the last one first.
-     * @param array<int, int> $sbox
-     * @param array{array<int, int>, array<int, int>, array<int, int>, array<int, int>, array<int, int>} $invTables
+     * @param list<int> $keys The expanded key, in natural order.
+     * @param array{array<int, int>, array<int, int>, array<int, int>, array<int, int>} $invMixColumns
      * @return list<int>
      */
-    private static function decryptKeys(array $keys, array $sbox, array $invTables): array
+    private static function decryptKeys(array $keys, array $invMixColumns): array
     {
-        [$dt0, $dt1, $dt2, $dt3] = $invTables;
-        // Round r's key is at 4 + 4r for r < 14, round 14's at 0.
-        $result = [...\array_slice($keys, 4, 4), ...\array_slice($keys, 0, 4)];
-        for ($round = 13; $round > 0; $round--) {
-            for ($i = 0; $i < 4; $i++) {
-                // InvMixColumns(w) = InvMixColumns(InvSubBytes(SubBytes(w))), and the inverse T-tables are InvMixColumns ∘ InvSubBytes.
-                $word = self::subWord($keys[4 + 4 * $round + $i], $sbox);
-                $result[] = $dt0[$word >> 24] ^ $dt1[($word >> 16) & 0xff] ^ $dt2[($word >> 8) & 0xff] ^ $dt3[$word & 0xff];
-            }
+        [$m0, $m1, $m2, $m3] = $invMixColumns;
+        $result = [$keys[0], $keys[1], $keys[2], $keys[3], $keys[56], $keys[57], $keys[58], $keys[59]];
+        for ($i = 52; $i > 0; $i -= 4) {
+            $w = $keys[$i];
+            $result[] = $m0[$w >> 24] ^ $m1[($w >> 16) & 0xff] ^ $m2[($w >> 8) & 0xff] ^ $m3[$w & 0xff];
+            $w = $keys[$i + 1];
+            $result[] = $m0[$w >> 24] ^ $m1[($w >> 16) & 0xff] ^ $m2[($w >> 8) & 0xff] ^ $m3[$w & 0xff];
+            $w = $keys[$i + 2];
+            $result[] = $m0[$w >> 24] ^ $m1[($w >> 16) & 0xff] ^ $m2[($w >> 8) & 0xff] ^ $m3[$w & 0xff];
+            $w = $keys[$i + 3];
+            $result[] = $m0[$w >> 24] ^ $m1[($w >> 16) & 0xff] ^ $m2[($w >> 8) & 0xff] ^ $m3[$w & 0xff];
         }
         return $result;
-    }
-
-    /** @param array<int, int> $sbox */
-    private static function subWord(int $word, array $sbox): int
-    {
-        return ($sbox[$word >> 24] << 24) | ($sbox[($word >> 16) & 0xff] << 16) | ($sbox[($word >> 8) & 0xff] << 8) | $sbox[$word & 0xff];
     }
 
     /**
@@ -163,66 +177,66 @@ final class IGEPhp extends IGE
     private static function encryptBlocks(string $text, array $keys, string $iv1, string $iv2, array $tables): string
     {
         [$t0, $t1, $t2, $t3, $sbox] = $tables;
-        $k0 = $keys[0];
-        $k1 = $keys[1];
-        $k2 = $keys[2];
-        $k3 = $keys[3];
-        $k4 = $keys[4];
-        $k5 = $keys[5];
-        $k6 = $keys[6];
-        $k7 = $keys[7];
-        $k8 = $keys[8];
-        $k9 = $keys[9];
-        $k10 = $keys[10];
-        $k11 = $keys[11];
-        $k12 = $keys[12];
-        $k13 = $keys[13];
-        $k14 = $keys[14];
-        $k15 = $keys[15];
-        $k16 = $keys[16];
-        $k17 = $keys[17];
-        $k18 = $keys[18];
-        $k19 = $keys[19];
-        $k20 = $keys[20];
-        $k21 = $keys[21];
-        $k22 = $keys[22];
-        $k23 = $keys[23];
-        $k24 = $keys[24];
-        $k25 = $keys[25];
-        $k26 = $keys[26];
-        $k27 = $keys[27];
-        $k28 = $keys[28];
-        $k29 = $keys[29];
-        $k30 = $keys[30];
-        $k31 = $keys[31];
-        $k32 = $keys[32];
-        $k33 = $keys[33];
-        $k34 = $keys[34];
-        $k35 = $keys[35];
-        $k36 = $keys[36];
-        $k37 = $keys[37];
-        $k38 = $keys[38];
-        $k39 = $keys[39];
-        $k40 = $keys[40];
-        $k41 = $keys[41];
-        $k42 = $keys[42];
-        $k43 = $keys[43];
-        $k44 = $keys[44];
-        $k45 = $keys[45];
-        $k46 = $keys[46];
-        $k47 = $keys[47];
-        $k48 = $keys[48];
-        $k49 = $keys[49];
-        $k50 = $keys[50];
-        $k51 = $keys[51];
-        $k52 = $keys[52];
-        $k53 = $keys[53];
-        $k54 = $keys[54];
-        $k55 = $keys[55];
-        $k56 = $keys[56];
-        $k57 = $keys[57];
-        $k58 = $keys[58];
-        $k59 = $keys[59];
+        $k0 = $keys[56];
+        $k1 = $keys[57];
+        $k2 = $keys[58];
+        $k3 = $keys[59];
+        $k4 = $keys[0];
+        $k5 = $keys[1];
+        $k6 = $keys[2];
+        $k7 = $keys[3];
+        $k8 = $keys[4];
+        $k9 = $keys[5];
+        $k10 = $keys[6];
+        $k11 = $keys[7];
+        $k12 = $keys[8];
+        $k13 = $keys[9];
+        $k14 = $keys[10];
+        $k15 = $keys[11];
+        $k16 = $keys[12];
+        $k17 = $keys[13];
+        $k18 = $keys[14];
+        $k19 = $keys[15];
+        $k20 = $keys[16];
+        $k21 = $keys[17];
+        $k22 = $keys[18];
+        $k23 = $keys[19];
+        $k24 = $keys[20];
+        $k25 = $keys[21];
+        $k26 = $keys[22];
+        $k27 = $keys[23];
+        $k28 = $keys[24];
+        $k29 = $keys[25];
+        $k30 = $keys[26];
+        $k31 = $keys[27];
+        $k32 = $keys[28];
+        $k33 = $keys[29];
+        $k34 = $keys[30];
+        $k35 = $keys[31];
+        $k36 = $keys[32];
+        $k37 = $keys[33];
+        $k38 = $keys[34];
+        $k39 = $keys[35];
+        $k40 = $keys[36];
+        $k41 = $keys[37];
+        $k42 = $keys[38];
+        $k43 = $keys[39];
+        $k44 = $keys[40];
+        $k45 = $keys[41];
+        $k46 = $keys[42];
+        $k47 = $keys[43];
+        $k48 = $keys[44];
+        $k49 = $keys[45];
+        $k50 = $keys[46];
+        $k51 = $keys[47];
+        $k52 = $keys[48];
+        $k53 = $keys[49];
+        $k54 = $keys[50];
+        $k55 = $keys[51];
+        $k56 = $keys[52];
+        $k57 = $keys[53];
+        $k58 = $keys[54];
+        $k59 = $keys[55];
         [1 => $q0, 2 => $q1, 3 => $q2, 4 => $q3] = unpack('N4', $iv1);
         [1 => $r0, 2 => $r1, 3 => $r2, 4 => $r3] = unpack('N4', $iv2);
         $result = '';
