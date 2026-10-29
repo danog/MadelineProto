@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Codecs;
 
+use AssertionError;
 use Closure;
 use danog\MadelineProto\Codecs\Aac\AacDecoder;
 use danog\MadelineProto\Codecs\Opus\OpusEncoder;
@@ -67,7 +68,13 @@ final class PhpAacTranscoder extends AacTranscoder
     #[\Override]
     protected function feed(string $frame): void
     {
-        $samples = $this->resampler->process($this->decoder->decode($frame));
+        try {
+            $decoded = $this->decoder->decode($frame);
+        } catch (AssertionError) {
+            // A frame that can't be decoded is a frame of silence: the rest of the file is still played, in time.
+            $decoded = array_fill(0, $this->channels, array_fill(0, 1024, 0.0));
+        }
+        $samples = $this->resampler->process($decoded);
         $count = \count($samples[0]);
         $skip = min($this->toSkip, $count);
         $this->toSkip -= $skip;

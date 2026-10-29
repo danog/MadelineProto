@@ -48,6 +48,8 @@ final class AacDecoder
     /** The channels of the decoded samples: 1 or 2. */
     public readonly int $channels;
     private readonly int $rateIndex;
+    /** The channels of the stream's configuration (8 for 7.1): a frame can't have more. */
+    private readonly int $streamChannels;
 
     /** @var array<int, array<int, list<array{int, int}>>> Huffman decoding maps by codebook (0: scalefactors), by code length: code => symbol. */
     private static array $huffman = [];
@@ -99,6 +101,7 @@ final class AacDecoder
         $this->rateIndex = $rateIndex;
         $this->sampleRate = self::SAMPLE_RATES[$rateIndex];
         $this->channels = $channels === 1 ? 1 : 2;
+        $this->streamChannels = $channels === 7 ? 8 : $channels;
         $this->long = new Mdct(1024);
         $this->short = new Mdct(128);
     }
@@ -203,6 +206,10 @@ final class AacDecoder
             $id = $bits->read(3);
             if ($id === 7) {
                 break;
+            }
+            if (($id === 0 || $id === 3) && $channel >= $this->streamChannels || $id === 1 && $channel + 2 > $this->streamChannels) {
+                // Each channel costs an inverse MDCT: a frame can't make us decode more than the configuration has.
+                throw new AssertionError('The AAC frame has more channels than its configuration');
             }
             switch ($id) {
                 case 0: // SCE
