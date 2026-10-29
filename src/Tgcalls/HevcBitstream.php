@@ -145,22 +145,17 @@ final class HevcBitstream
     {
         $nals = [];
         $len = \strlen($frame);
-        $i = 0;
         $start = -1;
-        while ($i + 3 <= $len) {
-            if ($frame[$i] === "\x00" && $frame[$i + 1] === "\x00" && $frame[$i + 2] === "\x01") {
-                if ($start >= 0) {
-                    $end = $i;
-                    if ($end > $start && $frame[$end - 1] === "\x00") {
-                        $end--;
-                    }
-                    $nals[] = substr($frame, $start, $end - $start);
+        // strpos, not a byte by byte comparison in PHP: this runs on every frame sent over RTMP.
+        for ($i = strpos($frame, "\x00\x00\x01"); $i !== false; $i = strpos($frame, "\x00\x00\x01", $start)) {
+            if ($start >= 0) {
+                $end = $i;
+                if ($end > $start && $frame[$end - 1] === "\x00") {
+                    $end--;
                 }
-                $i += 3;
-                $start = $i;
-                continue;
+                $nals[] = substr($frame, $start, $end - $start);
             }
-            $i++;
+            $start = $i + 3;
         }
         if ($start >= 0 && $start <= $len) {
             $nals[] = substr($frame, $start);

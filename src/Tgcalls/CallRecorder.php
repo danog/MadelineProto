@@ -871,24 +871,19 @@ final class CallRecorder
     {
         $nals = [];
         $len = \strlen($frame);
-        $i = 0;
         $start = -1;
-        while ($i < $len) {
-            // Find a start code.
-            if ($i + 3 <= $len && $frame[$i] === "\x00" && $frame[$i + 1] === "\x00" && $frame[$i + 2] === "\x01") {
-                if ($start >= 0) {
-                    $end = $i;
-                    // Trim a trailing zero belonging to the next 4-byte start code.
-                    if ($end > $start && $frame[$end - 1] === "\x00") {
-                        $end--;
-                    }
-                    $nals[] = substr($frame, $start, $end - $start);
+        // Every frame the RTMP publisher sends goes through here: search the start codes with strpos, comparing
+        // byte by byte in PHP took a tenth of magnaluna's CPU.
+        for ($i = strpos($frame, "\x00\x00\x01"); $i !== false; $i = strpos($frame, "\x00\x00\x01", $start)) {
+            if ($start >= 0) {
+                $end = $i;
+                // Trim a trailing zero belonging to the next 4-byte start code.
+                if ($end > $start && $frame[$end - 1] === "\x00") {
+                    $end--;
                 }
-                $i += 3;
-                $start = $i;
-                continue;
+                $nals[] = substr($frame, $start, $end - $start);
             }
-            $i++;
+            $start = $i + 3;
         }
         if ($start >= 0 && $start < $len) {
             $nals[] = substr($frame, $start);
