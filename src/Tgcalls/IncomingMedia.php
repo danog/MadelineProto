@@ -441,7 +441,7 @@ final class IncomingMedia implements RecordingObserver
                 return;
             }
             if ($frame instanceof EncodedPacket) {
-                $this->pushVideoFrame($frame->getData(), $frame->getTimestamp(), $source, $slot);
+                $this->pushVideoFrame($frame->getData(), $frame->getTimestamp(), $source, $slot, CallRecorder::codecIdOf($frame->getMimeType()));
             }
         }
     }
@@ -483,25 +483,29 @@ final class IncomingMedia implements RecordingObserver
      * @param int    $rtpTimestamp The frame's RTP timestamp (90 kHz clock).
      * @param int    $source       Identifies the track the frame belongs to.
      * @param int    $slot         Whether this is the camera ({@see CallStream::VIDEO}) or the screen share ({@see CallStream::SCREEN}).
+     * @param ?string $codecId     The Matroska codec ID of the frame, if known (see {@see CallRecorder::pushVideoFrame()}).
      */
-    public function pushVideoFrame(string $data, int $rtpTimestamp, int $source = 0, int $slot = CallStream::VIDEO): void
+    public function pushVideoFrame(string $data, int $rtpTimestamp, int $source = 0, int $slot = CallStream::VIDEO, ?string $codecId = null): void
     {
         if ($this->closed || $data === '' || $this->expected[$slot] === false) {
             return;
         }
-        if (($this->sources[$slot] ?? null) !== $source) {
-            // A new source: its codec is read off its first keyframe, like the recorder does.
-            [, $keyframe] = CallRecorder::transformVideo($data, null);
+        if (($this->sources[$slot] ?? null) !== $source
+            || ($codecId !== null && ($this->codecs[$slot] ?? null) !== $codecId)
+        ) {
+            // A new source, or a new codec on the same one: the codec is read off its first keyframe,
+            // like the recorder does.
+            [, $keyframe] = CallRecorder::transformVideo($data, $codecId);
             if ($keyframe) {
-                [$codecId] = CallRecorder::describeVideo($data);
+                $codec = $codecId ?? CallRecorder::describeVideo($data)[0];
                 $this->sources[$slot] = $source;
-                if (($this->codecs[$slot] ?? null) !== $codecId) {
-                    $this->codecs[$slot] = $codecId;
+                if (($this->codecs[$slot] ?? null) !== $codec) {
+                    $this->codecs[$slot] = $codec;
                     $this->report(null, null);
                 }
             }
         }
-        $this->recorder?->pushVideoFrame($data, $rtpTimestamp, $source, $slot);
+        $this->recorder?->pushVideoFrame($data, $rtpTimestamp, $source, $slot, $codecId);
     }
 
     /**
