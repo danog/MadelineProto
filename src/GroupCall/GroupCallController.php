@@ -659,6 +659,8 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
                     'presentation' => $participant->presentationSources,
                     'videoEndpoint' => $participant->videoEndpoint,
                     'presentationEndpoint' => $participant->presentationEndpoint,
+                    // Participants saved by versions that didn't keep the retransmission sources have none.
+                    'rtx' => $participant->retransmissionSources ?? [],
                 ];
             }
         }

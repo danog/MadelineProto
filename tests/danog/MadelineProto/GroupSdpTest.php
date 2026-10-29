@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\Tgcalls\GroupSdp;
 use PHPUnit\Framework\TestCase;
+use Webrtc\SDP\SessionDescription;
 
 /**
  * Tests that the SDP we synthesize for the group call SFU covers everything a group call carries.
@@ -70,6 +71,27 @@ final class GroupSdpTest extends TestCase
             explode("\r\n", $answer),
             static fn (string $line): bool => str_starts_with($line, 'm=')
         ));
+    }
+
+    /**
+     * The retransmission SSRC of a remote video comes after it in its m-line, with their FID group: php-rtc takes the
+     * second SSRC of an m-line as the RTX stream of the first, so that the packets the SFU resends are received.
+     */
+    public function testARemoteVideoDeclaresItsRetransmissionSsrc(): void
+    {
+        $offer = substr(self::offer(), 0, -2)."\r\n".implode("\r\n", [
+            'm=video 9 UDP/TLS/RTP/SAVPF 100 101',
+            'a=mid:3',
+            'a=recvonly',
+        ])."\r\n";
+        $offer = str_replace('a=group:BUNDLE 0 1 2', 'a=group:BUNDLE 0 1 2 3', $offer);
+        $answer = GroupSdp::buildAnswer($offer, self::TRANSPORT, ['2' => 12345, '3' => 2000], retransmission: [2000 => 2001, 12345 => 9]);
+
+        $media = SessionDescription::decode($answer)->getMedia();
+        $this->assertSame([2000, 2001], array_map(static fn ($ssrc) => $ssrc->ssrc, $media[3]->getSsrc()));
+        $this->assertStringContainsString("a=ssrc-group:FID 2000 2001\r\n", $answer);
+        // Only video has retransmission streams.
+        $this->assertSame([12345], array_map(static fn ($ssrc) => $ssrc->ssrc, $media[2]->getSsrc()));
     }
 
     public function testEveryGroupCallCodecIsOffered(): void
