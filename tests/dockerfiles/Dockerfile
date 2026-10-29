@@ -11,7 +11,7 @@
 # PHP is compiled from scratch to build it with -O3, debug symbols (see the .gdbinit below) and capstone (to
 # disassemble the JIT's output), and jemalloc is used instead of the system malloc.
 
-FROM debian:trixie-slim
+FROM debian:trixie-slim AS php-runtime
 
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
@@ -280,9 +280,24 @@ RUN set -eux; \
 	mkdir -p /app; \
 	chown madeline:madeline /app
 
+# Build against the exact PHP headers and ABI shipped in the runtime.
+FROM php-runtime AS crypto-build
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY native/ /usr/src/madeline-crypto/
+WORKDIR /usr/src/madeline-crypto
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
+    && /root/.cargo/bin/cargo build --release --locked \
+    && install -D target/release/libmadeline_crypto.so "/artifacts$(php-config --extension-dir)/madeline_crypto.so" \
+    && mkdir -p "/artifacts$PHP_INI_DIR/conf.d" \
+    && echo 'extension=madeline_crypto.so' > "/artifacts$PHP_INI_DIR/conf.d/madeline-crypto.ini"
+
 FROM scratch
 
-COPY --from=0 / /
+COPY --from=php-runtime / /
+COPY --from=crypto-build /artifacts/ /
 
 LABEL "repository"="http://github.com/danog/MadelineProto"
 LABEL "homepage"="http://docs.madelineproto.xyz"
@@ -298,7 +313,8 @@ ENV PATH=/composer/vendor/bin:${PATH}
 ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
-RUN php -v
+RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || \danog\MadelineProto\Native\Crypto::version() !== "0.2.0" || version_compare(phpversion("madeline_crypto"), "0.2.1", "<")) { throw new RuntimeException("Native crypto extension unavailable"); }'
+
 
 USER madeline:madeline
 

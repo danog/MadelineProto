@@ -1,0 +1,29 @@
+[package]
+name = "madeline-crypto"
+version = "0.2.1"
+edition = "2021"
+rust-version = "1.92"
+authors = ["Alexander Pankratov <s.pankratoff@gmail.com>"]
+license = "AGPL-3.0-only"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ext-php-rs = { version = "=0.16.3", optional = true }
+php-tokio = { path = "php-tokio", version = "=0.1.7", optional = true }
+tokio = { version = "=1.54.1", features = ["rt-multi-thread", "sync"] }
+openssl = "=0.10.81"
+zeroize = { version = "=1.9.1", features = ["derive"] }
+libc = "=0.2.191"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[features]
+default = ["php-extension", "const-widths"]
+php-extension = ["dep:ext-php-rs", "dep:php-tokio"]
+# Specialize widths 1–32; larger batches use the dynamic kernel.
+const-widths = []

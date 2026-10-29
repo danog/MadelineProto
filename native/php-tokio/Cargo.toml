@@ -1,0 +1,11 @@
+[package]
+name = "php-tokio"
+version = "0.1.7"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/danog/php-tokio"
+
+[dependencies]
+ext-php-rs = "=0.16.3"
+tokio = { version = "=1.54.1", features = ["rt-multi-thread", "sync"] }
+libc = "=0.2.191"

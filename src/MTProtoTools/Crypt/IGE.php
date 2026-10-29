@@ -44,6 +44,20 @@ abstract class IGE
      */
     public static function getInstance(#[\SensitiveParameter] string $key, string $iv): IGE
     {
+        if (NativeExecutor::get()) {
+            return new IGENative($key, $iv);
+        }
+        return self::getSyncInstance($key, $iv);
+    }
+
+    /**
+     * Instantiate the fastest handler that never suspends.
+     */
+    public static function getSyncInstance(#[\SensitiveParameter] string $key, string $iv): IGE
+    {
+        if (IGEFFI::isAvailable()) {
+            return new IGEFFI($key, $iv);
+        }
         if (Magic::$hasOpenssl) {
             return new IGEOpenssl($key, $iv);
         }
