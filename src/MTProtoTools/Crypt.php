@@ -28,13 +28,87 @@ use phpseclib4\Crypt\AES;
 use phpseclib4\Math\BigInteger;
 
 use const OPENSSL_RAW_DATA;
-use const OPENSSL_ZERO_PADDING;
 
 /**
  * @internal
  */
 final class Crypt
 {
+    /**
+     * Inputs of at least this many bytes are hashed with OpenSSL instead of PHP's hash extension (measured).
+     */
+    private static ?int $opensslSha256From = null;
+
+    /**
+     * SHA-256, raw, with the faster of PHP's hash extension and OpenSSL for the input's size.
+     *
+     * Use it for inputs whose size depends on the data; fixed-size tiny inputs are faster with hash() directly.
+     */
+    public static function sha256(string $data): string
+    {
+        self::$opensslSha256From ??= self::opensslSha256From();
+        if (\strlen($data) >= self::$opensslSha256From) {
+            $digest = openssl_digest($data, 'sha256', true);
+            if ($digest !== false) {
+                return $digest;
+            }
+        }
+        return hash('sha256', $data, true);
+    }
+
+    /**
+     * HMAC-SHA256, raw, with the faster SHA-256 backend for the input's size (RFC 2104).
+     */
+    public static function hmacSha256(string $data, #[\SensitiveParameter] string $key): string
+    {
+        self::$opensslSha256From ??= self::opensslSha256From();
+        if (64 + \strlen($data) < self::$opensslSha256From) {
+            return hash_hmac('sha256', $data, $key, true);
+        }
+        if (\strlen($key) > 64) {
+            $key = self::sha256($key);
+        }
+        $key = str_pad($key, 64, "\0");
+        return self::sha256(($key ^ str_repeat("\x5c", 64)).self::sha256(($key ^ str_repeat("\x36", 64)).$data));
+    }
+
+    /**
+     * The smallest input size OpenSSL hashes faster than PHP's hash extension, measured once.
+     *
+     * OpenSSL costs ~250-500 ns per call, then hashes with the CPU's SHA instructions. PHP's hash
+     * extension uses them on x86 CPUs that have them (SHA-NI) and its builds that support it, and is
+     * portable C otherwise. Measured: on an M1, OpenSSL is as fast at 52 bytes and ~90% faster from
+     * 16 KiB; on an Intel N100 (SHA-NI), hash() is 3.6x faster at 52 bytes and OpenSSL only 3-15%
+     * faster from 16 KiB. The fixed cost makes the crossover a single size: probe upwards.
+     */
+    private static function opensslSha256From(): int
+    {
+        if (!\function_exists('openssl_digest')) {
+            return PHP_INT_MAX;
+        }
+        foreach ([64, 256, 1024, 4096, 16384, 65536] as $size) {
+            $data = str_repeat("\x5c", $size);
+            $calls = max(2, intdiv(32768, $size));
+            $hash = $openssl = PHP_INT_MAX;
+            for ($round = 0; $round < 3; $round++) {
+                $start = hrtime(true);
+                for ($i = 0; $i < $calls; $i++) {
+                    hash('sha256', $data, true);
+                }
+                $hash = min($hash, hrtime(true) - $start);
+                $start = hrtime(true);
+                for ($i = 0; $i < $calls; $i++) {
+                    openssl_digest($data, 'sha256', true);
+                }
+                $openssl = min($openssl, hrtime(true) - $start);
+            }
+            if ($openssl < $hash) {
+                return $size;
+            }
+        }
+        return PHP_INT_MAX;
+    }
+
     /**
      * AES KDF function for MTProto v2.
      *
@@ -131,23 +205,6 @@ final class Crypt
      */
     public static function igeEncrypt(string $plaintext, #[\SensitiveParameter] string $key, string $iv): string
     {
-        if (Magic::$hasOpenssl) {
-            $iv_part_1 = substr($iv, 0, 16);
-            $iv_part_2 = substr($iv, 16);
-            $ciphertext = '';
-            for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
-                $plain = substr($plaintext, $i, 16);
-
-                $cipher = openssl_encrypt($plain ^ $iv_part_1, 'aes-256-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $iv_part_2;
-
-                $ciphertext .= $cipher;
-
-                $iv_part_1 = $cipher;
-                $iv_part_2 = $plain;
-            }
-
-            return $ciphertext;
-        }
         return IGE::getInstance($key, $iv)->encrypt($plaintext);
     }
     /**
@@ -160,23 +217,6 @@ final class Crypt
      */
     public static function igeDecrypt(string $ciphertext, #[\SensitiveParameter] string $key, string $iv): string
     {
-        if (Magic::$hasOpenssl) {
-            $iv_part_1 = substr($iv, 0, 16);
-            $iv_part_2 = substr($iv, 16);
-            $plaintext = '';
-            for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
-                $cipher = substr($ciphertext, $i, 16);
-
-                $plain = openssl_decrypt($cipher ^ $iv_part_2, 'aes-256-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $iv_part_1;
-
-                $plaintext .= $plain;
-
-                $iv_part_1 = $cipher;
-                $iv_part_2 = $plain;
-            }
-
-            return $plaintext;
-        }
         return IGE::getInstance($key, $iv)->decrypt($ciphertext);
     }
     /**

@@ -17,6 +17,7 @@
 namespace danog\MadelineProto\Tgcalls\E2E;
 
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\MTProtoTools\Crypt;
 
 /**
  * Cryptographic primitives for Telegram end-to-end encrypted conference calls, ported byte-for-byte
@@ -116,7 +117,7 @@ final class Crypto
         $hmacKey = substr($large, 32, 32);
 
         $tail = $padded.$extra.pack('V', \strlen($extra));
-        $largeMsgId = hash_hmac('sha256', $tail, $hmacKey, true);
+        $largeMsgId = Crypt::hmacSha256($tail, $hmacKey);
         $msgId = substr($largeMsgId, 0, 16);
 
         [$aesKey, $aesIv] = self::aesFromHash($encKey, $msgId);
@@ -156,7 +157,7 @@ final class Crypto
         if ($padded === false) {
             throw new \RuntimeException('Could not decrypt data');
         }
-        $largeMsgId = hash_hmac('sha256', $padded.$extra.pack('V', \strlen($extra)), $hmacKey, true);
+        $largeMsgId = Crypt::hmacSha256($padded.$extra.pack('V', \strlen($extra)), $hmacKey);
         if (!hash_equals(substr($largeMsgId, 0, 16), $msgId)) {
             throw new \RuntimeException('Message id mismatch decrypting data');
         }
@@ -465,12 +466,10 @@ final class Crypto
 
     /**
      * SHA-256, raw bytes.
-     *
-     * @psalm-pure
      */
     public static function sha256(string $data): string
     {
-        return hash('sha256', $data, true);
+        return Crypt::sha256($data);
     }
 
     /**

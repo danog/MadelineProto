@@ -198,7 +198,7 @@ final class EncryptedConnection
         [$aesKey, $aesIv] = Crypt::voipKdf($msgKey, $this->authKey, $x);
         $decrypted = Crypt::ctrEncrypt(substr($data, 16), $aesKey, $aesIv);
 
-        $msgKeyLarge = hash('sha256', substr($this->authKey, 88 + $x, 32).$decrypted, true);
+        $msgKeyLarge = Crypt::sha256(substr($this->authKey, 88 + $x, 32).$decrypted);
         if (!hash_equals(substr($msgKeyLarge, 8, 16), $msgKey)) {
             return null;
         }
@@ -249,7 +249,7 @@ final class EncryptedConnection
         [$aesKey, $aesIv] = Crypt::voipKdf($msgKey, $this->authKey, $x);
         $decrypted = Crypt::ctrEncrypt(substr($data, 16), $aesKey, $aesIv);
 
-        $msgKeyLarge = hash('sha256', substr($this->authKey, 88 + $x, 32).$decrypted, true);
+        $msgKeyLarge = Crypt::sha256(substr($this->authKey, 88 + $x, 32).$decrypted);
         if (!hash_equals(substr($msgKeyLarge, 8, 16), $msgKey)) {
             return [];
         }
@@ -425,7 +425,7 @@ final class EncryptedConnection
     private function encryptPrepared(string $buffer): string
     {
         $x = Crypt::voipX(!$this->outgoing, true);
-        $msgKeyLarge = hash('sha256', substr($this->authKey, 88 + $x, 32).$buffer, true);
+        $msgKeyLarge = Crypt::sha256(substr($this->authKey, 88 + $x, 32).$buffer);
         $msgKey = substr($msgKeyLarge, 8, 16);
         [$aesKey, $aesIv] = Crypt::voipKdf($msgKey, $this->authKey, $x);
         return $msgKey.Crypt::ctrEncrypt($buffer, $aesKey, $aesIv);

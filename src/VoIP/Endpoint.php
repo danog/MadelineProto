@@ -200,7 +200,7 @@ final class Endpoint
             $encrypted_data = $payload->bufferRead($l-($pos+16));
             $packet = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
 
-            if ($message_key != substr(hash('sha256', substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet, true), 8, 16)) {
+            if ($message_key != substr(Crypt::sha256(substr($this->authKey, 88 + ($this->creator ? 8 : 0), 32).$packet), 8, 16)) {
                 Logger::log('msg_key mismatch!', Logger::ERROR);
                 continue;
             }
@@ -429,7 +429,7 @@ final class Endpoint
             $padding += 16;
         }
         $plaintext .= Tools::random($padding);
-        $message_key = substr(hash('sha256', substr($this->authKey, 88 + ($this->creator ? 0 : 8), 32).$plaintext, true), 8, 16);
+        $message_key = substr(Crypt::sha256(substr($this->authKey, 88 + ($this->creator ? 0 : 8), 32).$plaintext), 8, 16);
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->authKey, $this->creator);
         $payload = $message_key.Crypt::igeEncrypt($plaintext, $aes_key, $aes_iv);
 
