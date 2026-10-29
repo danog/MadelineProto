@@ -34,7 +34,7 @@ final class NativeExecutorTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        NativeExecutor::initialize(2, 4 * 1024 * 1024, 1000);
+        NativeExecutor::initialize(2, 4 * 1024 * 1024);
     }
 
     protected function setUp(): void
@@ -130,6 +130,52 @@ final class NativeExecutorTest extends TestCase
         }
         $tail = random_bytes(16);
         self::assertSame($this->reference(implode('', $parts).$tail, $key, $iv), $expected.$cipher->encrypt($tail));
+    }
+
+    public function testIsolatedOperationsDoNotWaitForABatch(): void
+    {
+        $key = random_bytes(32);
+        $iv = random_bytes(32);
+        $plain = random_bytes(4096);
+        $expected = $this->reference($plain, $key, $iv);
+        // After the first measured job, the batching policy probes a width of two: a lone job
+        // must still run immediately instead of waiting for a second one.
+        $start = hrtime(true);
+        for ($i = 0; $i < 100; $i++) {
+            self::assertSame($expected, IGE::getInstance($key, $iv)->encrypt($plain));
+        }
+        self::assertLessThan(0.05, (hrtime(true) - $start) / 1e9, '100 isolated 4 KiB operations take a few milliseconds');
+    }
+
+    public function testInputLargerThanTheQueueLimitUsesAnotherBackend(): void
+    {
+        $key = random_bytes(32);
+        $iv = random_bytes(32);
+        // The queue accounts input, output and the PHP copy: 2 MiB can never fit in 4 MiB.
+        $plain = random_bytes(2 * 1024 * 1024);
+        $cipher = IGE::getInstance($key, $iv);
+        self::assertInstanceOf(IGENative::class, $cipher);
+        self::assertSame($this->reference($plain, $key, $iv), $cipher->encrypt($plain));
+        self::assertNotNull(NativeExecutor::get());
+    }
+
+    public function testShutdownResumesAdmissionWaitersWithAnotherBackend(): void
+    {
+        $executor = NativeExecutor::get();
+        $jobs = [];
+        // The queue takes two jobs: the third waits for admission when the executor closes.
+        for ($i = 0; $i < 3; $i++) {
+            $key = random_bytes(32);
+            $iv = random_bytes(32);
+            $plain = random_bytes(65536);
+            $jobs[] = [$this->reference($plain, $key, $iv), async(IGE::getInstance($key, $iv)->encrypt(...), $plain)];
+        }
+        \Amp\delay(0);
+        $executor->close();
+        self::assertNull(NativeExecutor::get());
+        foreach ($jobs as [$expected, $job]) {
+            self::assertSame($expected, $job->await());
+        }
     }
 
     public function testShutdownCompletesAcceptedWorkAndAllowsSynchronousContinuation(): void

@@ -128,12 +128,15 @@ final class ConnectionCryptoTest extends TestCase
     public static function outgoingChanges(): iterable
     {
         foreach (['reconnect', 'session', 'auth'] as $change) {
-            yield $change => [$change];
+            yield $change => [$change, false];
         }
+        // auth.bindTempAuthKey embeds its msg_id and session: it can't be resent with new ones.
+        yield 'session-bound message, session' => ['session', true];
+        yield 'session-bound message, auth' => ['auth', true];
     }
 
     /** @dataProvider outgoingChanges */
-    public function testUnsentMessagesSurviveConnectionChangesDuringEncryption(string $change): void
+    public function testUnsentMessagesSurviveConnectionChangesDuringEncryption(string $change, bool $sessionBound): void
     {
         NativeExecutor::initialize();
         if (!NativeExecutor::get()) {
@@ -170,7 +173,11 @@ final class ConnectionCryptoTest extends TestCase
         $stream->expects(self::never())->method('getWriteBuffer');
         $connection->stream = $stream;
         $outgoing = $this->getMockBuilder(MTProtoOutgoingMessage::class)->disableOriginalConstructor()
-            ->onlyMethods(['hasBody', 'getSerializedBody', 'hasPromise', 'sent', '__toString'])->getMock();
+            ->onlyMethods(['hasBody', 'getSerializedBody', 'hasPromise', 'sent', 'reply', '__toString'])->getMock();
+        \Closure::bind(static function () use ($outgoing, $sessionBound): void {
+            $outgoing->sessionBound = $sessionBound;
+        }, null, MTProtoOutgoingMessage::class)();
+        $outgoing->expects($sessionBound ? self::once() : self::never())->method('reply');
         $outgoing->constructor = 'test.request';
         $outgoing->contentRelated = true;
         $outgoing->method('hasBody')->willReturn(true);
@@ -200,8 +207,11 @@ final class ConnectionCryptoTest extends TestCase
             }
         });
         $result->await();
-        self::assertSame($change === 'reconnect' ? 12345 : null, $outgoing->getMsgId());
-        self::assertSame($change === 'reconnect' ? 1 : null, $outgoing->getSeqNo());
+        // Unsent messages keep their IDs across a reconnection, and get new ones in a new session
+        // or with a new key, unless they are bound to their session: then they fail instead.
+        $kept = $change === 'reconnect' || $sessionBound;
+        self::assertSame($kept ? 12345 : null, $outgoing->getMsgId());
+        self::assertSame($kept ? 1 : null, $outgoing->getSeqNo());
     }
 
 }

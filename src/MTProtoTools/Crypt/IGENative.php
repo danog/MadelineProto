@@ -62,16 +62,22 @@ final class IGENative extends IGE
                 return '';
             }
             $executor = NativeExecutor::get();
-            if (!$executor) {
-                // The last committed IV is sufficient to continue after executor shutdown.
-                $fallback = IGE::getInstance($this->key, $this->iv);
-                $output = $encrypt ? $fallback->encrypt($data) : $fallback->decrypt($data);
-                $this->iv = $fallback->getState();
-                return $output;
+            if ($executor) {
+                try {
+                    $result = $executor->run(fn (): array => \danog\MadelineProto\Native\Crypto::ige($data, $this->key, $this->iv, $encrypt));
+                    $this->iv = $result[1];
+                    return $result[0];
+                } catch (\Exception $e) {
+                    if (!NativeExecutor::failedWith($e, NativeExecutor::UNAVAILABLE)) {
+                        throw $e;
+                    }
+                }
             }
-            $result = $executor->run(fn (): array => \danog\MadelineProto\Native\Crypto::ige($data, $this->key, $this->iv, $encrypt));
-            $this->iv = $result[1];
-            return $result[0];
+            // The last committed IV is sufficient to continue without the executor.
+            $fallback = IGE::getSyncInstance($this->key, $this->iv);
+            $output = $encrypt ? $fallback->encrypt($data) : $fallback->decrypt($data);
+            $this->iv = $fallback->getState();
+            return $output;
         } finally {
             $lock->release();
         }

@@ -10,7 +10,6 @@ use std::{
     pin::Pin,
     sync::{Arc, Condvar, Mutex},
     thread::{self, JoinHandle},
-    time::{Duration, Instant},
 };
 use tokio::sync::{oneshot, OwnedSemaphorePermit, Semaphore};
 
@@ -30,7 +29,6 @@ struct Job {
     message: Message,
     lease: Lease,
     sender: oneshot::Sender<Reply>,
-    queued: Instant,
 }
 struct Queue {
     jobs: VecDeque<Job>,
@@ -43,7 +41,6 @@ struct Shared {
     bytes: Arc<Semaphore>,
     capacity: usize,
     byte_limit: usize,
-    window: Duration,
 }
 pub struct Executor {
     shared: Arc<Shared>,
@@ -68,13 +65,8 @@ fn cpu_ns() -> u64 {
     time.tv_sec as u64 * 1_000_000_000 + time.tv_nsec as u64
 }
 impl Executor {
-    pub fn new(capacity: usize, byte_limit: usize, window_us: u64) -> Result<Self> {
-        if capacity == 0
-            || capacity > 4096
-            || byte_limit < 4096
-            || byte_limit > u32::MAX as usize
-            || window_us > 1_000_000
-        {
+    pub fn new(capacity: usize, byte_limit: usize) -> Result<Self> {
+        if capacity == 0 || capacity > 4096 || byte_limit < 4096 || byte_limit > u32::MAX as usize {
             return Err("Invalid crypto queue limits".into());
         }
         let shared = Arc::new(Shared {
@@ -87,7 +79,6 @@ impl Executor {
             bytes: Arc::new(Semaphore::new(byte_limit)),
             capacity,
             byte_limit,
-            window: Duration::from_micros(window_us),
         });
         let state = shared.clone();
         let worker = thread::Builder::new()
@@ -155,7 +146,6 @@ impl Executor {
             message,
             lease,
             sender,
-            queued: Instant::now(),
         });
         self.shared.ready.notify_one();
         Ok(receiver)
@@ -195,23 +185,11 @@ fn run(shared: Arc<Shared>) {
             return;
         };
         let group = class(&first.message);
-        let deadline = first.queued + shared.window;
         let policy = policies.entry(group).or_default();
         let target = if hardware { policy.target() } else { 1 };
-        while !q.closed
-            && q.jobs
-                .iter()
-                .filter(|j| class(&j.message) == group)
-                .take(target)
-                .count()
-                < target
-        {
-            let now = Instant::now();
-            if now >= deadline {
-                break;
-            }
-            q = shared.ready.wait_timeout(q, deadline - now).unwrap().0;
-        }
+        // Batch only the jobs already queued, never wait for more: the jobs submitted while
+        // a batch runs form the next one. Waiting would delay every lone job by the whole
+        // window whenever the policy targets more than one, even under no concurrency.
         let mut messages = Vec::with_capacity(target);
         let mut replies = Vec::with_capacity(target);
         let mut i = 0;

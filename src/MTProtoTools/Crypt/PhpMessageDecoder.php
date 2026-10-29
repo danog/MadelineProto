@@ -25,7 +25,7 @@ final class PhpMessageDecoder implements MessageDecoder
             throw new SecurityException('Invalid encrypted transport message size');
         }
         [$key, $iv] = Crypt::kdf($messageKey, $authKey, false);
-        $plain = Crypt::igeDecrypt($ciphertext, $key, $iv);
+        $plain = IGE::getSyncInstance($key, $iv)->decrypt($ciphertext);
         if (!hash_equals($messageKey, substr(Crypt::sha256(substr($authKey, 96, 32).$plain), 8, 16))) {
             throw new SecurityException('msg_key mismatch');
         }

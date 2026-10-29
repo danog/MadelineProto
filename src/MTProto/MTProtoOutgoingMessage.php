@@ -288,6 +288,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         }
         $this->setMsgId(null);
         $this->setSeqNo(null);
+        $this->container = null;
         return true;
     }
     private function check(): void
@@ -568,17 +569,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     {
         \assert($this->resultDeferred !== null);
         return $this->resultDeferred->getFuture();
-    }
-
-    /**
-     * Discard unsent transport metadata prepared for a replaced session or key.
-     * @psalm-external-mutation-free
-     */
-    public function resetForNewSession(): void
-    {
-        $this->msgId = null;
-        $this->seqNo = null;
-        $this->container = null;
     }
 
     /**

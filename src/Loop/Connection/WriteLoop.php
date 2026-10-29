@@ -436,9 +436,10 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                 || $authKey !== $this->shared->auth->getTempAuthKey();
             if ($generation !== $this->connection->getGeneration() || $this->connection->shouldReconnect() || $contextChanged) {
                 if ($contextChanged) {
+                    // The container was never queued; session-bound messages fail, the rest get new IDs.
                     foreach ($messages as $unsent) {
-                        if (!$unsent->hasReply()) {
-                            $unsent->resetForNewSession();
+                        if (!$unsent instanceof Container && !$unsent->hasReply()) {
+                            $unsent->resetForResend();
                         }
                     }
                 }

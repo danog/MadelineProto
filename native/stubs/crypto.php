@@ -9,7 +9,7 @@ final class Crypto
     public static function version(): string
     {
     }
-    public static function init(int $capacity, int $byte_limit, int $window_us): int
+    public static function init(int $capacity, int $byte_limit): int
     {
     }
     public static function available(): bool

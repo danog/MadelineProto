@@ -23,6 +23,11 @@ final class NativeExecutor
     use ForbidCloning;
     use ForbidSerialization;
 
+    /** Exception code of a native operation that was not performed: another backend can perform it. */
+    public const UNAVAILABLE = 1;
+    /** Exception code of a message that failed MTProto validation. */
+    public const INVALID = 2;
+
     private static self|false|null $instance = null;
     /** @var resource */
     private $stream;
@@ -31,18 +36,18 @@ final class NativeExecutor
     private int $active = 0;
     private readonly int $pid;
 
-    public static function initialize(int $capacity = 128, int $byteLimit = 134217728, int $windowUs = 5000): void
+    public static function initialize(int $capacity = 128, int $byteLimit = 134217728): void
     {
         if (self::$instance !== null) {
             return;
         }
         self::$instance = false;
         if (!\extension_loaded('madeline_crypto') || !class_exists(Crypto::class, false)
-            || Crypto::version() !== '0.2.0') {
+            || Crypto::version() !== '0.3.0') {
             return;
         }
         try {
-            $fd = Crypto::init($capacity, $byteLimit, $windowUs);
+            $fd = Crypto::init($capacity, $byteLimit);
             self::$instance = new self($fd);
             register_shutdown_function(self::$instance->close(...));
         } catch (Throwable) {
@@ -61,7 +66,8 @@ final class NativeExecutor
     private function __construct(int $fd)
     {
         $this->pid = getmypid();
-        $stream = @fopen('php://fd/'.$fd, 'r');
+        // A failing fopen throws (warnings throw): initialize() falls back to PHP.
+        $stream = fopen('php://fd/'.$fd, 'r');
         if (!$stream) {
             throw new RuntimeException('Could not open crypto notification stream');
         }
@@ -81,7 +87,7 @@ final class NativeExecutor
     public function run(\Closure $operation): array
     {
         if ($this->closed || $this->pid !== getmypid()) {
-            throw new RuntimeException('Native executor is closed');
+            throw new RuntimeException('Native executor is closed', self::UNAVAILABLE);
         }
         $this->active++;
         EventLoop::reference($this->watcher);
@@ -94,20 +100,30 @@ final class NativeExecutor
         }
     }
 
+    /**
+     * Whether a native operation failed with the given error code.
+     *
+     * Any other error (such as an exception thrown into the suspended caller by the event loop) must propagate.
+     */
+    public static function failedWith(\Throwable $e, int $code): bool
+    {
+        return ($e::class === \Exception::class || $e::class === RuntimeException::class) && $e->getCode() === $code;
+    }
+
     public function close(): void
     {
         if ($this->closed || $this->pid !== getmypid()) {
             return;
         }
         $this->closed = true;
-        Crypto::stop(); // Finish accepted work; wake and reject admission waiters.
-        while ($this->active) {
-            Crypto::wakeup();
-            \Amp\delay(0);
+        // Finishes the accepted work, rejects the admission waiters and resumes the callers
+        // without running the event loop (this is a shutdown function): if it runs again,
+        // they continue, and later operations use the PHP backends.
+        try {
+            Crypto::shutdown();
+        } finally {
+            EventLoop::cancel($this->watcher);
+            fclose($this->stream);
         }
-        Crypto::shutdown();
-        EventLoop::cancel($this->watcher);
-        $stream = $this->stream;
-        fclose($stream);
     }
 }

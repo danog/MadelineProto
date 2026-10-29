@@ -110,7 +110,7 @@ fn policy_can_pass_eight_and_ignores_incomplete_batches() {
 #[test]
 fn accepted_jobs_survive_dropped_receivers_and_shutdown() {
     use crate::executor::Executor;
-    let mut executor = Executor::new(2, 4 * 1024 * 1024, 1000).unwrap();
+    let mut executor = Executor::new(2, 4 * 1024 * 1024).unwrap();
     let first = executor
         .enqueue(
             message(65536, 1, Operation::Encrypt),
@@ -147,7 +147,7 @@ fn reserve_now(executor: &crate::executor::Executor, size: usize) -> crate::exec
 #[test]
 fn memory_pressure_waits_for_result_consumption_and_shutdown_wakes_admission() {
     use crate::executor::{Admission, Executor};
-    let mut executor = Executor::new(4, 256 * 1024, 0).unwrap();
+    let mut executor = Executor::new(4, 256 * 1024).unwrap();
     assert!(executor.reserve(256 * 1024).is_err());
     let first = executor
         .enqueue(

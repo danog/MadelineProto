@@ -276,6 +276,17 @@ final class DataCenterAvailabilityTest extends TestCase
         self::assertNull($connection->stream);
     }
 
+    public function testPartSentWhileTheSharedConnectionReconnectsIsNotRebalanced(): void
+    {
+        $media = self::client(false, false)->datacenter->getDataCenterConnection(-2);
+        $connection = $this->part($media->getConnection())->connection;
+        // A shared reconnection empties the pool until connect() refills it.
+        (new \ReflectionProperty($media, 'connections'))->setValue($media, []);
+        $part = $this->part($connection);
+        self::assertSame($connection, $part->connection);
+        self::assertFalse($part->hasReply());
+    }
+
     private function part(Connection $connection, ?Cancellation $cancellation = null): MTProtoOutgoingMessage
     {
         $message = new MTProtoOutgoingMessage($connection, [], 'upload.getFile', 'upload.File', true, false, SpecialMethodType::FILE_RELATED, $cancellation);

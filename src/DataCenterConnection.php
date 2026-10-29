@@ -516,7 +516,7 @@ final class DataCenterConnection implements SimpleSubscriber
         if ($id >= 0) {
             return $this->connections[$id];
         }
-        if ($this->auth->isMedia || $this->auth->isCdn) {
+        if ($this->connections && ($this->auth->isMedia || $this->auth->isCdn)) {
             $loads = array_map(static fn (Connection $connection): int => $connection->getPendingRequestCount(), $this->connections);
             $min = min($loads);
             if ($min > 0 && \count($loads) < $this->API->getSettings()->getConnection()->getMaxMediaSocketCount()) {

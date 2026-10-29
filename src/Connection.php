@@ -602,7 +602,10 @@ final class Connection
     public function sendMessage(MTProtoOutgoingMessage $message): void
     {
         // A retry with an assigned message ID and sequence number must stay in its original session.
-        if ($message->specialMethodType === SpecialMethodType::FILE_RELATED && !$message->sessionBound && !$message->hasMsgId()) {
+        // There is nothing to balance while the shared connection is reconnecting (no connections).
+        if ($message->specialMethodType === SpecialMethodType::FILE_RELATED && !$message->sessionBound && !$message->hasMsgId()
+            && $this->shared->hasConnection()
+        ) {
             $connection = $this->shared->getConnection();
             if ($connection !== $this) {
                 $connection->sendMessage($message);
