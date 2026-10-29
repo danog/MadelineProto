@@ -108,4 +108,49 @@ final class Mp4Test extends TestCase
             @unlink($file);
         }
     }
+
+    /**
+     * Interleaved audio and video make a sample-to-chunk table about as long as the chunk list: it used to be rescanned
+     * for each chunk, blocking the event loop for minutes before the first frame of a film.
+     */
+    public function testLongSampleToChunkTableIsParsedInLinearTime(): void
+    {
+        exec('ffmpeg -hide_banner -encoders 2>/dev/null', $encoders, $code);
+        if ($code !== 0 || !str_contains(implode("\n", $encoders), 'libx264')) {
+            self::markTestSkipped('ffmpeg with libx264 is needed');
+        }
+        $file = tempnam(sys_get_temp_dir(), 'mp4').'.mp4';
+        try {
+            exec(implode(' ', array_map(escapeshellarg(...), [
+                'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
+                '-f', 'lavfi', '-i', 'testsrc2=size=64x48:rate=25', '-f', 'lavfi', '-i', 'sine=sample_rate=48000',
+                '-t', '1800', '-c:v', 'libx264', '-preset', 'ultrafast', '-g', '250', '-pix_fmt', 'yuv420p',
+                '-c:a', 'aac', '-b:a', '16k', '-movflags', '+faststart', $file,
+            ])), $output, $code);
+            self::assertSame(0, $code, implode("\n", $output));
+            $data = (string) file_get_contents($file);
+            $pos = strpos($data, 'stsc');
+            $entries = 0;
+            for (; $pos !== false; $pos = strpos($data, 'stsc', $pos + 1)) {
+                $entries = max($entries, unpack('N', $data, $pos + 8)[1]);
+            }
+            self::assertGreaterThan(10000, $entries, 'The sample-to-chunk table is too short to tell');
+
+            $start = hrtime(true);
+            $mp4 = new Mp4(new ReadableBuffer($data));
+            $video = 0;
+            foreach ($mp4->frames as $frame) {
+                if ($video === 0) {
+                    // Quadratic, this took about 20 seconds.
+                    self::assertLessThan(2_000_000_000, hrtime(true) - $start, 'The sample tables took too long to parse');
+                }
+                if ($frame['codec'] === 'V_MPEG4/ISO/AVC') {
+                    $video++;
+                }
+            }
+            self::assertSame(1800 * 25, $video);
+        } finally {
+            @unlink($file);
+        }
+    }
 }
