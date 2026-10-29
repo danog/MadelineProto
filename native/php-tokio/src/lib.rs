@@ -1,7 +1,12 @@
 // Derived from php-tokio, Copyright 2023-2024 Daniil Gentili.
 // Modifications Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>.
 // SPDX-License-Identifier: Apache-2.0
-use ext_php_rs::{call_user_func, prelude::*, types::Zval, zend::Function};
+use ext_php_rs::{
+    call_user_func,
+    prelude::*,
+    types::Zval,
+    zend::{ExecutorGlobals, Function},
+};
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -111,15 +116,22 @@ impl EventLoop {
             });
             Ok(id)
         })?;
-        if let Err(error) = waiter.try_call_method("suspend", vec![]) {
-            // The caller can be interrupted by an event-loop error. Detach the
-            // Rust-only future: accepted work still completes and drops safely.
+        // try_call_method returns Ok even when suspend() throws (an event-loop error thrown into
+        // {main}, or the waiting fiber being destroyed at shutdown): the exception is left pending,
+        // so check for it. The caller continues without being resumed: unregister it rather than
+        // keep its suspension until the future completes. The future owns its data, so it is
+        // detached and completes on its own; the error lets the pending exception propagate.
+        let suspended = waiter.try_call_method("suspend", vec![]);
+        if suspended.is_err() || ExecutorGlobals::has_exception() {
             BRIDGE.with_borrow_mut(|b| {
                 if let Some(b) = b.as_mut() {
                     b.suspensions.remove(&id);
                 }
             });
-            return Err(error.into());
+            return Err(match suspended {
+                Err(error) => error.into(),
+                Ok(_) => "Interrupted by an exception".into(),
+            });
         }
         let value = slot.lock().unwrap().take();
         value.ok_or_else(|| "Tokio bridge was shut down before the operation completed".into())
