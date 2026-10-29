@@ -484,6 +484,30 @@ final class Ogg
         const char *opus_get_version_string(void);
     ';
     private static ?FFI $FFI = null;
+
+    /**
+     * libopus' encoder API, through FFI.
+     *
+     * @internal
+     *
+     * @throws Throwable If FFI or libopus is not available.
+     */
+    public static function libopus(): FFI
+    {
+        if (self::$FFI !== null) {
+            return self::$FFI;
+        }
+        foreach (['libopus.so', 'libopus.so.0'] as $k => $lib) {
+            try {
+                return self::$FFI = FFI::cdef(self::CDEF, $lib);
+            } catch (Throwable $e) {
+                if ($k) {
+                    throw $e;
+                }
+            }
+        }
+        throw new AssertionError('Unreachable');
+    }
     /**
      * Converts a file, URL, or stream in WAV format @ 48khz into an OGG audio stream suitable for consumption by MadelineProto's VoIP implementation.
      *
@@ -495,22 +519,7 @@ final class Ogg
         LocalFile|WritableStream $oggOut,
         ?Cancellation $cancellation = null
     ): void {
-        if (isset(self::$FFI)) {
-            $opus = self::$FFI;
-        } else {
-            foreach (['libopus.so', 'libopus.so.0'] as $k => $lib) {
-                try {
-                    $opus = FFI::cdef(self::CDEF, $lib);
-                    self::$FFI = $opus;
-                    break;
-                } catch (Throwable $e) {
-                    if ($k) {
-                        throw $e;
-                    }
-                }
-            }
-        }
-        \assert(isset($opus));
+        $opus = self::libopus();
         $checkErr = static function (int|CData $err) use ($opus): void {
             if ($err instanceof CData) {
                 $err = $err->cdata;
