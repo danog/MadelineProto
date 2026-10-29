@@ -97,6 +97,12 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
     private array $participants = [];
     /** @var array<int, int> Signed source ID => bot API peer ID. */
     private array $sourceToPeer = [];
+    /**
+     * @var array<int, array<int, int>> The retransmission (RTX) SSRC of each video and screen-share SSRC of each
+     *                                  participant that has one (the second source of its FID group), signed, by SSRC,
+     *                                  by bot API peer ID: the SFU resends the lost packets of the stream on it.
+     */
+    private array $retransmission = [];
 
     /** Our own audio source ID, in the signed form used by the API. */
     private int $source = 0;
@@ -526,6 +532,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         }
         $this->participants = [];
         $this->sourceToPeer = [];
+        $this->retransmission = [];
         foreach ($result['participants'] as $participant) {
             $this->applyParticipant($participant);
         }
@@ -604,6 +611,35 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
         $this->syncSources();
     }
 
+    /**
+     * The retransmission SSRC of each video and screen-share SSRC of a participant that has one: from the source
+     * groups of the update, or kept from the previous one for a stream a min update doesn't carry.
+     *
+     * @param array<int, int> $previous
+     *
+     * @return array<int, int> Signed SSRCs, by signed SSRC.
+     *
+     * @psalm-pure
+     */
+    private static function retransmissionSources(array $participant, AbstractGroupCallParticipant $parsed, array $previous): array
+    {
+        $sources = [];
+        foreach (['video', 'presentation'] as $key) {
+            $video = $participant[$key] ?? null;
+            if (!\is_array($video)) {
+                continue;
+            }
+            foreach ($video['source_groups'] ?? [] as $group) {
+                if (($group['semantics'] ?? '') === 'FID' && isset($group['sources'][0], $group['sources'][1])) {
+                    $sources[$group['sources'][0]] = $group['sources'][1];
+                }
+            }
+        }
+        // Only the streams the participant sends (not a paused one, say).
+        $current = array_flip([...$parsed->videoSources, ...$parsed->presentationSources]);
+        return array_intersect_key($sources + $previous, $current);
+    }
+
     private function applyParticipant(array $participant): void
     {
         $peerId = $this->API->getIdInternal($participant['peer']);
@@ -615,6 +651,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             if ($old !== null) {
                 unset($this->sourceToPeer[$old->source], $this->participants[$peerId]);
             }
+            unset($this->retransmission[$peerId]);
             if (($participant['self'] ?? false)
                 && $this->callState === GroupCallState::JOINED
                 && (int) ($participant['source'] ?? 0) === $this->source
@@ -630,6 +667,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             ? LiveStoryParticipant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null)
             : GroupCallParticipant::fromRaw($participant, $peerId, $this->participants[$peerId] ?? null);
         $this->participants[$peerId] = $parsed;
+        $this->retransmission[$peerId] = self::retransmissionSources($participant, $parsed, $this->retransmission[$peerId] ?? []);
         if ($parsed->source !== 0) {
             $this->sourceToPeer[$parsed->source] = $peerId;
             $this->sourcePeers[$parsed->source] = $peerId;
@@ -650,7 +688,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
             return;
         }
         $sources = [];
-        foreach ($this->participants as $participant) {
+        foreach ($this->participants as $peerId => $participant) {
             if ($participant->source !== 0 && $participant->source !== $this->source) {
                 $sources[] = [
                     'audio' => $participant->source,
@@ -659,8 +697,7 @@ final class GroupCallController implements CallControllerInterface, GroupConnect
                     'presentation' => $participant->presentationSources,
                     'videoEndpoint' => $participant->videoEndpoint,
                     'presentationEndpoint' => $participant->presentationEndpoint,
-                    // Participants saved by versions that didn't keep the retransmission sources have none.
-                    'rtx' => $participant->retransmissionSources ?? [],
+                    'rtx' => $this->retransmission[$peerId] ?? [],
                 ];
             }
         }

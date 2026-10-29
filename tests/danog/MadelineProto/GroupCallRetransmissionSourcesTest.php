@@ -17,12 +17,15 @@
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\EventHandler\Calls\GroupCallParticipant;
+use danog\MadelineProto\GroupCall\GroupCallController;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 /**
- * The video sources of a participant, from the source groups of its groupCallParticipantVideo.
+ * The retransmission (RTX) SSRCs of a participant's videos, kept by the controller (not by the participant objects
+ * the event handlers get) from the FID groups of its groupCallParticipantVideo.
  */
-final class GroupCallParticipantTest extends TestCase
+final class GroupCallRetransmissionSourcesTest extends TestCase
 {
     private static function raw(bool $min, ?array $video): array
     {
@@ -40,27 +43,40 @@ final class GroupCallParticipantTest extends TestCase
         ] + ($video === null ? [] : ['video' => $video]);
     }
 
+    /**
+     * @param array<int, int> $previous
+     * @return array<int, int>
+     */
+    private static function sources(array $raw, GroupCallParticipant $parsed, array $previous = []): array
+    {
+        return (new ReflectionMethod(GroupCallController::class, 'retransmissionSources'))->invoke(null, $raw, $parsed, $previous);
+    }
+
     public function testTheRetransmissionSourceOfEachVideoSourceIsKept(): void
     {
-        $participant = GroupCallParticipant::fromRaw(self::raw(false, [
+        $raw = self::raw(false, [
             'endpoint' => 'e',
             'source_groups' => [
                 ['semantics' => 'SIM', 'sources' => [10, 20]],
                 ['semantics' => 'FID', 'sources' => [10, 11]],
                 ['semantics' => 'FID', 'sources' => [20, -21]],
             ],
-        ]), 1);
+        ]);
+        $participant = GroupCallParticipant::fromRaw($raw, 1);
         $this->assertSame([10, 20], $participant->videoSources);
-        $this->assertSame([10 => 11, 20 => -21], $participant->retransmissionSources);
+        $rtx = self::sources($raw, $participant);
+        $this->assertSame([10 => 11, 20 => -21], $rtx);
 
         // A min update without the video keeps the known one, with its retransmission sources.
-        $min = GroupCallParticipant::fromRaw(self::raw(true, null), 1, $participant);
+        $raw = self::raw(true, null);
+        $min = GroupCallParticipant::fromRaw($raw, 1, $participant);
         $this->assertSame([10, 20], $min->videoSources);
-        $this->assertSame([10 => 11, 20 => -21], $min->retransmissionSources);
+        $this->assertSame([10 => 11, 20 => -21], self::sources($raw, $min, $rtx));
 
-        // The video stopping takes them away.
-        $stopped = GroupCallParticipant::fromRaw(self::raw(false, ['endpoint' => 'e', 'paused' => true, 'source_groups' => [['semantics' => 'FID', 'sources' => [10, 11]]]]), 1, $participant);
+        // The video pausing takes them away.
+        $raw = self::raw(false, ['endpoint' => 'e', 'paused' => true, 'source_groups' => [['semantics' => 'FID', 'sources' => [10, 11]]]]);
+        $stopped = GroupCallParticipant::fromRaw($raw, 1, $participant);
         $this->assertSame([], $stopped->videoSources);
-        $this->assertSame([], $stopped->retransmissionSources);
+        $this->assertSame([], self::sources($raw, $stopped, $rtx));
     }
 }
