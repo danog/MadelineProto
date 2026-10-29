@@ -72,7 +72,13 @@ retain their own PHP KDF and verification while using the IGE interface.
 
 Independent chains of the same operation and size bucket are interleaved at each
 AES round. Unequal lengths share their common prefix and finish their short tails
-with the continued IV directly in the original buffers. Hardware AES is detected at runtime (`std::arch` ARM AES /
+with the continued IV directly in the original buffers. Batches of up to three chains, whose
+speed is the latency of one block, keep every XOR off the dependency chain: with a the AES output
+before its last key XOR, y_i = a_i ^ k14 ^ x_{i-1}, so the next block's input
+x_{i+1} ^ y_i ^ k0 = a_i ^ (x_{i+1} ^ x_{i-1} ^ k14 ^ k0) folds into a round key computed from the
+inputs (for encryption, that is CBC over p_i ^ p_{i-2}). Wider batches keep the direct form: the
+AES units are busy anyway, and the folded form's extra XORs and loads cost issue slots.
+Hardware AES is detected at runtime (`std::arch` ARM AES /
 x86 AES-NI); unsupported CPUs use EVP inside the same executor.
 
 Each operation/size bucket starts at width N=1. Complete batches alternate N and

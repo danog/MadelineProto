@@ -42,12 +42,7 @@ mod arch {
             zero(),
         )))
     }
-    #[inline]
-    pub unsafe fn initial(s: V, _k: V) -> V {
-        s
-    }
-    pub const FIRST: usize = 0;
-    pub const LAST: usize = 13;
+    /// A round: AESE/AESD XOR their key first, then (Inv)SubBytes and (Inv)ShiftRows.
     #[target_feature(enable = "aes")]
     pub unsafe fn step(s: V, k: V, enc: bool) -> V {
         if enc {
@@ -56,16 +51,24 @@ mod arch {
             vaesimcq_u8(vaesdq_u8(s, k))
         }
     }
+    /// The last round without its final key XOR.
+    #[target_feature(enable = "aes")]
+    pub unsafe fn last(s: V, k13: V, enc: bool) -> V {
+        if enc {
+            vaeseq_u8(s, k13)
+        } else {
+            vaesdq_u8(s, k13)
+        }
+    }
+    #[inline]
+    pub unsafe fn initial(s: V, _k: V) -> V {
+        s
+    }
+    pub const FIRST: usize = 0;
+    pub const LAST: usize = 13;
     #[target_feature(enable = "aes")]
     pub unsafe fn final_round(s: V, k13: V, k14: V, enc: bool) -> V {
-        xor(
-            if enc {
-                vaeseq_u8(s, k13)
-            } else {
-                vaesdq_u8(s, k13)
-            },
-            k14,
-        )
+        xor(last(s, k13, enc), k14)
     }
 }
 #[cfg(target_arch = "x86_64")]
@@ -97,12 +100,7 @@ mod arch {
             _mm_set1_epi32(w as i32),
         ))) as u32
     }
-    #[inline]
-    pub unsafe fn initial(s: V, k: V) -> V {
-        xor(s, k)
-    }
-    pub const FIRST: usize = 1;
-    pub const LAST: usize = 14;
+    /// A round: AESENC/AESDEC XOR their key last.
     #[target_feature(enable = "aes")]
     pub unsafe fn step(s: V, k: V, enc: bool) -> V {
         if enc {
@@ -111,13 +109,24 @@ mod arch {
             _mm_aesdec_si128(s, k)
         }
     }
+    /// The last round, XORing `k` (the last round key, or anything folded into it).
+    #[target_feature(enable = "aes")]
+    pub unsafe fn last(s: V, k: V, enc: bool) -> V {
+        if enc {
+            _mm_aesenclast_si128(s, k)
+        } else {
+            _mm_aesdeclast_si128(s, k)
+        }
+    }
+    #[inline]
+    pub unsafe fn initial(s: V, k: V) -> V {
+        xor(s, k)
+    }
+    pub const FIRST: usize = 1;
+    pub const LAST: usize = 14;
     #[target_feature(enable = "aes")]
     pub unsafe fn final_round(s: V, _k13: V, k14: V, enc: bool) -> V {
-        if enc {
-            _mm_aesenclast_si128(s, k14)
-        } else {
-            _mm_aesdeclast_si128(s, k14)
-        }
+        last(s, k14, enc)
     }
 }
 use arch::*;
@@ -148,7 +157,128 @@ unsafe fn expand(key: &[u8; 32], round: &mut [V], lane: usize, stride: usize, en
     }
     words.zeroize();
 }
-macro_rules! body {
+// IGE: y_i = AES(x_i ^ y_{i-1}) ^ x_{i-1}, with x the input and y the output blocks (p and c when
+// encrypting, c and p when decrypting), and the IV holding y_0 and x_0 in this order of direction.
+// Each chain is serial: its speed is the latency of one block, so every XOR is kept off the dependency
+// chain by folding it into a round key computed from the inputs. Writing a for the AES output before
+// its last key XOR, y_i = a_i ^ k14 ^ x_{i-1}, so the next block's input is
+// x_{i+1} ^ y_i ^ k0 = a_i ^ (x_{i+1} ^ x_{i-1} ^ k14 ^ k0): for encryption, CBC over p_i ^ p_{i-2}.
+// That key is passed to the first round on ARM (AESE XORs its key first) and to the last one on x86
+// (AESENCLAST XORs it last). Chains are interleaved at each round to fill the AES pipeline.
+// Folding pays off while few chains run: then their latency is the bottleneck. With more chains
+// the AES units are busy anyway, and the extra XORs and loads only take issue slots (on an M1, the
+// folded kernel is 15-20% faster at widths 1-3 and slower at 4-6): wider batches XOR on the chain.
+const FOLDED_WIDTH: usize = 3;
+// Per chain, only three vectors live across blocks (the AES pipeline is filled by interleaving
+// chains, so registers are scarce): the chained state and the last two input blocks.
+#[cfg(target_arch = "aarch64")]
+macro_rules! folded {
+    ($jobs:ident,$round:ident,$carry:ident,$previous_in:ident,$older_in:ident,$n:expr,$enc:ident,$size:ident,$start:ident) => {{
+        let n = $n;
+        if $start < $size {
+            for c in 0..n {
+                // a_0 = y_0 ^ k14, taking x_{-1} = 0.
+                $carry[c] = xor(
+                    load($jobs[c].iv.as_ptr().add(if $enc { 0 } else { 16 })),
+                    $round[14 * n + c],
+                );
+                $previous_in[c] = load($jobs[c].iv.as_ptr().add(if $enc { 16 } else { 0 }));
+                $older_in[c] = zero();
+            }
+            for offset in ($start..$size).step_by(16) {
+                for c in 0..n {
+                    let input = load($jobs[c].input.as_ptr().add(offset));
+                    let key = xor(xor(input, $older_in[c]), $round[15 * n + c]);
+                    $carry[c] = step($carry[c], key, $enc);
+                    $older_in[c] = $previous_in[c];
+                    $previous_in[c] = input;
+                }
+                for r in 1..13 {
+                    for c in 0..n {
+                        $carry[c] = step($carry[c], $round[r * n + c], $enc);
+                    }
+                }
+                for c in 0..n {
+                    $carry[c] = last($carry[c], $round[13 * n + c], $enc);
+                    // The output block, off the chain: a_i ^ k14 ^ x_{i-1}.
+                    store(
+                        $jobs[c].output.as_mut_ptr().add(offset),
+                        xor($carry[c], xor($round[14 * n + c], $older_in[c])),
+                    );
+                }
+            }
+            for c in 0..n {
+                let output = xor($carry[c], xor($round[14 * n + c], $older_in[c]));
+                store(
+                    $jobs[c].iv.as_mut_ptr().add(if $enc { 0 } else { 16 }),
+                    output,
+                );
+                store(
+                    $jobs[c].iv.as_mut_ptr().add(if $enc { 16 } else { 0 }),
+                    $previous_in[c],
+                );
+            }
+        }
+    }};
+}
+#[cfg(target_arch = "x86_64")]
+macro_rules! folded {
+    ($jobs:ident,$round:ident,$carry:ident,$previous_in:ident,$current_in:ident,$n:expr,$enc:ident,$size:ident,$start:ident) => {{
+        let n = $n;
+        if $start < $size {
+            for c in 0..n {
+                // The carry is the state entering round 1: x_i ^ y_{i-1} ^ k0.
+                $current_in[c] = load($jobs[c].input.as_ptr().add($start));
+                $carry[c] = xor(
+                    xor(
+                        $current_in[c],
+                        load($jobs[c].iv.as_ptr().add(if $enc { 0 } else { 16 })),
+                    ),
+                    $round[c],
+                );
+                $previous_in[c] = load($jobs[c].iv.as_ptr().add(if $enc { 16 } else { 0 }));
+            }
+            for offset in ($start..$size).step_by(16) {
+                for r in 1..14 {
+                    for c in 0..n {
+                        $carry[c] = step($carry[c], $round[r * n + c], $enc);
+                    }
+                }
+                // The next input block (none after the last one: that output is unused).
+                let next = offset + 16 < $size;
+                for c in 0..n {
+                    let input = if next {
+                        load($jobs[c].input.as_ptr().add(offset + 16))
+                    } else {
+                        zero()
+                    };
+                    let key = xor(xor(input, $previous_in[c]), $round[15 * n + c]);
+                    $carry[c] = last($carry[c], key, $enc);
+                    // The output block, off the chain: the next carry ^ x_{i+1} ^ k0.
+                    store(
+                        $jobs[c].output.as_mut_ptr().add(offset),
+                        xor(xor($carry[c], input), $round[c]),
+                    );
+                    $previous_in[c] = $current_in[c];
+                    $current_in[c] = input;
+                }
+            }
+            for c in 0..n {
+                // After the last block, x_{i+1} = 0: the output is the carry ^ k0.
+                store(
+                    $jobs[c].iv.as_mut_ptr().add(if $enc { 0 } else { 16 }),
+                    xor($carry[c], $round[c]),
+                );
+                store(
+                    $jobs[c].iv.as_mut_ptr().add(if $enc { 16 } else { 0 }),
+                    $previous_in[c],
+                );
+            }
+        }
+    }};
+}
+// The direct form, for wider batches: y_i = AES(x_i ^ y_{i-1}) ^ x_{i-1}.
+macro_rules! chained {
     ($jobs:ident,$round:ident,$previous_out:ident,$previous_in:ident,$input:ident,$state:ident,$n:expr,$enc:ident,$size:ident,$start:ident) => {{
         let n = $n;
         for c in 0..n {
@@ -194,21 +324,14 @@ unsafe fn kernel<const N: usize>(
     start: usize,
 ) {
     let jobs: &mut [Message; N] = jobs.try_into().expect("fixed batch width mismatch");
-    let round = &round[..15 * N];
+    let round = &round[..16 * N];
     let mut buffers = [[zero(); N]; 4];
-    let [previous_out, previous_in, input, state] = &mut buffers;
-    body!(
-        jobs,
-        round,
-        previous_out,
-        previous_in,
-        input,
-        state,
-        N,
-        enc,
-        size,
-        start
-    );
+    let [a, b, c, d] = &mut buffers;
+    if N <= FOLDED_WIDTH {
+        folded!(jobs, round, a, b, c, N, enc, size, start);
+    } else {
+        chained!(jobs, round, a, b, c, d, N, enc, size, start);
+    }
     wipe(buffers.as_flattened_mut());
 }
 unsafe fn wipe(v: &mut [V]) {
@@ -218,21 +341,14 @@ unsafe fn wipe(v: &mut [V]) {
 unsafe fn dynamic(jobs: &mut [Message], round: &[V], enc: bool, size: usize, start: usize) {
     let n = jobs.len();
     let mut buffers = vec![zero(); 4 * n];
-    let (previous_out, rest) = buffers.split_at_mut(n);
-    let (previous_in, rest) = rest.split_at_mut(n);
-    let (input, state) = rest.split_at_mut(n);
-    body!(
-        jobs,
-        round,
-        previous_out,
-        previous_in,
-        input,
-        state,
-        n,
-        enc,
-        size,
-        start
-    );
+    let (a, rest) = buffers.split_at_mut(n);
+    let (b, rest) = rest.split_at_mut(n);
+    let (c, d) = rest.split_at_mut(n);
+    if n <= FOLDED_WIDTH {
+        folded!(jobs, round, a, b, c, n, enc, size, start);
+    } else {
+        chained!(jobs, round, a, b, c, d, n, enc, size, start);
+    }
     wipe(&mut buffers);
 }
 #[target_feature(enable = "aes")]
@@ -243,9 +359,11 @@ pub unsafe fn batch(jobs: &mut [Message], start: usize) {
     let n = jobs.len();
     let enc = jobs[0].operation == Operation::Encrypt;
     let common = jobs.iter().map(|j| j.input.len()).min().unwrap();
-    let mut round = vec![zero(); 15 * n];
+    // The 15 round keys of each chain, then k14 ^ k0 (folded into the chained state).
+    let mut round = vec![zero(); 16 * n];
     for (c, job) in jobs.iter().enumerate() {
         expand(&job.key, &mut round, c, n, enc);
+        round[15 * n + c] = xor(round[14 * n + c], round[c]);
     }
     #[cfg(feature = "const-widths")]
     {
