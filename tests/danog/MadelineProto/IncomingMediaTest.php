@@ -98,6 +98,22 @@ final class IncomingMediaTest extends TestCase
         ], $this->events);
     }
 
+    /** A codec switch on the same source (told by the payload type of the frames) is reported once its keyframe arrives. */
+    public function testACodecChangeOnTheSameSourceIsReported(): void
+    {
+        $this->media->setExpected(audio: false, video: true, presentation: false);
+        $this->media->pushVideoFrame(self::vp8(true), 0, 10, codecId: 'V_VP8');
+        $this->media->pushVideoFrame(self::vp8(false), 3000, 10, codecId: 'V_VP8');
+        $this->media->pushVideoFrame("\x86\x00\x40\x92".str_repeat('v', 20), 6000, 10, codecId: 'V_VP9'); // no keyframe yet
+        $this->media->pushVideoFrame("\x82\x49\x83\x42\x00\x01\x3f\x00\xb3".str_repeat('v', 30), 9000, 10, codecId: 'V_VP9');
+        $this->media->pushVideoFrame("\x86\x00\x40\x92".str_repeat('v', 20), 12000, 10, codecId: 'V_VP9');
+        $this->assertSame([
+            [CallStream::VIDEO, [], null, null],
+            [CallStream::VIDEO, [CallStream::VIDEO => 'V_VP8'], null, null],
+            [CallStream::VIDEO, [CallStream::VIDEO => 'V_VP9'], null, null],
+        ], $this->events);
+    }
+
     public function testRecordingEventsCarryTheFile(): void
     {
         $this->media->setExpected(audio: true, video: false, presentation: false);

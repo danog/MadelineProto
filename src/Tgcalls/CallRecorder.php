@@ -324,8 +324,11 @@ final class CallRecorder
      * @param int    $source       Identifies the track the frame belongs to; a new source is placed on
      *                             the recording's clock where it currently is.
      * @param int    $slot         Whether this is the camera ({@see CallStream::VIDEO}) or the screen share ({@see CallStream::SCREEN}).
+     * @param ?string $codecId     The Matroska codec ID of the frame, if known (from the payload type it arrived with,
+     *                             see {@see self::codecIdOf()}): a sender can switch codec on the same source, which
+     *                             is then described afresh, like a new source. Sniffed from the bitstream otherwise.
      */
-    public function pushVideoFrame(string $data, int $rtpTimestamp, int $source = 0, int $slot = CallStream::VIDEO): void
+    public function pushVideoFrame(string $data, int $rtpTimestamp, int $source = 0, int $slot = CallStream::VIDEO, ?string $codecId = null): void
     {
         if ($this->closed || $data === '') {
             return;
@@ -334,10 +337,11 @@ final class CallRecorder
         if ($this->expected[$slot] === false || !$this->wanted($slot)) {
             return; // Signaling says this stream is off (a straggler), or it is not recorded.
         }
-        $newSource = ($this->sources[$slot] ?? null) !== $source;
+        $newSource = ($this->sources[$slot] ?? null) !== $source
+            || ($codecId !== null && isset($this->described[$slot]) && $this->described[$slot]['codecId'] !== $codecId);
         $ms = $this->placeOnClock($slot, $source, $rtpTimestamp, 90000);
 
-        [$out, $keyframe] = self::transformVideo($data, $newSource ? null : ($this->described[$slot]['codecId'] ?? null));
+        [$out, $keyframe] = self::transformVideo($data, $codecId ?? ($newSource ? null : ($this->described[$slot]['codecId'] ?? null)));
         if ($out === '') {
             return;
         }
@@ -788,6 +792,24 @@ final class CallRecorder
         }
         // Unknown: default to VP8 with a common size so the file is still valid.
         return ['V_VP8', 1280, 720, ''];
+    }
+
+    /**
+     * The Matroska codec ID of a received frame's codec, from the MIME type of its payload type
+     * ({@see \Webrtc\Codecs\EncodedPacket::getMimeType()}), if it is a video codec we record.
+     *
+     * @psalm-pure
+     */
+    public static function codecIdOf(?string $mimeType): ?string
+    {
+        return match ($mimeType === null ? null : strtolower($mimeType)) {
+            'video/vp8' => 'V_VP8',
+            'video/vp9' => 'V_VP9',
+            'video/av1' => 'V_AV1',
+            'video/h264' => 'V_MPEG4/ISO/AVC',
+            'video/h265' => 'V_MPEGH/ISO/HEVC',
+            default => null,
+        };
     }
 
     /**

@@ -558,7 +558,7 @@ final class Controller implements VideoCodecObserver, SignalingServiceObserver, 
                     $this->incomingVideoTracks[$index]['target'] = $target;
                     $this->call->log("The incoming video track $source of {$this->call} is the peer's ".CallStream::NAMES[$target], Logger::VERBOSE);
                 }
-                $this->media->pushVideoFrame($data, $frame->getTimestamp(), $source, $target);
+                $this->media->pushVideoFrame($data, $frame->getTimestamp(), $source, $target, CallRecorder::codecIdOf($frame->getMimeType()));
             }
         });
     }

@@ -181,6 +181,54 @@ final class CallRecorderSegmentsTest extends TestCase
         $this->assertSame(1, self::describe($this->segment(1, 'video'))['frames']);
     }
 
+    /** A 32x32 H.264 keyframe (SPS, PPS and IDR slice, with start codes) and the inter frame after it. */
+    private const H264_KEYFRAME = '000000016742c00ad9096c0440000003004000000f03c489920000000168cb83cb200000016588840af118a00024031c00043ae3800097c49d75e0';
+    private const H264_INTER = '00000001419a3813e580';
+
+    /**
+     * @return list<array{codec: string, keyframe: bool}>
+     */
+    private static function frames(string $path): array
+    {
+        $frames = [];
+        foreach ((new Matroska(new LocalFile($path), null))->frames as $frame) {
+            $frames[] = ['codec' => $frame['codec'], 'keyframe' => $frame['keyframe']];
+        }
+        return $frames;
+    }
+
+    /**
+     * A sender can switch codec on the same SSRC (as MadelineProto itself does in group calls, when the next file
+     * has another video codec): the codec of the payload type of the frames is what tells, as an inter frame of one
+     * codec can look like another's. The frames of the new codec go into a new segment, parsed as what they are.
+     */
+    public function testCodecChangeOnTheSameSourceStartsANewSegment(): void
+    {
+        $recorder = CallRecorder::series(new LocalFile($this->base), RecordingFormat::Mkv);
+        $recorder->setExpected(audio: false, video: true, presentation: false);
+        $recorder->pushVideoFrame(self::vp9(true), 0, 1, codecId: 'V_VP9');
+        $recorder->pushVideoFrame(self::vp9(false), 3000, 1, codecId: 'V_VP9');
+        $recorder->pushVideoFrame(hex2bin(self::H264_KEYFRAME), 6000, 1, codecId: 'V_MPEG4/ISO/AVC');
+        $this->assertFileExists($this->segment(1, 'video'));
+        $recorder->pushVideoFrame(hex2bin(self::H264_INTER), 9000, 1, codecId: 'V_MPEG4/ISO/AVC');
+        $recorder->close();
+        $this->assertSame([['codec' => 'V_VP9', 'keyframe' => true], ['codec' => 'V_VP9', 'keyframe' => false]], self::frames($this->segment(0, 'video')));
+        $this->assertSame([['codec' => 'V_MPEG4/ISO/AVC', 'keyframe' => true], ['codec' => 'V_MPEG4/ISO/AVC', 'keyframe' => false]], self::frames($this->segment(1, 'video')));
+    }
+
+    /** A single-file recording can't change codec either: it's finished, rather than given frames of another codec. */
+    public function testCodecChangeOnTheSameSourceFinishesAFixedRecording(): void
+    {
+        $recorder = CallRecorder::fixed(new LocalFile($this->base), RecordingFormat::Mkv, CallStream::VIDEO);
+        $recorder->setExpected(audio: false, video: true, presentation: false);
+        $recorder->pushVideoFrame(self::vp9(true), 0, 1, codecId: 'V_VP9');
+        $recorder->pushVideoFrame(self::vp9(false), 3000, 1, codecId: 'V_VP9');
+        $recorder->pushVideoFrame(hex2bin(self::H264_KEYFRAME), 6000, 1, codecId: 'V_MPEG4/ISO/AVC');
+        $recorder->pushVideoFrame(hex2bin(self::H264_INTER), 9000, 1, codecId: 'V_MPEG4/ISO/AVC');
+        $recorder->close();
+        $this->assertSame([['codec' => 'V_VP9', 'keyframe' => true], ['codec' => 'V_VP9', 'keyframe' => false]], self::frames($this->base));
+    }
+
     public function testDirectoryStemAndNothingRecorded(): void
     {
         $dir = sys_get_temp_dir().'/rec_'.bin2hex(random_bytes(4)).'/';
