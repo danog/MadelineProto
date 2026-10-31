@@ -138,12 +138,10 @@ abstract class Serialization
         });
         EventLoop::unreference($warningId);
 
-        $lightState = null;
         $cancelFlock = new DeferredCancellation;
         $cancelIpc = new DeferredFuture;
         // Cancelled once we stop waiting for the lock
         $lockWait = new DeferredCancellation;
-        $canContinue = true;
         $ipcSocket = null;
         // For IPC workers: true if the lock holder serves the session, false if it didn't for WORKER_LOCK_TIMEOUT seconds
         $alreadyServed = null;
@@ -155,41 +153,23 @@ abstract class Serialization
             }
         };
         if (!$forceFull) {
-            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$canContinue, &$ipcSocket, &$lightState): void {
-                if ($lockWait->isCancelled()) {
-                    return;
-                }
-                $lightStateRead = async(static function () use ($session, $cancelFull, &$canContinue, &$lightState): void {
+            // The lock holder is an instance that serves (or will serve) the session once it's loaded, or a client
+            // that releases the lock in a moment: connect as soon as the holder listens, however long it takes to
+            // load the session, unless we get the lock first.
+            // Also when the session has an event handler whose class this script lacks: the holder may be the event
+            // handler, serving the session; if we get the lock instead, the light state check below reports it.
+            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$ipcSocket): void {
+                while (!$lockWait->isCancelled()) {
+                    Logger::log('MadelineProto is starting, please wait...');
+                    if ($socket = self::connectIfListening($session->getIpcPath())) {
+                        $ipcSocket = [$socket, null];
+                        $cancelFull();
+                        return;
+                    }
                     try {
-                        $lightState = $session->getLightState();
-                        if (!$lightState->canStartIpc()) {
-                            $canContinue = false;
-                            $cancelFull();
-                        }
-                    } catch (Throwable) {
-                        $lightState = false;
+                        delay(1.0, true, $lockWait->getCancellation());
+                    } catch (CancelledException) {
                     }
-                });
-                try {
-                    // The lock holder is an instance that serves (or will serve) the session once it's loaded, or a
-                    // client that releases the lock in a moment: connect as soon as the holder listens, however
-                    // long it takes to load the session, unless we get the lock first.
-                    while (!$lockWait->isCancelled()) {
-                        Logger::log('MadelineProto is starting, please wait...');
-                        if ($socket = self::connectIfListening($session->getIpcPath())) {
-                            $ipcSocket = [$socket, null];
-                            $cancelFull();
-                            return;
-                        }
-                        try {
-                            delay(1.0, true, $lockWait->getCancellation());
-                        } catch (CancelledException) {
-                        }
-                    }
-                } finally {
-                    // Its result is used once we get the lock, and it must not outlive this call: at shutdown,
-                    // ext-uv runs the callbacks of the file operations still in flight on its destroyed loop.
-                    $lightStateRead->await();
                 }
             };
         } elseif (Magic::$isIpcWorker) {
@@ -270,19 +250,15 @@ abstract class Serialization
             if ($alreadyServed === false) {
                 throw new AlreadyServedException("Another process holds the lock of the session {$session->getSessionDirectoryPath()} without serving it for ".self::WORKER_LOCK_TIMEOUT." seconds");
             }
-            return $ipcSocket;
-        }
-        if (!$canContinue) { // Have lock, can't use it
-            Logger::log("Session has event handler, but it's not started.", Logger::ERROR);
-            Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
-            Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
-            $unlock();
+            // Only cancelled once connected to the server
+            \assert($ipcSocket !== null);
             return $ipcSocket;
         }
 
         try {
-            $lightState ??= $session->getLightState();
+            $lightState = $session->getLightState();
         } catch (Throwable) {
+            $lightState = null;
         }
 
         \assert($lightState === null || $lightState instanceof LightState);
