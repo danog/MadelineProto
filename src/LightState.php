@@ -45,14 +45,6 @@ final class LightState
     }
 
     /**
-     * Check whether we can start IPC.
-     */
-    public function canStartIpc(): bool
-    {
-        return !$this->eventHandler || class_exists($this->eventHandler);
-    }
-
-    /**
      * Get event handler class name.
      *
      * @return null|class-string<EventHandler>
