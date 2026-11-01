@@ -73,9 +73,9 @@ final class PingLoop extends Loop implements SimpleSubscriber, EphemeralSubscrib
     /**
      * Signal that the socket (re)connected.
      *
-     * ping_delay_disconnect only applies to the connection it is sent on, and connections without one get closed by
-     * the server (busy sockets to media DCs, every few seconds). The loop is stopped on disconnection, and was only
-     * started again by the state changes of the auth key, so reconnected sockets weren't pinged anymore.
+     * ping_delay_disconnect only applies to the connection it is sent on, so a new connection must be pinged again.
+     * The loop is stopped on disconnection, and since 810712168 connect() didn't start it anymore (only the state
+     * changes of the auth key did), so reconnected sockets weren't pinged.
      */
     public function onConnect(): void
     {

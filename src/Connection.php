@@ -301,8 +301,7 @@ final class Connection
                             $this->flush(true); // Flush acks
                         }
                     }, "Handler loop");
-                    // Media DCs drop busy sockets without ping_delay_disconnect; CDN DCs don't support pings.
-                    if (!isset($this->pinger) && !$this->shared->auth->isCdn && !$this->isHttp()) {
+                    if (!isset($this->pinger) && !$this->shared->auth->isMedia && !$this->shared->auth->isCdn && !$this->isHttp()) {
                         $this->pinger = new PingLoop($this);
                     }
                     foreach ($this->unencrypted_new_outgoing as $message) {
