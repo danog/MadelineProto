@@ -159,7 +159,7 @@ trait CallHandler
             return $this->API->methodCallAsyncWrite($method, $args, $args['id']['dc_id']);
         }
         $special = $args['specialMethodType'] ?? null;
-        if ($special === SpecialMethodType::FILE_RELATED
+        if (($special === SpecialMethodType::FILE_RELATED || $special === SpecialMethodType::GROUP_CALL_FILE_RELATED)
             && !$this->shared->auth->isMedia
             && !$this->shared->auth->isCdn
             && $this->API->datacenter->has(-$this->datacenter)
@@ -167,7 +167,7 @@ trait CallHandler
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
         }
-        if ($special === SpecialMethodType::FILE_RELATED && ($args['fileWindow'] ?? true)) {
+        if ($special === SpecialMethodType::FILE_RELATED) {
             // Sent on the socket of the DC with the fewest file requests in flight, once one has room for it.
             $connection = $this->shared->waitGetFileConnection($cancellation);
             $start = hrtime(true);
