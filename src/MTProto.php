@@ -2222,9 +2222,11 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!$this->admins) {
             return [];
         }
-        // Convert (and upload) once: a ReadableStream can only be uploaded once
+        // Convert (and upload) once: a ReadableStream can only be uploaded once. Files are uploaded for the first
+        // admin (bots can't upload media without a chat), and the uploaded media can be sent to the others too.
         $message = $this->toInputRichMessage(
             InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+            $this->admins[0],
             cancellation: $cancellation,
         );
         $result = [];

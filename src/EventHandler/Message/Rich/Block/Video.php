@@ -26,10 +26,6 @@ final class Video extends Block
         Caption|RichText|string|null $caption = null,
         /** Whether the video is covered by a spoiler */
         public readonly bool $spoiler = false,
-        /** Whether the video plays automatically */
-        public readonly bool $autoplay = false,
-        /** Whether the video is looped */
-        public readonly bool $loop = false,
     ) {
         $this->caption = Caption::from($caption);
     }

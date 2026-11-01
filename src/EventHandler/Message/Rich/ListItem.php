@@ -35,7 +35,7 @@ final class ListItem implements JsonSerializable
         public readonly ?ListLabelType $type = null,
         /** Numeric value of the item of an ordered list */
         public readonly ?int $value = null,
-        /** Custom label of the item of an ordered list, null to use the label of its value */
+        /** Label of the item of an ordered list as received from Telegram, if any: ignored when sending, since Telegram computes the labels from the values */
         public readonly ?string $label = null,
     ) {
         $this->blocks = \is_array($blocks) ? $blocks : [new Paragraph($blocks)];

@@ -1868,6 +1868,12 @@ trait FilesAbstraction
                 default => 'inputMediaDocument',
             };
             $media['id'] = $reuseId;
+        } elseif ($type === Photo::class && $media['file'] instanceof ReadableStream) {
+            // A stream of unknown length is uploaded as a big file (inputFileBig), and photos must be small files
+            // (inputFile, up to 10 MB): Telegram refuses big ones with PHOTO_SAVE_FILE_INVALID. Buffer the photo to
+            // upload it with its size.
+            $data = buffer($media['file'], $cancellation, 10 * 1024 * 1024);
+            $media['file'] = $this->uploadFromStream(new ReadableBuffer($data), \strlen($data), null, $fileName ?? '', $callback, cancellation: $cancellation);
         } elseif (!\is_array($media['file'])) {
             $media['file'] = $this->upload($media['file'], $fileName ?? '', $callback, cancellation: $cancellation);
         }

@@ -26,10 +26,6 @@ final class Animation extends Block
         Caption|RichText|string|null $caption = null,
         /** Whether the animation is covered by a spoiler */
         public readonly bool $spoiler = false,
-        /** Whether the animation plays automatically */
-        public readonly bool $autoplay = true,
-        /** Whether the animation is looped */
-        public readonly bool $loop = true,
     ) {
         $this->caption = Caption::from($caption);
     }
