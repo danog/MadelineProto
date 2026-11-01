@@ -14,7 +14,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\RichMessage;
+namespace danog\MadelineProto\TL\Conversion\Rich;
 
 use Closure;
 use danog\MadelineProto\EventHandler\Message\Entities\FormattedDate;
@@ -214,11 +214,15 @@ final class OutputConverter
             $type => $wrapped,
             ...$this->caption($block['caption']),
         ];
-        if ($block['autoplay'] ?? false) {
-            $result['need_autoplay'] = true;
+        // Only when they differ from what TDLib (and InputConverter) assumes: animations autoplay and loop, videos don't
+        $default = $type === 'animation';
+        $autoplay = (bool) ($block['autoplay'] ?? false);
+        $loop = (bool) ($block['loop'] ?? false);
+        if ($autoplay !== $default) {
+            $result['need_autoplay'] = $autoplay;
         }
-        if ($type === 'video' && ($block['loop'] ?? false)) {
-            $result['is_looped'] = true;
+        if ($loop !== $default) {
+            $result['is_looped'] = $loop;
         }
         if ($block['spoiler'] ?? false) {
             $result['has_spoiler'] = true;

@@ -77,6 +77,7 @@ use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\Conversion\BotAPI;
 use danog\MadelineProto\TL\Conversion\BotAPIFiles;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 use danog\MadelineProto\TL\Conversion\TD;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\TL\TLCallback;
@@ -2197,7 +2198,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      * @param boolean       $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean       $background   Send this message as background message
      * @param boolean       $clearDraft   Clears the draft field
-     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
+     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); uploaded once for all admins.
      * @param boolean       $rtl          Whether the text is right-to-left
      * @param boolean       $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation $cancellation Cancellation
@@ -2218,21 +2219,25 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         bool $noAutolink = false,
         ?Cancellation $cancellation = null
     ): array {
+        if (!$this->admins) {
+            return [];
+        }
+        // Convert (and upload) once: a ReadableStream can only be uploaded once
+        $message = $this->toInputRichMessage(
+            InputConverter::fromParameters($message, $parseMode, $media, $rtl, $noAutolink),
+            cancellation: $cancellation,
+        );
         $result = [];
         foreach ($this->admins as $report) {
             $result []= $this->sendRichMessage(
                 peer: $report,
                 message: $message,
-                parseMode: $parseMode,
                 replyMarkup: $replyMarkup,
                 scheduleDate: $scheduleDate,
                 silent: $silent,
                 noForwards: $noForwards,
                 background: $background,
                 clearDraft: $clearDraft,
-                media: $media,
-                rtl: $rtl,
-                noAutolink: $noAutolink,
                 cancellation: $cancellation
             );
         }

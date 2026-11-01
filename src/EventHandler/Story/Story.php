@@ -30,9 +30,9 @@ use danog\MadelineProto\EventHandler\Privacy\RuleDestination;
 use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 
 /**
  * Represents a Telegram story.

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use danog\DialogId\DialogId;
 use danog\MadelineProto\APIWrapper;
 use danog\MadelineProto\EventHandler\AbstractMessage;
+use danog\MadelineProto\EventHandler\Filter\Filter;
 use danog\MadelineProto\EventHandler\Filter\FilterRegex;
+use danog\MadelineProto\EventHandler\Filter\FilterRichMessage;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
@@ -20,17 +23,18 @@ use danog\MadelineProto\EventHandler\Message\PrivateMessage;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Query\ChatTrait;
 use danog\MadelineProto\EventHandler\Query\InlineTrait;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsRichMessage;
 use danog\MadelineProto\EventHandler\Story\Story;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RemoteUrl;
-use danog\MadelineProto\RichMessage\InputConverter;
-use danog\MadelineProto\RichMessage\OutputConverter;
 use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as LoggerSettings;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
+use danog\MadelineProto\TL\Conversion\Rich\OutputConverter;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -65,11 +69,11 @@ class RichMessageTest extends TestCase
     {
         $file = new RemoteUrl('https://example.com/a.jpg');
         $this->assertSame(['markdown' => '*a*', 'media' => ['x' => $file]], InputConverter::fromParameters('*a*', RichParseMode::MARKDOWN, ['x' => $file], false, false));
-        $this->assertSame(['html' => '<b>a</b>', 'media' => [], 'is_rtl' => true, 'skip_entity_detection' => true], InputConverter::fromParameters('<b>a</b>', RichParseMode::HTML, [], true, true));
+        $this->assertSame(['html' => '<b>a</b>', 'is_rtl' => true, 'skip_entity_detection' => true], InputConverter::fromParameters('<b>a</b>', RichParseMode::HTML, [], true, true));
         $this->assertSame(['blocks' => [['type' => 'paragraph', 'text' => '*a*']]], InputConverter::fromParameters('*a*', RichParseMode::TEXT, [], false, false));
-        $this->assertSame(['blocks' => [['type' => 'divider']]], InputConverter::fromParameters([['type' => 'divider']], RichParseMode::MARKDOWN, [], false, false));
-        $this->assertSame(['blocks' => [['type' => 'divider']], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([['type' => 'divider']], true), RichParseMode::MARKDOWN, [], false, false));
-        $this->assertSame(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a', 'rtl' => true], InputConverter::fromParameters(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'], RichParseMode::MARKDOWN, [], true, false));
+        $this->assertSame(['blocks' => [['type' => 'divider']]], InputConverter::fromParameters([['type' => 'divider']], RichParseMode::TEXT, [], false, false));
+        $this->assertSame(['blocks' => [['type' => 'divider']], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([['type' => 'divider']], true), RichParseMode::TEXT, [], false, false));
+        $this->assertSame(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a', 'rtl' => true], InputConverter::fromParameters(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'], RichParseMode::TEXT, [], true, false));
     }
 
     public function testMarkdownAndHtml(): void
@@ -489,7 +493,7 @@ class RichMessageTest extends TestCase
                 ]],
                 ['type' => 'photo', 'photo' => ['photo' => 1], 'caption' => ['text' => 'cap'], 'has_spoiler' => true],
                 ['type' => 'unknown'],
-                ['type' => 'animation', 'animation' => ['animation' => 2], 'need_autoplay' => true],
+                ['type' => 'animation', 'animation' => ['animation' => 2]],
                 ['type' => 'video', 'video' => ['video' => 3], 'need_autoplay' => true, 'is_looped' => true],
                 ['type' => 'voice_note', 'voice_note' => ['voice_note' => 4]],
                 ['type' => 'document', 'document' => ['document' => 5]],
@@ -607,7 +611,7 @@ class RichMessageTest extends TestCase
     }
 
     /**
-     * RichMessage objects can be created with the shorthands of input blocks, to be sent.
+     * The text conversion also accepts the shorthands of input blocks, and raw blocks and texts.
      */
     public function testInputShorthands(): void
     {
@@ -710,6 +714,169 @@ class RichMessageTest extends TestCase
             ))[0];
             $this->assertSame(RichParseMode::TEXT, $parseMode->getDefaultValue(), "$class::$method");
         }
+    }
+
+    /**
+     * The parse mode and the media only apply to Markdown and HTML strings: they must not be silently ignored.
+     */
+    public function testFromParametersRejectsIgnoredParameters(): void
+    {
+        $file = new RemoteUrl('https://example.com/a.jpg');
+        foreach ([
+            [[['type' => 'divider']], RichParseMode::MARKDOWN, [], 'The parse mode only applies'],
+            [new RichMessage([['type' => 'divider']]), RichParseMode::HTML, [], 'The parse mode only applies'],
+            [[['type' => 'divider']], RichParseMode::TEXT, ['x' => $file], 'Media can only be passed separately'],
+            ['text', RichParseMode::TEXT, ['x' => $file], 'Media can only be passed separately'],
+            [['markdown' => 'x', 'media' => ['x' => $file]], RichParseMode::TEXT, ['x' => $file], 'were passed twice'],
+            [['_' => 'inputRichMessageMarkdown', 'markdown' => 'x'], RichParseMode::TEXT, ['x' => $file], 'were passed twice'],
+        ] as [$message, $parseMode, $media, $error]) {
+            try {
+                InputConverter::fromParameters($message, $parseMode, $media, false, false);
+                $this->fail("Expected an exception: $error");
+            } catch (Exception $e) {
+                $this->assertStringContainsString($error, $e->getMessage());
+            }
+        }
+        // The media of a Bot API InputRichMessage can also be passed separately
+        $this->assertSame(['markdown' => 'x', 'media' => ['x' => $file]], InputConverter::fromParameters(['markdown' => 'x'], RichParseMode::TEXT, ['x' => $file], false, false));
+    }
+
+    /**
+     * $media accepts a list of Bot API InputRichMessageMedia, whose media are Bot API InputMedia objects.
+     */
+    public function testFromParametersAcceptsInputRichMessageMedia(): void
+    {
+        $file = new LocalFile('/tmp/cat.jpg');
+        $media = [['id' => 'cat', 'media' => ['type' => 'photo', 'media' => $file]], ['id' => 'doc', 'media' => $file]];
+        $this->assertSame(['markdown' => 'x', 'media' => $media], InputConverter::fromParameters('x', RichParseMode::MARKDOWN, $media, false, false));
+
+        $this->expectExceptionMessage('The file cat of the rich message must be');
+        InputConverter::fromParameters('x', RichParseMode::MARKDOWN, [['id' => 'cat', 'media' => ['type' => 'photo', 'media' => 'https://example.com/cat.jpg']]], false, false);
+    }
+
+    /**
+     * Untyped media get the type of the tg:// link that references them, so that e.g. a LocalFile embedded with
+     * tg://photo is uploaded as a photo; an explicit type wins.
+     */
+    public function testMediaTypeFromLinks(): void
+    {
+        $result = $this->convert([
+            'markdown' => '![A](tg://photo?id=cat) [v](tg://video?id=v) [a](tg://audio?id=a) [d](tg://document?id=d) [t](tg://video?id=typed)',
+            'media' => ['cat' => 'c', 'v' => 'v', 'a' => 'a', 'd' => 'd', 'typed' => ['type' => 'animation', 'media' => 't'], 'unused' => 'u'],
+        ]);
+        $this->assertSame(
+            [['photo', 'c'], ['video', 'v'], ['audio', 'a'], ['document', 'd'], ['animation', ['type' => 'animation', 'media' => 't']], ['document', 'u']],
+            $this->resolved,
+        );
+        $this->assertSame('inputRichFilePhoto', $result['files'][0]['_']);
+        $this->assertSame('inputRichFileDocument', $result['files'][1]['_']);
+
+        // HTML too
+        $this->resolved = [];
+        $this->convert(['html' => '<img src="tg://photo?id=cat">', 'media' => ['cat' => 'c']]);
+        $this->assertSame([['photo', 'c']], $this->resolved);
+    }
+
+    /**
+     * Raw inputPhoto/inputDocument constructors are files, not inputRichFile constructors.
+     */
+    public function testRawInputMediaInMediaMap(): void
+    {
+        $photo = ['_' => 'inputPhoto', 'id' => 7, 'access_hash' => 1, 'file_reference' => ''];
+        $richFile = ['_' => 'inputRichFileDocument', 'id' => 'f', 'document' => ['_' => 'inputDocument', 'id' => 8, 'access_hash' => 1, 'file_reference' => '']];
+        $result = $this->convert(['markdown' => '![A](tg://photo?id=cat)', 'media' => ['cat' => $photo, 'f' => $richFile]]);
+        $this->assertSame([['photo', $photo]], $this->resolved);
+        $this->assertSame('inputRichFilePhoto', $result['files'][0]['_']);
+        $this->assertSame($richFile, $result['files'][1]);
+    }
+
+    /**
+     * Raw media blocks reference media by ID in the photos and documents of the InputRichMessage, which can't be
+     * built from raw blocks alone.
+     */
+    public function testRawMediaBlocksRejected(): void
+    {
+        $noCaption = ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']];
+        foreach ([
+            ['_' => 'pageBlockPhoto', 'photo_id' => 5, 'caption' => $noCaption],
+            ['_' => 'pageBlockCollage', 'items' => [['_' => 'pageBlockVideo', 'video_id' => 5, 'caption' => $noCaption]], 'caption' => $noCaption],
+            ['type' => 'paragraph', 'text' => ['_' => 'textImage', 'document_id' => 5, 'w' => 1, 'h' => 1]],
+            ['type' => 'list', 'items' => [['_' => 'pageListItemBlocks', 'blocks' => [['_' => 'pageBlockDocument', 'document_id' => 5, 'caption' => $noCaption]]]]],
+        ] as $block) {
+            try {
+                $this->convert(['blocks' => [$block]]);
+                $this->fail('Expected an exception for '.json_encode($block));
+            } catch (Exception $e) {
+                $this->assertStringContainsString('can only be sent in a raw inputRichMessage', $e->getMessage());
+            }
+        }
+        // Raw blocks without media are still passed through
+        $this->assertSame([['_' => 'pageBlockDivider']], $this->convert(['blocks' => [['_' => 'pageBlockDivider']]])['blocks']);
+    }
+
+    /**
+     * Videos that autoplay or loop, and animations that don't, keep doing so when sent again.
+     */
+    public function testRoundTripVideoFlags(): void
+    {
+        $noCaption = ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']];
+        $video = static fn (int $id, bool $animated): array => ['_' => 'document', 'id' => $id, 'attributes' => [['_' => $animated ? 'documentAttributeAnimated' : 'documentAttributeVideo', 'round_message' => false]]];
+        $blocks = [];
+        foreach ([[1, false], [2, true]] as [$id, $animated]) {
+            foreach ([[false, false], [true, false], [false, true], [true, true]] as [$autoplay, $loop]) {
+                $blocks[] = ['_' => 'pageBlockVideo', 'autoplay' => $autoplay, 'loop' => $loop, 'spoiler' => false, 'video_id' => $id, 'caption' => $noCaption];
+            }
+        }
+        $output = self::output(['_' => 'richMessage', 'blocks' => $blocks, 'photos' => [], 'documents' => [$video(1, false), $video(2, true)]]);
+        $input = $this->convert(new RichMessage($output['blocks']));
+        $this->assertSame(
+            array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $blocks),
+            array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $input['blocks']),
+        );
+    }
+
+    /**
+     * Details blocks with no content add no empty line.
+     */
+    public function testEmptyDetailsText(): void
+    {
+        $this->assertSame("S\nafter", (new RichMessage([['type' => 'details', 'summary' => 'S', 'blocks' => []], ['type' => 'paragraph', 'text' => 'after']]))->message);
+        $this->assertSame("S\nafter", (new RichMessage([['type' => 'details', 'summary' => 'S', 'blocks' => [['type' => 'divider']]], ['type' => 'paragraph', 'text' => 'after']]))->message);
+    }
+
+    public function testFilterRichMessage(): void
+    {
+        $raw = ['_' => 'message', 'id' => 1, 'out' => false, 'date' => 1, 'noforwards' => false, 'message' => 'plain'];
+        $plain = new PrivateMessage(self::api(), $raw, ['bot_api_id' => 101374607], false);
+        $rich = new PrivateMessage(self::api(), [...$raw, 'message' => '', 'rich_message' => [
+            '_' => 'richMessage', 'blocks' => [['_' => 'pageBlockParagraph', 'text' => ['_' => 'textPlain', 'text' => 'rich']]], 'photos' => [], 'documents' => [],
+        ]], ['bot_api_id' => 101374607], false);
+        $this->assertFalse((new FilterRichMessage)->apply($plain));
+        $this->assertTrue((new FilterRichMessage)->apply($rich));
+        $this->assertInstanceOf(FilterRichMessage::class, Filter::fromReflectionType((new \ReflectionFunction(static fn (IsRichMessage $m) => null))->getParameters()[0]->getType()));
+    }
+
+    /**
+     * Raw methods accept the JSON-serialized raw constructor too, and rich messages are refused for secret chats
+     * before any media is uploaded.
+     */
+    public function testRawRichMessageArguments(): void
+    {
+        $this->assertSame(
+            ['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'],
+            self::api()->botAPIToMTProto(['rich_message' => json_encode(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'])])['rich_message'],
+        );
+        $this->expectExceptionMessage("Rich messages can't be sent to secret chats");
+        self::api()->botAPIToMTProto([
+            'peer' => DialogId::fromSecretChatId(1),
+            'rich_message' => ['blocks' => [['type' => 'photo', 'photo' => ['type' => 'photo', 'media' => new LocalFile('/nonexistent.jpg')]]]],
+        ]);
+    }
+
+    public function testZeroDraftId(): void
+    {
+        $this->expectExceptionMessage('The draft ID must be non-zero');
+        self::api()->sendRichMessageDraft(1, 'x', draftId: 0);
     }
 
     private static function api(): MTProto

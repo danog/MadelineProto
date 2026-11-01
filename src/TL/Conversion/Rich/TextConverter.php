@@ -14,7 +14,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\RichMessage;
+namespace danog\MadelineProto\TL\Conversion\Rich;
 
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message\Entities\BankCard;
@@ -100,24 +100,37 @@ final class TextConverter
     }
 
     /**
+     * Run a function that appends text after a newline, removing the newline if nothing was appended.
+     *
+     * @param callable(): void $append
+     */
+    private function separated(callable $append): void
+    {
+        $offset = $this->length;
+        $this->append("\n");
+        $append();
+        if ($this->length === $offset + 1) {
+            $this->message = substr($this->message, 0, -1);
+            $this->length = $offset;
+        }
+    }
+
+    /**
      * @param list<array> $blocks
      */
     private function blocks(array $blocks): void
     {
         $first = true;
         foreach ($blocks as $block) {
-            $offset = $this->length;
-            if (!$first) {
-                $this->append("\n");
-            }
-            $this->block($block);
-            if ($this->length === $offset + ($first ? 0 : 1)) {
-                // Nothing was added (dividers, anchors and so on): no separator either
-                $this->message = substr($this->message, 0, \strlen($this->message) - ($first ? 0 : 1));
-                $this->length = $offset;
+            if ($first) {
+                $offset = $this->length;
+                $this->block($block);
+                // Nothing was added (dividers, anchors and so on): the next block is still the first one
+                $first = $this->length === $offset;
                 continue;
             }
-            $first = false;
+            // No separator either for blocks that add nothing
+            $this->separated(fn () => $this->block($block));
         }
     }
 
@@ -126,17 +139,17 @@ final class TextConverter
         // Also accept the shorthands of input blocks (see InputConverter); raw MTProto blocks have no text
         switch ($block['type'] ?? '') {
             case 'heading':
-                $this->wrap(fn () => $this->text($block['text']), static fn (int $o, int $l) => new Bold($o, $l));
+                $this->wrap(fn () => $this->text($block['text'] ?? ''), static fn (int $o, int $l) => new Bold($o, $l));
                 break;
             case 'pre':
-                $this->wrap(fn () => $this->text($block['text']), static fn (int $o, int $l) => new Pre($o, $l, $block['language'] ?? ''));
+                $this->wrap(fn () => $this->text($block['text'] ?? ''), static fn (int $o, int $l) => new Pre($o, $l, $block['language'] ?? ''));
                 break;
             case 'mathematical_expression':
-                $this->wrap(fn () => $this->append($block['expression']), static fn (int $o, int $l) => new Pre($o, $l, 'latex'));
+                $this->wrap(fn () => $this->append((string) ($block['expression'] ?? '')), static fn (int $o, int $l) => new Pre($o, $l, 'latex'));
                 break;
             case 'list':
                 $first = true;
-                foreach ($block['items'] as $item) {
+                foreach ($block['items'] ?? [] as $item) {
                     if (!$first) {
                         $this->append("\n");
                     }
@@ -162,19 +175,18 @@ final class TextConverter
             case 'expandable_blockquote':
             case 'pullquote':
                 $this->wrap(function () use ($block): void {
-                    $this->text($block['text']);
+                    $this->text($block['text'] ?? '');
                     $this->credit($block['credit'] ?? null);
                 }, static fn (int $o, int $l) => new Blockquote($o, $l, $block['type'] === 'expandable_blockquote'));
                 break;
             case 'details':
-                $this->wrap(fn () => $this->text($block['summary']), static fn (int $o, int $l) => new Bold($o, $l));
-                $this->append("\n");
-                $this->wrap(fn () => $this->blocks($block['blocks']), static fn (int $o, int $l) => new Blockquote($o, $l, !($block['is_open'] ?? false)));
+                $this->wrap(fn () => $this->text($block['summary'] ?? ''), static fn (int $o, int $l) => new Bold($o, $l));
+                $this->separated(fn () => $this->wrap(fn () => $this->blocks($block['blocks'] ?? []), static fn (int $o, int $l) => new Blockquote($o, $l, !($block['is_open'] ?? false))));
                 break;
             case 'collage':
             case 'slideshow':
                 $offset = $this->length;
-                $this->blocks($block['blocks']);
+                $this->blocks($block['blocks'] ?? []);
                 $this->caption($block['caption'] ?? null, $this->length > $offset);
                 break;
             case 'table':
@@ -182,7 +194,7 @@ final class TextConverter
                     $this->wrap(fn () => $this->text($block['caption']), static fn (int $o, int $l) => new Bold($o, $l));
                     $this->append("\n");
                 }
-                foreach ($block['cells'] as $y => $row) {
+                foreach ($block['cells'] ?? [] as $y => $row) {
                     if ($y) {
                         $this->append("\n");
                     }
@@ -201,11 +213,11 @@ final class TextConverter
                 }
                 break;
             case 'buttons':
-                foreach ($block['buttons'] as $k => $button) {
+                foreach ($block['buttons'] ?? [] as $k => $button) {
                     if ($k) {
                         $this->append(' ');
                     }
-                    $this->text($button['text']);
+                    $this->text($button['text'] ?? '');
                 }
                 break;
             case 'photo':

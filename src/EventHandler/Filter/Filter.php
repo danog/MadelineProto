@@ -68,6 +68,7 @@ use danog\MadelineProto\EventHandler\SimpleFilter\IsForwarded;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsNotEdited;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReply;
 use danog\MadelineProto\EventHandler\SimpleFilter\IsReplyToSelf;
+use danog\MadelineProto\EventHandler\SimpleFilter\IsRichMessage;
 use danog\MadelineProto\EventHandler\SimpleFilter\Outgoing;
 use danog\MadelineProto\EventHandler\SimpleFilter\Running;
 use danog\MadelineProto\EventHandler\Update;
@@ -122,6 +123,7 @@ abstract class Filter
                 IsReplyToSelf::class => new FilterReplyToSelf,
                 HasMedia::class => new FilterMedia,
                 HasNoMedia::class => new FilterNoMedia,
+                IsRichMessage::class => new FilterRichMessage,
                 FromAdmin::class => new FilterFromAdmin,
                 HasAudio::class => new FilterAudio,
                 HasDocument::class => new FilterDocument,

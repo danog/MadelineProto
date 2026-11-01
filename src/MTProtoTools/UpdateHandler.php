@@ -146,7 +146,6 @@ use danog\MadelineProto\ParseMode;
 use danog\MadelineProto\PeerNotInDbException;
 use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\ResponseException;
-use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\RPCError\ChannelPrivateError;
 use danog\MadelineProto\RPCError\FloodWaitError;
@@ -155,6 +154,7 @@ use danog\MadelineProto\RPCError\SessionPasswordNeededError;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tgcalls\PrivateCallController;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 use danog\MadelineProto\TL\TL;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UpdateHandlerType;
@@ -1031,7 +1031,9 @@ trait UpdateHandler
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
      *
-     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`); files are uploaded as documents unless the type says otherwise.
+     * $parseMode only applies to string messages, and $media only to Markdown and HTML: passing them with other messages throws.
+     *
+     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
@@ -1102,7 +1104,7 @@ trait UpdateHandler
      * @param string|array|RichMessage $message      Partial rich message
      * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
-     * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
+     * @param ?integer                 $draftId      ID of the draft to update (non-zero), if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
      * @param boolean                  $keepOnStop   Whether the draft should be kept if the user stops the generation
      * @param boolean                  $rtl          Whether the text is right-to-left
@@ -1125,7 +1127,13 @@ trait UpdateHandler
         ?int $topMsgId = null,
         ?Cancellation $cancellation = null,
     ): int {
-        $draftId ??= Tools::randomInt();
+        if ($draftId === 0) {
+            throw new Exception('The draft ID must be non-zero');
+        }
+        // Telegram requires a non-zero draft ID
+        while ($draftId === null || $draftId === 0) {
+            $draftId = Tools::randomInt();
+        }
         $this->methodCallAsyncRead(
             'messages.setTyping',
             [

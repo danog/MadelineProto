@@ -22,12 +22,14 @@ namespace danog\MadelineProto\TL\Conversion;
 
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
+use danog\DialogId\DialogId;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
+use danog\MadelineProto\Exception as MadelineException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\RichMessage\OutputConverter;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Conversion\Rich\OutputConverter;
 use danog\MadelineProto\Tools;
 use Throwable;
 
@@ -454,10 +456,14 @@ trait BotAPI
             $richMessage = $arguments['rich_message'];
             if (\is_string($richMessage)) {
                 // JSON-serialized, as passed to the Bot API
-                $richMessage = json_decode($richMessage, true, flags: JSON_THROW_ON_ERROR);
+                $arguments['rich_message'] = $richMessage = json_decode($richMessage, true, flags: JSON_THROW_ON_ERROR);
             }
             if ($richMessage instanceof RichMessage || (\is_array($richMessage) && !isset($richMessage['_']))) {
                 $peer = $arguments['peer'] ?? null;
+                if (\is_int($peer) && DialogId::isSecretChat($peer)) {
+                    // Checked again when the call is rewritten for secret chats, but before uploading the media here
+                    throw new MadelineException("Rich messages can't be sent to secret chats");
+                }
                 $arguments['rich_message'] = $this->toInputRichMessage(
                     $richMessage,
                     \is_int($peer) || \is_string($peer) ? $peer : null,

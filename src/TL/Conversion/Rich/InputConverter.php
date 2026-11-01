@@ -14,7 +14,7 @@
  * @link https://docs.madelineproto.xyz MadelineProto documentation
  */
 
-namespace danog\MadelineProto\RichMessage;
+namespace danog\MadelineProto\TL\Conversion\Rich;
 
 use Amp\ByteStream\ReadableStream;
 use Closure;
@@ -58,31 +58,49 @@ final class InputConverter
     /**
      * Build a Bot API InputRichMessage from the parameters of the high-level methods.
      *
+     * The parse mode only applies to string messages, and the media only to Markdown and HTML messages: passing them with other messages throws, instead of silently ignoring them.
+     *
      * @param string|array|RichMessage $message Markdown or HTML (or plain text, depending on $parseMode), a list of blocks, a received RichMessage, a Bot API InputRichMessage or an MTProto InputRichMessage.
      * @param array $media Media referenced in Markdown or HTML, as a list of Bot API InputRichMessageMedia objects ({id, media}) or as a map from ID to file: files are Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream objects, like in the other methods, optionally in a Bot API InputMedia-like array.
      */
     public static function fromParameters(string|array|RichMessage $message, RichParseMode $parseMode, array $media, bool $rtl, bool $noAutolink): array
     {
         foreach ($media as $id => $file) {
+            if (\is_array($file) && !isset($file['_']) && isset($file['id']) && array_is_list($media)) {
+                // Bot API InputRichMessageMedia
+                $id = $file['id'];
+                $file = $file['media'] ?? null;
+            }
             if (\is_array($file) && !isset($file['_'])) {
-                // InputRichMessageMedia or InputMedia-like array
-                $id = $file['id'] ?? $id;
+                // Bot API InputMedia-like array
                 $file = $file['media'] ?? null;
             }
             if (!($file instanceof Message || $file instanceof Media || $file instanceof LocalFile || $file instanceof RemoteUrl || $file instanceof BotApiFileId || $file instanceof ReadableStream || (\is_array($file) && isset($file['_'])))) {
                 throw new Exception("The file $id of the rich message must be a Message, Media, LocalFile, RemoteUrl, BotApiFileId or ReadableStream object: wrap bot API file IDs in BotApiFileId and URLs in RemoteUrl");
             }
         }
+        if (!\is_string($message) && $parseMode !== RichParseMode::TEXT) {
+            throw new Exception('The parse mode only applies to rich messages passed as strings: pass Markdown or HTML as a string, or the markdown or html field of a Bot API InputRichMessage');
+        }
         if ($message instanceof RichMessage) {
             $message = ['blocks' => $message->blocks, 'is_rtl' => $message->rtl];
         } elseif (\is_string($message)) {
             $message = match ($parseMode) {
-                RichParseMode::MARKDOWN => ['markdown' => $message, 'media' => $media],
-                RichParseMode::HTML => ['html' => $message, 'media' => $media],
+                RichParseMode::MARKDOWN => ['markdown' => $message],
+                RichParseMode::HTML => ['html' => $message],
                 RichParseMode::TEXT => ['blocks' => [['type' => 'paragraph', 'text' => $message]]],
             };
         } elseif (array_is_list($message)) {
             $message = ['blocks' => $message];
+        }
+        if ($media) {
+            if (!isset($message['markdown']) && !isset($message['html'])) {
+                throw new Exception('Media can only be passed separately for Markdown and HTML rich messages: use media blocks to add media to a list of blocks');
+            }
+            if (isset($message['_']) || isset($message['media'])) {
+                throw new Exception('The media of the rich message were passed twice: pass them either in the media field of the rich message or in the media parameter');
+            }
+            $message['media'] = $media;
         }
         if (isset($message['_'])) {
             if ($rtl) {
@@ -144,7 +162,7 @@ final class InputConverter
         } else {
             throw new Exception('Rich message must be non-empty');
         }
-        $files = $converter->files($message['media'] ?? []);
+        $files = $converter->files($message['media'] ?? [], $result['markdown'] ?? $result['html']);
         if ($files) {
             $result['files'] = $files;
         }
@@ -154,18 +172,27 @@ final class InputConverter
     /**
      * Convert the media referenced by Markdown or HTML rich messages.
      *
+     * Media without an explicit type get the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, so that e.g. a LocalFile referenced by a tg://photo link is uploaded as a photo.
+     *
+     * @param string $text Markdown or HTML referencing the media
+     *
      * @return list<array>
      */
-    private function files(array $media): array
+    private function files(array $media, string $text): array
     {
+        $types = [];
+        preg_match_all('~tg://(photo|video|audio|document)\?id=([A-Za-z0-9_-]{1,64})~', $text, $matches, PREG_SET_ORDER);
+        foreach ($matches as [, $type, $id]) {
+            $types[$id] ??= $type;
+        }
         $files = [];
         foreach ($media as $key => $item) {
-            if (\is_array($item) && isset($item['_'])) {
+            if (\is_array($item) && str_starts_with($item['_'] ?? '', 'inputRichFile')) {
                 // inputRichFilePhoto/inputRichFileDocument
                 $files[] = $item;
                 continue;
             }
-            if (\is_array($item) && isset($item['id'], $item['media']) && array_is_list($media)) {
+            if (\is_array($item) && !isset($item['_']) && isset($item['id'], $item['media']) && array_is_list($media)) {
                 // Bot API InputRichMessageMedia
                 $id = (string) $item['id'];
                 $item = $item['media'];
@@ -175,7 +202,7 @@ final class InputConverter
             if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $id)) {
                 throw new Exception("Invalid rich message file identifier specified: $id");
             }
-            $type = \is_array($item) && isset($item['type']) && !isset($item['_']) ? (string) $item['type'] : 'document';
+            $type = \is_array($item) && isset($item['type']) && !isset($item['_']) ? (string) $item['type'] : ($types[$id] ?? 'document');
             $input = ($this->resolveMedia)($type, $item);
             $files[] = $input['_'] === 'inputPhoto'
                 ? ['_' => 'inputRichFilePhoto', 'id' => $id, 'photo' => $input]
@@ -209,6 +236,7 @@ final class InputConverter
             throw new Exception('Object expected as InputRichBlock');
         }
         if (isset($block['_'])) {
+            self::assertNoRawMedia($block);
             return $block;
         }
         $type = $block['type'] ?? throw new Exception('The type of the rich block must be specified');
@@ -248,9 +276,9 @@ final class InputConverter
             ],
             'video', 'animation' => [
                 '_' => 'pageBlockVideo',
-                // TDLib always autoplays and loops animations, and never videos
-                'autoplay' => $type === 'animation',
-                'loop' => $type === 'animation',
+                // TDLib always autoplays and loops animations, and never videos; received blocks that differ from that say so
+                'autoplay' => (bool) ($block['need_autoplay'] ?? $type === 'animation'),
+                'loop' => (bool) ($block['is_looped'] ?? $type === 'animation'),
                 'spoiler' => self::hasSpoiler($block, $type),
                 'video_id' => $this->media($type, $block)['id'],
                 'caption' => $this->caption($block['caption'] ?? null),
@@ -259,6 +287,21 @@ final class InputConverter
             'document' => ['_' => 'pageBlockDocument', 'document_id' => $this->media('document', $block)['id'], 'caption' => $this->caption($block['caption'] ?? null)],
             default => throw new Exception("Rich block type \"$type\" is unsupported"),
         };
+    }
+
+    /**
+     * Raw media blocks (and images in raw rich texts) reference their media by ID, in the photos and documents of the InputRichMessage, which can't be built from raw blocks alone.
+     */
+    private static function assertNoRawMedia(array $block): void
+    {
+        if (\in_array($block['_'] ?? null, ['pageBlockPhoto', 'pageBlockVideo', 'pageBlockAudio', 'pageBlockDocument', 'textImage'], true)) {
+            throw new Exception("Raw {$block['_']} constructors can only be sent in a raw inputRichMessage, with their media in its photos and documents: use Bot API media blocks instead");
+        }
+        foreach ($block as $value) {
+            if (\is_array($value)) {
+                self::assertNoRawMedia($value);
+            }
+        }
     }
 
     private static function heading(mixed $size, array $text): array
@@ -322,6 +365,7 @@ final class InputConverter
                 throw new Exception('Object expected as InputRichBlockListItem');
             }
             if (isset($item['_'])) {
+                self::assertNoRawMedia($item);
                 $result[] = $item;
                 $isOrdered = str_starts_with($item['_'], 'pageListOrderedItem');
             } else {
@@ -630,6 +674,7 @@ final class InputConverter
             throw new Exception('Invalid rich text specified');
         }
         if (isset($text['_'])) {
+            self::assertNoRawMedia($text);
             return $text;
         }
         if (array_is_list($text)) {
