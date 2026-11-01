@@ -60,6 +60,9 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
 
     private readonly bool $isHttp;
 
+    /**
+     * RPC resend timeout, in nanoseconds like the send times (hrtime) of the messages.
+     */
     private int $resendTimeout;
 
     private LinkedList $queue;
@@ -71,7 +74,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
     public function __construct(Connection $connection)
     {
         $this->init2($connection);
-        $this->resendTimeout = $this->API->getSettings()->getRpc()->getRpcResendTimeout();
+        $this->resendTimeout = $this->API->getSettings()->getRpc()->getRpcResendTimeout() * 1_000_000_000;
         $connection->getState()->subscribe($this);
     }
 
@@ -209,6 +212,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                 if ($msgIds) {
                     $this->API->logger("Still missing {$list} on DC {$this->datacenter}, sending state request", Logger::ERROR);
                     $stream = $this->connection->stream;
+                    $requestedAt = hrtime(true);
                     $this->connection->objectCallAsync('msgs_state_req', [
                         'msg_ids' => $msgIds,
                         'cancellation' => new \Amp\TimeoutCancellation(
@@ -216,7 +220,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                             "Timeout while waiting for msgs_state_req response on DC {$this->datacenter}"
                         ),
                     ], $deferred);
-                    $deferred->getFuture()->map(function (array|\Closure $result) use ($arr, $stream): void {
+                    $deferred->getFuture()->map(function (array|\Closure $result) use ($arr, $requestedAt, $stream): void {
                         if (\is_callable($result)) {
                             try {
                                 $result();
@@ -243,6 +247,13 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                                     $this->connection->ack_queue[] = $message->getMsgId();
                                     continue;
                                 }
+                                if ($message->getSent() === null || $message->getSent() > $requestedAt) {
+                                    // Sent again since the state request (after a reconnection, a bad_msg_notification
+                                    // or the answer to an earlier state request): the state is the one of the previous
+                                    // send, and acting on it would send the request once more.
+                                    $this->API->logger("Ignoring the state of $message, sent again since the state request");
+                                    continue;
+                                }
                                 $chr = \ord($chr);
                                 switch ($chr & 7) {
                                     case 0:
@@ -255,7 +266,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                                             $message->reply(null);
                                             break;
                                         }
-                                        $this->API->logger("Message $message not received by server, resending...", Logger::ERROR);
+                                        $this->API->logger("Message $message not received by server (state $chr), resending...", Logger::ERROR);
                                         $this->connection->methodRecall($message);
                                         break;
                                     case 4:

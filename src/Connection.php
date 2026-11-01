@@ -141,6 +141,12 @@ final class Connection
      */
     private bool $needsReconnect = false;
     /**
+     * Number of file requests sent on this socket that weren't answered yet (see DataCenterConnection::waitGetFileConnection).
+     *
+     * @internal
+     */
+    public int $fileRequests = 0;
+    /**
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
@@ -166,7 +172,6 @@ final class Connection
     public function writing(bool $writing): void
     {
         $this->writing = $writing;
-        $this->shared->writing($writing, $this->id);
     }
     /**
      * Set reading boolean.
@@ -176,7 +181,6 @@ final class Connection
     public function reading(bool $reading): void
     {
         $this->reading = $reading;
-        $this->shared->reading($reading, $this->id);
     }
     /**
      * Whether we're currently reading an MTProto packet.
@@ -317,7 +321,7 @@ final class Connection
                             $this->flush(true); // Flush acks
                         }
                     }, "Handler loop");
-                    if (!isset($this->pinger) && !$this->shared->auth->isMedia && !$this->shared->auth->isCdn && !$this->isHttp()) {
+                    if (!isset($this->pinger) && !$this->isHttp()) {
                         $this->pinger = new PingLoop($this);
                     }
                     foreach ($this->unencrypted_new_outgoing as $message) {
@@ -327,6 +331,7 @@ final class Connection
                     Assert::true($this->reader->start(), "Could not start reader stream");
                     Assert::true($this->cleanup->start(), "Could not start cleanup stream");
                     $this->handler->start();
+                    $this->pinger?->onConnect();
 
                     if ($this->stream !== $stream) {
                         // Disconnected meanwhile (this fiber can suspend after publishing the stream: logging, a loop

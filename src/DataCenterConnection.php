@@ -20,9 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Cancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
-use danog\MadelineProto\Loop\Generic\PeriodicLoopInternal;
 use danog\MadelineProto\MTProto\ConnectionState;
 use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
@@ -47,9 +47,14 @@ use function count;
  */
 final class DataCenterConnection implements SimpleSubscriber
 {
-    public const READ_WEIGHT = 1;
-    public const READ_WEIGHT_MEDIA = 5;
-    public const WRITE_WEIGHT = 10;
+    /**
+     * Maximum number of file requests (parts of up to 1 MB) waiting for an answer on a socket of a media or CDN DC.
+     *
+     * The server answers them one after the other: more of them only queue up on the socket, delaying the last ones
+     * past their timeout, while the server drops connections with too much pending (tdesktop keeps at most 2 MB of
+     * parts in flight per session too, opening up to 8 sessions instead).
+     */
+    public const MAX_FILE_REQUESTS_PER_SOCKET = 2;
 
     /** @deprecated */
     private ?PermAuthKey $permAuthKey;
@@ -72,29 +77,15 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     private array $connections = [];
     /**
-     * Connection weights.
-     *
-     * @var array<int, int>
-     */
-    private array $availableConnections = [];
-    /**
      * Connection contexts.
      */
     private ?ContextIterator $ctx = null;
     /**
-     * Loop to keep weights at sane value.
-     */
-    private ?PeriodicLoopInternal $robinLoop = null;
-    /**
-     * Decrement roundrobin weight by this value if busy reading.
+     * Requests waiting for a socket with room for a file request.
      *
+     * @var array<int, DeferredFuture<null>>
      */
-    private int $decRead = 1;
-    /**
-     * Decrement roundrobin weight by this value if busy writing.
-     *
-     */
-    private int $decWrite = 10;
+    private array $fileRequestWaiters = [];
     /**
      * Backed up messages.
      *
@@ -343,20 +334,6 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     public function connect(int $id = -1): void
     {
-        $media = $this->auth->isMedia || $this->auth->isCdn;
-        if ($media) {
-            if (!$this->robinLoop) {
-                $this->robinLoop = new PeriodicLoopInternal(
-                    $this->API,
-                    $this->even(...),
-                    "robin loop DC {$this->datacenter}",
-                    $this->API->getSettings()->getConnection()->getRobinPeriod()
-                );
-            }
-            $this->robinLoop->start();
-        }
-        $this->decRead = $media ? self::READ_WEIGHT_MEDIA : self::READ_WEIGHT;
-        $this->decWrite = self::WRITE_WEIGHT;
         if ($id === -1 || !isset($this->connections[$id])) {
             if ($this->connections) {
                 $this->API->logger('Already connected!', Logger::WARNING);
@@ -372,8 +349,9 @@ final class DataCenterConnection implements SimpleSubscriber
                 $connectionsDeferred->complete();
             }
             $this->restoreBackup();
+            // Requests waiting for room on the sockets that were closed can use the new ones.
+            $this->wakeFileRequestWaiters(true);
         } else {
-            $this->availableConnections[$id] = 0;
             $this->connections[$id]->setExtra($this, $this->datacenter, $id);
         }
     }
@@ -391,7 +369,6 @@ final class DataCenterConnection implements SimpleSubscriber
             $connection = new Connection();
             $connection->setExtra($this, $this->datacenter, $x);
             $this->connections[$x] = $connection;
-            $this->availableConnections[$x] = 0;
         }
     }
     /**
@@ -410,7 +387,7 @@ final class DataCenterConnection implements SimpleSubscriber
         }
         $this->API->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
         $this->backup = array_merge($this->backup, $backup);
-        unset($this->connections[$id], $this->availableConnections[$id]);
+        unset($this->connections[$id]);
     }
     /**
      * Close all connections to DC.
@@ -423,10 +400,6 @@ final class DataCenterConnection implements SimpleSubscriber
             return;
         }
         $this->API->logger("Disconnecting from shared DC {$this->datacenter}");
-        if ($this->robinLoop) {
-            $this->robinLoop->stop();
-            $this->robinLoop = null;
-        }
         $before = \count($this->backup);
         foreach ($this->connections as $connection) {
             $connection->disconnect();
@@ -434,7 +407,8 @@ final class DataCenterConnection implements SimpleSubscriber
         $count = \count($this->backup) - $before;
         $this->API->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->datacenter}");
         $this->connections = [];
-        $this->availableConnections = [];
+        // Requests waiting for room on the closed sockets wait for the new ones.
+        $this->wakeFileRequestWaiters(true);
     }
     /**
      * Reconnect to DC.
@@ -488,89 +462,106 @@ final class DataCenterConnection implements SimpleSubscriber
         return $id < 0 ? \count($this->connections) : isset($this->connections[$id]);
     }
     /**
-     * Get best socket in round robin, asynchronously.
+     * Get a socket (see getConnection()), waiting for the sockets to be created.
      */
     public function waitGetConnection(): Connection
     {
-        if (empty($this->availableConnections)) {
+        if (!$this->connections) {
             $this->connectionsPromise->await();
         }
         return $this->getConnection();
     }
     /**
-     * Get best socket in round robin.
+     * Get a socket for a file request (a part to download or upload), waiting for one with room for it.
+     *
+     * On media and CDN DCs, each socket carries at most MAX_FILE_REQUESTS_PER_SOCKET of them: the least loaded
+     * one is used, and more sockets are opened (up to the configured maximum) when all are full. Other DCs only
+     * have one socket, used as before.
+     *
+     * fileRequestDone() must be called with the returned socket once the request is answered (or failed).
+     */
+    public function waitGetFileConnection(?Cancellation $cancellation = null): Connection
+    {
+        if (!$this->auth->isMedia && !$this->auth->isCdn) {
+            $connection = $this->waitGetConnection();
+            $connection->fileRequests++;
+            return $connection;
+        }
+        $max = $this->API->getSettings()->getConnection()->getMaxMediaSocketCount();
+        while (true) {
+            if (!$this->connections) {
+                $this->connectionsPromise->await($cancellation);
+                continue;
+            }
+            $best = $this->getLeastLoadedConnection();
+            if ($best->fileRequests < self::MAX_FILE_REQUESTS_PER_SOCKET) {
+                $best->fileRequests++;
+                return $best;
+            }
+            if (\count($this->connections) < $max) {
+                $this->connectMore(1);
+                continue;
+            }
+            $deferred = new DeferredFuture;
+            $id = spl_object_id($deferred);
+            $this->fileRequestWaiters[$id] = $deferred;
+            try {
+                $deferred->getFuture()->await($cancellation);
+            } finally {
+                unset($this->fileRequestWaiters[$id]);
+            }
+        }
+    }
+    /**
+     * Signal that a file request sent with waitGetFileConnection() was answered (or failed).
+     */
+    public function fileRequestDone(Connection $connection): void
+    {
+        $connection->fileRequests--;
+        $this->wakeFileRequestWaiters(false);
+    }
+    /**
+     * Wake up the requests waiting for a socket for a file request (one, or all of them when the sockets changed).
+     */
+    private function wakeFileRequestWaiters(bool $all): void
+    {
+        foreach ($this->fileRequestWaiters as $id => $deferred) {
+            unset($this->fileRequestWaiters[$id]);
+            $deferred->complete();
+            if (!$all) {
+                return;
+            }
+        }
+    }
+    /**
+     * Get a socket: the one with the fewest file requests in flight, or the one with the given ID.
      *
      * @param integer $id Connection ID, for manual fetching
      *
-     * @psalm-external-mutation-free
+     * @psalm-mutation-free
      */
     public function getConnection(int $id = -1): Connection
     {
         if ($id >= 0) {
             return $this->connections[$id];
         }
-        if (\count($this->availableConnections) <= 1) {
-            return $this->connections[0];
-        }
-        $max = max($this->availableConnections);
-        $key = array_search($max, $this->availableConnections, true);
-        // Decrease to implement round robin
-        $this->availableConnections[$key]--;
-        return $this->connections[$key];
+        return $this->getLeastLoadedConnection();
     }
     /**
-     * Even out round robin values.
+     * Get the socket with the fewest file requests in flight.
+     *
+     * @psalm-mutation-free
      */
-    public function even(): void
+    private function getLeastLoadedConnection(): Connection
     {
-        if (!$this->availableConnections) {
-            return;
-        }
-        $min = min($this->availableConnections);
-        if ($min < 50) {
-            foreach ($this->availableConnections as &$count) {
-                $count += 50;
-            }
-        } elseif ($min < 100) {
-            $max = $this->auth->isMedia || $this->auth->isCdn ? $this->API->getSettings()->getConnection()->getMaxMediaSocketCount() : 1;
-            if (\count($this->availableConnections) < $max) {
-                $this->connectMore(2);
-            } else {
-                foreach ($this->availableConnections as &$value) {
-                    $value += 1000;
-                }
+        $best = null;
+        foreach ($this->connections as $connection) {
+            if ($best === null || $connection->fileRequests < $best->fileRequests) {
+                $best = $connection;
             }
         }
-    }
-    /**
-     * Indicate that one of the sockets is busy reading.
-     *
-     * @param boolean $reading Whether we're busy reading
-     * @param int     $x       Connection ID
-     *
-     * @psalm-external-mutation-free
-     */
-    public function reading(bool $reading, int $x): void
-    {
-        if (!isset($this->availableConnections[$x])) {
-            return;
-        }
-        $this->availableConnections[$x] += $reading ? -$this->decRead : $this->decRead;
-    }
-    /**
-     * Indicate that one of the sockets is busy writing.
-     *
-     * @param boolean $writing Whether we're busy writing
-     * @param int     $x       Connection ID
-     *
-     * @psalm-external-mutation-free
-     */
-    public function writing(bool $writing, int $x): void
-    {
-        if (!isset($this->availableConnections[$x])) {
-            return;
-        }
-        $this->availableConnections[$x] += $writing ? -$this->decWrite : $this->decWrite;
+        \assert($best !== null);
+        return $best;
     }
     /**
      * @psalm-external-mutation-free

@@ -64,6 +64,8 @@ final class Connection extends SettingsAbstract
     protected int $maxMediaSocketCount = 10;
     /**
      * Robin period (seconds).
+     *
+     * @deprecated Unused.
      */
     protected int $robinPeriod = 10;
     /**
@@ -298,6 +300,8 @@ final class Connection extends SettingsAbstract
 
     /**
      * Get robin period (seconds).
+     *
+     * @deprecated Unused: sockets to media DCs are opened when the ones open have too many file requests in flight.
      */
     public function getRobinPeriod(): int
     {
@@ -306,6 +310,8 @@ final class Connection extends SettingsAbstract
 
     /**
      * Set robin period (seconds).
+     *
+     * @deprecated Unused: sockets to media DCs are opened when the ones open have too many file requests in flight.
      *
      * @param int $robinPeriod Robin period (seconds).
      *

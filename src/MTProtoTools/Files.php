@@ -68,7 +68,6 @@ use Webmozart\Assert\Assert;
 
 use const LOCK_EX;
 use function Amp\async;
-use function Amp\delay;
 use function Amp\File\deleteFile;
 use function Amp\File\getSize;
 use function Amp\File\openFile;
@@ -409,7 +408,7 @@ trait Files
         };
         $resPromises = [];
         $start = hrtime(true);
-        /** @var ?FloodPremiumWaitError */
+        /** @var FloodWaitError|FloodPremiumWaitError|null */
         $floodWaitError = null;
         try {
             while ($part_num < $part_total_num || !$size) {
@@ -470,7 +469,7 @@ trait Files
                                 $progress?->partDone(min($part_size, $size - $part_num * $part_size));
                                 $d->complete();
                                 return;
-                            } catch (FloodPremiumWaitError $e) {
+                            } catch (FloodWaitError|FloodPremiumWaitError $e) {
                                 $this->logger("Got {$e->rpc} while uploading part $part_num: {$datacenter}, waiting and retrying...");
                                 $floodWaitError = $e;
                                 $writePromise = async($writeCb);
@@ -1584,9 +1583,8 @@ trait Files
                     break;
                 } catch (FileRedirect $e) {
                     $datacenter = $e->dc;
-                } catch (FloodWaitError) {
-                    delay(1, cancellation: $cancellation);
-                } catch (FloodPremiumWaitError $e) {
+                } catch (FloodWaitError|FloodPremiumWaitError $e) {
+                    // Sent again before the wait expires, the part gets the error again.
                     $e->wait($cancellation);
                 } catch (FileTokenInvalidError) {
                     $cdn = false;
