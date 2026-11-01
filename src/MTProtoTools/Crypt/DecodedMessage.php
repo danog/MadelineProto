@@ -13,15 +13,14 @@ namespace danog\MadelineProto\MTProtoTools\Crypt;
 /**
  * Authenticated transport payload; connection state is checked by ReadLoop.
  * @internal
- * @psalm-immutable
  */
-final class DecodedMessage
+final readonly class DecodedMessage
 {
     public function __construct(
-        public readonly string $body,
-        public readonly int $messageId,
-        public readonly int $seqNo,
-        public readonly string $sessionId,
+        public string $body,
+        public int $messageId,
+        public int $seqNo,
+        public string $sessionId,
     ) {
     }
 }
