@@ -312,6 +312,13 @@ final class Connection
                     Assert::true($this->cleanup->start(), "Could not start cleanup stream");
                     $this->handler->start();
                     $this->pinger?->onConnect();
+                    // The requests sent on the previous connection may have been lost with it: ask for their state now
+                    // (the server answers state requests right away), not when their check timer fires.
+                    foreach ($this->new_outgoing as $message) {
+                        if ($message->contentRelated) {
+                            $message->requestState();
+                        }
+                    }
 
                     if ($this->stream !== $stream) {
                         // Disconnected meanwhile (this fiber can suspend after publishing the stream: logging, a loop

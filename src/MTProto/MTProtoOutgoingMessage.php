@@ -295,8 +295,14 @@ class MTProtoOutgoingMessage extends MTProtoMessage
                 $self->get()?->check();
             }
         );
-
-        if ($this->msgId === null) {
+        $this->requestState();
+    }
+    /**
+     * Ask the server for the state of this message with the next msgs_state_req.
+     */
+    public function requestState(): void
+    {
+        if ($this->state & self::STATE_REPLIED || $this->msgId === null) {
             return;
         }
         if ($this->unencrypted) {
