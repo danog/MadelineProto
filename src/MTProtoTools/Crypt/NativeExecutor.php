@@ -43,12 +43,11 @@ final class NativeExecutor
         }
         self::$instance = false;
         if (!\extension_loaded('madeline_crypto') || !class_exists(Crypto::class, false)
-            || Crypto::version() !== '0.3.0') {
+            || Crypto::version() !== '0.4.0') {
             return;
         }
         try {
-            $fd = Crypto::init($capacity, $byteLimit);
-            self::$instance = new self($fd);
+            self::$instance = new self(Crypto::init($capacity, $byteLimit));
             register_shutdown_function(self::$instance->close(...));
         } catch (Throwable) {
             Crypto::shutdown();
@@ -63,14 +62,10 @@ final class NativeExecutor
             ? $instance : null;
     }
 
-    private function __construct(int $fd)
+    /** @param resource $stream php-tokio's notification stream. */
+    private function __construct($stream)
     {
         $this->pid = getmypid();
-        // A failing fopen throws (warnings throw): initialize() falls back to PHP.
-        $stream = fopen('php://fd/'.$fd, 'r');
-        if (!$stream) {
-            throw new RuntimeException('Could not open crypto notification stream');
-        }
         $this->stream = $stream;
         stream_set_blocking($stream, false);
         stream_set_read_buffer($stream, 0);

@@ -9,7 +9,8 @@ final class Crypto
     public static function version(): string
     {
     }
-    public static function init(int $capacity, int $byte_limit): int
+    /** @return resource php-tokio's notification stream, to watch for readability. */
+    public static function init(int $capacity, int $byte_limit)
     {
     }
     public static function available(): bool
