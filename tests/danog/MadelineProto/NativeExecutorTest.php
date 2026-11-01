@@ -139,12 +139,12 @@ final class NativeExecutorTest extends TestCase
         $plain = random_bytes(4096);
         $expected = $this->reference($plain, $key, $iv);
         // After the first measured job, the batching policy probes a width of two: a lone job
-        // must still run immediately instead of waiting for a second one.
-        $start = hrtime(true);
+        // must still run instead of waiting for a second one, which would never come (it would hang:
+        // native/src/tests.rs, lone_jobs_never_wait_for_a_batch, checks the executor itself). Not timed:
+        // a wall-clock bound fails on whichever runner is slower than the one it was picked on.
         for ($i = 0; $i < 100; $i++) {
             self::assertSame($expected, IGE::getInstance($key, $iv)->encrypt($plain));
         }
-        self::assertLessThan(0.05, (hrtime(true) - $start) / 1e9, '100 isolated 4 KiB operations take a few milliseconds');
     }
 
     public function testInputLargerThanTheQueueLimitUsesAnotherBackend(): void
