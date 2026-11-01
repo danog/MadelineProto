@@ -7,7 +7,9 @@ declare(strict_types=1);
 //   where processes can't be started (proc_open disabled), and prints what they returned as JSON;
 // - process: starts a context where processes can be started;
 // - userset: sets the context factory and the worker pool of amphp/parallel before MadelineProto starts;
-// - selfstart: sends a request to the webserver with WebRunner::selfStart(), to ?mode=ping.
+// - selfstart: sends a request to the webserver with WebRunner::selfStart(), to ?mode=ping;
+// - idle: runs a task in the worker pool, whose idle workers are stopped after an hour, then runs the event loop
+//   until nothing keeps it running, without shutting the pool down.
 
 use Amp\Cancellation;
 use Amp\Parallel\Context\Context;
@@ -21,6 +23,7 @@ use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
 use danog\MadelineProto\Parallel\Internal\OnDemandWorkerFactory;
 use danog\MadelineProto\Parallel\WebContextFactory;
 use danog\MadelineProto\Test\WebContextTask;
+use Revolt\EventLoop;
 
 use function Amp\delay;
 use function Amp\Future\await;
@@ -40,18 +43,29 @@ if ($mode === 'ping') {
 /** The factory of the workers of a ContextWorkerPool */
 $getWorkerFactory = static fn (ContextWorkerPool $pool): ?object => (new ReflectionProperty(ContextWorkerPool::class, 'factory'))->getValue($pool);
 
-/** The requests of web contexts the webserver logged as done */
-$countDoneContexts = static fn (): int => substr_count(
-    file_get_contents(sys_get_temp_dir().'/server.log'),
-    ']: GET /src/Ipc/Runner/entry.php?argv%5B0%5D=madeline-parallel&',
-);
+/** The web contexts whose request the webserver logged as done (a context may be requested more than once) */
+$countDoneContexts = static function (): int {
+    preg_match_all(
+        '/\]: GET \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/',
+        file_get_contents(sys_get_temp_dir().'/server.log'),
+        $matches,
+    );
+    return count(array_unique($matches[1]));
+};
 
 $modes = [
     'selfstart' => static function (array &$result): void {
         Magic::start(light: true);
-        $start = microtime(true);
         WebRunner::selfStart('/tests/parallel_web_child.php?mode=ping');
-        $result['selfStart'] = microtime(true) - $start;
+        // What MadelineProto logged about the requests to the endpoints when selfStart() returned
+        $result['logged'] = ob_get_contents();
+    },
+    'idle' => static function (array &$result): void {
+        Magic::start(light: true);
+        workerPool(new ContextWorkerPool(1, new OnDemandWorkerFactory(3600)));
+        $result['task'] = submit(new WebContextTask(1, talk: false))->await()['value'];
+        // Not shut down: the idle worker must not keep the event loop running, though it's only stopped after an hour
+        EventLoop::run();
     },
     'process' => static function (array &$result): void {
         Magic::start(light: true);

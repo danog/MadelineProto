@@ -17,31 +17,34 @@
 namespace danog\MadelineProto\Parallel\Internal;
 
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\ForbidCloning;
 use Amp\ForbidSerialization;
+use Amp\Future;
 use Amp\Ipc\Sync\ChannelException as IpcChannelException;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\Ipc\Sync\SerializationException as IpcSerializationException;
-use Amp\Pipeline\ConcurrentIterator;
-use Amp\Pipeline\Queue;
 use Amp\Serialization\SerializationException;
 use Amp\Sync\Channel;
 use Amp\Sync\ChannelException;
+use Amp\Sync\LocalMutex;
 use Closure;
-use Revolt\EventLoop;
 use Throwable;
 
+use function Amp\async;
 use function Amp\Parallel\Context\flattenArgument;
 
 /**
- * An amphp channel over a danog/ipc socket, used by both ends of a {@see \danog\MadelineProto\Parallel\WebContext}.
+ * An amphp channel over a danog/ipc socket, used for both channels of a {@see \danog\MadelineProto\Parallel\WebContext}
+ * (its IPC channel and its result channel), at both ends.
  *
  * Values are wrapped in a ChannelValue: a ChannelledSocket returns null once closed, and a null value must still
  * reach the other end (ContextWorker sends one to stop the task runner).
- * Anything else the peer sends (the exit result of the context) goes to the control message callback.
  *
- * A ChannelledSocket can't be read with a cancellation, so a fiber reads it into a queue that can.
+ * The socket is only read by receive(), like StreamChannel: an idle channel has no read pending, which would keep the
+ * event loop running (an idle worker would keep its script from ending). A ChannelledSocket can't be read with a
+ * cancellation: a receive() that is cancelled leaves its read to the next one.
  *
  * @internal
  *
@@ -54,49 +57,16 @@ final class SocketChannel implements Channel
     use ForbidCloning;
     use ForbidSerialization;
 
-    /** @var ConcurrentIterator<TReceive> */
-    private readonly ConcurrentIterator $iterator;
-    private readonly Queue $queue;
+    /** @var Future<mixed>|null The read of a receive() that was cancelled. */
+    private ?Future $reading = null;
+    private readonly LocalMutex $readMutex;
     private readonly DeferredFuture $onClose;
 
-    /**
-     * @param (Closure(mixed): void)|null $onControlMessage Invoked with what the peer sends besides values.
-     */
     public function __construct(
         private readonly ChannelledSocket $socket,
-        ?Closure $onControlMessage = null,
     ) {
-        $queue = $this->queue = new Queue();
-        $this->iterator = $queue->iterate();
-        $onClose = $this->onClose = new DeferredFuture();
-
-        // Static, so that dropping the channel (or the context holding it) closes it
-        EventLoop::queue(static function () use ($socket, $queue, $onClose, $onControlMessage): void {
-            try {
-                while (($message = $socket->receive()) !== null) {
-                    if ($message instanceof ChannelValue) {
-                        // Not push(): an unread value must not stop the exit result from being read
-                        $queue->pushAsync($message->value)->ignore();
-                    } elseif ($onControlMessage !== null) {
-                        $onControlMessage($message);
-                    } else {
-                        throw new ChannelException('Unexpected message: '.flattenArgument($message));
-                    }
-                }
-            } catch (Throwable $e) {
-                if (!$queue->isComplete()) {
-                    $queue->error(new ChannelException('Receiving from the channel failed', previous: $e));
-                }
-                $socket->disconnect();
-            } finally {
-                if (!$queue->isComplete()) {
-                    $queue->complete();
-                }
-                if (!$onClose->isComplete()) {
-                    $onClose->complete();
-                }
-            }
-        });
+        $this->readMutex = new LocalMutex();
+        $this->onClose = new DeferredFuture();
     }
 
     public function __destruct()
@@ -107,28 +77,47 @@ final class SocketChannel implements Channel
     #[\Override]
     public function receive(?Cancellation $cancellation = null): mixed
     {
-        if (!$this->iterator->continue($cancellation)) {
+        $lock = $this->readMutex->acquire();
+        try {
+            if ($this->isClosed()) {
+                throw new ChannelException('The channel was closed');
+            }
+            $socket = $this->socket;
+            $this->reading ??= async(static fn (): mixed => $socket->receive());
+            // Errors are thrown to the receive() awaiting it, if any
+            $this->reading->ignore();
+            try {
+                $message = $this->reading->await($cancellation);
+            } catch (CancelledException $e) {
+                throw $e;
+            } catch (Throwable $e) {
+                $this->reading = null;
+                $this->close();
+                throw new ChannelException('Receiving from the channel failed', previous: $e);
+            }
+            $this->reading = null;
+        } finally {
+            $lock->release();
+        }
+        if ($message === null) {
+            $this->close();
             throw new ChannelException('The channel closed while waiting to receive the next value');
         }
-        return $this->iterator->getValue();
+        if (!$message instanceof ChannelValue) {
+            $this->close();
+            throw new ChannelException('Unexpected message: '.flattenArgument($message));
+        }
+        return $message->value;
     }
 
     #[\Override]
     public function send(mixed $data): void
     {
-        $this->sendControl(new ChannelValue($data));
-    }
-
-    /**
-     * Send a message that is not a value of the channel (an exit result, a key).
-     */
-    public function sendControl(mixed $message): void
-    {
         if ($this->isClosed()) {
             throw new ChannelException('The channel was closed');
         }
         try {
-            $this->socket->send($message);
+            $this->socket->send(new ChannelValue($data));
         } catch (IpcSerializationException $e) {
             throw new SerializationException($e->getMessage(), previous: $e);
         } catch (IpcChannelException $e) {
@@ -140,9 +129,6 @@ final class SocketChannel implements Channel
     public function close(): void
     {
         $this->socket->disconnect();
-        if (!$this->queue->isComplete()) {
-            $this->queue->complete();
-        }
         if (!$this->onClose->isComplete()) {
             $this->onClose->complete();
         }

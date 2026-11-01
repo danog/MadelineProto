@@ -320,7 +320,7 @@ final class WebContextFactory implements ContextFactory
                 'cwd' => Magic::getcwd(),
                 'timeout' => $this->childConnectTimeout,
             ]);
-            $socket = $this->connect($server, $id, $key, $cancellation);
+            [$ipcSocket, $resultSocket] = $this->connect($server, $id, $key, $cancellation);
         } catch (CancelledException|ContextException $e) {
             throw $e;
         } catch (Throwable $e) {
@@ -336,7 +336,7 @@ final class WebContextFactory implements ContextFactory
         }
 
         Logger::log("Started web context $id");
-        return new WebContext($socket);
+        return new WebContext($ipcSocket, $resultSocket);
     }
 
     /**
@@ -388,8 +388,8 @@ final class WebContextFactory implements ContextFactory
     private static ?int $endpoint = null;
 
     /**
-     * Send the request of the context to the webserver, and accept the connection of the context, which
-     * authenticates with the key.
+     * Send the request of the context to the webserver, and accept the two connections of the context (its IPC
+     * channel and its result channel, like a process context of amphp/parallel), which authenticate with the key.
      *
      * The request goes to one endpoint of the webserver at a time (see WebRunner::getSelfStartEndpoints()), until
      * the context connects: every request reaching the webserver occupies one of its workers, if only for a moment
@@ -399,8 +399,10 @@ final class WebContextFactory implements ContextFactory
      *
      * The connections of the requests are closed once their response ends (see WebRunner::sendSelfRequest()): for
      * the one that started the context, once its request ends.
+     *
+     * @return array{ChannelledSocket, ChannelledSocket} The IPC channel and the result channel.
      */
-    private function connect(IpcServer $server, string $id, string $key, ?Cancellation $cancellation): ChannelledSocket
+    private function connect(IpcServer $server, string $id, string $key, ?Cancellation $cancellation): array
     {
         $timeout = new TimeoutCancellation(
             $this->childConnectTimeout,
@@ -409,35 +411,48 @@ final class WebContextFactory implements ContextFactory
         $startCancellation = $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout;
         $endpoints = WebRunner::getSelfStartEndpoints();
 
-        /** @var DeferredFuture<array{ChannelledSocket, ?int}> */
+        /** @var DeferredFuture<?int> Completed with the endpoint that served the context, once it connects */
+        $served = new DeferredFuture();
+        /** @var DeferredFuture<array{ipc: ChannelledSocket, result: ChannelledSocket}> */
         $deferred = new DeferredFuture();
+        /** @var array<'ipc'|'result', ChannelledSocket> */
+        $channels = [];
         /** @var array<int, ChannelledSocket> */
         $pending = [];
-        EventLoop::queue(static function () use ($server, $key, $endpoints, $deferred, &$pending): void {
+        EventLoop::queue(static function () use ($server, $key, $endpoints, $served, $deferred, &$channels, &$pending): void {
             while ($socket = $server->accept()) {
                 // Read the key of each connection on its own: one that sends nothing must not hold up the others
                 $pending[$socketId = spl_object_id($socket)] = $socket;
-                EventLoop::queue(static function () use ($socket, $socketId, $key, $endpoints, $deferred, &$pending): void {
+                EventLoop::queue(static function () use ($socket, $socketId, $key, $endpoints, $served, $deferred, &$channels, &$pending): void {
                     try {
                         $received = $socket->receive();
                     } catch (Throwable) {
                         $received = null;
                     }
                     unset($pending[$socketId]);
-                    if (\is_array($received)
-                        && \is_string($received['key'] ?? null)
-                        && hash_equals($key, $received['key'])
-                        && !$deferred->isComplete()
+                    $channel = \is_array($received) ? ($received['channel'] ?? null) : null;
+                    if (!\is_array($received)
+                        || !\is_string($received['key'] ?? null)
+                        || !hash_equals($key, $received['key'])
+                        || !\in_array($channel, ['ipc', 'result'], true)
+                        || isset($channels[$channel])
+                        || $deferred->isComplete()
                     ) {
-                        $endpoint = $received['endpoint'] ?? null;
-                        $deferred->complete([$socket, \is_int($endpoint) && isset($endpoints[$endpoint]) ? $endpoint : null]);
-                    } else {
                         $socket->disconnect();
+                        return;
+                    }
+                    $channels[$channel] = $socket;
+                    if (!$served->isComplete()) {
+                        $endpoint = $received['endpoint'] ?? null;
+                        $served->complete(\is_int($endpoint) && isset($endpoints[$endpoint]) ? $endpoint : null);
+                    }
+                    if (\count($channels) === 2) {
+                        $deferred->complete($channels);
                     }
                 });
             }
         });
-        $connected = $deferred->getFuture();
+        $connected = $served->getFuture();
 
         try {
             $order = array_keys($endpoints);
@@ -469,9 +484,10 @@ final class WebContextFactory implements ContextFactory
             if (!$sent) {
                 throw new ContextException('Could not send the request of the context to the webserver: check the logs and the server configuration');
             }
-            [$socket, $endpoint] = $connected->await($startCancellation);
+            $endpoint = $connected->await($startCancellation);
+            ['ipc' => $ipcSocket, 'result' => $resultSocket] = $deferred->getFuture()->await($startCancellation);
             self::$endpoint = $endpoint;
-            return $socket;
+            return [$ipcSocket, $resultSocket];
         } catch (CancelledException $e) {
             $cancellation?->throwIfRequested();
             throw new ContextException('Starting the context failed', previous: $e);
@@ -480,6 +496,11 @@ final class WebContextFactory implements ContextFactory
             $server->close();
             foreach ($pending as $socket) {
                 $socket->disconnect();
+            }
+            if (!$deferred->isComplete()) {
+                foreach ($channels as $socket) {
+                    $socket->disconnect();
+                }
             }
         }
     }

@@ -17,60 +17,32 @@
 namespace danog\MadelineProto\Parallel;
 
 use Amp\Cancellation;
-use Amp\DeferredFuture;
-use Amp\ForbidCloning;
-use Amp\ForbidSerialization;
 use Amp\Ipc\Sync\ChannelledSocket;
-use Amp\Parallel\Context\Context;
-use Amp\Parallel\Context\ContextException;
-use Amp\Sync\ChannelException;
-use danog\MadelineProto\Parallel\Internal\ContextExit;
+use Amp\Parallel\Context\Internal\AbstractContext;
 use danog\MadelineProto\Parallel\Internal\SocketChannel;
-
-use function Amp\Parallel\Context\flattenArgument;
 
 /**
  * A context running in a request to the webserver, started by {@see WebContextFactory}.
  *
- * The request can't be killed: closing the context disconnects it, which ends the task runner of a worker.
+ * It works like a process context of amphp/parallel: two channels to the context (one for the values it exchanges,
+ * one for its exit result), over danog/ipc sockets instead of amphp/socket ones, so that every transport of danog/ipc
+ * can be used.
+ *
+ * The request can't be killed: closing the context closes its channels, which ends the task runner of a worker.
  *
  * @template-covariant TResult
  * @template-covariant TReceive
  * @template TSend
- * @implements Context<TResult, TReceive, TSend>
+ * @extends AbstractContext<TResult, TReceive, TSend>
  */
-final class WebContext implements Context
+final class WebContext extends AbstractContext
 {
-    use ForbidCloning;
-    use ForbidSerialization;
-
-    /** @var SocketChannel<TReceive, TSend> */
-    private readonly SocketChannel $channel;
-
-    /** @var DeferredFuture<ContextExit> */
-    private readonly DeferredFuture $result;
-
     /**
      * @internal
      */
-    public function __construct(ChannelledSocket $socket)
+    public function __construct(ChannelledSocket $ipcSocket, ChannelledSocket $resultSocket)
     {
-        $result = $this->result = new DeferredFuture();
-        $this->channel = new SocketChannel($socket, static function (mixed $message) use ($result): void {
-            if (!$message instanceof ContextExit || $result->isComplete()) {
-                throw new ChannelException('Unexpected message from the context: '.flattenArgument($message));
-            }
-            $result->complete($message);
-        });
-        // The exit result is read before the socket is closed
-        $this->channel->onClose(static function () use ($result): void {
-            if (!$result->isComplete()) {
-                $result->error(new ContextException(
-                    'The context exited without a result, potentially due to a fatal error, calling exit, or the webserver ending the request'
-                ));
-            }
-        });
-        $result->getFuture()->ignore();
+        parent::__construct(new SocketChannel($ipcSocket), new SocketChannel($resultSocket));
     }
 
     public function __destruct()
@@ -78,57 +50,12 @@ final class WebContext implements Context
         $this->close();
     }
 
-    #[\Override]
-    public function receive(?Cancellation $cancellation = null): mixed
-    {
-        try {
-            return $this->channel->receive($cancellation);
-        } catch (ChannelException $e) {
-            throw new ContextException(
-                'The context stopped responding during receive, potentially due to a fatal error or calling exit',
-                previous: $e,
-            );
-        }
-    }
-
-    #[\Override]
-    public function send(mixed $data): void
-    {
-        try {
-            $this->channel->send($data);
-        } catch (ChannelException $e) {
-            throw new ContextException(
-                'The context stopped responding during send, potentially due to a fatal error or calling exit',
-                previous: $e,
-            );
-        }
-    }
-
     /**
      * @return TResult
-     * @throws ContextException
      */
     #[\Override]
     public function join(?Cancellation $cancellation = null): mixed
     {
-        return $this->result->getFuture()->await($cancellation)->getResult();
-    }
-
-    #[\Override]
-    public function close(): void
-    {
-        $this->channel->close();
-    }
-
-    #[\Override]
-    public function isClosed(): bool
-    {
-        return $this->channel->isClosed();
-    }
-
-    #[\Override]
-    public function onClose(\Closure $onClose): void
-    {
-        $this->channel->onClose($onClose);
+        return $this->receiveExitResult($cancellation)->getResult();
     }
 }

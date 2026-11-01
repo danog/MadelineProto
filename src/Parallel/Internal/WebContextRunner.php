@@ -17,6 +17,9 @@
 namespace danog\MadelineProto\Parallel\Internal;
 
 use Amp\Future;
+use Amp\Parallel\Context\Internal\ContextChannel;
+use Amp\Parallel\Context\Internal\ExitFailure;
+use Amp\Parallel\Context\Internal\ExitSuccess;
 use Amp\Serialization\SerializationException;
 use Amp\Sync\ChannelException;
 use Amp\TimeoutCancellation;
@@ -25,10 +28,12 @@ use danog\MadelineProto\Parallel\WebContextFactory;
 use Throwable;
 
 use function Amp\Ipc\connect;
+use function Amp\Parallel\Context\contextFactory;
 
 /**
  * Runs a {@see \danog\MadelineProto\Parallel\WebContext} in the webserver request started for it, like the
- * process runner of amphp/parallel.
+ * process runner of amphp/parallel (Amp\Parallel\Context\Internal\runContext(), which only connects with
+ * amphp/socket: the context connects with danog/ipc, for every transport it supports).
  *
  * @internal
  */
@@ -47,6 +52,9 @@ final class WebContextRunner
             error_log("MadelineProto web context: invalid ID");
             return false;
         }
+        // MadelineProto's error handler first: what follows relies on failing builtins throwing (the request taken by
+        // a concurrent request, a working directory that can't be entered)
+        Magic::start(light: true);
         $request = self::readRequest($id);
         if ($request === null) {
             return false;
@@ -54,19 +62,30 @@ final class WebContextRunner
 
         self::detach();
 
+        // Like amphp's process contexts: one channel for the values, one for the exit result
+        $channels = [];
         // With a FIFO, the client creates its FIFOs in the temporary directory: only this user may open them
         $umask = umask(0o077);
         try {
-            $socket = connect($request['uri'], new TimeoutCancellation($request['timeout']));
-            $socket->send(['key' => $request['key'], 'endpoint' => $endpoint]);
+            $cancellation = new TimeoutCancellation($request['timeout']);
+            foreach (['ipc', 'result'] as $channel) {
+                $socket = connect($request['uri'], $cancellation);
+                $socket->send(['key' => $request['key'], 'endpoint' => $endpoint, 'channel' => $channel]);
+                $channels[$channel] = new SocketChannel($socket);
+            }
         } catch (Throwable $e) {
             error_log("MadelineProto web context: could not connect to the parent: $e");
+            foreach ($channels as $channel) {
+                $channel->close();
+            }
             return false;
         } finally {
             umask($umask);
         }
-        $channel = new SocketChannel($socket);
 
+        // This context is a request because processes don't work here: the contexts it starts are requests too
+        // (Magic::start() installed the factory that tries processes first)
+        contextFactory(new WebContextFactory());
         if (!\defined('AMP_CONTEXT')) {
             \define('AMP_CONTEXT', 'process');
             \define('AMP_CONTEXT_ID', getmypid());
@@ -76,11 +95,9 @@ final class WebContextRunner
         } catch (Throwable $e) {
             error_log("MadelineProto web context: could not change the working directory to {$request['cwd']}: {$e->getMessage()}");
         }
-        // Like the script that started it: MadelineProto's error handler, and the context factory of this host for
-        // the contexts started by this one (the default one of amphp/parallel only starts processes)
-        Magic::start(light: true);
         Magic::$script_cwd = $request['cwd'];
 
+        // As in Amp\Parallel\Context\Internal\runContext()
         try {
             $argv = $request['script'];
             $argc = \count($argv);
@@ -103,23 +120,24 @@ final class WebContextRunner
                 throw new \Error(\sprintf("Script '%s' contains a parse error: %s", $argv[0], $e->getMessage()), 0, $e);
             }
 
-            $returnValue = $callable($channel);
-            $result = ContextExit::success($returnValue instanceof Future ? $returnValue->await() : $returnValue);
+            $returnValue = $callable(new ContextChannel($channels['ipc']));
+            $result = new ExitSuccess($returnValue instanceof Future ? $returnValue->await() : $returnValue);
         } catch (Throwable $e) {
-            $result = ContextExit::failure($e);
+            $result = new ExitFailure($e);
         }
 
+        $channels['ipc']->close();
         try {
             try {
-                $channel->sendControl($result);
+                $channels['result']->send($result);
             } catch (SerializationException $e) {
                 // Serializing the result failed: send the reason why
-                $channel->sendControl(ContextExit::failure($e));
+                $channels['result']->send(new ExitFailure($e));
+            } finally {
+                $channels['result']->close();
             }
         } catch (ChannelException) {
             // The parent already closed the channel
-        } finally {
-            $channel->close();
         }
         return true;
     }
@@ -150,12 +168,10 @@ final class WebContextRunner
         }
         try {
             $contents = file_get_contents($path);
+            // The request that deletes the file runs it: concurrent ones may have read it too
             unlink($path);
         } catch (Throwable) {
             // Served concurrently
-            return null;
-        }
-        if (!\is_string($contents)) {
             return null;
         }
         try {

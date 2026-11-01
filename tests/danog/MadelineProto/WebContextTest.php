@@ -18,9 +18,15 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\Cancellation;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\Ipc\IpcServer;
+use Amp\Parallel\Context\Context;
+use Amp\Parallel\Context\ContextException;
+use Amp\Parallel\Context\ContextFactory;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
 use danog\MadelineProto\Parallel\Internal\WebContextRunner;
 use danog\MadelineProto\Parallel\WebContextFactory;
@@ -81,10 +87,15 @@ final class WebContextTest extends TestCase
             self::assertFalse(WebContextRunner::run($id), 'A request ran twice');
             self::assertFileDoesNotExist($marker);
         } finally {
-            @unlink($path);
-            @rmdir($dir);
-            @unlink($script);
-            @unlink($marker);
+            // Without @: WebContextRunner::run() started MadelineProto, whose error handler throws for it too
+            foreach ([$path, $script, $marker] as $file) {
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+            if (is_dir($dir)) {
+                rmdir($dir);
+            }
         }
     }
 
@@ -141,8 +152,8 @@ final class WebContextTest extends TestCase
             self::assertSame(realpath(self::ROOT.'/tests'), $result['joined']['cwd']);
             self::assertStringContainsString('The context failed', $result['failure']);
 
-            // A context runs with MadelineProto started: it starts web contexts too
-            self::assertSame(FallbackContextFactory::class, $result['nested']['factory']);
+            // A context runs with MadelineProto started: it starts web contexts too, without trying processes first
+            self::assertSame(WebContextFactory::class, $result['nested']['factory']);
             self::assertSame(Exception::class, $result['nested']['errorHandler']);
             self::assertSame('cli-server', $result['nested']['nested']['sapi']);
             self::assertNotContains($result['nested']['nested']['pid'], [$result['pid'], $result['nested']['pid']]);
@@ -163,12 +174,12 @@ final class WebContextTest extends TestCase
 
             self::assertSame([], glob("$tmp/madeline-parallel-*"), 'Request files or IPC endpoints were left behind');
 
-            // Every context was started with one request, to one endpoint: every request reaching the webserver
-            // takes one of its workers
+            // Every context started is one context ID (the idle worker after the others, besides the ones counted):
+            // a context slower than ENDPOINT_GRACE to connect is requested again on another endpoint, by design, and
+            // only runs once (see testARequestOnlyRunsForTheRequestThatDeletesIt())
             $log = file_get_contents("$tmp/server.log");
             preg_match_all('/\]: GET \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/', $log, $matches);
-            self::assertNotEmpty($matches[1]);
-            self::assertSame(array_values(array_unique($matches[1])), $matches[1], 'A context was requested more than once');
+            self::assertCount($result['started'] + 1, array_unique($matches[1]));
             self::assertSame(
                 substr_count($log, ' Accepted') - substr_count($log, 'Closed without sending a request'),
                 preg_match_all('/\]: [A-Z]+ \//', $log),
@@ -210,7 +221,10 @@ final class WebContextTest extends TestCase
     {
         self::withServer(sys_get_temp_dir().'/madeline-webcontext-test-', [], static function (int $port, string $tmp): void {
             $result = self::request($port, 'selfstart');
-            self::assertLessThan(2, $result['selfStart']);
+            // Returned once the request was sent to the port of the webserver, without waiting for the TLS handshake
+            // with it, which can't be answered until this request ends
+            self::assertStringContainsString("Sent the request to tcp://127.0.0.1:$port", $result['logged']);
+            self::assertStringNotContainsString("tls://127.0.0.1:$port", $result['logged']);
 
             // Served once the worker is free
             $deadline = microtime(true) + 10;
@@ -221,6 +235,166 @@ final class WebContextTest extends TestCase
                 delay(0.1);
             }
         });
+    }
+
+    /**
+     * An idle worker has no read pending on its context: it doesn't keep the event loop running until it's stopped,
+     * as for amphp's own process contexts (a script waiting with EventLoop::run() for what it started to finish).
+     */
+    public function testAnIdleWorkerDoesntKeepTheScriptRunning(): void
+    {
+        self::withServer(sys_get_temp_dir().'/madeline-webcontext-test-', ['PHP_CLI_SERVER_WORKERS' => '3'], static function (int $port): void {
+            // The worker is only stopped after an hour: if it kept the event loop running, the request would time out
+            self::assertSame(1, self::request($port, 'idle')['task']);
+        }, ['-d', 'disable_functions=proc_open']);
+    }
+
+    /**
+     * A process that can't be started makes every context a web context only while no process could be started, and
+     * processes are tried again after a while: once one started, a failure (a timeout under load) is transient.
+     */
+    public function testProcessesAreOnlyGivenUpWhileNoneStarted(): void
+    {
+        $context = $this->createMock(Context::class);
+        $processes = new class($context) implements ContextFactory {
+            /** @var list<bool> Whether each start succeeds */
+            public array $results = [];
+            public int $started = 0;
+            public function __construct(private readonly Context $context)
+            {
+            }
+            public function start(string|array $script, ?Cancellation $cancellation = null): Context
+            {
+                $this->started++;
+                if (!array_shift($this->results)) {
+                    throw new ContextException('The process did not connect');
+                }
+                return $this->context;
+            }
+        };
+        $web = new class($context) implements ContextFactory {
+            public int $started = 0;
+            public function __construct(private readonly Context $context)
+            {
+            }
+            public function start(string|array $script, ?Cancellation $cancellation = null): Context
+            {
+                $this->started++;
+                return $this->context;
+            }
+        };
+
+        $factory = new FallbackContextFactory($processes, $web);
+        $processes->results = [true, false, true];
+        $factory->start('script');
+        $factory->start('script');
+        self::assertSame(1, $web->started, 'A failure after a process started is only for that context');
+        self::assertFalse($factory->usesWeb());
+        $factory->start('script');
+        self::assertSame(3, $processes->started);
+
+        $factory = new FallbackContextFactory($processes, $web);
+        $processes->started = $web->started = 0;
+        $processes->results = [false, true];
+        $factory->start('script');
+        $factory->start('script');
+        self::assertTrue($factory->usesWeb());
+        self::assertSame([1, 2], [$processes->started, $web->started], 'Processes were tried again right away');
+        (new \ReflectionProperty($factory, 'retryAt'))->setValue($factory, 0);
+        $factory->start('script');
+        self::assertSame([2, 2], [$processes->started, $web->started], 'Processes were not tried again');
+        self::assertFalse($factory->usesWeb());
+    }
+
+    /**
+     * Requests for the same context may be served concurrently (it's requested again on another endpoint if slow to
+     * connect): only the one that deletes the request file runs it, also before MadelineProto's error handler is
+     * installed (in a new request, where unlink() only warns). A working directory that can't be entered is logged.
+     *
+     * Here the request file can be read but not deleted (its directory is read-only), as by a request that read it
+     * just before another deleted it.
+     */
+    public function testARequestOnlyRunsForTheRequestThatDeletesIt(): void
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            self::markTestSkipped('Web contexts are not supported on Windows');
+        }
+        $id = bin2hex(random_bytes(16));
+        $dir = WebContextFactory::getDirectory($id);
+        $path = WebContextFactory::getRequestPath($id);
+        $marker = sys_get_temp_dir().'/madeline-webcontext-test-marker-'.$id;
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-script-'.$id.'.php';
+        file_put_contents($script, '<?php touch('.var_export($marker, true).'); return static fn () => null;');
+        $serverDir = sys_get_temp_dir().'/madeline-webcontext-test-ipc-'.bin2hex(random_bytes(4));
+        mkdir($serverDir, 0o700);
+        $server = new IpcServer("$serverDir/ipc");
+        $write = static fn (string $cwd) => file_put_contents($path, json_encode([
+            'uri' => $server->getUri(),
+            'key' => 'key',
+            'script' => [$script],
+            'cwd' => $cwd,
+            'timeout' => 5,
+        ]));
+        mkdir($dir, 0o700);
+        try {
+            $write(getcwd());
+            chmod($path, 0o600);
+            chmod($dir, 0o500);
+            [$code, $output] = self::runInNewProcess($id);
+            self::assertSame(0, $code, $output);
+            self::assertFileDoesNotExist($marker, "A request that couldn't delete the request file ran it");
+
+            chmod($dir, 0o700);
+            $write("$serverDir/missing");
+            [$code, $output] = self::runInNewProcess($id);
+            self::assertSame(1, $code, $output);
+            self::assertFileExists($marker, 'The request did not run');
+            self::assertStringContainsString("could not change the working directory to $serverDir/missing", $output);
+        } finally {
+            $server->close();
+            chmod($dir, 0o700);
+            exec('rm -rf '.escapeshellarg($dir).' '.escapeshellarg($serverDir).' '.escapeshellarg($script).' '.escapeshellarg($marker));
+        }
+    }
+
+    /**
+     * Run WebContextRunner::run() in a new PHP process, as in a new request: exits with 1 if the context ran.
+     *
+     * @return array{int, string} The exit code and the output.
+     */
+    private static function runInNewProcess(string $id): array
+    {
+        exec(
+            escapeshellarg(PHP_BINARY).' -r '.escapeshellarg(
+                'require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+                .'exit('.WebContextRunner::class.'::run('.var_export($id, true).') ? 1 : 0);'
+            ).' 2>&1',
+            $output,
+            $code,
+        );
+        return [$code, implode("\n", $output)];
+    }
+
+    /**
+     * The entry script is found also from a fiber resumed by a shutdown function, where Revolt runs the event loop of
+     * a script that never awaited: the last frame of the backtrace has no file there.
+     */
+    public function testTheEntryScriptIsFoundFromShutdownFunctions(): void
+    {
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-entry-'.bin2hex(random_bytes(8)).'.php';
+        file_put_contents($script, '<?php require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+            .'$_SERVER["SERVER_NAME"] = "localhost"; $_SERVER["REQUEST_URI"] = "/".basename(__FILE__);'
+            .'register_shutdown_function(static function (): void {'
+            .'  $fiber = new Fiber(static fn () => print('.WebRunner::class.'::getAbsoluteRootDir()));'
+            .'  $fiber->start();'
+            .'});');
+        try {
+            exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($script).' 2>&1', $output, $code);
+        } finally {
+            unlink($script);
+        }
+        self::assertSame(0, $code, implode("\n", $output));
+        self::assertSame(\dirname($script).DIRECTORY_SEPARATOR, implode("\n", $output));
     }
 
     /**

@@ -31,7 +31,6 @@ use danog\MadelineProto\Magic;
 use Revolt\EventLoop;
 use Throwable;
 
-use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use const DIRECTORY_SEPARATOR;
 use const PHP_URL_PATH;
 
@@ -109,8 +108,12 @@ final class WebRunner extends RunnerAbstract
         }
         $uri = str_replace('//', '/', $uri);
 
-        $rootDir = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $rootDir = end($rootDir)['file'] ?? '';
+        // The script the webserver runs: not the last frame of the backtrace, which has no file in a fiber resumed
+        // by a shutdown function (where Revolt runs the event loop of a script that never awaited)
+        $rootDir = $_SERVER['SCRIPT_FILENAME'] ?? '';
+        if (!\is_string($rootDir) || $rootDir === '') {
+            $rootDir = get_included_files()[0] ?? '';
+        }
         if (!$rootDir) {
             throw new ContextException('Could not get entry file!');
         }
@@ -226,9 +229,15 @@ final class WebRunner extends RunnerAbstract
                     throw new Exception("($errno) $errstr");
                 }
                 stream_set_timeout($socket, (int) ceil($timeout));
-                fwrite($socket, $payload);
+                $written = fwrite($socket, $payload);
+                if ($written !== \strlen($payload)) {
+                    throw new Exception('Wrote '.var_export($written, true).' of '.\strlen($payload).' bytes');
+                }
             } catch (Throwable $e) {
                 Logger::log("Could not send the request to $address: {$e->getMessage()}");
+                if (isset($socket) && \is_resource($socket)) {
+                    fclose($socket);
+                }
                 return false;
             }
             // Closed on exit: this is only used in shutdown functions

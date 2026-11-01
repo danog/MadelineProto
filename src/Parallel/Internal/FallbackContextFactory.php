@@ -40,7 +40,10 @@ use ValueError;
  * the extensions. Such a process exits or hangs without ever connecting, and amphp/parallel waits for it forever: it
  * gets PROCESS_TIMEOUT seconds.
  *
- * Once a process couldn't be started, every context is a web context.
+ * Until a process starts, a process that can't be started makes every context a web context, trying processes again
+ * every PROCESS_RETRY_INTERVAL seconds (one failure may be transient: a timeout under load, a process or descriptor
+ * limit). Once a process started, processes work here: one that can't be started only makes that context a web
+ * context.
  *
  * @internal
  */
@@ -54,19 +57,27 @@ final class FallbackContextFactory implements ContextFactory
      */
     public const PROCESS_TIMEOUT = 10;
 
-    private bool $useWeb = false;
+    /**
+     * Seconds after which processes are tried again, while none could be started.
+     */
+    public const PROCESS_RETRY_INTERVAL = 600;
+
+    /** Whether a process was started (true), none could be (false), or none was tried yet (null). */
+    private ?bool $processesWork = null;
+
+    /** hrtime() after which processes are tried again, while none could be started. */
+    private int $retryAt = 0;
 
     /**
-     * amphp's default factory, created when first needed: it listens on a UNIX socket in the temporary directory,
-     * which may fail too (a temporary directory too long for a UNIX socket path).
+     * @param ContextFactory|null $processFactory Starts processes: amphp's default factory if null, created when first
+     *                                            needed (it listens on a UNIX socket in the temporary directory, which
+     *                                            may fail too: a temporary directory too long for a UNIX socket path).
+     * @param ContextFactory      $webFactory     Starts contexts with requests to the webserver.
      */
-    private ?ContextFactory $processFactory = null;
-
-    private readonly WebContextFactory $webFactory;
-
-    public function __construct()
-    {
-        $this->webFactory = new WebContextFactory();
+    public function __construct(
+        private ?ContextFactory $processFactory = null,
+        private readonly ContextFactory $webFactory = new WebContextFactory(),
+    ) {
     }
 
     /**
@@ -74,20 +85,22 @@ final class FallbackContextFactory implements ContextFactory
      */
     public function usesWeb(): bool
     {
-        return $this->useWeb;
+        return $this->processesWork === false;
     }
 
     #[\Override]
     public function start(string|array $script, ?Cancellation $cancellation = null): Context
     {
-        if (!$this->useWeb) {
+        if ($this->processesWork !== false || hrtime(true) >= $this->retryAt) {
             $timeout = new TimeoutCancellation(self::PROCESS_TIMEOUT);
             try {
                 $this->processFactory ??= new DefaultContextFactory();
-                return $this->processFactory->start(
+                $context = $this->processFactory->start(
                     $script,
                     $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout,
                 );
+                $this->processesWork = true;
+                return $context;
             } catch (ValueError $e) {
                 // An invalid script
                 throw $e;
@@ -95,11 +108,19 @@ final class FallbackContextFactory implements ContextFactory
                 $cancellation?->throwIfRequested();
             } catch (Throwable $e) {
             }
-            Logger::log(
-                "Could not start a process for a context of amphp/parallel, starting them with requests to the webserver from now on: $e",
-                Logger::WARNING,
-            );
-            $this->useWeb = true;
+            if ($this->processesWork) {
+                Logger::log(
+                    "Could not start a process for a context of amphp/parallel, starting this one with a request to the webserver: $e",
+                    Logger::WARNING,
+                );
+            } else {
+                Logger::log(
+                    'Could not start a process for a context of amphp/parallel, starting them with requests to the webserver, trying processes again in '.self::PROCESS_RETRY_INTERVAL." seconds: $e",
+                    Logger::WARNING,
+                );
+                $this->processesWork = false;
+                $this->retryAt = hrtime(true) + self::PROCESS_RETRY_INTERVAL * 1_000_000_000;
+            }
         }
         return $this->webFactory->start($script, $cancellation);
     }
