@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
+use ValueError;
+
 use const OPENSSL_RAW_DATA;
 use const OPENSSL_ZERO_PADDING;
 
@@ -30,6 +32,7 @@ use const OPENSSL_ZERO_PADDING;
  */
 final class IGEOpenssl extends IGE
 {
+    private const ZERO_BLOCK = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
     /**
      * @psalm-mutation-free
      */
@@ -44,17 +47,29 @@ final class IGEOpenssl extends IGE
     #[\Override]
     public function encrypt(string $plaintext): string
     {
-        $ciphertext = '';
-        for ($i = 0, $length = \strlen($plaintext); $i < $length; $i += 16) {
-            $plain = substr($plaintext, $i, 16);
-
-            $cipher = openssl_encrypt($plain ^ $this->iv_part_1, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_2;
-
-            $ciphertext .= $cipher;
-
-            $this->iv_part_1 = $cipher;
-            $this->iv_part_2 = $plain;
+        $length = \strlen($plaintext);
+        if ($length % 16) {
+            throw new ValueError('AES-IGE data length must be a multiple of 16');
         }
+        if ($length === 0) {
+            return '';
+        }
+        // c_i = E(p_i ^ c_{i-1}) ^ p_{i-1}. With z_i = E(p_i ^ c_{i-1}) and c_{i-1} = z_{i-1} ^ p_{i-2},
+        // z_i = E((p_i ^ p_{i-2}) ^ z_{i-1}): that is CBC over p_i ^ p_{i-2} with IV c_0 (p_0 being the
+        // second IV half and p_{-1} zero), so the whole chain takes one OpenSSL call.
+        $previous = $this->iv_part_2.substr($plaintext, 0, $length - 16);
+        $chained = openssl_encrypt(
+            $plaintext ^ (self::ZERO_BLOCK.substr($previous, 0, $length - 16)),
+            'aes-256-cbc',
+            $this->key,
+            OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
+            $this->iv_part_1,
+        );
+        \assert($chained !== false);
+        $ciphertext = $chained ^ $previous;
+
+        $this->iv_part_1 = substr($ciphertext, -16);
+        $this->iv_part_2 = substr($plaintext, -16);
 
         return $ciphertext;
     }
@@ -64,17 +79,24 @@ final class IGEOpenssl extends IGE
     #[\Override]
     public function decrypt(string $ciphertext): string
     {
-        $plaintext = '';
-        for ($i = 0, $length = \strlen($ciphertext); $i < $length; $i += 16) {
-            $cipher = substr($ciphertext, $i, 16);
-
-            $plain = openssl_decrypt($cipher ^ $this->iv_part_2, 'aes-256-ecb', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING) ^ $this->iv_part_1;
-
-            $plaintext .= $plain;
-
-            $this->iv_part_1 = $cipher;
-            $this->iv_part_2 = $plain;
+        $length = \strlen($ciphertext);
+        if ($length % 16) {
+            throw new ValueError('AES-IGE data length must be a multiple of 16');
         }
+        // Decryption can't be chained in one call: each block's input depends on the previous output.
+        // p_i = D(c_i ^ p_{i-1}) ^ c_{i-1}: one-block CBC decryption with IV c_{i-1} applies the second XOR.
+        $previousCipher = $this->iv_part_1;
+        $previousPlain = $this->iv_part_2;
+        $plaintext = '';
+        for ($i = 0; $i < $length; $i += 16) {
+            $cipher = substr($ciphertext, $i, 16);
+            $previousPlain = openssl_decrypt($cipher ^ $previousPlain, 'aes-256-cbc', $this->key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $previousCipher);
+            \assert($previousPlain !== false);
+            $plaintext .= $previousPlain;
+            $previousCipher = $cipher;
+        }
+        $this->iv_part_1 = $previousCipher;
+        $this->iv_part_2 = $previousPlain;
 
         return $plaintext;
     }
