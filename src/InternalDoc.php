@@ -42,6 +42,7 @@ use danog\MadelineProto\EventHandler\Media\Thumbnail;
 use danog\MadelineProto\EventHandler\Media\Video;
 use danog\MadelineProto\EventHandler\Media\Voice;
 use danog\MadelineProto\EventHandler\Message;
+use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\Code;
 use danog\MadelineProto\EventHandler\Message\Entities\Email;
 use danog\MadelineProto\EventHandler\Message\Entities\Mention;
@@ -51,6 +52,15 @@ use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\Spoiler;
 use danog\MadelineProto\EventHandler\Message\Entities\Unknown;
 use danog\MadelineProto\EventHandler\Message\Entities\Url;
+use danog\MadelineProto\EventHandler\Message\Rich\Block;
+use danog\MadelineProto\EventHandler\Message\Rich\Block\Buttons;
+use danog\MadelineProto\EventHandler\Message\Rich\Block\Map;
+use danog\MadelineProto\EventHandler\Message\Rich\Block\Paragraph;
+use danog\MadelineProto\EventHandler\Message\Rich\Button\Callback;
+use danog\MadelineProto\EventHandler\Message\Rich\Button\Disabled;
+use danog\MadelineProto\EventHandler\Message\Rich\Caption;
+use danog\MadelineProto\EventHandler\Message\Rich\Text\Date;
+use danog\MadelineProto\EventHandler\Message\Rich\Text\Plain;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Participant;
 use danog\MadelineProto\EventHandler\Participant\Admin;
@@ -2562,13 +2572,13 @@ abstract class InternalDoc
      *
      * The message can be passed as:
      * - Plain text (the default, sent as a single paragraph), or Markdown or HTML (with $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
-     * - A list of blocks, in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
+     * - A list of blocks: typed Block objects (`new Paragraph(new Bold('Hello'))`, see the EventHandler\Message\Rich\Block namespace), arrays in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
      *
      * $parseMode only applies to string messages, and $media only to Markdown and HTML: passing them with other messages throws.
      *
-     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
+     * Media in Bot API blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
@@ -2621,7 +2631,7 @@ abstract class InternalDoc
     /**
      * Sends a [rich message](https://core.telegram.org/bots/api#sendrichmessage) to all report peers (admins of the bot), see sendRichMessage.
      *
-     * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param string|array|\danog\MadelineProto\EventHandler\Message\RichMessage $message Rich message: Markdown or HTML (depending on $parseMode), a list of blocks (Block objects or Bot API InputRichBlock arrays), a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
      * @param RichParseMode $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array|null    $replyMarkup  Keyboard information.
      * @param integer|null  $scheduleDate Schedule date.

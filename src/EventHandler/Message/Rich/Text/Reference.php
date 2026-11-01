@@ -1,0 +1,22 @@
+<?php declare(strict_types=1);
+
+namespace danog\MadelineProto\EventHandler\Message\Rich\Text;
+
+use danog\MadelineProto\EventHandler\Message\Rich\RichText;
+
+/**
+ * A reference: a text that reference links point to.
+ */
+final class Reference extends RichText
+{
+    /** The text */
+    public readonly RichText $text;
+
+    public function __construct(
+        RichText|string $text,
+        /** Name of the reference */
+        public readonly string $name,
+    ) {
+        $this->text = RichText::from($text);
+    }
+}

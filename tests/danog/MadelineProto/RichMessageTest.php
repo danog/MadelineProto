@@ -15,11 +15,22 @@ use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\Blockquote;
 use danog\MadelineProto\EventHandler\Message\Entities\Bold;
 use danog\MadelineProto\EventHandler\Message\Entities\CustomEmoji;
+use danog\MadelineProto\EventHandler\Message\Entities\FormattedDate;
 use danog\MadelineProto\EventHandler\Message\Entities\Italic;
 use danog\MadelineProto\EventHandler\Message\Entities\MentionName;
 use danog\MadelineProto\EventHandler\Message\Entities\Pre;
 use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
 use danog\MadelineProto\EventHandler\Message\PrivateMessage;
+use danog\MadelineProto\EventHandler\Message\Rich\Alignment;
+use danog\MadelineProto\EventHandler\Message\Rich\Block;
+use danog\MadelineProto\EventHandler\Message\Rich\Button;
+use danog\MadelineProto\EventHandler\Message\Rich\ButtonStyle;
+use danog\MadelineProto\EventHandler\Message\Rich\Caption;
+use danog\MadelineProto\EventHandler\Message\Rich\ListItem;
+use danog\MadelineProto\EventHandler\Message\Rich\ListLabelType;
+use danog\MadelineProto\EventHandler\Message\Rich\TableCell;
+use danog\MadelineProto\EventHandler\Message\Rich\Text;
+use danog\MadelineProto\EventHandler\Message\Rich\VerticalAlignment;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Query\ChatTrait;
 use danog\MadelineProto\EventHandler\Query\InlineTrait;
@@ -33,11 +44,13 @@ use danog\MadelineProto\RemoteUrl;
 use danog\MadelineProto\RichParseMode;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Logger as LoggerSettings;
+use danog\MadelineProto\TL\Conversion\Rich\BotAPIConverter;
 use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 use danog\MadelineProto\TL\Conversion\Rich\OutputConverter;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
+use WeakMap;
 
 /** @internal */
 class RichMessageTest extends TestCase
@@ -56,11 +69,30 @@ class RichMessageTest extends TestCase
         });
     }
 
-    private static function output(array $richMessage): array
+    /** @var WeakMap<Media, int> IDs of the photos and documents of the stub media of received rich messages */
+    private WeakMap $mediaIds;
+
+    /**
+     * Convert an MTProto richMessage to a RichMessage, with stub media.
+     */
+    private function received(array $richMessage): RichMessage
     {
-        return OutputConverter::convert(
-            $richMessage,
-            static fn (array $media, string $type): array => [$type => $media['photo']['id'] ?? $media['document']['id']],
+        $this->mediaIds ??= new WeakMap;
+        return OutputConverter::convert($richMessage, function (array $media): Media {
+            $stub = $this->createStub(Media::class);
+            $this->mediaIds[$stub] = $media['photo']['id'] ?? $media['document']['id'];
+            return $stub;
+        });
+    }
+
+    /**
+     * Convert an MTProto richMessage to a Bot API RichMessage, with media converted to [type => ID].
+     */
+    private function output(array $richMessage): array
+    {
+        return BotAPIConverter::convert(
+            $this->received($richMessage),
+            fn (Media $media, string $type): array => [$type => $this->mediaIds[$media]],
             static fn (int $userId): array => ['id' => $userId],
         );
     }
@@ -72,7 +104,8 @@ class RichMessageTest extends TestCase
         $this->assertSame(['html' => '<b>a</b>', 'is_rtl' => true, 'skip_entity_detection' => true], InputConverter::fromParameters('<b>a</b>', RichParseMode::HTML, [], true, true));
         $this->assertSame(['blocks' => [['type' => 'paragraph', 'text' => '*a*']]], InputConverter::fromParameters('*a*', RichParseMode::TEXT, [], false, false));
         $this->assertSame(['blocks' => [['type' => 'divider']]], InputConverter::fromParameters([['type' => 'divider']], RichParseMode::TEXT, [], false, false));
-        $this->assertSame(['blocks' => [['type' => 'divider']], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([['type' => 'divider']], true), RichParseMode::TEXT, [], false, false));
+        $divider = new Block\Divider;
+        $this->assertSame(['blocks' => [$divider], 'is_rtl' => true], InputConverter::fromParameters(new RichMessage([$divider], true), RichParseMode::TEXT, [], false, false));
         $this->assertSame(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a', 'rtl' => true], InputConverter::fromParameters(['_' => 'inputRichMessageMarkdown', 'markdown' => 'a'], RichParseMode::TEXT, [], true, false));
     }
 
@@ -409,7 +442,7 @@ class RichMessageTest extends TestCase
         $empty = ['_' => 'textEmpty'];
         $noCaption = ['_' => 'pageCaption', 'text' => $empty, 'credit' => $empty];
         $document = static fn (int $id, array $attributes): array => ['_' => 'document', 'id' => $id, 'attributes' => $attributes];
-        $result = self::output([
+        $result = $this->output([
             '_' => 'richMessage',
             'rtl' => true,
             'part' => false,
@@ -492,7 +525,7 @@ class RichMessageTest extends TestCase
                     ['label' => '9.', 'blocks' => [['type' => 'paragraph', 'text' => 'y']], 'type' => 'i', 'value' => 2],
                 ]],
                 ['type' => 'photo', 'photo' => ['photo' => 1], 'caption' => ['text' => 'cap'], 'has_spoiler' => true],
-                ['type' => 'unknown'],
+                ['type' => 'unsupported'],
                 ['type' => 'animation', 'animation' => ['animation' => 2]],
                 ['type' => 'video', 'video' => ['video' => 3], 'need_autoplay' => true, 'is_looped' => true],
                 ['type' => 'voice_note', 'voice_note' => ['voice_note' => 4]],
@@ -504,10 +537,10 @@ class RichMessageTest extends TestCase
                 ['type' => 'map', 'location' => ['latitude' => 1.5, 'longitude' => 2.5], 'zoom' => 10, 'width' => 100, 'height' => 50],
                 ['type' => 'buttons', 'buttons' => [
                     ['text' => 's', 'switch_inline_query_chosen_chat' => ['query' => 'q', 'allow_user_chats' => true, 'allow_bot_chats' => false, 'allow_group_chats' => false, 'allow_channel_chats' => false]],
-                    ['text' => 'l', 'url' => 'https://l'],
+                    ['text' => 'l', 'login_url' => ['url' => 'https://l']],
                 ], 'align' => 'right'],
                 ['type' => 'thinking', 'text' => 'hmm'],
-                ['type' => 'unknown'],
+                ['type' => 'unsupported'],
                 ['type' => 'anchor', 'name' => ''],
             ],
             'is_rtl' => true,
@@ -529,8 +562,9 @@ class RichMessageTest extends TestCase
             ['type' => 'buttons', 'buttons' => [['text' => 'b', 'callback_data' => 'd', 'style' => 'success']]],
         ]];
         $mtproto = $this->convert($input);
-        $output = self::output(['_' => 'richMessage', ...$mtproto]);
-        $this->assertSame($mtproto, $this->convert(new RichMessage($output['blocks'])));
+        // As objects, and in the Bot API format
+        $this->assertSame($mtproto, $this->convert($this->received(['_' => 'richMessage', ...$mtproto])));
+        $this->assertSame($mtproto, $this->convert(['blocks' => $this->output(['_' => 'richMessage', ...$mtproto])['blocks']]));
     }
 
     /**
@@ -538,7 +572,7 @@ class RichMessageTest extends TestCase
      */
     public function testRoundTripUnrepresentable(): void
     {
-        $output = self::output(['_' => 'richMessage', 'blocks' => [
+        $message = $this->received(['_' => 'richMessage', 'blocks' => [
             ['_' => 'pageBlockTitle', 'text' => ['_' => 'textPlain', 'text' => 'iv']],
             ['_' => 'pageBlockUnsupported'],
             ['_' => 'pageBlockPhoto', 'photo_id' => 404, 'caption' => ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']]],
@@ -546,29 +580,28 @@ class RichMessageTest extends TestCase
         ], 'photos' => [], 'documents' => []]);
         $this->assertSame(
             ['_' => 'inputRichMessage', 'rtl' => false, 'noautolink' => false, 'blocks' => [['_' => 'pageBlockParagraph', 'text' => ['_' => 'textPlain', 'text' => 'UQ']]]],
-            $this->convert(new RichMessage($output['blocks'])),
+            $this->convert($message),
         );
 
         // Media that can't be wrapped
-        $output = OutputConverter::convert(
+        $message = OutputConverter::convert(
             ['_' => 'richMessage', 'blocks' => [['_' => 'pageBlockPhoto', 'photo_id' => 1, 'caption' => ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']]]], 'photos' => [['_' => 'photo', 'id' => 1]], 'documents' => []],
-            static fn (): mixed => null,
-            static fn (int $id): array => ['id' => $id],
+            static fn (): ?Media => null,
         );
-        $this->assertSame([['type' => 'unknown']], $output['blocks']);
+        $this->assertEquals([new Block\Unsupported], $message->blocks);
     }
 
     public function testText(): void
     {
         $photo = $this->createStub(Media::class);
         $message = new RichMessage([
-            ['type' => 'heading', 'size' => 1, 'text' => 'Title'],
-            ['type' => 'paragraph', 'text' => ['Hello ', ['type' => 'bold', 'text' => 'world'], ' ', ['type' => 'custom_emoji', 'custom_emoji_id' => 1, 'alternative_text' => '👍']]],
-            ['type' => 'divider'],
-            ['type' => 'list', 'items' => [['label' => '1.', 'blocks' => [['type' => 'paragraph', 'text' => 'one']]], ['label' => '2.', 'blocks' => [['type' => 'paragraph', 'text' => 'two']]]]],
-            ['type' => 'table', 'cells' => [[['text' => 'a'], ['text' => 'b']], [[], ['text' => 'c']]]],
-            ['type' => 'photo', 'photo' => $photo, 'caption' => ['text' => 'A photo']],
-            ['type' => 'mathematical_expression', 'expression' => 'x^2'],
+            new Block\Heading(1, 'Title'),
+            new Block\Paragraph(new Text\Concat(['Hello ', new Text\Bold('world'), ' ', new Text\CustomEmoji(1, '👍')])),
+            new Block\Divider,
+            new Block\ItemList([new ListItem('one', type: ListLabelType::NUMBERS, value: 1), new ListItem('two', type: ListLabelType::NUMBERS, value: 2)]),
+            new Block\Table([[new TableCell('a'), new TableCell('b')], [new TableCell, new TableCell('c')]]),
+            new Block\Photo($photo, 'A photo'),
+            new Block\MathematicalExpression('x^2'),
         ]);
         $this->assertSame("Title\nHello world 👍\n1. one\n2. two\na\tb\n\tc\nA photo\nx^2", $message->message);
         $this->assertEquals([
@@ -583,10 +616,10 @@ class RichMessageTest extends TestCase
     public function testEntitiesAndHtml(): void
     {
         $message = new RichMessage([
-            ['type' => 'paragraph', 'text' => ['a ', ['type' => 'bold', 'text' => 'b'], ' ', ['type' => 'url', 'text' => 'c', 'url' => 'https://x']]],
-            ['type' => 'pre', 'text' => 'x<y', 'language' => 'php'],
-            ['type' => 'expandable_blockquote', 'text' => 'q', 'credit' => 'me'],
-            ['type' => 'details', 'summary' => 'More', 'blocks' => [['type' => 'paragraph', 'text' => ['hidden ', ['type' => 'text_mention', 'text' => 'D', 'user' => ['id' => 5]]]]]],
+            new Block\Paragraph(new Text\Concat(['a ', new Text\Bold('b'), ' ', new Text\Url('c', 'https://x')])),
+            new Block\Preformatted('x<y', 'php'),
+            new Block\ExpandableBlockquote('q', 'me'),
+            new Block\Details('More', [new Block\Paragraph(new Text\Concat(['hidden ', new Text\MentionName('D', 5)]))]),
         ]);
         $this->assertSame("a b c\nx<y\nq\nme\nMore\nhidden D", $message->message);
         $this->assertEquals([
@@ -607,26 +640,150 @@ class RichMessageTest extends TestCase
             'a <b>b</b> <a href="https://x">c</a><br><pre language="php">x&lt;y</pre><br><blockquote>q<br><i>me</i></blockquote><br><b>More</b><br><blockquote>hidden D</blockquote>',
             $message->getHTML(),
         );
-        $this->assertSame('a&lt;b', (new RichMessage([['type' => 'paragraph', 'text' => 'a<b']]))->getHTML());
+        $this->assertSame('a&lt;b', (new RichMessage([new Block\Paragraph('a<b')]))->getHTML());
     }
 
     /**
-     * The text conversion also accepts the shorthands of input blocks, and raw blocks and texts.
+     * Rich texts have the text API of messages.
      */
-    public function testInputShorthands(): void
+    public function testRichText(): void
     {
-        $message = new RichMessage([
-            ['type' => 'list', 'items' => [['text' => 'item']]],
-            ['type' => 'blockquote', 'text' => 'quote'],
-            ['type' => 'photo', 'photo' => 'file_id', 'caption' => 'caption'],
-            ['type' => 'paragraph', 'text' => ['type' => 'text_mention', 'text' => 'D', 'user_id' => 5]],
-            ['_' => 'pageBlockDivider'],
-            ['type' => 'paragraph', 'text' => ['a', ['_' => 'textPlain', 'text' => 'raw']]],
-        ]);
-        $this->assertSame("• item\nquote\ncaption\nD\na", $message->message);
-        $this->assertEquals([new Blockquote(7, 5), new MentionName(21, 1, 5)], $message->entities);
-        $this->assertSame([], $message->media);
+        $text = new Text\Concat(['a ', new Text\Bold(new Text\Italic('b')), ' ', new Text\Subscript('2'), new Text\Anchor('x'), ' ', new Text\Date('now', 5, relative: true)]);
+        $this->assertSame('a b 2 now', $text->getText());
+        $this->assertEquals([new Bold(2, 1), new Italic(2, 1), new FormattedDate(6, 3, 5, relative: true)], $text->getEntities());
+        $this->assertSame('a <b><i>b</i></b> 2 now', $text->getHTML());
+        $this->assertSame('a&lt;b', Text\Plain::from('a<b')->getHTML());
     }
+
+    /**
+     * Typed blocks are converted like their Bot API counterparts, and can be mixed with them.
+     */
+    public function testTypedBlocks(): void
+    {
+        $file = new LocalFile('/tmp/cat.jpg');
+        $typed = [
+            new Block\Heading(2, new Text\Bold('Title')),
+            new Block\Paragraph(new Text\Concat(['a ', new Text\Url('link', 'https://x'), new Text\MentionName('D', 5), new Text\Date('now', 5, shortDate: true)])),
+            new Block\ItemList([new ListItem('x', hasCheckbox: true, isChecked: true), new ListItem([new Block\Paragraph('y')])]),
+            new Block\ItemList([new ListItem('x', type: ListLabelType::LOWERCASE_ROMAN, value: 3)]),
+            new Block\Blockquote([new Block\Paragraph('q')], 'credit'),
+            new Block\Table([[new TableCell('h', header: true, colspan: 2), new TableCell(valign: VerticalAlignment::BOTTOM)]], 'caption', striped: true),
+            new Block\Details('More', [new Block\Divider], open: true),
+            new Block\Map(1.5, 2.5, 10, 100, 50, new Caption('map', 'osm'), 5),
+            new Block\Buttons([
+                new Button\Callback('c', 'data', ButtonStyle::SUCCESS),
+                new Button\Url('u', 'https://u'),
+                new Button\UserProfile('p', 5),
+                new Button\SwitchInline('s', 'q', allowBotChats: false, allowGroupChats: false, allowChannelChats: false),
+                new Button\LoginUrl('l', 'https://l', 'fwd', true),
+                new Button\CopyText('t', 'copied'),
+            ], Alignment::CENTER),
+            new Block\Photo($file, 'cat', spoiler: true),
+            new Block\Video($file, autoplay: true),
+            new Block\VoiceNote($file),
+            new Block\Unsupported,
+        ];
+        $botApi = [
+            ['type' => 'heading', 'size' => 2, 'text' => ['type' => 'bold', 'text' => 'Title']],
+            ['type' => 'paragraph', 'text' => ['a ', ['type' => 'url', 'text' => 'link', 'url' => 'https://x'], ['type' => 'text_mention', 'text' => 'D', 'user' => ['id' => 5]], ['type' => 'date_time', 'text' => 'now', 'unix_time' => 5, 'date_time_format' => 'd']]],
+            ['type' => 'list', 'items' => [['text' => 'x', 'has_checkbox' => true, 'is_checked' => true], ['blocks' => [['type' => 'paragraph', 'text' => 'y']]]]],
+            ['type' => 'list', 'items' => [['text' => 'x', 'type' => 'i', 'value' => 3]]],
+            ['type' => 'blockquote', 'blocks' => [['type' => 'paragraph', 'text' => 'q']], 'credit' => 'credit'],
+            ['type' => 'table', 'cells' => [[['text' => 'h', 'is_header' => true, 'colspan' => 2], ['valign' => 'bottom']]], 'caption' => 'caption', 'is_striped' => true],
+            ['type' => 'details', 'summary' => 'More', 'blocks' => [['type' => 'divider']], 'is_open' => true],
+            ['type' => 'map', 'location' => ['latitude' => 1.5, 'longitude' => 2.5, 'horizontal_accuracy' => 5], 'zoom' => 10, 'width' => 100, 'height' => 50, 'caption' => ['text' => 'map', 'credit' => 'osm']],
+            ['type' => 'buttons', 'align' => 'center', 'buttons' => [
+                ['text' => 'c', 'callback_data' => 'data', 'style' => 'success'],
+                ['text' => 'u', 'url' => 'https://u'],
+                ['text' => 'p', 'url' => 'tg://user?id=5'],
+                ['text' => 's', 'switch_inline_query_chosen_chat' => ['query' => 'q', 'allow_user_chats' => true]],
+                ['text' => 'l', 'login_url' => ['url' => 'https://l', 'forward_text' => 'fwd', 'request_write_access' => true]],
+                ['text' => 't', 'copy_text' => ['text' => 'copied']],
+            ]],
+            ['type' => 'photo', 'photo' => $file, 'caption' => 'cap', 'has_spoiler' => true],
+            ['type' => 'video', 'video' => $file, 'need_autoplay' => true],
+            ['type' => 'voice_note', 'voice_note' => $file],
+        ];
+        $botApi[9]['caption'] = 'cat';
+        $expected = $this->convert(['blocks' => $botApi]);
+        $expectedResolved = $this->resolved;
+        $this->resolved = [];
+        $this->assertSame($expected, $this->convert(['blocks' => $typed]));
+        $this->assertSame($expectedResolved, $this->resolved);
+        $this->assertSame([['photo', $file], ['video', $file], ['voice_note', $file]], $this->resolved);
+
+        // Mixed with Bot API blocks and texts
+        $this->resolved = [];
+        $this->assertSame(
+            $this->convert(['blocks' => [['type' => 'paragraph', 'text' => ['a ', ['type' => 'bold', 'text' => 'b']]], ['type' => 'divider']]]),
+            $this->convert(['blocks' => [['type' => 'paragraph', 'text' => ['a ', new Text\Bold('b')]], new Block\Divider]]),
+        );
+
+        // Invalid values are still refused
+        $this->expectExceptionMessage('Invalid section heading size specified');
+        $this->convert(['blocks' => [new Block\Heading(7, 'x')]]);
+    }
+
+    /**
+     * Buttons of types MadelineProto doesn't know (e.g. added in a newer layer) are unsupported buttons, not
+     * working-looking ones: like unsupported blocks, they're dropped when sending the rich message again (inline
+     * ones are replaced by their text, rows left empty are dropped).
+     */
+    public function testUnsupportedButtons(): void
+    {
+        $plain = static fn (string $text): array => ['_' => 'textPlain', 'text' => $text];
+        $future = ['_' => 'inlineButtonTypeFuture'];
+        $raw = ['_' => 'richMessage', 'blocks' => [
+            ['_' => 'pageBlockButtonRow', 'buttons' => [
+                ['_' => 'pageButton', 'text' => $plain('new'), 'type' => $future],
+                ['_' => 'pageButton', 'text' => $plain('u'), 'type' => ['_' => 'inlineButtonTypeUrl', 'url' => 'https://u']],
+            ]],
+            ['_' => 'pageBlockButtonRow', 'buttons' => [['_' => 'pageButton', 'text' => $plain('only'), 'type' => $future]]],
+            ['_' => 'pageBlockParagraph', 'text' => ['_' => 'textConcat', 'texts' => [
+                $plain('a '),
+                ['_' => 'textButton', 'text' => $plain('inline'), 'type' => $future],
+            ]]],
+            ['_' => 'pageBlockButtonRow', 'buttons' => [['_' => 'pageButton', 'text' => $plain('d'), 'type' => ['_' => 'inlineButtonTypeDisabled']]]],
+        ], 'photos' => [], 'documents' => []];
+        $message = $this->received($raw);
+        $this->assertInstanceOf(Button\Unsupported::class, $message->blocks[0]->buttons[0]);
+        $this->assertInstanceOf(Button\Disabled::class, $message->blocks[3]->buttons[0]);
+
+        $expected = ['_' => 'inputRichMessage', 'rtl' => false, 'noautolink' => false, 'blocks' => [
+            ['_' => 'pageBlockButtonRow', 'align_left' => false, 'align_center' => false, 'align_right' => false, 'buttons' => [
+                ['_' => 'pageButton', 'text' => $plain('u'), 'type' => ['_' => 'inlineButtonTypeUrl', 'url' => 'https://u']],
+            ]],
+            ['_' => 'pageBlockParagraph', 'text' => ['_' => 'textConcat', 'texts' => [$plain('a '), $plain('inline')]]],
+            ['_' => 'pageBlockButtonRow', 'align_left' => false, 'align_center' => false, 'align_right' => false, 'buttons' => [
+                ['_' => 'pageButton', 'text' => $plain('d'), 'type' => ['_' => 'inlineButtonTypeDisabled']],
+            ]],
+        ]];
+        // As objects, and in the Bot API format
+        $this->assertSame($expected, $this->convert($message));
+        $output = $this->output($raw);
+        $this->assertSame(['text' => 'new', 'unsupported' => true], $output['blocks'][0]['buttons'][0]);
+        $this->assertSame($expected, $this->convert(['blocks' => $output['blocks']]));
+    }
+
+    /**
+     * Custom labels of ordered list items can be sent (unlike with the Bot API), so they survive a round trip.
+     */
+    public function testCustomListLabels(): void
+    {
+        $plain = static fn (string $text): array => ['_' => 'textPlain', 'text' => $text];
+        $message = $this->received(['_' => 'richMessage', 'blocks' => [
+            ['_' => 'pageBlockOrderedList', 'items' => [
+                ['_' => 'pageListOrderedItemText', 'num' => 'Step 1', 'text' => $plain('x')],
+                ['_' => 'pageListOrderedItemText', 'text' => $plain('y')],
+            ]],
+        ], 'photos' => [], 'documents' => []]);
+        $items = $message->blocks[0]->items;
+        $this->assertSame(['Step 1.', '2.'], [$items[0]->getLabel(), $items[1]->getLabel()]);
+        $this->assertSame(['Step 1', null], [$items[0]->label, $items[1]->label]);
+        $this->assertSame("Step 1. x\n2. y", $message->message);
+        $this->assertSame(['Step 1', '2.'], array_column($this->convert($message)['blocks'][0]['items'], 'num'));
+    }
+
     /**
      * Like the files of the other methods, the files of $media must be typed: a string could be a bot API file ID or a URL.
      */
@@ -724,7 +881,7 @@ class RichMessageTest extends TestCase
         $file = new RemoteUrl('https://example.com/a.jpg');
         foreach ([
             [[['type' => 'divider']], RichParseMode::MARKDOWN, [], 'The parse mode only applies'],
-            [new RichMessage([['type' => 'divider']]), RichParseMode::HTML, [], 'The parse mode only applies'],
+            [new RichMessage([new Block\Divider]), RichParseMode::HTML, [], 'The parse mode only applies'],
             [[['type' => 'divider']], RichParseMode::TEXT, ['x' => $file], 'Media can only be passed separately'],
             ['text', RichParseMode::TEXT, ['x' => $file], 'Media can only be passed separately'],
             [['markdown' => 'x', 'media' => ['x' => $file]], RichParseMode::TEXT, ['x' => $file], 'were passed twice'],
@@ -827,8 +984,7 @@ class RichMessageTest extends TestCase
                 $blocks[] = ['_' => 'pageBlockVideo', 'autoplay' => $autoplay, 'loop' => $loop, 'spoiler' => false, 'video_id' => $id, 'caption' => $noCaption];
             }
         }
-        $output = self::output(['_' => 'richMessage', 'blocks' => $blocks, 'photos' => [], 'documents' => [$video(1, false), $video(2, true)]]);
-        $input = $this->convert(new RichMessage($output['blocks']));
+        $input = $this->convert($this->received(['_' => 'richMessage', 'blocks' => $blocks, 'photos' => [], 'documents' => [$video(1, false), $video(2, true)]]));
         $this->assertSame(
             array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $blocks),
             array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $input['blocks']),
@@ -840,8 +996,8 @@ class RichMessageTest extends TestCase
      */
     public function testEmptyDetailsText(): void
     {
-        $this->assertSame("S\nafter", (new RichMessage([['type' => 'details', 'summary' => 'S', 'blocks' => []], ['type' => 'paragraph', 'text' => 'after']]))->message);
-        $this->assertSame("S\nafter", (new RichMessage([['type' => 'details', 'summary' => 'S', 'blocks' => [['type' => 'divider']]], ['type' => 'paragraph', 'text' => 'after']]))->message);
+        $this->assertSame("S\nafter", (new RichMessage([new Block\Details('S', []), new Block\Paragraph('after')]))->message);
+        $this->assertSame("S\nafter", (new RichMessage([new Block\Details('S', [new Block\Divider]), new Block\Paragraph('after')]))->message);
     }
 
     public function testFilterRichMessage(): void

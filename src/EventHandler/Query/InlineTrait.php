@@ -85,7 +85,7 @@ trait InlineTrait
      *
      * Media must have already been uploaded (e.g. with uploadPhoto, uploadVideo, uploadDocument and so on).
      *
-     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks in Bot API InputRichBlock format, a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
+     * @param string|array|RichMessage $message      Rich message: Markdown or HTML (depending on $parseMode), a list of blocks (Block objects or Bot API InputRichBlock arrays), a received RichMessage, or a Bot API InputRichMessage (see sendRichMessage)
      * @param array|null               $replyMarkup  Reply markup for inline keyboards
      * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage).

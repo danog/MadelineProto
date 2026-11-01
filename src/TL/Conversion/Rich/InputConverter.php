@@ -22,6 +22,12 @@ use danog\MadelineProto\BotApiFileId;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Message\Entities\FormattedDate;
+use danog\MadelineProto\EventHandler\Message\Rich\Block;
+use danog\MadelineProto\EventHandler\Message\Rich\Button;
+use danog\MadelineProto\EventHandler\Message\Rich\Caption;
+use danog\MadelineProto\EventHandler\Message\Rich\ListItem;
+use danog\MadelineProto\EventHandler\Message\Rich\RichText;
+use danog\MadelineProto\EventHandler\Message\Rich\TableCell;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\LocalFile;
@@ -32,6 +38,9 @@ use danog\MadelineProto\RichParseMode;
  * Converts rich messages in the format of the Bot API's InputRichMessage to MTProto InputRichMessage constructors.
  *
  * Mirrors the conversion of TDLib (WebPageBlock.cpp, RichMessage.cpp) and of the Bot API server.
+ *
+ * Typed objects (Block, RichText, Button, ListItem, TableCell and Caption objects) are accepted anywhere their Bot API
+ * counterpart is: they're converted to it with BotAPIConverter, and then converted and validated like it.
  *
  * Raw MTProto constructors (arrays with a _ key) are accepted anywhere a block, rich text, button or the whole
  * rich message is expected, and are passed through as-is.
@@ -50,9 +59,17 @@ final class InputConverter
     /**
      * @param Closure(string, mixed): array $resolveMedia Resolves the media of a Bot API InputMedia-like object (or a MadelineProto file) of the specified type to an inputPhoto or inputDocument constructor, uploading it if needed.
      */
+    /** Converts typed blocks, texts and buttons to their Bot API format, which is then converted and validated like any other */
+    private readonly BotAPIConverter $objects;
+
     private function __construct(
         private readonly Closure $resolveMedia,
     ) {
+        $this->objects = new BotAPIConverter(
+            static fn (mixed $media): mixed => $media,
+            static fn (int $userId): array => ['id' => $userId],
+            forInput: true,
+        );
     }
 
     /**
@@ -223,15 +240,46 @@ final class InputConverter
             throw new Exception('Expected an array of InputRichBlock');
         }
         // Blocks of received rich messages that can't be represented (and so can't be sent again)
-        $blocks = array_filter(
-            $blocks,
-            static fn (mixed $block): bool => !\is_array($block) || !\in_array($block['type'] ?? null, ['unknown', 'unsupported'], true),
-        );
+        $blocks = array_filter($blocks, static fn (mixed $block): bool => !self::isUnsupported($block));
         return array_map($this->block(...), array_values($blocks));
+    }
+
+    /**
+     * Whether a block can't be represented, and is dropped: unsupported blocks, and rows of buttons that can't be represented.
+     */
+    private static function isUnsupported(mixed $block): bool
+    {
+        if ($block instanceof Block\Unsupported) {
+            return true;
+        }
+        if ($block instanceof Block\Buttons) {
+            return $block->buttons && !array_filter($block->buttons, static fn (Button $button): bool => !self::isUnsupportedButton($button));
+        }
+        if (!\is_array($block) || isset($block['_'])) {
+            return false;
+        }
+        $type = $block['type'] ?? null;
+        if ($type === 'unknown' || $type === 'unsupported') {
+            return true;
+        }
+        $buttons = $block['buttons'] ?? null;
+        return $type === 'buttons' && \is_array($buttons) && $buttons && !array_filter($buttons, static fn (mixed $button): bool => !self::isUnsupportedButton($button));
+    }
+
+    /**
+     * Whether a button of a received rich message can't be represented (e.g. it was added in a newer layer), and is dropped.
+     */
+    private static function isUnsupportedButton(mixed $button): bool
+    {
+        return $button instanceof Button\Unsupported
+            || (\is_array($button) && !isset($button['_']) && ($button['unsupported'] ?? false));
     }
 
     private function block(mixed $block): array
     {
+        if ($block instanceof Block) {
+            $block = $this->objects->block($block);
+        }
         if (!\is_array($block)) {
             throw new Exception('Object expected as InputRichBlock');
         }
@@ -343,6 +391,9 @@ final class InputConverter
 
     private function caption(mixed $caption): array
     {
+        if ($caption instanceof Caption) {
+            $caption = $this->objects->caption($caption)['caption'];
+        }
         // Bot API RichBlockCaption {text, credit}; anything else is accepted as the caption's text
         if (\is_array($caption) && !isset($caption['_']) && !isset($caption['type']) && !array_is_list($caption)) {
             return ['_' => 'pageCaption', 'text' => $this->text($caption['text'] ?? null), 'credit' => $this->text($caption['credit'] ?? null)];
@@ -361,6 +412,9 @@ final class InputConverter
         $ordered = null;
         $result = [];
         foreach ($items as $item) {
+            if ($item instanceof ListItem) {
+                $item = $this->objects->listItem($item);
+            }
             if (!\is_array($item)) {
                 throw new Exception('Object expected as InputRichBlockListItem');
             }
@@ -382,7 +436,8 @@ final class InputConverter
                         '_' => 'pageListOrderedItemBlocks',
                         'checkbox' => $checkbox,
                         'checked' => $checkbox && ($item['is_checked'] ?? false),
-                        'num' => self::getOrderedListLabel($value, $type),
+                        // Custom labels of typed list items (the Bot API can't send them)
+                        'num' => isset($item['num']) ? (string) $item['num'] : self::getOrderedListLabel($value, $type),
                         'blocks' => $blocks,
                         'value' => $value,
                         'type' => $type,
@@ -466,6 +521,9 @@ final class InputConverter
 
     private function tableCell(mixed $cell): array
     {
+        if ($cell instanceof TableCell) {
+            $cell = $this->objects->tableCell($cell);
+        }
         if (!\is_array($cell)) {
             throw new Exception('RichBlockTableCell must be an object');
         }
@@ -538,7 +596,10 @@ final class InputConverter
     private function buttonRow(array $block): array
     {
         $buttons = $block['buttons'] ?? throw new Exception('The buttons of the buttons block must be specified');
-        if (!\is_array($buttons) || !array_is_list($buttons) || !$buttons) {
+        if (\is_array($buttons)) {
+            $buttons = array_values(array_filter($buttons, static fn (mixed $button): bool => !self::isUnsupportedButton($button)));
+        }
+        if (!\is_array($buttons) || !$buttons) {
             throw new Exception('Button row must be non-empty');
         }
         $align = (string) ($block['align'] ?? '');
@@ -561,6 +622,9 @@ final class InputConverter
      */
     private function button(mixed $button): array
     {
+        if ($button instanceof Button) {
+            $button = $this->objects->button($button);
+        }
         if (!\is_array($button)) {
             throw new Exception('InlineButton must be an Object');
         }
@@ -661,6 +725,9 @@ final class InputConverter
      */
     private function text(mixed $text): array
     {
+        if ($text instanceof RichText) {
+            $text = $this->objects->text($text);
+        }
         if ($text === null || $text === '' || $text === []) {
             return ['_' => 'textEmpty'];
         }
@@ -705,7 +772,10 @@ final class InputConverter
             'reference_link' => ['_' => 'textUrl', 'text' => $inner(), 'url' => '#'.rawurlencode((string) ($text['reference_name'] ?? throw new Exception('The reference name of the reference_link must be specified'))), 'webpage_id' => 0],
             'anchor' => ['_' => 'textAnchor', 'text' => ['_' => 'textEmpty'], 'name' => (string) ($text['name'] ?? throw new Exception('The name of the anchor must be specified'))],
             'anchor_link' => ['_' => 'textUrl', 'text' => $inner(), 'url' => '#'.rawurlencode((string) ($text['anchor_name'] ?? throw new Exception('The anchor name of the anchor_link must be specified'))), 'webpage_id' => 0],
-            'button' => ['_' => 'textButton', ...$this->button($text['button'] ?? throw new Exception('The button of the button rich text must be specified'))],
+            'button' => self::isUnsupportedButton($text['button'] ?? null)
+                // Replaced by its text
+                ? $this->text($text['button']['text'] ?? null)
+                : ['_' => 'textButton', ...$this->button($text['button'] ?? throw new Exception('The button of the button rich text must be specified'))],
             default => throw new Exception("Unsupported rich text type: $type"),
         };
     }

@@ -1027,13 +1027,13 @@ trait UpdateHandler
      *
      * The message can be passed as:
      * - Plain text (the default, sent as a single paragraph), or Markdown or HTML (with $parseMode), parsed by Telegram; media passed in $media can be embedded by ID, e.g. `![A cat](tg://photo?id=cat)` or `![A file](tg://document?id=file)` in Markdown.
-     * - A list of blocks, in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
+     * - A list of blocks: typed Block objects (`new Paragraph(new Bold('Hello'))`, see the EventHandler\Message\Rich\Block namespace), arrays in the format of the Bot API's [InputRichBlock](https://core.telegram.org/bots/api#inputrichblock) type, or raw MTProto PageBlock constructors.
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
      *
      * $parseMode only applies to string messages, and $media only to Markdown and HTML: passing them with other messages throws.
      *
-     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
+     * Media in Bot API blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
