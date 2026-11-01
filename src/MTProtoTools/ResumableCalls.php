@@ -217,7 +217,8 @@ trait ResumableCalls
                     $this->logger->logger("Resumed interrupted {$call['method']} call$message", Logger::NOTICE);
                 } catch (RPCErrorException $e) {
                     if ($e->rpc === 'RANDOM_ID_DUPLICATE') {
-                        $this->logger->logger("Interrupted {$call['method']} call had already completed", Logger::NOTICE);
+                        // A completed call would have returned its result: the server is still processing it.
+                        $this->logger->logger("Interrupted {$call['method']} call is still being processed by the server", Logger::NOTICE);
                     } else {
                         $this->logger->logger("Could not resume interrupted {$call['method']} call: $e", Logger::ERROR);
                     }

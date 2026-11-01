@@ -336,6 +336,15 @@ trait ResponseHandler
                     $this->methodRecall($request, $this->datacenter, 1.0);
                     return null;
                 }
+                if ($response['error_message'] === 'RANDOM_ID_DUPLICATE' && $request->type === 'Updates' && $request->getTries() > 1) {
+                    // We sent it again (after a -503, in a new session, ...) while the server is still processing
+                    // the first copy, with the same random_id: once that's done, the server answers a copy with the
+                    // result of the first one instead of sending the messages again
+                    // (https://core.telegram.org/api/updates#updatemessageid-updates).
+                    $this->API->logger("$request is still being processed by the server, resending it in 1 second to get its result");
+                    $this->methodRecall($request, $this->datacenter, 1.0);
+                    return null;
+                }
                 return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 303:
                 $datacenter = (int) preg_replace('/[^0-9]+/', '', $response['error_message']);
