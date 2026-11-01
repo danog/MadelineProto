@@ -159,6 +159,45 @@ final class DownloadRangeTest extends TestCase
         self::assertSame(substr($file, $offset, $length), $this->download($downloader, $offset, $length, partSize: $partSize));
     }
 
+    /** @return iterable<string, array{int, int, int, int}> */
+    public static function ranges(): iterable
+    {
+        yield 'origin Safari probe' => [0, 2, 0, 4096];
+        yield 'origin block boundary' => [4095, 2, 0, 8192];
+        yield 'origin metadata near EOF' => [270000, 30000, 0, 64 * 1024];
+        yield 'CDN Safari probe' => [0, 2, 131072, 131072];
+        yield 'CDN hash lookup at a nonzero offset' => [140000, 2, 65536, 65536];
+        yield 'CDN range across hash blocks' => [126000, 16000, 131072, 262144];
+        yield 'CDN multiple hash blocks in one part' => [0, 20000, 8192, 32768];
+        yield 'CDN hash requiring multiple requests' => [200000, 2, 98304, 98304];
+        yield 'CDN hash larger than one request' => [0, 2, 2097152, 2097152];
+        yield 'CDN partial final hash block' => [299998, 2, 131072, 37856];
+    }
+
+    /** @dataProvider ranges */
+    public function testRangeReturnsRequestedBytesWithinDownloadBudget(int $offset, int $length, int $hashSize, int $budget): void
+    {
+        $file = random_bytes(max(300000, $hashSize));
+        $downloader = $this->downloader($file, $hashSize, redirectHashes: $offset === 0);
+        self::assertSame(substr($file, $offset, $length), $this->download($downloader, $offset, $length));
+        self::assertLessThanOrEqual($budget, $downloader->fetched);
+    }
+
+    public static function fullDownloads(): iterable
+    {
+        yield 'origin' => [0];
+        yield 'CDN' => [131072];
+    }
+
+    /** @dataProvider fullDownloads */
+    public function testFullDownloadKeepsLargeParts(int $hashSize): void
+    {
+        $file = random_bytes(2 * 1024 * 1024);
+        $downloader = $this->downloader($file, $hashSize);
+        self::assertSame($file, $this->download($downloader, 0, \strlen($file)));
+        self::assertSame(2, $downloader->requests);
+    }
+
     public static function invalidBlocks(): iterable
     {
         yield 'corrupt short part' => [null, 2, 4096];

@@ -1442,7 +1442,15 @@ trait Files
             $cb(100.0, 0.0, 0.0);
             return;
         }
-        $part_size ??= 1024 * 1024;
+        if ($part_size === null) {
+            $part_size = 1024 * 1024;
+            if ($end > $offset && !isset($messageMedia['key'])) {
+                // Short ranges (such as browser metadata probes) need not fetch a whole MiB.
+                while ($part_size > 4096 && ($part_size >> 1) >= $end - $offset) {
+                    $part_size >>= 1;
+                }
+            }
+        }
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
         if (isset($messageMedia['InputFileLocation']['dc_id'])) {
             $datacenter = $this->isTestMode() ? 10_000 + $messageMedia['InputFileLocation']['dc_id'] : $messageMedia['InputFileLocation']['dc_id'];
