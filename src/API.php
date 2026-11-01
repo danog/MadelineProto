@@ -335,6 +335,11 @@ final class API extends AbstractAPI
                     Logger::log('The session is still locked by another process (loading or releasing it), waiting...');
                     continue;
                 }
+                // Waiting for the event handler, whose class this script lacks: unserialize() bounds that wait
+                // itself (it may outlast this timeout), and reports the missing class.
+                if (Serialization::getMissingEventHandler($this->session) !== null) {
+                    continue;
+                }
                 $future->ignore();
                 [$unserialized, $this->unlock] = [0, null];
                 break;

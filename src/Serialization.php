@@ -65,6 +65,20 @@ abstract class Serialization
      */
     private const SERVED_TIMEOUT = 10;
     /**
+     * How long a script that lacks the class of the session's event handler waits for the event handler to listen,
+     * in seconds, while another process (the event handler loading the session) holds the session lock.
+     *
+     * @internal Shortened by the tests
+     */
+    public static float $eventHandlerLoadTimeout = 60.0;
+    /**
+     * How long a script that lacks the class of the session's event handler waits for the event handler to listen,
+     * in seconds, while nobody holds the session lock (the event handler isn't running, or it's restarting).
+     *
+     * @internal Shortened by the tests
+     */
+    public static float $eventHandlerStartTimeout = 25.0;
+    /**
      * Unserialize session.
      *
      * Logic for deserialization is as follows.
@@ -121,7 +135,7 @@ abstract class Serialization
      * @param bool             $forceFull Whether to force full session deserialization
      * @param bool             $selfRestart Whether full deserialization is only forced by a self-restart, which waits for its predecessor to release the lock: connect to a live server instead, which won't release it
      * @internal
-     * @return array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)}
+     * @return array{0: (ChannelledSocket|APIWrapper|Throwable|null|0), 1: (callable|null)} A connection to the IPC server, or (with the lock) the session, null if there's none yet; a Throwable or 0 if the IPC server couldn't be started or connected to
      */
     public static function unserialize(SessionPaths $session, SettingsAbstract $settings, bool $forceFull = false, bool $selfRestart = false): array
     {
@@ -139,10 +153,11 @@ abstract class Serialization
         EventLoop::unreference($warningId);
 
         $cancelFlock = new DeferredCancellation;
-        $cancelIpc = new DeferredFuture;
         // Cancelled once we stop waiting for the lock
         $lockWait = new DeferredCancellation;
         $ipcSocket = null;
+        // The class of the session's event handler, if this script lacks it
+        $missingClass = null;
         // For IPC workers: true if the lock holder serves the session, false if it didn't for WORKER_LOCK_TIMEOUT seconds
         $alreadyServed = null;
         $cancelFull = static function () use (&$cancelFlock): void {
@@ -156,13 +171,18 @@ abstract class Serialization
             // The lock holder is an instance that serves (or will serve) the session once it's loaded, or a client
             // that releases the lock in a moment: connect as soon as the holder listens, however long it takes to
             // load the session, unless we get the lock first.
-            // Also when the session has an event handler whose class this script lacks: the holder may be the event
-            // handler, serving the session; if we get the lock instead, the light state check below reports it.
-            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$ipcSocket): void {
+            // A script that lacks the class of the session's event handler can't load the session: the holder is the
+            // event handler, and connectToEventHandler() waits for it, but not forever.
+            $failureCb = static function () use ($session, $cancelFull, $lockWait, &$ipcSocket, &$missingClass): void {
                 while (!$lockWait->isCancelled()) {
                     Logger::log('MadelineProto is starting, please wait...');
                     if ($socket = self::connectIfListening($session->getIpcPath())) {
                         $ipcSocket = [$socket, null];
+                        $cancelFull();
+                        return;
+                    }
+                    if (($class = self::getMissingEventHandler($session)) !== null) {
+                        $missingClass = $class;
                         $cancelFull();
                         return;
                     }
@@ -250,9 +270,13 @@ abstract class Serialization
             if ($alreadyServed === false) {
                 throw new AlreadyServedException("Another process holds the lock of the session {$session->getSessionDirectoryPath()} without serving it for ".self::WORKER_LOCK_TIMEOUT." seconds");
             }
-            // Only cancelled once connected to the server
-            \assert($ipcSocket !== null);
-            return $ipcSocket;
+            if ($ipcSocket !== null) {
+                return $ipcSocket;
+            }
+            if ($missingClass !== null) {
+                return self::connectToEventHandler($session, $missingClass);
+            }
+            throw new AssertionError("Stopped waiting for the lock of the session {$session->getSessionDirectoryPath()} without connecting to its IPC server");
         }
 
         try {
@@ -271,12 +295,9 @@ abstract class Serialization
                 $unlock();
                 return self::startServerAndConnect($session, $ipcSocket);
             } elseif (!class_exists($class)) {
-                // Have lock, can't use it
+                // Have lock, can't use it: the event handler isn't running (or it's restarting)
                 $unlock();
-                Logger::log("Session has event handler (class $class), but it's not started.", Logger::ERROR);
-                Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
-                Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
-                return $ipcSocket ?? self::tryConnect($session->getIpcPath(), $cancelIpc->getFuture(), customE: new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process)."));
+                return $ipcSocket ?? self::connectToEventHandler($session, $class);
             } elseif (is_subclass_of($class, EventHandler::class)) {
                 EventHandler::cachePlugins($class);
             }
@@ -427,6 +448,69 @@ abstract class Serialization
     }
 
     /**
+     * The class of the session's event handler, if this script lacks it: then it can't load the session, nor start
+     * a server that could, it can only connect to the event handler.
+     *
+     * Read from disk, not from the light state cached by SessionPaths: the event handler may have changed since.
+     *
+     * @internal
+     */
+    public static function getMissingEventHandler(SessionPaths $session): ?string
+    {
+        try {
+            $lightState = $session->unserialize($session->getLightStatePath());
+        } catch (Throwable) {
+            return null;
+        }
+        if (!$lightState instanceof LightState) {
+            return null;
+        }
+        $class = $lightState->getEventHandler();
+        return $class !== null && !class_exists($class) ? $class : null;
+    }
+
+    /**
+     * Connect to the event handler of a session, from a script that lacks its class.
+     *
+     * While another process holds the session lock, that's the event handler loading the session (it listens once
+     * it's done) or restarting; while nobody holds it, the event handler isn't running, or it's between two runs.
+     * Either way the wait is bounded: a holder that never listens (its IPC server failed to start, or it's stuck)
+     * must not hang the script forever, like every request to the download script of the event handler, piling up
+     * web server workers.
+     *
+     * @return array{0: (ChannelledSocket|AssertionError), 1: null}
+     */
+    private static function connectToEventHandler(SessionPaths $session, string $class, ?Cancellation $cancellation = null): array
+    {
+        $ipcPath = $session->getIpcPath();
+        $start = hrtime(true);
+        $unlockedSince = null;
+        Logger::log("The session has an event handler ($class), but this script lacks its class: it can't start it, waiting for the event handler to serve the session...");
+        while (true) {
+            if ($socket = self::connectIfListening($ipcPath)) {
+                return [$socket, null];
+            }
+            $now = hrtime(true);
+            if (self::isLockedByAnotherProcess($session)) {
+                $unlockedSince = null;
+                if ($now - $start >= self::$eventHandlerLoadTimeout * 1_000_000_000) {
+                    Logger::log("The process holding the lock of the session didn't serve it for ".self::$eventHandlerLoadTimeout." seconds", Logger::ERROR);
+                    return [new AssertionError("Please make sure the event handler ($class) is running correctly, check its logs: the process holding the lock of the session {$session->getSessionDirectoryPath()} didn't serve it for ".self::$eventHandlerLoadTimeout." seconds. Or make sure the $class class is in scope."), null];
+                }
+            } else {
+                $unlockedSince ??= $now;
+                if ($now - $unlockedSince >= self::$eventHandlerStartTimeout * 1_000_000_000) {
+                    Logger::log("Session has event handler (class $class), but it's not started.", Logger::ERROR);
+                    Logger::log("We don't have access to the event handler class, so we can't start it.", Logger::ERROR);
+                    Logger::log('Please start the event handler or unset it to use the IPC server.', Logger::ERROR);
+                    return [new AssertionError("Please make sure the $class class is in scope, or that the event handler is running (in a separate process or in the current process)."), null];
+                }
+            }
+            delay(1.0, true, $cancellation);
+        }
+    }
+
+    /**
      * Connect again to the IPC server of a session, after losing the connection to it.
      *
      * Like unserialize(), only starts a server if nobody can serve the session: if something listens, that's the
@@ -434,6 +518,8 @@ abstract class Serialization
      * lock, it's an instance loading the session (it listens once it's done) or releasing it, so wait for it.
      * Starting a server anyway spawned a worker (and sent requests to the web server) on every attempt, all of them
      * waiting for a lock that the live holder never releases.
+     * A script that lacks the class of the session's event handler can't start a server (it couldn't load the
+     * session): it can only wait for the event handler, see connectToEventHandler().
      *
      * @internal
      *
@@ -447,6 +533,9 @@ abstract class Serialization
         while (true) {
             if ($socket = self::connectIfListening($ipcPath)) {
                 return [$socket, null];
+            }
+            if (($class = self::getMissingEventHandler($session)) !== null) {
+                return self::connectToEventHandler($session, $class, $cancellation);
             }
             if (!self::isLockedByAnotherProcess($session)) {
                 return self::startServerAndConnect($session);
