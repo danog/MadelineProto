@@ -1685,7 +1685,7 @@ trait Files
             if (!isset($this->cdn_hashes[$file][$offset])) {
                 throw new Exception('Could not fetch CDN hashes for offset '.$offset);
             }
-            if (hash('sha256', substr($data, 0, $this->cdn_hashes[$file][$offset]['limit']), true) !== $this->cdn_hashes[$file][$offset]['hash']) {
+            if (Crypt::sha256(substr($data, 0, $this->cdn_hashes[$file][$offset]['limit'])) !== $this->cdn_hashes[$file][$offset]['hash']) {
                 throw new SecurityException('CDN hash mismatch for offset '.$offset);
             }
             $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
