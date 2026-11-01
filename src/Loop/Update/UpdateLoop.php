@@ -86,6 +86,10 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
     #[\Override]
     public function onSimpleStateChange($state): void
     {
+        if (($this->API->updaters[$this->channelId] ?? null) !== $this) {
+            // Removed (see removeChannel()): a state change queued before it was unsubscribed must not restart it.
+            return;
+        }
         if ($state->state !== API::LOGGED_IN) {
             $this->authorizedDc = null;
             return;
@@ -129,24 +133,18 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
                 try {
                     $difference = $this->API->methodCallAsyncRead('updates.getChannelDifference', ['channel' => $this->channelId, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $request_pts, 'limit' => $limit, 'force' => true, 'floodWaitLimit' => 86400]);
                 } catch (ChannelPrivateError|ChatForbiddenError|ChannelInvalidError|UserBannedInChannelError) {
-                    $this->feeder->stop();
-                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
-                    $this->API->getChannelStates()->remove($this->channelId);
+                    $this->removeChannel();
                     $this->API->logger("Channel private, exiting {$this}");
                     return self::STOP;
                 } catch (TimeoutError $e) {
                     delay(1.0);
                     continue;
                 } catch (PeerNotInDbException) {
-                    $this->feeder->stop();
-                    $this->API->getChannelStates()->remove($this->channelId);
-                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                    $this->removeChannel();
                     $this->API->logger("Channel private, exiting {$this}");
                     return self::STOP;
                 } catch (PTSException $e) {
-                    $this->feeder->stop();
-                    $this->API->getChannelStates()->remove($this->channelId);
-                    unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+                    $this->removeChannel();
                     $this->API->logger("Got PTS exception, exiting update loop for $this: $e", Logger::FATAL_ERROR);
                     return self::STOP;
                 } catch (CancelledException $e) {
@@ -272,5 +270,19 @@ final class UpdateLoop extends Loop implements SimpleSubscriber
         return $this->channelId ?
             "getUpdate loop channel {$this->channelId}" :
             'getUpdate loop generic';
+    }
+
+    /**
+     * Stop updating the channel: remove its update and feed loops, and its state.
+     */
+    private function removeChannel(): void
+    {
+        $this->feeder->stop();
+        // Or the login state would restart the removed loops (and keep them alive: the publisher holds its
+        // subscribers), with no updater for the feed loop to use.
+        $this->API->loginState->unsubscribe($this->feeder);
+        $this->API->loginState->unsubscribe($this);
+        unset($this->API->updaters[$this->channelId], $this->API->feeders[$this->channelId]);
+        $this->API->getChannelStates()->remove($this->channelId);
     }
 }
