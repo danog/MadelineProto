@@ -57,17 +57,19 @@ jobs:
       - name: Test the web UI, and check that its committed bundle is up to date
         run: tests/webui.sh
 
-  # The tests that don't need any secret, with the event loop drivers of Revolt the image has: ext-uv's (its default)
-  # and PHP's own (stream_select, without any extension, as on most installations).
+  # The tests that don't need any secret, with each event loop driver of Revolt: ext-uv's (the default), PHP's own
+  # (stream_select, without any extension, as on most installations), ext-ev's and ext-event's. In the test image of
+  # the main branch (tests/dockerfiles/Dockerfile.test, which has their extensions): pull requests have no secrets to
+  # push one of their own.
   test_light:
     name: test_light (${{ matrix.event-loop }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        event-loop: [uv, select]
+        event-loop: [uv, select, ev, event]
     container:
-      image: danog/madelineproto:next
+      image: danog/madelineproto:next-test
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
       # caches are written to directories of the runner, mounted in the container.
       options: --user root
@@ -88,31 +90,6 @@ jobs:
         env:
           MADELINE_EVENT_LOOP: ${{ matrix.event-loop }}
         run: tests/test.sh phpunit-light
-
-  # The same, with the drivers whose extensions the image doesn't have: ext-ev's and ext-event's. Not in a container:
-  # tests/test_drivers.sh builds the test image with them (tests/drivers.Dockerfile) from the image of the main branch,
-  # and runs the tests in it.
-  test_light_drivers:
-    name: test_light (${{ matrix.event-loop }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        event-loop: [ev, event]
-    steps:
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
-        with:
-          path: ${{ runner.temp }}/composer-cache
-          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
-          restore-keys: composer-
-      - name: Run the light tests
-        env:
-          COMPOSER_CACHE_DIR: ${{ runner.temp }}/composer-cache
-          # For the GitHub API, from which PIE downloads the extensions: 60 unauthenticated requests per hour per IP.
-          GITHUB_TOKEN: ${{ github.token }}
-        run: tests/test_drivers.sh "${{ matrix.event-loop }}"
 
   handshake:
     runs-on: ubuntu-latest

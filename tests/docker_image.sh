@@ -8,7 +8,7 @@
 #   the newest release (of its minor/major version).
 # Each is a manifest of the images of each architecture, <tag>-debian-<arch>, built by the jobs of each architecture.
 # Along with it, the image the tests run in, <tag>-test (from tests/dockerfiles/Dockerfile.test: the same plus what only
-# the tests use, e.g. mtg), never published as latest or a version.
+# the tests use, e.g. mtg and the extensions of the other event loop drivers), never published as latest or a version.
 #
 # Usage:
 #   tests/docker_image.sh build <arch>  Build and push the image of an architecture (amd64, arm64).
@@ -73,22 +73,25 @@ case "$1" in
             echo "Unknown architecture: $arch"
             exit 1
         fi
+        secret=()
+        if [ -n "$GITHUB_TOKEN" ]; then
+            secret=(--secret id=github_token,env=GITHUB_TOKEN)
+        fi
         args=(--cache-from "$image:$base-debian-$arch")
+        test_args=(--cache-from "$image:$base-test-debian-$arch")
         if [ "$base" != next ]; then
             args+=(--cache-from "$image:next-debian-$arch")
-        fi
-        if [ -n "$GITHUB_TOKEN" ]; then
-            args+=(--secret id=github_token,env=GITHUB_TOKEN)
+            test_args+=(--cache-from "$image:next-test-debian-$arch")
         fi
         # Without attestations: a plain image (rather than an index), for docker manifest. The cache of a tag is the
         # image of the main branch, which is usually the same commit.
         run docker buildx build --platform "linux/$arch" . -f tests/dockerfiles/Dockerfile \
-            -t "$image:$base-debian-$arch" "${args[@]}" --cache-to type=inline \
+            -t "$image:$base-debian-$arch" "${args[@]}" "${secret[@]}" --cache-to type=inline \
             --provenance=false --sbom=false --push
         # The test image, from the one just pushed.
         run docker buildx build --platform "linux/$arch" tests/dockerfiles -f tests/dockerfiles/Dockerfile.test \
             --build-arg "BASE=$image:$base-debian-$arch" -t "$image:$base-test-debian-$arch" \
-            --cache-from "$image:$base-test-debian-$arch" --cache-to type=inline \
+            "${test_args[@]}" "${secret[@]}" --cache-to type=inline \
             --provenance=false --sbom=false --push
         ;;
     merge)
