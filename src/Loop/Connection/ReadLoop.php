@@ -181,6 +181,9 @@ final class ReadLoop extends Loop
         $seq_no = null;
         $auth_key_id = $buffer->bufferRead(8);
         $auth = $this->shared->auth;
+        // The key this ID belongs to: reading the rest of the message can suspend while the key is replaced.
+        $tempId = $auth->getTempID();
+        $authKey = $auth->getTempAuthKey();
         if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
             if ($this->shared->auth->connectionState->getState()->isEncrypted()) {
                 // The late answer to an unencrypted request of the key exchange that was sent again by its
@@ -203,11 +206,9 @@ final class ReadLoop extends Loop
                 $this->connection->incomingBytesCtr?->incBy($left);
                 $buffer->bufferRead($left);
             }
-        } elseif ($auth_key_id === $auth->getTempID()) {
+        } elseif ($auth_key_id === $tempId) {
+            \assert($authKey !== null);
             $message_key = $buffer->bufferRead(16);
-            $generation = $this->connection->getGeneration();
-            $session = $this->connection->session_id;
-            $authKey = $auth->getTempAuthKey();
             $payload_length -= 24;
             $left = $payload_length & 15;
             $ciphertext = $buffer->bufferRead($payload_length - $left);
@@ -215,21 +216,9 @@ final class ReadLoop extends Loop
                 $this->connection->incomingBytesCtr?->incBy($left);
                 $buffer->bufferRead($left);
             }
-            $decoder = MessageDecoderFactory::create();
-            try {
-                $decoded = $decoder->decode($ciphertext, $authKey, $message_key);
-            } finally {
-                // Decoding can suspend even through the PHP decoder's IGE backend.
-                // Stale success and stale validation errors must not affect a new session.
-                if ($generation !== $this->connection->getGeneration()
-                    || $this->connection->shouldReconnect()
-                    || $session !== $this->connection->session_id
-                    || $authKey !== $this->shared->auth->getTempAuthKey()
-                ) {
-                    return null;
-                }
-            }
-            if ($decoded->sessionId !== $session) {
+            // Decoding can suspend, like reading: a message of a previous session is handled the same either way.
+            $decoded = MessageDecoderFactory::create()->decode($ciphertext, $authKey, $message_key);
+            if ($decoded->sessionId !== $this->connection->session_id) {
                 $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
                 $this->connection->resetSession("session ID mismatch");
                 throw new NothingInTheSocketException();

@@ -434,7 +434,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             unset($MTmessages);
 
             $auth = $this->shared->auth;
-            $generation = $this->connection->getGeneration();
+            $stream = $this->connection->stream;
             $session = $this->connection->session_id;
             $authKey = $auth->getTempAuthKey();
 
@@ -452,7 +452,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             // IGE can suspend. Leave unsent requests queued for the current context.
             $contextChanged = $session !== $this->connection->session_id
                 || $authKey !== $this->shared->auth->getTempAuthKey();
-            if ($generation !== $this->connection->getGeneration() || $this->connection->shouldReconnect() || $contextChanged) {
+            if ($stream !== $this->connection->stream || $contextChanged) {
                 if ($contextChanged) {
                     // The container was never queued; session-bound messages fail, the rest get new IDs.
                     foreach ($messages as $unsent) {
@@ -461,7 +461,8 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                         }
                     }
                 }
-                if ($generation !== $this->connection->getGeneration() || $this->connection->shouldReconnect()) {
+                if ($stream !== $this->connection->stream) {
+                    // Disconnected: the next connection sends them.
                     return;
                 }
                 continue;

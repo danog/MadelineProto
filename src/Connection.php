@@ -140,13 +140,6 @@ final class Connection
      *
      */
     private bool $needsReconnect = false;
-    /** Changes whenever the transport is disconnected, including temporary reconnects. */
-    private int $generation = 0;
-
-    public function getGeneration(): int
-    {
-        return $this->generation;
-    }
     /**
      * Number of file requests sent on this socket that weren't answered yet (see DataCenterConnection::waitGetFileConnection).
      *
@@ -740,7 +733,6 @@ final class Connection
      */
     public function disconnect(bool $temporary = false): void
     {
-        $this->generation++;
         $this->API->logger("Disconnecting from DC {$this->datacenterId}");
         $this->needsReconnect = true;
         if (!$temporary) {

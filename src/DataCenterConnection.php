@@ -227,7 +227,6 @@ final class DataCenterConnection implements SimpleSubscriber
                     $logger->logger('Binding authorization keys...', Logger::VERBOSE);
                     $nonce = Tools::random(8);
                     $expires_at = time() + $expires_in;
-                    $generation = $connection->getGeneration();
                     $temp_auth_key_id = $this->auth->getTempId();
                     $perm_auth_key_id = $this->auth->getID();
                     $temp_session_id = $connection->session_id;
@@ -239,8 +238,9 @@ final class DataCenterConnection implements SimpleSubscriber
                     $padding = Tools::random(Tools::posmod(-\strlen($encrypted_data), 16));
                     [$aes_key, $aes_iv] = $this->auth->pfsKdf($message_key);
                     $encrypted_message = $this->auth->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
-                    if ($generation !== $connection->getGeneration() || $connection->shouldReconnect()
-                        || $temp_session_id !== $connection->session_id
+                    // Encrypting can suspend: the inner message must name the current session and keys (the
+                    // request itself is queued, and survives reconnections).
+                    if ($temp_session_id !== $connection->session_id
                         || $temp_auth_key_id !== $this->auth->getTempId() || $perm_auth_key_id !== $this->auth->getID()
                     ) {
                         continue;

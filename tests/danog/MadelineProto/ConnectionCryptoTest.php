@@ -22,6 +22,7 @@ use danog\MadelineProto\MTProtoSession\MsgIdHandler;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\NativeExecutor;
 use danog\MadelineProto\NothingInTheSocketException;
+use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\MTProtoBufferInterface;
 use danog\MadelineProto\Stream\ReadBufferInterface;
@@ -31,6 +32,7 @@ use ReflectionClass;
 use Revolt\EventLoop;
 
 use function Amp\async;
+use function Amp\delay;
 
 /**
  * @runTestsInSeparateProcesses
@@ -38,21 +40,29 @@ use function Amp\async;
  */
 final class ConnectionCryptoTest extends TestCase
 {
-    /** @return iterable<string, array{string, bool}> */
+    /** @return iterable<string, array{string, bool, bool}> */
     public static function changes(): iterable
     {
-        foreach (['reconnect', 'session', 'auth'] as $change) {
-            yield $change => [$change, false];
-            yield $change.' with damaged ciphertext' => [$change, true];
+        foreach ([false => 'decoding', true => 'reading'] as $reading => $while) {
+            foreach (['disconnect', 'session', 'auth'] as $change) {
+                yield "$change while $while" => [$change, false, (bool) $reading];
+                yield "$change while $while, damaged ciphertext" => [$change, true, (bool) $reading];
+            }
         }
-        yield 'current session mismatch' => ['mismatch', false];
+        yield 'current session mismatch' => ['mismatch', false, false];
     }
 
-    /** @dataProvider changes */
-    public function testResultsCannotModifyAReplacementConnection(string $change, bool $damaged): void
+    /**
+     * Decoding a message can suspend, as reading it can: what changes meanwhile is handled as if it changed
+     * before the message was read. It's decoded with the key its ID names, handled even if the socket was
+     * disconnected meanwhile (it was received), and a message of a previous session resets the session.
+     *
+     * @dataProvider changes
+     */
+    public function testMessagesDecodedAcrossConnectionChanges(string $change, bool $damaged, bool $reading): void
     {
         NativeExecutor::initialize();
-        if (!NativeExecutor::get()) {
+        if (!$reading && !NativeExecutor::get()) {
             self::markTestSkipped('Optional native decoder unavailable');
         }
         BypassFinals::enable();
@@ -60,16 +70,15 @@ final class ConnectionCryptoTest extends TestCase
             ->onlyMethods(['logger', 'getTL', '__destruct'])->getMock();
         $api->expects(self::never())->method('getTL');
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()
-            ->onlyMethods(['shouldReconnect', 'getGeneration', 'reading', 'resetSession'])->getMock();
+            ->onlyMethods(['resetSession'])->getMock();
         $connection->API = $api;
         $connection->session_id = random_bytes(8);
-        $connection->method('shouldReconnect')->willReturn(false);
-        $connection->expects($change === 'mismatch' ? self::once() : self::never())->method('resetSession');
-        $generation = 1;
-        // A reference is needed because the transport generation can change while decode awaits.
-        $connection->method('getGeneration')->willReturnCallback(static function () use (&$generation): int {
-            return $generation;
-        });
+        $previousSession = !$damaged && ($change === 'session' || $change === 'mismatch');
+        $connection->expects($previousSession ? self::once() : self::never())->method('resetSession');
+        // Handling a message starts with checking its ID.
+        $connection->msgIdHandler = $this->getMockBuilder(MsgIdHandler::class)->disableOriginalConstructor()->getMock();
+        $connection->msgIdHandler->expects(!$damaged && !$previousSession ? self::once() : self::never())
+            ->method('checkIncomingMessageId')->with(12345)->willThrowException(new \RuntimeException('handled'));
         $authKey = random_bytes(256);
         $authId = substr(sha1($authKey, true), -8);
         $auth = $this->getMockBuilder(NewAuthKey::class)->disableOriginalConstructor()
@@ -91,7 +100,13 @@ final class ConnectionCryptoTest extends TestCase
         $packet = $authId.$msgKey.$cipher;
         $length = \strlen($packet);
         $buffer = $this->createMock(ReadBufferInterface::class);
-        $buffer->method('bufferRead')->willReturnCallback(static function (int $size) use (&$packet): string {
+        $authIdRead = false;
+        $buffer->method('bufferRead')->willReturnCallback(static function (int $size) use (&$packet, &$authIdRead, $reading): string {
+            if ($reading && $authIdRead) {
+                // Waiting for the rest of the message, after its auth key ID.
+                delay(0);
+            }
+            $authIdRead = true;
             $part = substr($packet, 0, $size);
             $packet = substr($packet, $size);
             return $part;
@@ -108,9 +123,9 @@ final class ConnectionCryptoTest extends TestCase
             $reflection->getProperty($property)->setValue($loop, $value);
         }
         $result = async($loop->readMessage(...));
-        EventLoop::queue(static function () use ($connection, &$generation, &$authKey, $change): void {
-            if ($change === 'reconnect') {
-                $generation++;
+        EventLoop::queue(static function () use ($connection, &$authKey, $change): void {
+            if ($change === 'disconnect') {
+                $connection->stream = null;
             }
             if ($change === 'session') {
                 $connection->session_id = random_bytes(8);
@@ -119,15 +134,19 @@ final class ConnectionCryptoTest extends TestCase
                 $authKey = random_bytes(256);
             }
         });
-        if ($change === 'mismatch') {
+        if ($damaged) {
+            $this->expectException(SecurityException::class);
+        } elseif ($previousSession) {
             $this->expectException(NothingInTheSocketException::class);
+        } else {
+            $this->expectExceptionMessage('handled');
         }
-        self::assertNull($result->await());
+        $result->await();
     }
     /** @return iterable<string, array{string}> */
     public static function outgoingChanges(): iterable
     {
-        foreach (['reconnect', 'session', 'auth'] as $change) {
+        foreach (['disconnect', 'reconnect', 'session', 'auth'] as $change) {
             yield $change => [$change, false];
         }
         // auth.bindTempAuthKey embeds its msg_id and session: it can't be resent with new ones.
@@ -146,16 +165,11 @@ final class ConnectionCryptoTest extends TestCase
         $api = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()
             ->onlyMethods(['logger', '__destruct'])->getMock();
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()
-            ->onlyMethods(['shouldReconnect', 'getGeneration', 'isHttp', 'generateOutSeqNo'])->getMock();
+            ->onlyMethods(['isHttp', 'generateOutSeqNo'])->getMock();
         $connection->API = $api;
         $connection->session_id = random_bytes(8);
-        $connection->method('shouldReconnect')->willReturn(false);
         $connection->method('isHttp')->willReturn(false);
         $connection->method('generateOutSeqNo')->willReturn(1);
-        $generation = 1;
-        $connection->method('getGeneration')->willReturnCallback(static function () use (&$generation): int {
-            return $generation;
-        });
         $connection->msgIdHandler = $this->getMockBuilder(MsgIdHandler::class)->disableOriginalConstructor()->getMock();
         $connection->msgIdHandler->method('generateMessageId')->willReturn(12345);
         $authKey = random_bytes(256);
@@ -194,10 +208,15 @@ final class ConnectionCryptoTest extends TestCase
         foreach (['API' => $api, 'connection' => $connection, 'shared' => $shared, 'datacenter' => '1', 'queue' => $queue] as $property => $value) {
             $reflection->getProperty($property)->setValue($loop, $value);
         }
+        $replacement = $this->createMock(CryptoTestTransport::class);
+        $replacement->expects(self::never())->method('getWriteBuffer');
         $result = async($loop->encryptedWriteLoop(...));
-        EventLoop::queue(static function () use ($connection, &$generation, &$authKey, $change): void {
+        EventLoop::queue(static function () use ($connection, &$authKey, $change, $replacement): void {
+            if ($change === 'disconnect') {
+                $connection->stream = null;
+            }
             if ($change === 'reconnect') {
-                $generation++;
+                $connection->stream = $replacement;
             }
             if ($change === 'session') {
                 $connection->session_id = random_bytes(8);
@@ -209,7 +228,7 @@ final class ConnectionCryptoTest extends TestCase
         $result->await();
         // Unsent messages keep their IDs across a reconnection, and get new ones in a new session
         // or with a new key, unless they are bound to their session: then they fail instead.
-        $kept = $change === 'reconnect' || $sessionBound;
+        $kept = $change === 'disconnect' || $change === 'reconnect' || $sessionBound;
         self::assertSame($kept ? 12345 : null, $outgoing->getMsgId());
         self::assertSame($kept ? 1 : null, $outgoing->getSeqNo());
     }
