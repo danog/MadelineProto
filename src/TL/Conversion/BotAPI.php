@@ -23,15 +23,18 @@ namespace danog\MadelineProto\TL\Conversion;
 use danog\Decoder\FileId;
 use danog\Decoder\FileIdType;
 use danog\DialogId\DialogId;
+use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\Exception as MadelineException;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\StrTools;
+use danog\MadelineProto\TL\Conversion\Rich\BotAPIConverter;
 use danog\MadelineProto\TL\Conversion\Rich\OutputConverter;
 use danog\MadelineProto\Tools;
 use Throwable;
+use WeakMap;
 
 /**
  * @internal
@@ -482,10 +485,20 @@ trait BotAPI
      */
     public function richMessageToBotAPI(array $richMessage): array
     {
-        return OutputConverter::convert(
-            $richMessage,
-            function (array $media, string $type): array {
-                $converted = $this->MTProtoToBotAPI($media);
+        // The Bot API media are converted from the raw media of the Media objects of the blocks
+        /** @var WeakMap<Media, array> */
+        $raw = new WeakMap;
+        $message = OutputConverter::convert($richMessage, function (array $media) use ($raw): ?Media {
+            $wrapped = $this->wrapMedia($media);
+            if ($wrapped !== null) {
+                $raw[$wrapped] = $media;
+            }
+            return $wrapped;
+        });
+        return BotAPIConverter::convert(
+            $message,
+            function (mixed $media, string $type) use ($raw): array {
+                $converted = $this->MTProtoToBotAPI($raw[$media]);
                 unset($converted['caption']);
                 return $converted[$type] ?? reset($converted);
             },

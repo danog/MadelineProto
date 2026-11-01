@@ -38,10 +38,14 @@ use danog\MadelineProto\EventHandler\Message\Entities\Strike;
 use danog\MadelineProto\EventHandler\Message\Entities\TextUrl;
 use danog\MadelineProto\EventHandler\Message\Entities\TonAddress;
 use danog\MadelineProto\EventHandler\Message\Entities\Underline;
+use danog\MadelineProto\EventHandler\Message\Rich\Block;
+use danog\MadelineProto\EventHandler\Message\Rich\Caption;
+use danog\MadelineProto\EventHandler\Message\Rich\RichText;
+use danog\MadelineProto\EventHandler\Message\Rich\Text;
 use danog\MadelineProto\StrTools;
 
 /**
- * Converts the blocks of a rich message (in Bot API RichBlock format) to a plain text message with entities, like the ones of normal messages, and collects its media.
+ * Converts the blocks of a rich message to a plain text message with entities, like the ones of normal messages, and collects its media.
  *
  * - Blocks are separated by newlines; list items are prefixed by their label; table cells are separated by tabs, rows by newlines.
  * - Headings are bold; preformatted blocks and mathematical expressions are pre entities (the latter with the latex language).
@@ -64,7 +68,7 @@ final class TextConverter
     }
 
     /**
-     * @param list<array> $blocks
+     * @param list<Block> $blocks
      *
      * @return array{0: string, 1: list<MessageEntity>, 2: list<Media>} Message, entities and media
      */
@@ -72,10 +76,29 @@ final class TextConverter
     {
         $converter = new self;
         $converter->blocks($blocks);
-        $entities = $converter->entities;
-        // Outer entities first, as in the entities of normal messages: entities are added once their contents are
-        usort($entities, static fn (MessageEntity $a, MessageEntity $b): int => [$a->offset, $b->length] <=> [$b->offset, $a->length]);
-        return [$converter->message, $entities, $converter->media];
+        return [$converter->message, $converter->sortedEntities(), $converter->media];
+    }
+
+    /**
+     * @return array{0: string, 1: list<MessageEntity>} Text and entities
+     */
+    public static function convertText(RichText $text): array
+    {
+        $converter = new self;
+        $converter->text($text);
+        return [$converter->message, $converter->sortedEntities()];
+    }
+
+    /**
+     * @return list<MessageEntity>
+     */
+    private function sortedEntities(): array
+    {
+        // Outer entities first, as in the entities of normal messages: entities are added once their contents are,
+        // so of two entities over the same text, the one added last is the outer one
+        $keys = array_keys($this->entities);
+        usort($keys, fn (int $a, int $b): int => [$this->entities[$a]->offset, $this->entities[$b]->length, $b] <=> [$this->entities[$b]->offset, $this->entities[$a]->length, $a]);
+        return array_map(fn (int $k): MessageEntity => $this->entities[$k], $keys);
     }
 
     private function append(string $text): void
@@ -116,7 +139,7 @@ final class TextConverter
     }
 
     /**
-     * @param list<array> $blocks
+     * @param list<Block> $blocks
      */
     private function blocks(array $blocks): void
     {
@@ -134,67 +157,63 @@ final class TextConverter
         }
     }
 
-    private function block(array $block): void
+    private function block(Block $block): void
     {
-        // Also accept the shorthands of input blocks (see InputConverter); raw MTProto blocks have no text
-        switch ($block['type'] ?? '') {
-            case 'heading':
-                $this->wrap(fn () => $this->text($block['text'] ?? ''), static fn (int $o, int $l) => new Bold($o, $l));
+        switch (true) {
+            case $block instanceof Block\Heading:
+                $this->wrap(fn () => $this->text($block->text), static fn (int $o, int $l) => new Bold($o, $l));
                 break;
-            case 'pre':
-                $this->wrap(fn () => $this->text($block['text'] ?? ''), static fn (int $o, int $l) => new Pre($o, $l, $block['language'] ?? ''));
+            case $block instanceof Block\Paragraph:
+            case $block instanceof Block\Footer:
+            case $block instanceof Block\Thinking:
+                $this->text($block->text);
                 break;
-            case 'mathematical_expression':
-                $this->wrap(fn () => $this->append((string) ($block['expression'] ?? '')), static fn (int $o, int $l) => new Pre($o, $l, 'latex'));
+            case $block instanceof Block\Preformatted:
+                $this->wrap(fn () => $this->text($block->text), static fn (int $o, int $l) => new Pre($o, $l, $block->language));
                 break;
-            case 'list':
+            case $block instanceof Block\MathematicalExpression:
+                $this->wrap(fn () => $this->append($block->expression), static fn (int $o, int $l) => new Pre($o, $l, 'latex'));
+                break;
+            case $block instanceof Block\ItemList:
                 $first = true;
-                foreach ($block['items'] ?? [] as $item) {
+                foreach ($block->items as $item) {
                     if (!$first) {
                         $this->append("\n");
                     }
                     $first = false;
-                    $this->append(($item['label'] ?? "\u{2022}").' ');
-                    if (isset($item['blocks'])) {
-                        $this->blocks($item['blocks']);
-                    } elseif (isset($item['text'])) {
-                        $this->text($item['text']);
-                    }
+                    $this->append($item->getLabel().' ');
+                    $this->blocks($item->blocks);
                 }
                 break;
-            case 'blockquote':
+            case $block instanceof Block\Blockquote:
                 $this->wrap(function () use ($block): void {
-                    if (isset($block['blocks'])) {
-                        $this->blocks($block['blocks']);
-                    } elseif (isset($block['text'])) {
-                        $this->text($block['text']);
-                    }
-                    $this->credit($block['credit'] ?? null);
+                    $this->blocks($block->blocks);
+                    $this->credit($block->credit);
                 }, static fn (int $o, int $l) => new Blockquote($o, $l));
                 break;
-            case 'expandable_blockquote':
-            case 'pullquote':
+            case $block instanceof Block\ExpandableBlockquote:
+            case $block instanceof Block\Pullquote:
                 $this->wrap(function () use ($block): void {
-                    $this->text($block['text'] ?? '');
-                    $this->credit($block['credit'] ?? null);
-                }, static fn (int $o, int $l) => new Blockquote($o, $l, $block['type'] === 'expandable_blockquote'));
+                    $this->text($block->text);
+                    $this->credit($block->credit);
+                }, static fn (int $o, int $l) => new Blockquote($o, $l, $block instanceof Block\ExpandableBlockquote));
                 break;
-            case 'details':
-                $this->wrap(fn () => $this->text($block['summary'] ?? ''), static fn (int $o, int $l) => new Bold($o, $l));
-                $this->separated(fn () => $this->wrap(fn () => $this->blocks($block['blocks'] ?? []), static fn (int $o, int $l) => new Blockquote($o, $l, !($block['is_open'] ?? false))));
+            case $block instanceof Block\Details:
+                $this->wrap(fn () => $this->text($block->summary), static fn (int $o, int $l) => new Bold($o, $l));
+                $this->separated(fn () => $this->wrap(fn () => $this->blocks($block->blocks), static fn (int $o, int $l) => new Blockquote($o, $l, !$block->open)));
                 break;
-            case 'collage':
-            case 'slideshow':
+            case $block instanceof Block\Collage:
+            case $block instanceof Block\Slideshow:
                 $offset = $this->length;
-                $this->blocks($block['blocks'] ?? []);
-                $this->caption($block['caption'] ?? null, $this->length > $offset);
+                $this->blocks($block->blocks);
+                $this->caption($block->caption, $this->length > $offset);
                 break;
-            case 'table':
-                if (isset($block['caption'])) {
-                    $this->wrap(fn () => $this->text($block['caption']), static fn (int $o, int $l) => new Bold($o, $l));
+            case $block instanceof Block\Table:
+                if ($block->caption !== null) {
+                    $this->wrap(fn () => $this->text($block->caption), static fn (int $o, int $l) => new Bold($o, $l));
                     $this->append("\n");
                 }
-                foreach ($block['cells'] ?? [] as $y => $row) {
+                foreach ($block->cells as $y => $row) {
                     if ($y) {
                         $this->append("\n");
                     }
@@ -202,135 +221,129 @@ final class TextConverter
                         if ($x) {
                             $this->append("\t");
                         }
-                        if (isset($cell['text'])) {
-                            if ($cell['is_header'] ?? false) {
-                                $this->wrap(fn () => $this->text($cell['text']), static fn (int $o, int $l) => new Bold($o, $l));
-                            } else {
-                                $this->text($cell['text']);
-                            }
+                        if ($cell->text === null) {
+                            continue;
+                        }
+                        if ($cell->header) {
+                            $this->wrap(fn () => $this->text($cell->text), static fn (int $o, int $l) => new Bold($o, $l));
+                        } else {
+                            $this->text($cell->text);
                         }
                     }
                 }
                 break;
-            case 'buttons':
-                foreach ($block['buttons'] ?? [] as $k => $button) {
+            case $block instanceof Block\Buttons:
+                foreach ($block->buttons as $k => $button) {
                     if ($k) {
                         $this->append(' ');
                     }
-                    $this->text($button['text'] ?? '');
+                    $this->text($button->text);
                 }
                 break;
-            case 'photo':
-            case 'video':
-            case 'animation':
-            case 'audio':
-            case 'voice_note':
-            case 'document':
-                if (($block[$block['type']] ?? null) instanceof Media) {
-                    $this->media[] = $block[$block['type']];
-                }
-                $this->caption($block['caption'] ?? null, false);
+            case $block instanceof Block\Photo:
+                $this->media($block->photo, $block->caption);
                 break;
-            case 'map':
-                $this->caption($block['caption'] ?? null, false);
+            case $block instanceof Block\Video:
+                $this->media($block->video, $block->caption);
                 break;
-            case 'divider':
-            case 'anchor':
-            case 'unknown':
-            case 'unsupported':
+            case $block instanceof Block\Animation:
+                $this->media($block->animation, $block->caption);
                 break;
-            default:
-                // paragraph, footer, thinking
-                if (isset($block['text'])) {
-                    $this->text($block['text']);
-                }
+            case $block instanceof Block\Audio:
+                $this->media($block->audio, $block->caption);
+                break;
+            case $block instanceof Block\VoiceNote:
+                $this->media($block->voiceNote, $block->caption);
+                break;
+            case $block instanceof Block\Document:
+                $this->media($block->document, $block->caption);
+                break;
+            case $block instanceof Block\Map:
+                $this->caption($block->caption, false);
+                break;
+                // Divider, Anchor, Unsupported: no text
         }
     }
 
-    private function caption(mixed $caption, bool $newline): void
+    private function media(mixed $media, ?Caption $caption): void
     {
-        if ($caption === null || $caption === '' || $caption === []) {
+        if ($media instanceof Media) {
+            $this->media[] = $media;
+        }
+        $this->caption($caption, false);
+    }
+
+    private function caption(?Caption $caption, bool $newline): void
+    {
+        if ($caption === null) {
             return;
         }
         if ($newline) {
             $this->append("\n");
         }
-        if (\is_array($caption) && !array_is_list($caption) && !isset($caption['type']) && !isset($caption['_'])) {
-            // RichBlockCaption
-            $this->text($caption['text'] ?? '');
-            $this->credit($caption['credit'] ?? null);
-        } else {
-            // Shorthand for the text of the caption
-            $this->text($caption);
-        }
+        $this->text($caption->text);
+        $this->credit($caption->credit);
     }
 
-    private function credit(mixed $credit): void
+    private function credit(?RichText $credit): void
     {
-        if ($credit === null || $credit === '' || $credit === []) {
+        if ($credit === null) {
             return;
         }
-        $this->append("\n");
-        $this->wrap(fn () => $this->text($credit), static fn (int $o, int $l) => new Italic($o, $l));
+        $this->separated(fn () => $this->wrap(fn () => $this->text($credit), static fn (int $o, int $l) => new Italic($o, $l)));
     }
 
-    /**
-     * Append a rich text in Bot API format.
-     */
-    private function text(mixed $text): void
+    private function text(RichText $text): void
     {
-        if (\is_string($text) || \is_int($text) || \is_float($text)) {
-            $this->append((string) $text);
+        if ($text instanceof Text\Plain) {
+            $this->append($text->text);
             return;
         }
-        if (!\is_array($text) || isset($text['_']) || (!array_is_list($text) && !isset($text['type']))) {
-            // Raw MTProto rich texts
-            return;
-        }
-        if (array_is_list($text)) {
-            foreach ($text as $sub) {
+        if ($text instanceof Text\Concat) {
+            foreach ($text->texts as $sub) {
                 $this->text($sub);
             }
             return;
         }
-        $inner = fn () => $this->text($text['text'] ?? '');
-        $entity = match ($text['type']) {
-            'bold' => static fn (int $o, int $l) => new Bold($o, $l),
-            'italic' => static fn (int $o, int $l) => new Italic($o, $l),
-            'underline' => static fn (int $o, int $l) => new Underline($o, $l),
-            'strikethrough' => static fn (int $o, int $l) => new Strike($o, $l),
-            'spoiler' => static fn (int $o, int $l) => new Spoiler($o, $l),
-            'code' => static fn (int $o, int $l) => new Code($o, $l),
-            'url' => static fn (int $o, int $l) => new TextUrl($o, $l, $text['url']),
-            'email_address' => static fn (int $o, int $l) => new Email($o, $l),
-            'phone_number' => static fn (int $o, int $l) => new Phone($o, $l),
-            'mention' => static fn (int $o, int $l) => new Mention($o, $l),
-            'hashtag' => static fn (int $o, int $l) => new Hashtag($o, $l),
-            'cashtag' => static fn (int $o, int $l) => new Cashtag($o, $l),
-            'bot_command' => static fn (int $o, int $l) => new BotCommand($o, $l),
-            'bank_card_number' => static fn (int $o, int $l) => new BankCard($o, $l),
-            'ton_address' => static fn (int $o, int $l) => new TonAddress($o, $l),
-            'text_mention' => static fn (int $o, int $l) => new MentionName($o, $l, (int) ($text['user']['id'] ?? $text['user_id'])),
-            'date_time' => static fn (int $o, int $l) => FormattedDate::fromBotAPIFormat($o, $l, (int) $text['unix_time'], $text['date_time_format'] ?? ''),
+        $entity = match (true) {
+            $text instanceof Text\Bold => static fn (int $o, int $l) => new Bold($o, $l),
+            $text instanceof Text\Italic => static fn (int $o, int $l) => new Italic($o, $l),
+            $text instanceof Text\Underline => static fn (int $o, int $l) => new Underline($o, $l),
+            $text instanceof Text\Strikethrough => static fn (int $o, int $l) => new Strike($o, $l),
+            $text instanceof Text\Spoiler => static fn (int $o, int $l) => new Spoiler($o, $l),
+            $text instanceof Text\Code => static fn (int $o, int $l) => new Code($o, $l),
+            $text instanceof Text\Url => static fn (int $o, int $l) => new TextUrl($o, $l, $text->url),
+            $text instanceof Text\Email => static fn (int $o, int $l) => new Email($o, $l),
+            $text instanceof Text\Phone => static fn (int $o, int $l) => new Phone($o, $l),
+            $text instanceof Text\Mention => static fn (int $o, int $l) => new Mention($o, $l),
+            $text instanceof Text\Hashtag => static fn (int $o, int $l) => new Hashtag($o, $l),
+            $text instanceof Text\Cashtag => static fn (int $o, int $l) => new Cashtag($o, $l),
+            $text instanceof Text\BotCommand => static fn (int $o, int $l) => new BotCommand($o, $l),
+            $text instanceof Text\BankCard => static fn (int $o, int $l) => new BankCard($o, $l),
+            $text instanceof Text\TonAddress => static fn (int $o, int $l) => new TonAddress($o, $l),
+            $text instanceof Text\MentionName => static fn (int $o, int $l) => new MentionName($o, $l, $text->userId),
+            $text instanceof Text\Date => static fn (int $o, int $l) => new FormattedDate($o, $l, $text->date, $text->relative, $text->shortTime, $text->longTime, $text->shortDate, $text->longDate, $text->dayOfWeek),
             default => null,
         };
         if ($entity !== null) {
-            $this->wrap($inner, $entity);
+            \assert(property_exists($text, 'text') && $text->text instanceof RichText);
+            $this->wrap(fn () => $this->text($text->text), $entity);
             return;
         }
-        match ($text['type']) {
-            'custom_emoji' => $this->wrap(
-                fn () => $this->append($text['alternative_text']),
-                static fn (int $o, int $l) => new CustomEmoji($o, $l, (int) $text['custom_emoji_id']),
+        match (true) {
+            $text instanceof Text\CustomEmoji => $this->wrap(
+                fn () => $this->append($text->alternativeText),
+                static fn (int $o, int $l) => new CustomEmoji($o, $l, $text->documentId),
             ),
-            'mathematical_expression' => $this->wrap(
-                fn () => $this->append($text['expression']),
+            $text instanceof Text\MathematicalExpression => $this->wrap(
+                fn () => $this->append($text->expression),
                 static fn (int $o, int $l) => new Code($o, $l),
             ),
-            'button' => $this->text($text['button']['text']),
-            'anchor' => null,
-            // subscript, superscript, marked, reference, reference_link, anchor_link
-            default => $inner(),
+            $text instanceof Text\InlineButton => $this->text($text->button->text),
+            // Subscript, Superscript, Marked, Reference, ReferenceLink, AnchorLink
+            $text instanceof Text\StyledText, $text instanceof Text\Reference, $text instanceof Text\ReferenceLink, $text instanceof Text\AnchorLink => $this->text($text->text),
+            // Anchor
+            default => null,
         };
     }
 }

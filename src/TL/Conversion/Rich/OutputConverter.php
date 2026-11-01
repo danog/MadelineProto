@@ -17,13 +17,26 @@
 namespace danog\MadelineProto\TL\Conversion\Rich;
 
 use Closure;
-use danog\MadelineProto\EventHandler\Message\Entities\FormattedDate;
+use danog\MadelineProto\EventHandler\Media;
+use danog\MadelineProto\EventHandler\Message\Rich\Alignment;
+use danog\MadelineProto\EventHandler\Message\Rich\Block;
+use danog\MadelineProto\EventHandler\Message\Rich\Button;
+use danog\MadelineProto\EventHandler\Message\Rich\ButtonStyle;
+use danog\MadelineProto\EventHandler\Message\Rich\Caption;
+use danog\MadelineProto\EventHandler\Message\Rich\ListItem;
+use danog\MadelineProto\EventHandler\Message\Rich\ListLabelType;
+use danog\MadelineProto\EventHandler\Message\Rich\RichText;
+use danog\MadelineProto\EventHandler\Message\Rich\TableCell;
+use danog\MadelineProto\EventHandler\Message\Rich\Text;
+use danog\MadelineProto\EventHandler\Message\Rich\VerticalAlignment;
+use danog\MadelineProto\EventHandler\Message\RichMessage;
 
 /**
- * Converts MTProto richMessage constructors to the format of the Bot API's RichMessage.
+ * Converts MTProto richMessage constructors to RichMessage objects.
  *
  * Mirrors the conversion of TDLib (WebPageBlock.cpp, RichMessage.cpp) and of the Bot API server, except that
- * blocks and texts the Bot API can't represent (thinking blocks, TON addresses) are kept instead of being dropped.
+ * blocks and texts the Bot API can't represent (thinking blocks, TON addresses, custom list labels, video flags)
+ * are kept instead of being dropped.
  *
  * @internal
  */
@@ -37,26 +50,21 @@ final class OutputConverter
     private array $anchors = ['' => 'anchor'];
 
     /**
-     * @param Closure(array, string): mixed $wrapMedia Wraps a messageMediaPhoto or messageMediaDocument of the specified Bot API type (photo, video, animation, audio, voice_note, document)
-     * @param Closure(int): mixed $wrapUser Wraps a user ID
+     * @param Closure(array, string): ?Media $wrapMedia Wraps a messageMediaPhoto or messageMediaDocument of the specified type (photo, video, animation, audio, voice_note, document)
      */
     private function __construct(
         private readonly Closure $wrapMedia,
-        private readonly Closure $wrapUser,
     ) {
     }
 
     /**
-     * Convert an MTProto richMessage to a Bot API RichMessage.
+     * Convert an MTProto richMessage to a RichMessage object.
      *
-     * @param Closure(array, string): mixed $wrapMedia Wraps a messageMediaPhoto or messageMediaDocument of the specified Bot API type (photo, video, animation, audio, voice_note, document)
-     * @param Closure(int): mixed $wrapUser Wraps a user ID
-     *
-     * @return array{blocks: list<array>, is_rtl?: true, is_part?: true}
+     * @param Closure(array, string): ?Media $wrapMedia Wraps a messageMediaPhoto or messageMediaDocument of the specified type (photo, video, animation, audio, voice_note, document), null if it can't be wrapped
      */
-    public static function convert(array $richMessage, Closure $wrapMedia, Closure $wrapUser): array
+    public static function convert(array $richMessage, Closure $wrapMedia): RichMessage
     {
-        $converter = new self($wrapMedia, $wrapUser);
+        $converter = new self($wrapMedia);
         foreach ($richMessage['photos'] ?? [] as $photo) {
             if ($photo['_'] === 'photo') {
                 $converter->photos[$photo['id']] = $photo;
@@ -68,14 +76,11 @@ final class OutputConverter
             }
         }
         $converter->collectAnchors($richMessage['blocks']);
-        $result = ['blocks' => array_map($converter->block(...), $richMessage['blocks'])];
-        if ($richMessage['rtl'] ?? false) {
-            $result['is_rtl'] = true;
-        }
-        if ($richMessage['part'] ?? false) {
-            $result['is_part'] = true;
-        }
-        return $result;
+        return new RichMessage(
+            array_map($converter->block(...), $richMessage['blocks']),
+            $richMessage['rtl'] ?? false,
+            $richMessage['part'] ?? false,
+        );
     }
 
     private static function getDocumentType(array $document): string
@@ -121,164 +126,142 @@ final class OutputConverter
         return $text['_'] === 'textEmpty' || ($text['_'] === 'textPlain' && $text['text'] === '');
     }
 
-    private function block(array $block): array
+    /**
+     * @param list<array> $blocks
+     *
+     * @return list<Block>
+     */
+    private function blocks(array $blocks): array
+    {
+        return array_map($this->block(...), $blocks);
+    }
+
+    private function block(array $block): Block
     {
         return match ($block['_']) {
-            'pageBlockHeading1', 'pageBlockHeading2', 'pageBlockHeading3', 'pageBlockHeading4', 'pageBlockHeading5', 'pageBlockHeading6' => [
-                'type' => 'heading',
-                'text' => $this->text($block['text']),
-                'size' => (int) substr($block['_'], -1),
-            ],
-            'pageBlockParagraph' => ['type' => 'paragraph', 'text' => $this->text($block['text'])],
-            'pageBlockPreformatted' => ['type' => 'pre', 'text' => $this->text($block['text']), ...($block['language'] !== '' ? ['language' => $block['language']] : [])],
-            'pageBlockFooter' => ['type' => 'footer', 'text' => $this->text($block['text'])],
-            'pageBlockThinking' => ['type' => 'thinking', 'text' => $this->text($block['text'])],
-            'pageBlockDivider' => ['type' => 'divider'],
-            'pageBlockMath' => ['type' => 'mathematical_expression', 'expression' => $block['source']],
-            'pageBlockAnchor' => ['type' => 'anchor', 'name' => $block['name']],
-            'pageBlockList' => ['type' => 'list', 'items' => array_map($this->unorderedListItem(...), $block['items'])],
-            'pageBlockOrderedList' => ['type' => 'list', 'items' => $this->orderedListItems($block)],
+            'pageBlockHeading1', 'pageBlockHeading2', 'pageBlockHeading3', 'pageBlockHeading4', 'pageBlockHeading5', 'pageBlockHeading6' => new Block\Heading((int) substr($block['_'], -1), $this->text($block['text'])),
+            'pageBlockParagraph' => new Block\Paragraph($this->text($block['text'])),
+            'pageBlockPreformatted' => new Block\Preformatted($this->text($block['text']), $block['language']),
+            'pageBlockFooter' => new Block\Footer($this->text($block['text'])),
+            'pageBlockThinking' => new Block\Thinking($this->text($block['text'])),
+            'pageBlockDivider' => new Block\Divider,
+            'pageBlockMath' => new Block\MathematicalExpression($block['source']),
+            'pageBlockAnchor' => new Block\Anchor($block['name']),
+            'pageBlockList' => new Block\ItemList(array_map($this->unorderedListItem(...), $block['items'])),
+            'pageBlockOrderedList' => new Block\ItemList($this->orderedListItems($block)),
             'pageBlockBlockquote' => ($block['collapsed'] ?? false)
-                ? ['type' => 'expandable_blockquote', 'text' => $this->text($block['text']), ...$this->credit($block['caption'])]
-                : ['type' => 'blockquote', 'blocks' => [['type' => 'paragraph', 'text' => $this->text($block['text'])]], ...$this->credit($block['caption'])],
-            'pageBlockBlockquoteBlocks' => ['type' => 'blockquote', 'blocks' => array_map($this->block(...), $block['blocks']), ...$this->credit($block['caption'])],
-            'pageBlockPullquote' => ['type' => 'pullquote', 'text' => $this->text($block['text']), ...$this->credit($block['caption'])],
+                ? new Block\ExpandableBlockquote($this->text($block['text']), $this->optionalText($block['caption']))
+                : new Block\Blockquote([new Block\Paragraph($this->text($block['text']))], $this->optionalText($block['caption'])),
+            'pageBlockBlockquoteBlocks' => new Block\Blockquote($this->blocks($block['blocks']), $this->optionalText($block['caption'])),
+            'pageBlockPullquote' => new Block\Pullquote($this->text($block['text']), $this->optionalText($block['caption'])),
             'pageBlockPhoto' => $this->photo($block),
             'pageBlockVideo' => $this->video($block),
             'pageBlockAudio' => $this->document($block, $block['audio_id'], ['audio', 'voice_note']),
             'pageBlockDocument' => $this->document($block, $block['document_id'], ['document']),
-            'pageBlockCollage' => ['type' => 'collage', 'blocks' => array_map($this->block(...), $block['items']), ...$this->caption($block['caption'])],
-            'pageBlockSlideshow' => ['type' => 'slideshow', 'blocks' => array_map($this->block(...), $block['items']), ...$this->caption($block['caption'])],
+            'pageBlockCollage' => new Block\Collage($this->blocks($block['items']), $this->caption($block['caption'])),
+            'pageBlockSlideshow' => new Block\Slideshow($this->blocks($block['items']), $this->caption($block['caption'])),
             'pageBlockTable' => $this->table($block),
-            'pageBlockDetails' => [
-                'type' => 'details',
-                'summary' => $this->text($block['title']),
-                'blocks' => array_map($this->block(...), $block['blocks']),
-                ...(($block['open'] ?? false) ? ['is_open' => true] : []),
-            ],
+            'pageBlockDetails' => new Block\Details($this->text($block['title']), $this->blocks($block['blocks']), $block['open'] ?? false),
             'pageBlockMap' => $this->map($block),
-            'pageBlockButtonRow' => [
-                'type' => 'buttons',
-                'buttons' => array_map(fn (array $button): array => $this->button($button['text'], $button['type'], $button['style'] ?? null), $block['buttons']),
-                ...(($block['align_left'] ?? false) ? ['align' => 'left'] : (($block['align_center'] ?? false) ? ['align' => 'center'] : (($block['align_right'] ?? false) ? ['align' => 'right'] : []))),
-            ],
-            'pageBlockUnsupported' => ['type' => 'unsupported'],
-            // Instant view blocks
-            default => ['type' => 'unknown'],
+            'pageBlockButtonRow' => new Block\Buttons(
+                array_map(fn (array $button): Button => $this->button($button['text'], $button['type'], $button['style'] ?? null), $block['buttons']),
+                ($block['align_left'] ?? false) ? Alignment::LEFT : (($block['align_center'] ?? false) ? Alignment::CENTER : (($block['align_right'] ?? false) ? Alignment::RIGHT : null)),
+            ),
+            // pageBlockUnsupported, and instant view blocks
+            default => new Block\Unsupported,
         };
     }
 
-    private function caption(array $caption): array
+    private function caption(array $caption): ?Caption
     {
         if (self::isEmpty($caption['text']) && self::isEmpty($caption['credit'])) {
-            return [];
+            return null;
         }
-        $result = ['text' => $this->text($caption['text'])];
-        if (!self::isEmpty($caption['credit'])) {
-            $result['credit'] = $this->text($caption['credit']);
-        }
-        return ['caption' => $result];
+        return new Caption($this->text($caption['text']), $this->optionalText($caption['credit']));
     }
 
-    private function credit(array $credit): array
+    private function optionalText(array $text): ?RichText
     {
-        return self::isEmpty($credit) ? [] : ['credit' => $this->text($credit)];
+        return self::isEmpty($text) ? null : $this->text($text);
     }
 
-    private function photo(array $block): array
+    private function wrap(array $media, string $type): ?Media
+    {
+        return ($this->wrapMedia)($media, $type);
+    }
+
+    private function photo(array $block): Block
     {
         $photo = $this->photos[$block['photo_id']] ?? null;
-        $wrapped = $photo === null ? null : ($this->wrapMedia)(['_' => 'messageMediaPhoto', 'photo' => $photo, 'spoiler' => $block['spoiler'] ?? false], 'photo');
+        $wrapped = $photo === null ? null : $this->wrap(['_' => 'messageMediaPhoto', 'photo' => $photo, 'spoiler' => $block['spoiler'] ?? false], 'photo');
         if ($wrapped === null) {
-            return ['type' => 'unknown'];
+            return new Block\Unsupported;
         }
-        return [
-            'type' => 'photo',
-            'photo' => $wrapped,
-            ...$this->caption($block['caption']),
-            ...(($block['spoiler'] ?? false) ? ['has_spoiler' => true] : []),
-        ];
+        return new Block\Photo($wrapped, $this->caption($block['caption']), $block['spoiler'] ?? false);
     }
 
-    private function video(array $block): array
+    private function video(array $block): Block
     {
         [$type, $document] = $this->documents[$block['video_id']] ?? [null, null];
         $wrapped = $document === null || ($type !== 'video' && $type !== 'animation')
             ? null
-            : ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document, 'spoiler' => $block['spoiler'] ?? false], $type);
+            : $this->wrap(['_' => 'messageMediaDocument', 'document' => $document, 'spoiler' => $block['spoiler'] ?? false], $type);
         if ($wrapped === null) {
-            return ['type' => 'unknown'];
+            return new Block\Unsupported;
         }
-        $result = [
-            'type' => $type,
-            $type => $wrapped,
-            ...$this->caption($block['caption']),
-        ];
-        // Only when they differ from what TDLib (and InputConverter) assumes: animations autoplay and loop, videos don't
-        $default = $type === 'animation';
-        $autoplay = (bool) ($block['autoplay'] ?? false);
-        $loop = (bool) ($block['loop'] ?? false);
-        if ($autoplay !== $default) {
-            $result['need_autoplay'] = $autoplay;
-        }
-        if ($loop !== $default) {
-            $result['is_looped'] = $loop;
-        }
-        if ($block['spoiler'] ?? false) {
-            $result['has_spoiler'] = true;
-        }
-        return $result;
+        $class = $type === 'video' ? Block\Video::class : Block\Animation::class;
+        return new $class(
+            $wrapped,
+            $this->caption($block['caption']),
+            $block['spoiler'] ?? false,
+            $block['autoplay'] ?? false,
+            $block['loop'] ?? false,
+        );
     }
 
     /**
      * @param list<string> $types Allowed media types
      */
-    private function document(array $block, int $id, array $types): array
+    private function document(array $block, int $id, array $types): Block
     {
         [$type, $document] = $this->documents[$id] ?? [null, null];
         if ($document === null) {
-            return ['type' => 'unsupported'];
+            return new Block\Unsupported;
         }
         if (!\in_array($type, $types, true)) {
             // E.g. a pageBlockAudio with a document that has no audio attribute
             $type = $types[0];
         }
-        $wrapped = ($this->wrapMedia)(['_' => 'messageMediaDocument', 'document' => $document], $type);
+        $wrapped = $this->wrap(['_' => 'messageMediaDocument', 'document' => $document], $type);
         if ($wrapped === null) {
-            return ['type' => 'unsupported'];
+            return new Block\Unsupported;
         }
-        return [
-            'type' => $type,
-            $type => $wrapped,
-            ...$this->caption($block['caption']),
-        ];
+        $caption = $this->caption($block['caption']);
+        return match ($type) {
+            'audio' => new Block\Audio($wrapped, $caption),
+            'voice_note' => new Block\VoiceNote($wrapped, $caption),
+            default => new Block\Document($wrapped, $caption),
+        };
     }
 
-    private function unorderedListItem(array $item): array
+    private function unorderedListItem(array $item): ListItem
     {
-        return ['label' => "\u{2022}", ...$this->listItem($item)];
-    }
-
-    private function listItem(array $item): array
-    {
-        $blocks = isset($item['blocks'])
-            ? array_map($this->block(...), $item['blocks'])
-            : [['type' => 'paragraph', 'text' => $this->text($item['text'])]];
-        if (!$blocks) {
-            $blocks = [['type' => 'paragraph', 'text' => '']];
-        }
-        $result = ['blocks' => $blocks];
-        if ($item['checkbox'] ?? false) {
-            $result['has_checkbox'] = true;
-            if ($item['checked'] ?? false) {
-                $result['is_checked'] = true;
-            }
-        }
-        return $result;
+        return new ListItem($this->listItemBlocks($item), $item['checkbox'] ?? false, ($item['checkbox'] ?? false) && ($item['checked'] ?? false));
     }
 
     /**
-     * @return list<array>
+     * @return list<Block>
+     */
+    private function listItemBlocks(array $item): array
+    {
+        $blocks = isset($item['blocks'])
+            ? $this->blocks($item['blocks'])
+            : [new Block\Paragraph($this->text($item['text']))];
+        return $blocks ?: [new Block\Paragraph('')];
+    }
+
+    /**
+     * @return list<ListItem>
      */
     private function orderedListItems(array $block): array
     {
@@ -290,151 +273,118 @@ final class OutputConverter
             if (isset($item['value'])) {
                 $value = $item['value'];
             }
-            $type = ($item['type'] ?? '') !== '' ? self::getOrderedListType($item['type']) : $baseType;
             $num = $item['num'] ?? '';
-            $result[] = [
-                'label' => $num !== '' ? (str_ends_with($num, '.') ? $num : "$num.") : InputConverter::getOrderedListLabel($value, $type),
-                ...$this->listItem($item),
-                'type' => $type,
-                'value' => $value,
-            ];
+            $result[] = new ListItem(
+                $this->listItemBlocks($item),
+                $item['checkbox'] ?? false,
+                ($item['checkbox'] ?? false) && ($item['checked'] ?? false),
+                ($item['type'] ?? '') !== '' ? self::getOrderedListType($item['type']) : $baseType,
+                $value,
+                $num !== '' ? $num : null,
+            );
             $value += $reversed ? -1 : 1;
         }
         return $result;
     }
 
-    private static function getOrderedListType(string $type): string
+    private static function getOrderedListType(string $type): ListLabelType
     {
-        return \in_array($type, ['a', 'A', 'i', 'I', '1'], true) ? $type : '1';
+        return ListLabelType::tryFrom($type) ?? ListLabelType::NUMBERS;
     }
 
-    private function table(array $block): array
+    private function table(array $block): Block\Table
     {
-        $result = [
-            'type' => 'table',
-            'cells' => array_map(
+        return new Block\Table(
+            array_map(
                 fn (array $row): array => array_map($this->tableCell(...), $row['cells']),
                 $block['rows'],
             ),
-        ];
-        if (!self::isEmpty($block['title'])) {
-            $result['caption'] = $this->text($block['title']);
-        }
-        if ($block['bordered'] ?? false) {
-            $result['is_bordered'] = true;
-        }
-        if ($block['striped'] ?? false) {
-            $result['is_striped'] = true;
-        }
-        if ($block['compact'] ?? false) {
-            $result['is_compact'] = true;
-        }
-        return $result;
+            $this->optionalText($block['title']),
+            $block['bordered'] ?? false,
+            $block['striped'] ?? false,
+            $block['compact'] ?? false,
+        );
     }
 
-    private function tableCell(array $cell): array
+    private function tableCell(array $cell): TableCell
     {
-        $result = [];
-        if (isset($cell['text']) && !self::isEmpty($cell['text'])) {
-            $result['text'] = $this->text($cell['text']);
-        }
-        if ($cell['header'] ?? false) {
-            $result['is_header'] = true;
-        }
-        if (($cell['colspan'] ?? 1) > 1) {
-            $result['colspan'] = $cell['colspan'];
-        }
-        if (($cell['rowspan'] ?? 1) > 1) {
-            $result['rowspan'] = $cell['rowspan'];
-        }
-        $result['align'] = ($cell['align_center'] ?? false) ? 'center' : (($cell['align_right'] ?? false) ? 'right' : 'left');
-        $result['valign'] = ($cell['valign_middle'] ?? false) ? 'middle' : (($cell['valign_bottom'] ?? false) ? 'bottom' : 'top');
-        return $result;
+        return new TableCell(
+            isset($cell['text']) ? $this->optionalText($cell['text']) : null,
+            $cell['header'] ?? false,
+            max($cell['colspan'] ?? 1, 1),
+            max($cell['rowspan'] ?? 1, 1),
+            ($cell['align_center'] ?? false) ? Alignment::CENTER : (($cell['align_right'] ?? false) ? Alignment::RIGHT : Alignment::LEFT),
+            ($cell['valign_middle'] ?? false) ? VerticalAlignment::MIDDLE : (($cell['valign_bottom'] ?? false) ? VerticalAlignment::BOTTOM : VerticalAlignment::TOP),
+        );
     }
 
-    private function map(array $block): array
+    private function map(array $block): Block
     {
         if ($block['geo']['_'] !== 'geoPoint' || $block['zoom'] < 0 || $block['zoom'] > 24 || $block['w'] <= 0 || $block['h'] <= 0) {
-            return ['type' => 'unsupported'];
+            return new Block\Unsupported;
         }
-        $location = ['latitude' => $block['geo']['lat'], 'longitude' => $block['geo']['long']];
-        if (isset($block['geo']['accuracy_radius'])) {
-            $location['horizontal_accuracy'] = $block['geo']['accuracy_radius'];
-        }
-        return [
-            'type' => 'map',
-            'location' => $location,
-            'zoom' => $block['zoom'],
-            'width' => $block['w'],
-            'height' => $block['h'],
-            ...$this->caption($block['caption']),
-        ];
+        return new Block\Map(
+            $block['geo']['lat'],
+            $block['geo']['long'],
+            $block['zoom'],
+            $block['w'],
+            $block['h'],
+            $this->caption($block['caption']),
+            $block['geo']['accuracy_radius'] ?? null,
+        );
     }
 
-    private function button(array $text, array $type, ?array $style): array
+    private function button(array $text, array $type, ?array $style): Button
     {
-        $result = ['text' => $this->text($text)];
-        if ($style !== null) {
-            if ($style['bg_primary'] ?? false) {
-                $result['style'] = 'primary';
-            } elseif ($style['bg_danger'] ?? false) {
-                $result['style'] = 'danger';
-            } elseif ($style['bg_success'] ?? false) {
-                $result['style'] = 'success';
-            } elseif ($style['link'] ?? false) {
-                $result['style'] = 'link';
-            }
-        }
+        $text = $this->text($text);
+        $style = match (true) {
+            $style === null => null,
+            $style['bg_primary'] ?? false => ButtonStyle::PRIMARY,
+            $style['bg_danger'] ?? false => ButtonStyle::DANGER,
+            $style['bg_success'] ?? false => ButtonStyle::SUCCESS,
+            $style['link'] ?? false => ButtonStyle::LINK,
+            default => null,
+        };
         switch ($type['_']) {
             case 'inlineButtonTypeUrl':
+                return new Button\Url($text, $type['url'], $style);
             case 'inlineButtonTypeUrlAuth':
-                $result['url'] = $type['url'];
-                break;
+                return new Button\LoginUrl($text, $type['url'], $type['fwd_text'] ?? null, style: $style);
             case 'inlineButtonTypeCallback':
-                $result['callback_data'] = (string) $type['data'];
-                break;
+                return new Button\Callback($text, (string) $type['data'], $style);
             case 'inlineButtonTypeGame':
-                $result['callback_game'] = [];
-                break;
+                return new Button\Game($text, $style);
             case 'inlineButtonTypeBuy':
-                $result['pay'] = true;
-                break;
+                return new Button\Buy($text, $style);
             case 'inlineButtonTypeSwitchInline':
-                if ($type['same_peer'] ?? false) {
-                    $result['switch_inline_query_current_chat'] = $type['query'];
-                    break;
-                }
                 $peerTypes = array_column($type['peer_types'] ?? [], '_');
-                $allowed = [
-                    'allow_user_chats' => \in_array('inlineQueryPeerTypePM', $peerTypes, true),
-                    'allow_bot_chats' => \in_array('inlineQueryPeerTypeBotPM', $peerTypes, true),
-                    'allow_group_chats' => \in_array('inlineQueryPeerTypeChat', $peerTypes, true) || \in_array('inlineQueryPeerTypeMegagroup', $peerTypes, true),
-                    'allow_channel_chats' => \in_array('inlineQueryPeerTypeBroadcast', $peerTypes, true),
-                ];
-                if (!$peerTypes || !\in_array(false, $allowed, true)) {
-                    $result['switch_inline_query'] = $type['query'];
-                } else {
-                    $result['switch_inline_query_chosen_chat'] = ['query' => $type['query'], ...$allowed];
-                }
-                break;
+                $all = !$peerTypes;
+                return new Button\SwitchInline(
+                    $text,
+                    $type['query'],
+                    $type['same_peer'] ?? false,
+                    $all || \in_array('inlineQueryPeerTypePM', $peerTypes, true),
+                    $all || \in_array('inlineQueryPeerTypeBotPM', $peerTypes, true),
+                    $all || \in_array('inlineQueryPeerTypeChat', $peerTypes, true) || \in_array('inlineQueryPeerTypeMegagroup', $peerTypes, true),
+                    $all || \in_array('inlineQueryPeerTypeBroadcast', $peerTypes, true),
+                    $style,
+                );
             case 'inlineButtonTypeUserProfile':
-                $result['url'] = 'tg://user?id='.$type['user_id'];
-                break;
+                return new Button\UserProfile($text, $type['user_id'], $style);
             case 'inlineButtonTypeWebView':
-                $result['web_app'] = ['url' => $type['url']];
-                break;
+                return new Button\WebApp($text, $type['url'], $style);
             case 'inlineButtonTypeCopy':
-                $result['copy_text'] = ['text' => $type['copy_text']];
-                break;
+                return new Button\CopyText($text, $type['copy_text'], $style);
             case 'inlineButtonTypeDisabled':
-                $result['disabled'] = [];
-                break;
+                return new Button\Disabled($text, $style);
+            default:
+                // Button types added in newer layers: dropped when sending the rich message again
+                return new Button\Unsupported($text, $style);
         }
-        return $result;
     }
 
     /**
-     * Get the concatenated plain text of a rich text, as TDLib does to compute the usernames, hashtags etc. of detected entities.
+     * Get the concatenated plain text of a rich text, as TDLib does to compute the URLs, emails etc. of detected entities.
      */
     private static function getFullText(array $text): string
     {
@@ -448,72 +398,61 @@ final class OutputConverter
     }
 
     /**
-     * Convert an MTProto RichText to a Bot API RichText.
+     * Convert an MTProto RichText to a RichText object.
      */
-    private function text(array $text): string|array
+    private function text(array $text): RichText
     {
-        $inner = fn (): string|array => $this->text($text['text']);
+        $inner = fn (): RichText => $this->text($text['text']);
         return match ($text['_']) {
-            'textEmpty' => '',
-            'textPlain' => $text['text'],
-            'textConcat' => array_map($this->text(...), $text['texts']),
-            'textBold' => ['type' => 'bold', 'text' => $inner()],
-            'textItalic' => ['type' => 'italic', 'text' => $inner()],
-            'textUnderline' => ['type' => 'underline', 'text' => $inner()],
-            'textStrike' => ['type' => 'strikethrough', 'text' => $inner()],
-            'textSpoiler' => ['type' => 'spoiler', 'text' => $inner()],
-            'textFixed' => ['type' => 'code', 'text' => $inner()],
-            'textSubscript' => ['type' => 'subscript', 'text' => $inner()],
-            'textSuperscript' => ['type' => 'superscript', 'text' => $inner()],
-            'textMarked' => ['type' => 'marked', 'text' => $inner()],
+            'textEmpty' => new Text\Plain(''),
+            'textPlain' => new Text\Plain($text['text']),
+            'textConcat' => new Text\Concat(array_map($this->text(...), $text['texts'])),
+            'textBold' => new Text\Bold($inner()),
+            'textItalic' => new Text\Italic($inner()),
+            'textUnderline' => new Text\Underline($inner()),
+            'textStrike' => new Text\Strikethrough($inner()),
+            'textSpoiler' => new Text\Spoiler($inner()),
+            'textFixed' => new Text\Code($inner()),
+            'textSubscript' => new Text\Subscript($inner()),
+            'textSuperscript' => new Text\Superscript($inner()),
+            'textMarked' => new Text\Marked($inner()),
             'textUrl' => $this->url($text, $inner()),
-            'textEmail' => ['type' => 'email_address', 'text' => $inner(), 'email_address' => $text['email']],
-            'textPhone' => ['type' => 'phone_number', 'text' => $inner(), 'phone_number' => $text['phone']],
-            'textAutoUrl' => ['type' => 'url', 'text' => $inner(), 'url' => self::getFullText($text)],
-            'textAutoEmail' => ['type' => 'email_address', 'text' => $inner(), 'email_address' => self::getFullText($text)],
-            'textAutoPhone' => ['type' => 'phone_number', 'text' => $inner(), 'phone_number' => self::getFullText($text)],
-            'textMention' => ['type' => 'mention', 'text' => $inner(), 'username' => self::stripPrefix(self::getFullText($text), '@')],
-            'textHashtag' => ['type' => 'hashtag', 'text' => $inner(), 'hashtag' => self::stripPrefix(self::getFullText($text), '#')],
-            'textCashtag' => ['type' => 'cashtag', 'text' => $inner(), 'cashtag' => self::stripPrefix(self::getFullText($text), '$')],
-            'textBotCommand' => ['type' => 'bot_command', 'text' => $inner(), 'bot_command' => self::stripPrefix(self::getFullText($text), '/')],
-            'textBankCard' => ['type' => 'bank_card_number', 'text' => $inner(), 'bank_card_number' => self::getFullText($text)],
-            'textTonAddress' => ['type' => 'ton_address', 'text' => $inner(), 'address' => self::getFullText($text)],
-            'textMentionName' => ['type' => 'text_mention', 'text' => $inner(), 'user' => ($this->wrapUser)($text['user_id'])],
-            'textDate' => $text['date'] > 0 ? [
-                'type' => 'date_time',
-                'text' => $inner(),
-                'unix_time' => $text['date'],
-                'date_time_format' => (new FormattedDate(
-                    0,
-                    0,
-                    $text['date'],
-                    $text['relative'] ?? false,
-                    $text['short_time'] ?? false,
-                    $text['long_time'] ?? false,
-                    $text['short_date'] ?? false,
-                    $text['long_date'] ?? false,
-                    $text['day_of_week'] ?? false,
-                ))->getBotAPIFormat(),
-            ] : $inner(),
-            'textCustomEmoji' => ['type' => 'custom_emoji', 'custom_emoji_id' => $text['document_id'], 'alternative_text' => $text['alt']],
-            'textMath' => ['type' => 'mathematical_expression', 'expression' => $text['source']],
+            'textEmail' => new Text\Email($inner(), $text['email']),
+            'textPhone' => new Text\Phone($inner(), $text['phone']),
+            'textAutoUrl' => new Text\Url($inner(), self::getFullText($text)),
+            'textAutoEmail' => new Text\Email($inner(), self::getFullText($text)),
+            'textAutoPhone' => new Text\Phone($inner(), self::getFullText($text)),
+            'textMention' => new Text\Mention($inner()),
+            'textHashtag' => new Text\Hashtag($inner()),
+            'textCashtag' => new Text\Cashtag($inner()),
+            'textBotCommand' => new Text\BotCommand($inner()),
+            'textBankCard' => new Text\BankCard($inner()),
+            'textTonAddress' => new Text\TonAddress($inner()),
+            'textMentionName' => new Text\MentionName($inner(), $text['user_id']),
+            'textDate' => $text['date'] > 0 ? new Text\Date(
+                $inner(),
+                $text['date'],
+                $text['relative'] ?? false,
+                $text['short_time'] ?? false,
+                $text['long_time'] ?? false,
+                $text['short_date'] ?? false,
+                $text['long_date'] ?? false,
+                $text['day_of_week'] ?? false,
+            ) : $inner(),
+            'textCustomEmoji' => new Text\CustomEmoji($text['document_id'], $text['alt']),
+            'textMath' => new Text\MathematicalExpression($text['source']),
             'textAnchor' => self::isEmpty($text['text'])
-                ? ['type' => 'anchor', 'name' => $text['name']]
-                : ['type' => 'reference', 'text' => $inner(), 'name' => $text['name']],
-            'textButton' => ['type' => 'button', 'button' => $this->button($text['text'], $text['type'], $text['style'] ?? null)],
+                ? new Text\Anchor($text['name'])
+                : new Text\Reference($inner(), $text['name']),
+            'textButton' => new Text\InlineButton($this->button($text['text'], $text['type'], $text['style'] ?? null)),
             // The new text of an edit
             'textDiff' => $inner(),
-            // Not representable in the Bot API
-            default => '',
+            // Not representable (e.g. textImage)
+            default => new Text\Plain(''),
         };
     }
 
-    private static function stripPrefix(string $text, string $prefix): string
-    {
-        return str_starts_with($text, $prefix) ? substr($text, \strlen($prefix)) : $text;
-    }
-
-    private function url(array $text, string|array $inner): array
+    private function url(array $text, RichText $inner): RichText
     {
         $url = $text['url'];
         if (str_starts_with($url, '#')) {
@@ -524,12 +463,12 @@ final class OutputConverter
                 $kind = $this->anchors[$name] ?? null;
             }
             if ($kind === 'anchor') {
-                return ['type' => 'anchor_link', 'text' => $inner, 'anchor_name' => $name];
+                return new Text\AnchorLink($inner, $name);
             }
             if ($kind === 'reference') {
-                return ['type' => 'reference_link', 'text' => $inner, 'reference_name' => $name];
+                return new Text\ReferenceLink($inner, $name);
             }
         }
-        return ['type' => 'url', 'text' => $inner, 'url' => $url];
+        return new Text\Url($inner, $url);
     }
 }
