@@ -83,6 +83,11 @@ final class FeedLoop extends Loop implements SimpleSubscriber
     #[\Override]
     public function onSimpleStateChange($state): void
     {
+        if (($this->API->feeders[$this->channelId] ?? null) !== $this) {
+            // Removed (see UpdateLoop::removeChannel()): a state change queued before it was unsubscribed must not
+            // restart it.
+            return;
+        }
         $this->mustPause = $state->state !== API::LOGGED_IN;
         if (!$this->mustPause) {
             if ($this->isRunning()) {
