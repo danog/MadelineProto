@@ -68,7 +68,6 @@ final class InputConverter
         $this->objects = new BotAPIConverter(
             static fn (mixed $media): mixed => $media,
             static fn (int $userId): array => ['id' => $userId],
-            forInput: true,
         );
     }
 
@@ -324,9 +323,9 @@ final class InputConverter
             ],
             'video', 'animation' => [
                 '_' => 'pageBlockVideo',
-                // TDLib always autoplays and loops animations, and never videos; received blocks that differ from that say so
-                'autoplay' => (bool) ($block['need_autoplay'] ?? $type === 'animation'),
-                'loop' => (bool) ($block['is_looped'] ?? $type === 'animation'),
+                // TDLib always autoplays and loops animations, and never videos (Telegram sets them so anyway)
+                'autoplay' => $type === 'animation',
+                'loop' => $type === 'animation',
                 'spoiler' => self::hasSpoiler($block, $type),
                 'video_id' => $this->media($type, $block)['id'],
                 'caption' => $this->caption($block['caption'] ?? null),
@@ -436,8 +435,8 @@ final class InputConverter
                         '_' => 'pageListOrderedItemBlocks',
                         'checkbox' => $checkbox,
                         'checked' => $checkbox && ($item['is_checked'] ?? false),
-                        // Custom labels of typed list items (the Bot API can't send them)
-                        'num' => isset($item['num']) ? (string) $item['num'] : self::getOrderedListLabel($value, $type),
+                        // Telegram computes the labels from the values anyway
+                        'num' => self::getOrderedListLabel($value, $type),
                         'blocks' => $blocks,
                         'value' => $value,
                         'type' => $type,

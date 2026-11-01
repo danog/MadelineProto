@@ -30,8 +30,8 @@ use danog\MadelineProto\EventHandler\Message\RichMessage;
 /**
  * Converts RichMessage objects to the format of the Bot API's RichMessage.
  *
- * Blocks and texts the Bot API can't represent are kept (TON addresses, custom list labels as labels, video flags as
- * need_autoplay and is_looped when they differ from the default of the type), and so are unsupported blocks.
+ * Texts the Bot API can't represent are kept (TON addresses), and so are unsupported blocks and buttons, marked as
+ * such (type unsupported, unsupported: true) so that InputConverter drops them when sending the rich message again.
  *
  * @internal
  */
@@ -40,12 +40,10 @@ final class BotAPIConverter
     /**
      * @param Closure(mixed, string): mixed $media Converts the media of a media block of the specified Bot API type (photo, video, animation, audio, voice_note, document)
      * @param Closure(int): mixed $user Converts a user ID
-     * @param bool $forInput Whether the result will be converted to MTProto by InputConverter, which also needs the custom labels of list items (as num)
      */
     public function __construct(
         private readonly Closure $media,
         private readonly Closure $user,
-        private readonly bool $forInput = false,
     ) {
     }
 
@@ -143,14 +141,6 @@ final class BotAPIConverter
             $type => ($this->media)($block instanceof Block\Video ? $block->video : $block->animation, $type),
             ...$this->caption($block->caption),
         ];
-        // Only when they differ from what TDLib assumes: animations autoplay and loop, videos don't
-        $default = $type === 'animation';
-        if ($block->autoplay !== $default) {
-            $result['need_autoplay'] = $block->autoplay;
-        }
-        if ($block->loop !== $default) {
-            $result['is_looped'] = $block->loop;
-        }
         if ($block->spoiler) {
             $result['has_spoiler'] = true;
         }
@@ -182,9 +172,6 @@ final class BotAPIConverter
         if ($item->type !== null) {
             $result['type'] = $item->type->value;
             $result['value'] = $item->value ?? 0;
-            if ($this->forInput && $item->label !== null) {
-                $result['num'] = $item->label;
-            }
         }
         return $result;
     }

@@ -35,8 +35,7 @@ use danog\MadelineProto\EventHandler\Message\RichMessage;
  * Converts MTProto richMessage constructors to RichMessage objects.
  *
  * Mirrors the conversion of TDLib (WebPageBlock.cpp, RichMessage.cpp) and of the Bot API server, except that
- * blocks and texts the Bot API can't represent (thinking blocks, TON addresses, custom list labels, video flags)
- * are kept instead of being dropped.
+ * texts the Bot API can't represent (TON addresses) are kept instead of being dropped.
  *
  * @internal
  */
@@ -209,14 +208,9 @@ final class OutputConverter
         if ($wrapped === null) {
             return new Block\Unsupported;
         }
+        // autoplay and loop are set by Telegram from the type, like TDLib does: animations autoplay and loop, videos don't
         $class = $type === 'video' ? Block\Video::class : Block\Animation::class;
-        return new $class(
-            $wrapped,
-            $this->caption($block['caption']),
-            $block['spoiler'] ?? false,
-            $block['autoplay'] ?? false,
-            $block['loop'] ?? false,
-        );
+        return new $class($wrapped, $this->caption($block['caption']), $block['spoiler'] ?? false);
     }
 
     /**

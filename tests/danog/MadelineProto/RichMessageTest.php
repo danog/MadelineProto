@@ -527,7 +527,7 @@ class RichMessageTest extends TestCase
                 ['type' => 'photo', 'photo' => ['photo' => 1], 'caption' => ['text' => 'cap'], 'has_spoiler' => true],
                 ['type' => 'unsupported'],
                 ['type' => 'animation', 'animation' => ['animation' => 2]],
-                ['type' => 'video', 'video' => ['video' => 3], 'need_autoplay' => true, 'is_looped' => true],
+                ['type' => 'video', 'video' => ['video' => 3]],
                 ['type' => 'voice_note', 'voice_note' => ['voice_note' => 4]],
                 ['type' => 'document', 'document' => ['document' => 5]],
                 ['type' => 'table', 'cells' => [[
@@ -679,7 +679,7 @@ class RichMessageTest extends TestCase
                 new Button\CopyText('t', 'copied'),
             ], Alignment::CENTER),
             new Block\Photo($file, 'cat', spoiler: true),
-            new Block\Video($file, autoplay: true),
+            new Block\Video($file),
             new Block\VoiceNote($file),
             new Block\Unsupported,
         ];
@@ -701,7 +701,7 @@ class RichMessageTest extends TestCase
                 ['text' => 't', 'copy_text' => ['text' => 'copied']],
             ]],
             ['type' => 'photo', 'photo' => $file, 'caption' => 'cap', 'has_spoiler' => true],
-            ['type' => 'video', 'video' => $file, 'need_autoplay' => true],
+            ['type' => 'video', 'video' => $file],
             ['type' => 'voice_note', 'voice_note' => $file],
         ];
         $botApi[9]['caption'] = 'cat';
@@ -766,7 +766,8 @@ class RichMessageTest extends TestCase
     }
 
     /**
-     * Custom labels of ordered list items can be sent (unlike with the Bot API), so they survive a round trip.
+     * Received labels are shown, but labels are always sent computed from the values: Telegram recomputes them
+     * anyway (checked live: an item sent with num "Step 1" was stored with num "1").
      */
     public function testCustomListLabels(): void
     {
@@ -781,7 +782,7 @@ class RichMessageTest extends TestCase
         $this->assertSame(['Step 1.', '2.'], [$items[0]->getLabel(), $items[1]->getLabel()]);
         $this->assertSame(['Step 1', null], [$items[0]->label, $items[1]->label]);
         $this->assertSame("Step 1. x\n2. y", $message->message);
-        $this->assertSame(['Step 1', '2.'], array_column($this->convert($message)['blocks'][0]['items'], 'num'));
+        $this->assertSame(['1.', '2.'], array_column($this->convert($message)['blocks'][0]['items'], 'num'));
     }
 
     /**
@@ -972,22 +973,23 @@ class RichMessageTest extends TestCase
     }
 
     /**
-     * Videos that autoplay or loop, and animations that don't, keep doing so when sent again.
+     * Like TDLib, videos are sent without autoplay and loop, and animations with them: Telegram sets them so anyway
+     * (checked live: a video sent with autoplay and loop was stored without them).
      */
-    public function testRoundTripVideoFlags(): void
+    public function testVideoFlags(): void
     {
         $noCaption = ['_' => 'pageCaption', 'text' => ['_' => 'textEmpty'], 'credit' => ['_' => 'textEmpty']];
         $video = static fn (int $id, bool $animated): array => ['_' => 'document', 'id' => $id, 'attributes' => [['_' => $animated ? 'documentAttributeAnimated' : 'documentAttributeVideo', 'round_message' => false]]];
         $blocks = [];
         foreach ([[1, false], [2, true]] as [$id, $animated]) {
-            foreach ([[false, false], [true, false], [false, true], [true, true]] as [$autoplay, $loop]) {
-                $blocks[] = ['_' => 'pageBlockVideo', 'autoplay' => $autoplay, 'loop' => $loop, 'spoiler' => false, 'video_id' => $id, 'caption' => $noCaption];
-            }
+            $blocks[] = ['_' => 'pageBlockVideo', 'autoplay' => true, 'loop' => true, 'spoiler' => false, 'video_id' => $id, 'caption' => $noCaption];
         }
-        $input = $this->convert($this->received(['_' => 'richMessage', 'blocks' => $blocks, 'photos' => [], 'documents' => [$video(1, false), $video(2, true)]]));
+        $message = $this->received(['_' => 'richMessage', 'blocks' => $blocks, 'photos' => [], 'documents' => [$video(1, false), $video(2, true)]]);
+        $this->assertInstanceOf(Block\Video::class, $message->blocks[0]);
+        $this->assertInstanceOf(Block\Animation::class, $message->blocks[1]);
         $this->assertSame(
-            array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $blocks),
-            array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $input['blocks']),
+            [[false, false], [true, true]],
+            array_map(static fn (array $b): array => [$b['autoplay'], $b['loop']], $this->convert($message)['blocks']),
         );
     }
 

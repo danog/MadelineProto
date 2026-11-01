@@ -1170,9 +1170,18 @@ trait UpdateHandler
         return InputConverter::convert($message, function (string $type, mixed $media) use ($peer, $allowUploads, $cancellation): array {
             $extra = [];
             if (\is_array($media) && !isset($media['_'])) {
-                // Bot API InputMedia-like object
-                $extra = $media;
-                $media = $media['media'] ?? throw new Exception("The media of the $type must be specified");
+                $last = end($media);
+                if (!isset($media['media']) && !isset($media['file_id']) && \is_array($last) && isset($last['file_id'])) {
+                    // Bot API photo (list of PhotoSize), as in the output of MTProtoToBotAPI: its largest size
+                    $media = end($media)['file_id'];
+                } elseif (isset($media['file_id']) && !isset($media['media'])) {
+                    // Bot API Video, Animation, Audio, Voice or Document, as in the output of MTProtoToBotAPI
+                    $media = $media['file_id'];
+                } else {
+                    // Bot API InputMedia-like object
+                    $extra = $media;
+                    $media = $media['media'] ?? throw new Exception("The media of the $type must be specified");
+                }
             }
             if ($media === null) {
                 throw new Exception("The media of the $type must be specified");
@@ -1202,30 +1211,41 @@ trait UpdateHandler
                 $duration = isset($extra['duration']) ? (int) $extra['duration'] : null;
                 $width = isset($extra['width']) ? (int) $extra['width'] : null;
                 $height = isset($extra['height']) ? (int) $extra['height'] : null;
+                // Streams have no file name of their own, and uploads need one
+                $fileName = isset($extra['file_name']) ? (string) $extra['file_name'] : ($media instanceof ReadableStream ? match ($type) {
+                    'photo', 'live_photo' => 'photo.jpg',
+                    'video' => 'video.mp4',
+                    'animation' => 'animation.mp4',
+                    'audio' => 'audio.mp3',
+                    'voice_note' => 'voice.ogg',
+                    default => 'file',
+                } : null);
                 $media = match ($type) {
-                    'photo', 'live_photo' => $this->uploadPhoto(file: $media, peer: $peer, cancellation: $cancellation),
+                    'photo', 'live_photo' => $this->uploadPhoto(file: $media, peer: $peer, fileName: $fileName, cancellation: $cancellation),
                     'video' => $this->uploadVideo(
                         file: $media,
                         thumb: $thumb,
                         peer: $peer,
+                        fileName: $fileName,
                         supportsStreaming: (bool) ($extra['supports_streaming'] ?? true),
                         duration: $duration,
                         width: $width,
                         height: $height,
                         cancellation: $cancellation,
                     ),
-                    'animation' => $this->uploadGif(file: $media, thumb: $thumb, peer: $peer, duration: $duration, width: $width, height: $height, cancellation: $cancellation),
+                    'animation' => $this->uploadGif(file: $media, thumb: $thumb, peer: $peer, fileName: $fileName, duration: $duration, width: $width, height: $height, cancellation: $cancellation),
                     'audio' => $this->uploadAudio(
                         file: $media,
                         thumb: $thumb,
                         peer: $peer,
+                        fileName: $fileName,
                         duration: $duration,
                         title: isset($extra['title']) ? (string) $extra['title'] : null,
                         performer: isset($extra['performer']) ? (string) $extra['performer'] : null,
                         cancellation: $cancellation,
                     ),
-                    'voice_note' => $this->uploadVoice(peer: $peer ?? 'me', file: $media, duration: $duration, cancellation: $cancellation),
-                    default => $this->uploadDocument(file: $media, thumb: $thumb, peer: $peer, cancellation: $cancellation),
+                    'voice_note' => $this->uploadVoice(peer: $peer ?? 'me', file: $media, fileName: $fileName, duration: $duration, cancellation: $cancellation),
+                    default => $this->uploadDocument(file: $media, thumb: $thumb, peer: $peer, fileName: $fileName, cancellation: $cancellation),
                 };
             }
             if ($media instanceof BotApiFileId) {
