@@ -74,7 +74,7 @@ Phar::interceptFileFuncs();
 Phar::mapPhar("'.$argv[2].'"); 
 $result = require_once "phar://'.$argv[2].'/vendor/autoload.php"; 
 
-if (\defined("MADELINE_WORKER_TYPE") && \constant("MADELINE_WORKER_TYPE") === "madeline-ipc") {
+if (\defined("MADELINE_WORKER_TYPE") && \in_array(\constant("MADELINE_WORKER_TYPE"), ["madeline-ipc", "madeline-parallel"], true)) {
     require_once "phar://'.$argv[2].'/vendor/danog/madelineproto/src/Ipc/Runner/entry.php";
 }
 
