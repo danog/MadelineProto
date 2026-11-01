@@ -63,12 +63,6 @@ final class Connection extends SettingsAbstract
      */
     protected int $maxMediaSocketCount = 10;
     /**
-     * Robin period (seconds).
-     *
-     * @deprecated Unused.
-     */
-    protected int $robinPeriod = 10;
-    /**
      * Protocol identifier.
      *
      * @var class-string<MTProtoBufferInterface>
@@ -294,32 +288,6 @@ final class Connection extends SettingsAbstract
     public function setMaxMediaSocketCount(int $maxMediaSocketCount): self
     {
         $this->maxMediaSocketCount = $maxMediaSocketCount;
-
-        return $this;
-    }
-
-    /**
-     * Get robin period (seconds).
-     *
-     * @deprecated Unused: sockets to media DCs are opened when the ones open have too many file requests in flight.
-     */
-    public function getRobinPeriod(): int
-    {
-        return $this->robinPeriod;
-    }
-
-    /**
-     * Set robin period (seconds).
-     *
-     * @deprecated Unused: sockets to media DCs are opened when the ones open have too many file requests in flight.
-     *
-     * @param int $robinPeriod Robin period (seconds).
-     *
-     * @psalm-external-mutation-free
-     */
-    public function setRobinPeriod(int $robinPeriod): self
-    {
-        $this->robinPeriod = $robinPeriod;
 
         return $this;
     }
