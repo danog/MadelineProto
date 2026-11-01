@@ -27,6 +27,8 @@ final class RPC extends SettingsAbstract
 {
     /**
      * RPC resend timeout.
+     *
+     * @deprecated Unused: a request received by the server is never sent again, it would be executed twice
      */
     protected int $rpcResendTimeout = 10;
     /**
@@ -68,6 +70,8 @@ final class RPC extends SettingsAbstract
 
     /**
      * Get RPC resend timeout.
+     *
+     * @deprecated Unused: a request received by the server is never sent again, it would be executed twice
      */
     public function getRpcResendTimeout(): int
     {
@@ -76,6 +80,8 @@ final class RPC extends SettingsAbstract
 
     /**
      * Set RPC resend timeout.
+     *
+     * @deprecated Unused: a request received by the server is never sent again, it would be executed twice
      *
      * @param int $rpcResendTimeout RPC timeout.
      *

@@ -60,11 +60,6 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
 
     private readonly bool $isHttp;
 
-    /**
-     * RPC resend timeout, in nanoseconds like the send times (hrtime) of the messages.
-     */
-    private int $resendTimeout;
-
     private LinkedList $queue;
     private ?ConnectionState $pendingState = null;
 
@@ -74,7 +69,6 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
     public function __construct(Connection $connection)
     {
         $this->init2($connection);
-        $this->resendTimeout = $this->API->getSettings()->getRpc()->getRpcResendTimeout() * 1_000_000_000;
         $connection->getState()->subscribe($this);
     }
 
@@ -282,14 +276,11 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                                         } elseif ($chr & 64) {
                                             $this->API->logger("Message $message received by server and was already processed.", Logger::ERROR);
                                         } elseif ($chr & 32) {
-                                            if ($message->getSent() + $this->resendTimeout < hrtime(true)) {
-                                                if (!$message->cancellation?->isRequested()) {
-                                                    $this->API->logger("Message $message received by server and is being processed for way too long, resending request...", Logger::ERROR);
-                                                    $this->connection->methodRecall($message);
-                                                }
-                                            } else {
-                                                $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
-                                            }
+                                            // Never send it again, however long it takes: the server would execute it twice, and the
+                                            // answer to this copy would be dropped (a request with a random_id fails with
+                                            // RANDOM_ID_DUPLICATE). Like TDLib, wait for the answer: the drop timeout fails a request
+                                            // that never gets one.
+                                            $this->API->logger("Message $message received by server and is being processed, waiting...", Logger::ERROR);
                                         } else {
                                             $this->API->logger("Message $message received by server, waiting...", Logger::ERROR);
                                         }
