@@ -143,27 +143,40 @@ final class ConnectionCryptoTest extends TestCase
         }
         $result->await();
     }
-    /** @return iterable<string, array{string}> */
+    /** @return iterable<string, array{string, bool, bool}> */
     public static function outgoingChanges(): iterable
     {
-        foreach (['disconnect', 'reconnect', 'session', 'auth'] as $change) {
-            yield $change => [$change, false];
+        foreach ([false => 'encrypting', true => 'building'] as $building => $while) {
+            foreach (['disconnect', 'reconnect', 'session', 'auth'] as $change) {
+                yield "$change while $while" => [$change, false, (bool) $building];
+            }
+            // auth.bindTempAuthKey embeds its msg_id and session: it can't be resent with new ones.
+            yield "session-bound message, session while $while" => ['session', true, (bool) $building];
+            yield "session-bound message, auth while $while" => ['auth', true, (bool) $building];
         }
-        // auth.bindTempAuthKey embeds its msg_id and session: it can't be resent with new ones.
-        yield 'session-bound message, session' => ['session', true];
-        yield 'session-bound message, auth' => ['auth', true];
     }
 
-    /** @dataProvider outgoingChanges */
-    public function testUnsentMessagesSurviveConnectionChangesDuringEncryption(string $change, bool $sessionBound): void
+    /**
+     * Building a payload (logging can suspend) and encrypting it (native IGE suspends) happen before it's
+     * written: it's only written for the connection, session and key its message IDs were assigned for.
+     *
+     * @dataProvider outgoingChanges
+     */
+    public function testUnsentMessagesSurviveConnectionChangesBeforeTheyAreWritten(string $change, bool $sessionBound, bool $building): void
     {
         NativeExecutor::initialize();
-        if (!NativeExecutor::get()) {
+        if (!$building && !NativeExecutor::get()) {
             self::markTestSkipped('Optional native IGE unavailable');
         }
         BypassFinals::enable();
         $api = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()
             ->onlyMethods(['logger', '__destruct'])->getMock();
+        $api->method('logger')->willReturnCallback(static function (mixed $param) use ($building): void {
+            if ($building && \is_string($param) && str_contains($param, 'as encrypted message with id')) {
+                // A file logger waiting for its file, after the message got its ID.
+                delay(0);
+            }
+        });
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()
             ->onlyMethods(['isHttp', 'generateOutSeqNo'])->getMock();
         $connection->API = $api;
