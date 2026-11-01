@@ -184,7 +184,7 @@ final class ReadLoop extends Loop
                     return null;
                 }
                 $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
-                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
+                $this->connection->msgIdHandler->checkIncomingMessageId($message_id);
                 $message_length = unpack('V', $buffer->bufferRead(4))[1];
                 $message_data = $buffer->bufferRead($message_length);
                 $left = $payload_length - $message_length - 4 - 8 - 8;
@@ -223,7 +223,12 @@ final class ReadLoop extends Loop
                     throw new NothingInTheSocketException();
                 }
                 $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
-                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
+                if (!$this->connection->msgIdHandler->checkIncomingPacketId($message_id)) {
+                    // Acknowledged all the same, as TDLib does: the server stops sending it again
+                    $this->connection->ack_queue []= $message_id;
+                    $this->connection->flush(true);
+                    return null;
+                }
                 $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
                 $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
                 if ($message_data_length > \strlen($decrypted_data)) {
