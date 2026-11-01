@@ -651,7 +651,7 @@ class RichMessageTest extends TestCase
         $text = new Text\Concat(['a ', new Text\Bold(new Text\Italic('b')), ' ', new Text\Subscript('2'), new Text\Anchor('x'), ' ', new Text\Date('now', 5, relative: true)]);
         $this->assertSame('a b 2 now', $text->getText());
         $this->assertEquals([new Bold(2, 1), new Italic(2, 1), new FormattedDate(6, 3, 5, relative: true)], $text->getEntities());
-        $this->assertSame('a <b><i>b</i></b> 2 now', $text->getHTML());
+        $this->assertSame('a <b><i>b</i></b> 2 <time datetime="1970-01-01T00:00:05+00:00">now</time>', $text->getHTML());
         $this->assertSame('a&lt;b', Text\Plain::from('a<b')->getHTML());
     }
 
