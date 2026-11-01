@@ -107,10 +107,15 @@ final class MtProxyTest extends TestCase
     }
 
     /**
-     * Download mtg once, to the temporary directory.
+     * mtg: the one of the docker image of the CI (tests/dockerfiles/Dockerfile), of the same version, or else
+     * downloaded once, to the temporary directory.
      */
     private static function getMtg(): string
     {
+        $installed = '/usr/local/bin/mtg';
+        if (is_executable($installed) && str_contains((string) shell_exec(escapeshellarg($installed).' --version 2>&1'), self::MTG_VERSION)) {
+            return $installed;
+        }
         if (PHP_OS_FAMILY !== 'Linux') {
             self::markTestSkipped('mtg is only downloaded for Linux');
         }
