@@ -304,6 +304,13 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                 }
             }
 
+            // What the payload is built for: building and encrypting it can suspend (logging, IGE), and the
+            // connection can be disconnected or get a new session or key meanwhile.
+            $auth = $this->shared->auth;
+            $stream = $this->connection->stream;
+            $session = $this->connection->session_id;
+            $authKey = $auth->getTempAuthKey();
+
             $messages = [];
             $MTmessages = [];
 
@@ -433,11 +440,6 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             }
             unset($MTmessages);
 
-            $auth = $this->shared->auth;
-            $stream = $this->connection->stream;
-            $session = $this->connection->session_id;
-            $authKey = $auth->getTempAuthKey();
-
             $plaintext = $auth->getServerSalt().$session.Tools::packSignedLong($message_id).pack('VV', $seq_no, $message_data_length).$message_data;
             $padding = Tools::posmod(-\strlen($plaintext), 16);
             if ($padding < 12) {
@@ -449,7 +451,7 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
             //$ack = unpack('V', substr($message_key_large, 0, 4))[1] | (1 << 31);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $authKey);
             $message = $auth->getTempID().$message_key.Crypt::igeEncrypt($plaintext.$padding, $aes_key, $aes_iv);
-            // IGE can suspend. Leave unsent requests queued for the current context.
+            // Leave the messages queued for the current connection, session and key.
             $contextChanged = $session !== $this->connection->session_id
                 || $authKey !== $this->shared->auth->getTempAuthKey();
             if ($stream !== $this->connection->stream || $contextChanged) {
