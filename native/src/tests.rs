@@ -217,3 +217,35 @@ fn unequal_lengths_and_empty_chains_preserve_data_and_iv() {
         }
     }
 }
+#[test]
+fn lone_jobs_never_wait_for_a_batch() {
+    use crate::executor::Executor;
+    use std::{sync::mpsc, thread, time::Duration};
+    // One job at a time, each waited for before the next: once the policy probes a width of two
+    // (after the first measured job, on CPUs with AES instructions), a lone job must still run
+    // instead of waiting for a second one. Waiting would hang it: no other job ever comes.
+    let mut executor = Executor::new(4, 4 * 1024 * 1024).unwrap();
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .build()
+        .unwrap();
+    for i in 0..100u8 {
+        let receiver = executor
+            .enqueue(
+                message(4096, i, Operation::Encrypt),
+                reserve_now(&executor, 4096),
+            )
+            .unwrap();
+        let (done, finished) = mpsc::channel();
+        let handle = runtime.handle().clone();
+        thread::spawn(move || {
+            let _ = done.send(handle.block_on(receiver));
+        });
+        // A liveness bound, not a speed one: a lone job takes microseconds
+        let reply = finished
+            .recv_timeout(Duration::from_secs(10))
+            .unwrap_or_else(|_| panic!("lone job {i} waited for a batch"))
+            .unwrap();
+        assert_eq!(reply.result.unwrap().data().len(), 4096);
+    }
+    executor.close();
+}

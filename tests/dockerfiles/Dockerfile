@@ -289,6 +289,7 @@ RUN apt-get update \
 COPY native/ /usr/src/madeline-crypto/
 WORKDIR /usr/src/madeline-crypto
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
+    && /root/.cargo/bin/cargo test --release --locked --no-default-features --features const-widths \
     && /root/.cargo/bin/cargo build --release --locked \
     && install -D target/release/libmadeline_crypto.so "/artifacts$(php-config --extension-dir)/madeline_crypto.so" \
     && mkdir -p "/artifacts$PHP_INI_DIR/conf.d" \
