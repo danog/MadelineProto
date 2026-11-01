@@ -19,8 +19,8 @@ namespace danog\MadelineProto\EventHandler\Query;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichParseMode;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 use danog\MadelineProto\Tools;
 
 /** @internal */

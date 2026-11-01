@@ -36,8 +36,8 @@ use danog\MadelineProto\EventHandler\Message\ReportReason;
 use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichParseMode;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 use Webmozart\Assert\Assert;
 
 /**
@@ -132,7 +132,9 @@ abstract class Message extends AbstractMessage
     /**
      * [Rich message](https://core.telegram.org/bots/api#richmessage) content, if this is a rich message (sent with sendRichMessage).
      *
-     * Its text and entities are also in $message and $entities; its media are only in $richMessage->media, not in $media.
+     * Its text and entities are also in $message and $entities, so text filters, commands and getHTML() work on rich messages; its media are only in $richMessage->media, not in $media, so media filters don't match rich messages (use FilterRichMessage or the IsRichMessage simple filter).
+     *
+     * editText() and the other non-rich methods replace a rich message with a plain one: use editRich() to keep it rich.
      */
     public readonly ?RichMessage $richMessage;
 

@@ -23,8 +23,8 @@ use danog\MadelineProto\EventHandler\Message\RichMessage;
 use danog\MadelineProto\EventHandler\Update;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\ParseMode;
-use danog\MadelineProto\RichMessage\InputConverter;
 use danog\MadelineProto\RichParseMode;
+use danog\MadelineProto\TL\Conversion\Rich\InputConverter;
 
 /** @internal */
 trait ChatTrait

@@ -19,8 +19,8 @@ namespace danog\MadelineProto\EventHandler\Message;
 use danog\MadelineProto\EventHandler\Media;
 use danog\MadelineProto\EventHandler\Message\Entities\MessageEntity;
 use danog\MadelineProto\MTProto;
-use danog\MadelineProto\RichMessage\OutputConverter;
-use danog\MadelineProto\RichMessage\TextConverter;
+use danog\MadelineProto\TL\Conversion\Rich\OutputConverter;
+use danog\MadelineProto\TL\Conversion\Rich\TextConverter;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
@@ -35,8 +35,14 @@ use ReflectionProperty;
  * - text_mention rich texts contain a user object with just the ID of the user.
  * - custom_emoji_id is an integer.
  * - thinking blocks and ton_address rich texts are kept (the Bot API returns unknown blocks and fails on TON addresses).
+ * - video and animation blocks have need_autoplay and is_looped fields when they differ from the default (animations autoplay and loop, videos don't).
  *
- * The blocks can be sent again as-is with sendRichMessage (or editRich, replyRich and so on), and so can the whole object.
+ * The blocks can be sent again as-is with sendRichMessage (or editRich, replyRich and so on), and so can the whole object, except for:
+ * - unknown and unsupported blocks (blocks and media that can't be represented), which are dropped;
+ * - TON addresses and other entities detected by Telegram, which are sent as plain text, and detected again unless entity detection is skipped;
+ * - custom labels of ordered list items, which are replaced by the labels of their values (like in the Bot API, labels can't be sent).
+ *
+ * Rich messages are not media messages: media filters (e.g. FilterMedia) don't match them, FilterNoMedia does, and FilterRichMessage matches only them.
  */
 final class RichMessage implements JsonSerializable
 {
@@ -66,6 +72,8 @@ final class RichMessage implements JsonSerializable
     public readonly array $media;
 
     /**
+     * @internal Received rich messages are created by MadelineProto: to send one, pass the blocks to sendRichMessage.
+     *
      * @param list<array> $blocks Blocks of the rich message, in Bot API RichBlock format
      * @param bool $rtl Whether the text is right-to-left
      * @param bool $part Whether this is just a part of the message (e.g. while a rich message draft is being streamed)

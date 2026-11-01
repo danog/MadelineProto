@@ -2566,7 +2566,9 @@ abstract class InternalDoc
      * - A received RichMessage (`$message->richMessage`), to send it again.
      * - A full Bot API [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage), or a raw MTProto InputRichMessage constructor.
      *
-     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`); files are uploaded as documents unless the type says otherwise.
+     * $parseMode only applies to string messages, and $media only to Markdown and HTML: passing them with other messages throws.
+     *
+     * Media in blocks and in $media can be Message or Media objects, bot API file IDs, raw photos and documents, or files to upload (LocalFile, RemoteUrl, ReadableStream or URLs), optionally wrapped in a Bot API InputMedia-like array (`['type' => 'video', 'media' => new LocalFile('video.mp4'), 'duration' => 10]`). Files in $media are uploaded with the type of the tg://photo, tg://video, tg://audio or tg://document link that references them, unless the wrapper specifies a type.
      *
      * @param integer|string           $peer         Destination peer or username.
      * @param string|array|RichMessage $message      Rich message to send
@@ -2601,7 +2603,7 @@ abstract class InternalDoc
      * @param string|array|RichMessage $message      Partial rich message
      * @param RichParseMode            $parseMode    How to parse a string $message: plain text (the default) is sent as a single paragraph, Markdown and HTML are parsed by Telegram.
      * @param array                    $media        Media referenced by Markdown or HTML messages, as a map from ID to file (a Message, Media or BotApiFileId: new files can't be uploaded).
-     * @param ?integer                 $draftId      ID of the draft to update, if null a new draft ID is generated.
+     * @param ?integer                 $draftId      ID of the draft to update (non-zero), if null a new draft ID is generated.
      * @param boolean                  $canStop      Whether the user can stop the generation of the message
      * @param boolean                  $keepOnStop   Whether the draft should be kept if the user stops the generation
      * @param boolean                  $rtl          Whether the text is right-to-left
@@ -2627,7 +2629,7 @@ abstract class InternalDoc
      * @param boolean       $noForwards   Only for bots, disallows further re-forwarding and saving of the messages, even if the destination chat doesn’t have [content protection](https://telegram.org/blog/protected-content-delete-by-date-and-more) enabled
      * @param boolean       $background   Send this message as background message
      * @param boolean       $clearDraft   Clears the draft field
-     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); upload files beforehand to avoid uploading them once per admin.
+     * @param array         $media        Media referenced by Markdown or HTML messages, as a map from ID to file (see sendRichMessage); uploaded once for all admins.
      * @param boolean       $rtl          Whether the text is right-to-left
      * @param boolean       $noAutolink   Whether to skip the automatic detection of mentions, hashtags, URLs and so on
      * @param ?Cancellation $cancellation Cancellation
