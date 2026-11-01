@@ -22,6 +22,7 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\AesCtr;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\MTProtoTools\Crypt\IGEFFI;
 use danog\MadelineProto\MTProtoTools\Crypt\IGEOpenssl;
 use danog\MadelineProto\MTProtoTools\Crypt\IGEPhp;
 use danog\MadelineProto\RSA;
@@ -31,6 +32,8 @@ use danog\MadelineProto\TL\TL;
 use phpseclib4\Crypt\AES;
 use phpseclib4\Math\BigInteger;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 use ValueError;
 
 /**
@@ -95,9 +98,30 @@ final class CryptoBackendsTest extends TestCase
         }
     }
 
+    /** Instantiate a specific IGE backend, whatever IGE::getInstance() would choose. */
+    private static function igeBackend(string $class, string $key, string $iv): IGE
+    {
+        $cipher = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+        (new ReflectionMethod($cipher, '__construct'))->invoke($cipher, $key, $iv);
+        return $cipher;
+    }
+
+    public function testIgeBackendsAreChosenFastestFirst(): void
+    {
+        $key = random_bytes(32);
+        $iv = random_bytes(32);
+        foreach ([true, false] as $openssl) {
+            Magic::$hasOpenssl = $openssl;
+            $expected = IGEFFI::isAvailable() ? IGEFFI::class : ($openssl ? IGEOpenssl::class : IGEPhp::class);
+            self::assertInstanceOf($expected, IGE::getSyncInstance($key, $iv));
+        }
+        Magic::$hasOpenssl = true;
+    }
+
     /**
      * With OpenSSL, IGE encryption runs the whole chain as one CBC call; without it, IGE uses its own
-     * AES rounds: both must match the definition (one ECB block at a time), also continued in chunks.
+     * AES rounds; with FFI, libcrypto's: all must match the definition (one ECB block at a time), also continued
+     * in chunks, as well as the backend chosen by Crypt.
      *
      * @dataProvider igeSizes
      */
@@ -109,14 +133,15 @@ final class CryptoBackendsTest extends TestCase
         $ciphertext = self::igeDefinition($plaintext, $key, $iv);
         // Continue at a random block boundary.
         $cut = 16 * random_int(1, $size / 16);
-        foreach ([true => IGEOpenssl::class, false => IGEPhp::class] as $openssl => $class) {
-            Magic::$hasOpenssl = (bool) $openssl;
-            self::assertInstanceOf($class, IGE::getInstance($key, $iv));
-            self::assertSame($ciphertext, Crypt::igeEncrypt($plaintext, $key, $iv), $class);
-            self::assertSame($plaintext, Crypt::igeDecrypt($ciphertext, $key, $iv), $class);
-
-            $encrypt = IGE::getInstance($key, $iv);
-            $decrypt = IGE::getInstance($key, $iv);
+        self::assertSame($ciphertext, Crypt::igeEncrypt($plaintext, $key, $iv));
+        self::assertSame($plaintext, Crypt::igeDecrypt($ciphertext, $key, $iv));
+        $classes = [IGEOpenssl::class, IGEPhp::class];
+        if (IGEFFI::isAvailable()) {
+            $classes[] = IGEFFI::class;
+        }
+        foreach ($classes as $class) {
+            $encrypt = self::igeBackend($class, $key, $iv);
+            $decrypt = self::igeBackend($class, $key, $iv);
             self::assertSame('', $encrypt->encrypt(''));
             self::assertSame('', $decrypt->decrypt(''));
             self::assertSame($ciphertext, $encrypt->encrypt(substr($plaintext, 0, $cut)).$encrypt->encrypt(substr($plaintext, $cut)), $class);
