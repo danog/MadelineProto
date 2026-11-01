@@ -26,7 +26,9 @@ use danog\MadelineProto\DataCenterConnection;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProto\LoginState;
+use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProto\NewAuthKey;
+use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\Reactive\Publisher;
 use danog\MadelineProto\RPCError\FloodWaitError;
 use danog\MadelineProto\Settings;
@@ -257,6 +259,44 @@ final class FileWindowTest extends TestCase
         $elapsed = microtime(true) - $start;
         $this->assertGreaterThan(0.9, $elapsed);
         $this->assertLessThan(2.5, $elapsed);
+    }
+
+    private static function fileRequest(Connection $connection): MTProtoOutgoingMessage
+    {
+        return new MTProtoOutgoingMessage($connection, ['offset' => 0, 'limit' => 1024], 'upload.getFile', 'upload.File', true, false, SpecialMethodType::FILE_RELATED, null);
+    }
+
+    public function testTheRoomMovesWithTheRequestToAnotherSocket(): void
+    {
+        $shared = $this->shared(2);
+        self::set($shared, 'fileWindow', 2.0);
+        $first = self::send($shared);
+        $second = self::send($shared);
+        $this->assertNotSame($first, $second);
+        $message = self::fileRequest($first);
+        $message->holdFileRoom($first);
+
+        // Sent again on the other socket (the first was closed for good, or replaced by a reconnection).
+        $message->moveFileRoom($second);
+        $this->assertSame(0, $first->fileRequests);
+        $this->assertSame(2, $second->fileRequests);
+
+        $message->reply(['_' => 'upload.file']);
+        $this->assertSame(1, $second->fileRequests, 'Freed on the socket it was sent on');
+    }
+
+    public function testTheRoomIsFreedWhenTheRequestGoesToAnotherDc(): void
+    {
+        $shared = $this->shared();
+        $other = $this->shared();
+        $connection = $shared->waitGetFileConnection();
+        $message = self::fileRequest($connection);
+        $message->holdFileRoom($connection);
+
+        $message->moveFileRoom($other->getConnection());
+        $this->assertSame(0, $connection->fileRequests);
+        $this->assertSame(0, self::get($shared, 'fileRequestsUnsent'));
+        $this->assertSame(0, $other->getConnection()->fileRequests);
     }
 
     public function testRequestsWaitingForRoomGetTheSocketsOfAReconnection(): void

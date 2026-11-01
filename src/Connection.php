@@ -669,6 +669,7 @@ final class Connection
             return;
         }
         $message->connection = $this;
+        $message->moveFileRoom($this);
         $message->trySend();
         if (!$message->hasSerializedBody()) {
             $body = $message->getBody();
