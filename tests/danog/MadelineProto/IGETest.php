@@ -62,7 +62,7 @@ final class IGETest extends TestCase
     public static function backends(): iterable
     {
         yield 'openssl' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEOpenssl::class];
-        yield 'phpseclib' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEPhpseclib::class];
+        yield 'php' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEPhp::class];
         yield 'ffi' => [\danog\MadelineProto\MTProtoTools\Crypt\IGEFFI::class];
     }
 
