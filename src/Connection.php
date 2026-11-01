@@ -268,12 +268,8 @@ final class Connection
     private bool $closed = false;
     /** Cancelled once the connection is closed for good, stopping the wait before the next connection attempt. */
     private ?DeferredCancellation $closing = null;
-    /** The connection attempts that run until connected, see {@see self::retryConnect()}. */
+    /** The connection attempts that run until connected, see {@see self::connectInBackground()}. */
     private ?Future $connecting = null;
-    /** Why the last connection attempt failed, until connected. */
-    private ?CouldNotConnectException $connectError = null;
-    /** How many connection attempts failed, see {@see self::connect()}. */
-    private int $failedConnects = 0;
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
      *
@@ -284,18 +280,11 @@ final class Connection
         if ($this->stream) {
             return $this;
         }
-        $failedConnects = $this->failedConnects;
         $this->connectMutex ??= new LocalMutex;
         $lock = $this->connectMutex->acquire();
         try {
             if ($this->stream) {
                 return $this;
-            }
-            if ($this->failedConnects !== $failedConnects && $this->connectError !== null) {
-                // The attempt this one waited for failed: each waiting sender trying again in turn makes attempts back
-                // to back during an outage (each up to the connect timeout for every way to connect), bypassing the
-                // backoff of the retries and blocking the senders for one attempt each.
-                throw $this->connectError;
             }
             $this->createSession();
             while (true) {
@@ -321,7 +310,6 @@ final class Connection
                         throw new CouldNotConnectException("The connection to DC {$this->datacenterId} was closed while connecting");
                     }
                     $this->stream = $stream;
-                    $this->connectError = null;
                     $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
                     $this->chosenCtx = $ctx;
 
@@ -371,48 +359,33 @@ final class Connection
                     }
                     return $this;
                 }
-                $this->failedConnects++;
                 $message = "Could not connect to DC {$this->datacenterId}";
                 if ($error !== null) {
                     $message .= ": {$error->getMessage()}";
                 }
-                throw $this->connectError = new CouldNotConnectException($message, 0, $error);
+                throw new CouldNotConnectException($message, 0, $error);
             }
         } finally {
             EventLoop::queue($lock->release(...));
         }
     }
     /**
-     * Connects, trying again until connected (waiting 1 second, doubling up to 30), or closed for good.
+     * Connects in the background, trying again until connected (waiting 1 second, doubling up to 30) or closed for good.
      *
-     * Runs once at a time per connection ({@see self::$connecting}), started by a reconnection, or by a message
-     * sent while it can't connect.
-     *
-     * @param bool $wait Whether to wait before the first attempt (one just failed).
+     * The only way connections are made (but for getInputClientProxy()), once at a time per connection: by a
+     * reconnection, or by a message sent while not connected (queued until then).
      */
-    private function retryConnect(bool $wait): void
+    private function connectInBackground(): Future
+    {
+        return $this->connecting ??= async($this->retryConnect(...));
+    }
+    private function retryConnect(): void
     {
         $this->closing ??= new DeferredCancellation;
         $closing = $this->closing->getCancellation();
         $delay = 1.0;
         try {
-            while (true) {
-                if ($this->closed) {
-                    // Closed before this started, or while connecting.
-                    return;
-                }
-                if ($wait) {
-                    try {
-                        delay($delay, cancellation: $closing);
-                    } catch (CancelledException) {
-                        return;
-                    }
-                    $delay = min($delay * 2, 30.0);
-                }
-                $wait = true;
-                if ($this->closed) {
-                    return;
-                }
+            while (!$this->closed) {
                 try {
                     $this->connect();
                     return;
@@ -422,28 +395,16 @@ final class Connection
                     }
                     $this->API->logger("{$e->getMessage()}, trying again in $delay seconds", Logger::WARNING);
                 }
+                try {
+                    delay($delay, cancellation: $closing);
+                } catch (CancelledException) {
+                    return;
+                }
+                $delay = min($delay * 2, 30.0);
             }
         } finally {
             $this->connecting = null;
         }
-    }
-    /**
-     * Why the last connection attempt failed, while not connected.
-     *
-     * @internal
-     */
-    public function getConnectError(): ?CouldNotConnectException
-    {
-        return $this->stream === null ? $this->connectError : null;
-    }
-    /**
-     * Whether the connection was closed for good.
-     *
-     * @internal
-     */
-    public function isClosed(): bool
-    {
-        return $this->closed;
     }
     public function wakeupHandler(MTProtoIncomingMessage $message): void
     {
@@ -706,25 +667,11 @@ final class Connection
             unset($body);
         }
         if ($this->stream === null) {
-            if ($this->connecting === null) {
-                try {
-                    $this->connect();
-                } catch (CouldNotConnectException $e) {
-                    if ($this->closed) {
-                        $this->handOver($message);
-                        return;
-                    }
-                    // No way to connect (the network is down): queued, it's sent once connected, or times out as any
-                    // request. Thrown, it failed every request at once, and killed the event loop of a script when a
-                    // request made in the background failed (polls, cancellations).
-                    $this->API->logger("{$e->getMessage()}, sending $message once connected", Logger::WARNING);
-                    $this->connecting ??= async($this->retryConnect(...), true);
-                }
-            } else {
-                // Queued without trying to connect while the connection attempts run, so that they back off. In the
-                // queues of the session, created by the first attempt, which may not have run yet.
-                $this->createSession();
-            }
+            // Queued, and sent once connected: connecting here made each sender wait for (and make) its own attempts,
+            // and threw out of requests made in the background (polls, cancellations) when every way to connect
+            // failed (the network is down), killing the event loop of the script.
+            $this->createSession();
+            $this->connectInBackground();
         }
         if ($message->hasReply()) {
             // Replied to (e.g. cancelled) while connecting: its body was already freed, and it must not be sent.
@@ -852,7 +799,7 @@ final class Connection
         // (the network is down) threw out of them as an unhandled exception, killing the event loop of a script after
         // a minute of outage. The attempts already running (started by a message that couldn't be sent, or by a
         // concurrent reconnection) connect this disconnected connection too.
-        ($this->connecting ??= async($this->retryConnect(...), false))->await();
+        $this->connectInBackground()->await();
     }
     /**
      * Get name.

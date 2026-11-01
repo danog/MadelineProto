@@ -19,11 +19,9 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use Amp\ByteStream\ClosedException;
-use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\TimeoutCancellation;
-use Amp\TimeoutException;
 use Closure;
 use danog\MadelineProto\API;
 use danog\MadelineProto\Connection;
@@ -193,32 +191,15 @@ final class NetworkOutageTest extends TestCase
         $connection->disconnect(true);
     }
 
-    public function testATimeoutSaysWhyItCouldNotConnect(): void
-    {
-        $connection = $this->connection();
-        $message = $this->message($connection, 0.5);
-        $connection->sendMessage($message);
-        try {
-            // Replied to with a closure that throws the error.
-            $message->getResultPromise()->await()();
-            $this->fail('Not timed out');
-        } catch (CancelledException $e) {
-            $timeout = $e->getPrevious();
-            $this->assertInstanceOf(TimeoutException::class, $timeout);
-            $this->assertSame(
-                'Timeout while waiting for req_pq_multi (Could not connect to DC 2_0: Network is unreachable)',
-                substr($timeout->getMessage(), 0, strcspn($timeout->getMessage(), "\r\n")),
-            );
-        }
-        $connection->disconnect();
-    }
-
     public function testClosingStopsTheRetries(): void
     {
         $connection = $this->connection();
         $connection->sendMessage($this->message($connection));
         $connecting = self::connecting($connection);
         $this->assertNotNull($connecting);
+        // The first attempt, made in the background.
+        delay(0.1);
+        $this->assertCount(1, $this->attempts);
 
         // Closed for good while waiting for the next attempt: the retries stop right away.
         $start = hrtime(true);

@@ -24,7 +24,6 @@ use Amp\Cancellation;
 use Amp\CancelledException;
 use Amp\DeferredFuture;
 use Amp\Future;
-use Amp\TimeoutException;
 use Closure;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Exception;
@@ -153,15 +152,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
             if ($self == null || $self->hasReply()) {
                 return;
             }
-            $connectError = $self->connection->getConnectError();
-            if ($connectError !== null && ($timeout = $e->getPrevious()) instanceof TimeoutException) {
-                // Timed out while its connection can't connect: say why, instead of only that it timed out (on the
-                // first line: in debug mode, amp appends where the cancellation was created).
-                $message = $timeout->getMessage();
-                $eol = strcspn($message, "\r\n");
-                $message = substr($message, 0, $eol)." ({$connectError->getMessage()})".substr($message, $eol);
-                $e = new CancelledException(new TimeoutException($message));
-            }
             if (!$self->wasSent()) {
                 $self->reply(static fn () => throw $e);
                 return;
@@ -174,8 +164,7 @@ class MTProtoOutgoingMessage extends MTProtoMessage
                 'error_code' => '408',
             ]);
 
-            // Not on a connection closed for good: its session, where the answer would be dropped, is gone.
-            if ($self->hasMsgId() && $self->constructor !== 'rpc_drop_answer' && !$self->connection->isClosed()) {
+            if ($self->hasMsgId() && $self->constructor !== 'rpc_drop_answer') {
                 $self->connection->API->logger("Cancelling $self...");
                 try {
                     $self->connection->API->logger($self->connection->methodCallAsyncRead(
@@ -183,9 +172,6 @@ class MTProtoOutgoingMessage extends MTProtoMessage
                         ['req_msg_id' => $self->getMsgId()]
                     ));
                 } catch (CancelledException) {
-                } catch (\Throwable $e) {
-                    // Best effort, from the event loop: thrown, it would kill the event loop of the script.
-                    $self->connection->API->logger("Could not cancel $self: {$e->getMessage()}", Logger::VERBOSE);
                 }
             }
         });
