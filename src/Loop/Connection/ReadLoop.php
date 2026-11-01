@@ -169,110 +169,105 @@ final class ReadLoop extends Loop
             $this->API->logger("Received {$code} from DC ".$this->datacenter, Logger::ULTRA_VERBOSE);
             return $code;
         }
-        $this->connection->reading(true);
-        try {
-            $seq_no = null;
-            $auth_key_id = $buffer->bufferRead(8);
-            $auth = $this->shared->auth;
-            if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
-                if ($this->shared->auth->connectionState->getState()->isEncrypted()) {
-                    // The late answer to an unencrypted request of the key exchange that was sent again by its
-                    // check timer (MTProtoOutgoingMessage::check) and was answered twice: the key is already
-                    // generated, nothing unencrypted is accepted anymore, drop it.
-                    $this->API->logger("Dropping unencrypted message received in DC {$this->datacenter} after generating the auth key", Logger::WARNING);
-                    $buffer->bufferRead($payload_length - 8);
-                    return null;
-                }
-                $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
-                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
-                $message_length = unpack('V', $buffer->bufferRead(4))[1];
-                $message_data = $buffer->bufferRead($message_length);
-                $left = $payload_length - $message_length - 4 - 8 - 8;
-                if ($left) {
-                    $this->API->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
-                    if ($left < (-$message_length & 15)) {
-                        $this->API->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
-                    }
-                    $this->connection->incomingBytesCtr?->incBy($left);
-                    $buffer->bufferRead($left);
-                }
-            } elseif ($auth_key_id === $auth->getTempID()) {
-                $message_key = $buffer->bufferRead(16);
-                [$aes_key, $aes_iv] = Crypt::kdf($message_key, $auth->getTempAuthKey(), false);
-                $payload_length -= 24;
-                $left = $payload_length & 15;
-                $payload_length -= $left;
-                $decrypted_data = Crypt::igeDecrypt($buffer->bufferRead($payload_length), $aes_key, $aes_iv);
-                if ($left) {
-                    $this->connection->incomingBytesCtr?->incBy($left);
-                    $buffer->bufferRead($left);
-                }
-                if ($message_key != substr(Crypt::sha256(substr($auth->getTempAuthKey(), 96, 32).$decrypted_data), 8, 16)) {
-                    throw new SecurityException('msg_key mismatch');
-                }
-                /*
-                                $server_salt = substr($decrypted_data, 0, 8);
-                                if ($server_salt != $this->shared->getTempAuthKey()->getServerSalt()) {
-                                $this->API->logger('WARNING: Server salt mismatch (my server salt '.$this->shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
-                                }
-                */
-                $session_id = substr($decrypted_data, 8, 8);
-                if ($session_id !== $this->connection->session_id) {
-                    $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
-                    $this->connection->resetSession("session ID mismatch");
-                    throw new NothingInTheSocketException();
-                }
-                $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
-                $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
-                $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
-                $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
-                if ($message_data_length > \strlen($decrypted_data)) {
-                    throw new SecurityException('message_data_length is too big');
-                }
-                if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
-                    throw new SecurityException('padding is too small');
-                }
-                if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
-                    throw new SecurityException('padding is too big');
-                }
-                if ($message_data_length < 0) {
-                    throw new SecurityException('message_data_length not positive');
-                }
-                if ($message_data_length % 4 != 0) {
-                    throw new SecurityException('message_data_length not divisible by 4');
-                }
-                $message_data = substr($decrypted_data, 32, $message_data_length);
-            } else {
-                $this->API->logger('Got unknown auth_key id', Logger::ERROR);
-                return -404;
+        $seq_no = null;
+        $auth_key_id = $buffer->bufferRead(8);
+        $auth = $this->shared->auth;
+        if ($unencrypted = $auth_key_id === "\0\0\0\0\0\0\0\0") {
+            if ($this->shared->auth->connectionState->getState()->isEncrypted()) {
+                // The late answer to an unencrypted request of the key exchange that was sent again by its
+                // check timer (MTProtoOutgoingMessage::check) and was answered twice: the key is already
+                // generated, nothing unencrypted is accepted anymore, drop it.
+                $this->API->logger("Dropping unencrypted message received in DC {$this->datacenter} after generating the auth key", Logger::WARNING);
+                $buffer->bufferRead($payload_length - 8);
+                return null;
             }
-            $this->API->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
-
-            try {
-                $deserialized = $this->deserialize($message_data, $message_id, !$unencrypted);
-                if ($deserialized === null) {
-                    return null;
+            $message_id = Tools::unpackSignedLong($buffer->bufferRead(8));
+            $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
+            $message_length = unpack('V', $buffer->bufferRead(4))[1];
+            $message_data = $buffer->bufferRead($message_length);
+            $left = $payload_length - $message_length - 4 - 8 - 8;
+            if ($left) {
+                $this->API->logger('Padded unencrypted message', Logger::ULTRA_VERBOSE);
+                if ($left < (-$message_length & 15)) {
+                    $this->API->logger('Protocol padded unencrypted message', Logger::ULTRA_VERBOSE);
                 }
-            } finally {
-                $this->API->minDatabase->reset();
+                $this->connection->incomingBytesCtr?->incBy($left);
+                $buffer->bufferRead($left);
             }
-
-            $message = new MTProtoIncomingMessage(
-                $this->connection,
-                $deserialized,
-                $message_id,
-                $unencrypted,
-                false
-            );
-            if (isset($seq_no)) {
-                $message->setSeqNo($seq_no);
+        } elseif ($auth_key_id === $auth->getTempID()) {
+            $message_key = $buffer->bufferRead(16);
+            [$aes_key, $aes_iv] = Crypt::kdf($message_key, $auth->getTempAuthKey(), false);
+            $payload_length -= 24;
+            $left = $payload_length & 15;
+            $payload_length -= $left;
+            $decrypted_data = Crypt::igeDecrypt($buffer->bufferRead($payload_length), $aes_key, $aes_iv);
+            if ($left) {
+                $this->connection->incomingBytesCtr?->incBy($left);
+                $buffer->bufferRead($left);
             }
-
-            $this->connection->wakeupHandler($message);
-            $this->connection->incomingCtr?->inc();
-        } finally {
-            $this->connection->reading(false);
+            if ($message_key != substr(Crypt::sha256(substr($auth->getTempAuthKey(), 96, 32).$decrypted_data), 8, 16)) {
+                throw new SecurityException('msg_key mismatch');
+            }
+            /*
+                            $server_salt = substr($decrypted_data, 0, 8);
+                            if ($server_salt != $this->shared->getTempAuthKey()->getServerSalt()) {
+                            $this->API->logger('WARNING: Server salt mismatch (my server salt '.$this->shared->getTempAuthKey()->getServerSalt().' is not equal to server server salt '.$server_salt.').', Logger::WARNING);
+                            }
+            */
+            $session_id = substr($decrypted_data, 8, 8);
+            if ($session_id !== $this->connection->session_id) {
+                $this->API->logger('Session ID mismatch', Logger::FATAL_ERROR);
+                $this->connection->resetSession("session ID mismatch");
+                throw new NothingInTheSocketException();
+            }
+            $message_id = Tools::unpackSignedLong(substr($decrypted_data, 16, 8));
+            $this->connection->msgIdHandler->checkIncomingMessageId($message_id, false);
+            $seq_no = unpack('V', substr($decrypted_data, 24, 4))[1];
+            $message_data_length = unpack('V', substr($decrypted_data, 28, 4))[1];
+            if ($message_data_length > \strlen($decrypted_data)) {
+                throw new SecurityException('message_data_length is too big');
+            }
+            if (\strlen($decrypted_data) - 32 - $message_data_length < 12) {
+                throw new SecurityException('padding is too small');
+            }
+            if (\strlen($decrypted_data) - 32 - $message_data_length > 1024) {
+                throw new SecurityException('padding is too big');
+            }
+            if ($message_data_length < 0) {
+                throw new SecurityException('message_data_length not positive');
+            }
+            if ($message_data_length % 4 != 0) {
+                throw new SecurityException('message_data_length not divisible by 4');
+            }
+            $message_data = substr($decrypted_data, 32, $message_data_length);
+        } else {
+            $this->API->logger('Got unknown auth_key id', Logger::ERROR);
+            return -404;
         }
+        $this->API->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
+
+        try {
+            $deserialized = $this->deserialize($message_data, $message_id, !$unencrypted);
+            if ($deserialized === null) {
+                return null;
+            }
+        } finally {
+            $this->API->minDatabase->reset();
+        }
+
+        $message = new MTProtoIncomingMessage(
+            $this->connection,
+            $deserialized,
+            $message_id,
+            $unencrypted,
+            false
+        );
+        if (isset($seq_no)) {
+            $message->setSeqNo($seq_no);
+        }
+
+        $this->connection->wakeupHandler($message);
+        $this->connection->incomingCtr?->inc();
         return null;
     }
     /**

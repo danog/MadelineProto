@@ -104,10 +104,6 @@ final class Connection
      */
     private int $httpResCount = 0;
     /**
-     * Whether we're currently reading an MTProto packet.
-     */
-    private bool $reading = false;
-    /**
      * Whether we're currently writing an MTProto packet.
      */
     private bool $writing = false;
@@ -172,22 +168,6 @@ final class Connection
     public function writing(bool $writing): void
     {
         $this->writing = $writing;
-    }
-    /**
-     * Set reading boolean.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function reading(bool $reading): void
-    {
-        $this->reading = $reading;
-    }
-    /**
-     * Whether we're currently reading an MTProto packet.
-     */
-    public function isReading(): bool
-    {
-        return $this->reading;
     }
     /**
      * Whether we're currently writing an MTProto packet.
