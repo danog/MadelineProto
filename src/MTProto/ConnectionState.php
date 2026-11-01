@@ -23,6 +23,7 @@ namespace danog\MadelineProto\MTProto;
 /** @internal */
 enum ConnectionState
 {
+    /** A key derived from the one of the main DC (media DC, parallel session), waiting for it to be authorized. */
     case UNENCRYPTED_MEDIA_WAITING_MAIN;
     case UNENCRYPTED_NO_PERMANENT;
     case UNENCRYPTED;

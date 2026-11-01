@@ -1293,6 +1293,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         }
         $this->seqUpdater ??= new SeqLoop($this);
         $this->loginState->subscribe($this->seqUpdater);
+        // Opens the parallel sessions to the main DC once logged in, closes them once logged out.
+        $this->loginState->subscribe($this->datacenter);
 
         foreach ($this->secretChats as $chat) {
             $chat->wakeupFeedLoop();
@@ -2343,13 +2345,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
      *
      * @psalm-external-mutation-free
      */
-    public function populateConfig(array $config): void
+    public function populateConfig(array $config, ?Connection $connection = null): void
     {
         $this->config = $config;
+        $state = $this->loginState->getState();
+        // Only the config of the logged in account tells how many sessions to its main DC it may use.
+        if ($connection !== null && $state->state === API::LOGGED_IN && $connection->getDatacenter() === $state->authorizedDc) {
+            $this->datacenter->setMainSessionCount($config['tmp_sessions'] ?? null);
+        }
     }
     /** @internal */
     public function handleAuthorization(array $authorization, Connection $connection): void
     {
+        $this->datacenter->setMainSessionCount($authorization['tmp_sessions'] ?? null);
         $this->authFuture = $f = async($this->processAuthorization(...), $authorization, $connection->getDatacenter());
         $f->finally(function () use ($f): void {
             if ($f === $this->authFuture) {

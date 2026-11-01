@@ -143,6 +143,13 @@ final class Connection
      */
     public int $fileRequests = 0;
     /**
+     * Number of method calls sent through this socket that weren't answered yet, to spread the calls over the
+     * parallel sessions of a DC (see DataCenterConnection::getConnection).
+     *
+     * @internal
+     */
+    public int $pendingCalls = 0;
+    /**
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
@@ -270,6 +277,9 @@ final class Connection
         try {
             if ($this->stream) {
                 return $this;
+            }
+            if ($this->shared->isClosed()) {
+                throw new Exception("The session to DC {$this->datacenterId} was closed");
             }
             $this->createSession();
             while (true) {
@@ -547,6 +557,11 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message): void
     {
+        if ($this->shared->isClosed()) {
+            // A parallel session closed for good: it must not connect again.
+            $this->shared->forward($message);
+            return;
+        }
         $message->connection = $this;
         $message->trySend();
         if (!$message->hasSerializedBody()) {
@@ -621,7 +636,7 @@ final class Connection
         $this->id = $id;
         $this->API = $extra->getExtra();
         $this->datacenter = $datacenter;
-        $this->datacenterId = $this->datacenter . '.' . $this->id;
+        $this->datacenterId = $extra->getLabel() . '.' . $this->id;
     }
     /**
      * Get main instance.
@@ -675,6 +690,9 @@ final class Connection
      */
     public function reconnect(): void
     {
+        if ($this->shared->isClosed()) {
+            return;
+        }
         $this->API->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
         $this->shared->connect($this->id);

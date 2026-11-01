@@ -47,6 +47,11 @@ final class NewAuthKey implements SimpleSubscriber
 
     private ?int $authedDcId;
 
+    /**
+     * @param ?self $mainKey The key of the main DC, for a key derived from it (a media DC, or a parallel session of
+     *                       the main DC, see DataCenterConnection::setSessionCount): it uses the same permanent key,
+     *                       copied once the main key is authorized, with its own temporary key bound to it.
+     */
     public function __construct(
         public readonly bool $isMedia,
         public readonly bool $isCdn,
@@ -57,12 +62,12 @@ final class NewAuthKey implements SimpleSubscriber
         $this->connectionState = new Publisher(
             $isCdn
                 ? ConnectionState::UNENCRYPTED
-                : ($isMedia ? ConnectionState::UNENCRYPTED_MEDIA_WAITING_MAIN : ConnectionState::UNENCRYPTED_NO_PERMANENT)
+                : ($mainKey !== null ? ConnectionState::UNENCRYPTED_MEDIA_WAITING_MAIN : ConnectionState::UNENCRYPTED_NO_PERMANENT)
         );
         if ($mainKey === null) {
             Assert::false($isMedia);
         } else {
-            Assert::true($isMedia);
+            Assert::false($isCdn);
             $mainKey->connectionState->subscribe($this);
         }
         $loginState->subscribe($this);
@@ -106,6 +111,17 @@ final class NewAuthKey implements SimpleSubscriber
         }
     }
 
+    /**
+     * Stop following the state of the main key and the login state, when this key is dropped.
+     *
+     * @param Publisher<LoginState> $loginState
+     */
+    public function detach(Publisher $loginState): void
+    {
+        $this->mainKey?->connectionState->unsubscribe($this);
+        $loginState->unsubscribe($this);
+    }
+
     public function setAuthKey(#[\SensitiveParameter] ?string $authKey): void
     {
         $this->authKey = $authKey;
@@ -128,7 +144,7 @@ final class NewAuthKey implements SimpleSubscriber
             $this->connectionState->publish(
                 $this->isCdn || $this->id !== null
                     ? ConnectionState::UNENCRYPTED
-                    : ($this->isMedia ? ConnectionState::UNENCRYPTED_MEDIA_WAITING_MAIN : ConnectionState::UNENCRYPTED_NO_PERMANENT)
+                    : ($this->mainKey !== null ? ConnectionState::UNENCRYPTED_MEDIA_WAITING_MAIN : ConnectionState::UNENCRYPTED_NO_PERMANENT)
             );
         } else {
             Assert::notNull($serverSalt, 'Server salt must not be null if auth key is not null');
@@ -221,7 +237,7 @@ final class NewAuthKey implements SimpleSubscriber
                 $this->authedDcId === null
                 ? ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN
                 : (
-                    $this->authedDcId === $this->dcId || $this->isMedia
+                    $this->authedDcId === $this->dcId || $this->mainKey !== null
                         ? ConnectionState::ENCRYPTED
                         : ConnectionState::ENCRYPTED_NOT_AUTHED
                 )

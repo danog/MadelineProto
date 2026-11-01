@@ -55,6 +55,10 @@ final class DataCenterConnection implements SimpleSubscriber
      * parts in flight per session too, opening up to 8 sessions instead).
      */
     public const MAX_FILE_REQUESTS_PER_SOCKET = 2;
+    /**
+     * Maximum number of parallel sessions to the main DC, whatever the server allows (as in TDLib).
+     */
+    public const MAX_SESSIONS = 100;
 
     /** @deprecated */
     private ?PermAuthKey $permAuthKey;
@@ -96,18 +100,52 @@ final class DataCenterConnection implements SimpleSubscriber
      *
      */
     private bool $needsReconnect = false;
+    /**
+     * The other sessions to the DC, each with its own temporary auth key bound to the permanent one, when the
+     * server allows more than one (tmp_sessions, see setSessionCount()): this is the first one.
+     *
+     * @var list<self>
+     */
+    private array $parallelSessions = [];
+    /**
+     * Index of this session among the sessions to the DC (0 for the first one, which owns the others).
+     */
+    private int $sessionIndex = 0;
+    /**
+     * The first session to the DC, for a parallel session.
+     */
+    private ?self $firstSession = null;
+    /**
+     * Whether this parallel session was closed (see close()): it must never connect again.
+     */
+    private bool $closed = false;
 
-    public function __construct(private readonly MTProto $API, private readonly int $datacenter)
+    /**
+     * @param ?self $firstSession The first session to the DC, for a parallel session (see setSessionCount())
+     */
+    public function __construct(private readonly MTProto $API, private readonly int $datacenter, ?self $firstSession = null, int $sessionIndex = 0)
     {
         $media = DataCenter::isMedia($this->datacenter);
+        $this->sessionIndex = $sessionIndex;
+        $this->firstSession = $firstSession;
         $this->auth = new NewAuthKey(
             $media,
             $this->API->isCdn($this->datacenter),
             $this->datacenter,
             $this->API->loginState,
-            $media ? $this->API->datacenter->getDataCenterConnection(-$this->datacenter)->auth : null
+            $firstSession?->auth ?? ($media ? $this->API->datacenter->getDataCenterConnection(-$this->datacenter)->auth : null)
         );
         $this->auth->connectionState->subscribe($this);
+    }
+
+    /**
+     * DC ID, followed by the index of the session for the parallel sessions (e.g. 2#1), for logs.
+     *
+     * @psalm-mutation-free
+     */
+    public function getLabel(): string
+    {
+        return $this->sessionIndex === 0 ? (string) $this->datacenter : "{$this->datacenter}#{$this->sessionIndex}";
     }
 
     public function importFromLegacy(self $legacy): void
@@ -120,18 +158,27 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     public function __sleep()
     {
-        return ['auth', 'API', 'datacenter'];
+        return ['auth', 'API', 'datacenter', 'parallelSessions', 'sessionIndex', 'firstSession'];
     }
 
     #[\Override]
     public function onSimpleStateChange($state): void
     {
+        if ($this->closed) {
+            return;
+        }
         try {
             $this->initAuthorization($state);
-        } catch (SecurityException $e) {
-            throw $e;
         } catch (\Throwable $e) {
-            throw new SecurityException("An error occurred while handling state transition to {$state->name} in DC {$this->datacenter}: ".$e->getMessage(), 0, $e);
+            if ($this->closed) {
+                // Closed meanwhile: its requests fail, the auth key it was setting up is not needed anymore.
+                $this->API->logger("Abandoning the auth key transition to {$state->name} of the closed session to DC {$this->getLabel()}: $e", Logger::NOTICE);
+                return;
+            }
+            if ($e instanceof SecurityException) {
+                throw $e;
+            }
+            throw new SecurityException("An error occurred while handling state transition to {$state->name} in DC {$this->getLabel()}: ".$e->getMessage(), 0, $e);
         }
     }
 
@@ -173,18 +220,18 @@ final class DataCenterConnection implements SimpleSubscriber
 
         // Skip old states in case of unexpected server-side abort back to the unencrypted state.
         if ($state !== $this->auth->connectionState->getState()) {
-            $logger->logger("Skipping outdated auth key transition to {$state->name} in DC {$this->datacenter}", Logger::NOTICE);
+            $logger->logger("Skipping outdated auth key transition to {$state->name} in DC {$this->getLabel()}", Logger::NOTICE);
             return;
         }
-        $logger->logger("Handling auth key transition to {$state->name} in DC {$this->datacenter}", Logger::NOTICE);
+        $logger->logger("Handling auth key transition to {$state->name} in DC {$this->getLabel()}", Logger::NOTICE);
 
         if ($state === ConnectionState::UNENCRYPTED_NO_PERMANENT) {
             Assert::false($this->auth->isMedia);
             Assert::false($this->auth->isCdn);
-            $logger->logger(\sprintf('Generating permanent authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+            $logger->logger(\sprintf('Generating permanent authorization key for DC %s...', $this->getLabel()), Logger::NOTICE);
             $connection->createAuthKey(false);
         } elseif ($state === ConnectionState::UNENCRYPTED) {
-            $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->datacenter), Logger::NOTICE);
+            $logger->logger(\sprintf('Generating temporary authorization key for DC %s...', $this->getLabel()), Logger::NOTICE);
             $connection->createAuthKey(true);
         } elseif ($state === ConnectionState::ENCRYPTED_NOT_BOUND) {
             $expires_in = MTProto::PFS_DURATION;
@@ -193,7 +240,7 @@ final class DataCenterConnection implements SimpleSubscriber
                     // A binding answered with CONNECTION_NOT_INITED (ResponseHandler): an earlier binding went
                     // through but its answer was lost (e.g. with a session reset), the key is bound.
                     // Or the key was dropped: the next transition takes over either way.
-                    $logger->logger("Not binding authorization keys anymore in DC {$this->datacenter}, now in state {$this->auth->connectionState->getState()->name}", Logger::NOTICE);
+                    $logger->logger("Not binding authorization keys anymore in DC {$this->getLabel()}, now in state {$this->auth->connectionState->getState()->name}", Logger::NOTICE);
                     return;
                 }
                 try {
@@ -213,7 +260,7 @@ final class DataCenterConnection implements SimpleSubscriber
                     $encrypted_message = $this->auth->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);
                     $res = $connection->methodCallAsyncRead('auth.bindTempAuthKey', ['perm_auth_key_id' => $perm_auth_key_id, 'nonce' => $nonce, 'expires_at' => $expires_at, 'encrypted_message' => $encrypted_message, 'madelineMsgId' => $message_id, 'specialMethodType' => SpecialMethodType::UNAUTHED_METHOD]);
                     if ($res === true) {
-                        $logger->logger("Bound temporary and permanent authorization keys, DC {$this->datacenter}", Logger::NOTICE);
+                        $logger->logger("Bound temporary and permanent authorization keys, DC {$this->getLabel()}", Logger::NOTICE);
                         $this->auth->bind();
                         return;
                     }
@@ -263,7 +310,7 @@ final class DataCenterConnection implements SimpleSubscriber
             $authed = $this->API->loginState->getState()->authorizedDc;
             Assert::notNull($authed);
 
-            $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->datacenter);
+            $logger->logger('Trying to copy authorization from DC '.$authed.' to DC '.$this->getLabel());
             $authorized_socket =  $this->API->datacenter->getDataCenterConnection($authed);
             $authorized_socket->waitGetConnection();
             for ($attempt = 1; ;) {
@@ -281,7 +328,7 @@ final class DataCenterConnection implements SimpleSubscriber
                     // the state of the connection, where an exception kills the process, and the connection can't be
                     // used without the authorization anyway. Not through the floodWaitLimit of the calls: their
                     // timeout (the RPC drop timeout) would expire first.
-                    $logger->logger("Got {$error->rpc} copying the authorization to DC {$this->datacenter}, waiting {$error->waitTime} seconds", Logger::WARNING);
+                    $logger->logger("Got {$error->rpc} copying the authorization to DC {$this->getLabel()}, waiting {$error->waitTime} seconds", Logger::WARNING);
                     delay($error->waitTime);
                 } catch (RPCErrorException $error) {
                     // A newer export of the same account (another process of the account copying its authorization
@@ -290,14 +337,14 @@ final class DataCenterConnection implements SimpleSubscriber
                     if ($error->rpc !== 'AUTH_BYTES_INVALID' || $attempt++ === 5) {
                         throw $error;
                     }
-                    $logger->logger("The exported authorization for DC {$this->datacenter} was invalidated, exporting it again", Logger::WARNING);
+                    $logger->logger("The exported authorization for DC {$this->getLabel()} was invalidated, exporting it again", Logger::WARNING);
                     delay(random_int(100, 2000) / 1000);
                 }
             }
             $this->auth->authorize();
         }
 
-        $logger->logger("Finished auth key transition to {$state->name} in DC {$this->datacenter}", Logger::NOTICE);
+        $logger->logger("Finished auth key transition to {$state->name} in DC {$this->getLabel()}", Logger::NOTICE);
     }
 
     /**
@@ -319,6 +366,113 @@ final class DataCenterConnection implements SimpleSubscriber
         }
     }
     /**
+     * Set the number of sessions to the DC: one, or up to tmp_sessions to the main DC of the logged in account.
+     *
+     * Each parallel session has its own temporary auth key, bound to the permanent one (the server requires it
+     * when it allows several sessions), and one socket: once its key is ready, calls are spread over the sessions
+     * (see getConnection()), and the updates the server sends through any of them are handled as usual.
+     * They are saved along with their temporary keys, so that a restart doesn't open more sessions than allowed.
+     *
+     * Only on the first session of a DC with a permanent auth key (not media or CDN DCs).
+     */
+    public function setSessionCount(int $count): void
+    {
+        Assert::eq($this->sessionIndex, 0);
+        Assert::false($this->auth->isMedia);
+        Assert::false($this->auth->isCdn);
+        $count = max(1, min($count, self::MAX_SESSIONS));
+        if ($count === \count($this->parallelSessions) + 1) {
+            return;
+        }
+        $this->API->logger("Using $count sessions for DC {$this->datacenter}", Logger::NOTICE);
+        while (\count($this->parallelSessions) + 1 < $count) {
+            $session = new self($this->API, $this->datacenter, $this, \count($this->parallelSessions) + 1);
+            $this->parallelSessions[] = $session;
+            if (isset($this->ctx)) {
+                // Otherwise connected along with this one (DataCenter::getDataCenterConnection()).
+                $session->setCtx($this->ctx);
+                $session->connect();
+            }
+        }
+        while (\count($this->parallelSessions) + 1 > $count) {
+            array_pop($this->parallelSessions)->close();
+        }
+    }
+    /**
+     * Close this parallel session for good: the server allows fewer sessions, or the account logged out.
+     *
+     * Nothing must connect it again, or there would be more sessions than allowed (the server would invalidate
+     * the auth key with AUTH_KEY_DUPLICATED): its socket is closed, its auth key stops following the main key,
+     * and its requests are sent through the first session (see forward()), now and if sent or resent later
+     * (by a loop of its socket, or a call waiting for a flood wait, say).
+     */
+    private function close(): void
+    {
+        Assert::notNull($this->firstSession);
+        $this->closed = true;
+        $this->auth->detach($this->API->loginState);
+        $this->disconnect();
+        $backup = $this->backup;
+        $this->backup = [];
+        foreach ($backup as $message) {
+            $this->forward($message);
+        }
+    }
+    /**
+     * Whether this parallel session was closed (see close()).
+     *
+     * @psalm-mutation-free
+     */
+    public function isClosed(): bool
+    {
+        return $this->closed;
+    }
+    /**
+     * Send a message of this closed session through the first session, or fail it if it belongs to this session
+     * (the exchange, binding and initialization of its auth key).
+     *
+     * @internal
+     */
+    public function forward(MTProtoOutgoingMessage $message): void
+    {
+        Assert::true($this->closed);
+        if ($message instanceof Container || $message->hasReply()) {
+            return;
+        }
+        if ($message->unencrypted || $message->specialMethodType === SpecialMethodType::UNAUTHED_METHOD) {
+            $message->reply(fn () => new Exception("The session to DC {$this->getLabel()} was closed"));
+            return;
+        }
+        if (!$message->resetForResend()) {
+            return;
+        }
+        $this->API->logger("Sending $message of the closed session to DC {$this->getLabel()} through the first one");
+        $firstSession = $this->firstSession;
+        EventLoop::queue(static function () use ($firstSession, $message): void {
+            $firstSession->waitGetConnection()->sendMessage($message);
+        });
+    }
+    /**
+     * Get this session and the parallel ones (see setSessionCount()).
+     *
+     * @return non-empty-list<self>
+     *
+     * @psalm-mutation-free
+     */
+    public function getSessions(): array
+    {
+        return [$this, ...$this->parallelSessions];
+    }
+    /**
+     * Get the index of this session among the ones to the DC (see setSessionCount()).
+     *
+     * @psalm-mutation-free
+     */
+    public function getSessionIndex(): int
+    {
+        return $this->sessionIndex;
+    }
+    /**
      * Has connection context?
      *
      * @psalm-mutation-free
@@ -334,6 +488,9 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     public function connect(int $id = -1): void
     {
+        if ($this->closed) {
+            return;
+        }
         if ($id === -1 || !isset($this->connections[$id])) {
             if ($this->connections) {
                 $this->API->logger('Already connected!', Logger::WARNING);
@@ -385,7 +542,7 @@ final class DataCenterConnection implements SimpleSubscriber
             $list .= $message->constructor;
             $list .= ', ';
         }
-        $this->API->logger("Backed up {$list} from DC {$this->datacenter}.{$id}");
+        $this->API->logger("Backed up {$list} from DC {$this->getLabel()}.{$id}");
         $this->backup = array_merge($this->backup, $backup);
         unset($this->connections[$id]);
     }
@@ -399,13 +556,13 @@ final class DataCenterConnection implements SimpleSubscriber
         if (!isset($this->ctx)) {
             return;
         }
-        $this->API->logger("Disconnecting from shared DC {$this->datacenter}");
+        $this->API->logger("Disconnecting from shared DC {$this->getLabel()}");
         $before = \count($this->backup);
         foreach ($this->connections as $connection) {
             $connection->disconnect();
         }
         $count = \count($this->backup) - $before;
-        $this->API->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->datacenter}");
+        $this->API->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->getLabel()}");
         $this->connections = [];
         // Requests waiting for room on the closed sockets wait for the new ones.
         $this->wakeFileRequestWaiters(true);
@@ -415,7 +572,7 @@ final class DataCenterConnection implements SimpleSubscriber
      */
     public function reconnect(): void
     {
-        $this->API->logger("Reconnecting shared DC {$this->datacenter}");
+        $this->API->logger("Reconnecting shared DC {$this->getLabel()}");
         $this->disconnect();
         $this->connect();
     }
@@ -427,7 +584,7 @@ final class DataCenterConnection implements SimpleSubscriber
         $backup = $this->backup;
         $this->backup = [];
         $count = \count($backup);
-        $this->API->logger("Restoring {$count} messages to DC {$this->datacenter}");
+        $this->API->logger("Restoring {$count} messages to DC {$this->getLabel()}");
         /** @var MTProtoOutgoingMessage */
         foreach ($backup as $message) {
             if ($message instanceof Container || $message->hasReply()) {
@@ -437,7 +594,7 @@ final class DataCenterConnection implements SimpleSubscriber
                 continue;
             }
             $message->connection = $connection = $this->getConnection();
-            $this->API->logger("Restoring $message to DC {$this->datacenter}");
+            $this->API->logger("Restoring $message to DC {$this->getLabel()}");
             EventLoop::queue($connection->sendMessage(...), $message);
         }
     }
@@ -463,13 +620,15 @@ final class DataCenterConnection implements SimpleSubscriber
     }
     /**
      * Get a socket (see getConnection()), waiting for the sockets to be created.
+     *
+     * @param ?string $affinity Calls with the same affinity (the same peer) are sent through the same session
      */
-    public function waitGetConnection(): Connection
+    public function waitGetConnection(?string $affinity = null): Connection
     {
         if (!$this->connections) {
             $this->connectionsPromise->await();
         }
-        return $this->getConnection();
+        return $this->getConnection(affinity: $affinity);
     }
     /**
      * Get a socket for a file request (a part to download or upload), waiting for one with room for it.
@@ -534,18 +693,57 @@ final class DataCenterConnection implements SimpleSubscriber
         }
     }
     /**
-     * Get a socket: the one with the fewest file requests in flight, or the one with the given ID.
+     * Get a socket: the one with the given ID, or the one with the fewest file requests in flight.
      *
-     * @param integer $id Connection ID, for manual fetching
+     * With parallel sessions (see setSessionCount()), the socket of a session whose key is ready: the one of the
+     * session of the affinity if given (so that the calls about a chat are sent in order through one session, as
+     * before), or the one with the fewest calls waiting for an answer.
      *
-     * @psalm-mutation-free
+     * @param integer $id       Connection ID, for manual fetching
+     * @param ?string $affinity Calls with the same affinity (the same peer) are sent through the same session
      */
-    public function getConnection(int $id = -1): Connection
+    public function getConnection(int $id = -1, ?string $affinity = null): Connection
     {
         if ($id >= 0) {
             return $this->connections[$id];
         }
-        return $this->getLeastLoadedConnection();
+        $best = $this->getLeastLoadedConnection();
+        if (!$this->parallelSessions) {
+            return $best;
+        }
+        if ($affinity !== null) {
+            $index = crc32($affinity) % (\count($this->parallelSessions) + 1);
+            if ($index !== 0 && $this->parallelSessions[$index - 1]->isReady()) {
+                return $this->parallelSessions[$index - 1]->getLeastLoadedConnection();
+            }
+            return $best;
+        }
+        $equal = 1;
+        foreach ($this->parallelSessions as $session) {
+            if (!$session->isReady()) {
+                continue;
+            }
+            $connection = $session->getLeastLoadedConnection();
+            if ($connection->pendingCalls < $best->pendingCalls) {
+                $best = $connection;
+                $equal = 1;
+            } elseif ($connection->pendingCalls === $best->pendingCalls && random_int(0, $equal++) === 0) {
+                // A random one among the least loaded, as in TDLib: all the sessions are used while idle too.
+                $best = $connection;
+            }
+        }
+        return $best;
+    }
+    /**
+     * Whether calls can be sent through this parallel session: its key is authorized, and it has a socket.
+     *
+     * Until then, its calls go through the other sessions instead of waiting for its key.
+     *
+     * @psalm-mutation-free
+     */
+    private function isReady(): bool
+    {
+        return $this->connections && $this->auth->connectionState->getState() === ConnectionState::ENCRYPTED;
     }
     /**
      * Get the socket with the fewest file requests in flight.
