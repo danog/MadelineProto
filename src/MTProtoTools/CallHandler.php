@@ -51,7 +51,7 @@ trait CallHandler
             'method',
             $method,
             $args,
-            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
+            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter, self::getSessionAffinity($args)))->methodCallAsyncRead($method, $args),
         );
     }
     /**
@@ -64,6 +64,22 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array $args, ?int $datacenter = null): WrappedFuture
     {
-        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
+        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter, self::getSessionAffinity($args)))->methodCallAsyncWrite($method, $args);
+    }
+    /**
+     * With parallel sessions to the DC, the calls about the same peer are sent through the same session, so that
+     * they reach the server in order as with a single session (TDLib sends them in the same session too).
+     *
+     * Best effort: the same peer given in different forms (a username and an ID, say) may use different sessions.
+     *
+     * @psalm-pure
+     */
+    private static function getSessionAffinity(array $args): ?string
+    {
+        $peer = $args['peer'] ?? null;
+        if (\is_array($peer)) {
+            $peer = $peer['user_id'] ?? $peer['chat_id'] ?? $peer['channel_id'] ?? null;
+        }
+        return \is_int($peer) || \is_string($peer) ? (string) $peer : null;
     }
 }

@@ -27,6 +27,8 @@ use Amp\Socket\InternetAddress;
 use Amp\Socket\InternetAddressVersion;
 use Amp\Sync\LocalKeyedMutex;
 use AssertionError;
+use danog\MadelineProto\MTProto\LoginState;
+use danog\MadelineProto\Reactive\SimpleSubscriber;
 use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\UdpBufferedStream;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -65,8 +67,10 @@ use Revolt\EventLoop;
  *      },
  * }
  * @internal Manages datacenters.
+ *
+ * @implements SimpleSubscriber<LoginState>
  */
-final class DataCenter
+final class DataCenter implements SimpleSubscriber
 {
     /**
      * @deprecated
@@ -84,6 +88,10 @@ final class DataCenter
      * Current DC ID.
      */
     public int $currentDatacenter = 1;
+    /**
+     * Number of sessions to the main DC of the logged in account allowed by the server (tmp_sessions).
+     */
+    private int $mainSessionCount = 1;
     private DoHWrapper $dohWrapper;
 
     private LocalKeyedMutex $connectMutex;
@@ -101,7 +109,7 @@ final class DataCenter
      */
     public function __sleep()
     {
-        return ['API', 'list', 'currentDatacenter'];
+        return ['API', 'list', 'currentDatacenter', 'mainSessionCount'];
     }
 
     /**
@@ -111,6 +119,54 @@ final class DataCenter
     {
         $this->connectMutex = new LocalKeyedMutex;
         $this->dohWrapper = new DoHWrapper($this->API);
+    }
+
+    #[\Override]
+    public function onSimpleStateChange($state): void
+    {
+        $this->applySessionCounts();
+    }
+
+    /**
+     * Set the number of sessions to the main DC allowed by the server, from the tmp_sessions field of the config
+     * or of the authorization (absent: one).
+     *
+     * @internal
+     */
+    public function setMainSessionCount(?int $count): void
+    {
+        $count = max(1, min($count ?? 1, DataCenterConnection::MAX_SESSIONS));
+        if ($count === $this->mainSessionCount) {
+            return;
+        }
+        $this->API->logger("The server allows $count sessions to the main DC", Logger::NOTICE);
+        $this->mainSessionCount = $count;
+        // Not from this fiber: called while deserializing a response, in the read loop of a connection that may be
+        // one of the sessions to close, whose loops wait for it to return.
+        EventLoop::queue($this->applySessionCounts(...));
+    }
+
+    /**
+     * Number of sessions to open to a DC: more than one only to the main DC of the logged in account.
+     */
+    private function getSessionCount(int $dc): int
+    {
+        $state = $this->API->loginState->getState();
+        return $state->state === API::LOGGED_IN && $state->authorizedDc === $dc
+            ? $this->mainSessionCount
+            : 1;
+    }
+
+    /**
+     * Open or close the parallel sessions of the DCs (see DataCenterConnection::setSessionCount()).
+     */
+    private function applySessionCounts(): void
+    {
+        foreach ($this->list as $dc => $socket) {
+            if (\is_int($dc) && !$socket->auth->isMedia && !$socket->auth->isCdn) {
+                $socket->setSessionCount($this->getSessionCount($dc));
+            }
+        }
     }
 
     /**
@@ -128,8 +184,11 @@ final class DataCenter
             if (\is_string($dc)) {
                 continue;
             }
-            $socket->setCtx($this->generateContexts($dc));
-            $socket->reconnect();
+            $ctxs = $this->generateContexts($dc);
+            foreach ($socket->getSessions() as $session) {
+                $session->setCtx($ctxs);
+                $session->reconnect();
+            }
         }
         $this->getSettings()->applyChanges();
     }
@@ -422,9 +481,12 @@ final class DataCenter
         }
         return new ContextIterator($ctxs);
     }
-    public function waitGetConnection(int $dc): Connection
+    /**
+     * @param ?string $affinity Calls with the same affinity (the same peer) are sent through the same session
+     */
+    public function waitGetConnection(int $dc, ?string $affinity = null): Connection
     {
-        return $this->getDataCenterConnection($dc)->waitGetConnection();
+        return $this->getDataCenterConnection($dc)->waitGetConnection($affinity);
     }
     /**
      * Get DataCenterConnection instance.
@@ -443,13 +505,18 @@ final class DataCenter
                 $ctxs = $this->generateContexts($dc);
 
                 $this->API->logger("Connecting to DC {$dc}", Logger::WARNING);
-                $this->list[$dc] ??= new DataCenterConnection($this->API, $dc, $legacy);
+                $this->list[$dc] ??= new DataCenterConnection($this->API, $dc);
                 if ($legacy) {
                     $this->list[$dc]->importFromLegacy($legacy);
                 }
-                $this->list[$dc]->setCtx($ctxs);
-                $this->list[$dc]->connect();
-                $this->list[$dc]->auth->connectionState->wakeup();
+                if (!$this->list[$dc]->auth->isMedia && !$this->list[$dc]->auth->isCdn) {
+                    $this->list[$dc]->setSessionCount($this->getSessionCount($dc));
+                }
+                foreach ($this->list[$dc]->getSessions() as $session) {
+                    $session->setCtx($ctxs);
+                    $session->connect();
+                    $session->auth->connectionState->wakeup();
+                }
             } finally {
                 EventLoop::queue($lock->release(...));
             }
@@ -466,12 +533,18 @@ final class DataCenter
         return isset($this->API->dcList[$test][$ipv6][$dc]);
     }
     /**
-     * Get all DataCenterConnection instances.
+     * Get all DataCenterConnection instances, the parallel sessions included.
      *
-     * @return array<int, DataCenterConnection>
+     * @return list<DataCenterConnection>
      */
     public function getDataCenterConnections(): array
     {
-        return $this->list;
+        $result = [];
+        foreach ($this->list as $socket) {
+            foreach ($socket->getSessions() as $session) {
+                $result[] = $session;
+            }
+        }
+        return $result;
     }
 }

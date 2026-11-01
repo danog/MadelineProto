@@ -274,7 +274,9 @@ trait Login
             $dataCenterConnection->disconnect();
             $this->loginState->unsubscribe($dataCenterConnection->auth);
         }
+        $this->loginState->unsubscribe($this->datacenter);
         $this->datacenter = new DataCenter($this);
+        $this->loginState->subscribe($this->datacenter);
         // Not the default DC 1, which doesn't exist on the test servers (whose DCs are 10001-10003).
         $this->datacenter->currentDatacenter = $mainDcID;
         $auth_key = $authorization[$mainDcID];

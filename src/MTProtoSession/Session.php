@@ -165,7 +165,8 @@ trait Session
      */
     public function createSession(): void
     {
-        $labels = ['datacenter' => (string) $this->datacenter, 'connection' => (string) $this->id];
+        $session = $this->shared->getSessionIndex();
+        $labels = ['datacenter' => (string) $this->datacenter, 'connection' => $session === 0 ? (string) $this->id : "$session.{$this->id}"];
         $this->pendingOutgoingGauge = $this->API->getPromGauge("MadelineProto", "pending_outgoing_mtproto_messages_count", "Number of not-yet sent outgoing MTProto messages", $labels);
         $this->inFlightGauge = $this->API->getPromGauge("MadelineProto", "inflight_requests_count", "Number of in-flight requests", $labels);
         $this->incomingCtr = $this->API->getPromCounter("MadelineProto", "incoming_mtproto_messages_count", "Number of received MTProto messages", $labels);

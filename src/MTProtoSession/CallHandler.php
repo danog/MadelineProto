@@ -240,8 +240,14 @@ trait CallHandler
             $message->setMsgId($args['madelineMsgId']);
         }
         $this->sendMessage($message);
+        // Counted once queued: if sendMessage() throws, the result is never completed.
+        $this->pendingCalls++;
+        $result = $response->getFuture();
+        $result->finally(function (): void {
+            $this->pendingCalls--;
+        })->ignore();
         $message->getSendPromise()->await($cancellation);
-        return $response->getFuture();
+        return $result;
     }
     /**
      * Send object.
