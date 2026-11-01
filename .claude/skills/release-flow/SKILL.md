@@ -44,5 +44,8 @@ description: How MadelineProto releases work on GitHub Actions — PR release la
 Release markdown is converted with danog/telegram-entities: drop GitHub's backslash escapes before
 re-escaping, keep only links (bare URLs too), bold and code, headings → bold, bullets → "•"; split under
 4096 characters as Telegram counts them. If sending through MadelineProto's markdown parse mode instead:
-bold is a single `*` (GitHub's `**` silently produces no entity), a link overlapping code loses the link,
-and editing with unchanged content throws MESSAGE_NOT_MODIFIED.
+bold is a single `*` (GitHub's `**` silently produces no entity), a link overlapping code loses the link
+(drop the backticks inside link text), the 4096 limit applies to the parsed text
+(`mb_strlen(Entities::fromMarkdown($p)->message)`; split at section boundaries), and editing with unchanged
+content throws MESSAGE_NOT_MODIFIED. Verify after sending by reading the entities back with
+`messages->getMessages`.

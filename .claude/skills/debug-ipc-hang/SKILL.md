@@ -25,9 +25,12 @@ only ever shows `ClientAbstract->__call` awaiting).
 3. Grep the log for `Error during deserializing message`, `Invalid constructor given`, "Reporting:
    Surfaced", "Unhandled future".
 
-Known mechanism: a throw inside a TL after-deserialization callback (e.g. PeerDatabase addChat ->
-getIdInternal) kills the DC read loop; the request is backed up and resent after reconnecting, the same
-response fails again forever, and the caller never returns.
+Past mechanism: a throw while deserializing a response (an unknown constructor, e.g. tdesktop's abandoned
+layer 231 `userFull#7fe738c4`, or a TL after-deserialization callback like PeerDatabase addChat ->
+getIdInternal) killed the DC read loop; the request was resent after reconnecting, failed again forever,
+and the caller never returned. Since 201ebf9ac `ReadLoop::deserialize` fails the request with the TL
+exception instead (`UndeserializableResultTest`), so such bugs surface as exceptions: a new hang of this
+shape means that path regressed.
 
 A script that seems to hang at `start()` may simply be at an interactive prompt (app credentials, login):
 with stdin closed it fails within a second instead.
@@ -35,8 +38,9 @@ with stdin closed it fails within a second instead.
 ## A loop ignores SIGTERM (tight loop)
 
 A fiber that never suspends keeps MadelineProto's signal handlers (`EventLoop::onSignal`) from running:
-`timeout`/`pkill` do nothing, only SIGKILL works, and `sample <pid>` on macOS only shows native frames. Get
-the PHP stack with async signals in the reproduction, run under `timeout -s KILL`:
+`timeout`/`pkill` do nothing, and `sample <pid>` on macOS only shows native frames. Don't SIGKILL the
+session's worker (it saves the session on SIGTERM); reproduce in a throwaway script on a session *copy*
+instead, and get the PHP stack with async signals there, run under `timeout -s KILL`:
 
 ```php
 pcntl_async_signals(true);

@@ -32,10 +32,10 @@ Locally only DEST is exported. Use *copies* of the sessions, never the originals
 ## Rules
 
 - Never run two copies of the same session at once (testing/cycle/requester copies of fuzz_user share one
-  auth key): responses go to the wrong process, which looks like flakiness. Kill every test worker between
-  suites and check for strays.
+  auth key): responses go to the wrong process, which looks like flakiness. Stop every test worker between
+  suites (SIGTERM scoped to the session path, then wait for the exit; never SIGKILL) and check for strays.
 - `pkill` with `/tmp/...` misses workers on macOS (their command line says `/private/tmp/...`) and the old
-  worker keeps serving old code; wait ~5 s after killing before the next run.
+  worker keeps serving old code; wait ~5 s after stopping before the next run.
 - The file logger truncates at `maxSize` (1 MB by default; MadelineTestCase sets 100 MB): log-based
   assertions are meaningless below that.
 - IPC bugs are timing-dependent: run 3+ times and check `tests/MadelineProto.log` for "Reporting: Surfaced"

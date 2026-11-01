@@ -13,7 +13,8 @@ tgcalls protocol 8.0.0, H.264 High profile first in its offers), or tdesktop.
 - 1:1: `php tests/manual_call_features.php 1to1 @danogentili <audio|video|screencast> a.webm fuzz_user.madeline`
   — the user answers on the phone and hangs up to end the call.
 - Group: `php tests/manual_call_features.php group <chat id> video a.webm fuzz_user.madeline` — the user
-  joins the video chat and judges what MadelineProto plays.
+  joins the video chat and judges what MadelineProto plays. The user's test group was -5244696618 (Sept
+  2026), a private basic group: it has no invite link, so a notice is sent instead.
 - Conference: `php tests/manual_call_features.php conference video a.webm fuzz_user.madeline` prints a
   t.me/call link; `conference-join <link> video a.webm <session>` joins by link (or re-attaches, restarting
   the transmission if idle, when the session is already in it).
@@ -33,7 +34,7 @@ DTLS handshake mean swapped SRTP keys (they follow the DTLS role).
 ## Gotchas
 
 - The script runs the call inside the session's IPC worker ("MadelineProto worker <session>"), which
-  outlives the script: kill it to load new code (the call resumes). A call persisted by a killed process is
+  outlives the script: stop it (SIGTERM, never SIGKILL) to load new code (the call resumes). A call persisted by a killed process is
   re-attached on the next run ("Already joined — attaching") and only re-transmits if nothing is playing; a
   revived group call connection only fails after ~30 s of consent checks before the controller re-joins.
 - While the script holds the session, no other process can use it over IPC. Any extra IPC client persists
