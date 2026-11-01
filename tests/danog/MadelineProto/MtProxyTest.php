@@ -107,7 +107,7 @@ final class MtProxyTest extends TestCase
     }
 
     /**
-     * mtg: the one of the docker image of the CI (tests/dockerfiles/Dockerfile), of the same version, or else
+     * mtg: the one of the test image of the CI (tests/dockerfiles/Dockerfile.test), of the same version, or else
      * downloaded once, to the temporary directory.
      */
     private static function getMtg(): string

@@ -118,7 +118,7 @@ jobs:
     if: github.ref_type != 'tag'
     runs-on: ubuntu-latest
     container:
-      # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use, e.g. mtg).
+      # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use).
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}-test
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
       # caches are written to directories of the runner, mounted in the container.
@@ -159,15 +159,21 @@ jobs:
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
-  # The tests that need no account, with PHP's own event loop driver of Revolt (stream_select, without any extension,
-  # as on most installations), rather than ext-uv's (the image's default, tested above).
+  # The tests that need no account, with the other event loop drivers of Revolt than ext-uv's (the default, tested
+  # above): PHP's own (stream_select, without any extension, as on most installations), ext-ev's and ext-event's, whose
+  # extensions are only in the test image.
   test_light:
-    name: test_light (select)
+    name: test_light (${{ matrix.event-loop }})
     needs: docker-merge
     if: github.ref_type != 'tag'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        event-loop: [select, ev, event]
     container:
-      image: danog/madelineproto:next
+      # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use).
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}-test
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
       # caches are written to directories of the runner, mounted in the container.
       options: --user root
@@ -192,40 +198,8 @@ jobs:
           restore-keys: composer-
       - name: Run the light tests
         env:
-          MADELINE_EVENT_LOOP: select
+          MADELINE_EVENT_LOOP: ${{ matrix.event-loop }}
         run: tests/test.sh phpunit-light
-
-  # The same, with the drivers whose extensions the image doesn't have: ext-ev's and ext-event's. Not in a container:
-  # tests/test_drivers.sh builds the test image with them (tests/drivers.Dockerfile) from the image built above, and
-  # runs the tests in it.
-  test_light_drivers:
-    name: test_light (${{ matrix.event-loop }})
-    needs: docker-merge
-    if: github.ref_type != 'tag'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        event-loop: [ev, event]
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
-        with:
-          path: ${{ runner.temp }}/composer-cache
-          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
-          restore-keys: composer-
-      - name: Run the light tests
-        env:
-          COMPOSER_CACHE_DIR: ${{ runner.temp }}/composer-cache
-          # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
-          # other user of the IP of the runner.
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          # For the GitHub API, from which PIE downloads the extensions: 60 unauthenticated requests per hour per IP.
-          GITHUB_TOKEN: ${{ github.token }}
-        run: tests/test_drivers.sh "${{ matrix.event-loop }}"
 
   handshake:
     needs: docker-merge
@@ -338,7 +312,7 @@ jobs:
   release:
     # Once every test passed (the test job is skipped for tags). Skipped for the main branch: it needs the results of
     # this run, so it can't be in a workflow of its own.
-    needs: [cs, webui, test, test_light, test_light_drivers, handshake, build]
+    needs: [cs, webui, test, test_light, handshake, build]
     if: ${{ !cancelled() && !failure() && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:
