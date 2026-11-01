@@ -1668,6 +1668,13 @@ trait Files
                 $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $iv);
                 $this->checkCdnHash($messageMedia['file_token'], $requestOffset, $res['bytes'], $eof, $cancellation);
                 $res['bytes'] = substr($res['bytes'], $offset['offset'] - $requestOffset, $offset['limit']);
+                // A CDN answer that stops at the end of a hash block passes every hash: only the size of the file
+                // (from the main DC) shows that the file doesn't end there.
+                if (!empty($messageMedia['size'])
+                    && \strlen($res['bytes']) < min($offset['limit'], $messageMedia['size'] - $offset['offset'])
+                ) {
+                    throw new SecurityException('The CDN ended the file early, at offset '.($offset['offset'] + \strlen($res['bytes'])).' of '.$messageMedia['size']);
+                }
             }
             if ($res['bytes'] === '') {
                 return 0;

@@ -179,6 +179,9 @@ final class DownloadRangeTest extends TestCase
         yield 'empty short range' => [0, 2];
         yield 'corrupt large range' => [null, 1048576];
         yield 'incomplete large range' => [4096, 1048576];
+        // Whole hash blocks pass their hashes: only the file size shows that the file goes on.
+        yield 'empty large range' => [0, 1048576];
+        yield 'large range cut at a hash block' => [131072, 1048576];
     }
 
     /** @dataProvider invalidBlocks */
