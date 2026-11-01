@@ -31,7 +31,6 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\NothingInTheSocketException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
-use danog\MadelineProto\TransportError;
 use Error;
 use Revolt\EventLoop;
 
@@ -128,8 +127,9 @@ final class ReadLoop extends Loop
                     delay(3);
                     $this->connection->reconnect();
                 } else {
+                    // Not thrown: from the event loop, it killed the event loop of the script.
+                    $this->API->logger("Got transport error $error from DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
-                    throw new TransportError($error);
                 }
             });
             $this->API->logger("Stopping $this due to $error...", Logger::ERROR);

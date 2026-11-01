@@ -23,8 +23,10 @@ namespace danog\MadelineProto;
 use Amp\ByteStream\ClosedException;
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
+use Amp\CancelledException;
+use Amp\DeferredCancellation;
+use Amp\Future;
 use Amp\Sync\LocalMutex;
-use AssertionError;
 use danog\DialogId\DialogId;
 use danog\Loop\GenericLoop;
 use danog\MadelineProto\Loop\Connection\CleanupLoop;
@@ -44,6 +46,7 @@ use danog\MadelineProto\TL\Exception as TLException;
 use Revolt\EventLoop;
 use Webmozart\Assert\Assert;
 
+use function Amp\async;
 use function Amp\ByteStream\buffer;
 use function Amp\delay;
 
@@ -258,34 +261,67 @@ final class Connection
     }
 
     private ?LocalMutex $connectMutex = null;
-    /** Whether the connection was closed for good (not to reconnect it), see {@see self::reconnect()}. */
+    /**
+     * Whether the connection was closed for good ({@see self::disconnect()}, not temporary): it's never connected
+     * again, its pending messages were backed up by the DC, which sends the next ones on another connection.
+     */
     private bool $closed = false;
-    /** How many {@see self::reconnect()} are running: a message that can't be sent starts one if none is. */
-    private int $reconnecting = 0;
+    /** Cancelled once the connection is closed for good, stopping the wait before the next connection attempt. */
+    private ?DeferredCancellation $closing = null;
+    /** The connection attempts that run until connected, see {@see self::retryConnect()}. */
+    private ?Future $connecting = null;
+    /** Why the last connection attempt failed, until connected. */
+    private ?CouldNotConnectException $connectError = null;
+    /** How many connection attempts failed, see {@see self::connect()}. */
+    private int $failedConnects = 0;
     /**
      * Connects to a telegram DC using the specified protocol, proxy and connection parameters.
+     *
+     * @throws CouldNotConnectException If every way to connect failed, or the connection was closed for good.
      */
     private function connect(): self
     {
         if ($this->stream) {
             return $this;
         }
+        $failedConnects = $this->failedConnects;
         $this->connectMutex ??= new LocalMutex;
         $lock = $this->connectMutex->acquire();
         try {
             if ($this->stream) {
                 return $this;
             }
+            if ($this->failedConnects !== $failedConnects && $this->connectError !== null) {
+                // The attempt this one waited for failed: each waiting sender trying again in turn makes attempts back
+                // to back during an outage (each up to the connect timeout for every way to connect), bypassing the
+                // backoff of the retries and blocking the senders for one attempt each.
+                throw $this->connectError;
+            }
             $this->createSession();
             while (true) {
+                $error = null;
                 foreach ($this->shared->getCtxs() as $ctx) {
+                    if ($this->closed) {
+                        throw new CouldNotConnectException("The connection to DC {$this->datacenterId} was closed");
+                    }
                     $this->API->logger("Connecting to DC {$this->datacenterId} via $ctx ", Logger::WARNING);
                     try {
-                        $stream = $this->stream = $ctx->getStream();
+                        $stream = $ctx->getStream();
                     } catch (\Throwable $e) {
+                        $error = $e;
                         $this->API->logger("$e while connecting to DC {$this->datacenterId} via $ctx, trying next...", Logger::ERROR);
                         continue;
                     }
+                    if ($this->closed) {
+                        // Closed for good while connecting: nothing would ever stop the loops of this connection.
+                        try {
+                            $stream->disconnect();
+                        } catch (ClosedException) {
+                        }
+                        throw new CouldNotConnectException("The connection to DC {$this->datacenterId} was closed while connecting");
+                    }
+                    $this->stream = $stream;
+                    $this->connectError = null;
                     $this->API->logger("Connected to DC {$this->datacenterId} via $ctx!", Logger::WARNING);
                     $this->chosenCtx = $ctx;
 
@@ -328,17 +364,86 @@ final class Connection
                     if ($this->stream !== $stream) {
                         // Disconnected meanwhile (this fiber can suspend after publishing the stream: logging, a loop
                         // waiting for its previous run to exit): disconnect() couldn't stop the loops started after it.
+                        // Connecting again, unless it was closed for good (checked by the next iteration).
                         $this->API->logger("Disconnected from DC {$this->datacenterId} while connecting, connecting again", Logger::WARNING);
                         $this->stopLoops();
                         continue 2;
                     }
                     return $this;
                 }
-                throw new AssertionError("Could not connect to DC {$this->datacenterId}!");
+                $this->failedConnects++;
+                $message = "Could not connect to DC {$this->datacenterId}";
+                if ($error !== null) {
+                    $message .= ": {$error->getMessage()}";
+                }
+                throw $this->connectError = new CouldNotConnectException($message, 0, $error);
             }
         } finally {
             EventLoop::queue($lock->release(...));
         }
+    }
+    /**
+     * Connects, trying again until connected (waiting 1 second, doubling up to 30), or closed for good.
+     *
+     * Runs once at a time per connection ({@see self::$connecting}), started by a reconnection, or by a message
+     * sent while it can't connect.
+     *
+     * @param bool $wait Whether to wait before the first attempt (one just failed).
+     */
+    private function retryConnect(bool $wait): void
+    {
+        $this->closing ??= new DeferredCancellation;
+        $closing = $this->closing->getCancellation();
+        $delay = 1.0;
+        try {
+            while (true) {
+                if ($this->closed) {
+                    // Closed before this started, or while connecting.
+                    return;
+                }
+                if ($wait) {
+                    try {
+                        delay($delay, cancellation: $closing);
+                    } catch (CancelledException) {
+                        return;
+                    }
+                    $delay = min($delay * 2, 30.0);
+                }
+                $wait = true;
+                if ($this->closed) {
+                    return;
+                }
+                try {
+                    $this->connect();
+                    return;
+                } catch (CouldNotConnectException $e) {
+                    if ($this->closed) {
+                        return;
+                    }
+                    $this->API->logger("{$e->getMessage()}, trying again in $delay seconds", Logger::WARNING);
+                }
+            }
+        } finally {
+            $this->connecting = null;
+        }
+    }
+    /**
+     * Why the last connection attempt failed, while not connected.
+     *
+     * @internal
+     */
+    public function getConnectError(): ?CouldNotConnectException
+    {
+        return $this->stream === null ? $this->connectError : null;
+    }
+    /**
+     * Whether the connection was closed for good.
+     *
+     * @internal
+     */
+    public function isClosed(): bool
+    {
+        return $this->closed;
     }
     public function wakeupHandler(MTProtoIncomingMessage $message): void
     {
@@ -559,6 +664,10 @@ final class Connection
      */
     public function sendMessage(MTProtoOutgoingMessage $message): void
     {
+        if ($this->closed) {
+            $this->handOver($message);
+            return;
+        }
         $message->connection = $this;
         $message->trySend();
         if (!$message->hasSerializedBody()) {
@@ -595,15 +704,25 @@ final class Connection
             $message->setSerializedBody($body);
             unset($body);
         }
-        try {
-            $this->connect();
-        } catch (\Throwable $e) {
-            // No way to connect (the network is down): queued, it's sent once reconnected, or times out as usual.
-            // Thrown, it failed every request at once, and killed the event loop of a script when a background
-            // request failed (polls, cancellations).
-            $this->API->logger("Could not connect to DC {$this->datacenterId}, sending $message once reconnected: {$e->getMessage()}", Logger::WARNING);
-            if ($this->reconnecting === 0) {
-                EventLoop::queue($this->reconnect(...));
+        if ($this->stream === null) {
+            if ($this->connecting === null) {
+                try {
+                    $this->connect();
+                } catch (CouldNotConnectException $e) {
+                    if ($this->closed) {
+                        $this->handOver($message);
+                        return;
+                    }
+                    // No way to connect (the network is down): queued, it's sent once connected, or times out as any
+                    // request. Thrown, it failed every request at once, and killed the event loop of a script when a
+                    // request made in the background failed (polls, cancellations).
+                    $this->API->logger("{$e->getMessage()}, sending $message once connected", Logger::WARNING);
+                    $this->connecting ??= async($this->retryConnect(...), true);
+                }
+            } else {
+                // Queued without trying to connect while the connection attempts run, so that they back off. In the
+                // queues of the session, created by the first attempt, which may not have run yet.
+                $this->createSession();
             }
         }
         if ($message->hasReply()) {
@@ -670,6 +789,7 @@ final class Connection
         $this->needsReconnect = true;
         if (!$temporary) {
             $this->closed = true;
+            $this->closing?->cancel();
         }
         if ($this->stream) {
             try {
@@ -696,43 +816,42 @@ final class Connection
         $this->cleanup?->stop();
     }
     /**
-     * Reconnect to DC.
+     * Sends a message of this connection, closed for good, on a connection of the DC (as its pending messages were
+     * when it was closed): connecting it again would run loops nobody stops, on a session nobody uses.
+     */
+    private function handOver(MTProtoOutgoingMessage $message): void
+    {
+        if ($message->hasReply() || !$message->resetForResend()) {
+            return;
+        }
+        $this->API->logger("The connection to DC {$this->datacenterId} is closed, sending $message on another one", Logger::NOTICE);
+        // In the background: the DC may have no connection until it's connected again (or never, if it was closed
+        // for good too), while the sender waits for the message to be sent within its timeout.
+        EventLoop::queue(function () use ($message): void {
+            $this->shared->waitGetConnection()->sendMessage($message);
+        });
+    }
+    /**
+     * Reconnect to DC, trying again until connected or closed for good.
      */
     public function reconnect(): void
     {
-        $this->reconnecting++;
-        try {
-            $this->reconnectLoop();
-        } finally {
-            $this->reconnecting--;
+        if ($this->closed) {
+            $this->API->logger("Not reconnecting DC {$this->datacenterId}, closed");
+            return;
         }
-    }
-    private function reconnectLoop(): void
-    {
         $this->API->logger("Reconnecting DC {$this->datacenterId}");
         $this->disconnect(true);
-        $this->shared->connect($this->id);
-        $this->closed = false;
-        // Reconnections run in the background (a dead connection, a server error): every way to connect failing
-        // (the network is down) threw out of them as an unhandled future, killing the event loop of a script after
-        // a minute of outage. Try again until it's back, unless the connection is closed meanwhile.
-        $delay = 1.0;
-        while (true) {
-            try {
-                $this->connect();
-                return;
-            } catch (\Throwable $e) {
-                if ($this->closed) {
-                    return;
-                }
-                $this->API->logger("Could not reconnect to DC {$this->datacenterId}, retrying in $delay seconds: {$e->getMessage()}", Logger::WARNING);
-                delay($delay);
-                $delay = min($delay * 2, 30.0);
-                if ($this->closed) {
-                    return;
-                }
-            }
+        if ($this->closed) {
+            // Closed for good while disconnecting (logging can suspend).
+            return;
         }
+        $this->shared->connect($this->id);
+        // Reconnections run in the background (a dead connection, a server error): every way to connect failing
+        // (the network is down) threw out of them as an unhandled exception, killing the event loop of a script after
+        // a minute of outage. The attempts already running (started by a message that couldn't be sent, or by a
+        // concurrent reconnection) connect this disconnected connection too.
+        ($this->connecting ??= async($this->retryConnect(...), false))->await();
     }
     /**
      * Get name.
