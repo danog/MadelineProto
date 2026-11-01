@@ -14,6 +14,8 @@ use danog\MadelineProto\RemoteUrl;
 
 /**
  * A photo. Received blocks have a MadelineProto Media object, blocks to send can also have a Message or a file to upload (LocalFile, RemoteUrl, BotApiFileId or ReadableStream).
+ *
+ * Like with sendPhoto, photos can't be uploaded from streams of unknown length (photos must be uploaded with their size): pass a ReadableBuffer instead.
  */
 final class Photo extends Block
 {
