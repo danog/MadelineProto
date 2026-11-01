@@ -105,6 +105,7 @@ use Prometheus\RenderTextFormat;
 use Prometheus\Summary;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
+use Revolt\EventLoop\UncaughtThrowable;
 use SplQueue;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -2068,6 +2069,13 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if ($e instanceof UnhandledFutureError) {
             $e = $e->getPrevious();
             \assert($e !== null);
+        }
+        // Thrown into a suspended fiber when no event loop error handler is set (e.g. a SIGTERM during an onStart
+        // still running while the session is loaded, before startAndLoop sets one).
+        if ($e instanceof UncaughtThrowable
+            && ($e->getPrevious() instanceof SecurityException || $e->getPrevious() instanceof SignalException)
+        ) {
+            $e = $e->getPrevious();
         }
         if ($e instanceof SecurityException || $e instanceof SignalException) {
             if ($now) {

@@ -43,16 +43,16 @@ final class PingLoop extends Loop implements SimpleSubscriber, EphemeralSubscrib
         __construct as constructCommon;
     }
     private int $timeoutDisconnect;
-    private bool $mustPause;
+    private bool $mustPause = true;
     /**
      * Constructor function.
      */
     public function __construct(Connection $connection)
     {
         $this->constructCommon($connection);
-        $this->timeout = $timeout = $this->shared->getSettings()->getPingInterval();
-        $this->timeoutDisconnect = $timeout + 15;
-        $this->timeoutSeconds = (float) $this->timeout;
+        $interval = $this->shared->getSettings()->getPingInterval();
+        $this->timeoutDisconnect = $interval + 15;
+        $this->timeoutSeconds = (float) $interval;
         $connection->getShared()->auth->connectionState->subscribe($this);
     }
     #[\Override]
@@ -67,6 +67,20 @@ final class PingLoop extends Loop implements SimpleSubscriber, EphemeralSubscrib
             }
         } else {
             $this->mustPause = true;
+        }
+    }
+
+    /**
+     * Signal that the socket (re)connected.
+     *
+     * ping_delay_disconnect only applies to the connection it is sent on, so a new connection must be pinged again.
+     * The loop is stopped on disconnection, and since 810712168 connect() didn't start it anymore (only the state
+     * changes of the auth key did), so reconnected sockets weren't pinged.
+     */
+    public function onConnect(): void
+    {
+        if (!$this->mustPause && !$this->start()) {
+            $this->resume();
         }
     }
 

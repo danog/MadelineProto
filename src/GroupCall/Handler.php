@@ -1057,7 +1057,7 @@ trait Handler
                 'offset' => \strlen($bytes),
                 'limit' => self::STREAM_CHUNK_PART,
                 'floodWaitLimit' => 0,
-                'specialMethodType' => SpecialMethodType::FILE_RELATED,
+                'specialMethodType' => SpecialMethodType::GROUP_CALL_FILE_RELATED,
             ], $dc);
             if ($result['_'] !== 'upload.file') {
                 return null;

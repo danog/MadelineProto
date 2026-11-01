@@ -23,6 +23,7 @@ namespace danog\MadelineProto;
 use Amp\Future\UnhandledFutureError;
 use Amp\SignalException;
 use Revolt\EventLoop;
+use Revolt\EventLoop\UncaughtThrowable;
 
 abstract class AbstractAPI extends InternalDoc
 {
@@ -41,6 +42,11 @@ abstract class AbstractAPI extends InternalDoc
         EventLoop::setErrorHandler(
             $cb = function (\Throwable $e) use (&$errors, &$started): void {
                 if ($e instanceof UnhandledFutureError) {
+                    $e = $e->getPrevious();
+                }
+                if ($e instanceof UncaughtThrowable
+                    && ($e->getPrevious() instanceof SecurityException || $e->getPrevious() instanceof SignalException)
+                ) {
                     $e = $e->getPrevious();
                 }
                 if ($e instanceof SecurityException || $e instanceof SignalException) {

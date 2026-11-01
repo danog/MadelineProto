@@ -104,10 +104,6 @@ final class Connection
      */
     private int $httpResCount = 0;
     /**
-     * Whether we're currently reading an MTProto packet.
-     */
-    private bool $reading = false;
-    /**
      * Whether we're currently writing an MTProto packet.
      */
     private bool $writing = false;
@@ -141,6 +137,12 @@ final class Connection
      */
     private bool $needsReconnect = false;
     /**
+     * Number of file requests sent on this socket that weren't answered yet (see DataCenterConnection::waitGetFileConnection).
+     *
+     * @internal
+     */
+    public int $fileRequests = 0;
+    /**
      * Indicate if this socket needs to be reconnected.
      *
      * @param boolean $needsReconnect Whether the socket has to be reconnected
@@ -166,24 +168,6 @@ final class Connection
     public function writing(bool $writing): void
     {
         $this->writing = $writing;
-        $this->shared->writing($writing, $this->id);
-    }
-    /**
-     * Set reading boolean.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function reading(bool $reading): void
-    {
-        $this->reading = $reading;
-        $this->shared->reading($reading, $this->id);
-    }
-    /**
-     * Whether we're currently reading an MTProto packet.
-     */
-    public function isReading(): bool
-    {
-        return $this->reading;
     }
     /**
      * Whether we're currently writing an MTProto packet.
@@ -327,6 +311,14 @@ final class Connection
                     Assert::true($this->reader->start(), "Could not start reader stream");
                     Assert::true($this->cleanup->start(), "Could not start cleanup stream");
                     $this->handler->start();
+                    $this->pinger?->onConnect();
+                    // The requests sent on the previous connection may have been lost with it: ask for their state now
+                    // (the server answers state requests right away), not when their check timer fires.
+                    foreach ($this->new_outgoing as $message) {
+                        if ($message->contentRelated) {
+                            $message->requestState();
+                        }
+                    }
 
                     if ($this->stream !== $stream) {
                         // Disconnected meanwhile (this fiber can suspend after publishing the stream: logging, a loop

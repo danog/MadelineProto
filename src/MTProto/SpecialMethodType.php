@@ -26,4 +26,9 @@ enum SpecialMethodType
     case USER_RELATED;
     case FILE_RELATED;
     case FILEREF_RELATED;
+    /**
+     * Downloads the chunks of a group call stream: like FILE_RELATED, but they don't wait for room in the file
+     * window (DataCenterConnection::waitGetFileConnection()), as each chunk is due now.
+     */
+    case GROUP_CALL_FILE_RELATED;
 }

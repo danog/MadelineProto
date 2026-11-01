@@ -342,7 +342,9 @@ trait ResponseHandler
                 if ($this->API->isTestMode()) {
                     $datacenter += 10_000;
                 }
-                if ($request->specialMethodType === SpecialMethodType::FILE_RELATED) {
+                if ($request->specialMethodType === SpecialMethodType::FILE_RELATED
+                    || $request->specialMethodType === SpecialMethodType::GROUP_CALL_FILE_RELATED
+                ) {
                     return fn () => new FileRedirect(
                         $this->API->datacenter->has(-$datacenter)
                             ? -$datacenter

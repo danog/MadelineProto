@@ -167,7 +167,61 @@ trait CallHandler
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
         }
-
+        if ($special === SpecialMethodType::FILE_RELATED) {
+            // Sent on the socket of the DC with the fewest file requests in flight, once one has room for it.
+            $connection = $this->shared->waitGetFileConnection($cancellation);
+            return new WrappedFuture($connection->sendMethodCall($method, $args, true));
+        }
+        return new WrappedFuture($this->sendMethodCall($method, $args));
+    }
+    /**
+     * Send a method call on this socket, returning once it is sent.
+     *
+     * @param string $method   Method name
+     * @param array  $args     Arguments
+     * @param bool   $fileRoom Whether it is a file request that got room in the file window of the DC: the room is
+     *                         held until it is answered (MTProtoOutgoingMessage::reply()).
+     *
+     * @return Future The result, or a closure returning the error.
+     */
+    private function sendMethodCall(string $method, array $args, bool $fileRoom = false): Future
+    {
+        try {
+            [$message, $response] = $this->buildMethodCall($method, $args);
+        } catch (Throwable $e) {
+            if ($fileRoom) {
+                $this->shared->fileRequestSent();
+                $this->shared->fileRequestDone($this, false);
+            }
+            throw $e;
+        }
+        if ($fileRoom) {
+            $message->holdFileRoom($this);
+        }
+        try {
+            $this->sendMessage($message);
+            $message->getSendPromise()->await($message->cancellation);
+        } catch (Throwable $e) {
+            if ($fileRoom) {
+                // Frees its room, unless it was already replied to (cancelled).
+                $message->reply(static fn (): Throwable => $e);
+            }
+            throw $e;
+        }
+        return $response->getFuture();
+    }
+    /**
+     * Build a method call.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     *
+     * @return array{MTProtoOutgoingMessage, DeferredFuture}
+     */
+    private function buildMethodCall(string $method, array $args): array
+    {
+        $cancellation = $args['cancellation'] ?? null;
+        $special = $args['specialMethodType'] ?? null;
         $args = $this->API->botAPIToMTProto($args);
 
         $response = new DeferredFuture;
@@ -214,9 +268,7 @@ trait CallHandler
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);
         }
-        $this->sendMessage($message);
-        $message->getSendPromise()->await($cancellation);
-        return new WrappedFuture($response->getFuture());
+        return [$message, $response];
     }
     /**
      * Send object.
