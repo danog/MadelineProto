@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
-/** Stateless decoding of inbound encrypted MTProto v2 messages. @internal */
+/**
+ * Stateless decoding of inbound encrypted MTProto v2 messages.
+ *
+ * @internal
+ */
 interface MessageDecoder
 {
     /** @psalm-impure */

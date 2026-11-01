@@ -17,7 +17,11 @@ use Revolt\EventLoop;
 use RuntimeException;
 use Throwable;
 
-/** Lifecycle of the Rust/php-tokio bridge, initialized only by the MTProto owner. @internal */
+/**
+ * Lifecycle of the Rust/php-tokio bridge, initialized only by the MTProto owner.
+ *
+ * @internal
+ */
 final class NativeExecutor
 {
     use ForbidCloning;
