@@ -67,7 +67,8 @@ final class ReadLoop extends Loop
                 $this->API->logger("Stopping $this due to reconnect...", Logger::ERROR);
                 return self::STOP;
             }
-            EventLoop::queue(function () use ($e): void {
+            $stream = $this->connection->stream;
+            EventLoop::queue(function () use ($e, $stream): void {
                 if ($e instanceof NothingInTheSocketException
                     && !$this->connection->unencrypted_new_outgoing
                     && !$this->connection->new_outgoing
@@ -77,6 +78,9 @@ final class ReadLoop extends Loop
                     $this->API->logger("Got NothingInTheSocketException in DC {$this->datacenter}, disconnecting because we have nothing to do...", Logger::ERROR);
                     $this->connection->disconnect(true);
                 } else {
+                    if ($stream !== null && ($e instanceof NothingInTheSocketException || $e instanceof StreamException)) {
+                        $this->shared->fileConnectionDropped($this->connection, $stream);
+                    }
                     $this->API->logger($e, Logger::ERROR);
                     $this->API->logger("Got exception in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();
@@ -92,7 +96,8 @@ final class ReadLoop extends Loop
             return self::STOP;
         }
         if (\is_int($error)) {
-            EventLoop::queue(function () use ($error): void {
+            $stream = $this->connection->stream;
+            EventLoop::queue(function () use ($error, $stream): void {
                 if ($error === -404) {
                     if ($this->shared->auth->getTempAuthKey() !== null) {
                         $this->API->logger("WARNING: Resetting auth key in DC {$this->datacenter}...", Logger::WARNING);
@@ -116,6 +121,10 @@ final class ReadLoop extends Loop
                     $this->connection->reconnect();
                 } elseif ($error === -429) {
                     $this->API->logger("Got -429 from DC {$this->datacenter}", Logger::WARNING);
+                    // Transport flood: too many connections, or a container/service message limit reached.
+                    if ($stream !== null) {
+                        $this->shared->fileConnectionDropped($this->connection, $stream);
+                    }
                     delay(3);
                     $this->connection->reconnect();
                 } else {

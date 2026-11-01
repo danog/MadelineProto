@@ -32,9 +32,11 @@ use danog\MadelineProto\MTProto\SpecialMethodType;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Reactive\SimpleSubscriber;
 use danog\MadelineProto\RPCError\FloodWaitError;
+use danog\MadelineProto\RPCError\RateLimitError;
 use danog\MadelineProto\Settings\Connection as ConnectionSettings;
 use danog\MadelineProto\Stream\ContextIterator;
 use Revolt\EventLoop;
+use WeakMap;
 use Webmozart\Assert\Assert;
 
 use function Amp\delay;
@@ -48,14 +50,14 @@ use function count;
 final class DataCenterConnection implements SimpleSubscriber
 {
     /**
-     * Maximum number of file requests (parts of up to 1 MB) waiting for an answer on a socket of a media or CDN DC.
-     *
-     * The server answers them one after the other: more of them only queue up on the socket, delaying the last ones
-     * past their timeout, while the server drops connections with too much pending (tdesktop keeps at most 2 MB of
-     * parts in flight per session too, opening up to 8 sessions instead).
+     * Minimum number of answers in a round of the slow start of the file window, before comparing its latency (RFC 9406).
      */
-    public const MAX_FILE_REQUESTS_PER_SOCKET = 2;
-
+    private const SLOW_START_MIN_SAMPLES = 8;
+    /**
+     * Bounds of the latency increase that ends the slow start of the file window, in nanoseconds (RFC 9406).
+     */
+    private const SLOW_START_MIN_LATENCY_INCREASE = 4_000_000;
+    private const SLOW_START_MAX_LATENCY_INCREASE = 16_000_000;
     /** @deprecated */
     private ?PermAuthKey $permAuthKey;
 
@@ -86,6 +88,55 @@ final class DataCenterConnection implements SimpleSubscriber
      * @var array<int, DeferredFuture<null>>
      */
     private array $fileRequestWaiters = [];
+    /**
+     * File requests waiting for another one of this DC to be answered, after a FLOOD_WAIT.
+     *
+     * @var array<int, DeferredFuture<null>>
+     */
+    private array $fileFloodWaiters = [];
+    /**
+     * Number of file requests (parts to download or upload) a media or CDN DC may have in flight, spread over its sockets.
+     *
+     * The server takes a number of them at once that varies over time, rejecting the others with FLOOD_WAITs, and drops
+     * sockets with too many of them (or answers -429), so it is learned like a TCP congestion window: it grows while
+     * file requests wait for room and get answered (by one per answer at first, then by one per window of answers),
+     * and it is halved on a FLOOD_WAIT, a dropped socket or a -429 (at most once per window of answers, for the
+     * requests of a same burst).
+     * It only grows while all the requests in flight were written to the sockets: when they queue up to be written
+     * (parts to upload, limited by the bandwidth), more of them would only queue up, and reach the server in a burst.
+     * And its slow start ends as soon as the answers get slower (HyStart++, RFC 9406): requests queue up somewhere
+     * (in the buffers of the sockets, or on the server) before the server rejects them.
+     */
+    private float $fileWindow = 1.0;
+    /**
+     * Whether the file window still grows by one per answer (no FLOOD_WAIT or dropped socket yet).
+     */
+    private bool $fileSlowStart = true;
+    /**
+     * File requests answered since the file window was last halved.
+     */
+    private float $fileAnswersSinceDecrease = INF;
+    /**
+     * File requests that got room in the window but weren't written to their socket yet.
+     */
+    private int $fileRequestsUnsent = 0;
+    /**
+     * Current round of the slow start of the file window (it ends with the first answer to a request that got room
+     * after it started): when it started (hrtime), the smallest latency of its answers, and their number.
+     */
+    private int $fileRoundStart = 0;
+    private float $fileRoundMinLatency = INF;
+    private int $fileRoundAnswers = 0;
+    /**
+     * Smallest latency of the answers of the previous round of the slow start of the file window.
+     */
+    private float $fileLastRoundMinLatency = INF;
+    /**
+     * Streams whose drop by the server was already counted (both the read and the write loop see it).
+     *
+     * @var ?WeakMap<object, true>
+     */
+    private ?WeakMap $droppedStreams = null;
     /**
      * Backed up messages.
      *
@@ -350,7 +401,7 @@ final class DataCenterConnection implements SimpleSubscriber
             }
             $this->restoreBackup();
             // Requests waiting for room on the sockets that were closed can use the new ones.
-            $this->wakeFileRequestWaiters(true);
+            $this->wakeFileRequestWaiters();
         } else {
             $this->connections[$id]->setExtra($this, $this->datacenter, $id);
         }
@@ -408,7 +459,7 @@ final class DataCenterConnection implements SimpleSubscriber
         $this->API->logger("Backed up {$count}, added to {$before} existing messages) from DC {$this->datacenter}");
         $this->connections = [];
         // Requests waiting for room on the closed sockets wait for the new ones.
-        $this->wakeFileRequestWaiters(true);
+        $this->wakeFileRequestWaiters();
     }
     /**
      * Reconnect to DC.
@@ -474,17 +525,19 @@ final class DataCenterConnection implements SimpleSubscriber
     /**
      * Get a socket for a file request (a part to download or upload), waiting for one with room for it.
      *
-     * On media and CDN DCs, each socket carries at most MAX_FILE_REQUESTS_PER_SOCKET of them: the least loaded
-     * one is used, and more sockets are opened (up to the configured maximum) when all are full. Other DCs only
-     * have one socket, used as before.
+     * On media and CDN DCs, each socket carries at most the learned file window of them: the least loaded one is
+     * used, and more sockets are opened (up to the configured maximum) when all are full. Other DCs only have one
+     * socket, used as before.
      *
-     * fileRequestDone() must be called with the returned socket once the request is answered (or failed).
+     * fileRequestSent() must be called once the request is written to the returned socket (or failed to be), and
+     * fileRequestDone() with the socket once it is answered (or failed).
      */
     public function waitGetFileConnection(?Cancellation $cancellation = null): Connection
     {
         if (!$this->auth->isMedia && !$this->auth->isCdn) {
             $connection = $this->waitGetConnection();
             $connection->fileRequests++;
+            $this->fileRequestsUnsent++;
             return $connection;
         }
         $max = $this->API->getSettings()->getConnection()->getMaxMediaSocketCount();
@@ -493,14 +546,16 @@ final class DataCenterConnection implements SimpleSubscriber
                 $this->connectionsPromise->await($cancellation);
                 continue;
             }
-            $best = $this->getLeastLoadedConnection();
-            if ($best->fileRequests < self::MAX_FILE_REQUESTS_PER_SOCKET) {
+            if ($this->getFileRequestsInFlight() < (int) $this->fileWindow) {
+                $best = $this->getLeastLoadedConnection();
+                // One socket per file request in the window, up to the maximum.
+                if ($best->fileRequests > 0 && \count($this->connections) < min($max, (int) ceil($this->fileWindow))) {
+                    $this->connectMore(1);
+                    continue;
+                }
                 $best->fileRequests++;
+                $this->fileRequestsUnsent++;
                 return $best;
-            }
-            if (\count($this->connections) < $max) {
-                $this->connectMore(1);
-                continue;
             }
             $deferred = new DeferredFuture;
             $id = spl_object_id($deferred);
@@ -513,24 +568,141 @@ final class DataCenterConnection implements SimpleSubscriber
         }
     }
     /**
-     * Signal that a file request sent with waitGetFileConnection() was answered (or failed).
+     * Signal that a file request that got room with waitGetFileConnection() was written to its socket (or failed to be).
      */
-    public function fileRequestDone(Connection $connection): void
+    public function fileRequestSent(): void
     {
-        $connection->fileRequests--;
-        $this->wakeFileRequestWaiters(false);
+        $this->fileRequestsUnsent--;
     }
     /**
-     * Wake up the requests waiting for a socket for a file request (one, or all of them when the sockets changed).
+     * Signal that a file request sent with waitGetFileConnection() is over.
+     *
+     * @param bool $answered Whether the server answered it (with a result, not an error).
+     * @param int  $start    When it got room in the window (hrtime).
      */
-    private function wakeFileRequestWaiters(bool $all): void
+    public function fileRequestDone(Connection $connection, bool $answered, int $start): void
+    {
+        $connection->fileRequests--;
+        if ($answered) {
+            $this->fileAnswersSinceDecrease++;
+            if ($this->fileSlowStart) {
+                $this->trackFileSlowStart($start);
+            }
+            if ($this->fileRequestWaiters && $this->fileRequestsUnsent === 0) {
+                // More file requests than room for them, and the server and the sockets keep up: try with one more.
+                $this->fileWindow += $this->fileSlowStart ? 1.0 : 1.0 / $this->fileWindow;
+            }
+        }
+        $this->wakeFileRequestWaiters();
+        $inFlight = $this->getFileRequestsInFlight() > 0;
+        // One request rejected with FLOOD_WAIT is sent again per answer; all of them once nothing else is in flight,
+        // as no other answer will wake them up.
+        foreach ($this->fileFloodWaiters as $id => $deferred) {
+            unset($this->fileFloodWaiters[$id]);
+            $deferred->complete();
+            if ($inFlight) {
+                break;
+            }
+        }
+    }
+    /**
+     * End the slow start of the file window once the answers of a round get slower than those of the previous one.
+     *
+     * @param int $start When the answered request got room in the window (hrtime).
+     */
+    private function trackFileSlowStart(int $start): void
+    {
+        $now = hrtime(true);
+        if ($start >= $this->fileRoundStart) {
+            // The first answer to a request of this round: the previous one is over.
+            $this->fileLastRoundMinLatency = $this->fileRoundMinLatency;
+            $this->fileRoundMinLatency = INF;
+            $this->fileRoundAnswers = 0;
+            $this->fileRoundStart = $now;
+        }
+        $this->fileRoundMinLatency = min($this->fileRoundMinLatency, (float) ($now - $start));
+        $this->fileRoundAnswers++;
+        if ($this->fileRoundAnswers >= self::SLOW_START_MIN_SAMPLES && $this->fileLastRoundMinLatency < INF) {
+            $increase = min(max($this->fileLastRoundMinLatency / 8, self::SLOW_START_MIN_LATENCY_INCREASE), self::SLOW_START_MAX_LATENCY_INCREASE);
+            if ($this->fileRoundMinLatency >= $this->fileLastRoundMinLatency + $increase) {
+                $this->fileSlowStart = false;
+                $this->API->logger(\sprintf("File requests in flight in DC %d: %.2f, their answers got slower (%.0f ms => %.0f ms), growing slower", $this->datacenter, $this->fileWindow, $this->fileLastRoundMinLatency / 1e6, $this->fileRoundMinLatency / 1e6), Logger::NOTICE);
+            }
+        }
+    }
+    /**
+     * Signal that the server closed a socket: halve the file window if it carried file requests.
+     *
+     * @param object $stream The stream that was closed.
+     */
+    public function fileConnectionDropped(Connection $connection, object $stream): void
+    {
+        $this->droppedStreams ??= new WeakMap;
+        if (isset($this->droppedStreams[$stream])) {
+            return;
+        }
+        $this->droppedStreams[$stream] = true;
+        if ($connection->fileRequests <= 0) {
+            return;
+        }
+        $this->decreaseFileWindow("the server dropped a socket with {$connection->fileRequests} file requests in flight");
+    }
+    /**
+     * Halve the file window, at most once per window of answers.
+     */
+    private function decreaseFileWindow(string $why): void
+    {
+        if ($this->fileAnswersSinceDecrease < $this->fileWindow) {
+            return;
+        }
+        $previous = $this->fileWindow;
+        $this->fileWindow = max(1.0, min($this->fileWindow, (float) $this->getFileRequestsInFlight()) / 2);
+        $this->fileSlowStart = false;
+        $this->fileAnswersSinceDecrease = 0;
+        $this->API->logger("File requests in flight in DC {$this->datacenter}: {$previous} => {$this->fileWindow}, as $why", Logger::NOTICE);
+    }
+    /**
+     * Number of file requests in flight on the sockets of this DC.
+     */
+    private function getFileRequestsInFlight(): int
+    {
+        $inFlight = 0;
+        foreach ($this->connections as $socket) {
+            $inFlight += $socket->fileRequests;
+        }
+        return $inFlight;
+    }
+    /**
+     * Wait before sending again a file request rejected with a FLOOD_WAIT.
+     *
+     * A FLOOD_WAIT on a file request doesn't block anything: it rejects the requests beyond those the server takes at
+     * once (a request sent right after it goes through, whatever its wait time). Send it again once another file
+     * request of this DC is answered, or after the wait time if none is in flight.
+     */
+    public function waitAfterFileFlood(RateLimitError $e, ?Cancellation $cancellation = null): void
+    {
+        $this->decreaseFileWindow("the server rejected a file request with {$e->rpc}");
+        if ($this->getFileRequestsInFlight() === 0) {
+            $e->wait($cancellation);
+            return;
+        }
+        $deferred = new DeferredFuture;
+        $id = spl_object_id($deferred);
+        $this->fileFloodWaiters[$id] = $deferred;
+        try {
+            $deferred->getFuture()->await($cancellation);
+        } finally {
+            unset($this->fileFloodWaiters[$id]);
+        }
+    }
+    /**
+     * Wake up the requests waiting for a socket for a file request, to look for room again.
+     */
+    private function wakeFileRequestWaiters(): void
     {
         foreach ($this->fileRequestWaiters as $id => $deferred) {
             unset($this->fileRequestWaiters[$id]);
             $deferred->complete();
-            if (!$all) {
-                return;
-            }
         }
     }
     /**

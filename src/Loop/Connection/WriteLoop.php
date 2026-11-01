@@ -131,7 +131,11 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                     $this->API->logger("Stopping $this because we have to reconnect");
                     return self::STOP;
                 }
-                EventLoop::queue(function () use ($e): void {
+                $stream = $this->connection->stream;
+                EventLoop::queue(function () use ($e, $stream): void {
+                    if ($stream !== null) {
+                        $this->shared->fileConnectionDropped($this->connection, $stream);
+                    }
                     $this->API->logger($e);
                     $this->API->logger("Got nothing in the socket in DC {$this->datacenter}, reconnecting...", Logger::ERROR);
                     $this->connection->reconnect();

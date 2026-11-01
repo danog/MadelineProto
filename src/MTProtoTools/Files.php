@@ -408,7 +408,7 @@ trait Files
         };
         $resPromises = [];
         $start = hrtime(true);
-        /** @var FloodWaitError|FloodPremiumWaitError|null */
+        /** @var ?FloodPremiumWaitError */
         $floodWaitError = null;
         try {
             while ($part_num < $part_total_num || !$size) {
@@ -469,7 +469,10 @@ trait Files
                                 $progress?->partDone(min($part_size, $size - $part_num * $part_size));
                                 $d->complete();
                                 return;
-                            } catch (FloodWaitError|FloodPremiumWaitError $e) {
+                            } catch (FloodWaitError $e) {
+                                $this->datacenter->getDataCenterConnection($datacenter)->waitAfterFileFlood($e, $cancellation);
+                                $writePromise = async($writeCb);
+                            } catch (FloodPremiumWaitError $e) {
                                 $this->logger("Got {$e->rpc} while uploading part $part_num: {$datacenter}, waiting and retrying...");
                                 $floodWaitError = $e;
                                 $writePromise = async($writeCb);
@@ -1583,8 +1586,9 @@ trait Files
                     break;
                 } catch (FileRedirect $e) {
                     $datacenter = $e->dc;
-                } catch (FloodWaitError|FloodPremiumWaitError $e) {
-                    // Sent again before the wait expires, the part gets the error again.
+                } catch (FloodWaitError $e) {
+                    $this->datacenter->getDataCenterConnection($datacenter)->waitAfterFileFlood($e, $cancellation);
+                } catch (FloodPremiumWaitError $e) {
                     $e->wait($cancellation);
                 } catch (FileTokenInvalidError) {
                     $cdn = false;

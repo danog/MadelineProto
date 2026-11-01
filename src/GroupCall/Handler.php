@@ -1058,6 +1058,8 @@ trait Handler
                 'limit' => self::STREAM_CHUNK_PART,
                 'floodWaitLimit' => 0,
                 'specialMethodType' => SpecialMethodType::FILE_RELATED,
+                // A live stream chunk is due now: it doesn't wait for room among the parts of downloads and uploads.
+                'fileWindow' => false,
             ], $dc);
             if ($result['_'] !== 'upload.file') {
                 return null;

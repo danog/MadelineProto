@@ -167,16 +167,24 @@ trait CallHandler
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
         }
-        if ($special === SpecialMethodType::FILE_RELATED) {
+        if ($special === SpecialMethodType::FILE_RELATED && ($args['fileWindow'] ?? true)) {
             // Sent on the socket of the DC with the fewest file requests in flight, once one has room for it.
             $connection = $this->shared->waitGetFileConnection($cancellation);
+            $start = hrtime(true);
             try {
+                // Returns once the request is written to the socket.
                 $result = $connection->sendMethodCall($method, $args);
             } catch (Throwable $e) {
-                $this->shared->fileRequestDone($connection);
+                $this->shared->fileRequestSent();
+                $this->shared->fileRequestDone($connection, false, $start);
                 throw $e;
             }
-            $result->finally(fn () => $this->shared->fileRequestDone($connection))->ignore();
+            $this->shared->fileRequestSent();
+            // Errors are closures returning the exception.
+            $result->map(static fn ($r): bool => !$r instanceof Closure)
+                ->catch(static fn (): bool => false)
+                ->map(fn (bool $answered) => $this->shared->fileRequestDone($connection, $answered, $start))
+                ->ignore();
             return new WrappedFuture($result);
         }
         return new WrappedFuture($this->sendMethodCall($method, $args));
