@@ -218,6 +218,33 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         $this->fileRoom = $connection;
     }
     /**
+     * Move the room this file request holds to $connection, which it is sent on now (instead of the socket it got room
+     * on: a socket closed for good, or replaced by a reconnection of the whole DC).
+     *
+     * Left on the previous socket, it was counted on a socket no longer of the DC, letting more requests in than the
+     * file window of the DC while it is in flight.
+     */
+    public function moveFileRoom(Connection $connection): void
+    {
+        $room = $this->fileRoom;
+        if ($room === null || $room === $connection) {
+            return;
+        }
+        $shared = $room->getShared();
+        if ($shared === $connection->getShared()) {
+            $room->fileRequests--;
+            $connection->fileRequests++;
+            $this->fileRoom = $connection;
+            return;
+        }
+        // Sent to another DC: the room was in the window of the previous one.
+        $this->fileRoom = null;
+        if (!$this->fileRoomWritten) {
+            $shared->fileRequestSent();
+        }
+        $shared->fileRequestDone($room, false);
+    }
+    /**
      * Signal that the message was sent.
      */
     public function sent(bool $pending = true): void
