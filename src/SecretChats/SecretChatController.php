@@ -365,7 +365,7 @@ final class SecretChatController implements Stringable
             'chat_id' => $this->id,
         ]; // Not sent
         $message = ['_' => 'decryptedMessageLayer', 'layer' => $this->remoteLayer, 'in_seq_no' => $this->generateSecretInSeqNo(), 'out_seq_no' => $this->generateSecretOutSeqNo(), 'message' => $message];
-        $body['seq'] = $seq = $this->out_seq_no; // Committed after encryption, which can suspend.
+        $body['seq'] = $seq = $this->out_seq_no; // Committed once the message is built: serializing or encrypting it can throw.
         $constructor = $this->remoteLayer === 8 ? 'DecryptedMessage' : 'DecryptedMessageLayer';
         $message = $this->API->getTL()->serializeObject(['type' => $constructor], $message, $constructor, $this->remoteLayer);
         $message = Tools::packUnsignedInt(\strlen($message)).$message;
