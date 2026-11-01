@@ -11,6 +11,7 @@ use ext_php_rs::{
 };
 use php_tokio::EventLoop;
 use std::{cell::RefCell, time::Duration};
+use tokio::runtime::Builder;
 use zeroize::Zeroizing;
 thread_local! {static EXECUTOR:RefCell<Option<Executor>>=const{RefCell::new(None)};}
 
@@ -21,16 +22,24 @@ pub struct Crypto;
 #[php_impl]
 impl Crypto {
     pub fn version() -> &'static str {
-        "0.3.0" // PHP API compatibility, independent of the extension release.
+        "0.4.0" // PHP API compatibility, independent of the extension release.
     }
-    pub fn init(capacity: i64, byte_limit: i64) -> PhpResult<i64> {
+    /// Returns the stream to watch for php-tokio's notifications.
+    pub fn init(capacity: i64, byte_limit: i64) -> PhpResult<Zval> {
         if ext_php_rs::PHP_ZTS {
             return Err("The crypto worker currently requires NTS PHP".into());
         }
         if capacity < 0 || byte_limit < 0 {
             return Err("Negative crypto limits".into());
         }
-        let fd = EventLoop::init()?;
+        // One worker, on a runtime of the request's own: no cryptographic work runs on Tokio.
+        let stream = EventLoop::init_with(|| {
+            Builder::new_multi_thread()
+                .worker_threads(1)
+                .max_blocking_threads(1)
+                .thread_name("madeline-tokio")
+                .build()
+        })?;
         EXECUTOR.with_borrow_mut(|e| -> PhpResult<()> {
             if let Some(existing) = e.as_ref() {
                 if !existing.is_open() {
@@ -41,7 +50,7 @@ impl Crypto {
             }
             Ok(())
         })?;
-        Ok(fd)
+        Ok(stream)
     }
     pub fn available() -> bool {
         EXECUTOR.with_borrow(|e| e.as_ref().is_some_and(Executor::is_open))
@@ -122,7 +131,11 @@ fn execute(operation: Operation, data: &[u8], key: &[u8], iv: &[u8]) -> PhpResul
         .map_err(unavailable)?;
     let lease = match admission {
         Admission::Ready(lease) => lease,
-        Admission::Waiting(wait) => EventLoop::suspend_on(wait)?.map_err(unavailable)?,
+        Admission::Waiting(wait) => match EventLoop::try_suspend_on(wait)? {
+            Some(lease) => lease.map_err(unavailable)?,
+            // Interrupted by an exit, which stays pending (see below).
+            None => return Ok(vec![]),
+        },
     };
     let mut message = Message {
         operation,
@@ -147,8 +160,12 @@ fn execute(operation: Operation, data: &[u8], key: &[u8], iv: &[u8]) -> PhpResul
                 .enqueue(message, lease)
         })
         .map_err(unavailable)?;
-    let reply =
-        EventLoop::suspend_on(receiver)?.map_err(|_| unavailable("Crypto worker stopped"))?;
+    // None: an exit (exit(), or PHP destroying the fiber) interrupted the caller, and must stay
+    // pending: PHP discards whatever this returns.
+    let Some(reply) = EventLoop::try_suspend_on(receiver)? else {
+        return Ok(vec![]);
+    };
+    let reply = reply.map_err(|_| unavailable("Crypto worker stopped"))?;
     let output = reply.result.map_err(|e| {
         if e.starts_with("Invalid MTProto") {
             PhpException::new(e, INVALID, ce::exception())

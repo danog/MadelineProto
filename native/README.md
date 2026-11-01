@@ -13,8 +13,9 @@ The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
 Build for the target PHP version, architecture and debug ABI.
 Install that PHP's development headers and `php-config`, OpenSSL development
 headers, a linker, pkg-config and libclang. Rust 1.92.0 is pinned by
-`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.3 accepts queue count
-and byte limit; width is always selected adaptively.
+`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.4 accepts queue count
+and byte limit, and `init()` returns php-tokio's notification stream; width is always selected
+adaptively.
 
 ```sh
 cd native
@@ -25,7 +26,7 @@ php --ri madeline_crypto
 ```
 
 On macOS Cargo produces a `.dylib`; install it under the same `.so` extension
-name. The bridge currently targets Unix. Restart PHP processes after installation.
+name. The extension currently targets Unix. Restart PHP processes after installation.
 Rust/Cargo/libclang exist only in the Docker build stage. TAS reuses a compatible
 base extension or builds against the base image's PHP; its sources are mirrored
 in `dev/crypto`.
@@ -43,8 +44,9 @@ or too large for the queue) runs on the synchronous PHP backends instead.
 Each initialized process has exactly one crypto worker and one Tokio scheduler
 thread for completion/admission futures. No Tokio blocking jobs are spawned.
 The scheduler never invokes PHP. PHP values and suspended Revolt contexts stay
-on the PHP thread. The vendored php-tokio bridge and its upstream revision/local
-changes are documented in `php-tokio/UPSTREAM.md`.
+on the PHP thread. The bridge is [php-tokio](https://github.com/danog/php-tokio) 0.2, with a
+runtime of the extension's own (`EventLoop::init_with`). Its notification stream stays open until
+the bridge is destroyed.
 
 The queue defaults to 128 live jobs and 128 MiB of accounted native storage.
 Admission reserves both count and byte permits before copying input. Accounting
@@ -111,4 +113,4 @@ validation failures, queue pressure, cancellation, shutdown, connection freshnes
 and PHP fallbacks. Run the same suite with and without the extension enabled.
 
 The extension release is reported by `phpversion("madeline_crypto")`.
-`Crypto::version()` reports the PHP API version, which remains `0.2.0`.
+`Crypto::version()` reports the PHP API version, currently `0.4.0`.
