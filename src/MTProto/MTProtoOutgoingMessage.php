@@ -93,6 +93,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     private int $tries = 0;
 
     private ?string $checkTimer = null;
+    /**
+     * The socket whose room in the file window of its DC this file request holds until it is answered (see
+     * DataCenterConnection::waitGetFileConnection()), and whether it was written already.
+     */
+    private ?Connection $fileRoom = null;
+    private bool $fileRoomWritten = false;
     private readonly ?string $cancelSubscription;
 
     /**
@@ -205,10 +211,21 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         $this->tries++;
     }
     /**
+     * Hold the room of this file request in the file window of the DC of $connection until it is answered.
+     */
+    public function holdFileRoom(Connection $connection): void
+    {
+        $this->fileRoom = $connection;
+    }
+    /**
      * Signal that the message was sent.
      */
     public function sent(bool $pending = true): void
     {
+        if ($this->fileRoom !== null && !$this->fileRoomWritten) {
+            $this->fileRoomWritten = true;
+            $this->fileRoom->getShared()->fileRequestSent();
+        }
         if ($pending) {
             if ($this->unencrypted) {
                 $this->connection->unencrypted_new_outgoing[$this->getMsgId()] = $this;
@@ -362,6 +379,12 @@ class MTProtoOutgoingMessage extends MTProtoMessage
         $this->body = null;
 
         $this->state |= self::STATE_REPLIED;
+        if ($this->fileRoom !== null) {
+            $room = $this->fileRoom;
+            $this->fileRoom = null;
+            // Errors (FLOOD_WAITs included) are closures returning the exception.
+            $room->getShared()->fileRequestDone($room, !$result instanceof Closure);
+        }
         $this->cancellation?->unsubscribe($this->cancelSubscription);
         if ($this->resultDeferred) { // Sometimes can get an RPC error for constructors
             $promise = $this->resultDeferred;
