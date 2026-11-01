@@ -90,6 +90,23 @@ if [ "$1" == "phpunit" ]; then
 fi
 
 if [ "$1" == "phpunit-light" ]; then
+    # The event loop driver of Revolt to test with: most installations have no ext-uv (the image's default). The
+    # extensions of ev and event aren't in the image: they're in the test image of tests/drivers.Dockerfile, which
+    # tests/test_drivers.sh builds and runs this in.
+    case "${MADELINE_EVENT_LOOP:-uv}" in
+        uv) driver=UvDriver; extension=uv ;;
+        ev) driver=EvDriver; extension=ev ;;
+        event) driver=EventDriver; extension=event ;;
+        select) driver=StreamSelectDriver; extension= ;;
+        *) echo "Unknown event loop: $MADELINE_EVENT_LOOP"; exit 1 ;;
+    esac
+    if [ -n "$extension" ] && ! php -r "exit(extension_loaded('$extension') ? 0 : 1);"; then
+        echo "ext-$extension isn't loaded: run tests/test_drivers.sh $MADELINE_EVENT_LOOP"
+        exit 1
+    fi
+    export REVOLT_DRIVER="Revolt\\EventLoop\\Driver\\$driver"
+    # The driver in use.
+    php -r 'require "vendor/autoload.php"; echo get_class(Revolt\EventLoop::getDriver()), PHP_EOL;'
     composer test-light
     exit 0
 fi
