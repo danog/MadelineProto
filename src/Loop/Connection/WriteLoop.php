@@ -247,10 +247,13 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
                                     $this->connection->ack_queue[] = $message->getMsgId();
                                     continue;
                                 }
-                                if ($message->getSent() === null || $message->getSent() > $requestedAt) {
-                                    // Sent again since the state request (after a reconnection, a bad_msg_notification
-                                    // or the answer to an earlier state request): the state is the one of the previous
-                                    // send, and acting on it would send the request once more.
+                                if ($message->getSent() > $requestedAt) {
+                                    // The state is the one of the message as sent before the state request, but sent()
+                                    // stamps every write to the socket: it was already written again since (by the
+                                    // answer to another state request, sent every timeout seconds while this one is
+                                    // unanswered, a bad_msg_notification or bad_server_salt, a msg_resend_req, an RPC
+                                    // error repeated on the same DC, a session reset, or the restore of the messages of
+                                    // a DC whose sockets were replaced). Acting on it would send the request once more.
                                     $this->API->logger("Ignoring the state of $message, sent again since the state request");
                                     continue;
                                 }
