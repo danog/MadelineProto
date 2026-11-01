@@ -48,16 +48,6 @@ final class WrappedFuture
     }
 
     /**
-     * Call $onComplete once the operation completes, successfully or not.
-     *
-     * @param \Closure(): void $onComplete
-     */
-    public function finally(\Closure $onComplete): void
-    {
-        $this->f->finally($onComplete)->ignore();
-    }
-
-    /**
      * Awaits the operation to complete.
      *
      * Throws an exception if the operation fails.

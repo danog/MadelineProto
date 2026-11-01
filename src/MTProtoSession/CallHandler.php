@@ -167,7 +167,32 @@ trait CallHandler
             $this->API->logger('Using media DC');
             return $this->API->methodCallAsyncWrite($method, $args, -$this->datacenter);
         }
-
+        if ($special === SpecialMethodType::FILE_RELATED) {
+            // Sent on the socket of the DC with the fewest file requests in flight, once one has room for it.
+            $connection = $this->shared->waitGetFileConnection($cancellation);
+            try {
+                $result = $connection->sendMethodCall($method, $args);
+            } catch (Throwable $e) {
+                $this->shared->fileRequestDone($connection);
+                throw $e;
+            }
+            $result->finally(fn () => $this->shared->fileRequestDone($connection))->ignore();
+            return new WrappedFuture($result);
+        }
+        return new WrappedFuture($this->sendMethodCall($method, $args));
+    }
+    /**
+     * Send a method call on this socket, returning once it is sent.
+     *
+     * @param string $method Method name
+     * @param array  $args   Arguments
+     *
+     * @return Future The result, or a closure returning the error.
+     */
+    private function sendMethodCall(string $method, array $args): Future
+    {
+        $cancellation = $args['cancellation'] ?? null;
+        $special = $args['specialMethodType'] ?? null;
         $args = $this->API->botAPIToMTProto($args);
 
         $response = new DeferredFuture;
@@ -216,7 +241,7 @@ trait CallHandler
         }
         $this->sendMessage($message);
         $message->getSendPromise()->await($cancellation);
-        return new WrappedFuture($response->getFuture());
+        return $response->getFuture();
     }
     /**
      * Send object.

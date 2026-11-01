@@ -51,19 +51,7 @@ trait CallHandler
             'method',
             $method,
             $args,
-            function (array $args) use ($method, $datacenter) {
-                $datacenter ??= $this->datacenter->currentDatacenter;
-                if (($args['specialMethodType'] ?? null) !== SpecialMethodType::FILE_RELATED) {
-                    return $this->datacenter->waitGetConnection($datacenter)->methodCallAsyncRead($method, $args);
-                }
-                $shared = $this->datacenter->getDataCenterConnection($this->getFileDatacenter($datacenter));
-                $connection = $shared->waitGetFileConnection($args['cancellation'] ?? null);
-                try {
-                    return $connection->methodCallAsyncRead($method, $args);
-                } finally {
-                    $shared->fileRequestDone($connection);
-                }
-            },
+            fn (array $args) => ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncRead($method, $args),
         );
     }
     /**
@@ -76,26 +64,6 @@ trait CallHandler
      */
     public function methodCallAsyncWrite(string $method, array $args, ?int $datacenter = null): WrappedFuture
     {
-        $datacenter ??= $this->datacenter->currentDatacenter;
-        if (($args['specialMethodType'] ?? null) !== SpecialMethodType::FILE_RELATED) {
-            return $this->datacenter->waitGetConnection($datacenter)->methodCallAsyncWrite($method, $args);
-        }
-        $shared = $this->datacenter->getDataCenterConnection($this->getFileDatacenter($datacenter));
-        $connection = $shared->waitGetFileConnection($args['cancellation'] ?? null);
-        try {
-            $result = $connection->methodCallAsyncWrite($method, $args);
-        } catch (\Throwable $e) {
-            $shared->fileRequestDone($connection);
-            throw $e;
-        }
-        $result->finally(static fn () => $shared->fileRequestDone($connection));
-        return $result;
-    }
-    /**
-     * Get the DC to send a file request for DC $datacenter to: its media DC, if it has one.
-     */
-    private function getFileDatacenter(int $datacenter): int
-    {
-        return $datacenter > 0 && $this->datacenter->has(-$datacenter) ? -$datacenter : $datacenter;
+        return ($this->datacenter->waitGetConnection($datacenter ?? $this->datacenter->currentDatacenter))->methodCallAsyncWrite($method, $args);
     }
 }
