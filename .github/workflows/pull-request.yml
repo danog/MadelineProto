@@ -65,7 +65,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        event-loop: [uv, ev, select]
+        event-loop: [uv, ev, event, select]
     container:
       image: danog/madelineproto:next
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
