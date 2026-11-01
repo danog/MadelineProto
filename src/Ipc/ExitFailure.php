@@ -32,8 +32,6 @@ final class ExitFailure
 
     private array $props;
 
-    private ?self $previous = null;
-
     public function __construct(Throwable $exception)
     {
         $this->type = $exception::class;
@@ -64,10 +62,7 @@ final class ExitFailure
         $refl = new \ReflectionClass($this->type);
         $exception = $refl->newInstanceWithoutConstructor();
 
-        $props = $this->props;
-        $props[\Exception::class]['previous'] = $this->previous?->getException();
-
-        foreach ($props as $class => $subprops) {
+        foreach ($this->props as $class => $subprops) {
             $class = new ReflectionClass($class);
             foreach ($class->getProperties() as $prop) {
                 $key = $prop->getName();
