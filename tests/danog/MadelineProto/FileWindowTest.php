@@ -103,7 +103,7 @@ final class FileWindowTest extends TestCase
         delay(0.01);
         $this->assertFalse($second->isComplete(), 'One file request in flight at first');
 
-        $shared->fileRequestDone($first, true, hrtime(true));
+        $shared->fileRequestDone($first, true);
         $this->assertSame(2.0, self::get($shared, 'fileWindow'));
         $second->await();
     }
@@ -128,7 +128,7 @@ final class FileWindowTest extends TestCase
         $waiting = async(self::send(...), $shared);
         delay(0.01);
 
-        $shared->fileRequestDone($written, true, hrtime(true));
+        $shared->fileRequestDone($written, true);
         $this->assertSame(2.0, self::get($shared, 'fileWindow'), 'More of them would only queue up');
         $shared->fileRequestSent();
         $waiting->await();
@@ -137,7 +137,7 @@ final class FileWindowTest extends TestCase
     public function testAnswersWithoutRequestsWaitingDontGrowIt(): void
     {
         $shared = $this->shared();
-        $shared->fileRequestDone(self::send($shared), true, hrtime(true));
+        $shared->fileRequestDone(self::send($shared), true);
         $this->assertSame(1.0, self::get($shared, 'fileWindow'));
     }
 
@@ -147,7 +147,7 @@ final class FileWindowTest extends TestCase
         $first = self::send($shared);
         $second = async(self::send(...), $shared);
         delay(0.01);
-        $shared->fileRequestDone($first, false, hrtime(true));
+        $shared->fileRequestDone($first, false);
         $second->await();
         $this->assertSame(1.0, self::get($shared, 'fileWindow'));
     }
@@ -164,17 +164,16 @@ final class FileWindowTest extends TestCase
         $second = async($shared->waitAfterFileFlood(...), self::flood());
         delay(0.01);
         $this->assertSame(3.0, self::get($shared, 'fileWindow'), 'Half of the requests in flight, once for the same burst');
-        $this->assertFalse(self::get($shared, 'fileSlowStart'));
 
         foreach ($sent as $connection) {
-            $shared->fileRequestDone($connection, true, hrtime(true));
+            $shared->fileRequestDone($connection, true);
         }
         Future\await([$first, $second]);
         $last = self::send($shared);
         $flooded = async($shared->waitAfterFileFlood(...), self::flood());
         delay(0.01);
         $this->assertSame(1.0, self::get($shared, 'fileWindow'), 'Halved again after a window of answers');
-        $shared->fileRequestDone($last, true, hrtime(true));
+        $shared->fileRequestDone($last, true);
         $flooded->await();
     }
 
@@ -199,49 +198,20 @@ final class FileWindowTest extends TestCase
         self::set($shared, 'fileWindow', 4.0);
         $shared->fileConnectionDropped($shared->getConnection(), new stdClass);
         $this->assertSame(4.0, self::get($shared, 'fileWindow'));
-        $this->assertTrue(self::get($shared, 'fileSlowStart'));
     }
 
-    public function testItGrowsByOnePerWindowOfAnswersAfterTheSlowStart(): void
+    public function testItGrowsByOnePerWindowOfAnswers(): void
     {
         $shared = $this->shared();
         self::set($shared, 'fileWindow', 4.0);
-        self::set($shared, 'fileSlowStart', false);
         for ($i = 0; $i < 4; $i++) {
             $connection = self::send($shared);
         }
         $waiting = async(self::send(...), $shared);
         delay(0.01);
-        $shared->fileRequestDone($connection, true, hrtime(true));
+        $shared->fileRequestDone($connection, true);
         $this->assertSame(4.25, self::get($shared, 'fileWindow'));
         $waiting->await();
-    }
-
-    /**
-     * Answer 8 requests that got room $latencyMs ago, in a new round of the slow start.
-     */
-    private static function round(DataCenterConnection $shared, Connection $connection, int $latencyMs): void
-    {
-        // Got room after the previous round started: starts a new one.
-        $shared->fileRequestDone($connection, true, hrtime(true) - $latencyMs * 1_000_000);
-        $roundStart = self::get($shared, 'fileRoundStart');
-        for ($i = 1; $i < 8; $i++) {
-            // Got room before this round started: part of it.
-            $shared->fileRequestDone($connection, true, $roundStart - $latencyMs * 1_000_000);
-        }
-        delay(0.06);
-    }
-
-    public function testTheSlowStartEndsWhenTheAnswersGetSlower(): void
-    {
-        $shared = $this->shared();
-        $connection = $shared->getConnection();
-        $connection->fileRequests = 100;
-        self::round($shared, $connection, 10);
-        self::round($shared, $connection, 10);
-        $this->assertTrue(self::get($shared, 'fileSlowStart'), 'As fast as the previous round');
-        self::round($shared, $connection, 30);
-        $this->assertFalse(self::get($shared, 'fileSlowStart'), 'Requests queue up somewhere');
     }
 
     public function testAFloodedRequestIsSentAgainAfterTheNextAnswer(): void
@@ -253,7 +223,7 @@ final class FileWindowTest extends TestCase
         delay(0.01);
         $this->assertFalse($flooded->isComplete(), 'Waits for another answer, not 30 seconds');
 
-        $shared->fileRequestDone($inFlight, true, hrtime(true));
+        $shared->fileRequestDone($inFlight, true);
         $flooded->await();
     }
 
@@ -269,11 +239,11 @@ final class FileWindowTest extends TestCase
         }
         delay(0.01);
 
-        $shared->fileRequestDone($first, true, hrtime(true));
+        $shared->fileRequestDone($first, true);
         delay(0.01);
         $this->assertCount(1, array_filter($flooded, static fn (Future $f) => $f->isComplete()), 'One per answer while requests are in flight');
 
-        $shared->fileRequestDone($second, true, hrtime(true));
+        $shared->fileRequestDone($second, true);
         delay(0.01);
         $this->assertCount(3, array_filter($flooded, static fn (Future $f) => $f->isComplete()), 'No other answer would wake them up');
     }

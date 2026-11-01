@@ -49,15 +49,6 @@ use function count;
  */
 final class DataCenterConnection implements SimpleSubscriber
 {
-    /**
-     * Minimum number of answers in a round of the slow start of the file window, before comparing its latency (RFC 9406).
-     */
-    private const SLOW_START_MIN_SAMPLES = 8;
-    /**
-     * Bounds of the latency increase that ends the slow start of the file window, in nanoseconds (RFC 9406).
-     */
-    private const SLOW_START_MIN_LATENCY_INCREASE = 4_000_000;
-    private const SLOW_START_MAX_LATENCY_INCREASE = 16_000_000;
     /** @deprecated */
     private ?PermAuthKey $permAuthKey;
 
@@ -98,20 +89,15 @@ final class DataCenterConnection implements SimpleSubscriber
      * Number of file requests (parts to download or upload) a media or CDN DC may have in flight, spread over its sockets.
      *
      * The server takes a number of them at once that varies over time, rejecting the others with FLOOD_WAITs, and drops
-     * sockets with too many of them (or answers -429), so it is learned like a TCP congestion window: it grows while
-     * file requests wait for room and get answered (by one per answer at first, then by one per window of answers),
-     * and it is halved on a FLOOD_WAIT, a dropped socket or a -429 (at most once per window of answers, for the
-     * requests of a same burst).
+     * sockets with too many of them (or answers -429), so it is learned like a TCP congestion window: it grows by one
+     * per window of answers while file requests wait for room, and it is halved on a FLOOD_WAIT, a dropped socket or a
+     * -429 (at most once per window of answers, for the requests of a same burst).
      * It only grows while all the requests in flight were written to the sockets: when they queue up to be written
-     * (parts to upload, limited by the bandwidth), more of them would only queue up, and reach the server in a burst.
-     * And its slow start ends as soon as the answers get slower (HyStart++, RFC 9406): requests queue up somewhere
-     * (in the buffers of the sockets, or on the server) before the server rejects them.
+     * (parts to upload, limited by the bandwidth), more of them would only queue up, and be rejected once they reach
+     * the server (sending each part to upload twice).
      */
     private float $fileWindow = 1.0;
-    /**
-     * Whether the file window still grows by one per answer (no FLOOD_WAIT or dropped socket yet).
-     */
-    private bool $fileSlowStart = true;
+
     /**
      * File requests answered since the file window was last halved.
      */
@@ -120,17 +106,7 @@ final class DataCenterConnection implements SimpleSubscriber
      * File requests that got room in the window but weren't written to their socket yet.
      */
     private int $fileRequestsUnsent = 0;
-    /**
-     * Current round of the slow start of the file window (it ends with the first answer to a request that got room
-     * after it started): when it started (hrtime), the smallest latency of its answers, and their number.
-     */
-    private int $fileRoundStart = 0;
-    private float $fileRoundMinLatency = INF;
-    private int $fileRoundAnswers = 0;
-    /**
-     * Smallest latency of the answers of the previous round of the slow start of the file window.
-     */
-    private float $fileLastRoundMinLatency = INF;
+
     /**
      * Streams whose drop by the server was already counted (both the read and the write loop see it).
      *
@@ -578,19 +554,15 @@ final class DataCenterConnection implements SimpleSubscriber
      * Signal that a file request sent with waitGetFileConnection() is over.
      *
      * @param bool $answered Whether the server answered it (with a result, not an error).
-     * @param int  $start    When it got room in the window (hrtime).
      */
-    public function fileRequestDone(Connection $connection, bool $answered, int $start): void
+    public function fileRequestDone(Connection $connection, bool $answered): void
     {
         $connection->fileRequests--;
         if ($answered) {
             $this->fileAnswersSinceDecrease++;
-            if ($this->fileSlowStart) {
-                $this->trackFileSlowStart($start);
-            }
             if ($this->fileRequestWaiters && $this->fileRequestsUnsent === 0) {
-                // More file requests than room for them, and the server and the sockets keep up: try with one more.
-                $this->fileWindow += $this->fileSlowStart ? 1.0 : 1.0 / $this->fileWindow;
+                // More file requests than room for them, and the server and the sockets keep up: one more per window.
+                $this->fileWindow += 1.0 / $this->fileWindow;
             }
         }
         $this->wakeFileRequestWaiters();
@@ -602,31 +574,6 @@ final class DataCenterConnection implements SimpleSubscriber
             $deferred->complete();
             if ($inFlight) {
                 break;
-            }
-        }
-    }
-    /**
-     * End the slow start of the file window once the answers of a round get slower than those of the previous one.
-     *
-     * @param int $start When the answered request got room in the window (hrtime).
-     */
-    private function trackFileSlowStart(int $start): void
-    {
-        $now = hrtime(true);
-        if ($start >= $this->fileRoundStart) {
-            // The first answer to a request of this round: the previous one is over.
-            $this->fileLastRoundMinLatency = $this->fileRoundMinLatency;
-            $this->fileRoundMinLatency = INF;
-            $this->fileRoundAnswers = 0;
-            $this->fileRoundStart = $now;
-        }
-        $this->fileRoundMinLatency = min($this->fileRoundMinLatency, (float) ($now - $start));
-        $this->fileRoundAnswers++;
-        if ($this->fileRoundAnswers >= self::SLOW_START_MIN_SAMPLES && $this->fileLastRoundMinLatency < INF) {
-            $increase = min(max($this->fileLastRoundMinLatency / 8, self::SLOW_START_MIN_LATENCY_INCREASE), self::SLOW_START_MAX_LATENCY_INCREASE);
-            if ($this->fileRoundMinLatency >= $this->fileLastRoundMinLatency + $increase) {
-                $this->fileSlowStart = false;
-                $this->API->logger(\sprintf("File requests in flight in DC %d: %.2f, their answers got slower (%.0f ms => %.0f ms), growing slower", $this->datacenter, $this->fileWindow, $this->fileLastRoundMinLatency / 1e6, $this->fileRoundMinLatency / 1e6), Logger::NOTICE);
             }
         }
     }
@@ -657,7 +604,6 @@ final class DataCenterConnection implements SimpleSubscriber
         }
         $previous = $this->fileWindow;
         $this->fileWindow = max(1.0, min($this->fileWindow, (float) $this->getFileRequestsInFlight()) / 2);
-        $this->fileSlowStart = false;
         $this->fileAnswersSinceDecrease = 0;
         $this->API->logger("File requests in flight in DC {$this->datacenter}: {$previous} => {$this->fileWindow}, as $why", Logger::NOTICE);
     }
