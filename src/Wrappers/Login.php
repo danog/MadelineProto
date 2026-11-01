@@ -289,6 +289,11 @@ trait Login
         $dataCenterConnection->auth->setAuthKey($auth_key['auth_key']);
         $dataCenterConnection->auth->connectionState->waitForState(ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN);
         $this->loginState->publish($this->loginState->getState()->setStateDc(API::LOGGED_IN, $mainDcID));
+        // How many sessions the account may open to its main DC (tmp_sessions) is only taken from a config received
+        // while logged in (populateConfig()), and no auth.authorization carries it here: the only config of the DC
+        // so far came with the initialization of its connection, while logged out. Fetched again, even if cached.
+        $this->config['expires'] = -1;
+        $this->getConfig();
 
         $res = $this->fullGetSelf();
         $callbacks = [$this, $this->referenceDatabase, $this->peerDatabase];

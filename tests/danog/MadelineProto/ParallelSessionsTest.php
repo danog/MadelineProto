@@ -162,6 +162,40 @@ final class ParallelSessionsTest extends TestCase
         $this->assertCount(1, $main->getSessions());
     }
 
+    /**
+     * Only the config the main DC sends to the logged in account tells its count: the one received while logged
+     * out (with the initialization of the connection, before importAuthorization() logs in, which fetches it again)
+     * or from another DC doesn't.
+     */
+    public function testTheCountComesFromTheConfigOfTheMainDcWhileLoggedIn(): void
+    {
+        $main = $this->firstSession(2);
+        $other = $this->firstSession(4);
+        $this->dataCenter($main, $other);
+        $config = ['_' => 'config', 'tmp_sessions' => 3];
+        $this->API->loginState->publish(new LoginState(API::NOT_LOGGED_IN, null));
+        delay(0.01);
+
+        $this->API->populateConfig($config, $main->getConnection(0));
+        delay(0.01);
+        $this->assertCount(1, $main->getSessions());
+
+        $this->API->loginState->publish(new LoginState(API::LOGGED_IN, 2));
+        $this->API->populateConfig($config, $other->getConnection(0));
+        delay(0.01);
+        $this->assertCount(1, $main->getSessions());
+
+        $this->API->populateConfig($config, $main->getConnection(0));
+        delay(0.01);
+        $this->assertCount(3, $main->getSessions());
+        $this->assertCount(1, $other->getSessions());
+
+        // A later config without it: one session again.
+        $this->API->populateConfig(['_' => 'config'], $main->getConnection(0));
+        delay(0.01);
+        $this->assertCount(1, $main->getSessions());
+    }
+
     public function testDerivedKeysFollowTheMainKey(): void
     {
         $main = new NewAuthKey(false, false, 2, $this->API->loginState);
