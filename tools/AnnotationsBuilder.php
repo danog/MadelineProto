@@ -639,25 +639,38 @@ final class Blacklist {
                     fwrite($handle, "use $class;\n");
                 }
 
-                fwrite($handle, "\n/** @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor */\nabstract class {$namespace}\n{\nprotected APIWrapper \$wrapper;\n");
+                fwrite($handle, "\n/**\n * @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor\n *\n");
+                $namespaces = [];
                 foreach ($this->TL->getMethodNamespaces() as $namespace) {
                     $namespaceInterface = '\\danog\\MadelineProto\\Namespace\\'.ucfirst($namespace);
-                    fwrite($handle, '/** @var '.$namespaceInterface.' $'.$namespace." */\n");
-                    fwrite($handle, 'public $'.$namespace.";\n");
+                    fwrite($handle, " * @property-read $namespaceInterface \$$namespace\n");
+                    $namespaces []= var_export($namespace, true).' => true';
                 }
-                fwrite($handle, '
+                fwrite($handle, " */\nabstract class InternalDoc\n{\nprotected APIWrapper \$wrapper;\n");
+                fwrite($handle, 'private const NAMESPACES = ['.implode(', ', $namespaces).'];
                     /**
-                     * Export APIFactory instance with the specified namespace.
-                     * @psalm-suppress InaccessibleProperty
+                     * Get a namespace of the API ($api->messages, ...).
+                     *
+                     * A new namespace object at every access, which keeps this instance alive while it\'s used (see
+                     * \danog\MadelineProto\Namespace\AbstractAPI).
+                     *
+                     * @internal
                      */
-                    protected function exportNamespaces(): void
+                    public function __get(string $name): \danog\MadelineProto\Namespace\AbstractAPI
                     {
+                        if (!isset(self::NAMESPACES[$name])) {
+                            throw new \Error(\'Undefined property: \'.static::class.\'::$\'.$name);
+                        }
+                        return new \danog\MadelineProto\Namespace\AbstractAPI($name, $this->wrapper, $this);
+                    }
+                    /**
+                     * @internal
+                     */
+                    public function __isset(string $name): bool
+                    {
+                        return isset(self::NAMESPACES[$name]);
+                    }
                 ');
-                foreach ($this->TL->getMethodNamespaces() as $namespace) {
-                    fwrite($handle, "\$this->$namespace ??= new \\danog\\MadelineProto\\Namespace\\AbstractAPI('$namespace');\n");
-                    fwrite($handle, "\$this->{$namespace}->setWrapper(\$this->wrapper);\n");
-                }
-                fwrite($handle, "}\n");
             } else {
                 $namespace = ucfirst($namespace);
                 $handle = fopen(__DIR__."/../src/Namespace/$namespace.php", 'w');

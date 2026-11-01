@@ -59,125 +59,62 @@ use danog\MadelineProto\Ipc\Client;
 use danog\MadelineProto\Ipc\EventHandlerProxy;
 use danog\MadelineProto\Ipc\Server;
 
-/** @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor */
+/**
+ * @psalm-suppress PossiblyNullReference, PropertyNotSetInConstructor
+ *
+ * @property-read \danog\MadelineProto\Namespace\Auth $auth
+ * @property-read \danog\MadelineProto\Namespace\Account $account
+ * @property-read \danog\MadelineProto\Namespace\Users $users
+ * @property-read \danog\MadelineProto\Namespace\Contacts $contacts
+ * @property-read \danog\MadelineProto\Namespace\Messages $messages
+ * @property-read \danog\MadelineProto\Namespace\Updates $updates
+ * @property-read \danog\MadelineProto\Namespace\Photos $photos
+ * @property-read \danog\MadelineProto\Namespace\Upload $upload
+ * @property-read \danog\MadelineProto\Namespace\Help $help
+ * @property-read \danog\MadelineProto\Namespace\Channels $channels
+ * @property-read \danog\MadelineProto\Namespace\Bots $bots
+ * @property-read \danog\MadelineProto\Namespace\Payments $payments
+ * @property-read \danog\MadelineProto\Namespace\Stickers $stickers
+ * @property-read \danog\MadelineProto\Namespace\Phone $phone
+ * @property-read \danog\MadelineProto\Namespace\Langpack $langpack
+ * @property-read \danog\MadelineProto\Namespace\Folders $folders
+ * @property-read \danog\MadelineProto\Namespace\Stats $stats
+ * @property-read \danog\MadelineProto\Namespace\Chatlists $chatlists
+ * @property-read \danog\MadelineProto\Namespace\Stories $stories
+ * @property-read \danog\MadelineProto\Namespace\Premium $premium
+ * @property-read \danog\MadelineProto\Namespace\Smsjobs $smsjobs
+ * @property-read \danog\MadelineProto\Namespace\Fragment $fragment
+ * @property-read \danog\MadelineProto\Namespace\Aicompose $aicompose
+ * @property-read \danog\MadelineProto\Namespace\Communities $communities
+ * @property-read \danog\MadelineProto\Namespace\Ephemeral $ephemeral
+ * @property-read \danog\MadelineProto\Namespace\Toncenter $toncenter
+ * @property-read \danog\MadelineProto\Namespace\Wallet $wallet
+ */
 abstract class InternalDoc
 {
     protected APIWrapper $wrapper;
-    /** @var \danog\MadelineProto\Namespace\Auth $auth */
-    public $auth;
-    /** @var \danog\MadelineProto\Namespace\Account $account */
-    public $account;
-    /** @var \danog\MadelineProto\Namespace\Users $users */
-    public $users;
-    /** @var \danog\MadelineProto\Namespace\Contacts $contacts */
-    public $contacts;
-    /** @var \danog\MadelineProto\Namespace\Messages $messages */
-    public $messages;
-    /** @var \danog\MadelineProto\Namespace\Updates $updates */
-    public $updates;
-    /** @var \danog\MadelineProto\Namespace\Photos $photos */
-    public $photos;
-    /** @var \danog\MadelineProto\Namespace\Upload $upload */
-    public $upload;
-    /** @var \danog\MadelineProto\Namespace\Help $help */
-    public $help;
-    /** @var \danog\MadelineProto\Namespace\Channels $channels */
-    public $channels;
-    /** @var \danog\MadelineProto\Namespace\Bots $bots */
-    public $bots;
-    /** @var \danog\MadelineProto\Namespace\Payments $payments */
-    public $payments;
-    /** @var \danog\MadelineProto\Namespace\Stickers $stickers */
-    public $stickers;
-    /** @var \danog\MadelineProto\Namespace\Phone $phone */
-    public $phone;
-    /** @var \danog\MadelineProto\Namespace\Langpack $langpack */
-    public $langpack;
-    /** @var \danog\MadelineProto\Namespace\Folders $folders */
-    public $folders;
-    /** @var \danog\MadelineProto\Namespace\Stats $stats */
-    public $stats;
-    /** @var \danog\MadelineProto\Namespace\Chatlists $chatlists */
-    public $chatlists;
-    /** @var \danog\MadelineProto\Namespace\Stories $stories */
-    public $stories;
-    /** @var \danog\MadelineProto\Namespace\Premium $premium */
-    public $premium;
-    /** @var \danog\MadelineProto\Namespace\Smsjobs $smsjobs */
-    public $smsjobs;
-    /** @var \danog\MadelineProto\Namespace\Fragment $fragment */
-    public $fragment;
-    /** @var \danog\MadelineProto\Namespace\Aicompose $aicompose */
-    public $aicompose;
-    /** @var \danog\MadelineProto\Namespace\Communities $communities */
-    public $communities;
-    /** @var \danog\MadelineProto\Namespace\Ephemeral $ephemeral */
-    public $ephemeral;
-    /** @var \danog\MadelineProto\Namespace\Toncenter $toncenter */
-    public $toncenter;
-    /** @var \danog\MadelineProto\Namespace\Wallet $wallet */
-    public $wallet;
-
+    private const NAMESPACES = ['auth' => true, 'account' => true, 'users' => true, 'contacts' => true, 'messages' => true, 'updates' => true, 'photos' => true, 'upload' => true, 'help' => true, 'channels' => true, 'bots' => true, 'payments' => true, 'stickers' => true, 'phone' => true, 'langpack' => true, 'folders' => true, 'stats' => true, 'chatlists' => true, 'stories' => true, 'premium' => true, 'smsjobs' => true, 'fragment' => true, 'aicompose' => true, 'communities' => true, 'ephemeral' => true, 'toncenter' => true, 'wallet' => true];
     /**
-     * Export APIFactory instance with the specified namespace.
-     * @psalm-suppress InaccessibleProperty
+     * Get a namespace of the API ($api->messages, ...).
+     *
+     * A new namespace object at every access, which keeps this instance alive while it's used (see
+     * \danog\MadelineProto\Namespace\AbstractAPI).
+     *
+     * @internal
      */
-    protected function exportNamespaces(): void
+    public function __get(string $name): \danog\MadelineProto\Namespace\AbstractAPI
     {
-        $this->auth ??= new \danog\MadelineProto\Namespace\AbstractAPI('auth');
-        $this->auth->setWrapper($this->wrapper);
-        $this->account ??= new \danog\MadelineProto\Namespace\AbstractAPI('account');
-        $this->account->setWrapper($this->wrapper);
-        $this->users ??= new \danog\MadelineProto\Namespace\AbstractAPI('users');
-        $this->users->setWrapper($this->wrapper);
-        $this->contacts ??= new \danog\MadelineProto\Namespace\AbstractAPI('contacts');
-        $this->contacts->setWrapper($this->wrapper);
-        $this->messages ??= new \danog\MadelineProto\Namespace\AbstractAPI('messages');
-        $this->messages->setWrapper($this->wrapper);
-        $this->updates ??= new \danog\MadelineProto\Namespace\AbstractAPI('updates');
-        $this->updates->setWrapper($this->wrapper);
-        $this->photos ??= new \danog\MadelineProto\Namespace\AbstractAPI('photos');
-        $this->photos->setWrapper($this->wrapper);
-        $this->upload ??= new \danog\MadelineProto\Namespace\AbstractAPI('upload');
-        $this->upload->setWrapper($this->wrapper);
-        $this->help ??= new \danog\MadelineProto\Namespace\AbstractAPI('help');
-        $this->help->setWrapper($this->wrapper);
-        $this->channels ??= new \danog\MadelineProto\Namespace\AbstractAPI('channels');
-        $this->channels->setWrapper($this->wrapper);
-        $this->bots ??= new \danog\MadelineProto\Namespace\AbstractAPI('bots');
-        $this->bots->setWrapper($this->wrapper);
-        $this->payments ??= new \danog\MadelineProto\Namespace\AbstractAPI('payments');
-        $this->payments->setWrapper($this->wrapper);
-        $this->stickers ??= new \danog\MadelineProto\Namespace\AbstractAPI('stickers');
-        $this->stickers->setWrapper($this->wrapper);
-        $this->phone ??= new \danog\MadelineProto\Namespace\AbstractAPI('phone');
-        $this->phone->setWrapper($this->wrapper);
-        $this->langpack ??= new \danog\MadelineProto\Namespace\AbstractAPI('langpack');
-        $this->langpack->setWrapper($this->wrapper);
-        $this->folders ??= new \danog\MadelineProto\Namespace\AbstractAPI('folders');
-        $this->folders->setWrapper($this->wrapper);
-        $this->stats ??= new \danog\MadelineProto\Namespace\AbstractAPI('stats');
-        $this->stats->setWrapper($this->wrapper);
-        $this->chatlists ??= new \danog\MadelineProto\Namespace\AbstractAPI('chatlists');
-        $this->chatlists->setWrapper($this->wrapper);
-        $this->stories ??= new \danog\MadelineProto\Namespace\AbstractAPI('stories');
-        $this->stories->setWrapper($this->wrapper);
-        $this->premium ??= new \danog\MadelineProto\Namespace\AbstractAPI('premium');
-        $this->premium->setWrapper($this->wrapper);
-        $this->smsjobs ??= new \danog\MadelineProto\Namespace\AbstractAPI('smsjobs');
-        $this->smsjobs->setWrapper($this->wrapper);
-        $this->fragment ??= new \danog\MadelineProto\Namespace\AbstractAPI('fragment');
-        $this->fragment->setWrapper($this->wrapper);
-        $this->aicompose ??= new \danog\MadelineProto\Namespace\AbstractAPI('aicompose');
-        $this->aicompose->setWrapper($this->wrapper);
-        $this->communities ??= new \danog\MadelineProto\Namespace\AbstractAPI('communities');
-        $this->communities->setWrapper($this->wrapper);
-        $this->ephemeral ??= new \danog\MadelineProto\Namespace\AbstractAPI('ephemeral');
-        $this->ephemeral->setWrapper($this->wrapper);
-        $this->toncenter ??= new \danog\MadelineProto\Namespace\AbstractAPI('toncenter');
-        $this->toncenter->setWrapper($this->wrapper);
-        $this->wallet ??= new \danog\MadelineProto\Namespace\AbstractAPI('wallet');
-        $this->wallet->setWrapper($this->wrapper);
+        if (!isset(self::NAMESPACES[$name])) {
+            throw new \Error('Undefined property: '.static::class.'::$'.$name);
+        }
+        return new \danog\MadelineProto\Namespace\AbstractAPI($name, $this->wrapper, $this);
+    }
+    /**
+     * @internal
+     */
+    public function __isset(string $name): bool
+    {
+        return isset(self::NAMESPACES[$name]);
     }
     /**
          * Convert MTProto parameters to bot API parameters.

@@ -190,7 +190,6 @@ final class API extends AbstractAPI
         }
         $this->session = new SessionPaths($session);
         $this->wrapper = new APIWrapper($this->session);
-        $this->exportNamespaces();
 
         Logger::constructorFromSettings($settings instanceof Settings
             ? $settings->getLogger()
@@ -377,7 +376,6 @@ final class API extends AbstractAPI
             $this->wrapper->getAPI()?->unreference();
             $this->wrapper = $unserialized;
             $this->wrapper->setSession($this->session);
-            $this->exportNamespaces();
             if ($this->wrapper->getAPI()) {
                 unset($unserialized);
 
