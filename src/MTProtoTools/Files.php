@@ -1442,15 +1442,7 @@ trait Files
             $cb(100.0, 0.0, 0.0);
             return;
         }
-        if ($part_size === null) {
-            $part_size = 1024 * 1024;
-            if ($end > $offset && !isset($messageMedia['key'])) {
-                // Short ranges (such as browser metadata probes) need not fetch a whole MiB.
-                while ($part_size > 4096 && ($part_size >> 1) >= $end - $offset) {
-                    $part_size >>= 1;
-                }
-            }
-        }
+        $part_size ??= 1024 * 1024;
         $parallel_chunks = $this->settings->getFiles()->getDownloadParallelChunks();
         if (isset($messageMedia['InputFileLocation']['dc_id'])) {
             $datacenter = $this->isTestMode() ? 10_000 + $messageMedia['InputFileLocation']['dc_id'] : $messageMedia['InputFileLocation']['dc_id'];
@@ -1586,25 +1578,11 @@ trait Files
             do {
                 $cancellation?->throwIfRequested();
                 try {
-                    $requests = $this->getDownloadPartRequests($messageMedia, $offset, $cdn, $cancellation);
-                    $requestOffset = $requests->current()['offset'];
-                    $bytes = '';
-                    $eof = false;
-                    foreach ($requests as $request) {
-                        $cancellation?->throwIfRequested();
-                        $res = $this->methodCallAsyncRead($cdn ? 'upload.getCdnFile' : 'upload.getFile', ['offset' => $request['offset'], 'limit' => $request['limit']] + $basic_param, $datacenter);
-                        if (!isset($res['bytes'])) {
-                            break;
-                        }
-                        $bytes .= substr((string) $res['bytes'], 0, $request['length']);
-                        if (\strlen((string) $res['bytes']) < $request['limit']) {
-                            $eof = true;
-                            break;
-                        }
-                    }
-                    if (isset($res['bytes'])) {
-                        $res['bytes'] = $bytes;
-                    }
+                    $res = $this->methodCallAsyncRead(
+                        $cdn ? 'upload.getCdnFile' : 'upload.getFile',
+                        $basic_param + $offset,
+                        $datacenter
+                    );
                     break;
                 } catch (FileRedirect $e) {
                     $datacenter = $e->dc;
@@ -1625,7 +1603,6 @@ trait Files
                 $messageMedia['file_token'] = $res['file_token'];
                 $messageMedia['cdn_key'] = $res['encryption_key'];
                 $messageMedia['cdn_iv'] = $res['encryption_iv'];
-                $this->addCdnHashes($res['file_token'], $res['file_hashes']);
                 $datacenter = ($this->isTestMode() ? 10_000 : 0) + $res['dc_id'];
                 if (!$this->datacenter->has($datacenter)) {
                     $this->config['expires'] = -1;
@@ -1660,17 +1637,13 @@ trait Files
             }
             $cancellation?->throwIfRequested();
             $res['bytes'] = (string) $res['bytes'];
-            if ($cdn) {
-                if ($res['bytes'] === '' && $offset['limit'] < 1024 * 1024) {
-                    throw new SecurityException('Incomplete CDN hash block at offset '.$requestOffset);
-                }
-                $iv = substr($messageMedia['cdn_iv'], 0, 12).pack('N', $requestOffset >> 4);
-                $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $iv);
-                $this->checkCdnHash($messageMedia['file_token'], $requestOffset, $res['bytes'], $eof, $cancellation);
-                $res['bytes'] = substr($res['bytes'], $offset['offset'] - $requestOffset, $offset['limit']);
-            }
             if ($res['bytes'] === '') {
                 return 0;
+            }
+            if (isset($messageMedia['cdn_key'])) {
+                $ivec = substr($messageMedia['cdn_iv'], 0, 12).pack('N', $offset['offset'] >> 4);
+                $res['bytes'] = Crypt::ctrEncrypt($res['bytes'], $messageMedia['cdn_key'], $ivec);
+                $this->checkCdnHash($messageMedia['file_token'], $offset['offset'], $res['bytes'], $cancellation);
             }
             if (!$seekable && $offset['previous_promise'] instanceof Future) {
                 $offset['previous_promise']->await($cancellation);
@@ -1691,31 +1664,6 @@ trait Files
             return $len;
         } while (true);
     }
-    /** @return \Generator<int, array{offset: int, limit: int, length: int}> */
-    private function getDownloadPartRequests(array $media, array $part, bool $cdn, ?Cancellation $cancellation): \Generator
-    {
-        $offset = $part['offset'];
-        $end = $offset + $part['limit'];
-        if ($cdn && $part['limit'] < 1024 * 1024) {
-            $offset = $this->getCdnHash($media['file_token'], $offset, $cancellation)['offset'];
-            $end = min($end, $media['size'] ?? PHP_INT_MAX);
-        }
-        do {
-            $remaining = $end - $offset;
-            if ($cdn && $part['limit'] < 1024 * 1024) {
-                $hash = $this->getCdnHash($media['file_token'], $offset, $cancellation);
-                $remaining = $hash['offset'] + $hash['limit'] - $offset;
-                $end = max($end, $offset + $remaining);
-            }
-            $limit = 1024 * 1024;
-            while ($limit > 4096 && ($offset % $limit !== 0 || ($limit >> 1) >= $remaining)) {
-                $limit >>= 1;
-            }
-            $length = min($limit, $remaining);
-            yield ['offset' => $offset, 'limit' => $limit, 'length' => $length];
-            $offset += $length;
-        } while ($offset < $end);
-    }
     /**
      * @var array<string, array<int, array{limit: int, hash: string}>>
      */
@@ -1730,36 +1678,20 @@ trait Files
             $this->cdn_hashes[$file][$hash['offset']] = ['limit' => $hash['limit'], 'hash' => (string) $hash['hash']];
         }
     }
-    /** @return array{offset: int, limit: int, hash: string} */
-    private function getCdnHash(string $file, int $offset, ?Cancellation $cancellation): array
-    {
-        if (isset($this->cdn_hashes[$file][$offset])) {
-            return ['offset' => $offset] + $this->cdn_hashes[$file][$offset];
-        }
-        for ($attempt = 0; $attempt < 2; $attempt++) {
-            foreach ($this->cdn_hashes[$file] ?? [] as $start => $hash) {
-                if ($start <= $offset && $offset < $start + $hash['limit']) {
-                    return ['offset' => $start] + $hash;
-                }
-            }
-            if ($attempt === 0) {
-                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $this->loginState->getState()->authorizedDc));
-            }
-        }
-        throw new Exception('Could not fetch CDN hashes for offset '.$offset);
-    }
-    /**
-     * @param bool $eof Whether $data ends at the end of the file, whose last block can be shorter than the limit of its hash (as in TDLib).
-     */
-    private function checkCdnHash(string $file, int $offset, string $data, bool $eof, ?Cancellation $cancellation): void
+    private function checkCdnHash(string $file, int $offset, string $data, ?Cancellation $cancellation): void
     {
         while (\strlen($data)) {
-            $hash = $this->getCdnHash($file, $offset, $cancellation);
-            if ($hash['offset'] !== $offset || (!$eof && \strlen($data) < $hash['limit']) || Crypt::sha256(substr($data, 0, $hash['limit'])) !== $hash['hash']) {
+            if (!isset($this->cdn_hashes[$file][$offset])) {
+                $this->addCdnHashes($file, $this->methodCallAsyncRead('upload.getCdnFileHashes', ['file_token' => $file, 'offset' => $offset, 'cancellation' => $cancellation], $this->loginState->getState()->authorizedDc));
+            }
+            if (!isset($this->cdn_hashes[$file][$offset])) {
+                throw new Exception('Could not fetch CDN hashes for offset '.$offset);
+            }
+            if (Crypt::sha256(substr($data, 0, $this->cdn_hashes[$file][$offset]['limit'])) !== $this->cdn_hashes[$file][$offset]['hash']) {
                 throw new SecurityException('CDN hash mismatch for offset '.$offset);
             }
-            $data = substr($data, $hash['limit']);
-            $offset += $hash['limit'];
+            $data = substr($data, $this->cdn_hashes[$file][$offset]['limit']);
+            $offset += $this->cdn_hashes[$file][$offset]['limit'];
         }
     }
 
