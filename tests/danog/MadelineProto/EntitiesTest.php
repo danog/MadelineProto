@@ -111,7 +111,8 @@ class EntitiesTest extends TestCase
         $this->assertEquals(new FormattedDate(86, 16, 1792330294, shortTime: true, shortDate: true), $entities[3]);
         $this->assertSame(['type' => 'date_time', 'offset' => 86, 'length' => 16, 'unix_time' => 1792330294, 'date_time_format' => 'dt'], $entities[3]->toBotAPI());
         $this->assertSame("18/\u{2063}10/\u{2063}26 15:31", StrTools::mbSubstr($message, 86, 16));
-        $this->assertStringContainsString(" fino al 18/\u{2063}10/\u{2063}26 15:31<br>", StrTools::entitiesToHtml($message, $entities));
+        // Without Telegram tags, dates are <time> tags (since telegram-entities 1.1.1)
+        $this->assertStringContainsString(' fino al <time datetime="2026-10-18T13:31:34+00:00">18/'."\u{2063}10/\u{2063}26 15:31</time><br>", StrTools::entitiesToHtml($message, $entities));
 
         $this->assertEquals(new FormattedDate(0, 1, 1, dayOfWeek: true, longDate: true, longTime: true), MessageEntity::fromRawEntity(['type' => 'date_time', 'offset' => 0, 'length' => 1, 'unix_time' => 1, 'date_time_format' => 'wDT']));
         $this->expectException(AssertionError::class);
