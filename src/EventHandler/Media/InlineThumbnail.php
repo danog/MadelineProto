@@ -19,6 +19,7 @@ namespace danog\MadelineProto\EventHandler\Media;
 use AssertionError;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Tools;
 
 /**
@@ -177,12 +178,12 @@ final class InlineThumbnail extends AbstractThumbnail
 
     private static function mac(string $payload, #[\SensitiveParameter] string $key): string
     {
-        return substr(hash_hmac('sha256', $payload, $key, true), 0, self::MAC_LENGTH);
+        return substr(Crypt::hmacSha256($payload, $key), 0, self::MAC_LENGTH);
     }
 
     private static function hash(string $contents): string
     {
-        return bin2hex(substr(hash('sha256', $contents, true), 0, 16));
+        return bin2hex(substr(Crypt::sha256($contents), 0, 16));
     }
 
     /** @return array{string, string} */

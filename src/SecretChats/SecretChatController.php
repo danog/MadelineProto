@@ -375,7 +375,7 @@ final class SecretChatController implements Stringable
                 $padding += 16;
             }
             $message .= Tools::random($padding);
-            $message_key = substr(hash('sha256', substr($this->key['auth_key'], 88 + ($this->public->creator ? 0 : 8), 32).$message, true), 8, 16);
+            $message_key = substr(Crypt::sha256(substr($this->key['auth_key'], 88 + ($this->public->creator ? 0 : 8), 32).$message), 8, 16);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->key['auth_key'], $this->public->creator);
         } else {
             $message_key = substr(sha1($message, true), -16);
@@ -612,7 +612,7 @@ final class SecretChatController implements Stringable
         $key = $key['auth_key'];
         [$aes_key, $aes_iv] = Crypt::kdf($message_key, $key, !$this->public->creator);
         $decrypted_data = Crypt::igeDecrypt($encrypted_data, $aes_key, $aes_iv);
-        if ($message_key != substr(hash('sha256', substr($key, 88 + ($this->public->creator ? 8 : 0), 32).$decrypted_data, true), 8, 16)) {
+        if ($message_key != substr(Crypt::sha256(substr($key, 88 + ($this->public->creator ? 8 : 0), 32).$decrypted_data), 8, 16)) {
             throw new SecurityException('Msg_key mismatch');
         }
         $message_data_length = unpack('V', substr($decrypted_data, 0, 4))[1];

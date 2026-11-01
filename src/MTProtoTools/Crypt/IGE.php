@@ -47,7 +47,7 @@ abstract class IGE
         if (Magic::$hasOpenssl) {
             return new IGEOpenssl($key, $iv);
         }
-        return new IGEPhpseclib($key, $iv);
+        return new IGEPhp($key, $iv);
     }
 
     /**
