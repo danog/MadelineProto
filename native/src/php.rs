@@ -1,4 +1,5 @@
 // Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
+// Copyright 2026 Daniil Gentili <daniil@daniil.it>
 // SPDX-License-Identifier: AGPL-3.0-only
 use crate::crypto::{Buffer, Message, Operation};
 use crate::executor::{Admission, Executor};
@@ -22,7 +23,7 @@ pub struct Crypto;
 #[php_impl]
 impl Crypto {
     pub fn version() -> &'static str {
-        "0.4.0" // PHP API compatibility, independent of the extension release.
+        "0.5.0" // PHP API compatibility, independent of the extension release.
     }
     /// Returns the stream to watch for php-tokio's notifications.
     pub fn init(capacity: i64, byte_limit: i64) -> PhpResult<Zval> {
@@ -204,4 +205,11 @@ pub fn get_module(module: ModuleBuilder) -> ModuleBuilder {
         .version(env!("CARGO_PKG_VERSION"))
         .request_shutdown_function(request_shutdown)
         .class::<Crypto>()
+        .class::<crate::php_api::AesGcm>()
+        .class::<crate::php_api::AesCtr>()
+        .class::<crate::php_api::AesCtrKey>()
+        .class::<crate::php_api::AesCbc>()
+        .class::<crate::php_api::AesIge>()
+        .class::<crate::php_api::Hmac>()
+        .class::<crate::php_api::Hash>()
 }

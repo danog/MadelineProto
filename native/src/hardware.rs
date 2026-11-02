@@ -1,4 +1,5 @@
 // Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
+// Copyright 2026 Daniil Gentili <daniil@daniil.it>
 // SPDX-License-Identifier: AGPL-3.0-only
 // Hardware kernels are entered only after runtime feature detection.
 #![allow(unsafe_op_in_unsafe_fn)]

@@ -1,9 +1,9 @@
 [package]
 name = "madeline-crypto"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 rust-version = "1.92"
-authors = ["Alexander Pankratov <s.pankratoff@gmail.com>"]
+authors = ["Alexander Pankratov <s.pankratoff@gmail.com>", "Daniil Gentili <daniil@daniil.it>"]
 license = "AGPL-3.0-only"
 
 [lib]
@@ -16,6 +16,7 @@ tokio = { version = "=1.54.1", features = ["rt-multi-thread", "sync"] }
 openssl = "=0.10.81"
 zeroize = { version = "=1.9.1", features = ["derive"] }
 libc = "=0.2.191"
+ring = "=0.17.14"
 
 [profile.release]
 opt-level = 3
