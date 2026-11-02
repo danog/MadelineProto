@@ -182,22 +182,40 @@ final class NativePrimitivesTest extends TestCase
         self::assertSame(hash_hmac('sha256', $data, 'k', true), Crypt::hmacSha256($data, 'k'));
     }
 
+    /**
+     * Serializing would silently drop the key: the classes are not serializable (nor clonable), and neither are the
+     * MadelineProto wrappers that hold them.
+     */
     public function testKeyObjectsAreNeitherClonableNorSerializable(): void
     {
-        foreach ([new AesGcm(self::rnd(16)), new AesCtr(self::rnd(16), self::rnd(16)), new AesCtrKey(self::rnd(16)), new Hmac('sha1', 'k'), new Hash('sha1')] as $object) {
-            try {
-                clone $object;
-                self::fail('Cloned '.$object::class);
-            } catch (\Error) {
-                $this->addToAssertionCount(1);
+        $key = self::rnd(32);
+        $objects = [
+            new AesGcm(self::rnd(16)), new AesCtr(self::rnd(16), self::rnd(16)), new AesCtrKey(self::rnd(16)),
+            new Hmac('sha1', 'k'), new Hash('sha1'),
+            new Crypt\AesCtr(self::rnd(16), self::rnd(16)), Crypt\IGE::getSyncInstance($key, self::rnd(32)),
+        ];
+        self::assertInstanceOf(Crypt\IGENativeSync::class, $objects[6]);
+        foreach ($objects as $object) {
+            if (str_starts_with($object::class, 'danog\\MadelineProto\\Native\\')) {
+                self::assertSame('Error', self::failure(static fn () => clone $object), 'Cloned '.$object::class);
             }
-            try {
-                serialize($object);
-                self::fail('Serialized '.$object::class);
-            } catch (\Exception) {
-                $this->addToAssertionCount(1);
-            }
+            self::assertNotSame('', self::failure(static fn () => serialize($object)), 'Serialized '.$object::class);
         }
+        foreach ([AesGcm::class, AesCtr::class, AesCtrKey::class, AesCbc::class, AesIge::class, Hmac::class, Hash::class] as $class) {
+            $payload = 'O:'.\strlen($class).':"'.$class.'":0:{}';
+            self::assertSame('Exception', self::failure(static fn () => unserialize($payload)), "Unserialized $class");
+        }
+    }
+
+    /** The class of what the operation threw, or '' if it didn't. */
+    private static function failure(\Closure $operation): string
+    {
+        try {
+            $operation();
+        } catch (\Throwable $e) {
+            return $e::class;
+        }
+        return '';
     }
 
     private function assertValueError(\Closure $operation): void

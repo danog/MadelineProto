@@ -187,8 +187,11 @@ fn sync_ige_matches_the_executor_kernels() {
     let key = [3u8; 32];
     let iv = [5u8; 32];
     let data: Vec<u8> = (0..96u8).collect();
-    let enc = p::aes_ige(&key, &iv, &data, true).unwrap();
-    assert_eq!(p::aes_ige(&key, &iv, &enc, false).unwrap()[..], data);
+    let mut enc = vec![0; 96];
+    p::aes_ige_into(&key, &iv, &data, true, &mut enc).unwrap();
+    let mut dec = vec![0; 96];
+    p::aes_ige_into(&key, &iv, &enc, false, &mut dec).unwrap();
+    assert_eq!(dec, data);
     let mut m = crate::crypto::Message {
         operation: crate::crypto::Operation::Encrypt,
         input: crate::crypto::Buffer::new(data.clone()),

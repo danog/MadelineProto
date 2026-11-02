@@ -50,6 +50,10 @@ it has no dependency on the removed C helper.
 
 ## Build
 
+PHP 8.1 or later is required: the extension marks its classes `ZEND_ACC_NOT_SERIALIZABLE`, calls
+the engine's `zend_argument_type_error()` and `zend_zval_type_name()` from its raw method
+handlers, and allocates result strings with the `zend_string` header layout and `GC_STRING`
+type info of PHP 8 (as `zend_string_alloc()` does).
 The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
 Build for the target PHP version, architecture and debug ABI.
 Install that PHP's development headers and `php-config`, OpenSSL development

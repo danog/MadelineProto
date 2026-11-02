@@ -161,9 +161,10 @@ extern "C" fn ctr_once(ex: &mut ExecuteData, retval: &mut Zval) {
     };
     ret(
         retval,
-        p::AesCtr::new(key, Some(iv))
-            .map_err(PhpException::from)
-            .and_then(|mut ctr| try_output(data.len(), |out| ctr.process_into(data, out))),
+        // The key schedule is built after the output allocation (see output()).
+        try_output(data.len(), |out| {
+            p::AesCtr::new(key, Some(iv))?.process_into(data, out)
+        }),
     );
 }
 pub fn aes_ctr(class: ClassBuilder) -> ClassBuilder {
@@ -217,9 +218,12 @@ extern "C" fn hmac_compute(ex: &mut ExecuteData, retval: &mut Zval) {
         retval,
         Algo::parse_bytes(algo)
             .map_err(PhpException::from)
+            // The keyed pads are built after the output allocation (see output()).
             .map(|algo| {
-                let hmac = p::Hmac::new(algo, key);
-                output(algo.size(), |out| hmac.mac_into(data, out)).0
+                output(algo.size(), |out| {
+                    p::Hmac::new(algo, key).mac_into(data, out)
+                })
+                .0
             }),
     );
 }

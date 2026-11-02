@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
+use Amp\ForbidSerialization;
 use danog\MadelineProto\Native\AesIge;
 use ValueError;
 
@@ -28,6 +29,8 @@ use ValueError;
  */
 final class IGENativeSync extends IGE
 {
+    use ForbidSerialization;
+
     protected function __construct(#[\SensitiveParameter] private readonly string $key, string $iv)
     {
         if (\strlen($key) !== 32 || \strlen($iv) !== 32) {

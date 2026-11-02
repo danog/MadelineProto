@@ -448,7 +448,15 @@ pub fn aes_cbc_into(
 }
 
 /// One AES-256-IGE call on the PHP thread (MTProto key/IV layout), with the executor's kernels.
-pub fn aes_ige(key: &[u8], iv: &[u8], data: &[u8], encrypt: bool) -> Result<Buffer> {
+/// Writes to `out` (the length of `data`); the native buffers are dropped (and wiped) before it
+/// returns.
+pub fn aes_ige_into(
+    key: &[u8],
+    iv: &[u8],
+    data: &[u8],
+    encrypt: bool,
+    out: &mut [u8],
+) -> Result<()> {
     if key.len() != 32 || iv.len() != 32 {
         return value("AES-256-IGE requires a 32-byte key and IV");
     }
@@ -473,5 +481,6 @@ pub fn aes_ige(key: &[u8], iv: &[u8], data: &[u8], encrypt: bool) -> Result<Buff
     let mut batch = [message];
     crypto::batch(&mut batch).map_err(Error::Internal)?;
     let [message] = batch;
-    Ok(message.output)
+    out.copy_from_slice(&message.output);
+    Ok(())
 }

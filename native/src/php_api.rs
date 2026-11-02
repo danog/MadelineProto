@@ -36,6 +36,10 @@ impl From<Error> for PhpException {
 const GC_STRING: u32 = 6 | (1 << 4);
 /// A new PHP string of `len` zero bytes, filled by `fill`: the only allocation of a call
 /// (zend_string_alloc, which ext-php-rs doesn't export, plus the zero fill).
+///
+/// The string is allocated first: emalloc bails out (longjmp) past the memory limit, which skips
+/// the Drop of every Rust frame in between, so no local holding key material (a key schedule, HMAC
+/// pads, IGE buffers, a running hash) may be live across it: callers build such state in `fill`.
 pub(crate) fn output<R>(len: usize, fill: impl FnOnce(&mut [u8]) -> R) -> (Zval, R) {
     let header = std::mem::offset_of!(zend_string, val);
     let size = (header + len + 1 + 7) & !7;
@@ -58,9 +62,6 @@ pub(crate) fn output<R>(len: usize, fill: impl FnOnce(&mut [u8]) -> R) -> (Zval,
     zval.set_zend_string(string);
     (zval, result)
 }
-fn bytes(data: &[u8]) -> Zval {
-    output(data.len(), |out| out.copy_from_slice(data)).0
-}
 pub(crate) fn try_output(
     len: usize,
     fill: impl FnOnce(&mut [u8]) -> p::Result<()>,
@@ -72,7 +73,7 @@ pub(crate) fn try_output(
 
 /// AES-GCM with the key schedule and GHASH key computed once.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\AesGcm", flags = ClassFlags::Final, modifier = fast_aes_gcm)]
+#[php(name = "danog\\MadelineProto\\Native\\AesGcm", flags = ClassFlags::Final.union(ClassFlags::NotSerializable), modifier = fast_aes_gcm)]
 pub struct AesGcm(pub(crate) p::AesGcm);
 #[php_impl]
 impl AesGcm {
@@ -83,7 +84,7 @@ impl AesGcm {
 
 /// Stateful AES-CTR: the keystream continues across calls.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\AesCtr", flags = ClassFlags::Final, modifier = fast_aes_ctr)]
+#[php(name = "danog\\MadelineProto\\Native\\AesCtr", flags = ClassFlags::Final.union(ClassFlags::NotSerializable), modifier = fast_aes_ctr)]
 pub struct AesCtr(pub(crate) p::AesCtr);
 #[php_impl]
 impl AesCtr {
@@ -94,7 +95,7 @@ impl AesCtr {
 
 /// AES-CTR with the key scheduled once and a fresh IV per call.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\AesCtrKey", flags = ClassFlags::Final, modifier = fast_aes_ctr_key)]
+#[php(name = "danog\\MadelineProto\\Native\\AesCtrKey", flags = ClassFlags::Final.union(ClassFlags::NotSerializable), modifier = fast_aes_ctr_key)]
 pub struct AesCtrKey(pub(crate) p::AesCtr);
 #[php_impl]
 impl AesCtrKey {
@@ -105,7 +106,7 @@ impl AesCtrKey {
 
 /// AES-CBC without padding.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\AesCbc", flags = ClassFlags::Final)]
+#[php(name = "danog\\MadelineProto\\Native\\AesCbc", flags = ClassFlags::Final.union(ClassFlags::NotSerializable))]
 pub struct AesCbc;
 #[php_impl]
 impl AesCbc {
@@ -123,21 +124,25 @@ impl AesCbc {
 
 /// Synchronous AES-256-IGE, for small payloads.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\AesIge", flags = ClassFlags::Final)]
+#[php(name = "danog\\MadelineProto\\Native\\AesIge", flags = ClassFlags::Final.union(ClassFlags::NotSerializable))]
 pub struct AesIge;
 #[php_impl]
 impl AesIge {
     pub fn encrypt(key: Bytes, iv: Bytes, data: Bytes) -> PhpResult<Zval> {
-        Ok(bytes(&p::aes_ige(&key, &iv, &data, true)?))
+        try_output(data.len(), |out| {
+            p::aes_ige_into(&key, &iv, &data, true, out)
+        })
     }
     pub fn decrypt(key: Bytes, iv: Bytes, data: Bytes) -> PhpResult<Zval> {
-        Ok(bytes(&p::aes_ige(&key, &iv, &data, false)?))
+        try_output(data.len(), |out| {
+            p::aes_ige_into(&key, &iv, &data, false, out)
+        })
     }
 }
 
 /// HMAC with the keyed inner and outer states computed once.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\Hmac", flags = ClassFlags::Final, modifier = fast_hmac)]
+#[php(name = "danog\\MadelineProto\\Native\\Hmac", flags = ClassFlags::Final.union(ClassFlags::NotSerializable), modifier = fast_hmac)]
 pub struct Hmac(pub(crate) p::Hmac);
 #[php_impl]
 impl Hmac {
@@ -148,7 +153,7 @@ impl Hmac {
 
 /// An incremental hash.
 #[php_class]
-#[php(name = "danog\\MadelineProto\\Native\\Hash", flags = ClassFlags::Final, modifier = fast_hash)]
+#[php(name = "danog\\MadelineProto\\Native\\Hash", flags = ClassFlags::Final.union(ClassFlags::NotSerializable), modifier = fast_hash)]
 pub struct Hash(pub(crate) Option<p::Digest>);
 #[php_impl]
 impl Hash {
@@ -157,8 +162,14 @@ impl Hash {
     }
     #[php(name = "final")]
     pub fn finish(&mut self) -> PhpResult<Zval> {
-        let digest = self.0.take().ok_or_else(finalized)?;
-        Ok(output(digest.algo().size(), |out| digest.finish_into(out)).0)
+        let size = self.0.as_ref().ok_or_else(finalized)?.algo().size();
+        // The running state is moved out only once the string is allocated (see output()).
+        Ok(output(size, |out| {
+            if let Some(digest) = self.0.take() {
+                digest.finish_into(out);
+            }
+        })
+        .0)
     }
 }
 pub(crate) fn finalized() -> PhpException {

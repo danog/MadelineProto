@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
+use Amp\ForbidSerialization;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Native\AesCtr as NativeAesCtr;
@@ -36,6 +37,8 @@ use const OPENSSL_RAW_DATA;
  */
 final class AesCtr
 {
+    use ForbidSerialization;
+
     private ?NativeAesCtr $native = null;
     private ?AES $phpseclib = null;
     private string $cipher;
