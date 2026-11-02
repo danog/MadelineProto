@@ -46,7 +46,7 @@ final class SecretChatCryptoTest extends TestCase
         BypassFinals::enable();
         $tl = $this->createMock(TLInterface::class);
         // Larger than what Crypt::igeEncrypt() encrypts without the executor, which suspends.
-        $tl->method('serializeObject')->willReturn(str_repeat('b', 8192));
+        $tl->method('serializeObject')->willReturn(str_repeat('b', 32768));
         $api = $this->getMockBuilder(MTProto::class)->disableOriginalConstructor()
             ->onlyMethods(['getTL', '__destruct'])->getMock();
         $api->method('getTL')->willReturn($tl);

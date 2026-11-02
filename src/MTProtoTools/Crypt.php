@@ -47,10 +47,12 @@ final class Crypt
     private static ?int $opensslSha256From = null;
     private static ?bool $native = null;
     /**
-     * One-shot IGE up to this size runs on the PHP thread with the extension: an executor round trip costs ~55 µs
-     * of latency (and a suspension), the AES of 4 KiB ~5 µs (Intel N100); larger ones go to the executor.
+     * One-shot IGE and inbound transport messages up to this size are processed on the PHP thread with the
+     * extension: the executor's cost for them is a suspension and a wakeup of the caller per message (measured
+     * end to end: -6% instructions per RPC outbound, a further -9% instructions and -14% cycles inbound, transfers
+     * unchanged; 1, 4 and 16 KiB were indistinguishable). Larger ones go to the executor.
      */
-    private const SYNC_IGE_MAX = 4096;
+    public const NATIVE_SYNC_MAX = 16384;
 
     /**
      * Whether the madeline_crypto extension provides API 0.5 (synchronous primitives, usable without its executor).
@@ -288,7 +290,7 @@ final class Crypt
      */
     public static function igeEncrypt(string $plaintext, #[\SensitiveParameter] string $key, string $iv): string
     {
-        if (\strlen($plaintext) <= self::SYNC_IGE_MAX && self::native()) {
+        if (\strlen($plaintext) <= self::NATIVE_SYNC_MAX && self::native()) {
             return NativeAesIge::encrypt($key, $iv, $plaintext);
         }
         return IGE::getInstance($key, $iv)->encrypt($plaintext);
@@ -303,7 +305,7 @@ final class Crypt
      */
     public static function igeDecrypt(string $ciphertext, #[\SensitiveParameter] string $key, string $iv): string
     {
-        if (\strlen($ciphertext) <= self::SYNC_IGE_MAX && self::native()) {
+        if (\strlen($ciphertext) <= self::NATIVE_SYNC_MAX && self::native()) {
             return NativeAesIge::decrypt($key, $iv, $ciphertext);
         }
         return IGE::getInstance($key, $iv)->decrypt($ciphertext);

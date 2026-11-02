@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
 
@@ -23,11 +24,25 @@ final class NativeMessageDecoder implements MessageDecoder
             || \strlen($ciphertext) < 48 || \strlen($ciphertext) % 16) {
             throw new SecurityException('Invalid encrypted transport message size');
         }
+        if (\strlen($ciphertext) <= Crypt::NATIVE_SYNC_MAX && Crypt::native()) {
+            // The executor's Decode on the PHP thread: same checks, same failures.
+            try {
+                return self::decoded(\danog\MadelineProto\Native\Crypto::decodeSync($ciphertext, $authKey, $messageKey));
+            } catch (\Exception $e) {
+                if (NativeExecutor::failedWith($e, NativeExecutor::INVALID)) {
+                    throw new SecurityException($e->getMessage(), 0, $e);
+                }
+                if (!NativeExecutor::failedWith($e, NativeExecutor::UNAVAILABLE)) {
+                    throw $e;
+                }
+            }
+            return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
+        }
         $executor = NativeExecutor::get();
         if ($executor) {
             try {
                 $result = $executor->run(static fn (): array => \danog\MadelineProto\Native\Crypto::decode($ciphertext, $authKey, $messageKey));
-                return new DecodedMessage($result[0], Tools::unpackSignedLong(substr($result[1], 8, 8)), (int) unpack('V', substr($result[1], 16, 4))[1], substr($result[1], 0, 8));
+                return self::decoded($result);
             } catch (\Exception $e) {
                 if (NativeExecutor::failedWith($e, NativeExecutor::INVALID)) {
                     throw new SecurityException($e->getMessage(), 0, $e);
@@ -39,5 +54,11 @@ final class NativeMessageDecoder implements MessageDecoder
         }
         // Not decoded natively (no executor, or it was closed or could not take the message).
         return (new PhpMessageDecoder)->decode($ciphertext, $authKey, $messageKey);
+    }
+
+    /** @param array{string, string} $result The body, and the salt, message ID and seqno. */
+    private static function decoded(array $result): DecodedMessage
+    {
+        return new DecodedMessage($result[0], Tools::unpackSignedLong(substr($result[1], 8, 8)), (int) unpack('V', substr($result[1], 16, 4))[1], substr($result[1], 0, 8));
     }
 }

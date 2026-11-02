@@ -111,6 +111,64 @@ impl Crypto {
         }
         execute(Operation::Decode, &data, &auth, &message_key)
     }
+    /// decode() on the PHP thread, for small messages: the same KDF, IGE kernels and checks
+    /// (Message::prepare and Message::finish), failing with the same codes, without the round trip
+    /// through the worker (a suspension and a wakeup of the caller per message).
+    pub fn decode_sync(
+        data: BinarySlice<u8>,
+        auth: BinarySlice<u8>,
+        message_key: BinarySlice<u8>,
+    ) -> PhpResult<Vec<Zval>> {
+        if auth.len() != 256
+            || message_key.len() != 16
+            || data.len() < 48
+            || !data.len().is_multiple_of(16)
+        {
+            return Err("Invalid transport message input".into());
+        }
+        // The body string is allocated first, at its largest size, and shortened after: emalloc
+        // bails out (longjmp) past the memory limit, which would skip the Drop (and wiping) of
+        // the message's key, IV and plaintext. Message::finish() bounds the body by the input.
+        let mut state = [0u8; 20];
+        let (body, result) = crate::php_api::output(data.len(), |out| -> PhpResult<usize> {
+            let mut message = Message {
+                operation: Operation::Decode,
+                input: Buffer::new(data.to_vec()),
+                output: Buffer::uninitialized(data.len()),
+                key: Zeroizing::new([0; 32]),
+                iv: Zeroizing::new([0; 32]),
+                auth: Zeroizing::new([0; 256]),
+                message_key: [0; 16],
+            };
+            message.auth.copy_from_slice(&auth);
+            message.message_key.copy_from_slice(&message_key);
+            let mut batch = [message];
+            crate::crypto::batch(&mut batch).map_err(unavailable)?;
+            let [message] = batch;
+            let output = message.finish().map_err(|e| {
+                if e.starts_with("Invalid MTProto") {
+                    PhpException::new(e, INVALID, ce::exception())
+                } else {
+                    unavailable(e)
+                }
+            })?;
+            let decoded = output.data();
+            out[..decoded.len()].copy_from_slice(decoded);
+            state.copy_from_slice(output.state());
+            Ok(decoded.len())
+        });
+        let length = result?;
+        // SAFETY: a string output() just created, not shared yet; its buffer holds data.len() + 1
+        // bytes, and length <= data.len().
+        unsafe {
+            let string = body.value.str_;
+            (*string).len = length;
+            *(*string).val.as_mut_ptr().add(length) = 0;
+        }
+        let mut info = Zval::new();
+        info.set_zend_string(ZendStr::new(&state[..], false));
+        Ok(vec![body, info])
+    }
 }
 /// The operation was not performed (the executor is closed, or cannot take it):
 /// the caller can perform it with another backend.

@@ -37,6 +37,14 @@ final class Crypto
     public static function decode(string $data, string $auth, string $message_key): array
     {
     }
+    /**
+     * decode() on the PHP thread (no init() needed): the same KDF, checks and exception codes.
+     *
+     * @return array{string, string}
+     */
+    public static function decodeSync(string $data, string $auth, string $message_key): array
+    {
+    }
 }
 
 // The per-packet primitives below are synchronous and need no init(). Their per-packet methods take

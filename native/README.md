@@ -41,9 +41,15 @@ Per call, from PHP (ns, Intel N100, PHP 8.5, best of 5 runs of 200000):
 | `sha1()` / `Hash::digest('sha1')` | 602 / 221 | 3287 / 744 |
 | `hash('sha256')` / `Hash::digest('sha256')` | 252 / 238 | 1018 / 813 |
 
-One-shot IGE up to 4 KiB runs synchronously (`AesIge`, 0.6 µs for 64 bytes, 5 µs for 4 KiB)
-instead of through the executor (a ~55 µs round trip from a Fiber); larger payloads, streams and
-transport decoding use the executor as before.
+One-shot IGE and inbound transport messages up to 16 KiB are processed synchronously (`AesIge`,
+and `Crypto::decodeSync()`, which runs the executor's Decode — KDF, IGE kernels, constant-time
+msg_key check, length and padding checks — on the PHP thread, failing with the same codes). The
+executor's cost for small messages is on the PHP side: suspending and resuming the caller (the
+read loop, for inbound messages) and the wakeup callback, against 0.6 µs of AES for 64 bytes. An
+end-to-end benchmark (parallel 256 MiB transfers plus 5000 small RPCs, perf-counted) measured −6%
+instructions per RPC for synchronous outbound IGE and a further −9% instructions and −14% cycles
+for synchronous inbound decoding, with transfers unchanged; thresholds of 1, 4 and 16 KiB were
+indistinguishable. Larger payloads and IGE streams use the executor as before.
 
 The optional IGEFFI fallback requires enabled FFI and compatible libcrypto symbols;
 it has no dependency on the removed C helper.
