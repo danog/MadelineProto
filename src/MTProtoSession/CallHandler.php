@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoSession;
 
 use Amp\CompositeCancellation;
+
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\Sync\LocalKeyedMutex;
@@ -32,6 +33,7 @@ use danog\MadelineProto\MTProto\Container;
 use danog\MadelineProto\MTProto\LinkedList;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\MTProto\SpecialMethodType;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\TL\Exception;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\WrappedFuture;
@@ -123,7 +125,7 @@ trait CallHandler
             foreach ($args as $k => $sub) {
                 if ($k > 0 && isset($sub['random_id']) && \is_int($sub['random_id'])) {
                     // Each message needs its own random ID, derived from the one of the call so that it's the same if the call is made again.
-                    $sub['random_id'] = Tools::unpackSignedLong(substr(hash('sha256', pack('q', $sub['random_id']).pack('V', $k), true), 0, 8));
+                    $sub['random_id'] = Tools::unpackSignedLong(substr(Crypt::sha256(pack('q', $sub['random_id']).pack('V', $k)), 0, 8));
                 }
                 $sub['queueId'] = $queueId;
                 $sub = $this->API->botAPIToMTProto($sub);

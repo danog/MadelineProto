@@ -157,7 +157,8 @@ final class ConnectionCryptoTest extends TestCase
     }
 
     /**
-     * Building a payload (logging can suspend) and encrypting it (native IGE suspends) happen before it's
+     * Building a payload (logging can suspend) and encrypting it (native IGE suspends, above the size it encrypts
+     * synchronously) happen before it's
      * written: it's only written for the connection, session and key its message IDs were assigned for.
      *
      * @dataProvider outgoingChanges
@@ -208,7 +209,8 @@ final class ConnectionCryptoTest extends TestCase
         $outgoing->constructor = 'test.request';
         $outgoing->contentRelated = true;
         $outgoing->method('hasBody')->willReturn(true);
-        $outgoing->method('getSerializedBody')->willReturn(str_repeat('b', 16));
+        // Larger than what Crypt::igeEncrypt() encrypts without the executor.
+        $outgoing->method('getSerializedBody')->willReturn(str_repeat('b', 8192));
         $outgoing->method('hasPromise')->willReturn(false);
         $outgoing->method('__toString')->willReturn('test request');
         $outgoing->expects(self::never())->method('sent');

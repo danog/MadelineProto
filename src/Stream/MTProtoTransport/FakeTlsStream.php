@@ -21,8 +21,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Stream\MTProtoTransport;
 
 use Amp\Cancellation;
+
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferedStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
@@ -148,7 +150,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
         $hello = substr_replace($hello, pack('n', \strlen($hello) - 5), 3, 2);
         $hello = substr_replace($hello, pack('n', \strlen($hello) - 9), 7, 2);
 
-        $random = hash_hmac('sha256', $hello, $key, true);
+        $random = Crypt::hmacSha256($hello, $key);
         $random = substr($random, 0, 28).pack('V', unpack('V', substr($random, 28))[1] ^ ($time & 0xFFFFFFFF));
         return substr_replace($hello, $random, 11, 32);
     }
@@ -166,7 +168,7 @@ final class FakeTlsStream implements BufferedProxyStreamInterface, BufferInterfa
         }
         $serverRandom = substr($response, 11, 32);
         $response = substr_replace($response, str_repeat("\0", 32), 11, 32);
-        return hash_equals(hash_hmac('sha256', $clientRandom.$response, $key, true), $serverRandom);
+        return hash_equals(Crypt::hmacSha256($clientRandom.$response, $key), $serverRandom);
     }
 
     private static function scope(string $data): string

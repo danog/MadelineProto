@@ -18,6 +18,8 @@ namespace danog\MadelineProto\Tgcalls\E2E;
 
 use danog\MadelineProto\Magic;
 
+use danog\MadelineProto\MTProtoTools\Crypt;
+
 /**
  * The commit-reveal emoji verification of an end-to-end encrypted conference call (subchain 1).
  *
@@ -106,13 +108,11 @@ final class Verification
      * byte strings, concatenated, and used as the HMAC-SHA512 key over the last block hash.
      *
      * @param list<string> $nonces Every participant's revealed 32-byte nonce.
-     *
-     * @psalm-pure
      */
     public static function emojiHash(array $nonces, string $lastBlockHash): string
     {
         sort($nonces, SORT_STRING);
-        return hash_hmac('sha512', $lastBlockHash, implode('', $nonces), true);
+        return Crypt::hmac('sha512', $lastBlockHash, implode('', $nonces));
     }
 
     /**

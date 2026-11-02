@@ -19,10 +19,12 @@
 namespace danog\MadelineProto\Tgcalls;
 
 use Amp\ByteStream\WritableStream;
+
 use danog\MadelineProto\CallStream;
 use danog\MadelineProto\LocalFile;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Loop\VoIP\DjLoop;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\VoIP\Endpoint;
@@ -77,7 +79,7 @@ final class LegacyController
     ) {
         $this->messageHandler = new MessageHandler(
             $this,
-            substr(hash('sha256', $authKey, true), -16)
+            substr(Crypt::sha256($authKey), -16)
         );
         $this->initialize($connections);
     }
