@@ -311,7 +311,8 @@ LABEL "org.opencontainers.image.licenses"=AGPL-3.0-only
 ENV PHP_INI_DIR /usr/local/etc/php
 ENV PATH=/composer/vendor/bin:${PATH}
 
-ENV USE_ZEND_ALLOC=0
+# PHP keeps its own allocator: disabling it (USE_ZEND_ALLOC=0) made every small allocation a jemalloc call,
+# 7-9% more CPU on the call media path. jemalloc still serves its 2 MiB chunks and the C libraries.
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
 RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || \danog\MadelineProto\Native\Crypto::version() !== "0.4.0" || version_compare(phpversion("madeline_crypto"), "0.3.0", "<")) { throw new RuntimeException("Native crypto extension unavailable"); }'
