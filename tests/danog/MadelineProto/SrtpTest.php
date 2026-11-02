@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Test;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use Webrtc\Srtp\AesCtrKey;
 use Webrtc\Srtp\Enum\SrtpProfile;
 use Webrtc\Srtp\Enum\SsrcType;
 use Webrtc\Srtp\Exception\SrtpExceptionInterface;
@@ -36,7 +37,8 @@ final class SrtpTest extends TestCase
      */
     public function testRfc3711KeyDerivationVectors(): void
     {
-        $masterKey = hex2bin('E1F97A0D3E018BE0D64FA32C06DE4139');
+        // derive() takes the master key scheduled once, as the session keeps it.
+        $masterKey = new AesCtrKey(hex2bin('E1F97A0D3E018BE0D64FA32C06DE4139'));
         $masterSalt = hex2bin('0EC675AD498AFEEBB6960B3AABE6');
 
         $derive = new ReflectionMethod(Session::class, 'derive');
