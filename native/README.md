@@ -21,9 +21,11 @@ call, as much as the AES-GCM of a 160-byte packet), taking strings only, as with
 KDFs, big integers and public-key cryptography stay on the PHP builtins: one call costs
 microseconds to milliseconds, where the per-call overhead Rust removes doesn't matter.
 
-Backends: AES-128/256-GCM use ring's VAES/AVX2 and AES-NI/PCLMUL kernels (139 ns per 160-byte
-packet against 222 ns for a reused, key-scheduled EVP context, measured in Rust); AES-192-GCM, CTR
-and CBC a reused key-scheduled EVP context; hashes and HMAC OpenSSL's low-level SHA/MD5 contexts
+Backends: AES-128/256-GCM below 2 KiB use ring's kernels (139 ns per 160-byte packet against 222 ns
+for a reused, key-scheduled EVP context, measured in Rust); from 2 KiB, and AES-192-GCM, a reused
+key-scheduled EVP context (ring seals in place only, so it copies the input first, and its kernels
+aren't faster than OpenSSL's: 0.74-0.82x at 64 KiB on x86 and ARM); CTR and CBC EVP, with the
+ciphers fetched once per process; hashes and HMAC OpenSSL's low-level SHA/MD5 contexts
 (SHA-NI), held inline. Validation errors are `\ValueError` and never fall back; GCM tags are
 checked in constant time (and unauthenticated plaintext wiped). Outputs match the PHP builtins
 byte for byte. `random_bytes`, `hash_equals` and `crc32` are deliberately not provided.
@@ -77,7 +79,9 @@ php --ri madeline_crypto
 ```
 
 On macOS Cargo produces a `.dylib`; install it under the same `.so` extension
-name. The extension currently targets Unix. Restart PHP processes after installation.
+name. `.cargo/config.toml` links it with `-undefined dynamic_lookup` (PHP's symbols resolve at load
+time) and skips the strip pass, whose output macOS 27's dyld rejects ("mis-aligned LINKEDIT string
+pool"). The extension currently targets Unix. Restart PHP processes after installation.
 Rust/Cargo/libclang exist only in the Docker build stage. TAS reuses a compatible
 base extension or builds against the base image's PHP; its sources are mirrored
 in `dev/crypto`.

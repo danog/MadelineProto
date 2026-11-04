@@ -1,0 +1,5 @@
+# macOS: PHP's symbols resolve when the extension is loaded, not at link time; and no strip pass:
+# cargo's default (`strip -S` after linking) leaves the dylib's string table 4-byte aligned with
+# Xcode 27's strip, which macOS 27's dyld rejects ("mis-aligned LINKEDIT string pool").
+[target.'cfg(target_os = "macos")']
+rustflags = ["-C", "link-arg=-undefined", "-C", "link-arg=dynamic_lookup", "-C", "strip=none"]

@@ -279,3 +279,45 @@ fn uninitialized_outputs_match_initialized_ones() {
         assert_eq!(a, bytes(b), "cbc, {klen}-byte key");
     }
 }
+
+#[test]
+fn gcm_agrees_with_openssl_on_both_sides_of_the_evp_threshold() {
+    use openssl::symm::{decrypt_aead, encrypt_aead, Cipher};
+    for (klen, cipher) in [
+        (16, Cipher::aes_128_gcm()),
+        (24, Cipher::aes_192_gcm()),
+        (32, Cipher::aes_256_gcm()),
+    ] {
+        let key: Vec<u8> = (0..klen as u8).collect();
+        let mut gcm = p::AesGcm::new(&key).unwrap();
+        let t = p::GCM_EVP_MIN;
+        for len in [0, 1, 1500, t - 1, t, t + 1, 3 * t + 5] {
+            let data: Vec<u8> = (0..len).map(|i| (i * 7) as u8).collect();
+            let (nonce, aad) = ([len as u8; 12], b"header");
+            let mut tag = [0; 16];
+            let expected = encrypt_aead(cipher, &key, Some(&nonce), aad, &data, &mut tag).unwrap();
+            let mut out = vec![0; len + 16];
+            gcm.encrypt_into(&nonce, aad, &data, &mut out).unwrap();
+            assert_eq!(&out[..len], &expected[..], "{klen}-byte key, {len} bytes");
+            assert_eq!(&out[len..], &tag, "tag, {klen}-byte key, {len} bytes");
+            assert_eq!(
+                decrypt_aead(cipher, &key, Some(&nonce), aad, &out[..len], &tag).unwrap(),
+                data
+            );
+            let mut plain = vec![0; len];
+            assert!(gcm
+                .decrypt_into(&nonce, aad, &out[..len], &tag, &mut plain)
+                .unwrap());
+            assert_eq!(plain, data);
+            tag[0] ^= 1;
+            let mut wiped = vec![0xaa; len];
+            assert!(!gcm
+                .decrypt_into(&nonce, aad, &out[..len], &tag, &mut wiped)
+                .unwrap());
+            assert!(
+                wiped.iter().all(|&x| x == 0),
+                "failed decrypt wipes, {klen}-byte key, {len} bytes"
+            );
+        }
+    }
+}

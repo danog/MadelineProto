@@ -18,6 +18,7 @@ use std::{
     ffi::c_int,
     marker::PhantomData,
     mem::{ManuallyDrop, MaybeUninit},
+    sync::OnceLock,
 };
 use zeroize::{Zeroize, Zeroizing};
 
@@ -253,19 +254,78 @@ impl Hmac {
 // ---------------------------------------------------------------------------------------------
 // AES
 
-fn aes_cipher(key: &[u8], mode: &str) -> Result<&'static CipherRef> {
-    Ok(match (key.len(), mode) {
-        (16, "gcm") => Cipher::aes_128_gcm(),
-        (24, "gcm") => Cipher::aes_192_gcm(),
-        (32, "gcm") => Cipher::aes_256_gcm(),
-        (16, "ctr") => Cipher::aes_128_ctr(),
-        (24, "ctr") => Cipher::aes_192_ctr(),
-        (32, "ctr") => Cipher::aes_256_ctr(),
-        (16, "cbc") => Cipher::aes_128_cbc(),
-        (24, "cbc") => Cipher::aes_192_cbc(),
-        (32, "cbc") => Cipher::aes_256_cbc(),
+#[derive(Clone, Copy)]
+enum Mode {
+    Gcm,
+    Ctr,
+    Cbc,
+}
+/// The AES ciphers, fetched once. A legacy `Cipher::aes_*()` passed to EVP init makes OpenSSL 3
+/// fetch the provider implementation again on every init (a locked store lookup: ~210 of the
+/// ~440 ns of a one-shot 80-byte AES-CTR context on x86).
+fn aes_cipher(key: &[u8], mode: Mode) -> Result<&'static CipherRef> {
+    static FETCHED: OnceLock<[Option<Cipher>; 9]> = OnceLock::new();
+    const NAMES: [&str; 9] = [
+        "AES-128-GCM",
+        "AES-192-GCM",
+        "AES-256-GCM",
+        "AES-128-CTR",
+        "AES-192-CTR",
+        "AES-256-CTR",
+        "AES-128-CBC",
+        "AES-192-CBC",
+        "AES-256-CBC",
+    ];
+    let size = match key.len() {
+        16 => 0,
+        24 => 1,
+        32 => 2,
         _ => return value("AES keys are 16, 24 or 32 bytes"),
+    };
+    let i = mode as usize * 3 + size;
+    let fetched = FETCHED.get_or_init(|| NAMES.map(|name| Cipher::fetch(None, name, None).ok()));
+    Ok(match &fetched[i] {
+        Some(cipher) => cipher,
+        // Not fetchable (e.g. a provider without it): the legacy cipher, fetched per init.
+        None => [
+            Cipher::aes_128_gcm,
+            Cipher::aes_192_gcm,
+            Cipher::aes_256_gcm,
+            Cipher::aes_128_ctr,
+            Cipher::aes_192_ctr,
+            Cipher::aes_256_ctr,
+            Cipher::aes_128_cbc,
+            Cipher::aes_192_cbc,
+            Cipher::aes_256_cbc,
+        ][i](),
     })
+}
+/// A context keyed for `cipher`, in one EVP init (the crate's `encrypt_init` does two, plus length
+/// getters). The key length matches `cipher` (from [`aes_cipher`]); `iv`, if any, is checked by the
+/// caller.
+fn cipher_ctx(
+    cipher: &CipherRef,
+    key: &[u8],
+    iv: Option<&[u8]>,
+    encrypt: bool,
+) -> Result<CipherCtx> {
+    let ctx = CipherCtx::new()?;
+    // SAFETY: the context is fresh, the key is as long as the cipher's, the IV (if any) as long as
+    // its IV (16 bytes for CTR and CBC; GCM gets its nonce later).
+    let ok = unsafe {
+        openssl_sys::EVP_CipherInit_ex(
+            ctx.as_ptr(),
+            cipher.as_ptr(),
+            std::ptr::null_mut(),
+            key.as_ptr(),
+            iv.map_or(std::ptr::null(), <[u8]>::as_ptr),
+            c_int::from(encrypt),
+        )
+    };
+    if ok != 1 {
+        return Err(openssl::error::ErrorStack::get().into());
+    }
+    Ok(ctx)
 }
 /// EVP_CipherUpdate takes an int length.
 const CHUNK: usize = 1 << 30;
@@ -369,37 +429,48 @@ fn update(ctx: &mut CipherCtx, input: &[u8], output: &mut Out<'_>) -> Result<()>
 }
 
 pub const GCM_TAG: usize = 16;
-/// AES-GCM: ring's VAES/AVX2 and AES-NI/PCLMUL kernels for 128/256-bit keys (key schedule and
-/// GHASH table computed once), a key-scheduled reused OpenSSL context for 192-bit keys.
-/// The ring key stays inline: no indirection per packet.
-#[allow(clippy::large_enum_variant)]
-pub enum AesGcm {
-    Ring(ManuallyDrop<aead::LessSafeKey>),
-    Evp { enc: CipherCtx, dec: CipherCtx },
+/// From this length, AES-GCM goes through OpenSSL's EVP instead of ring. ring only seals in place, so
+/// its output is a copy of the input first (15% of the time at 512 KiB), and its x86 VAES/AVX2 and
+/// aarch64 kernels aren't faster than OpenSSL's: 0.70-0.82x of EVP at 64 KiB on both. ring wins on
+/// small packets (no context reinit per call): 1.6x at 256 B, equal at 1.5-2 KiB.
+pub const GCM_EVP_MIN: usize = 2048;
+/// AES-GCM with the key scheduled once: ring's kernels (key schedule and GHASH table inline) for
+/// 128/256-bit keys below [`GCM_EVP_MIN`], reused OpenSSL contexts otherwise (and for 192-bit keys,
+/// which ring lacks).
+pub struct AesGcm {
+    ring: Option<ManuallyDrop<aead::LessSafeKey>>,
+    enc: CipherCtx,
+    dec: CipherCtx,
 }
 impl AesGcm {
     pub fn new(key: &[u8]) -> Result<Self> {
-        let algorithm = match key.len() {
-            16 => &aead::AES_128_GCM,
-            32 => &aead::AES_256_GCM,
-            24 => {
-                let cipher = Cipher::aes_192_gcm();
-                let mut enc = CipherCtx::new()?;
-                enc.encrypt_init(Some(cipher), Some(key), None)?;
-                let mut dec = CipherCtx::new()?;
-                dec.decrypt_init(Some(cipher), Some(key), None)?;
-                return Ok(AesGcm::Evp { enc, dec });
-            }
-            _ => return value("AES-GCM keys are 16, 24 or 32 bytes"),
-        };
-        let key = aead::UnboundKey::new(algorithm, key)
-            .map_err(|_| Error::Internal("Could not schedule the AES-GCM key".into()))?;
-        Ok(AesGcm::Ring(ManuallyDrop::new(aead::LessSafeKey::new(key))))
+        let cipher =
+            aes_cipher(key, Mode::Gcm).or_else(|_| value("AES-GCM keys are 16, 24 or 32 bytes"))?;
+        let ring = match key.len() {
+            16 => Some(&aead::AES_128_GCM),
+            32 => Some(&aead::AES_256_GCM),
+            _ => None,
+        }
+        .map(|algorithm| {
+            aead::UnboundKey::new(algorithm, key)
+                .map(|key| ManuallyDrop::new(aead::LessSafeKey::new(key)))
+                .map_err(|_| Error::Internal("Could not schedule the AES-GCM key".into()))
+        })
+        .transpose()?;
+        Ok(AesGcm {
+            ring,
+            enc: cipher_ctx(cipher, key, None, true)?,
+            dec: cipher_ctx(cipher, key, None, false)?,
+        })
     }
     fn nonce(nonce: &[u8]) -> Result<[u8; 12]> {
         nonce
             .try_into()
             .or_else(|_| value("AES-GCM nonces are 12 bytes"))
+    }
+    /// ring's key, if this length goes through ring.
+    fn ring(&self, len: usize) -> Option<&aead::LessSafeKey> {
+        self.ring.as_deref().filter(|_| len < GCM_EVP_MIN)
     }
     /// `out`: plaintext length + 16 (the ciphertext, then the tag).
     pub fn encrypt_into<'a>(
@@ -415,29 +486,27 @@ impl AesGcm {
             return value("AES-GCM output must be the plaintext length plus the tag");
         }
         let (mut body, tag) = out.split_at(plaintext.len());
-        match self {
-            AesGcm::Ring(key) => {
-                let body = body.fill_from(plaintext);
-                let t = key
-                    .seal_in_place_separate_tag(
-                        aead::Nonce::assume_unique_for_key(nonce),
-                        aead::Aad::from(aad),
-                        body,
-                    )
-                    .map_err(|_| Error::Value("AES-GCM input too long".into()))?;
-                tag.fill_from(t.as_ref());
+        if let Some(key) = self.ring(plaintext.len()) {
+            let body = body.fill_from(plaintext);
+            let t = key
+                .seal_in_place_separate_tag(
+                    aead::Nonce::assume_unique_for_key(nonce),
+                    aead::Aad::from(aad),
+                    body,
+                )
+                .map_err(|_| Error::Value("AES-GCM input too long".into()))?;
+            tag.fill_from(t.as_ref());
+        } else {
+            let enc = &mut self.enc;
+            enc.encrypt_init(None, None, Some(&nonce))?;
+            if !aad.is_empty() {
+                enc.cipher_update(aad, None)?;
             }
-            AesGcm::Evp { enc, .. } => {
-                enc.encrypt_init(None, None, Some(&nonce))?;
-                if !aad.is_empty() {
-                    enc.cipher_update(aad, None)?;
-                }
-                update(enc, plaintext, &mut body)?;
-                enc.cipher_final(&mut [])?;
-                let mut t = [0; GCM_TAG];
-                enc.tag(&mut t)?;
-                tag.fill_from(&t);
-            }
+            update(enc, plaintext, &mut body)?;
+            enc.cipher_final(&mut [])?;
+            let mut t = [0; GCM_TAG];
+            enc.tag(&mut t)?;
+            tag.fill_from(&t);
         }
         Ok(())
     }
@@ -458,33 +527,31 @@ impl AesGcm {
         if out.len() != ciphertext.len() {
             return value("AES-GCM output must be the ciphertext length");
         }
-        let ok = match self {
-            AesGcm::Ring(key) => {
-                let buf = Out {
-                    ptr: out.ptr,
-                    len: out.len,
-                    _buf: PhantomData,
-                }
-                .fill_from(ciphertext);
-                key.open_in_place_separate_tag(
-                    aead::Nonce::assume_unique_for_key(nonce),
-                    aead::Aad::from(aad),
-                    aead::Tag::from(tag),
-                    buf,
-                    0..,
-                )
-                .is_ok()
+        let ok = if let Some(key) = self.ring(ciphertext.len()) {
+            let buf = Out {
+                ptr: out.ptr,
+                len: out.len,
+                _buf: PhantomData,
             }
-            AesGcm::Evp { dec, .. } => {
-                dec.decrypt_init(None, None, Some(&nonce))?;
-                if !aad.is_empty() {
-                    dec.cipher_update(aad, None)?;
-                }
-                update(dec, ciphertext, &mut out)?;
-                dec.set_tag(&tag)?;
-                // The tag comparison is constant-time (CRYPTO_memcmp).
-                dec.cipher_final(&mut []).is_ok()
+            .fill_from(ciphertext);
+            key.open_in_place_separate_tag(
+                aead::Nonce::assume_unique_for_key(nonce),
+                aead::Aad::from(aad),
+                aead::Tag::from(tag),
+                buf,
+                0..,
+            )
+            .is_ok()
+        } else {
+            let dec = &mut self.dec;
+            dec.decrypt_init(None, None, Some(&nonce))?;
+            if !aad.is_empty() {
+                dec.cipher_update(aad, None)?;
             }
+            update(dec, ciphertext, &mut out)?;
+            dec.set_tag(&tag)?;
+            // The tag comparison is constant-time (CRYPTO_memcmp).
+            dec.cipher_final(&mut []).is_ok()
         };
         if !ok {
             out.wipe();
@@ -494,7 +561,7 @@ impl AesGcm {
 }
 impl Drop for AesGcm {
     fn drop(&mut self) {
-        if let AesGcm::Ring(key) = self {
+        if let Some(key) = &mut self.ring {
             // SAFETY: ring's AES-GCM key (round keys, GHASH powers) is inline and has no Drop.
             unsafe { wipe::<aead::LessSafeKey>(key) }
         }
@@ -507,13 +574,11 @@ pub struct AesCtr(CipherCtx);
 impl AesCtr {
     /// Schedules the key; with an IV, also starts the keystream.
     pub fn new(key: &[u8], iv: Option<&[u8]>) -> Result<Self> {
-        let cipher = aes_cipher(key, "ctr")?;
+        let cipher = aes_cipher(key, Mode::Ctr)?;
         if iv.is_some_and(|iv| iv.len() != 16) {
             return value("AES-CTR IVs are 16 bytes");
         }
-        let mut ctx = CipherCtx::new()?;
-        ctx.encrypt_init(Some(cipher), Some(key), iv)?;
-        Ok(Self(ctx))
+        Ok(Self(cipher_ctx(cipher, key, iv, true)?))
     }
     /// Continues the keystream (byte-granular).
     pub fn process_into<'a>(&mut self, data: &[u8], out: impl Into<Out<'a>>) -> Result<()> {
@@ -541,19 +606,14 @@ pub fn aes_cbc_into<'a>(
     encrypt: bool,
     out: impl Into<Out<'a>>,
 ) -> Result<()> {
-    let cipher = aes_cipher(key, "cbc")?;
+    let cipher = aes_cipher(key, Mode::Cbc)?;
     if iv.len() != 16 {
         return value("AES-CBC IVs are 16 bytes");
     }
     if !data.len().is_multiple_of(16) {
         return value("AES-CBC data length must be a multiple of 16");
     }
-    let mut ctx = CipherCtx::new()?;
-    if encrypt {
-        ctx.encrypt_init(Some(cipher), Some(key), Some(iv))?;
-    } else {
-        ctx.decrypt_init(Some(cipher), Some(key), Some(iv))?;
-    }
+    let mut ctx = cipher_ctx(cipher, key, Some(iv), encrypt)?;
     ctx.set_padding(false);
     update(&mut ctx, data, &mut out.into())
 }
