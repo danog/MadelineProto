@@ -13,10 +13,33 @@ namespace danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
+use Revolt\EventLoop;
 
 /** @internal */
 final class NativeMessageDecoder implements MessageDecoder
 {
+    /** At most this long between two yields to the event loop of the synchronous decodes. */
+    private const YIELD_INTERVAL_NS = 1_000_000;
+    private static int $lastYieldNs = 0;
+
+    /**
+     * An executor decode completes in a later loop tick, letting the timers run in between; a synchronous one
+     * doesn't, so the read loop would chain the dispatch of every message it reads into a single tick (upload
+     * timers 0.5-1 ms late at p99). Yielding once per millisecond restores those tick boundaries without
+     * a loop iteration per message (which cost 10% of the CPU of RPC bursts).
+     */
+    private static function yieldToLoop(): void
+    {
+        $now = hrtime(true);
+        if ($now - self::$lastYieldNs < self::YIELD_INTERVAL_NS) {
+            return;
+        }
+        self::$lastYieldNs = $now;
+        $suspension = EventLoop::getSuspension();
+        EventLoop::defer($suspension->resume(...));
+        $suspension->suspend();
+    }
+
     #[\Override]
     public function decode(string $ciphertext, string $authKey, string $messageKey): DecodedMessage
     {
@@ -27,7 +50,9 @@ final class NativeMessageDecoder implements MessageDecoder
         if (\strlen($ciphertext) <= Crypt::NATIVE_SYNC_MAX && Crypt::native()) {
             // The executor's Decode on the PHP thread: same checks, same failures.
             try {
-                return self::decoded(\danog\MadelineProto\Native\Crypto::decodeSync($ciphertext, $authKey, $messageKey));
+                $decoded = self::decoded(\danog\MadelineProto\Native\Crypto::decodeSync($ciphertext, $authKey, $messageKey));
+                self::yieldToLoop();
+                return $decoded;
             } catch (\Exception $e) {
                 if (NativeExecutor::failedWith($e, NativeExecutor::INVALID)) {
                     throw new SecurityException($e->getMessage(), 0, $e);
