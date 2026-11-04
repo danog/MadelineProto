@@ -280,13 +280,14 @@ RUN set -eux; \
 	mkdir -p /app; \
 	chown madeline:madeline /app
 
-# Build against the exact PHP headers and ABI shipped in the runtime.
+# Build against the exact PHP headers and ABI shipped in the runtime (danog/MadelineCrypto, pinned).
 FROM php-runtime AS crypto-build
 USER root
+ARG MADELINE_CRYPTO_VERSION=0.5.1
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates \
+    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates git \
     && rm -rf /var/lib/apt/lists/*
-COPY native/ /usr/src/madeline-crypto/
+RUN git clone --depth 1 --branch "$MADELINE_CRYPTO_VERSION" https://github.com/danog/MadelineCrypto.git /usr/src/madeline-crypto
 WORKDIR /usr/src/madeline-crypto
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
     && /root/.cargo/bin/cargo test --release --locked --no-default-features --features const-widths \
