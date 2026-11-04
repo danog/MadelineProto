@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\MTProtoTools\Crypt;
 
 /**
  * Continuous mode IGE implementation.
@@ -55,6 +56,9 @@ abstract class IGE
      */
     public static function getSyncInstance(#[\SensitiveParameter] string $key, string $iv): IGE
     {
+        if (Crypt::native()) {
+            return new IGENativeSync($key, $iv);
+        }
         if (IGEFFI::isAvailable()) {
             return new IGEFFI($key, $iv);
         }

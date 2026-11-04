@@ -237,9 +237,9 @@ final class SecretChatController implements Stringable
             $params['g_a'] = new BigInteger((string) $params['g_a'], 256);
             Crypt::checkG($params['g_a'], $dh_config['p']);
             $key = ['auth_key' => str_pad($params['g_a']->powMod($b, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+            $key['fingerprint'] = substr(Crypt::sha1($key['auth_key']), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
-            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+            $key['visualization_46'] = substr(Crypt::sha256($key['auth_key']), 20);
 
             $this->rekeyState = RekeyState::ACCEPTED;
             $this->rekeyExchangeId = $params['exchange_id'];
@@ -272,9 +272,9 @@ final class SecretChatController implements Stringable
             Crypt::checkG($params['g_b'], $dh_config['p']);
             \assert($this->rekeyParam !== null);
             $key = ['auth_key' => str_pad($params['g_b']->powMod($this->rekeyParam, $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT)];
-            $key['fingerprint'] = substr(sha1($key['auth_key'], true), -8);
+            $key['fingerprint'] = substr(Crypt::sha1($key['auth_key']), -8);
             $key['visualization_orig'] = $this->key['visualization_orig'];
-            $key['visualization_46'] = substr(hash('sha256', $key['auth_key'], true), 20);
+            $key['visualization_46'] = substr(Crypt::sha256($key['auth_key']), 20);
             if ($key['fingerprint'] !== $params['key_fingerprint']) {
                 $this->API->methodCallAsyncRead('messages.sendEncryptedService', ['peer' => $this->id, 'message' => ['_' => 'decryptedMessageService', 'action' => ['_' => 'decryptedMessageActionAbortKey', 'exchange_id' => $params['exchange_id']]]]);
                 throw new SecurityException('Invalid key fingerprint!');
@@ -378,7 +378,7 @@ final class SecretChatController implements Stringable
             $message_key = substr(Crypt::sha256(substr($this->key['auth_key'], 88 + ($this->public->creator ? 0 : 8), 32).$message), 8, 16);
             [$aes_key, $aes_iv] = Crypt::kdf($message_key, $this->key['auth_key'], $this->public->creator);
         } else {
-            $message_key = substr(sha1($message, true), -16);
+            $message_key = substr(Crypt::sha1($message), -16);
             [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $this->key['auth_key'], true);
             $message .= Tools::random(Tools::posmod(-\strlen($message), 16));
         }
@@ -594,7 +594,7 @@ final class SecretChatController implements Stringable
         if ($message_data_length > \strlen($decrypted_data)) {
             throw new SecurityException('message_data_length is too big');
         }
-        if ($message_key != substr(sha1(substr($decrypted_data, 0, 4 + $message_data_length), true), -16)) {
+        if ($message_key != substr(Crypt::sha1(substr($decrypted_data, 0, 4 + $message_data_length)), -16)) {
             throw new SecurityException('Msg_key mismatch');
         }
         if (\strlen($decrypted_data) - 4 - $message_data_length > 15) {

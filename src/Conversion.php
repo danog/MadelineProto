@@ -326,7 +326,7 @@ final class Conversion
      */
     private static function tdesktopFilePart(string $name): string
     {
-        return strtoupper(strrev(bin2hex(strrev(substr(md5($name, true), 0, 8)))));
+        return strtoupper(strrev(bin2hex(strrev(substr(Crypt::md5($name), 0, 8)))));
     }
 
     /**
@@ -349,7 +349,7 @@ final class Conversion
             $versionBytes = substr($contents, 4, 4);
             Logger::log('TDesktop version: '.unpack('V', $versionBytes)[1]);
             $data = substr($contents, 8, -16);
-            if (md5($data.pack('V', \strlen($data)).$versionBytes.'TDF$', true) !== substr($contents, -16)) {
+            if (Crypt::md5($data.pack('V', \strlen($data)).$versionBytes.'TDF$') !== substr($contents, -16)) {
                 Logger::log("Wrong MD5 in $file", Logger::ERROR);
                 continue;
             }
@@ -399,7 +399,7 @@ final class Conversion
         $message_key = substr($encrypted, 0, 16);
         [$aes_key, $aes_iv] = Crypt::oldKdf($message_key, $key, false);
         $decrypted = Crypt::igeDecrypt(substr($encrypted, 16), $aes_key, $aes_iv);
-        if ($message_key !== substr(sha1($decrypted, true), 0, 16)) {
+        if ($message_key !== substr(Crypt::sha1($decrypted), 0, 16)) {
             throw new SecurityException('msg_key mismatch: wrong passcode?');
         }
         $length = unpack('V', $decrypted)[1];
@@ -414,7 +414,7 @@ final class Conversion
      */
     private static function tdesktopCreateLocalKey(string $passcode, string $salt): string
     {
-        $hash = hash('sha512', $salt.$passcode.$salt, true);
+        $hash = Crypt::sha512($salt.$passcode.$salt);
         return openssl_pbkdf2($hash, $salt, 256, $passcode === '' ? 1 : 100000, 'sha512');
     }
 

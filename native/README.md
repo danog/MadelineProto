@@ -1,19 +1,70 @@
 # Optional Rust cryptography extension
 
 The Docker image includes `madeline_crypto`. Other installations use
-IGEFFI with system libcrypto, then ext-openssl and phpseclib. CTR and CDN keep
-their existing PHP implementations. The extension needs no library paths, FFI
+IGEFFI with system libcrypto, then ext-openssl and phpseclib for IGE, and the PHP
+builtins (openssl, hash) for the other primitives. The extension needs no library paths, FFI
 permissions or runtime compilation.
+## API 0.5: the per-packet and per-message primitives
+
+`Crypto::version()` is `0.5.0`; callers check
+`\extension_loaded('madeline_crypto') && version_compare(Crypto::version(), '0.5.0', '>=')` once
+and keep their PHP implementation as the fallback. Besides the executor's IGE and transport
+decoding, the extension exports the primitives that gain from Rust because they run per packet or
+per message (namespace `danog\MadelineProto\Native`, all `final`, see `stubs/crypto.php`):
+`AesGcm`, `AesCtr` (stateful keystream), `AesCtrKey` (fresh IV per call), `AesCbc`, `AesIge`
+(synchronous, small payloads), `Hmac`, `Hash`. They are synchronous and need no `init()` (IPC
+clients, tests, php-rtc standalone). Key objects schedule their key (GHASH key, HMAC inner/outer
+state) once in the constructor, zeroize it on drop and can't be cloned or serialized. A call looks
+nothing up by name and allocates only the returned string: the hot methods are raw handlers
+reading their arguments from the call frame (ext-php-rs's generated handlers allocate a parser per
+call, as much as the AES-GCM of a 160-byte packet), taking strings only, as with `strict_types`.
+KDFs, big integers and public-key cryptography stay on the PHP builtins: one call costs
+microseconds to milliseconds, where the per-call overhead Rust removes doesn't matter.
+
+Backends: AES-128/256-GCM use ring's VAES/AVX2 and AES-NI/PCLMUL kernels (139 ns per 160-byte
+packet against 222 ns for a reused, key-scheduled EVP context, measured in Rust); AES-192-GCM, CTR
+and CBC a reused key-scheduled EVP context; hashes and HMAC OpenSSL's low-level SHA/MD5 contexts
+(SHA-NI), held inline. Validation errors are `\ValueError` and never fall back; GCM tags are
+checked in constant time (and unauthenticated plaintext wiped). Outputs match the PHP builtins
+byte for byte. `random_bytes`, `hash_equals` and `crc32` are deliberately not provided.
+
+Per call, from PHP (ns, Intel N100, PHP 8.5, best of 5 runs of 200000):
+
+| Operation | 160 B | 1200 B |
+|---|---|---|
+| `openssl_encrypt()` aes-128-gcm / `AesGcm(128)->encrypt()` | 2189 / 200 | 2879 / 655 |
+| `openssl_decrypt()` aes-128-gcm / `AesGcm(128)->decrypt()` | 2252 / 193 | 2781 / 533 |
+| `sodium_crypto_aead_aes256gcm_encrypt()` / `AesGcm(256)->encrypt()` | 343 / 209 | 1114 / 736 |
+| `openssl_encrypt()` aes-128-ctr / `AesCtrKey->apply()` / `AesCtr->process()` | 1617 / 166 / 117 | 1930 / 305 / 277 |
+| `hash_hmac()` sha1 / `Hmac->mac()` | 1356 / 349 | 3942 / 825 |
+| `hash_hmac()` sha256 / `Hmac->mac()` | 589 / 394 | 1218 / 961 |
+| `sha1()` / `Hash::digest('sha1')` | 602 / 221 | 3287 / 744 |
+| `hash('sha256')` / `Hash::digest('sha256')` | 252 / 238 | 1018 / 813 |
+
+One-shot IGE and inbound transport messages up to 16 KiB are processed synchronously (`AesIge`,
+and `Crypto::decodeSync()`, which runs the executor's Decode — KDF, IGE kernels, constant-time
+msg_key check, length and padding checks — on the PHP thread, failing with the same codes). The
+executor's cost for small messages is on the PHP side: suspending and resuming the caller (the
+read loop, for inbound messages) and the wakeup callback, against 0.6 µs of AES for 64 bytes. An
+end-to-end benchmark (parallel 256 MiB transfers plus 5000 small RPCs, perf-counted) measured −6%
+instructions per RPC for synchronous outbound IGE and a further −9% instructions and −14% cycles
+for synchronous inbound decoding, with transfers unchanged; thresholds of 1, 4 and 16 KiB were
+indistinguishable. Larger payloads and IGE streams use the executor as before.
+
 The optional IGEFFI fallback requires enabled FFI and compatible libcrypto symbols;
 it has no dependency on the removed C helper.
 
 ## Build
 
+PHP 8.1 or later is required: the extension marks its classes `ZEND_ACC_NOT_SERIALIZABLE`, calls
+the engine's `zend_argument_type_error()` and `zend_zval_type_name()` from its raw method
+handlers, and allocates result strings with the `zend_string` header layout and `GC_STRING`
+type info of PHP 8 (as `zend_string_alloc()` does).
 The current bridge supports NTS PHP; ZTS initialization falls back to PHP.
 Build for the target PHP version, architecture and debug ABI.
 Install that PHP's development headers and `php-config`, OpenSSL development
 headers, a linker, pkg-config and libclang. Rust 1.92.0 is pinned by
-`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies. API 0.4 accepts queue count
+`rust-toolchain.toml`; Cargo.lock pins all transitive dependencies (ring also needs a C compiler). API 0.4 accepts queue count
 and byte limit, and `init()` returns php-tokio's notification stream; width is always selected
 adaptively.
 
@@ -108,9 +159,11 @@ cargo test --release --locked --no-default-features
 cargo test --release --locked --no-default-features --features const-widths
 ```
 
-PHP tests cover known vectors, continuation/IV, independent and ordered chains,
+Rust tests cover the known vectors of the primitives (NIST GCM, RFC 3686, SP 800-38A,
+RFC 2104/2202/4231); PHP tests (`NativePrimitivesTest`) compare every class against the PHP
+builtins on random inputs. PHP tests cover known vectors, continuation/IV, independent and ordered chains,
 validation failures, queue pressure, cancellation, shutdown, connection freshness
 and PHP fallbacks. Run the same suite with and without the extension enabled.
 
 The extension release is reported by `phpversion("madeline_crypto")`.
-`Crypto::version()` reports the PHP API version, currently `0.4.0`.
+`Crypto::version()` reports the PHP API version, currently `0.5.0`.

@@ -23,6 +23,7 @@ use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\MTProtoTools\Crypt\AesCtr;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
 use danog\MadelineProto\MTProtoTools\Crypt\IGEFFI;
+use danog\MadelineProto\MTProtoTools\Crypt\IGENativeSync;
 use danog\MadelineProto\MTProtoTools\Crypt\IGEOpenssl;
 use danog\MadelineProto\MTProtoTools\Crypt\IGEPhp;
 use danog\MadelineProto\RSA;
@@ -112,7 +113,7 @@ final class CryptoBackendsTest extends TestCase
         $iv = random_bytes(32);
         foreach ([true, false] as $openssl) {
             Magic::$hasOpenssl = $openssl;
-            $expected = IGEFFI::isAvailable() ? IGEFFI::class : ($openssl ? IGEOpenssl::class : IGEPhp::class);
+            $expected = Crypt::native() ? IGENativeSync::class : (IGEFFI::isAvailable() ? IGEFFI::class : ($openssl ? IGEOpenssl::class : IGEPhp::class));
             self::assertInstanceOf($expected, IGE::getSyncInstance($key, $iv));
         }
         Magic::$hasOpenssl = true;

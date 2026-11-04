@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace danog\MadelineProto;
 
 use Amp\ByteStream\Pipe;
+
 use Amp\ByteStream\ReadableBuffer;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\WritableBuffer;
@@ -34,6 +35,7 @@ use ArrayAccess;
 use Closure;
 use Countable;
 use danog\DialogId\DialogId;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use Fiber;
 use PhpParser\Node\Arg;
 use PhpParser\Node\DeclareItem;
@@ -179,7 +181,7 @@ abstract class Tools extends AsyncTools
         $hash = 0;
         foreach ($longs as $long) {
             if (\is_string($long)) {
-                $long = self::unpackSignedLong(strrev(substr(md5($long, true), 0, 8)));
+                $long = self::unpackSignedLong(strrev(substr(Crypt::md5($long), 0, 8)));
             }
             $hash ^= self::uRShift($hash, 21);
             $hash ^= $hash << 35;

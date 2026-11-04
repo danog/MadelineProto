@@ -20,7 +20,10 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\MTProtoTools\Crypt;
 
+use Amp\ForbidSerialization;
 use danog\MadelineProto\Magic;
+use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Native\AesCtr as NativeAesCtr;
 use phpseclib4\Crypt\AES;
 
 use const OPENSSL_RAW_DATA;
@@ -28,12 +31,15 @@ use const OPENSSL_RAW_DATA;
 /**
  * Continuous AES-CTR: each call goes on from where the previous one stopped.
  *
- * With OpenSSL, or phpseclib without it.
+ * With the native extension (one key-scheduled context keeping the keystream position), OpenSSL, or phpseclib.
  *
  * @internal
  */
 final class AesCtr
 {
+    use ForbidSerialization;
+
+    private ?NativeAesCtr $native = null;
     private ?AES $phpseclib = null;
     private string $cipher;
     /** The counter of the current block. */
@@ -45,7 +51,9 @@ final class AesCtr
     {
         $this->cipher = 'aes-'.(\strlen($key) * 8).'-ctr';
         $this->counter = $iv;
-        if (!Magic::$hasOpenssl) {
+        if (Crypt::native()) {
+            $this->native = new NativeAesCtr($key, $iv);
+        } elseif (!Magic::$hasOpenssl) {
             $this->phpseclib = new AES('ctr');
             $this->phpseclib->enableContinuousBuffer();
             $this->phpseclib->setKey($key);
@@ -58,6 +66,9 @@ final class AesCtr
      */
     public function encrypt(string $data): string
     {
+        if ($this->native !== null) {
+            return $this->native->process($data);
+        }
         if ($this->phpseclib !== null) {
             return $this->phpseclib->encrypt($data);
         }

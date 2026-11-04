@@ -99,7 +99,7 @@ trait AuthKeyHandler
             $res = $this->methodCallAsyncRead('phone.requestCall', [
                 'video' => $video,
                 'user_id' => $user,
-                'g_a_hash' => hash('sha256', $g_a->toBytes(), true),
+                'g_a_hash' => Crypt::sha256($g_a->toBytes()),
                 'protocol' => PrivateCallController::CALL_PROTOCOL,
             ])['phone_call'];
             $res['a'] = $a;

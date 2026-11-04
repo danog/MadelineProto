@@ -23,11 +23,18 @@ namespace danog\MadelineProto\MTProtoTools;
 use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProtoTools\Crypt\IGE;
+use danog\MadelineProto\Native\AesCbc as NativeAesCbc;
+use danog\MadelineProto\Native\AesCtr as NativeAesCtr;
+use danog\MadelineProto\Native\AesIge as NativeAesIge;
+use danog\MadelineProto\Native\Crypto as NativeCrypto;
+use danog\MadelineProto\Native\Hash as NativeHash;
+use danog\MadelineProto\Native\Hmac as NativeHmac;
 use danog\MadelineProto\SecurityException;
 use phpseclib4\Crypt\AES;
 use phpseclib4\Math\BigInteger;
 
 use const OPENSSL_RAW_DATA;
+use const OPENSSL_ZERO_PADDING;
 
 /**
  * @internal
@@ -38,14 +45,91 @@ final class Crypt
      * Inputs of at least this many bytes are hashed with OpenSSL instead of PHP's hash extension (measured).
      */
     private static ?int $opensslSha256From = null;
+    private static ?bool $native = null;
+    /**
+     * One-shot IGE and inbound transport messages up to this size are processed on the PHP thread with the
+     * extension: the executor's cost for them is a suspension and a wakeup of the caller per message (measured
+     * end to end: -6% instructions per RPC outbound, a further -9% instructions and -14% cycles inbound, transfers
+     * unchanged; 1, 4 and 16 KiB were indistinguishable). Larger ones go to the executor.
+     */
+    public const NATIVE_SYNC_MAX = 16384;
 
     /**
-     * SHA-256, raw, with the faster of PHP's hash extension and OpenSSL for the input's size.
-     *
-     * Use it for inputs whose size depends on the data; fixed-size tiny inputs are faster with hash() directly.
+     * Whether the madeline_crypto extension provides API 0.5 (synchronous primitives, usable without its executor).
+     */
+    public static function native(): bool
+    {
+        return self::$native ??= \extension_loaded('madeline_crypto')
+            && class_exists(NativeHash::class, false)
+            && version_compare(NativeCrypto::version(), '0.5.0', '>=');
+    }
+
+    /**
+     * SHA-1, raw (SHA-NI with the extension; PHP's sha1() has no hardware path).
+     */
+    public static function sha1(string $data): string
+    {
+        return self::native() ? NativeHash::digest('sha1', $data) : sha1($data, true);
+    }
+
+    /**
+     * SHA-512, raw.
+     */
+    public static function sha512(string $data): string
+    {
+        return self::native() ? NativeHash::digest('sha512', $data) : hash('sha512', $data, true);
+    }
+
+    /**
+     * MD5, raw.
+     */
+    public static function md5(string $data): string
+    {
+        return self::native() ? NativeHash::digest('md5', $data) : md5($data, true);
+    }
+
+    /**
+     * HMAC, raw (md5, sha1, sha256, sha384 or sha512).
+     */
+    public static function hmac(string $algo, string $data, #[\SensitiveParameter] string $key): string
+    {
+        return self::native() ? NativeHmac::compute($algo, $key, $data) : hash_hmac($algo, $data, $key, true);
+    }
+
+    /**
+     * AES-CBC without padding (the data length is a multiple of 16).
+     */
+    public static function cbcEncrypt(string $data, #[\SensitiveParameter] string $key, string $iv): string
+    {
+        if (self::native()) {
+            return NativeAesCbc::encrypt($key, $iv, $data);
+        }
+        $out = openssl_encrypt($data, 'aes-'.(\strlen($key) * 8).'-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+        \assert($out !== false);
+        return $out;
+    }
+
+    /**
+     * AES-CBC without padding (the data length is a multiple of 16).
+     */
+    public static function cbcDecrypt(string $data, #[\SensitiveParameter] string $key, string $iv): string
+    {
+        if (self::native()) {
+            return NativeAesCbc::decrypt($key, $iv, $data);
+        }
+        $out = openssl_decrypt($data, 'aes-'.(\strlen($key) * 8).'-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+        \assert($out !== false);
+        return $out;
+    }
+
+    /**
+     * SHA-256, raw, with the extension, or the faster of PHP's hash extension and OpenSSL for the input's size.
      */
     public static function sha256(string $data): string
     {
+        if (self::native()) {
+            return NativeHash::digest('sha256', $data);
+        }
         self::$opensslSha256From ??= self::opensslSha256From();
         if (\strlen($data) >= self::$opensslSha256From) {
             $digest = openssl_digest($data, 'sha256', true);
@@ -61,6 +145,9 @@ final class Crypt
      */
     public static function hmacSha256(string $data, #[\SensitiveParameter] string $key): string
     {
+        if (self::native()) {
+            return NativeHmac::compute('sha256', $key, $data);
+        }
         self::$opensslSha256From ??= self::opensslSha256From();
         if (64 + \strlen($data) < self::$opensslSha256From) {
             return hash_hmac('sha256', $data, $key, true);
@@ -118,14 +205,12 @@ final class Crypt
      * @param boolean $to_server To server/from server direction
      *
      * @internal
-     *
-     * @psalm-pure
      */
     public static function kdf(string $msg_key, #[\SensitiveParameter] string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
-        $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
-        $sha256_b = hash('sha256', substr($auth_key, 40 + $x, 36).$msg_key, true);
+        $sha256_a = self::sha256($msg_key.substr($auth_key, $x, 36));
+        $sha256_b = self::sha256(substr($auth_key, 40 + $x, 36).$msg_key);
         $aes_key = substr($sha256_a, 0, 8).substr($sha256_b, 8, 16).substr($sha256_a, 24, 8);
         $aes_iv = substr($sha256_b, 0, 8).substr($sha256_a, 8, 16).substr($sha256_b, 24, 8);
         return [$aes_key, $aes_iv];
@@ -143,13 +228,11 @@ final class Crypt
      * AES KDF function for MTProto v2, VoIP.
      *
      * @internal
-     *
-     * @psalm-pure
      */
     public static function voipKdf(string $msg_key, #[\SensitiveParameter] string $auth_key, int $x): array
     {
-        $sha256_a = hash('sha256', $msg_key.substr($auth_key, $x, 36), true);
-        $sha256_b = hash('sha256', substr($auth_key, 40 + $x, 36).$msg_key, true);
+        $sha256_a = self::sha256($msg_key.substr($auth_key, $x, 36));
+        $sha256_b = self::sha256(substr($auth_key, 40 + $x, 36).$msg_key);
         $aes_key = substr($sha256_a, 0, 8).substr($sha256_b, 8, 16).substr($sha256_a, 24, 8);
         $aes_iv = substr($sha256_b, 0, 4).substr($sha256_a, 8, 8).substr($sha256_b, 24, 4);
         return [$aes_key, $aes_iv, $x];
@@ -162,16 +245,14 @@ final class Crypt
      * @param boolean $to_server To server/from server direction
      *
      * @internal
-     *
-     * @psalm-pure
      */
     public static function oldKdf(string $msg_key, #[\SensitiveParameter] string $auth_key, bool $to_server = true): array
     {
         $x = $to_server ? 0 : 8;
-        $sha1_a = sha1($msg_key.substr($auth_key, $x, 32), true);
-        $sha1_b = sha1(substr($auth_key, 32 + $x, 16).$msg_key.substr($auth_key, 48 + $x, 16), true);
-        $sha1_c = sha1(substr($auth_key, 64 + $x, 32).$msg_key, true);
-        $sha1_d = sha1($msg_key.substr($auth_key, 96 + $x, 32), true);
+        $sha1_a = self::sha1($msg_key.substr($auth_key, $x, 32));
+        $sha1_b = self::sha1(substr($auth_key, 32 + $x, 16).$msg_key.substr($auth_key, 48 + $x, 16));
+        $sha1_c = self::sha1(substr($auth_key, 64 + $x, 32).$msg_key);
+        $sha1_d = self::sha1($msg_key.substr($auth_key, 96 + $x, 32));
         $aes_key = substr($sha1_a, 0, 8).substr($sha1_b, 8, 12).substr($sha1_c, 4, 12);
         $aes_iv = substr($sha1_a, 8, 12).substr($sha1_b, 0, 8).substr($sha1_c, 16, 4).substr($sha1_d, 0, 8);
         return [$aes_key, $aes_iv];
@@ -186,6 +267,9 @@ final class Crypt
      */
     public static function ctrEncrypt(string $message, #[\SensitiveParameter] string $key, string $iv): string
     {
+        if (self::native()) {
+            return NativeAesCtr::once($key, $iv, $message);
+        }
         if (Magic::$hasOpenssl) {
             $result = openssl_encrypt($message, 'aes-'.(\strlen($key) * 8).'-ctr', $key, OPENSSL_RAW_DATA, $iv);
             \assert($result !== false);
@@ -206,6 +290,9 @@ final class Crypt
      */
     public static function igeEncrypt(string $plaintext, #[\SensitiveParameter] string $key, string $iv): string
     {
+        if (\strlen($plaintext) <= self::NATIVE_SYNC_MAX && self::native()) {
+            return NativeAesIge::encrypt($key, $iv, $plaintext);
+        }
         return IGE::getInstance($key, $iv)->encrypt($plaintext);
     }
     /**
@@ -218,6 +305,9 @@ final class Crypt
      */
     public static function igeDecrypt(string $ciphertext, #[\SensitiveParameter] string $key, string $iv): string
     {
+        if (\strlen($ciphertext) <= self::NATIVE_SYNC_MAX && self::native()) {
+            return NativeAesIge::decrypt($key, $iv, $ciphertext);
+        }
         return IGE::getInstance($key, $iv)->decrypt($ciphertext);
     }
     /**

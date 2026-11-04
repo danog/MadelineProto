@@ -1,4 +1,5 @@
 // Copyright 2026 Alexander Pankratov <s.pankratoff@gmail.com>
+// Copyright 2026 Daniil Gentili <daniil@daniil.it>
 // SPDX-License-Identifier: AGPL-3.0-only
 use crate::{
     crypto::{self, Buffer, Message, Operation},

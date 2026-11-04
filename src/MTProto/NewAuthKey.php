@@ -112,7 +112,7 @@ final class NewAuthKey implements SimpleSubscriber
         if ($authKey === null) {
             $this->id = null;
         } else {
-            $this->id = substr(sha1($authKey, true), -8);
+            $this->id = substr(Crypt::sha1($authKey), -8);
         }
         $this->setTempAuthKey(null, null);
     }
@@ -135,7 +135,7 @@ final class NewAuthKey implements SimpleSubscriber
             if (!$this->isCdn) {
                 Assert::notNull($this->id, 'Auth key must not be null if temp auth key is not null');
             }
-            $this->tempId = substr(sha1($authKey, true), -8);
+            $this->tempId = substr(Crypt::sha1($authKey), -8);
             $this->tempAuthKeyForHash = substr($authKey, 88, 32);
             $this->connectionState->publish(
                 $this->isCdn

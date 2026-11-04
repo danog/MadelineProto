@@ -83,12 +83,10 @@ final class Crypto
     /**
      * The tde2e key-derivation function: `HMAC-SHA512(key = secret, msg = info)`, 64 bytes
      * (MessageEncryption.cpp `kdf_expand`). The purpose string is the *message*, the secret the key.
-     *
-     * @psalm-pure
      */
     public static function kdfExpand(#[\SensitiveParameter] string $secret, string $info): string
     {
-        return hash_hmac('sha512', $info, $secret, true);
+        return Crypt::hmac('sha512', $info, $secret);
     }
 
     /* ------------------------------------------------------------------ *
@@ -204,22 +202,18 @@ final class Crypto
 
     /**
      * AES-256-CBC (key, iv) from `HMAC-SHA512(hashKey, msgId)[0:48]`.
-     *
-     * @psalm-pure
      */
     private static function aesFromHash(#[\SensitiveParameter] string $hashKey, string $msgId): array
     {
-        $kv = hash_hmac('sha512', $msgId, $hashKey, true);
+        $kv = Crypt::hmac('sha512', $msgId, $hashKey);
         return [substr($kv, 0, 32), substr($kv, 32, 16)];
     }
 
-    /** AES-256-CBC encrypt without padding (input is already block-aligned): openssl, else phpseclib. */
+    /** AES-256-CBC encrypt without padding (input is already block-aligned): native or openssl, else phpseclib. */
     private static function aesEncrypt(#[\SensitiveParameter] string $key, string $iv, string $data): string
     {
-        if (\extension_loaded('openssl')) {
-            $out = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-            \assert($out !== false);
-            return $out;
+        if (Crypt::native() || \extension_loaded('openssl')) {
+            return Crypt::cbcEncrypt($data, $key, $iv);
         }
         $aes = new \phpseclib4\Crypt\AES('cbc');
         $aes->setKey($key);
@@ -228,14 +222,14 @@ final class Crypto
         return $aes->encrypt($data);
     }
 
-    /** AES-256-CBC decrypt without padding: openssl, else phpseclib. Returns false on failure. */
+    /** AES-256-CBC decrypt without padding: native or openssl, else phpseclib. Returns false on failure. */
     private static function aesDecrypt(#[\SensitiveParameter] string $key, string $iv, string $data): string|false
     {
-        if (\extension_loaded('openssl')) {
-            return openssl_decrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-        }
         if ($data === '' || \strlen($data) % 16 !== 0) {
             return false;
+        }
+        if (Crypt::native() || \extension_loaded('openssl')) {
+            return Crypt::cbcDecrypt($data, $key, $iv);
         }
         $aes = new \phpseclib4\Crypt\AES('cbc');
         $aes->setKey($key);
@@ -346,7 +340,7 @@ final class Crypto
             $raw = self::x25519(self::edSeedToX25519($seed), self::edPublicToX25519($peerPublicKey));
         }
         // Note the key/msg order here is the opposite of kdfExpand: the purpose string is the key.
-        return substr(hash_hmac('sha512', $raw, 'tde2e_shared_secret', true), 0, 32);
+        return substr(Crypt::hmac('sha512', $raw, 'tde2e_shared_secret'), 0, 32);
     }
 
     /* ------------------------------------------------------------------ *
@@ -389,12 +383,10 @@ final class Crypto
 
     /**
      * Ed25519 seed -> clamped X25519 scalar: SHA-512(seed)[0:32] with the RFC 7748 clamp.
-     *
-     * @psalm-pure
      */
     private static function edSeedToX25519(#[\SensitiveParameter] string $seed): string
     {
-        $s = substr(hash('sha512', $seed, true), 0, 32);
+        $s = substr(Crypt::sha512($seed), 0, 32);
         $s[0] = \chr(\ord($s[0]) & 248);
         $s[31] = \chr((\ord($s[31]) & 127) | 64);
         return $s;
@@ -475,11 +467,9 @@ final class Crypto
     /**
      * Derive the actual group encryption key from the raw shared key for protocol version >= 1:
      * `HMAC-SHA512(key = raw, msg = blockHash)[0:32]` (Call.cpp update_group_shared_key).
-     *
-     * @psalm-pure
      */
     public static function deriveGroupKey(#[\SensitiveParameter] string $rawSharedKey, string $blockHash): string
     {
-        return substr(hash_hmac('sha512', $blockHash, $rawSharedKey, true), 0, 32);
+        return substr(Crypt::hmac('sha512', $blockHash, $rawSharedKey), 0, 32);
     }
 }

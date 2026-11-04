@@ -90,7 +90,8 @@ final class ConnectionCryptoTest extends TestCase
         $shared = (new ReflectionClass(DataCenterConnection::class))->newInstanceWithoutConstructor();
         (new \ReflectionProperty(DataCenterConnection::class, 'auth'))->setValue($shared, $auth);
         $wireSession = $change === 'mismatch' ? random_bytes(8) : $connection->session_id;
-        $plain = random_bytes(8).$wireSession.pack('V2', 12345, 0).pack('V2', 1, 16).str_repeat('b', 16).str_repeat('p', 16);
+        // Larger than what's decoded synchronously, without the executor (Crypt::NATIVE_SYNC_MAX).
+        $plain = random_bytes(8).$wireSession.pack('V2', 12345, 0).pack('V2', 1, 32768).str_repeat('b', 32768).str_repeat('p', 16);
         $msgKey = substr(Crypt::sha256(substr($authKey, 96, 32).$plain), 8, 16);
         [$key, $iv] = Crypt::kdf($msgKey, $authKey, false);
         $cipher = Crypt::igeEncrypt($plain, $key, $iv);
@@ -157,7 +158,8 @@ final class ConnectionCryptoTest extends TestCase
     }
 
     /**
-     * Building a payload (logging can suspend) and encrypting it (native IGE suspends) happen before it's
+     * Building a payload (logging can suspend) and encrypting it (native IGE suspends, above the size it encrypts
+     * synchronously) happen before it's
      * written: it's only written for the connection, session and key its message IDs were assigned for.
      *
      * @dataProvider outgoingChanges
@@ -208,7 +210,8 @@ final class ConnectionCryptoTest extends TestCase
         $outgoing->constructor = 'test.request';
         $outgoing->contentRelated = true;
         $outgoing->method('hasBody')->willReturn(true);
-        $outgoing->method('getSerializedBody')->willReturn(str_repeat('b', 16));
+        // Larger than what Crypt::igeEncrypt() encrypts without the executor.
+        $outgoing->method('getSerializedBody')->willReturn(str_repeat('b', 32768));
         $outgoing->method('hasPromise')->willReturn(false);
         $outgoing->method('__toString')->willReturn('test request');
         $outgoing->expects(self::never())->method('sent');
