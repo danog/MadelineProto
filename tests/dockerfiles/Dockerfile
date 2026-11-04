@@ -276,7 +276,7 @@ RUN set -eux; \
 # Build against the exact PHP headers and ABI shipped in the runtime (danog/MadelineCrypto, pinned).
 FROM php-runtime AS crypto-build
 USER root
-ARG MADELINE_CRYPTO_VERSION=0.6.0
+ARG MADELINE_CRYPTO_VERSION=0.6.1
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates git \
     && rm -rf /var/lib/apt/lists/*
