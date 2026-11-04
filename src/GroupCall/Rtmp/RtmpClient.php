@@ -22,6 +22,7 @@ use Amp\Dns\DnsException;
 use Amp\Dns\DnsRecord;
 use Amp\Socket\ClientTlsContext;
 use Amp\Socket\ConnectContext;
+use Amp\Socket\ResourceSocket;
 use Amp\Socket\Socket;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\RtmpServers;
@@ -64,6 +65,13 @@ final class RtmpClient
 
     /** The size of the chunks we send: fewer chunk headers than the default 128 bytes. */
     private const OUTGOING_CHUNK_SIZE = 4096;
+
+    /**
+     * The most a single write of the socket sends: a whole message, keyframes included. amphp's default
+     * (8 KiB) splits a message into one TLS record and one syscall per 8 KiB, the rest of each waiting for
+     * the socket to be writable again.
+     */
+    private const SOCKET_CHUNK_SIZE = 256 * 1024;
 
     private int $outgoingChunkSize = 128;
     private int $incomingChunkSize = 128;
@@ -135,6 +143,10 @@ final class RtmpClient
             $address = "[$address]";
         }
         $socket = connect("tcp://$address:$port", $context, $cancellation);
+        if ($socket instanceof ResourceSocket && \is_resource($resource = $socket->getResource())) {
+            // The old wrapper only lets go of the resource (nothing was read or written yet).
+            $socket = ResourceSocket::fromClientSocket($resource, $context->getTlsContext(), self::SOCKET_CHUNK_SIZE);
+        }
         if ($tls) {
             $socket->setupTls($cancellation);
         }
