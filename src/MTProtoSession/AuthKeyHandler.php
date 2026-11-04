@@ -26,6 +26,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Native\Crypto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -114,21 +115,22 @@ trait AuthKeyHandler
                  */
                 $ok = false;
                 $pq = Tools::unpackSignedLong(strrev($pq_bytes));
+                $native = Crypt::native() && version_compare(Crypto::version(), '0.6.0', '>=');
                 foreach ([
-                    'native_single_cpp',
+                    ...($native ? ['madeline_crypto'] : []),
                     'python_single_alt',
                     'python_single',
                     'native_single',
                 ] as $method) {
                     $this->API->logger("Factorizing with $method (please wait, might take a while)");
-                    if ($method !== 'native_single_cpp') {
-                        $this->API->logger('Install https://prime.madelineproto.xyz and the FFI extension to speed this up!');
+                    if ($method !== 'madeline_crypto') {
+                        $this->API->logger('Install the MadelineCrypto extension (pie install danog/madelinecrypto) to speed this up!');
                     }
 
                     $p = 0;
                     $q = 0;
                     try {
-                        $p = PrimeModule::$method($pq);
+                        $p = $method === 'madeline_crypto' ? Crypto::factorize($pq) : PrimeModule::$method($pq);
                     } catch (Throwable $e) {
                         $this->API->logger("While factorizing with $method: $e");
                     }
@@ -145,7 +147,7 @@ trait AuthKeyHandler
                     }
                 }
                 if (!$ok) {
-                    throw new SecurityException("Couldn't compute p and q, install prime.madelineproto.xyz to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p*$q);
+                    throw new SecurityException("Couldn't compute p and q, install the MadelineCrypto extension (pie install danog/madelinecrypto) to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p*$q);
                 }
                 $this->API->logger('Factorization '.$pq.' = '.$p.' * '.$q, Logger::VERBOSE);
                 /*
@@ -413,7 +415,7 @@ trait AuthKeyHandler
             }
         }
         if (!$cdn) {
-            throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
+            throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install the MadelineCrypto extension (pie install danog/madelinecrypto)!');
         }
     }
 }
