@@ -44,6 +44,7 @@ use danog\MadelineProto\Tgcalls\H264Framing;
 use danog\MadelineProto\Tgcalls\VideoCodecObserver;
 use danog\MadelineProto\Tools;
 use Revolt\EventLoop;
+use Revolt\EventLoop\Suspension;
 use SplQueue;
 use Throwable;
 use Webrtc\Codecs\Codec;
@@ -177,6 +178,9 @@ final class DjLoop extends VoIPLoop
     private ?DeferredFuture $drainDeferred = null;
     /** Awaited by {@see self::pullPacket()} and {@see self::awaitFrame()} until a frame is queued. */
     private ?DeferredFuture $packetDeferred = null;
+    /** @var array<int, Suspension<null>> Waiting in {@see self::awaitFrame()}, by id. */
+    private array $frameWaiters = [];
+    private int $nextFrameWaiter = 0;
     /** Whether the current WebM file has audio for the audio track, see {@see self::isStarving()}. */
     private bool $currentHasAudio = false;
     /** Whether the current WebM file has video for the video track, see {@see self::isStarving()}. */
@@ -454,6 +458,7 @@ final class DjLoop extends VoIPLoop
         $this->previous = [];
         $this->packetDeferred?->complete(false);
         $this->packetDeferred = null;
+        $this->wakeFrameWaiters();
     }
 
     #[\Override]
@@ -598,15 +603,34 @@ final class DjLoop extends VoIPLoop
      */
     public function awaitFrame(float $timeout): void
     {
-        $this->packetDeferred ??= new DeferredFuture;
-        $future = $this->packetDeferred->getFuture();
-        $timeoutCancellation = new DeferredCancellation;
-        $timer = EventLoop::delay($timeout, static fn () => $timeoutCancellation->cancel());
+        // Resumed by whichever comes first, the timer or a queued frame: no cancellation, whose
+        // CancelledException (and backtrace) was built every time the timeout won.
+        $suspension = EventLoop::getSuspension();
+        $id = $this->nextFrameWaiter++;
+        $this->frameWaiters[$id] = $suspension;
+        $waiters = &$this->frameWaiters;
+        $timer = EventLoop::delay($timeout, static function () use (&$waiters, $id): void {
+            if (isset($waiters[$id])) {
+                $suspension = $waiters[$id];
+                unset($waiters[$id]);
+                $suspension->resume();
+            }
+        });
         try {
-            $future->await($timeoutCancellation->getCancellation());
-        } catch (CancelledException) {
+            $suspension->suspend();
         } finally {
             EventLoop::cancel($timer);
+            unset($this->frameWaiters[$id]);
+        }
+    }
+
+    /** Resume everything waiting in {@see self::awaitFrame()}. */
+    private function wakeFrameWaiters(): void
+    {
+        $waiters = $this->frameWaiters;
+        $this->frameWaiters = [];
+        foreach ($waiters as $suspension) {
+            $suspension->resume();
         }
     }
 
@@ -1319,7 +1343,7 @@ final class DjLoop extends VoIPLoop
         }
     }
 
-    /** Wake anything blocked in {@see self::pullPacket()}. */
+    /** Wake anything blocked in {@see self::pullPacket()} or {@see self::awaitFrame()}. */
     private function wakePacketWaiters(): void
     {
         if ($this->packetDeferred !== null) {
@@ -1327,6 +1351,7 @@ final class DjLoop extends VoIPLoop
             $this->packetDeferred = null;
             $deferred->complete(true);
         }
+        $this->wakeFrameWaiters();
     }
 
     private function hasPendingOggWork(): bool
