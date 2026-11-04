@@ -46,13 +46,6 @@ RUN set -eux; \
 	; \
 	apt-get dist-clean
 
-RUN curl -sSLf https://github.com/danog/PrimeModule-ext/archive/refs/tags/2.0.tar.gz | tar -xz && \
-    cd PrimeModule-ext-2.0 && \
-    make -j$(nproc) && \
-    make install && \
-    cd .. && \
-    rm -r PrimeModule-ext-2.0
-
 ENV PHP_INI_DIR /usr/local/etc/php
 RUN set -eux; \
 	mkdir -p "$PHP_INI_DIR/conf.d"; \
@@ -280,13 +273,14 @@ RUN set -eux; \
 	mkdir -p /app; \
 	chown madeline:madeline /app
 
-# Build against the exact PHP headers and ABI shipped in the runtime.
+# Build against the exact PHP headers and ABI shipped in the runtime (danog/MadelineCrypto, pinned).
 FROM php-runtime AS crypto-build
 USER root
+ARG MADELINE_CRYPTO_VERSION=0.6.1
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates \
+    && apt-get install -y --no-install-recommends build-essential libclang-dev libssl-dev pkg-config curl ca-certificates git \
     && rm -rf /var/lib/apt/lists/*
-COPY native/ /usr/src/madeline-crypto/
+RUN git clone --depth 1 --branch "$MADELINE_CRYPTO_VERSION" https://github.com/danog/MadelineCrypto.git /usr/src/madeline-crypto
 WORKDIR /usr/src/madeline-crypto
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
     && /root/.cargo/bin/cargo test --release --locked --no-default-features --features const-widths \

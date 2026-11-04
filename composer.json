@@ -102,8 +102,7 @@
         "sebastian/diff": "^4.0.6"
     },
     "suggest": {
-        "ext-primemodule": "Install the primemodule and FFI extensions to speed up MadelineProto (https://prime.madelineproto.xyz)",
-        "ext-madeline_crypto": "Optional Rust acceleration: AES-IGE and MTProto v2 transport decoding off the PHP thread, and per-packet AES-GCM/CTR/CBC, hashes and HMAC",
+        "ext-madeline_crypto": "MadelineCrypto 0.6+ (pie install danog/madelinecrypto), optional Rust acceleration: auth key factorization, AES-IGE and MTProto v2 transport decoding off the PHP thread, and per-packet AES-GCM/CTR/CBC, hashes and HMAC",
         "ext-ffi": "Install FFI with libcrypto for the AES-IGE fallback, and with libopus, libvpx and ffmpeg for realtime audio/video transcoding; not required to play and record video and audio inside calls",
         "ext-pdo": "Install the pdo extension to store session data on MySQL",
         "ext-openssl": "Install the openssl extension for faster crypto",

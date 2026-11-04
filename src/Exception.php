@@ -65,8 +65,8 @@ class Exception extends \Exception
     {
         if ($extensionName === 'libtgvoip') {
             $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://voip.madelineproto.xyz');
-        } elseif ($extensionName === 'prime') {
-            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://prime.madelineproto.xyz');
+        } elseif ($extensionName === 'prime' || $extensionName === 'madeline_crypto') {
+            $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithCustomInstructions'], 'https://github.com/danog/MadelineCrypto');
         } else {
             $additional = \sprintf(Lang::$current_lang['extensionRequiredInstallWithApt'], 'php'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'-'.$extensionName);
         }

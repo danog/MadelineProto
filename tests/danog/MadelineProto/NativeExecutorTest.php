@@ -140,7 +140,7 @@ final class NativeExecutorTest extends TestCase
         $expected = $this->reference($plain, $key, $iv);
         // After the first measured job, the batching policy probes a width of two: a lone job
         // must still run instead of waiting for a second one, which would never come (it would hang:
-        // native/src/tests.rs, lone_jobs_never_wait_for_a_batch, checks the executor itself). Not timed:
+        // danog/MadelineCrypto: src/tests.rs, lone_jobs_never_wait_for_a_batch, checks the executor itself). Not timed:
         // a wall-clock bound fails on whichever runner is slower than the one it was picked on.
         for ($i = 0; $i < 100; $i++) {
             self::assertSame($expected, IGE::getInstance($key, $iv)->encrypt($plain));

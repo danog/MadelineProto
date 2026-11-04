@@ -9,8 +9,16 @@ namespace danog\MadelineProto\Native;
 /** @internal Exported by the optional madeline_crypto Rust extension. */
 final class Crypto
 {
-    /** The PHP API version: 0.5.0. */
+    /** The PHP API version: 0.6.0 (0.6: factorize()). */
     public static function version(): string
+    {
+    }
+    /**
+     * The smallest prime factor of $pq (MTProto's auth key exchange). Synchronous, no init() needed.
+     *
+     * @throws \ValueError If $pq isn't a composite number.
+     */
+    public static function factorize(int $pq): int
     {
     }
     /** @return resource php-tokio's notification stream, to watch for readability. */
