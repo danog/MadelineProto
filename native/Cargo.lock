@@ -690,8 +690,10 @@ name = "madeline-crypto"
 version = "0.4.0"
 dependencies = [
  "ext-php-rs",
+ "foreign-types",
  "libc",
  "openssl",
+ "openssl-sys",
  "php-tokio",
  "ring",
  "tokio",

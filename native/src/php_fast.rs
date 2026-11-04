@@ -7,7 +7,9 @@
 //! `String` per parameter name): about as much as the AES-GCM of a 160-byte packet. These
 //! read the arguments straight from the call frame and allocate only the returned string.
 //! They accept strings only (no scalar coercion), as with `declare(strict_types=1)`.
-use crate::php_api::{output, try_output, AesCtr, AesCtrKey, AesGcm, Hash, Hmac};
+use crate::php_api::{
+    output, output_uninit, try_output_uninit, AesCtr, AesCtrKey, AesGcm, Hash, Hmac,
+};
 use crate::primitives::{self as p, Algo};
 use ext_php_rs::{
     args::Arg,
@@ -110,7 +112,7 @@ extern "C" fn gcm_encrypt(ex: &mut ExecuteData, retval: &mut Zval) {
     };
     ret(
         retval,
-        try_output(plaintext.len() + p::GCM_TAG, |out| {
+        try_output_uninit(plaintext.len() + p::GCM_TAG, |out| {
             this.0.encrypt_into(nonce, aad, plaintext, out)
         }),
     );
@@ -123,7 +125,7 @@ extern "C" fn gcm_decrypt(ex: &mut ExecuteData, retval: &mut Zval) {
     let Some(this) = this::<AesGcm>(ex) else {
         return;
     };
-    let (value, ok) = output(ciphertext.len(), |out| {
+    let (value, ok) = output_uninit(ciphertext.len(), |out| {
         this.0.decrypt_into(nonce, aad, ciphertext, tag, out)
     });
     match ok {
@@ -151,7 +153,7 @@ extern "C" fn ctr_process(ex: &mut ExecuteData, retval: &mut Zval) {
     };
     ret(
         retval,
-        try_output(data.len(), |out| this.0.process_into(data, out)),
+        try_output_uninit(data.len(), |out| this.0.process_into(data, out)),
     );
 }
 const CTR_ONCE: [&str; 3] = ["key", "iv", "data"];
@@ -162,7 +164,7 @@ extern "C" fn ctr_once(ex: &mut ExecuteData, retval: &mut Zval) {
     ret(
         retval,
         // The key schedule is built after the output allocation (see output()).
-        try_output(data.len(), |out| {
+        try_output_uninit(data.len(), |out| {
             p::AesCtr::new(key, Some(iv))?.process_into(data, out)
         }),
     );
@@ -189,7 +191,7 @@ extern "C" fn ctr_apply(ex: &mut ExecuteData, retval: &mut Zval) {
     };
     ret(
         retval,
-        try_output(data.len(), |out| this.0.apply_into(iv, data, out)),
+        try_output_uninit(data.len(), |out| this.0.apply_into(iv, data, out)),
     );
 }
 pub fn aes_ctr_key(class: ClassBuilder) -> ClassBuilder {

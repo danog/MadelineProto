@@ -62,6 +62,40 @@ pub(crate) fn output<R>(len: usize, fill: impl FnOnce(&mut [u8]) -> R) -> (Zval,
     zval.set_zend_string(string);
     (zval, result)
 }
+/// As [output], with the payload left uninitialized (only the terminator is set), for the
+/// ciphers, which write all of it ([p::Out]): a large output isn't zeroed just to be overwritten.
+pub(crate) fn output_uninit<R>(
+    len: usize,
+    fill: impl FnOnce(&mut [std::mem::MaybeUninit<u8>]) -> R,
+) -> (Zval, R) {
+    let header = std::mem::offset_of!(zend_string, val);
+    let size = (header + len + 1 + 7) & !7;
+    let layout = Layout::from_size_align(size, 8).expect("string too large");
+    // SAFETY: as in output(); the payload is handed out as MaybeUninit, which any contents are.
+    let (string, result) = unsafe {
+        let ptr = ext_php_rs::alloc::emalloc(layout).cast::<zend_string>();
+        (*ptr).gc.refcount = 1;
+        (*ptr).gc.u.type_info = GC_STRING;
+        (*ptr).h = 0;
+        (*ptr).len = len;
+        let val = (*ptr).val.as_mut_ptr().cast::<u8>();
+        *val.add(len) = 0;
+        let result = fill(std::slice::from_raw_parts_mut(val.cast(), len));
+        (ZBox::<ZendStr>::from_raw(ptr), result)
+    };
+    let mut zval = Zval::new();
+    zval.set_zend_string(string);
+    (zval, result)
+}
+/// [try_output] with [output_uninit]: on failure the string, whatever it holds, is dropped.
+pub(crate) fn try_output_uninit(
+    len: usize,
+    fill: impl FnOnce(&mut [std::mem::MaybeUninit<u8>]) -> p::Result<()>,
+) -> PhpResult<Zval> {
+    let (zval, result) = output_uninit(len, fill);
+    result?;
+    Ok(zval)
+}
 pub(crate) fn try_output(
     len: usize,
     fill: impl FnOnce(&mut [u8]) -> p::Result<()>,
@@ -111,12 +145,12 @@ pub struct AesCbc;
 #[php_impl]
 impl AesCbc {
     pub fn encrypt(key: Bytes, iv: Bytes, data: Bytes) -> PhpResult<Zval> {
-        try_output(data.len(), |out| {
+        try_output_uninit(data.len(), |out| {
             p::aes_cbc_into(&key, &iv, &data, true, out)
         })
     }
     pub fn decrypt(key: Bytes, iv: Bytes, data: Bytes) -> PhpResult<Zval> {
-        try_output(data.len(), |out| {
+        try_output_uninit(data.len(), |out| {
             p::aes_cbc_into(&key, &iv, &data, false, out)
         })
     }

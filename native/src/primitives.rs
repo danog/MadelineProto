@@ -7,13 +7,18 @@
 //! HMAC inner/outer state) from construction, look nothing up per call and write straight into
 //! the caller's output buffer.
 use crate::crypto::{self, Buffer, Message, Operation};
+use foreign_types::ForeignTypeRef;
 use openssl::{
     cipher::{Cipher, CipherRef},
     cipher_ctx::CipherCtx,
     sha::{Sha1, Sha256, Sha384, Sha512},
 };
 use ring::aead;
-use std::mem::ManuallyDrop;
+use std::{
+    ffi::c_int,
+    marker::PhantomData,
+    mem::{ManuallyDrop, MaybeUninit},
+};
 use zeroize::{Zeroize, Zeroizing};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -264,15 +269,101 @@ fn aes_cipher(key: &[u8], mode: &str) -> Result<&'static CipherRef> {
 }
 /// EVP_CipherUpdate takes an int length.
 const CHUNK: usize = 1 << 30;
-fn update(ctx: &mut CipherCtx, input: &[u8], output: &mut [u8]) -> Result<()> {
-    debug_assert_eq!(input.len(), output.len());
-    for (i, o) in input.chunks(CHUNK).zip(output.chunks_mut(CHUNK)) {
-        // SAFETY: stream modes (CTR, GCM) write exactly the input length; CBC is called on whole
-        // blocks without padding, which also write exactly the input length.
-        let n = unsafe { ctx.cipher_update_unchecked(i, Some(o))? };
-        if n != i.len() {
+
+/// The output of a cipher, written in full by it: initialized (`&mut [u8]`) or not
+/// (`&mut [MaybeUninit<u8>]`, the PHP strings, so that a large output isn't zeroed just to be overwritten).
+pub struct Out<'a> {
+    ptr: *mut u8,
+    len: usize,
+    _buf: PhantomData<&'a mut [MaybeUninit<u8>]>,
+}
+impl<'a> From<&'a mut [u8]> for Out<'a> {
+    fn from(b: &'a mut [u8]) -> Self {
+        Out {
+            ptr: b.as_mut_ptr(),
+            len: b.len(),
+            _buf: PhantomData,
+        }
+    }
+}
+impl<'a> From<&'a mut Vec<u8>> for Out<'a> {
+    fn from(b: &'a mut Vec<u8>) -> Self {
+        b.as_mut_slice().into()
+    }
+}
+impl<'a> From<&'a mut [MaybeUninit<u8>]> for Out<'a> {
+    fn from(b: &'a mut [MaybeUninit<u8>]) -> Self {
+        Out {
+            ptr: b.as_mut_ptr().cast(),
+            len: b.len(),
+            _buf: PhantomData,
+        }
+    }
+}
+impl<'a> Out<'a> {
+    pub(crate) fn len(&self) -> usize {
+        self.len
+    }
+    fn split_at(self, mid: usize) -> (Out<'a>, Out<'a>) {
+        assert!(mid <= self.len);
+        // SAFETY: the two halves are disjoint parts of the buffer.
+        let tail = unsafe { self.ptr.add(mid) };
+        (
+            Out {
+                ptr: self.ptr,
+                len: mid,
+                _buf: PhantomData,
+            },
+            Out {
+                ptr: tail,
+                len: self.len - mid,
+                _buf: PhantomData,
+            },
+        )
+    }
+    /// Writes `src` (as long as the buffer), returning the buffer, now initialized.
+    fn fill_from(self, src: &[u8]) -> &'a mut [u8] {
+        assert_eq!(src.len(), self.len);
+        // SAFETY: the buffer is valid for `len` writes and doesn't overlap `src` (a distinct
+        // borrow); once written, all of it is initialized.
+        unsafe {
+            std::ptr::copy_nonoverlapping(src.as_ptr(), self.ptr, self.len);
+            std::slice::from_raw_parts_mut(self.ptr, self.len)
+        }
+    }
+    /// Zeroes the buffer, whatever it holds.
+    fn wipe(&mut self) {
+        // SAFETY: MaybeUninit<u8> accepts any contents.
+        unsafe { std::slice::from_raw_parts_mut(self.ptr.cast::<MaybeUninit<u8>>(), self.len) }
+            .zeroize();
+    }
+}
+
+/// EVP_CipherUpdate of all of `input` into `output` (as long), through its pointer.
+fn update(ctx: &mut CipherCtx, input: &[u8], output: &mut Out<'_>) -> Result<()> {
+    assert_eq!(input.len(), output.len);
+    let mut at = 0;
+    for i in input.chunks(CHUNK) {
+        let mut n: c_int = 0;
+        // SAFETY: `output` is valid for `input.len()` writes; stream modes (CTR, GCM) write exactly
+        // the input length, and CBC is called on whole blocks without padding, which also writes
+        // exactly the input length (checked below).
+        let ok = unsafe {
+            openssl_sys::EVP_CipherUpdate(
+                ctx.as_ptr(),
+                output.ptr.add(at),
+                &mut n,
+                i.as_ptr(),
+                i.len() as c_int,
+            )
+        };
+        if ok != 1 {
+            return Err(openssl::error::ErrorStack::get().into());
+        }
+        if n as usize != i.len() {
             return Err(Error::Internal("EVP returned a partial output".into()));
         }
+        at += i.len();
     }
     Ok(())
 }
@@ -311,18 +402,22 @@ impl AesGcm {
             .or_else(|_| value("AES-GCM nonces are 12 bytes"))
     }
     /// `out`: plaintext length + 16 (the ciphertext, then the tag).
-    pub fn encrypt_into(
+    pub fn encrypt_into<'a>(
         &mut self,
         nonce: &[u8],
         aad: &[u8],
         plaintext: &[u8],
-        out: &mut [u8],
+        out: impl Into<Out<'a>>,
     ) -> Result<()> {
         let nonce = Self::nonce(nonce)?;
-        let (body, tag) = out.split_at_mut(plaintext.len());
+        let out = out.into();
+        if out.len() != plaintext.len() + GCM_TAG {
+            return value("AES-GCM output must be the plaintext length plus the tag");
+        }
+        let (mut body, tag) = out.split_at(plaintext.len());
         match self {
             AesGcm::Ring(key) => {
-                body.copy_from_slice(plaintext);
+                let body = body.fill_from(plaintext);
                 let t = key
                     .seal_in_place_separate_tag(
                         aead::Nonce::assume_unique_for_key(nonce),
@@ -330,41 +425,52 @@ impl AesGcm {
                         body,
                     )
                     .map_err(|_| Error::Value("AES-GCM input too long".into()))?;
-                tag.copy_from_slice(t.as_ref());
+                tag.fill_from(t.as_ref());
             }
             AesGcm::Evp { enc, .. } => {
                 enc.encrypt_init(None, None, Some(&nonce))?;
                 if !aad.is_empty() {
                     enc.cipher_update(aad, None)?;
                 }
-                update(enc, plaintext, body)?;
+                update(enc, plaintext, &mut body)?;
                 enc.cipher_final(&mut [])?;
-                enc.tag(tag)?;
+                let mut t = [0; GCM_TAG];
+                enc.tag(&mut t)?;
+                tag.fill_from(&t);
             }
         }
         Ok(())
     }
     /// `out`: ciphertext length. On authentication failure, returns false with `out` wiped.
-    pub fn decrypt_into(
+    pub fn decrypt_into<'a>(
         &mut self,
         nonce: &[u8],
         aad: &[u8],
         ciphertext: &[u8],
         tag: &[u8],
-        out: &mut [u8],
+        out: impl Into<Out<'a>>,
     ) -> Result<bool> {
         let nonce = Self::nonce(nonce)?;
         let tag: [u8; GCM_TAG] = tag
             .try_into()
             .or_else(|_| value("AES-GCM tags are 16 bytes"))?;
+        let mut out = out.into();
+        if out.len() != ciphertext.len() {
+            return value("AES-GCM output must be the ciphertext length");
+        }
         let ok = match self {
             AesGcm::Ring(key) => {
-                out.copy_from_slice(ciphertext);
+                let buf = Out {
+                    ptr: out.ptr,
+                    len: out.len,
+                    _buf: PhantomData,
+                }
+                .fill_from(ciphertext);
                 key.open_in_place_separate_tag(
                     aead::Nonce::assume_unique_for_key(nonce),
                     aead::Aad::from(aad),
                     aead::Tag::from(tag),
-                    out,
+                    buf,
                     0..,
                 )
                 .is_ok()
@@ -374,14 +480,14 @@ impl AesGcm {
                 if !aad.is_empty() {
                     dec.cipher_update(aad, None)?;
                 }
-                update(dec, ciphertext, out)?;
+                update(dec, ciphertext, &mut out)?;
                 dec.set_tag(&tag)?;
                 // The tag comparison is constant-time (CRYPTO_memcmp).
                 dec.cipher_final(&mut []).is_ok()
             }
         };
         if !ok {
-            out.zeroize();
+            out.wipe();
         }
         Ok(ok)
     }
@@ -410,25 +516,30 @@ impl AesCtr {
         Ok(Self(ctx))
     }
     /// Continues the keystream (byte-granular).
-    pub fn process_into(&mut self, data: &[u8], out: &mut [u8]) -> Result<()> {
-        update(&mut self.0, data, out)
+    pub fn process_into<'a>(&mut self, data: &[u8], out: impl Into<Out<'a>>) -> Result<()> {
+        update(&mut self.0, data, &mut out.into())
     }
     /// Restarts the keystream at `iv`, keeping the key schedule.
-    pub fn apply_into(&mut self, iv: &[u8], data: &[u8], out: &mut [u8]) -> Result<()> {
+    pub fn apply_into<'a>(
+        &mut self,
+        iv: &[u8],
+        data: &[u8],
+        out: impl Into<Out<'a>>,
+    ) -> Result<()> {
         if iv.len() != 16 {
             return value("AES-CTR IVs are 16 bytes");
         }
         self.0.encrypt_init(None, None, Some(iv))?;
-        update(&mut self.0, data, out)
+        update(&mut self.0, data, &mut out.into())
     }
 }
 
-pub fn aes_cbc_into(
+pub fn aes_cbc_into<'a>(
     key: &[u8],
     iv: &[u8],
     data: &[u8],
     encrypt: bool,
-    out: &mut [u8],
+    out: impl Into<Out<'a>>,
 ) -> Result<()> {
     let cipher = aes_cipher(key, "cbc")?;
     if iv.len() != 16 {
@@ -444,7 +555,7 @@ pub fn aes_cbc_into(
         ctx.decrypt_init(Some(cipher), Some(key), Some(iv))?;
     }
     ctx.set_padding(false);
-    update(&mut ctx, data, out)
+    update(&mut ctx, data, &mut out.into())
 }
 
 /// One AES-256-IGE call on the PHP thread (MTProto key/IV layout), with the executor's kernels.

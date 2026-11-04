@@ -204,3 +204,78 @@ fn sync_ige_matches_the_executor_kernels() {
     crate::crypto::evp(&mut m).unwrap();
     assert_eq!(enc[..], m.output[..]);
 }
+
+/// Uninitialized outputs (the PHP strings) get the same bytes as zeroed ones, through every
+/// cipher writing them: both GCM backends, CTR (stateful and keyed), CBC.
+#[test]
+fn uninitialized_outputs_match_initialized_ones() {
+    use std::mem::MaybeUninit;
+    fn uninit(n: usize) -> Vec<MaybeUninit<u8>> {
+        // Garbage, as an uninitialized allocation may hold.
+        (0..n).map(|i| MaybeUninit::new(i as u8 ^ 0xa5)).collect()
+    }
+    fn bytes(v: Vec<MaybeUninit<u8>>) -> Vec<u8> {
+        // SAFETY: the tests below have written every element.
+        v.into_iter().map(|b| unsafe { b.assume_init() }).collect()
+    }
+    let data: Vec<u8> = (0..1000u32).map(|i| (i * 7) as u8).collect();
+    for klen in [16, 24, 32] {
+        let key = vec![9u8; klen];
+        let mut gcm = p::AesGcm::new(&key).unwrap();
+        let mut a = vec![0; data.len() + 16];
+        gcm.encrypt_into(&[1; 12], b"aad", &data, &mut a).unwrap();
+        let mut b = uninit(data.len() + 16);
+        gcm.encrypt_into(&[1; 12], b"aad", &data, &mut b[..])
+            .unwrap();
+        let b = bytes(b);
+        assert_eq!(a, b, "gcm encrypt, {klen}-byte key");
+        let mut plain = uninit(data.len());
+        assert!(gcm
+            .decrypt_into(
+                &[1; 12],
+                b"aad",
+                &b[..data.len()],
+                &b[data.len()..],
+                &mut plain[..]
+            )
+            .unwrap());
+        assert_eq!(bytes(plain), data);
+        let mut wiped = uninit(data.len());
+        assert!(!gcm
+            .decrypt_into(
+                &[2; 12],
+                b"aad",
+                &b[..data.len()],
+                &b[data.len()..],
+                &mut wiped[..]
+            )
+            .unwrap());
+        assert!(
+            bytes(wiped).iter().all(|&x| x == 0),
+            "failed decrypt wipes the output"
+        );
+
+        let mut a = vec![0; data.len()];
+        p::AesCtr::new(&key, Some(&[3; 16]))
+            .unwrap()
+            .process_into(&data, &mut a)
+            .unwrap();
+        let mut b = uninit(data.len());
+        let mut ctr = p::AesCtr::new(&key, Some(&[3; 16])).unwrap();
+        ctr.process_into(&data[..333], &mut b[..333]).unwrap();
+        ctr.process_into(&data[333..], &mut b[333..]).unwrap();
+        assert_eq!(a, bytes(b), "ctr, {klen}-byte key");
+        let mut b = uninit(data.len());
+        p::AesCtr::new(&key, None)
+            .unwrap()
+            .apply_into(&[3; 16], &data, &mut b[..])
+            .unwrap();
+        assert_eq!(a, bytes(b), "keyed ctr, {klen}-byte key");
+
+        let mut a = vec![0; 992];
+        p::aes_cbc_into(&key, &[4; 16], &data[..992], true, &mut a).unwrap();
+        let mut b = uninit(992);
+        p::aes_cbc_into(&key, &[4; 16], &data[..992], true, &mut b[..]).unwrap();
+        assert_eq!(a, bytes(b), "cbc, {klen}-byte key");
+    }
+}

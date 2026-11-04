@@ -14,6 +14,8 @@ ext-php-rs = { version = "=0.16.3", optional = true }
 php-tokio = { version = "=0.2.1", optional = true }
 tokio = { version = "=1.54.1", features = ["rt-multi-thread", "sync"] }
 openssl = "=0.10.81"
+openssl-sys = "=0.9.117"
+foreign-types = "=0.3.2"
 zeroize = { version = "=1.9.1", features = ["derive"] }
 libc = "=0.2.191"
 ring = "=0.17.14"
