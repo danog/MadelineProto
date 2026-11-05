@@ -161,6 +161,10 @@ final class WriteLoop extends Loop implements Subscriber, EphemeralSubscriber
         }
         while ($message = $this->queue->peek()) {
             $this->API->logger("Sending $message as unencrypted message to DC $this->datacenter", Logger::ULTRA_VERBOSE);
+            // Logging can suspend: cancellation meanwhile unlinks the message and frees its body.
+            if ($message->hasReply()) {
+                continue;
+            }
             $serialized = $message->getSerializedBody();
 
             $message_id = $message->getMsgId() ?? $this->connection->msgIdHandler->generateMessageId();
