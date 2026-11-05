@@ -488,12 +488,18 @@ class MTProtoOutgoingMessage extends MTProtoMessage
      * Set serialized body.
      *
      * @param string $serializedBody Serialized body.
+     * @param ?array $sentBody       The arguments as serialized, with the values sent (see TL::serializeMethod):
+     *                               they replace the ones passed, for the handlers of the response.
      *
      * @psalm-external-mutation-free
      */
-    public function setSerializedBody(string $serializedBody): self
+    public function setSerializedBody(string $serializedBody, ?array $sentBody = null): self
     {
         $this->serializedBody = $serializedBody;
+        // Unless replied to (cancelled) while serializing, which freed the body.
+        if ($sentBody !== null && $this->body !== null) {
+            $this->body = $sentBody;
+        }
 
         return $this;
     }

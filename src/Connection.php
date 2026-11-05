@@ -637,14 +637,17 @@ final class Connection
         $message->trySend();
         if (!$message->hasSerializedBody()) {
             $body = $message->getBody();
+            $sent = null;
             if ($message->isMethod) {
                 $resumableCall = $body['resumableCall'] ?? null;
                 $referenceDatabase = $this->API->referenceDatabase;
                 if ($referenceDatabase === null) {
-                    $body = $this->API->getTL()->serializeMethod($message->constructor, $body);
+                    $body = $this->API->getTL()->serializeMethod($message->constructor, $body, $sent);
                 } else {
                     [$body, $message->sentFileReferences] = $referenceDatabase->serializeCall(
-                        fn () => $this->API->getTL()->serializeMethod($message->constructor, $body),
+                        function () use ($message, $body, &$sent): string {
+                            return $this->API->getTL()->serializeMethod($message->constructor, $body, $sent);
+                        },
                     );
                 }
                 if ($resumableCall !== null) {
@@ -666,8 +669,8 @@ final class Connection
                 $body['_'] = $message->constructor;
                 $body = $this->API->getTL()->serializeObject(['type' => ''], $body, $message->constructor);
             }
-            $message->setSerializedBody($body);
-            unset($body);
+            $message->setSerializedBody($body, $sent);
+            unset($body, $sent);
         }
         if ($this->stream === null) {
             // Queued, and sent once connected: connecting here made each sender wait for (and make) its own attempts,

@@ -1323,27 +1323,6 @@ trait UpdateHandler
         }
     }
     /**
-     * The arguments of a request as it was sent, to turn the short update it returned into a message.
-     *
-     * Deserialized from the bytes sent, not taken from the arguments passed to the method: the serializer accepts
-     * values the deserializer never produces (a numeric string for an int, a username for a peer, a bot API
-     * keyboard...), and a message built from them breaks the wrappers, which expect the types of the TL schema.
-     *
-     * @internal
-     */
-    public function sentRequestBody(string $serialized): array
-    {
-        $body = $this->TL->deserialize($serialized, ['type' => '', 'connection' => null, 'encrypted' => false]);
-        // invokeWithTakeout, invokeWithBusinessConnection...
-        while (str_starts_with($body['_'], 'method_invoke') && isset($body['query'])) {
-            $body = $body['query'];
-        }
-        if (isset($body['peer'])) {
-            $body['peer'] = $this->getIdInternal($body['peer']);
-        }
-        return $body;
-    }
-    /**
      * Fill a short message update with the parameters of the request that sent it.
      *
      * The request has the input types of the method (InputReplyTo, InputMedia, ...), not the ones of the message.

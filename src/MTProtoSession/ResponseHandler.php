@@ -259,13 +259,13 @@ trait ResponseHandler
                     || $response['_'] === 'updateShortMessage'
                     || $response['_'] === 'updateShortChatMessage'
                 ) {
-                    // Turned into a message with the arguments of the request.
-                    $serialized = $request->getSerializedBody();
-                    \assert($serialized !== null, 'Replied to before its body was freed');
-                    $response['request'] = [
-                        '_' => $request->constructor,
-                        'body' => $this->API->sentRequestBody($serialized),
-                    ];
+                    // Turned into a message with the arguments of the request, as sent (see TL::serializeMethod).
+                    $body = $request->getBodyOrEmpty();
+                    if (isset($body['peer'])) {
+                        $body['peer'] = $this->API->getIdInternal($body['peer']);
+                    }
+                    $response['request'] = ['_' => $request->constructor, 'body' => $body];
+                    unset($body);
                 }
                 EventLoop::queue($this->API->handleUpdates(...), $response);
             } elseif ($responseType === 'messages.SentEncryptedMessage') {

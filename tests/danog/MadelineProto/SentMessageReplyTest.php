@@ -7,8 +7,8 @@ namespace danog\MadelineProto\Test;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\Settings\TLSchema;
 use danog\MadelineProto\TL\TL;
+use danog\MadelineProto\TL\Types\Bytes;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /** @internal */
 class SentMessageReplyTest extends TestCase
@@ -89,43 +89,47 @@ class SentMessageReplyTest extends TestCase
      * #1979: the message built from a sendMessage call had the arguments as passed, and the serializer accepts a
      * numeric string for an int, so AbstractMessage got a string reply_to_msg_id (TypeError).
      */
-    public function testSentRequestBodyHasSchemaTypes(): void
+    public function testSerializerReturnsTheArgumentsAsSent(): void
     {
         $tl = new TL(null);
         $tl->init(new TLSchema);
-        $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
-        (new ReflectionClass(MTProto::class))->getProperty('TL')->setValue($API, $tl);
 
-        $sendMessage = $tl->serializeMethod('messages.sendMessage', [
+        $arguments = [
             'peer' => ['_' => 'inputPeerUser', 'user_id' => '101374607', 'access_hash' => '1'],
-            'message' => 'Message',
+            'message' => 1234,
             'silent' => 1,
             'reply_to' => [
                 '_' => 'inputReplyToMessage',
                 'reply_to_msg_id' => '5598',
                 'quote_text' => 'quote',
                 'quote_offset' => '2',
-                'quote_entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => '0', 'length' => '5', 'user_id' => ['_' => 'inputUser', 'user_id' => '783732906', 'access_hash' => 1]]],
+                'quote_entities' => [['_' => 'messageEntityMentionName', 'offset' => '0', 'length' => '5', 'user_id' => ['_' => 'inputUser', 'user_id' => '783732906', 'access_hash' => 1]]],
             ],
-            'entities' => [['_' => 'messageEntityBold', 'offset' => '0', 'length' => '7']],
+            'reply_markup' => ['_' => 'replyInlineMarkup', 'rows' => [['_' => 'keyboardInlineButtonRow', 'buttons' => [['_' => 'keyboardInlineButton', 'text' => 'a', 'type' => ['_' => 'inlineButtonTypeCallback', 'data' => 'b']]]]]],
+            'entities' => [['_' => 'messageEntityBold', 'offset' => '0', 'length' => '4']],
             'random_id' => '1234',
-        ]);
-        foreach ([
-            $sendMessage,
-            $tl->serializeMethod('invokeWithTakeout', ['takeout_id' => 1, 'query' => $sendMessage]),
-        ] as $serialized) {
-            $body = $API->sentRequestBody($serialized);
-            $this->assertSame('method_messages.sendMessage', $body['_']);
-            $this->assertSame(101374607, $body['peer']);
-            $this->assertSame('Message', $body['message']);
-            $this->assertTrue($body['silent']);
-            $this->assertSame([['_' => 'messageEntityBold', 'offset' => 0, 'length' => 7]], $body['entities']);
+        ];
+        $serialized = $tl->serializeMethod('messages.sendMessage', $arguments, $sent);
 
-            $header = MTProto::inputReplyToHeader($body['reply_to'], false, self::getId(...));
-            $this->assertSame(5598, $header['reply_to_msg_id']);
-            $this->assertSame(2, $header['quote_offset']);
-            $this->assertSame([['_' => 'messageEntityMentionName', 'offset' => 0, 'length' => 5, 'user_id' => 783732906]], $header['quote_entities']);
-        }
+        $this->assertSame(['_' => 'inputPeerUser', 'user_id' => 101374607, 'access_hash' => 1], $sent['peer']);
+        $this->assertSame('1234', $sent['message']);
+        $this->assertTrue($sent['silent']);
+        $this->assertSame(1234, $sent['random_id']);
+        $this->assertSame([['_' => 'messageEntityBold', 'offset' => 0, 'length' => 4]], $sent['entities']);
+        $this->assertArrayNotHasKey('flags', $sent);
+        $this->assertArrayNotHasKey('flags', $sent['reply_to']);
+        $data = $sent['reply_markup']['rows'][0]['buttons'][0]['type']['data'];
+        $this->assertInstanceOf(Bytes::class, $data);
+        $this->assertSame('b', (string) $data);
+
+        $header = MTProto::inputReplyToHeader($sent['reply_to'], false, self::getId(...));
+        $this->assertSame(5598, $header['reply_to_msg_id']);
+        $this->assertSame(2, $header['quote_offset']);
+        $this->assertSame([['_' => 'messageEntityMentionName', 'offset' => 0, 'length' => 5, 'user_id' => 783732906]], $header['quote_entities']);
+
+        // Sent again as is (a refresh of its file references)
+        $this->assertSame($serialized, $tl->serializeMethod('messages.sendMessage', $sent, $again));
+        $this->assertEquals($sent, $again);
     }
 
     public function testUnconvertible(): void
