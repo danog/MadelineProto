@@ -1413,6 +1413,10 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editChatCreator.html" name="messages.editChatCreator">messages.editChatCreator</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editChatParticipantRank.html" name="messages.editChatParticipantRank">messages.editChatParticipantRank</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editForumTopic.html" name="messages.editForumTopic">messages.editForumTopic</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editInlineBotMessageWidgetData.html" name="messages.editInlineBotMessageWidgetData">messages.editInlineBotMessageWidgetData</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editMessageWidgetData.html" name="messages.editMessageWidgetData">messages.editMessageWidgetData</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.editWidgetData.html" name="messages.editWidgetData">messages.editWidgetData</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getBotWidgetQueryAnswer.html" name="messages.getBotWidgetQueryAnswer">messages.getBotWidgetQueryAnswer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getEmojiGameInfo.html" name="messages.getEmojiGameInfo">messages.getEmojiGameInfo</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getForumTopics.html" name="messages.getForumTopics">messages.getForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getForumTopicsByID.html" name="messages.getForumTopicsByID">messages.getForumTopicsByID</a>
@@ -1420,15 +1424,19 @@ Some of MadelineProto's core components are also available as separate, standalo
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getPersonalChannelHistory.html" name="messages.getPersonalChannelHistory">messages.getPersonalChannelHistory</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getRichMessage.html" name="messages.getRichMessage">messages.getRichMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getShareThemeBackdrops.html" name="messages.getShareThemeBackdrops">messages.getShareThemeBackdrops</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getTranscriptionLangs.html" name="messages.getTranscriptionLangs">messages.getTranscriptionLangs</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getUnreadPollVotes.html" name="messages.getUnreadPollVotes">messages.getUnreadPollVotes</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.getWidgetPublicData.html" name="messages.getWidgetPublicData">messages.getWidgetPublicData</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.readPollVotes.html" name="messages.readPollVotes">messages.readPollVotes</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reorderPinnedForumTopics.html" name="messages.reorderPinnedForumTopics">messages.reorderPinnedForumTopics</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reportMusicListen.html" name="messages.reportMusicListen">messages.reportMusicListen</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.reportReadMetrics.html" name="messages.reportReadMetrics">messages.reportReadMetrics</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.requestChatJoinWebView.html" name="messages.requestChatJoinWebView">messages.requestChatJoinWebView</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotGuestChatResult.html" name="messages.setBotGuestChatResult">messages.setBotGuestChatResult</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setBotWidgetQueryAnswer.html" name="messages.setBotWidgetQueryAnswer">messages.setBotWidgetQueryAnswer</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.setShareTheme.html" name="messages.setShareTheme">messages.setShareTheme</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.summarizeText.html" name="messages.summarizeText">messages.summarizeText</a>
+    * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.transcribeAudioFile.html" name="messages.transcribeAudioFile">messages.transcribeAudioFile</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.translateRichMessage.html" name="messages.translateRichMessage">messages.translateRichMessage</a>
     * <a href="https://docs.madelineproto.xyz/API_docs/methods/messages.updatePinnedForumTopic.html" name="messages.updatePinnedForumTopic">messages.updatePinnedForumTopic</a>
     * <a href="https://docs.madelineproto.xyz/PHP/danog/MadelineProto/API.html#rleDecode" name="rleDecode">null-byte RLE decode: rleDecode</a>
