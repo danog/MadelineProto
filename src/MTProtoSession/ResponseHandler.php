@@ -255,22 +255,18 @@ trait ResponseHandler
         if (isset($response['_']) && !$this->shared->auth->isCdn) {
             $responseType = $this->API->getTL()->getConstructors()->findByPredicate($response['_'])['type'];
             if ($responseType === 'Updates') {
-                $body = $request->getBodyOrEmpty();
-                $trimmed = $body;
-                if (isset($trimmed['peer']) && (
-                    !\is_array($trimmed['peer'])
-                    || (($trimmed['peer']['_'] ?? null) !== 'inputPhoneCall')
-                )) {
-                    try {
-                        $trimmed['peer'] = \is_string($body['peer']) ? $body['peer'] : $this->API->getIdInternal($body['peer']);
-                    } catch (Throwable $e) {
+                if ($response['_'] === 'updateShortSentMessage'
+                    || $response['_'] === 'updateShortMessage'
+                    || $response['_'] === 'updateShortChatMessage'
+                ) {
+                    // Turned into a message with the arguments of the request, as sent (see TL::serializeMethod).
+                    $body = $request->getBodyOrEmpty();
+                    if (isset($body['peer'])) {
+                        $body['peer'] = $this->API->getIdInternal($body['peer']);
                     }
+                    $response['request'] = ['_' => $request->constructor, 'body' => $body];
+                    unset($body);
                 }
-                if (isset($trimmed['message'])) {
-                    $trimmed['message'] = (string) $body['message'];
-                }
-                $response['request'] = ['_' => $request->constructor, 'body' => $trimmed];
-                unset($body);
                 EventLoop::queue($this->API->handleUpdates(...), $response);
             } elseif ($responseType === 'messages.SentEncryptedMessage') {
                 $body = $request->getBodyOrEmpty();

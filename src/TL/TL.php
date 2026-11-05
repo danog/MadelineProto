@@ -462,12 +462,26 @@ final class TL implements TLInterface
     #[\Override]
     public function serializeObject(array $type, mixed $object, string|int $ctx, int $layer = -1)
     {
+        return $this->serializeValue($type, $object, $ctx, $layer);
+    }
+    /**
+     * Serialize a value, replacing it with the value sent: the one the deserializer would return for the bytes
+     * written (an int for a numeric string, a bool for a flag, a peer ID converted to an InputPeer...).
+     *
+     * @param array   $type   TL type definition
+     * @param mixed   $object Object to serialize
+     * @param string  $ctx    Context
+     * @param integer $layer  Layer version
+     */
+    private function serializeValue(array $type, mixed &$object, string|int $ctx, int $layer)
+    {
         switch ($type['type']) {
             case 'int':
                 if (!is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
                 }
-                return Tools::packSignedInt((int) $object);
+                $object = (int) $object;
+                return Tools::packSignedInt($object);
             case '#':
                 if (!\is_int($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
@@ -477,25 +491,24 @@ final class TL implements TLInterface
                 return $object;
             case 'long':
                 if (\is_object($object)) {
-                    return str_pad(strrev($object->toBytes()), 8, \chr(0));
-                }
-                if (\is_string($object) && \strlen($object) === 8) {
-                    return $object;
-                }
-                if (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
-                    return substr($object, 1);
-                }
-                if (\is_array($object) && $type['name'] === 'hash') {
+                    $packed = str_pad(strrev($object->toBytes()), 8, \chr(0));
+                } elseif (\is_string($object) && \strlen($object) === 8) {
+                    $packed = $object;
+                } elseif (\is_string($object) && \strlen($object) === 9 && $object[0] === 'a') {
+                    $packed = substr($object, 1);
+                } elseif (\is_array($object) && $type['name'] === 'hash') {
                     /** @psalm-suppress MixedArgumentTypeCoercion Typechecks are done inside */
-                    return Tools::genVectorHash($object);
-                }
-                if (\is_array($object) && \count($object) === 2) {
-                    return pack('l2', ...$object); // For bot API on 32bit
-                }
-                if (!is_numeric($object)) {
+                    $packed = Tools::genVectorHash($object);
+                } elseif (\is_array($object) && \count($object) === 2) {
+                    $packed = pack('l2', ...$object); // For bot API on 32bit
+                } elseif (!is_numeric($object)) {
                     throw new Exception(Lang::$current_lang['not_numeric']);
+                } else {
+                    $object = (int) $object;
+                    return Tools::packSignedLong($object);
                 }
-                return Tools::packSignedLong((int) $object);
+                $object = Tools::unpackSignedLong($packed);
+                return $packed;
             case 'int128':
                 if (\strlen($object) !== 16) {
                     $object = base64_decode($object, true);
@@ -521,7 +534,10 @@ final class TL implements TLInterface
                 }
                 return (string) $object;
             case 'double':
-                return Tools::packDouble(\is_int($object) ? (float) $object : $object);
+                if (\is_int($object)) {
+                    $object = (float) $object;
+                }
+                return Tools::packDouble($object);
             case 'string':
                 if ($object instanceof Bytes || \is_int($object) || \is_float($object)) {
                     $object = (string) $object;
@@ -564,6 +580,7 @@ final class TL implements TLInterface
                     $concat .= $object;
                     $concat .= pack('@'.Tools::posmod(-$l, 4));
                 }
+                $object = new Bytes($object);
                 return $concat;
             case 'waveform':
                 if (\is_array($object) && isset($object['_']) && $object['_'] === 'bytes') {
@@ -592,8 +609,10 @@ final class TL implements TLInterface
                 }
                 return $concat;
             case 'Bool':
-                return $this->constructors->findByPredicate((bool) $object ? 'boolTrue' : 'boolFalse')['id'];
+                $object = (bool) $object;
+                return $this->constructors->findByPredicate($object ? 'boolTrue' : 'boolFalse')['id'];
             case 'true':
+                $object = (bool) $object;
                 return;
             case '!X':
                 return $object;
@@ -606,18 +625,20 @@ final class TL implements TLInterface
                 }
                 $concat = $this->constructors->findByPredicate('vector')['id'];
                 $concat .= Tools::packUnsignedInt(\count($object));
-                foreach ($object as $k => $current_object) {
-                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                foreach ($object as $k => &$current_object) {
+                    $concat .= ($this->serializeValue(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
+                unset($current_object);
                 return $concat;
             case 'vector':
                 if (!\is_array($object)) {
                     throw new Exception(Lang::$current_lang['array_invalid']);
                 }
                 $concat = Tools::packUnsignedInt(\count($object));
-                foreach ($object as $k => $current_object) {
-                    $concat .= ($this->serializeObject(['type' => $type['subtype']], $current_object, $k, $layer));
+                foreach ($object as $k => &$current_object) {
+                    $concat .= ($this->serializeValue(['type' => $type['subtype']], $current_object, $k, $layer));
                 }
+                unset($current_object);
                 return $concat;
             case 'Object':
                 if (\is_string($object)) {
@@ -648,7 +669,9 @@ final class TL implements TLInterface
             $bare = true;
         }
         if ($predicate === 'messageEntityMentionName') {
+            // Sent with an InputUser
             $constructorData = $this->constructors->findByPredicate('inputMessageEntityMentionName');
+            $object['_'] = 'inputMessageEntityMentionName';
         }
         $concat = $bare ? '' : $constructorData['id'];
         return $concat.($this->serializeParams($constructorData, $object, '', $layer));
@@ -689,15 +712,18 @@ final class TL implements TLInterface
      *
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
+     * @param ?array $sent      Set to the arguments as sent: the values the deserializer would return for them
      */
     #[\Override]
-    public function serializeMethod(string $method, mixed $arguments)
+    public function serializeMethod(string $method, mixed $arguments, ?array &$sent = null)
     {
         $tl = $this->methods->findByMethod($method);
         if ($tl === false) {
             throw new Exception(Lang::$current_lang['method_not_found'].$method);
         }
-        return $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
+        $serialized = $tl['id'].$this->serializeParams($tl, $arguments, $method, -1);
+        $sent = $arguments;
+        return $serialized;
     }
     /**
      * Whether a `DataJSON` argument was already passed as a dataJSON constructor, instead of as the
@@ -716,7 +742,7 @@ final class TL implements TLInterface
      * @param string  $ctx   Context
      * @param integer $layer Layer
      */
-    private function serializeParams(array $tl, array|Button $arguments, string|int $ctx, int $layer)
+    private function serializeParams(array $tl, array|Button &$arguments, string|int $ctx, int $layer)
     {
         $serialized = '';
         $arguments = $arguments instanceof Button ? $arguments->jsonSerialize() : $arguments;
@@ -751,7 +777,8 @@ final class TL implements TLInterface
         foreach ($tl['params'] as $current_argument) {
             $name = $current_argument['name'];
             $type = $current_argument['type'];
-            if (!isset($arguments[$name])) {
+            $passed = isset($arguments[$name]);
+            if (!$passed) {
                 if (isset($current_argument['pow']) && ($type === 'true' || ($arguments[$current_argument['flag']] & $current_argument['pow']) === 0)) {
                     //$this->API->logger('Skipping '.$name.' of type '.$current_argument['type');
                     continue;
@@ -855,7 +882,14 @@ final class TL implements TLInterface
                 $value = $this->API->getSecretChatController($value)->inputChat;
                 $arguments[$name] = $value;
             }
-            $serialized .= ($this->serializeObject($current_argument, $value, $name, $layer));
+            $serialized .= ($this->serializeValue($current_argument, $value, $name, $layer));
+            if ($passed) {
+                $arguments[$name] = $value;
+            }
+        }
+        foreach ($tl['flags'] as ['flag' => $flag]) {
+            // Not returned by the deserializer: computed from the other arguments
+            unset($arguments[$flag]);
         }
         return $serialized;
     }

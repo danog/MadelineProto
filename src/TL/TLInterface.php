@@ -64,9 +64,10 @@ interface TLInterface
      *
      * @param string $method    Method name
      * @param mixed  $arguments Arguments
+     * @param ?array $sent      Set to the arguments as sent: the values the deserializer would return for them
      * @psalm-impure
      */
-    public function serializeMethod(string $method, mixed $arguments);
+    public function serializeMethod(string $method, mixed $arguments, ?array &$sent = null);
     /**
      * Convert a value passed for an object of a TL type to a constructor of that type, as done when serializing it.
      *
