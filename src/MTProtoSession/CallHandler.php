@@ -244,8 +244,9 @@ trait CallHandler
             throw new Exception("Could not find method $method!");
         }
         $encrypted = $methodInfo['encrypted'];
+        $timeoutSeconds = (float) ($args['timeout'] ?? ($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout()));
         $timeout = new TimeoutCancellation(
-            $args['timeout'] ?? ($this->drop ??= (float) $this->API->getSettings()->getRpc()->getRpcDropTimeout()),
+            $timeoutSeconds,
             "Timeout while waiting for $method"
         );
         $cancellation = $cancellation !== null
@@ -266,6 +267,7 @@ trait CallHandler
             takeoutId: $args['takeoutId'] ?? null,
             businessConnectionId: $args['businessConnectionId'] ?? null,
             sessionBound: isset($args['madelineMsgId']),
+            timeout: $timeoutSeconds,
         );
         if (isset($args['madelineMsgId'])) {
             $message->setMsgId($args['madelineMsgId']);

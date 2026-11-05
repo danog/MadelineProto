@@ -332,18 +332,25 @@ trait ResponseHandler
             case -503:
                 if ((($response['error_code'] === -503 || $response['error_message'] === '-503') && !\in_array($request->constructor, ['messages.getBotCallbackAnswer', 'messages.getInlineBotResults'], true))
                     || (\in_array($response['error_message'], ['MSGID_DECREASE_RETRY', 'HISTORY_GET_FAILED', 'RPC_CONNECT_FAILED', 'RPC_CALL_FAIL', 'RPC_MCGET_FAIL', 'PERSISTENT_TIMESTAMP_OUTDATED', 'RPC_MCGET_FAIL', 'no workers running', 'No workers running'], true))) {
-                    $this->API->logger("Resending $request in 1 second due to {$response['error_message']}");
-                    $this->methodRecall($request, $this->datacenter, 1.0);
-                    return null;
-                }
-                if ($response['error_message'] === 'RANDOM_ID_DUPLICATE' && $request->type === 'Updates' && $request->getTries() > 1) {
+                    $delay = $request->getServerErrorDelay();
+                    if ($delay !== null) {
+                        $this->API->logger("Resending $request in $delay seconds due to {$response['error_message']}");
+                        $this->methodRecall($request, $this->datacenter, $delay);
+                        return null;
+                    }
+                    $this->API->logger("Got {$response['error_message']} for $request again, not resending it anymore", Logger::WARNING);
+                } elseif ($response['error_message'] === 'RANDOM_ID_DUPLICATE' && $request->type === 'Updates' && $request->getTries() > 1) {
                     // We sent it again (after a -503, in a new session, ...) while the server is still processing
                     // the first copy, with the same random_id: once that's done, the server answers a copy with the
                     // result of the first one instead of sending the messages again
                     // (https://core.telegram.org/api/updates#updatemessageid-updates).
-                    $this->API->logger("$request is still being processed by the server, resending it in 1 second to get its result");
-                    $this->methodRecall($request, $this->datacenter, 1.0);
-                    return null;
+                    $delay = $request->getServerErrorDelay();
+                    if ($delay !== null) {
+                        $this->API->logger("$request is still being processed by the server, resending it in $delay seconds to get its result");
+                        $this->methodRecall($request, $this->datacenter, $delay);
+                        return null;
+                    }
+                    $this->API->logger("$request is still being processed by the server, not resending it anymore", Logger::WARNING);
                 }
                 return static fn () => RPCErrorException::make($response['error_message'], $response['error_code'], $request->constructor);
             case 303:
