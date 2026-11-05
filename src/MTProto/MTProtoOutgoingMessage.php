@@ -113,6 +113,15 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public array $sentFileReferences = [];
 
     /**
+     * Seconds to wait before resending the message after the next server-side error.
+     */
+    private float $serverErrorDelay = 1.0;
+    /**
+     * Seconds waited so far before resends after server-side errors.
+     */
+    private float $serverErrorWait = 0.0;
+
+    /**
      * Create outgoing message.
      *
      * @param array $body        Body
@@ -143,6 +152,10 @@ class MTProtoOutgoingMessage extends MTProtoMessage
          * it can't be sent again with another message ID or in another session.
          */
         public readonly bool $sessionBound = false,
+        /**
+         * The timeout of the call in seconds, if any: resends after server-side errors stop at half of it.
+         */
+        public readonly ?float $timeout = null,
     ) {
         parent::__construct(!isset(MTProtoMessage::NOT_CONTENT_RELATED[$constructor]));
 
@@ -482,6 +495,24 @@ class MTProtoOutgoingMessage extends MTProtoMessage
     public function getTries(): int
     {
         return $this->tries;
+    }
+
+    /**
+     * Get how long to wait before resending the message after a server-side error (500, -503), or null if it
+     * shouldn't be resent anymore.
+     *
+     * As in TDLib, the delay doubles from 1 second after each error. The waits add up to at most half of the timeout of
+     * the call: a call the server always fails then gets the error, instead of being resent until it times out.
+     */
+    public function getServerErrorDelay(): ?float
+    {
+        $delay = $this->serverErrorDelay;
+        if ($this->timeout !== null && $this->serverErrorWait + $delay > $this->timeout / 2) {
+            return null;
+        }
+        $this->serverErrorWait += $delay;
+        $this->serverErrorDelay = min($delay * 2, 60.0);
+        return $delay;
     }
 
     /**
