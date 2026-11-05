@@ -1323,6 +1323,27 @@ trait UpdateHandler
         }
     }
     /**
+     * The arguments of a request as it was sent, to turn the short update it returned into a message.
+     *
+     * Deserialized from the bytes sent, not taken from the arguments passed to the method: the serializer accepts
+     * values the deserializer never produces (a numeric string for an int, a username for a peer, a bot API
+     * keyboard...), and a message built from them breaks the wrappers, which expect the types of the TL schema.
+     *
+     * @internal
+     */
+    public function sentRequestBody(string $serialized): array
+    {
+        $body = $this->TL->deserialize($serialized, ['type' => '', 'connection' => null, 'encrypted' => false]);
+        // invokeWithTakeout, invokeWithBusinessConnection...
+        while (str_starts_with($body['_'], 'method_invoke') && isset($body['query'])) {
+            $body = $body['query'];
+        }
+        if (isset($body['peer'])) {
+            $body['peer'] = $this->getIdInternal($body['peer']);
+        }
+        return $body;
+    }
+    /**
      * Fill a short message update with the parameters of the request that sent it.
      *
      * The request has the input types of the method (InputReplyTo, InputMedia, ...), not the ones of the message.
@@ -1332,14 +1353,43 @@ trait UpdateHandler
         $body = $updates['request']['body'] ?? [];
         // The media actually sent, if any, is in the update itself.
         unset($updates['request'], $body['media'], $body['rich_message']);
+        $getId = fn (mixed $peer): int => $this->getInfo($peer, API::INFO_TYPE_ID);
         if (isset($body['reply_to'])) {
             $body['reply_to'] = self::inputReplyToHeader(
                 $body['reply_to'],
                 isset($body['reply_to']['top_msg_id']) && $this->isForum($body['peer']),
-                fn (mixed $peer): int => $this->getInfo($peer, API::INFO_TYPE_ID),
+                $getId,
             );
         }
+        if (isset($body['entities'])) {
+            $body['entities'] = self::inputEntitiesToMessage($body['entities'], $getId);
+        }
         return array_merge($body, $updates);
+    }
+    /**
+     * Convert the entities of a request into the ones of the message it sent.
+     *
+     * @internal
+     *
+     * @param list<array>          $entities
+     * @param \Closure(mixed): int $getId
+     *
+     * @return list<array>
+     */
+    public static function inputEntitiesToMessage(array $entities, \Closure $getId): array
+    {
+        foreach ($entities as &$entity) {
+            if ($entity['_'] === 'inputMessageEntityMentionName') {
+                $entity = [
+                    '_' => 'messageEntityMentionName',
+                    'offset' => $entity['offset'],
+                    'length' => $entity['length'],
+                    'user_id' => $getId($entity['user_id']),
+                ];
+            }
+        }
+        unset($entity);
+        return $entities;
     }
     /**
      * Convert the InputReplyTo of a request into the MessageReplyHeader of the message it sent.
@@ -1375,10 +1425,13 @@ trait UpdateHandler
                 if (isset($replyTo['reply_to_peer_id'])) {
                     $header['reply_to_peer_id'] = $getId($replyTo['reply_to_peer_id']);
                 }
-                foreach (['quote_text', 'quote_entities', 'quote_offset', 'todo_item_id', 'poll_option'] as $key) {
+                foreach (['quote_text', 'quote_offset', 'todo_item_id', 'poll_option'] as $key) {
                     if (isset($replyTo[$key])) {
                         $header[$key] = $replyTo[$key];
                     }
+                }
+                if (isset($replyTo['quote_entities'])) {
+                    $header['quote_entities'] = self::inputEntitiesToMessage($replyTo['quote_entities'], $getId);
                 }
                 return $header;
             case 'inputReplyToStory':

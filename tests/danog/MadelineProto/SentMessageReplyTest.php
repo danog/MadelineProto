@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\Settings\TLSchema;
+use danog\MadelineProto\TL\TL;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /** @internal */
 class SentMessageReplyTest extends TestCase
@@ -13,7 +16,7 @@ class SentMessageReplyTest extends TestCase
     private static function getId(mixed $peer): int
     {
         return match ($peer['_']) {
-            'inputPeerUser' => $peer['user_id'],
+            'inputPeerUser', 'inputUser' => $peer['user_id'],
             'inputPeerChannel' => -1000000000000 - $peer['channel_id'],
         };
     }
@@ -80,6 +83,49 @@ class SentMessageReplyTest extends TestCase
                 self::getId(...),
             ),
         );
+    }
+
+    /**
+     * #1979: the message built from a sendMessage call had the arguments as passed, and the serializer accepts a
+     * numeric string for an int, so AbstractMessage got a string reply_to_msg_id (TypeError).
+     */
+    public function testSentRequestBodyHasSchemaTypes(): void
+    {
+        $tl = new TL(null);
+        $tl->init(new TLSchema);
+        $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass(MTProto::class))->getProperty('TL')->setValue($API, $tl);
+
+        $sendMessage = $tl->serializeMethod('messages.sendMessage', [
+            'peer' => ['_' => 'inputPeerUser', 'user_id' => '101374607', 'access_hash' => '1'],
+            'message' => 'Message',
+            'silent' => 1,
+            'reply_to' => [
+                '_' => 'inputReplyToMessage',
+                'reply_to_msg_id' => '5598',
+                'quote_text' => 'quote',
+                'quote_offset' => '2',
+                'quote_entities' => [['_' => 'inputMessageEntityMentionName', 'offset' => '0', 'length' => '5', 'user_id' => ['_' => 'inputUser', 'user_id' => '783732906', 'access_hash' => 1]]],
+            ],
+            'entities' => [['_' => 'messageEntityBold', 'offset' => '0', 'length' => '7']],
+            'random_id' => '1234',
+        ]);
+        foreach ([
+            $sendMessage,
+            $tl->serializeMethod('invokeWithTakeout', ['takeout_id' => 1, 'query' => $sendMessage]),
+        ] as $serialized) {
+            $body = $API->sentRequestBody($serialized);
+            $this->assertSame('method_messages.sendMessage', $body['_']);
+            $this->assertSame(101374607, $body['peer']);
+            $this->assertSame('Message', $body['message']);
+            $this->assertTrue($body['silent']);
+            $this->assertSame([['_' => 'messageEntityBold', 'offset' => 0, 'length' => 7]], $body['entities']);
+
+            $header = MTProto::inputReplyToHeader($body['reply_to'], false, self::getId(...));
+            $this->assertSame(5598, $header['reply_to_msg_id']);
+            $this->assertSame(2, $header['quote_offset']);
+            $this->assertSame([['_' => 'messageEntityMentionName', 'offset' => 0, 'length' => 5, 'user_id' => 783732906]], $header['quote_entities']);
+        }
     }
 
     public function testUnconvertible(): void
