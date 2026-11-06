@@ -26,6 +26,8 @@ use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use PHPUnit\Framework\TestCase;
 
+use function Amp\delay;
+
 /**
  * A group call connection tells the server whether our video is stopped (or our screen-share paused) only when
  * that changes: the disk jockey reports the codec every time a file starts, including every time a looping file
@@ -132,6 +134,54 @@ final class GroupVideoStateTest extends TestCase
         $connection->onVideoCodec('VP8');
 
         $this->assertSame([['video_stopped', false], ['video_stopped', false]], $owner->sent);
+        $connection->close();
+    }
+
+    private static function constraint(int $idealHeight): string
+    {
+        return json_encode(['colibriClass' => 'SenderVideoConstraints', 'videoConstraints' => ['idealHeight' => $idealHeight]], JSON_THROW_ON_ERROR);
+    }
+
+    public function testTheVideoStopsAMomentAfterNobodyWatchesIt(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->onDataChannelMessage(self::constraint(360));
+        $connection->onDataChannelMessage(self::constraint(0));
+        $this->assertFalse($connection->isVideoUnwanted(), 'not at once: a viewer may only be switching layouts');
+        delay(2.5);
+        $this->assertTrue($connection->isVideoUnwanted());
+
+        $connection->onDataChannelMessage(self::constraint(180));
+        $this->assertFalse($connection->isVideoUnwanted(), 'at once, when someone watches again');
+        $connection->close();
+    }
+
+    public function testALoweringUndoneInTimeIsDropped(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage(self::constraint(0));
+        delay(1.0);
+        $connection->onDataChannelMessage(self::constraint(720));
+        delay(2.0);
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testOtherDataChannelMessagesAreIgnored(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage('{"colibriClass":"DebugMessage","message":""}');
+        $connection->onDataChannelMessage('{"colibriClass":"SenderVideoConstraints","videoConstraints":{}}');
+        $connection->onDataChannelMessage('not json');
+        delay(2.5);
+        $this->assertFalse($connection->isVideoUnwanted());
         $connection->close();
     }
 }
