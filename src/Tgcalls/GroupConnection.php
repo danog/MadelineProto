@@ -28,6 +28,7 @@ use danog\MadelineProto\RecordingEvent;
 use danog\MadelineProto\RecordingFormat;
 use danog\MadelineProto\RestoresDeclaredProperties;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
+use Revolt\EventLoop;
 use Throwable;
 use Webrtc\DataChannel\Enum\State;
 use Webrtc\DataChannel\Listener\DataChannelMessageListener;
@@ -73,6 +74,12 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     private const HEIGHT_THUMBNAIL = 180;
     private const HEIGHT_MEDIUM = 360;
     private const HEIGHT_FULL = 720;
+    /**
+     * How long a lower video constraint from the SFU must hold before it applies, in seconds (as in
+     * tgcalls): a viewer briefly switching layouts doesn't stop the video, which then could only
+     * resume on a keyframe.
+     */
+    private const SENDER_CONSTRAINT_LOWER_DELAY = 2.0;
 
     private RTCPeerConnection $peerConnection;
     private OpusPlaybackTrack $outgoingAudio;
@@ -177,6 +184,14 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private ?bool $videoStopped = null;
 
+    /**
+     * The highest video resolution anyone in the call wants from us (SenderVideoConstraints), as
+     * applied to the outgoing video. Like tgcalls, everything is wanted until the SFU says otherwise.
+     */
+    private int $senderConstraint = self::HEIGHT_FULL;
+    /** Bumped by every SenderVideoConstraints, so that a delayed lowering is dropped once a newer one arrived. */
+    private int $senderConstraintRequest = 0;
+
     private bool $closed = false;
     private bool $renegotiating = false;
     private bool $renegotiatePending = false;
@@ -274,6 +289,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     public function __unserialize(array $data): void
     {
         $this->restoreDeclaredProperties($data);
+        // As the outgoing video does, start over transmitting until the SFU reports again.
+        $this->senderConstraint = self::HEIGHT_FULL;
     }
 
     /**
@@ -591,13 +608,64 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
 
     /**
      * @internal The SFU sends encoder hints (SenderVideoConstraints) and diagnostics (DebugMessage)
-     * on the data channel. We transmit a demuxed file rather than a live encoder, so there is nothing
-     * to cap; the messages are logged for diagnostics only.
+     * on the data channel. A demuxed file has a single resolution, so of the hints only "nobody is
+     * watching" (below the smallest layer, usually 0) matters: the video is then not transmitted,
+     * as tgcalls deactivates all of its encodings.
      */
     #[\Override]
     public function onDataChannelMessage(string $data): void
     {
         $this->call->log("Colibri message on {$this->call}: $data", Logger::VERBOSE);
+        try {
+            $message = (array) json_decode($data, true, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return;
+        }
+        if (($message['colibriClass'] ?? null) !== 'SenderVideoConstraints') {
+            return;
+        }
+        $constraints = (array) ($message['videoConstraints'] ?? []);
+        if (isset($constraints['idealHeight']) && \is_int($constraints['idealHeight'])) {
+            $this->onSenderVideoConstraint($constraints['idealHeight']);
+        }
+    }
+
+    /**
+     * The SFU reported the highest video resolution anyone wants from us: a raise applies at once,
+     * a lowering only if it still holds after {@see self::SENDER_CONSTRAINT_LOWER_DELAY}.
+     */
+    private function onSenderVideoConstraint(int $height): void
+    {
+        $request = ++$this->senderConstraintRequest;
+        if ($height === $this->senderConstraint) {
+            return;
+        }
+        if ($height > $this->senderConstraint) {
+            $this->applySenderConstraint($height);
+            return;
+        }
+        EventLoop::delay(self::SENDER_CONSTRAINT_LOWER_DELAY, function () use ($request, $height): void {
+            if (!$this->closed && $request === $this->senderConstraintRequest) {
+                $this->applySenderConstraint($height);
+            }
+        });
+    }
+
+    private function applySenderConstraint(int $height): void
+    {
+        $this->senderConstraint = $height;
+        $this->outgoingVideo->setUnwanted($height < self::HEIGHT_THUMBNAIL);
+    }
+
+    /**
+     * Whether the outgoing video is not transmitted because nobody is watching it.
+     *
+     * @internal
+     * @psalm-mutation-free
+     */
+    public function isVideoUnwanted(): bool
+    {
+        return $this->outgoingVideo->isUnwanted();
     }
 
     /**
