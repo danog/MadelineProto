@@ -22,6 +22,7 @@ use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
 use danog\MadelineProto\Settings\Database\SerializerType;
+use danog\MadelineProto\Settings\Database\Sqlite;
 
 $MadelineProto = new API(__DIR__.'/../testing.madeline');
 
@@ -30,6 +31,7 @@ $map = [
     'mysql' => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
     'postgres' => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
     'redis' => (new Redis)->setUri('redis://redis'),
+    'sqlite' => (new Sqlite)->setPath(dirname(__DIR__).'/testing.madeline.sqlite'),
 ];
 
 $settings = $map[$argv[1]];
