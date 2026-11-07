@@ -44,10 +44,6 @@ final class Sqlite extends DatabaseAbstract
      * If null, the best serializer is chosen.
      */
     protected ?SerializerType $serializer = null;
-    /**
-     * Whether to checkpoint the WAL in amphp/parallel workers.
-     */
-    protected bool $checkpointInWorkers = true;
 
     #[\Override]
     public function getOrmSettings(): Settings
@@ -60,7 +56,9 @@ final class Sqlite extends DatabaseAbstract
                 null => null
             },
             $this->cacheTtl,
-            $this->checkpointInWorkers,
+            // Not in amphp/parallel workers: MadelineProto can't yet tell whether they can
+            // run where it runs (e.g. webhosts). SQLite checkpoints by itself, when committing.
+            checkpointInWorkers: false,
         );
     }
 
@@ -104,33 +102,6 @@ final class Sqlite extends DatabaseAbstract
     public function setCacheTtl(int|string $cacheTtl): self
     {
         $this->cacheTtl = \is_int($cacheTtl) ? $cacheTtl : strtotime($cacheTtl) - time();
-
-        return $this;
-    }
-
-    /**
-     * Get whether to checkpoint the WAL in amphp/parallel workers.
-     */
-    public function getCheckpointInWorkers(): bool
-    {
-        return $this->checkpointInWorkers;
-    }
-
-    /**
-     * Set whether to checkpoint the WAL in amphp/parallel workers.
-     *
-     * A checkpoint syncs the database file to disk. If false, or if no worker can be started,
-     * SQLite checkpoints by itself once the WAL reaches 1000 pages, when committing: that
-     * commit blocks the event loop while the disk syncs (a few milliseconds on an SSD, more
-     * on slower storage). Disable it where amphp/parallel can't be used.
-     *
-     * @param bool $checkpointInWorkers Whether to checkpoint the WAL in amphp/parallel workers.
-     *
-     * @psalm-external-mutation-free
-     */
-    public function setCheckpointInWorkers(bool $checkpointInWorkers): self
-    {
-        $this->checkpointInWorkers = $checkpointInWorkers;
 
         return $this;
     }
