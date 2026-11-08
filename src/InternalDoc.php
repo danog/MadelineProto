@@ -617,6 +617,9 @@ abstract class InternalDoc
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
+     * The first download chunk is read before returning the response, so initial download errors are thrown here.
+     * Errors after the first chunk are wrapped in StreamException when reading the response body.
+     *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
      * @param ServerRequest                                                                $request      Request
      * @param callable                                                                     $cb           Status callback (can also use FileCallback)

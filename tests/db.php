@@ -26,15 +26,16 @@ use danog\MadelineProto\Settings\Database\Sqlite;
 
 $MadelineProto = new API(__DIR__.'/../testing.madeline');
 
+// Built lazily: the previous version (ACTIONS_FORCE_PREVIOUS) may not have the classes of the newer backends.
 $map = [
-    'memory' => new Memory,
-    'mysql' => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
-    'postgres' => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
-    'redis' => (new Redis)->setUri('redis://redis'),
-    'sqlite' => (new Sqlite)->setPath(dirname(__DIR__).'/testing.madeline.sqlite'),
+    'memory' => static fn () => new Memory,
+    'mysql' => static fn () => (new Mysql)->setUri('tcp://mariadb')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
+    'postgres' => static fn () => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
+    'redis' => static fn () => (new Redis)->setUri('redis://redis'),
+    'sqlite' => static fn () => (new Sqlite)->setPath(dirname(__DIR__).'/testing.madeline.sqlite'),
 ];
 
-$settings = $map[$argv[1]];
+$settings = $map[$argv[1]]();
 
 if (!$settings instanceof Memory) {
     $settings->setSerializer($argv[2] === 'igbinary' ? SerializerType::IGBINARY : SerializerType::SERIALIZE);
