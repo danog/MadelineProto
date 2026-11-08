@@ -16,6 +16,8 @@ source tests/release_version.sh
 repository=${GH_REPO:-danog/MadelineProto}
 branch=v8
 export GH_TOKEN="$GITHUB_TOKEN"
+# git fetches and pushes with it too: the checkout doesn't keep a token.
+gh auth setup-git
 
 pr=$(gh api "repos/$repository/commits/$PUSH_SHA/pulls" --jq "[.[] | select(.merged_at != null and .merge_commit_sha == \"$PUSH_SHA\" and .user.login == \"dependabot[bot]\")] | first | .number // empty")
 if [ -z "$pr" ]; then

@@ -14,10 +14,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   jactionlint:
     name: Lint the workflows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -27,8 +32,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Run jactionlint
-        uses: jdx/jactionlint@9e87e8f34edfc00b849a27807e26eff9d00b936d # v2.5.0
+        uses: jdx/jactionlint@baa8d685e2b27ff5821558c9eeabb2051c1da61b # v2.4.0
         with:
           strict-exit: true
-          # The token of the job, for the online checks (rate limit of the GitHub API).
-          online: strict

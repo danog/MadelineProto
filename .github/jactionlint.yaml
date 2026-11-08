@@ -15,4 +15,41 @@ rules:
     days: 7
   # Opt-in: no job may run longer than the longest one of the CI (the test suite).
   timeout-too-long:
-    max: 120
+    max: 60
+  unpinned-images:
+    policies:
+      # The image of this repository, built by the same run of the CI (tests/docker_image.sh) or by the one of the
+      # main branch: its digest isn't known when the workflow is written, so it is pinned by its tag.
+      danog/madelineproto: tag-pin
+
+ignores:
+  - rule: dangerous-triggers
+    file: .github/workflows/automerge.yml
+    reason: >-
+      It needs the results of the checks of two workflows. It never runs the code of the pull request, only compares it
+      with git, and only for the pull requests of Dependabot and of the app of the autobuild from this repository.
+  - rule: dangerous-triggers
+    file: .github/workflows/prerelease.yml
+    reason: >-
+      Only releases what the CI of a push to the main branch passed on. It runs no code of a pull request: pushes to the
+      main branch are reviewed.
+  - rule: unpinned-images
+    file: .github/workflows/ci.yml
+    job: cs
+    reason: The image built by the docker jobs of the same run, whose digest can't be known in advance.
+  - rule: unpinned-images
+    file: .github/workflows/ci.yml
+    job: test
+    reason: The image built by the docker jobs of the same run, whose digest can't be known in advance.
+  - rule: unpinned-images
+    file: .github/workflows/ci.yml
+    job: test_light
+    reason: The image built by the docker jobs of the same run, whose digest can't be known in advance.
+  - rule: unpinned-images
+    file: .github/workflows/ci.yml
+    job: handshake
+    reason: The image built by the docker jobs of the same run, whose digest can't be known in advance.
+  - rule: unpinned-images
+    file: .github/workflows/ci.yml
+    job: build
+    reason: The image built by the docker jobs of the same run, whose digest can't be known in advance.

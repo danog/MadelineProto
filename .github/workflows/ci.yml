@@ -28,23 +28,37 @@ concurrency:
   # Not the builds of tags, which release.
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   # The image the other jobs run in, rebuilt for every run: they wait for it, and pull the new one. Tagged by
   # tests/docker_image.sh: next for the main branch; the version for a tag (whose jobs run in it), then latest, the
   # major and the minor version once it's released (docker-release).
   docker:
+    name: docker
+    timeout-minutes: 60
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     strategy:
       matrix:
         include:
-          - image: ubuntu-latest
+          - image: ubuntu-24.04
             arch: amd64
           - image: ubuntu-24.04-arm
             arch: arm64
     runs-on: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          # Not from the cache for the tags, which release.
+          cache-binary: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Build and push the image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -52,13 +66,20 @@ jobs:
           # For the GitHub API, from which PIE downloads the extensions: 60 unauthenticated requests per hour per IP.
           GITHUB_TOKEN: ${{ github.token }}
           CI_COMMIT_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-        run: tests/docker_image.sh build "${{ matrix.arch }}"
+          ARCH: ${{ matrix.arch }}
+        run: tests/docker_image.sh build "$ARCH"
 
   docker-merge:
+    name: docker-merge
+    timeout-minutes: 10
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Push the multi-arch image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -67,8 +88,14 @@ jobs:
         run: tests/docker_image.sh merge
 
   cs:
+    name: cs
+    timeout-minutes: 30
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: docker-merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
@@ -87,9 +114,11 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The packages downloaded by composer, between runs. Not for the tags, which release: a poisoned entry would end
+      # up in the phar.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -102,10 +131,12 @@ jobs:
 
   # Not in the container: it has no Node.js, the runner has.
   webui:
-    runs-on: ubuntu-latest
+    name: webui
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
       - name: Test the web UI, and check that its committed bundle is up to date
@@ -114,9 +145,14 @@ jobs:
   # The whole test suite, with the secrets. Not for the tags: they're the commits of the main branch whose CI passed
   # (see tests/prerelease.sh), whose tests would only compete for the sessions with the ones of the main branch.
   test:
+    name: test
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: docker-merge
-    if: github.ref_type != 'tag'
-    runs-on: ubuntu-latest
+    if: ${{ github.ref_type != 'tag' }}
+    runs-on: ubuntu-24.04
     container:
       # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use).
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}-test
@@ -140,9 +176,11 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The packages downloaded by composer, between runs. Not for the tags, which release: a poisoned entry would end
+      # up in the phar.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -164,9 +202,13 @@ jobs:
   # extensions are only in the test image.
   test_light:
     name: test_light (${{ matrix.event-loop }})
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: docker-merge
-    if: github.ref_type != 'tag'
-    runs-on: ubuntu-latest
+    if: ${{ github.ref_type != 'tag' }}
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -189,9 +231,11 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The packages downloaded by composer, between runs. Not for the tags, which release: a poisoned entry would end
+      # up in the phar.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -202,8 +246,14 @@ jobs:
         run: tests/test.sh phpunit-light
 
   handshake:
+    name: handshake
+    timeout-minutes: 30
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: docker-merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       # The image of the version, for a tag.
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
@@ -221,9 +271,11 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The packages downloaded by composer, between runs. Not for the tags, which release: a poisoned entry would end
+      # up in the phar.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -232,9 +284,15 @@ jobs:
         run: tests/test.sh handshake
 
   build:
+    name: build
+    timeout-minutes: 60
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     # At once with the other tests: the release job publishes the phar once all of them passed.
     needs: docker-merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # It tests the phar with the session of authorization 0 of the bot (see tests/session_tests.sh), which two
     # builds must not use at once.
     concurrency:
@@ -253,7 +311,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     services:
       mariadb:
-        image: mariadb
+        image: mariadb:13@sha256:f4054da26e3a9dd6c8b5cc97363e544408b15c0fb369d7359c25dc04826eb6e1
         env:
           MARIADB_DATABASE: MadelineProtoDb
           MARIADB_USER: MadelineProtoUser
@@ -263,7 +321,7 @@ jobs:
           --health-cmd "healthcheck.sh --connect --innodb_initialized"
           --health-interval 5s --health-timeout 5s --health-retries 20
       postgres:
-        image: postgres
+        image: postgres:18@sha256:e3d24f6906d0760bf4da0dae872415391ededefad23fd471c47dc53b0ddf3c42
         env:
           POSTGRES_DB: MadelineProtoDb
           POSTGRES_USER: MadelineProtoUser
@@ -272,7 +330,7 @@ jobs:
           --health-cmd "pg_isready -U MadelineProtoUser -d MadelineProtoDb"
           --health-interval 5s --health-timeout 5s --health-retries 20
       redis:
-        image: redis
+        image: redis:8@sha256:1f88291b4c57bdf249f02eb085a8669889b2d2954e91d4de5118a5da6b78dd53
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 20
@@ -282,9 +340,11 @@ jobs:
         run: |
           command -v git > /dev/null || { apt-get update && apt-get install -y git; }
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
-      # The packages downloaded by composer, between runs.
-      - uses: actions/cache@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The packages downloaded by composer, between runs. Not for the tags, which release: a poisoned entry would end
+      # up in the phar.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           path: /github/home/composer-cache
           key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
@@ -302,27 +362,29 @@ jobs:
           RELEASE_DIR: ${{ github.workspace }}/release-files
         run: /bin/bash -e tests/makephar.sh
       - name: Keep the files of the release
-        if: github.ref_type == 'tag'
-        uses: actions/upload-artifact@v7
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-files
           path: release-files
           if-no-files-found: error
 
   release:
+    name: release
+    timeout-minutes: 30
     # Once every test passed (the test job is skipped for tags). Skipped for the main branch: it needs the results of
     # this run, so it can't be in a workflow of its own.
     needs: [cs, webui, test, test_light, handshake, build]
     if: ${{ !cancelled() && !failure() && github.ref_type == 'tag' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       # To upload the phar to the release of a tag.
       contents: write
       # To run release.yml.
       actions: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-files
           path: release-files
@@ -330,24 +392,30 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: tests/release_phar.sh "${{ github.ref_name }}" release-files
+        run: tests/release_phar.sh "${GITHUB_REF_NAME}" release-files
       # Released with the token of the job: its events don't run workflows, so run it, and wait for it, so that the
       # release fails if it fails.
       - name: Announce the release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: tests/release_dispatch.sh "${{ github.ref_name }}"
+        run: tests/release_dispatch.sh "${GITHUB_REF_NAME}"
 
   # latest, and the major and minor versions, only once released.
   docker-release:
+    name: docker-release
+    timeout-minutes: 10
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: ci
+      deployment: false
     needs: release
     # The implicit success() skips a job when any job it depends on, even indirectly, was skipped: the test job
     # always is for tags, so latest was never moved.
     if: ${{ !cancelled() && needs.release.result == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Point latest to the image of the release
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
