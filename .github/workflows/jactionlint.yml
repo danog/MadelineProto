@@ -1,0 +1,34 @@
+name: jactionlint
+
+# Lints the workflows, the composite actions and dependabot.yml with jactionlint, at the strictness of
+# .github/jactionlint.yaml: every finding fails the job, warnings and infos too.
+on:
+  push:
+    branches:
+      - v8
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jactionlint:
+    name: Lint the workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run jactionlint
+        uses: jdx/jactionlint@9e87e8f34edfc00b849a27807e26eff9d00b936d # v2.5.0
+        with:
+          strict-exit: true
+          # The token of the job, for the online checks (rate limit of the GitHub API).
+          online: strict

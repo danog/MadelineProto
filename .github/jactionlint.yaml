@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jdx/jactionlint/main/schema/jactionlint-config.json
+# Checked by .github/workflows/jactionlint.yml, at maximum strictness: the pedantic profile (every rule of a profile),
+# the online checks (the rules that ask GitHub about the actions), the opt-in rules that need no list of this
+# repository, and every finding fails the build, warnings and infos too (strict-exit in the workflow).
+profile: pedantic
+
+online: true
+online-options:
+  # A failed lookup fails the run instead of being skipped.
+  mode: strict
+
+rules:
+  # Opt-in: no action pinned to a version released less than a week ago.
+  action-release-cooldown:
+    days: 7
+  # Opt-in: no job may run longer than the longest one of the CI (the test suite).
+  timeout-too-long:
+    max: 120
