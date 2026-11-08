@@ -19,6 +19,8 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use Amp\ByteStream\ClosedException;
+use Amp\Cancellation;
+use Amp\DeferredCancellation;
 use Amp\DeferredFuture;
 use Amp\Future;
 use Amp\TimeoutCancellation;
@@ -80,10 +82,13 @@ final class NetworkOutageTest extends TestCase
         BypassFinals::enable();
     }
 
-    private function connection(): Connection
+    private function connection(?Closure $onLog = null): Connection
     {
         $API = (new ReflectionClass(MTProto::class))->newInstanceWithoutConstructor();
         $API->logger = $this->createMock(Logger::class);
+        if ($onLog !== null) {
+            $API->logger->method('logger')->willReturnCallback($onLog);
+        }
         (new ReflectionProperty($API, 'settings'))->setValue($API, new Settings);
         $API->loginState = new Publisher(new LoginState(API::LOGGED_IN, 2));
 
@@ -130,7 +135,7 @@ final class NetworkOutageTest extends TestCase
         return $connection;
     }
 
-    private function message(Connection $connection, float $timeout = 60): MTProtoOutgoingMessage
+    private function message(Connection $connection, float $timeout = 60, ?Cancellation $cancellation = null): MTProtoOutgoingMessage
     {
         $message = new MTProtoOutgoingMessage(
             connection: $connection,
@@ -140,7 +145,7 @@ final class NetworkOutageTest extends TestCase
             isMethod: true,
             unencrypted: true,
             specialMethodType: null,
-            cancellation: new TimeoutCancellation($timeout, 'Timeout while waiting for req_pq_multi'),
+            cancellation: $cancellation ?? new TimeoutCancellation($timeout, 'Timeout while waiting for req_pq_multi'),
             resultDeferred: new DeferredFuture,
         );
         $message->setSerializedBody(str_repeat("\0", 20));
@@ -189,6 +194,37 @@ final class NetworkOutageTest extends TestCase
         }
 
         $connection->disconnect(true);
+    }
+
+    public function testCancelledRequestIsSkippedAndNextRequestIsSent(): void
+    {
+        $logging = new DeferredFuture;
+        $resume = new DeferredFuture;
+        $connection = $this->connection(static function (mixed $line) use ($logging, $resume): void {
+            if (\is_string($line) && str_starts_with($line, 'Sending ') && !$logging->isComplete()) {
+                // A full log pipe can suspend the writer after it has selected the message.
+                $logging->complete();
+                $resume->getFuture()->await();
+            }
+        });
+        $this->down = false;
+        $cancellation = new DeferredCancellation;
+        $cancelled = $this->message($connection, cancellation: $cancellation->getCancellation());
+        $connection->sendMessage($cancelled);
+        $logging->getFuture()->await(new TimeoutCancellation(5));
+
+        // Only the next message may reach the socket, and the writer must keep running to send it.
+        $connection->stream->expects($this->once())->method('getWriteBuffer');
+        $cancellation->cancel();
+        $next = $this->message($connection);
+        $connection->sendMessage($next);
+        $resume->complete();
+        try {
+            $next->getSendPromise()->await(new TimeoutCancellation(5));
+            $this->assertTrue($next->wasSent());
+        } finally {
+            $connection->disconnect();
+        }
     }
 
     public function testClosingStopsTheRetries(): void
