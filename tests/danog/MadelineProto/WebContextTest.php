@@ -344,17 +344,31 @@ final class WebContextTest extends TestCase
         ]));
         mkdir($dir, 0o700);
         try {
-            // Root ignores the permissions: it can delete the request file anyway
-            if (!\function_exists('posix_geteuid') || posix_geteuid() !== 0) {
-                $write(getcwd());
-                chmod($path, 0o600);
-                chmod($dir, 0o500);
-                [$code, $output] = self::runInNewProcess($id);
-                self::assertSame(0, $code, $output);
-                self::assertFileDoesNotExist($marker, "A request that couldn't delete the request file ran it");
+            // Root ignores the permissions (CI): then the request runs as nobody, the owner of the directory
+            $user = null;
+            if (\function_exists('posix_geteuid') && posix_geteuid() === 0) {
+                $nobody = posix_getpwnam('nobody');
+                self::assertIsArray($nobody, 'No nobody user to run the request as');
+                $user = [$nobody['uid'], $nobody['gid']];
             }
+            $write(getcwd());
+            chmod($path, 0o600);
+            if ($user !== null) {
+                // The IPC server too: a request that runs must be able to connect, or this can't tell
+                foreach ([$path, $dir, $serverDir, ...glob("$serverDir/*")] as $file) {
+                    chown($file, $user[0]);
+                }
+            }
+            chmod($dir, 0o500);
+            [$code, $output] = self::runInNewProcess($id, $user);
+            self::assertSame(0, $code, $output);
+            self::assertFileDoesNotExist($marker, "A request that couldn't delete the request file ran it");
 
             chmod($dir, 0o700);
+            if ($user !== null) {
+                chown($dir, 0);
+                chown($path, 0);
+            }
             $write("$serverDir/missing");
             [$code, $output] = self::runInNewProcess($id);
             self::assertSame(1, $code, $output);
@@ -370,13 +384,16 @@ final class WebContextTest extends TestCase
     /**
      * Run WebContextRunner::run() in a new PHP process, as in a new request: exits with 1 if the context ran.
      *
+     * @param array{int, int}|null $user The user and group ID to run it as (from root).
+     *
      * @return array{int, string} The exit code and the output.
      */
-    private static function runInNewProcess(string $id): array
+    private static function runInNewProcess(string $id, ?array $user = null): array
     {
         exec(
             escapeshellarg(PHP_BINARY).' -r '.escapeshellarg(
-                'require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+                ($user !== null ? "posix_setgid({$user[1]}); posix_setuid({$user[0]});" : '')
+                .'require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
                 .'exit('.WebContextRunner::class.'::run('.var_export($id, true).') ? 1 : 0);'
             ).' 2>&1',
             $output,
