@@ -10,6 +10,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Not a version released less than a week ago, which could still be yanked or compromised.
+    cooldown:
+      default-days: 7
     labels:
       - "release:internal"
   # The tools of the code checks (bamarni/composer-bin-plugin).
@@ -17,6 +20,9 @@ updates:
     directory: "/vendor-bin/check"
     schedule:
       interval: "weekly"
+    # Not a version released less than a week ago, which could still be yanked or compromised.
+    cooldown:
+      default-days: 7
     labels:
       - "release:internal"
   # The actions of the workflows, pinned by commit with their version in a comment, which Dependabot updates too.
@@ -24,11 +30,17 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Not a version released less than a week ago, which could still be yanked or compromised.
+    cooldown:
+      default-days: 7
     labels:
       - "release:internal"
   - package-ecosystem: "npm"
     directory: "/webui"
     schedule:
       interval: "weekly"
+    # Not a version released less than a week ago, which could still be yanked or compromised.
+    cooldown:
+      default-days: 7
     labels:
       - "release:internal"

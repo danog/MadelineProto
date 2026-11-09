@@ -20,16 +20,32 @@ on:
 permissions:
   contents: read
 
+# The run of the last check of a pull request to finish supersedes the others: it's the one that sees them all passed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   # Once all of the checks passed (the actor is checked again by tests/automerge.sh).
   merge:
+    name: merge
+    timeout-minutes: 15
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: admin-token
+      deployment: false
     if: >-
-      github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' &&
+      ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
-      (github.event.workflow_run.actor.login == 'dependabot[bot]' || github.event.workflow_run.actor.login == 'madelineproto-autobuild[bot]')
-    runs-on: ubuntu-latest
+      (github.event.workflow_run.actor.login == 'dependabot[bot]' || github.event.workflow_run.actor.login == 'madelineproto-autobuild[bot]') }}
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           # The history, without the files, to compare the pull requests with the main branch.

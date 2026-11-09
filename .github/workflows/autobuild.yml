@@ -26,20 +26,34 @@ concurrency:
   group: autobuild
   cancel-in-progress: false
 
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   docker:
+    name: docker
+    timeout-minutes: 30
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: autobuild
+      deployment: false
     # Until the app is set up.
-    if: vars.AUTOBUILD_APP_ID != ''
-    runs-on: ubuntu-latest
+    if: ${{ vars.AUTOBUILD_APP_ID != '' }}
+    runs-on: ubuntu-24.04
     steps:
       - name: Get a token of the app
         id: app
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ vars.AUTOBUILD_APP_ID }}
+          client-id: ${{ vars.AUTOBUILD_APP_ID }}
           private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: MadelineProto
+          # To push the branch of the pull request, and to open it.
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Get the user of the app
         id: user
@@ -47,12 +61,12 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
-          echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
-          echo "email=$(gh api "/users/$SLUG%5Bbot%5D" --jq .id)+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
+          echo "name=${SLUG}[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=$(gh api "/users/${SLUG}%5Bbot%5D" --jq .id)+${SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
       # The tip of the branch when the job starts, not the commit the run was triggered on: a run queued
       # behind another one would build on a commit older than the pull request of that run, if merged.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
@@ -68,29 +82,37 @@ jobs:
 
   # Not in the container: it has no Node.js, the runner has.
   webui:
-    if: vars.AUTOBUILD_APP_ID != ''
-    runs-on: ubuntu-latest
+    name: webui
+    timeout-minutes: 30
+    if: ${{ vars.AUTOBUILD_APP_ID != '' }}
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
           persist-credentials: false
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
       - name: Test and build the web UI
         run: tests/webui.sh --update
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: webui
           path: src/WebUI/templates/assets/tweb
           if-no-files-found: error
 
   build:
+    name: build
+    timeout-minutes: 60
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: autobuild
+      deployment: false
     needs: webui
     # Until the app is set up.
-    if: vars.AUTOBUILD_APP_ID != ''
-    runs-on: ubuntu-latest
+    if: ${{ vars.AUTOBUILD_APP_ID != '' }}
+    runs-on: ubuntu-24.04
     container:
       image: danog/madelineproto:next
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
@@ -109,12 +131,15 @@ jobs:
 
       - name: Get a token of the app
         id: app
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ vars.AUTOBUILD_APP_ID }}
+          client-id: ${{ vars.AUTOBUILD_APP_ID }}
           private-key: ${{ secrets.AUTOBUILD_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: MadelineProto,MadelineProtoDocs,schemas
+          # To push the branches of the pull requests, and to open them.
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Get the user of the app
         id: user
@@ -124,16 +149,16 @@ jobs:
         run: |
           apt-get install -y curl
           id=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/users/$SLUG%5Bbot%5D" | php -r 'echo json_decode(stream_get_contents(STDIN))->id;')
-          echo "name=$SLUG[bot]" >> "$GITHUB_OUTPUT"
-          echo "email=$id+$SLUG[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
+          echo "name=${SLUG}[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=$id+${SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
 
       - name: Get the bundle of the web UI
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: webui
           path: src/WebUI/templates/assets/tweb
@@ -152,11 +177,13 @@ jobs:
         run: tests/test.sh build
 
       - name: Report the failure to @danogentili
-        if: failure()
+        if: ${{ failure() }}
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # The PHP code is in single quotes on purpose: it reads the variables itself.
+          # shellcheck disable=SC2016
           php -r '
             $context = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json", "content" => json_encode(["chat_id" => 101374607, "text" => "The hourly composer build of MadelineProto failed: ".getenv("RUN_URL")])]]);
             exit(file_get_contents("https://api.telegram.org/bot".getenv("BOT_TOKEN")."/sendMessage", false, $context) === false ? 1 : 0);
