@@ -511,9 +511,6 @@ final class WebContextTest extends TestCase
      * Run a test with the built-in webserver serving the repository, with its own temporary directory (to check
      * that nothing is left behind), named $tmp followed by random characters.
      *
-     * @param array<string, string>        $environment
-     * @param \Closure(int, string): void $test Called with the port of the webserver and its temporary directory.
-     * @param list<string>                 $options     Options of PHP.
      */
     /**
      * Whether a process of the group is still running, not a zombie.
