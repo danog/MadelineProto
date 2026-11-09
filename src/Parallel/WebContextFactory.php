@@ -28,6 +28,9 @@ use Amp\Parallel\Context\ContextException;
 use Amp\Parallel\Context\ContextFactory;
 use Amp\Parallel\Context\ThreadContext;
 use Amp\Parallel\Worker\ContextWorkerPool;
+use Amp\Parallel\Worker\WorkerPool;
+use Amp\Sync\LocalSemaphore;
+use Amp\Sync\Lock;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Logger;
@@ -40,6 +43,7 @@ use Revolt\EventLoop;
 use Throwable;
 use WeakMap;
 
+use function Amp\async;
 use function Amp\Parallel\Context\contextFactory;
 use function Amp\Parallel\Worker\workerPool;
 
@@ -58,14 +62,18 @@ final class WebContextFactory implements ContextFactory
     use ForbidSerialization;
 
     /**
-     * Limit of the worker pool installed by {@see install()}.
+     * Web contexts running at once in this process: each occupies a worker of the webserver (a PHP-FPM child, of
+     * which there may be as few as 5) for as long as it runs. More wait for one to be done.
      */
-    public const DEFAULT_WORKER_LIMIT = 4;
+    public const WEB_CONTEXT_LIMIT = 4;
 
     /**
-     * Seconds after which an idle worker of the pool installed by {@see install()} is stopped.
+     * Seconds after which an idle worker of the pool installed by {@see install()} is stopped, if it runs in a web
+     * context.
      */
     public const WORKER_IDLE_TIMEOUT = 10;
+
+    private static ?LocalSemaphore $running = null;
 
     /**
      * @param positive-int $childConnectTimeout Seconds the request has to connect back.
@@ -80,11 +88,11 @@ final class WebContextFactory implements ContextFactory
      * webserver where processes can't be started ({@see FallbackContextFactory}), unless the global context factory
      * of amphp/parallel was already set.
      *
-     * Unless the global worker pool was already set, it's replaced with one of at most DEFAULT_WORKER_LIMIT workers,
-     * each stopped once idle for WORKER_IDLE_TIMEOUT seconds and started again when needed (amphp's default pool has
-     * up to 32 workers, never stopped): a web context occupies a worker of the webserver (a PHP-FPM child, of which
-     * there may be as few as 5) for as long as it runs. Starting a worker costs a request to the webserver (or a
-     * process), and running ones are subject to the time limits of the webserver.
+     * Unless the global worker pool was already set, it's replaced with one whose workers are started when needed
+     * and, if they run in a web context, stopped once idle for WORKER_IDLE_TIMEOUT seconds (amphp's default pool never
+     * stops them): a web context occupies a worker of the webserver (a PHP-FPM child) for as long as it runs. It has
+     * the limit of amphp's default pool: at most WEB_CONTEXT_LIMIT web contexts run at once anyway. Where processes
+     * work, the workers are processes, as with amphp's default pool.
      *
      * @internal
      */
@@ -104,7 +112,7 @@ final class WebContextFactory implements ContextFactory
         }
         if (!self::isGlobalSet('Amp\\Parallel\\Worker\\workerPool')) {
             workerPool(new ContextWorkerPool(
-                self::DEFAULT_WORKER_LIMIT,
+                WorkerPool::DEFAULT_WORKER_LIMIT,
                 new OnDemandWorkerFactory(self::WORKER_IDLE_TIMEOUT),
             ));
         }
@@ -118,8 +126,10 @@ final class WebContextFactory implements ContextFactory
      * If the map can't be read (another version of amphp/parallel), it's considered set, never to replace it.
      *
      * @param callable-string $function
+     *
+     * @internal
      */
-    private static function isGlobalSet(string $function): bool
+    public static function isGlobalSet(string $function): bool
     {
         try {
             $map = (new ReflectionFunction($function))->getStaticVariables()['map'] ?? null;
@@ -300,6 +310,38 @@ final class WebContextFactory implements ContextFactory
             throw new ContextException('Web contexts are not supported on Windows');
         }
 
+        $lock = self::acquire($cancellation);
+        try {
+            // Released once the context is done: its result received, or the context closed
+            return $this->startContext($script, $cancellation, $lock->release(...));
+        } catch (Throwable $e) {
+            $lock->release();
+            throw $e;
+        }
+    }
+
+    /**
+     * Wait for fewer than WEB_CONTEXT_LIMIT web contexts to run.
+     */
+    private static function acquire(?Cancellation $cancellation): Lock
+    {
+        self::$running ??= new LocalSemaphore(self::WEB_CONTEXT_LIMIT);
+        $acquiring = async(self::$running->acquire(...));
+        try {
+            return $acquiring->await($cancellation);
+        } catch (CancelledException $e) {
+            // Still acquired eventually: release it then
+            $acquiring->map(static fn (Lock $lock) => $lock->release())->ignore();
+            throw $e;
+        }
+    }
+
+    /**
+     * @param non-empty-list<string> $script
+     * @param \Closure(): void       $onDone
+     */
+    private function startContext(array $script, ?Cancellation $cancellation, \Closure $onDone): WebContext
+    {
         $id = bin2hex(random_bytes(16));
         $key = bin2hex(random_bytes(16));
         $dir = self::getDirectory($id);
@@ -336,7 +378,7 @@ final class WebContextFactory implements ContextFactory
         }
 
         Logger::log("Started web context $id");
-        return new WebContext($ipcSocket, $resultSocket);
+        return new WebContext($ipcSocket, $resultSocket, $onDone);
     }
 
     /**
@@ -400,15 +442,14 @@ final class WebContextFactory implements ContextFactory
      * The connections of the requests are closed once their response ends (see WebRunner::sendSelfRequest()): for
      * the one that started the context, once its request ends.
      *
+     * The context has childConnectTimeout seconds to connect from the last request sent, not from the first: each
+     * endpoint that doesn't answer takes ENDPOINT_TIMEOUT seconds (one that doesn't reach the webserver,
+     * ENDPOINT_GRACE more).
+     *
      * @return array{ChannelledSocket, ChannelledSocket} The IPC channel and the result channel.
      */
     private function connect(IpcServer $server, string $id, string $key, ?Cancellation $cancellation): array
     {
-        $timeout = new TimeoutCancellation(
-            $this->childConnectTimeout,
-            "The context didn't connect within {$this->childConnectTimeout} seconds: check that requests to the entry script of MadelineProto succeed",
-        );
-        $startCancellation = $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout;
         $endpoints = WebRunner::getSelfStartEndpoints();
 
         /** @var DeferredFuture<?int> Completed with the endpoint that served the context, once it connects */
@@ -464,26 +505,27 @@ final class WebContextFactory implements ContextFactory
             foreach ($order as $index) {
                 [$proto, $port] = $endpoints[$index];
                 $uri = $runPath.'?'.http_build_query(['argv' => ['madeline-parallel', $id, $index]]);
-                if (!WebRunner::sendSelfRequest($proto, $port, $uri, timeout: self::ENDPOINT_TIMEOUT)) {
+                if (!WebRunner::sendSelfRequest($proto, $port, $uri, timeout: self::ENDPOINT_TIMEOUT, cancellation: $cancellation)) {
                     continue;
                 }
                 $sent = true;
+                $grace = new TimeoutCancellation(self::ENDPOINT_GRACE);
                 try {
-                    $connected->await(new CompositeCancellation(
-                        $startCancellation,
-                        new TimeoutCancellation(self::ENDPOINT_GRACE),
-                    ));
+                    $connected->await($cancellation ? new CompositeCancellation($cancellation, $grace) : $grace);
                     break;
                 } catch (CancelledException $e) {
-                    if ($startCancellation->isRequested()) {
-                        throw $e;
-                    }
+                    $cancellation?->throwIfRequested();
                     // Not served (yet): try the next endpoint too
                 }
             }
             if (!$sent) {
                 throw new ContextException('Could not send the request of the context to the webserver: check the logs and the server configuration');
             }
+            $timeout = new TimeoutCancellation(
+                $this->childConnectTimeout,
+                "The context didn't connect within {$this->childConnectTimeout} seconds: check that requests to the entry script of MadelineProto succeed",
+            );
+            $startCancellation = $cancellation ? new CompositeCancellation($cancellation, $timeout) : $timeout;
             $endpoint = $connected->await($startCancellation);
             ['ipc' => $ipcSocket, 'result' => $resultSocket] = $deferred->getFuture()->await($startCancellation);
             self::$endpoint = $endpoint;

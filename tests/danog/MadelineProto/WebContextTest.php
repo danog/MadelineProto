@@ -19,15 +19,21 @@ declare(strict_types=1);
 namespace danog\MadelineProto\Test;
 
 use Amp\Cancellation;
+use Amp\CancelledException;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Ipc\IpcServer;
 use Amp\Parallel\Context\Context;
 use Amp\Parallel\Context\ContextException;
 use Amp\Parallel\Context\ContextFactory;
+use Amp\Parallel\Worker\Task;
+use Amp\Parallel\Worker\Worker;
+use Amp\TimeoutCancellation;
 use danog\MadelineProto\Exception;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
+use danog\MadelineProto\Parallel\Internal\OnDemandWorker;
+use danog\MadelineProto\Parallel\Internal\SocketChannel;
 use danog\MadelineProto\Parallel\Internal\WebContextRunner;
 use danog\MadelineProto\Parallel\WebContextFactory;
 use PHPUnit\Framework\TestCase;
@@ -177,12 +183,13 @@ final class WebContextTest extends TestCase
             // Every context started is one context ID (the idle worker after the others, besides the ones counted):
             // a context slower than ENDPOINT_GRACE to connect is requested again on another endpoint, by design, and
             // only runs once (see testARequestOnlyRunsForTheRequestThatDeletesIt())
-            $log = file_get_contents("$tmp/server.log");
-            preg_match_all('/\]: GET \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/', $log, $matches);
+            $requests = file_get_contents("$tmp/requests.log");
+            preg_match_all('/^start \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/m', $requests, $matches);
             self::assertCount($result['started'] + 1, array_unique($matches[1]));
+            $log = file_get_contents("$tmp/server.log");
             self::assertSame(
                 substr_count($log, ' Accepted') - substr_count($log, 'Closed without sending a request'),
-                preg_match_all('/\]: [A-Z]+ \//', $log),
+                preg_match_all('/^start /m', $requests),
                 'A connection to the webserver sent no request',
             );
         }, ['-d', 'disable_functions=proc_open']);
@@ -228,7 +235,7 @@ final class WebContextTest extends TestCase
 
             // Served once the worker is free
             $deadline = microtime(true) + 10;
-            while (!str_contains(file_get_contents("$tmp/server.log"), ']: GET /tests/parallel_web_child.php?mode=ping')) {
+            while (!str_contains(is_file("$tmp/requests.log") ? file_get_contents("$tmp/requests.log") : "", "end /tests/parallel_web_child.php?mode=ping\n")) {
                 if (microtime(true) > $deadline) {
                     self::fail('The request sent by selfStart() was not served');
                 }
@@ -337,12 +344,15 @@ final class WebContextTest extends TestCase
         ]));
         mkdir($dir, 0o700);
         try {
-            $write(getcwd());
-            chmod($path, 0o600);
-            chmod($dir, 0o500);
-            [$code, $output] = self::runInNewProcess($id);
-            self::assertSame(0, $code, $output);
-            self::assertFileDoesNotExist($marker, "A request that couldn't delete the request file ran it");
+            // Root ignores the permissions: it can delete the request file anyway
+            if (!\function_exists('posix_geteuid') || posix_geteuid() !== 0) {
+                $write(getcwd());
+                chmod($path, 0o600);
+                chmod($dir, 0o500);
+                [$code, $output] = self::runInNewProcess($id);
+                self::assertSame(0, $code, $output);
+                self::assertFileDoesNotExist($marker, "A request that couldn't delete the request file ran it");
+            }
 
             chmod($dir, 0o700);
             $write("$serverDir/missing");
@@ -394,7 +404,91 @@ final class WebContextTest extends TestCase
             unlink($script);
         }
         self::assertSame(0, $code, implode("\n", $output));
-        self::assertSame(\dirname($script).DIRECTORY_SEPARATOR, implode("\n", $output));
+        // Resolved: the temporary directory of macOS is behind a symlink
+        self::assertSame(realpath(\dirname($script)).DIRECTORY_SEPARATOR, implode("\n", $output));
+    }
+
+    /**
+     * A worker whose start outlives the submit() that started it (cancelled) is still stopped once idle if it runs in
+     * a web context; one running in a process isn't, as in amphp's default pool.
+     */
+    public function testAWorkerStartedForACancelledTaskIsStoppedWhenIdleInAWebContext(): void
+    {
+        foreach ([true, false] as $web) {
+            $worker = $this->createMock(Worker::class);
+            $worker->method('isRunning')->willReturn(true);
+            $worker->expects(self::exactly($web ? 1 : 0))->method('shutdown');
+            $onDemand = new OnDemandWorker(static function () use ($worker, $web): array {
+                delay(0.2);
+                return [$worker, $web];
+            }, 0.1);
+            try {
+                $onDemand->submit($this->createMock(Task::class), new TimeoutCancellation(0.05));
+                self::fail('The submit() was not cancelled');
+            } catch (CancelledException) {
+            }
+            // Started after 0.2s, idle for 0.1s more
+            delay(0.6);
+        }
+    }
+
+    /**
+     * A receive() that was cancelled leaves its read pending, which doesn't keep the event loop running.
+     */
+    public function testACancelledReceiveDoesntKeepTheEventLoopRunning(): void
+    {
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-receive-'.bin2hex(random_bytes(8)).'.php';
+        file_put_contents($script, '<?php require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+            .'$server = new '.IpcServer::class.'();'
+            .'$accepted = Amp\\async($server->accept(...));'
+            .'$channel = new '.SocketChannel::class.'(Amp\\Ipc\\connect($server->getUri()));'
+            // The other end never writes
+            .'$other = $accepted->await();'
+            .'$server->close();'
+            .'try { $channel->receive(new Amp\\TimeoutCancellation(0.1)); } catch (Amp\\CancelledException) { echo "cancelled"; }'
+            .'Revolt\\EventLoop::run();'
+            .'echo " returned";');
+        try {
+            $process = proc_open([PHP_BINARY, '-d', 'error_reporting=E_ALL&~E_DEPRECATED', $script], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+            self::assertIsResource($process);
+            $deadline = microtime(true) + 10;
+            while (proc_get_status($process)['running']) {
+                if (microtime(true) > $deadline) {
+                    proc_terminate($process);
+                    proc_close($process);
+                    self::fail('EventLoop::run() did not return: the read of the cancelled receive() kept it running');
+                }
+                usleep(50_000);
+            }
+            $output = stream_get_contents($pipes[1]).stream_get_contents($pipes[2]);
+            proc_close($process);
+        } finally {
+            unlink($script);
+        }
+        self::assertSame('cancelled returned', $output);
+    }
+
+    /**
+     * A document root reached through a symlink (a symlinked release directory) is resolved, like the path of the
+     * entry script it's compared with.
+     */
+    public function testASymlinkedDocumentRootIsResolved(): void
+    {
+        $link = sys_get_temp_dir().'/madeline-webcontext-test-root-'.bin2hex(random_bytes(8));
+        symlink(realpath(self::ROOT), $link);
+        $script = sys_get_temp_dir().'/madeline-webcontext-test-entry-'.bin2hex(random_bytes(8)).'.php';
+        file_put_contents($script, '<?php require '.var_export(self::ROOT.'/vendor/autoload.php', true).';'
+            .'$_SERVER["SERVER_NAME"] = "localhost"; $_SERVER["REQUEST_URI"] = "/tests/parallel_web_child.php";'
+            .'$_SERVER["SCRIPT_FILENAME"] = '.var_export("$link/tests/parallel_web_child.php", true).';'
+            .'echo '.WebRunner::class.'::getRunPath();');
+        try {
+            exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg($script).' 2>&1', $output, $code);
+        } finally {
+            unlink($script);
+            unlink($link);
+        }
+        self::assertSame(0, $code, implode("\n", $output));
+        self::assertSame('/src/Ipc/Runner/entry.php', implode("\n", $output));
     }
 
     /**
@@ -421,6 +515,41 @@ final class WebContextTest extends TestCase
      * @param \Closure(int, string): void $test Called with the port of the webserver and its temporary directory.
      * @param list<string>                 $options     Options of PHP.
      */
+    /**
+     * Whether a process of the group is still running, not a zombie.
+     *
+     * The workers of the webserver are reparented to PID 1 when it exits, which may never reap them (in a container
+     * whose PID 1 is `tail -f /dev/null`, like a CI job): their zombies stay in the group, and signal 0 still reaches
+     * a zombie.
+     */
+    private static function isGroupRunning(int $pgid): bool
+    {
+        if (!posix_kill(-$pgid, 0)) {
+            return false;
+        }
+        if (!is_dir('/proc/self')) {
+            // Without procfs (macOS), launchd reaps the orphans
+            return true;
+        }
+        foreach (glob('/proc/[0-9]*/stat') ?: [] as $path) {
+            try {
+                $stat = file_get_contents($path);
+            } catch (\Throwable) {
+                // Exited meanwhile
+                continue;
+            }
+            if ($stat === false) {
+                continue;
+            }
+            // pid (comm) state ppid pgrp ...: comm may contain spaces and parentheses
+            $fields = explode(' ', substr($stat, strrpos($stat, ')') + 2));
+            if ((int) ($fields[2] ?? -1) === $pgid && !\in_array($fields[0] ?? '', ['Z', 'X'], true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static function withServer(string $tmp, array $environment, \Closure $test, array $options = []): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
@@ -460,36 +589,45 @@ final class WebContextTest extends TestCase
         if (!\function_exists('posix_setpgid') || !\function_exists('pcntl_exec')) {
             self::markTestSkipped('posix and pcntl are needed to stop the workers of the webserver');
         }
-        $server = stream_socket_server('tcp://127.0.0.1:0');
-        $port = (int) substr(strrchr(stream_socket_get_name($server, false), ':'), 1);
-        fclose($server);
-
         $log = "$tmp/server.log";
-        $process = proc_open(
-            [
-                PHP_BINARY, '-r', 'posix_setpgid(0, 0); pcntl_exec(PHP_BINARY, \array_slice($argv, 1));', '--',
-                '-d', 'opcache.enable_cli=0', ...$options, '-S', "127.0.0.1:$port", '-t', self::ROOT,
-            ],
-            [['file', '/dev/null', 'r'], ['file', $log, 'a'], ['file', $log, 'a']],
-            $pipes,
-            null,
-            $environment + getenv(),
-        );
-        self::assertIsResource($process);
-        $server = [$process, proc_get_status($process)['pid']];
+        // A free port is picked and closed before the webserver binds it: another process may take it meanwhile.
+        // The webserver only logs that it started once it bound the port: until then, a connection could reach
+        // another process. If it exits without starting, the port was taken: try another one.
+        for ($attempt = 1; ; $attempt++) {
+            $probe = stream_socket_server('tcp://127.0.0.1:0');
+            $port = (int) substr(strrchr(stream_socket_get_name($probe, false), ':'), 1);
+            fclose($probe);
 
-        $deadline = microtime(true) + 10;
-        while (true) {
-            try {
-                fclose(stream_socket_client("tcp://127.0.0.1:$port"));
-                break;
-            } catch (\Throwable) {
+            $process = proc_open(
+                [
+                    PHP_BINARY, '-r', 'posix_setpgid(0, 0); pcntl_exec(PHP_BINARY, \array_slice($argv, 1));', '--',
+                    '-d', 'opcache.enable_cli=0', '-d', 'auto_prepend_file='.self::ROOT.'/tests/parallel_web_request_log.php',
+                    ...$options, '-S', "127.0.0.1:$port", '-t', self::ROOT,
+                ],
+                [['file', '/dev/null', 'r'], ['file', $log, 'a'], ['file', $log, 'a']],
+                $pipes,
+                null,
+                ['MADELINE_TEST_REQUEST_LOG' => "$tmp/requests.log"] + $environment + getenv(),
+            );
+            self::assertIsResource($process);
+            $server = [$process, proc_get_status($process)['pid']];
+
+            $deadline = microtime(true) + 10;
+            while (!str_contains(file_get_contents($log), "Development Server (http://127.0.0.1:$port) started")) {
+                if (!proc_get_status($process)['running']) {
+                    self::stopServer($server);
+                    if ($attempt < 5) {
+                        continue 2;
+                    }
+                    self::fail("The webserver did not start:\n".file_get_contents($log));
+                }
+                if (microtime(true) > $deadline) {
+                    self::stopServer($server);
+                    self::fail("The webserver did not start:\n".file_get_contents($log));
+                }
+                delay(0.1);
             }
-            if (microtime(true) > $deadline || !proc_get_status($process)['running']) {
-                self::stopServer($server);
-                self::fail("The webserver did not start:\n".file_get_contents($log));
-            }
-            delay(0.1);
+            break;
         }
         return [$server, $port];
     }
@@ -508,7 +646,7 @@ final class WebContextTest extends TestCase
         posix_kill(-$pid, SIGTERM);
         proc_close($process);
         $deadline = microtime(true) + 10;
-        while (posix_kill(-$pid, 0)) {
+        while (self::isGroupRunning($pid)) {
             if (microtime(true) > $deadline) {
                 self::fail("The workers of the webserver (process group $pid) didn't exit on SIGTERM");
             }

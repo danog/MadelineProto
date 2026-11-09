@@ -19,13 +19,21 @@ namespace danog\MadelineProto\Parallel\Internal;
 use Amp\Cancellation;
 use Amp\ForbidCloning;
 use Amp\ForbidSerialization;
+use Amp\Parallel\Context\Context;
+use Amp\Parallel\Context\ContextFactory;
+use Amp\Parallel\Worker\ContextWorkerFactory;
 use Amp\Parallel\Worker\Worker;
 use Amp\Parallel\Worker\WorkerFactory;
+use danog\MadelineProto\Parallel\WebContext;
+use danog\MadelineProto\Parallel\WebContextFactory;
 
+use function Amp\Parallel\Context\contextFactory;
 use function Amp\Parallel\Worker\workerFactory;
 
 /**
- * Creates {@see OnDemandWorker}s, which start their workers with the global worker factory of amphp/parallel.
+ * Creates {@see OnDemandWorker}s, which start their workers like amphp's default worker factory, with the global
+ * context factory: only those whose context is a web context are stopped when idle. With a global worker factory set
+ * by the user, which can't tell, its workers are.
  *
  * @internal
  */
@@ -45,6 +53,27 @@ final class OnDemandWorkerFactory implements WorkerFactory
     #[\Override]
     public function create(?Cancellation $cancellation = null): Worker
     {
-        return new OnDemandWorker(static fn (): Worker => workerFactory()->create(), $this->idleTimeout);
+        return new OnDemandWorker(static function (): array {
+            if (WebContextFactory::isGlobalSet('Amp\\Parallel\\Worker\\workerFactory')) {
+                return [workerFactory()->create(), true];
+            }
+            $contexts = new class(contextFactory()) implements ContextFactory {
+                public bool $web = false;
+
+                public function __construct(private readonly ContextFactory $factory)
+                {
+                }
+
+                #[\Override]
+                public function start(string|array $script, ?Cancellation $cancellation = null): Context
+                {
+                    $context = $this->factory->start($script, $cancellation);
+                    $this->web = $context instanceof WebContext;
+                    return $context;
+                }
+            };
+            $worker = (new ContextWorkerFactory(contextFactory: $contexts))->create();
+            return [$worker, $contexts->web];
+        }, $this->idleTimeout);
     }
 }

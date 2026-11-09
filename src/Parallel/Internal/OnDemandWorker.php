@@ -33,8 +33,8 @@ use function Amp\async;
 
 /**
  * A worker of the pool installed by {@see \danog\MadelineProto\Parallel\WebContextFactory::install()}, whose
- * context is started for its first task and stopped once it's been idle for a while, to be started again for the
- * next task.
+ * context is started for its first task and, if it's a web context, stopped once it's been idle for a while, to be
+ * started again for the next task (a process context keeps running, as in amphp's default pool).
  *
  * A web context occupies a worker of the webserver (a PHP-FPM child) for as long as it runs, and a worker of a pool
  * runs until the pool is shut down: the pool of a long-running script (an IPC server) would occupy its workers
@@ -51,6 +51,9 @@ final class OnDemandWorker implements Worker
 
     private ?Worker $worker = null;
 
+    /** Whether the worker runs in a web context, and is stopped when idle. */
+    private bool $stopWhenIdle = false;
+
     /** @var Future<Worker>|null */
     private ?Future $starting = null;
 
@@ -62,8 +65,9 @@ final class OnDemandWorker implements Worker
     private bool $stopped = false;
 
     /**
-     * @param Closure(): Worker $factory     Starts the worker running the tasks.
-     * @param float             $idleTimeout Seconds after which an idle worker is stopped.
+     * @param Closure(): array{Worker, bool} $factory     Starts the worker running the tasks, and tells whether it
+     *                                                    runs in a web context (stopped when idle).
+     * @param float                          $idleTimeout Seconds after which an idle worker in a web context is stopped.
      */
     public function __construct(
         private readonly Closure $factory,
@@ -112,7 +116,7 @@ final class OnDemandWorker implements Worker
         $this->worker = null;
         $this->starting ??= async(function (): Worker {
             try {
-                $worker = ($this->factory)();
+                [$worker, $stopWhenIdle] = ($this->factory)();
             } finally {
                 $this->starting = null;
             }
@@ -120,14 +124,32 @@ final class OnDemandWorker implements Worker
                 $worker->kill();
                 throw new StatusError('The worker has been shut down');
             }
-            return $this->worker = $worker;
+            $this->worker = $worker;
+            $this->stopWhenIdle = $stopWhenIdle;
+            // The submit() that started it may have been cancelled meanwhile: done() found no worker to stop
+            $this->armIdleTimer();
+            return $worker;
         });
         return $this->starting->await($cancellation);
     }
 
     private function done(): void
     {
-        if (--$this->running === 0 && !$this->stopped && $this->worker !== null) {
+        $this->running--;
+        $this->armIdleTimer();
+    }
+
+    /**
+     * Stop the worker once it's been idle for idleTimeout seconds, if it's idle now and runs in a web context.
+     */
+    private function armIdleTimer(): void
+    {
+        if ($this->running === 0
+            && $this->stopWhenIdle
+            && !$this->stopped
+            && $this->worker !== null
+            && $this->idleTimer === null
+        ) {
             $this->idleTimer = EventLoop::unreference(EventLoop::delay($this->idleTimeout, function (): void {
                 $this->idleTimer = null;
                 $worker = $this->worker;

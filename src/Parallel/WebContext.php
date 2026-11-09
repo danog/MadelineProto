@@ -38,11 +38,27 @@ use danog\MadelineProto\Parallel\Internal\SocketChannel;
 final class WebContext extends AbstractContext
 {
     /**
+     * @param (\Closure(): void)|null $onDone Called once either channel closes: the result was received (join()), or
+     *                                       the context was closed.
+     *
      * @internal
      */
-    public function __construct(ChannelledSocket $ipcSocket, ChannelledSocket $resultSocket)
+    public function __construct(ChannelledSocket $ipcSocket, ChannelledSocket $resultSocket, ?\Closure $onDone = null)
     {
-        parent::__construct(new SocketChannel($ipcSocket), new SocketChannel($resultSocket));
+        $ipc = new SocketChannel($ipcSocket);
+        $result = new SocketChannel($resultSocket);
+        parent::__construct($ipc, $result);
+        if ($onDone !== null) {
+            $once = static function () use (&$onDone): void {
+                if ($onDone !== null) {
+                    $callback = $onDone;
+                    $onDone = null;
+                    $callback();
+                }
+            };
+            $ipc->onClose($once);
+            $result->onClose($once);
+        }
     }
 
     public function __destruct()

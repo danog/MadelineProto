@@ -17,6 +17,7 @@ use Amp\Parallel\Context\ContextException;
 use Amp\Parallel\Context\ContextFactory;
 use Amp\Parallel\Worker\ContextWorkerPool;
 use Amp\Parallel\Worker\TaskFailureThrowable;
+use Amp\Parallel\Worker\WorkerPool;
 use danog\MadelineProto\Ipc\Runner\WebRunner;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Parallel\Internal\FallbackContextFactory;
@@ -43,11 +44,11 @@ if ($mode === 'ping') {
 /** The factory of the workers of a ContextWorkerPool */
 $getWorkerFactory = static fn (ContextWorkerPool $pool): ?object => (new ReflectionProperty(ContextWorkerPool::class, 'factory'))->getValue($pool);
 
-/** The web contexts whose request the webserver logged as done (a context may be requested more than once) */
+/** The web contexts whose request ended (a context may be requested more than once), see parallel_web_request_log.php */
 $countDoneContexts = static function (): int {
     preg_match_all(
-        '/\]: GET \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/',
-        file_get_contents(sys_get_temp_dir().'/server.log'),
+        '/^end \/src\/Ipc\/Runner\/entry\.php\?argv%5B0%5D=madeline-parallel&argv%5B1%5D=([0-9a-f]{32})&/m',
+        file_get_contents(getenv('MADELINE_TEST_REQUEST_LOG')),
         $matches,
     );
     return count(array_unique($matches[1]));
@@ -86,7 +87,7 @@ $modes = [
         $pool = workerPool();
         $result['installed'] = contextFactory() instanceof FallbackContextFactory
             && $pool instanceof ContextWorkerPool
-            && $pool->getWorkerLimit() === WebContextFactory::DEFAULT_WORKER_LIMIT
+            && $pool->getWorkerLimit() === WorkerPool::DEFAULT_WORKER_LIMIT
             && $getWorkerFactory($pool) instanceof OnDemandWorkerFactory;
 
         $context = startContext(__DIR__.'/parallel_web_context.php');
@@ -121,7 +122,7 @@ $modes = [
             }
         };
         contextFactory($factory);
-        workerPool(new ContextWorkerPool(WebContextFactory::DEFAULT_WORKER_LIMIT, new OnDemandWorkerFactory(0.5)));
+        workerPool(new ContextWorkerPool(WebContextFactory::WEB_CONTEXT_LIMIT, new OnDemandWorkerFactory(0.5)));
         $executions = [];
         foreach ([1, 2, 3] as $value) {
             $executions[] = submit(new WebContextTask($value));

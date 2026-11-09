@@ -17,7 +17,10 @@
 namespace danog\MadelineProto\Ipc\Runner;
 
 use Amp\ByteStream\ResourceStream;
-use Amp\DeferredFuture;
+use Amp\Cancellation;
+use Amp\CancelledException;
+use Amp\CompositeCancellation;
+use Amp\CompositeException;
 use Amp\Future;
 use Amp\Parallel\Context\ContextException;
 use Amp\Socket\ClientTlsContext;
@@ -35,7 +38,7 @@ use const DIRECTORY_SEPARATOR;
 use const PHP_URL_PATH;
 
 use function Amp\async;
-use function Amp\Future\awaitAll;
+use function Amp\Future\awaitAny;
 use function Amp\Socket\connect;
 use function Amp\Socket\connectTls;
 
@@ -117,6 +120,12 @@ final class WebRunner extends RunnerAbstract
         if (!$rootDir) {
             throw new ContextException('Could not get entry file!');
         }
+        // Resolved, like the paths it's compared with (the entry script of MadelineProto, the files FileServer
+        // serves): SCRIPT_FILENAME keeps the symlinks of the document root (a symlinked release directory).
+        try {
+            $rootDir = realpath($rootDir) ?: $rootDir;
+        } catch (Throwable) {
+        }
         $rootDir = \dirname($rootDir).DIRECTORY_SEPARATOR;
         $uriDir = str_replace('/', DIRECTORY_SEPARATOR, \dirname($uri));
         if ($uriDir !== '/' && $uriDir !== '\\') {
@@ -169,22 +178,21 @@ final class WebRunner extends RunnerAbstract
                 $sent = self::sendSelfRequest($proto, $port, $uri, blocking: true) || $sent;
             }
         } else {
-            $deferred = new DeferredFuture();
+            // The first endpoint the request is sent to: the others keep going in the background
             $requests = array_map(
-                static fn (array $endpoint): Future => async(self::sendSelfRequest(...), $endpoint[0], $endpoint[1], $uri)
-                    ->map(static function (bool $sent) use ($deferred): void {
-                        if ($sent && !$deferred->isComplete()) {
-                            $deferred->complete(true);
-                        }
-                    }),
+                static fn (array $endpoint): Future => async(static function () use ($endpoint, $uri): void {
+                    if (!self::sendSelfRequest($endpoint[0], $endpoint[1], $uri)) {
+                        throw new Exception("Could not send the request to {$endpoint[0]}://{$endpoint[1]}");
+                    }
+                })->ignore(),
                 self::getSelfStartEndpoints(),
             );
-            async(awaitAll(...), $requests)->map(static function () use ($deferred): void {
-                if (!$deferred->isComplete()) {
-                    $deferred->complete(false);
-                }
-            })->ignore();
-            $sent = $deferred->getFuture()->await();
+            try {
+                awaitAny($requests);
+                $sent = true;
+            } catch (CompositeException) {
+                $sent = false;
+            }
         }
         if (!$sent) {
             throw new Exception('Could not connect to ourselves, please check the server configuration!');
@@ -204,12 +212,15 @@ final class WebRunner extends RunnerAbstract
      * The connection is closed once the response ends (the script exited, or ended the request), not before: closing
      * it could abort the request.
      *
-     * @param 'tcp'|'tls' $proto
-     * @param float       $timeout Seconds to connect and send the request.
+     * @param 'tcp'|'tls'    $proto
+     * @param float         $timeout      Seconds to connect and send the request.
+     * @param ?Cancellation $cancellation Cancels connecting (not without the event loop).
      *
      * @return bool Whether the request was sent.
+     *
+     * @throws CancelledException If $cancellation is cancelled while connecting.
      */
-    public static function sendSelfRequest(string $proto, int $port, string $uri, bool $blocking = false, float $timeout = 5): bool
+    public static function sendSelfRequest(string $proto, int $port, string $uri, bool $blocking = false, float $timeout = 5, ?Cancellation $cancellation = null): bool
     {
         $host = $_SERVER['SERVER_NAME'];
         $address = "$proto://$host:$port";
@@ -246,11 +257,16 @@ final class WebRunner extends RunnerAbstract
             return true;
         }
         $context = (new ConnectContext)->withConnectTimeout($timeout);
-        $cancellation = new TimeoutCancellation($timeout);
+        $timeoutCancellation = new TimeoutCancellation($timeout);
+        $connectCancellation = $cancellation ? new CompositeCancellation($cancellation, $timeoutCancellation) : $timeoutCancellation;
         try {
             $socket = $proto === 'tls'
-                ? connectTls("tcp://$host:$port", $context->withTlsContext(new ClientTlsContext($host)), $cancellation)
-                : connect("tcp://$host:$port", $context, $cancellation);
+                ? connectTls("tcp://$host:$port", $context->withTlsContext(new ClientTlsContext($host)), $connectCancellation)
+                : connect("tcp://$host:$port", $context, $connectCancellation);
+        } catch (CancelledException $e) {
+            $cancellation?->throwIfRequested();
+            Logger::log("Could not connect to $address: {$e->getMessage()}");
+            return false;
         } catch (Throwable $e) {
             Logger::log("Could not connect to $address: {$e->getMessage()}");
             return false;

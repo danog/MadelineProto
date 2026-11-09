@@ -25,6 +25,7 @@ use Amp\Sync\ChannelException;
 use Amp\TimeoutCancellation;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\Parallel\WebContextFactory;
+use danog\MadelineProto\Tools;
 use Throwable;
 
 use function Amp\Ipc\connect;
@@ -88,7 +89,8 @@ final class WebContextRunner
         contextFactory(new WebContextFactory());
         if (!\defined('AMP_CONTEXT')) {
             \define('AMP_CONTEXT', 'process');
-            \define('AMP_CONTEXT_ID', getmypid());
+            // Where getmypid() is disabled (Magic::$can_getmypid: Altervista, 000webhost), the ID of the context
+            \define('AMP_CONTEXT_ID', Magic::$can_getmypid ? getmypid() : (int) hexdec(substr($id, 0, 8)));
         }
         try {
             chdir($request['cwd']);
@@ -197,29 +199,18 @@ final class WebContextRunner
 
     /**
      * End the request for the webserver, but keep running.
+     *
+     * With Tools::closeConnection(), which also sends what's in the output buffer, and marks the request as ended
+     * for the script of the context.
      */
     private static function detach(): void
     {
-        try {
-            ignore_user_abort(true);
-        } catch (Throwable) {
-        }
         try {
             if (\function_exists('set_time_limit')) {
                 set_time_limit(0);
             }
         } catch (Throwable) {
         }
-        if (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') {
-            return;
-        }
-        if (!headers_sent()) {
-            header('Connection: close');
-            header('Content-Length: 0');
-        }
-        flush();
-        if (\function_exists('fastcgi_finish_request')) {
-            fastcgi_finish_request();
-        }
+        Tools::closeConnection('');
     }
 }

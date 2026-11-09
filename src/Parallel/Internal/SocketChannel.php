@@ -44,7 +44,7 @@ use function Amp\Parallel\Context\flattenArgument;
  *
  * The socket is only read by receive(), like StreamChannel: an idle channel has no read pending, which would keep the
  * event loop running (an idle worker would keep its script from ending). A ChannelledSocket can't be read with a
- * cancellation: a receive() that is cancelled leaves its read to the next one.
+ * cancellation: a receive() that is cancelled leaves its read to the next one, unreferenced meanwhile.
  *
  * @internal
  *
@@ -86,9 +86,13 @@ final class SocketChannel implements Channel
             $this->reading ??= async(static fn (): mixed => $socket->receive());
             // Errors are thrown to the receive() awaiting it, if any
             $this->reading->ignore();
+            // Awaited: the read keeps the event loop running, like any other
+            $socket->reference();
             try {
                 $message = $this->reading->await($cancellation);
             } catch (CancelledException $e) {
+                // Nobody awaits the read anymore: it mustn't keep the event loop running until the other end writes
+                $socket->unreference();
                 throw $e;
             } catch (Throwable $e) {
                 $this->reading = null;
