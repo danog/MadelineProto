@@ -138,11 +138,16 @@ final class ProcessRunner extends RunnerAbstract
         if ($process === false) {
             throw new Error("Could not start the IPC worker process!");
         }
+        $id = (int) $process;
+        self::$resources[$id] = $process;
+        if (!$pipes) {
+            // Windows: the worker has no pipes to read (see getWorkerDescriptors)
+            self::reap($id);
+            return true;
+        }
         // The process handle references its pipes: they stay open for as long as it's kept, whatever happens to
         // their streams. It's only kept until the worker exits, and the worker doesn't read its standard input.
         fclose($pipes[0]);
-        $id = (int) $process;
-        self::$resources[$id] = $process;
         $stdout = new ReadableResourceStream($pipes[1]);
         $stderr = new ReadableResourceStream($pipes[2]);
 
@@ -161,20 +166,24 @@ final class ProcessRunner extends RunnerAbstract
      * "Address already in use" when it's started again; php-fpm's), its connections (the FastCGI request, the
      * Telegram connections, which a close here no longer ends), and its flock()ed files (the session lock).
      *
+     * On Windows, the standard streams are null too: the pipes of proc_open can't be made non-blocking there, so
+     * reading them blocks the event loop until the worker writes something or exits, which hung the client for as
+     * long as the worker ran. The worker logs to its log file anyway, and reports its startup errors in the IPC state.
+     *
      * @internal
      *
      * @return array<int, list<string>>
      */
     public static function getWorkerDescriptors(): array
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return [['null'], ['null'], ['null']];
+        }
         $descriptors = [
             ['pipe', 'r'],
             ['pipe', 'w'],
             ['pipe', 'w'],
         ];
-        if (PHP_OS_FAMILY === 'Windows') {
-            return $descriptors;
-        }
         try {
             // On Linux, a link to /proc/self/fd
             $fds = scandir('/dev/fd');
@@ -190,7 +199,8 @@ final class ProcessRunner extends RunnerAbstract
         return $descriptors;
     }
     /**
-     * Release the handle of a worker that closed its output, once it exits, without keeping the loop alive.
+     * Release the handle of a worker that closed its output (or has none), once it exits, without keeping the loop
+     * alive.
      */
     private static function reap(int $id): void
     {

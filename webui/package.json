@@ -13,18 +13,18 @@
     "dependencies": {
         "lottie-web": "5.13.0",
         "qr-code-styling": "1.9.2",
-        "solid-js": "1.9.17",
+        "solid-js": "1.9.18",
         "solid-transition-group": "0.3.0"
     },
     "devDependencies": {
         "@solidjs/testing-library": "0.8.10",
-        "@types/node": "26.6.5",
-        "jsdom": "30.1.3",
-        "sass": "1.106.1",
+        "@types/node": "26.6.6",
+        "jsdom": "31.0.0",
+        "sass": "1.108.0",
         "typescript": "7.0.2",
         "vite": "8.3.5",
-        "vite-plugin-solid": "2.11.14",
-        "vitest": "5.0.5"
+        "vite-plugin-solid": "2.11.15",
+        "vitest": "5.1.0"
     },
     "overrides": {
         "seroval": "1.6.8",

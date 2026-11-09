@@ -234,7 +234,7 @@ final class DataCenterConnection implements SimpleSubscriber
                     $message_id = $connection->msgIdHandler->generateMessageId();
                     $seq_no = 0;
                     $encrypted_data = Tools::random(16).Tools::packSignedLong($message_id).pack('VV', $seq_no, \strlen($message_data)).$message_data;
-                    $message_key = substr(sha1($encrypted_data, true), -16);
+                    $message_key = substr(Crypt::sha1($encrypted_data), -16);
                     $padding = Tools::random(Tools::posmod(-\strlen($encrypted_data), 16));
                     [$aes_key, $aes_iv] = $this->auth->pfsKdf($message_key);
                     $encrypted_message = $this->auth->getID().$message_key.Crypt::igeEncrypt($encrypted_data.$padding, $aes_key, $aes_iv);

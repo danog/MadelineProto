@@ -10,7 +10,8 @@ To bump the layer to the latest one, clone the repo (with all submodules) and ru
 
 The optional Rust extension shares one crypto worker between IGE and transport message decoding.
 Factories retain IGEFFI (system libcrypto), ext-openssl and phpseclib fallbacks when the extension is unavailable.
-The Docker image includes it; see [native/README.md](native/README.md) for building
-against your PHP version, executor behavior, tests and tests.
+The Docker image includes it; elsewhere, install it with [PIE](https://github.com/php/pie)
+(`pie install danog/madelinecrypto`). Its sources, tests and documentation are in
+[danog/MadelineCrypto](https://github.com/danog/MadelineCrypto).
 
 Bye :)

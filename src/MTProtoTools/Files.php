@@ -324,7 +324,7 @@ trait Files
         if ($encrypted === true) {
             $key = $state['key'] ?? Tools::random(32);
             $iv = $state['iv'] ?? Tools::random(32);
-            $digest = hash('md5', $key.$iv, true);
+            $digest = Crypt::md5($key.$iv);
             $fingerprint = Tools::unpackSignedInt(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             // IGE is chained: resume encrypting from the last saved point.
             $ige = IGE::getInstance($key, $state['ige_state'] ?? $iv);
@@ -593,7 +593,7 @@ trait Files
         if ($resumeKey === null || $size <= 0) {
             return null;
         }
-        $key = hash('sha256', $resumeKey."\0".$size."\0".($encrypted ? 'encrypted' : 'plain'));
+        $key = bin2hex(Crypt::sha256($resumeKey."\0".$size."\0".($encrypted ? 'encrypted' : 'plain')));
         return isset($this->activeUploads[$key]) ? null : $key;
     }
 
@@ -1463,7 +1463,7 @@ trait Files
         if (isset($messageMedia['key'])) {
             $messageMedia['key'] = (string) $messageMedia['key'];
             $messageMedia['iv'] = (string) $messageMedia['iv'];
-            $digest = hash('md5', $messageMedia['key'].$messageMedia['iv'], true);
+            $digest = Crypt::md5($messageMedia['key'].$messageMedia['iv']);
             $fingerprint = Tools::unpackSignedInt(substr($digest, 0, 4) ^ substr($digest, 4, 4));
             if ($fingerprint !== $messageMedia['key_fingerprint']) {
                 throw new Exception('Fingerprint mismatch!');

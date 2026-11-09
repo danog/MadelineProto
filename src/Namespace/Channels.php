@@ -548,6 +548,7 @@ interface Channels
      *
      * @param bool $enabled Enable or disable forum functionality
      * @param bool $tabs If true enables the tabbed forum UI, otherwise enables the list-based forum UI.
+     * @param bool $sidebar 
      * @param array|int|string $channel Supergroup ID @see https://docs.madelineproto.xyz/API_docs/types/InputChannel.html
      * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
      * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
@@ -555,7 +556,7 @@ interface Channels
      * @return array @see https://docs.madelineproto.xyz/API_docs/types/Updates.html
      * @psalm-impure
      */
-    public function toggleForum(bool $enabled, bool $tabs, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+    public function toggleForum(bool $enabled, bool $tabs, bool $sidebar, array|int|string|null $channel = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
 
     /**
      * Enable or disable the [native antispam system](https://core.telegram.org/api/antispam).

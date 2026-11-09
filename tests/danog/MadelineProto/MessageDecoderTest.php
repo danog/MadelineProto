@@ -112,4 +112,92 @@ final class MessageDecoderTest extends TestCase
         $cipher = Crypt::igeEncrypt($plain, $key, $iv);
         self::assertEquals((new PhpMessageDecoder)->decode($cipher, $auth, $msgKey), (new NativeMessageDecoder)->decode($cipher, $auth, $msgKey));
     }
+
+    /** A message as the server encrypts it, then damaged. @return array{string, string, string, string} */
+    private static function packet(int $size, int $padding, ?int $declared = null, string $damage = ''): array
+    {
+        $auth = random_bytes(256);
+        $body = $size ? random_bytes($size) : '';
+        $plain = random_bytes(8).random_bytes(8).pack('V2', 12345, 0).pack('V2', 7, $declared ?? $size).$body.str_repeat('p', $padding);
+        $msgKey = substr(Crypt::sha256(substr($auth, 96, 32).$plain), 8, 16);
+        [$key, $iv] = Crypt::kdf($msgKey, $auth, false);
+        $cipher = Crypt::igeEncrypt($plain, $key, $iv);
+        switch ($damage) {
+            case 'auth': $auth[96] = \chr(\ord($auth[96]) ^ 1);
+                break;
+            case 'msg_key': $msgKey[15] = \chr(\ord($msgKey[15]) ^ 1);
+                break;
+            case 'ciphertext': $cipher[\strlen($cipher) - 1] = \chr(\ord($cipher[\strlen($cipher) - 1]) ^ 1);
+                break;
+        }
+        return [$cipher, $auth, $msgKey, $body];
+    }
+
+    /** @return iterable<string, array{int, int, ?int, string}> */
+    public static function thresholdPackets(): iterable
+    {
+        // Ciphertexts of 48 bytes up to around the synchronous threshold (16 KiB), and above it.
+        foreach ([[0, 16], [4, 12], [16, 1024], [16304, 16], [16320, 16], [16336, 16], [16340, 12], [16352, 16], [20000, 16]] as [$size, $padding]) {
+            yield "valid $size/$padding" => [$size, $padding, null, ''];
+        }
+        foreach ([16, 16320] as $size) {
+            foreach (['auth', 'msg_key', 'ciphertext'] as $damage) {
+                yield "$damage $size" => [$size, 16, null, $damage];
+            }
+            // Bad padding (too short, too long) and bad declared lengths (unaligned, past the end, huge).
+            foreach ([[0, null], [1040, null], [16, $size + 1], [16, $size + 16], [16, 4294967280]] as [$padding, $declared]) {
+                yield "bounds $size/$padding/$declared" => [$size, $padding, $declared, ''];
+            }
+        }
+    }
+
+    /**
+     * The synchronous native decode, the executor's and PHP's accept the same messages with the same result, and
+     * reject the same ones: natively with the same message and code.
+     *
+     * @dataProvider thresholdPackets
+     */
+    public function testSyncExecutorAndPhpDecodeIdentically(int $size, int $padding, ?int $declared, string $damage): void
+    {
+        NativeExecutor::initialize();
+        if (!Crypt::native()) {
+            self::markTestSkipped('The madeline_crypto extension (API 0.5) is not loaded');
+        }
+        [$cipher, $auth, $msgKey, $body] = self::packet($size, $padding, $declared, $damage);
+        $outcome = static function (\Closure $decode): array {
+            try {
+                $result = $decode();
+                return [$result->body, $result->messageId, $result->seqNo, $result->sessionId];
+            } catch (\Throwable $e) {
+                return [$e::class, $e->getMessage(), $e->getCode(), $e->getPrevious()?->getCode()];
+            }
+        };
+        $php = $outcome(static fn () => (new PhpMessageDecoder)->decode($cipher, $auth, $msgKey));
+        $decoder = $outcome(static fn () => (new NativeMessageDecoder)->decode($cipher, $auth, $msgKey));
+        $raw = static function (string $method) use ($cipher, $auth, $msgKey): array {
+            try {
+                $call = static fn (): array => \danog\MadelineProto\Native\Crypto::$method($cipher, $auth, $msgKey);
+                // The executor keeps the event loop alive while it suspends the caller.
+                return $method === 'decode' ? NativeExecutor::get()->run($call) : $call();
+            } catch (\Exception $e) {
+                return [$e::class, $e->getMessage(), $e->getCode()];
+            }
+        };
+        $sync = $raw('decodeSync');
+        $valid = $damage === '' && $declared === null && $padding >= 12 && $padding <= 1024;
+        if ($valid) {
+            self::assertSame([$body, 12345, 7], \array_slice($php, 0, 3));
+            self::assertSame($php, $decoder);
+            self::assertSame($body, $sync[0]);
+        } else {
+            self::assertSame(SecurityException::class, $php[0]);
+            self::assertSame(SecurityException::class, $decoder[0]);
+            self::assertSame(NativeExecutor::INVALID, $sync[2]);
+            // The decoder wraps the native failure.
+            self::assertSame([$sync[1], NativeExecutor::INVALID], [$decoder[1], $decoder[3]]);
+        }
+        if (NativeExecutor::get()) {
+            self::assertSame($sync, $raw('decode'));
+        }
+    }
 }

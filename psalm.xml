@@ -16,7 +16,7 @@
         <extension name="ffi"/>
     </enableExtensions>
     <stubs>
-        <file name="native/stubs/crypto.php" />
+        <file name="stubs/madeline_crypto.php" />
     </stubs>
     <projectFiles>
         <directory name="src" />

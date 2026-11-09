@@ -16,8 +16,8 @@
 
 namespace danog\MadelineProto\MTProtoTools;
 
-use Amp\ByteStream\Pipe;
 use Amp\ByteStream\ReadableBuffer;
+use Amp\ByteStream\ReadableIterableStream;
 use Amp\ByteStream\ReadableResourceStream;
 use Amp\ByteStream\ReadableStream;
 use Amp\ByteStream\StreamException;
@@ -256,6 +256,9 @@ trait FilesLogic
      *
      * Supports HEAD requests and content-ranges for parallel and resumed downloads.
      *
+     * The first download chunk is read before returning the response, so initial download errors are thrown here.
+     * Errors after the first chunk are wrapped in StreamException when reading the response body.
+     *
      * @param array|string|FileCallbackInterface|\danog\MadelineProto\EventHandler\Message $messageMedia File to download
      * @param ServerRequest                                                                $request      Request
      * @param callable                                                                     $cb           Status callback (can also use FileCallback)
@@ -288,13 +291,29 @@ trait FilesLogic
             $this->getSettings()->getFiles()->getSandboxDownloads(),
         );
 
-        $body = null;
+        $body = '';
         if ($result->shouldServe()) {
-            $pipe = new Pipe(1024 * 1024);
             [$start, $end] = $result->getServeRange();
-            $f = async($this->downloadToStream(...), $messageMedia, $pipe->getSink(), $cb, $start, $end, $cancellation);
-            $f->finally($pipe->getSink()->close(...));
-            $body = $pipe->getSource();
+            $stream = $this->downloadToReturnedStream($messageMedia, $cb, $start, $end, $cancellation);
+            try {
+                $firstChunk = $stream->read($cancellation);
+            } catch (Throwable $e) {
+                $stream->close();
+                throw $e;
+            }
+            $body = new ReadableIterableStream((static function () use ($firstChunk, $stream): \Generator {
+                try {
+                    for ($chunk = $firstChunk; $chunk !== null; $chunk = $stream->read()) {
+                        yield $chunk;
+                    }
+                } catch (Throwable $e) {
+                    // HTTP drivers handle StreamException by aborting this response instead of the event loop.
+                    throw new StreamException('Download failed while streaming HTTP response', 0, $e);
+                } finally {
+                    $stream->close();
+                }
+            })());
+            $body->onClose($stream->close(...));
         } elseif (!\in_array($result->getCode(), [HttpStatus::OK, HttpStatus::PARTIAL_CONTENT], true)) {
             $body = $result->getCodeExplanation();
         }

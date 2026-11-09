@@ -154,7 +154,7 @@ final class PasswordCalculator
      */
     public function hashSha256(string $data, string $salt): string
     {
-        return hash('sha256', $salt.$data.$salt, true);
+        return Crypt::sha256($salt.$data.$salt);
     }
     /**
      * Hashes the specified password.
@@ -196,23 +196,23 @@ final class PasswordCalculator
         $id = $this->srp_id;
         $x = new BigInteger($this->hashPassword($password, $client_salt, $server_salt), 256);
         $g_x = $g->powMod($x, $p);
-        $k = new BigInteger(hash('sha256', $pForHash.$gForHash, true), 256);
+        $k = new BigInteger(Crypt::sha256($pForHash.$gForHash), 256);
         $kg_x = $k->multiply($g_x)->powMod(Magic::$one, $p);
         $a = new BigInteger(Tools::random(256), 256);
         $A = $g->powMod($a, $p);
         Crypt::checkG($A, $p);
         $AForHash = str_pad($A->toBytes(), 256, \chr(0), STR_PAD_LEFT);
         $b_kg_x = $B->powMod(Magic::$one, $p)->subtract($kg_x);
-        $u = new BigInteger(hash('sha256', $AForHash.$BForHash, true), 256);
+        $u = new BigInteger(Crypt::sha256($AForHash.$BForHash), 256);
         $ux = $u->multiply($x);
         $a_ux = $a->add($ux);
         $S = $b_kg_x->powMod($a_ux, $p);
         $SForHash = str_pad($S->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-        $K = hash('sha256', $SForHash, true);
-        $h1 = hash('sha256', $pForHash, true);
-        $h2 = hash('sha256', $gForHash, true);
+        $K = Crypt::sha256($SForHash);
+        $h1 = Crypt::sha256($pForHash);
+        $h2 = Crypt::sha256($gForHash);
         $h1 ^= $h2;
-        $M1 = hash('sha256', $h1.hash('sha256', $client_salt, true).hash('sha256', $server_salt, true).$AForHash.$BForHash.$K, true);
+        $M1 = Crypt::sha256($h1.Crypt::sha256($client_salt).Crypt::sha256($server_salt).$AForHash.$BForHash.$K);
         return ['_' => 'inputCheckPasswordSRP', 'srp_id' => $id, 'A' => $AForHash, 'M1' => $M1];
     }
     /**

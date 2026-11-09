@@ -244,8 +244,11 @@ abstract class AbstractServer extends Loop
     #[\Override]
     final public function stop(): bool
     {
-        $this->server->close();
-        if (!$this instanceof ServerCallback) {
+        // Unset if setIpcPath() failed (the IPC server couldn't listen): stopping the instance must not hide that error
+        if (isset($this->server)) {
+            $this->server->close();
+        }
+        if (!$this instanceof ServerCallback && isset($this->callback->server)) {
             $this->callback->server->close();
         }
         if (self::$shutdownDeferred) {

@@ -238,7 +238,7 @@ final class PrivateCallController implements CallControllerInterface
             $key = str_pad($params['g_b']->powMod($this->call['a'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
             try {
                 $res = ($this->API->methodCallAsyncRead('phone.confirmCall', [
-                    'key_fingerprint' => substr(sha1($key, true), -8),
+                    'key_fingerprint' => substr(Crypt::sha1($key), -8),
                     'peer' => ['id' => $params['id'], 'access_hash' => $params['access_hash'], '_' => 'inputPhoneCall'],
                     'g_a' => $this->call['g_a'],
                     'protocol' => self::CALL_PROTOCOL,
@@ -335,13 +335,13 @@ final class PrivateCallController implements CallControllerInterface
 
             $this->log(\sprintf(Lang::$current_lang['call_completing'], $this->public->otherID), Logger::VERBOSE);
             $dh_config = $this->API->getDhConfig();
-            if (hash('sha256', (string) $params['g_a_or_b'], true) !== (string) $this->call['g_a_hash']) {
+            if (Crypt::sha256((string) $params['g_a_or_b']) !== (string) $this->call['g_a_hash']) {
                 throw new SecurityException('Invalid g_a!');
             }
             $params['g_a_or_b'] = new BigInteger((string) $params['g_a_or_b'], 256);
             Crypt::checkG($params['g_a_or_b'], $dh_config['p']);
             $key = str_pad($params['g_a_or_b']->powMod($this->call['b'], $dh_config['p'])->toBytes(), 256, \chr(0), STR_PAD_LEFT);
-            if (substr(sha1($key, true), -8) != $params['key_fingerprint']) {
+            if (substr(Crypt::sha1($key), -8) != $params['key_fingerprint']) {
                 throw new SecurityException(Lang::$current_lang['fingerprint_invalid']);
             }
             $this->visualization = self::computeVisualization(
@@ -366,7 +366,7 @@ final class PrivateCallController implements CallControllerInterface
     {
         $visualization = [];
         $length = new BigInteger(\count(Magic::$emojis));
-        foreach (str_split(hash('sha256', $key.$g_a, true), 8) as $number) {
+        foreach (str_split(Crypt::sha256($key.$g_a), 8) as $number) {
             $number[0] = \chr(\ord($number[0]) & 0x7f);
             $visualization[] = Magic::$emojis[(int) (new BigInteger($number, 256))->divide($length)[1]->toString()];
         }

@@ -26,6 +26,7 @@ use danog\MadelineProto\Logger;
 use danog\MadelineProto\Magic;
 use danog\MadelineProto\MTProto;
 use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Native\Crypto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\Tools;
@@ -114,21 +115,22 @@ trait AuthKeyHandler
                  */
                 $ok = false;
                 $pq = Tools::unpackSignedLong(strrev($pq_bytes));
+                $native = Crypt::native() && version_compare(Crypto::version(), '0.6.0', '>=');
                 foreach ([
-                    'native_single_cpp',
+                    ...($native ? ['madeline_crypto'] : []),
                     'python_single_alt',
                     'python_single',
                     'native_single',
                 ] as $method) {
                     $this->API->logger("Factorizing with $method (please wait, might take a while)");
-                    if ($method !== 'native_single_cpp') {
-                        $this->API->logger('Install https://prime.madelineproto.xyz and the FFI extension to speed this up!');
+                    if ($method !== 'madeline_crypto') {
+                        $this->API->logger('Install the MadelineCrypto extension (pie install danog/madelinecrypto) to speed this up!');
                     }
 
                     $p = 0;
                     $q = 0;
                     try {
-                        $p = PrimeModule::$method($pq);
+                        $p = $method === 'madeline_crypto' ? Crypto::factorize($pq) : PrimeModule::$method($pq);
                     } catch (Throwable $e) {
                         $this->API->logger("While factorizing with $method: $e");
                     }
@@ -145,7 +147,7 @@ trait AuthKeyHandler
                     }
                 }
                 if (!$ok) {
-                    throw new SecurityException("Couldn't compute p and q, install prime.madelineproto.xyz to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p*$q);
+                    throw new SecurityException("Couldn't compute p and q, install the MadelineCrypto extension (pie install danog/madelinecrypto) to fix. Original pq: {$pq}, computed p: {$p}, computed q: {$q}, computed pq: ".$p*$q);
                 }
                 $this->API->logger('Factorization '.$pq.' = '.$p.' * '.$q, Logger::VERBOSE);
                 /*
@@ -169,9 +171,9 @@ trait AuthKeyHandler
 
                 for ($tryInner = 0; $tryInner < 10; $tryInner++) {
                     $temp_key = Tools::random(32);
-                    $data_with_hash = $data_pad_reversed.hash('sha256', $temp_key.$data_with_padding, true);
+                    $data_with_hash = $data_pad_reversed.Crypt::sha256($temp_key.$data_with_padding);
                     $aes_encrypted = Crypt::igeEncrypt($data_with_hash, $temp_key, str_repeat("\0", 32));
-                    $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
+                    $temp_key_xor = $temp_key ^ Crypt::sha256($aes_encrypted);
                     $key_aes_encrypted_bigint = new BigInteger($temp_key_xor.$aes_encrypted, 256);
 
                     $ok = $key_aes_encrypted_bigint->compare($key->n) < 0;
@@ -225,7 +227,7 @@ trait AuthKeyHandler
                  * Check valid new nonce hash if return from server
                  * new nonce hash return in server_DH_params_fail
                  */
-                if (isset($server_dh_params['new_nonce_hash']) && substr(sha1($new_nonce), -32) != $server_dh_params['new_nonce_hash']) {
+                if (isset($server_dh_params['new_nonce_hash']) && substr(bin2hex(Crypt::sha1($new_nonce)), -32) != $server_dh_params['new_nonce_hash']) {
                     throw new SecurityException('wrong new nonce hash.');
                 }
                 /*
@@ -233,8 +235,8 @@ trait AuthKeyHandler
                  * Get key, iv and decrypt answer
                  */
                 $encrypted_answer = $server_dh_params['encrypted_answer'];
-                $tmp_aes_key = sha1($new_nonce.$server_nonce, true).substr(sha1($server_nonce.$new_nonce, true), 0, 12);
-                $tmp_aes_iv = substr(sha1($server_nonce.$new_nonce, true), 12, 8).sha1($new_nonce.$new_nonce, true).substr($new_nonce, 0, 4);
+                $tmp_aes_key = Crypt::sha1($new_nonce.$server_nonce).substr(Crypt::sha1($server_nonce.$new_nonce), 0, 12);
+                $tmp_aes_iv = substr(Crypt::sha1($server_nonce.$new_nonce), 12, 8).Crypt::sha1($new_nonce.$new_nonce).substr($new_nonce, 0, 4);
                 $answer_with_hash = Crypt::igeDecrypt($encrypted_answer, $tmp_aes_key, $tmp_aes_iv);
                 /*
                  * ***********************************************************************
@@ -261,7 +263,7 @@ trait AuthKeyHandler
                  * Do some checks
                  */
                 $server_DH_inner_data_length = $this->API->getTL()->getLength($answer);
-                if (sha1(substr($answer, 0, $server_DH_inner_data_length), true) != $answer_hash) {
+                if (Crypt::sha1(substr($answer, 0, $server_DH_inner_data_length)) != $answer_hash) {
                     throw new SecurityException('answer_hash mismatch.');
                 }
                 if ($nonce != $server_DH_inner_data['nonce']) {
@@ -315,7 +317,7 @@ trait AuthKeyHandler
                      * ***********************************************************************
                      * encrypt client_DH_inner_data
                      */
-                    $data_with_sha = sha1($data, true).$data;
+                    $data_with_sha = Crypt::sha1($data).$data;
                     $data_with_sha_padded = $data_with_sha.Tools::random(Tools::posmod(-\strlen($data_with_sha), 16));
                     $encrypted_data = Crypt::igeEncrypt($data_with_sha_padded, $tmp_aes_key, $tmp_aes_iv);
                     $this->API->logger('Executing set_client_DH_params...', Logger::VERBOSE);
@@ -347,11 +349,11 @@ trait AuthKeyHandler
                     );
                     $auth_key = $g_a->powMod($b, $dh_prime);
                     $auth_key_str = $auth_key->toBytes();
-                    $auth_key_sha = sha1($auth_key_str, true);
+                    $auth_key_sha = Crypt::sha1($auth_key_str);
                     $auth_key_aux_hash = substr($auth_key_sha, 0, 8);
-                    $new_nonce_hash1 = substr(sha1($new_nonce.\chr(1).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash2 = substr(sha1($new_nonce.\chr(2).$auth_key_aux_hash, true), -16);
-                    $new_nonce_hash3 = substr(sha1($new_nonce.\chr(3).$auth_key_aux_hash, true), -16);
+                    $new_nonce_hash1 = substr(Crypt::sha1($new_nonce.\chr(1).$auth_key_aux_hash), -16);
+                    $new_nonce_hash2 = substr(Crypt::sha1($new_nonce.\chr(2).$auth_key_aux_hash), -16);
+                    $new_nonce_hash3 = substr(Crypt::sha1($new_nonce.\chr(3).$auth_key_aux_hash), -16);
                     /*
                      * ***********************************************************************
                      * Check if the client's nonce and the server's nonce are the same
@@ -413,7 +415,7 @@ trait AuthKeyHandler
             }
         }
         if (!$cdn) {
-            throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install https://prime.madelineproto.xyz!');
+            throw new SecurityException('Auth Failed, please check the logfile for more information, make sure to install the MadelineCrypto extension (pie install danog/madelinecrypto)!');
         }
     }
 }

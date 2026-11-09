@@ -22,7 +22,10 @@ namespace danog\MadelineProto\Stream\Common;
 
 use Amp\Cancellation;
 use Amp\Socket\Socket;
+
 use danog\MadelineProto\Exception;
+use danog\MadelineProto\MTProtoTools\Crypt;
+use danog\MadelineProto\Native\Hash as NativeHash;
 use danog\MadelineProto\Stream\BufferedProxyStreamInterface;
 use danog\MadelineProto\Stream\BufferInterface;
 use danog\MadelineProto\Stream\ConnectionContext;
@@ -49,13 +52,35 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
     private $stream;
     private $rev = false;
     /**
+     * A running hash of the stream: native for the algorithms the extension has.
+     */
+    private function hashInit(): NativeHash|\HashContext
+    {
+        if (Crypt::native() && \in_array($this->hash_name, ['md5', 'sha1', 'sha256', 'sha384', 'sha512'], true)) {
+            return new NativeHash($this->hash_name);
+        }
+        return hash_init($this->hash_name);
+    }
+    private static function hashUpdate(NativeHash|\HashContext $hash, string $data): void
+    {
+        if ($hash instanceof NativeHash) {
+            $hash->update($data);
+        } else {
+            hash_update($hash, $data);
+        }
+    }
+    private static function hashFinal(NativeHash|\HashContext $hash): string
+    {
+        return $hash instanceof NativeHash ? $hash->final() : hash_final($hash, true);
+    }
+    /**
      * Enable read hashing.
      *
      * @psalm-external-mutation-free
      */
     public function startReadHash(): void
     {
-        $this->read_hash = hash_init($this->hash_name);
+        $this->read_hash = $this->hashInit();
     }
     /**
      * Check the read hash after N bytes are read.
@@ -75,7 +100,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function getReadHash(): string
     {
-        $hash = hash_final($this->read_hash, true);
+        $hash = self::hashFinal($this->read_hash);
         if ($this->rev) {
             $hash = strrev($hash);
         }
@@ -100,7 +125,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function startWriteHash(): void
     {
-        $this->write_hash = hash_init($this->hash_name);
+        $this->write_hash = $this->hashInit();
     }
     /**
      * Write the write hash after N bytes are read.
@@ -120,7 +145,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
      */
     public function getWriteHash(): string
     {
-        $hash = hash_final($this->write_hash, true);
+        $hash = self::hashFinal($this->write_hash);
         if ($this->rev) {
             $hash = strrev($hash);
         }
@@ -228,7 +253,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
                 throw new Exception('Tried to read too much out of frame data');
             }
             $data = $this->read_buffer->bufferRead($length, $cancellation);
-            hash_update($this->read_hash, $data);
+            self::hashUpdate($this->read_hash, $data);
             $hash = $this->getReadHash();
             if ($hash !== $this->read_buffer->bufferRead(\strlen($hash), $cancellation)) {
                 throw new Exception('Hash mismatch');
@@ -236,7 +261,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             return $data;
         }
         $data = $this->read_buffer->bufferRead($length, $cancellation);
-        hash_update($this->read_hash, $data);
+        self::hashUpdate($this->read_hash, $data);
         if ($this->read_check_after) {
             $this->read_check_pos += $length;
         }
@@ -259,7 +284,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             if ($length + $this->write_check_pos > $this->write_check_after) {
                 throw new Exception('Too much out of frame data was sent, cannot check hash');
             }
-            hash_update($this->write_hash, $data);
+            self::hashUpdate($this->write_hash, $data);
             $this->write_buffer->bufferWrite($data.$this->getWriteHash());
             return;
         }
@@ -267,7 +292,7 @@ final class HashedBufferedStream implements BufferedProxyStreamInterface, Buffer
             $this->write_check_pos += $length;
         }
         if ($this->write_hash) {
-            hash_update($this->write_hash, $data);
+            self::hashUpdate($this->write_hash, $data);
         }
         $this->write_buffer->bufferWrite($data);
     }

@@ -12,6 +12,7 @@ namespace danog\MadelineProto\MTProtoTools\Crypt;
 
 use Amp\ForbidCloning;
 use Amp\ForbidSerialization;
+use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Native\Crypto;
 use Revolt\EventLoop;
 use RuntimeException;
@@ -46,8 +47,7 @@ final class NativeExecutor
             return;
         }
         self::$instance = false;
-        if (!\extension_loaded('madeline_crypto') || !class_exists(Crypto::class, false)
-            || Crypto::version() !== '0.4.0') {
+        if (!Crypt::native()) {
             return;
         }
         try {
