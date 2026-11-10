@@ -32,10 +32,12 @@ use AssertionError;
 use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\Driver\DriverArray;
 use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\Settings\DriverSettings;
 use danog\AsyncOrm\ValueType;
 use danog\MadelineProto\Ipc\AlreadyServedException;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
+use danog\MadelineProto\Settings\DatabaseAbstract;
 use Revolt\EventLoop;
 use Throwable;
 
@@ -332,6 +334,8 @@ abstract class Serialization
         if ($settings instanceof Settings) {
             $settings = $settings->getDb();
         }
+        // The database settings given now, which may differ from the ones the session file points to.
+        $newSettings = $settings;
         $prefix = null;
         if ($unserialized instanceof DriverArray
             || $unserialized instanceof DbArrayBuilder
@@ -343,6 +347,9 @@ abstract class Serialization
         ) {
             $tableName = null;
             $array = null;
+            // The table and database the session was saved to.
+            $savedTable = null;
+            $savedDb = null;
             if ($prefix !== null) {
                 $tableName = "{$prefix}_MTProto_session";
             } elseif ($unserialized instanceof DriverArray) {
@@ -351,19 +358,44 @@ abstract class Serialization
                 $settings = $unserialized["\0*\0dbSettings"];
             } else {
                 \assert($unserialized instanceof DbArrayBuilder);
+                $savedTable = $unserialized->table;
+                if ($unserialized->settings instanceof DriverSettings) {
+                    $savedDb = $unserialized->settings->getDbIdentifier();
+                }
                 $array = $unserialized->build();
             }
             if ($tableName !== null && $settings instanceof DriverDatabaseAbstract) {
                 Logger::log('Extracting session from database...');
+                $savedTable = $tableName;
+                $ormSettings = $settings->getOrmSettings();
+                if ($ormSettings instanceof DriverSettings) {
+                    $savedDb = $ormSettings->getDbIdentifier();
+                }
                 $array = (new DbArrayBuilder(
                     $tableName,
-                    $settings->getOrmSettings(),
+                    $ormSettings,
                     KeyType::STRING,
                     ValueType::SCALAR,
                 ))->build();
             }
             \assert($array !== null);
             $unserialized = $array->get('data');
+            // Older versions moved the session to a new database before the session file pointed to it: if
+            // that was interrupted, the session is only in the database given now.
+            if (!$unserialized && $exists
+                && $savedTable !== null
+                && $newSettings instanceof DatabaseAbstract
+                && ($newOrmSettings = $newSettings->getOrmSettings()) instanceof DriverSettings
+                && $newOrmSettings->getDbIdentifier() !== $savedDb
+            ) {
+                Logger::log('The session is not in the database it was saved to, looking for it in the configured one...', Logger::WARNING);
+                $unserialized = (new DbArrayBuilder(
+                    $savedTable,
+                    $newOrmSettings,
+                    KeyType::STRING,
+                    ValueType::SCALAR,
+                ))->build()->get('data');
+            }
             if (!$unserialized && $exists) {
                 throw new Exception('Could not extract session from database!');
             }

@@ -1304,6 +1304,12 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /** @internal */
     public function initDb(): void
     {
+        // The session isn't copied to another database like the other arrays: reading it there would
+        // unserialize a second copy of this instance (with its connections and calls, which then run without
+        // being woken up), and the next serialize() writes it there anyway. Until then, the session file
+        // still points to the old copy, which stays where it is.
+        unset($this->sessionDb);
+
         $db = [];
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
