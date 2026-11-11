@@ -29,11 +29,16 @@ use Amp\Future;
 use Amp\Ipc\Sync\ChannelledSocket;
 use Amp\TimeoutException;
 use AssertionError;
+use danog\AsyncOrm\DbArray;
 use danog\AsyncOrm\DbArrayBuilder;
 use danog\AsyncOrm\Driver\DriverArray;
 use danog\AsyncOrm\KeyType;
+use danog\AsyncOrm\Serializer;
+use danog\AsyncOrm\Serializer\Igbinary;
+use danog\AsyncOrm\Settings as OrmSettings;
 use danog\AsyncOrm\Settings\DriverSettings;
 use danog\AsyncOrm\ValueType;
+use danog\MadelineProto\Db\RawSerializer;
 use danog\MadelineProto\Ipc\AlreadyServedException;
 use danog\MadelineProto\Ipc\Server;
 use danog\MadelineProto\Settings\Database\DriverDatabaseAbstract;
@@ -345,65 +350,82 @@ abstract class Serialization
                 && $prefix = $settings->getEphemeralFilesystemPrefix()
             )
         ) {
-            $tableName = null;
-            $array = null;
-            // The table and database the session was saved to.
-            $savedTable = null;
-            $savedDb = null;
+            // Where the session is saved.
+            $location = null;
             if ($prefix !== null) {
-                $tableName = "{$prefix}_MTProto_session";
+                \assert($settings instanceof DriverDatabaseAbstract);
+                $location = self::sessionLocation("{$prefix}_MTProto_session", $settings->getOrmSettings());
             } elseif ($unserialized instanceof DriverArray) {
                 $unserialized = (array) $unserialized;
-                $tableName = $unserialized["\0*\0table"];
                 $settings = $unserialized["\0*\0dbSettings"];
+                if ($settings instanceof DriverDatabaseAbstract) {
+                    Logger::log('Extracting session from database...');
+                    $location = self::sessionLocation($unserialized["\0*\0table"], $settings->getOrmSettings());
+                }
             } else {
                 \assert($unserialized instanceof DbArrayBuilder);
-                $savedTable = $unserialized->table;
-                if ($unserialized->settings instanceof DriverSettings) {
-                    $savedDb = $unserialized->settings->getDbIdentifier();
-                }
-                $array = $unserialized->build();
+                $location = $unserialized;
             }
-            if ($tableName !== null && $settings instanceof DriverDatabaseAbstract) {
-                Logger::log('Extracting session from database...');
-                $savedTable = $tableName;
-                $ormSettings = $settings->getOrmSettings();
-                if ($ormSettings instanceof DriverSettings) {
-                    $savedDb = $ormSettings->getDbIdentifier();
-                }
-                $array = (new DbArrayBuilder(
-                    $tableName,
-                    $ormSettings,
-                    KeyType::STRING,
-                    ValueType::SCALAR,
-                ))->build();
-            }
-            \assert($array !== null);
-            $unserialized = $array->get('data');
-            // Older versions moved the session to a new database before the session file pointed to it: if
-            // that was interrupted, the session is only in the database given now.
+            \assert($location !== null);
+            $unserialized = $location->build()->get('data');
+            // When the database settings change, the session is moved to the new database before the session
+            // file points to it (right after, see MTProto::initDb(); older versions only at the next save): if the
+            // process stopped in between, the session is only in the database given now.
             if (!$unserialized && $exists
-                && $savedTable !== null
+                && $location->settings instanceof DriverSettings
                 && $newSettings instanceof DatabaseAbstract
                 && ($newOrmSettings = $newSettings->getOrmSettings()) instanceof DriverSettings
-                && $newOrmSettings->getDbIdentifier() !== $savedDb
+                && $newOrmSettings->getDbIdentifier() !== $location->settings->getDbIdentifier()
             ) {
                 Logger::log('The session is not in the database it was saved to, looking for it in the configured one...', Logger::WARNING);
-                $unserialized = (new DbArrayBuilder(
-                    $savedTable,
-                    $newOrmSettings,
-                    KeyType::STRING,
-                    ValueType::SCALAR,
-                ))->build()->get('data');
+                $location = self::sessionLocation($location->table, $newOrmSettings);
+                $unserialized = $location->build()->get('data');
             }
             if (!$unserialized && $exists) {
                 throw new Exception('Could not extract session from database!');
+            }
+            if (\is_string($unserialized)) {
+                $unserialized = SessionPaths::unserializeFromString($unserialized);
+            } elseif (\is_object($unserialized)) {
+                self::convertSessionRow($location);
             }
         }
         \assert($unserialized instanceof APIWrapper || $unserialized === null);
 
         Shutdown::removeCallback($tempId);
         return [$unserialized, $unlock];
+    }
+
+    private static function sessionLocation(string $table, OrmSettings $settings): DbArrayBuilder
+    {
+        return new DbArrayBuilder($table, $settings, KeyType::STRING, ValueType::SCALAR);
+    }
+
+    /**
+     * Convert a session row saved by an older version, which holds the session object itself, to a string
+     * (see MTProto::serializeSession()): else moving the row to another database (when the database settings
+     * change before the session is saved again) would unserialize it, creating a second copy of the instance.
+     *
+     * The bytes the row was stored as are kept: it's not unserialized again, nor serialized from the session
+     * just unserialized, which isn't woken up yet.
+     *
+     * @internal
+     */
+    public static function convertSessionRow(DbArrayBuilder $location): void
+    {
+        $settings = $location->settings;
+        \assert($settings instanceof DriverSettings);
+        $withSerializer = static fn (Serializer $serializer): DbArray => self::sessionLocation(
+            $location->table,
+            new $settings(...array_merge((array) $settings, ['serializer' => $serializer, 'cacheTtl' => 0])),
+        )->build();
+
+        $raw = $withSerializer(new RawSerializer)->get('data');
+        \assert(\is_string($raw));
+        $withSerializer($settings->serializer)['data'] = SessionPaths::serializedToString(
+            $raw,
+            $settings->serializer instanceof Igbinary,
+        );
     }
 
     /**
