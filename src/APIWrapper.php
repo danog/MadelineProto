@@ -20,7 +20,9 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto;
 
+use Amp\Sync\LocalMutex;
 use danog\MadelineProto\Ipc\Client;
+use Fiber;
 
 /**
  * The root of a session. Dynamic properties are allowed only for unserialization: see __wakeup().
@@ -106,6 +108,16 @@ final class APIWrapper
     }
 
     /**
+     * Held while a session is saved, by any instance: see serialize().
+     */
+    private static ?LocalMutex $serializeMutex = null;
+    /**
+     * Whether a session is being saved, and by which fiber (null: {main}).
+     */
+    private static bool $serializing = false;
+    private static ?Fiber $serializingFiber = null;
+
+    /**
      * Serialize session.
      */
     public function serialize(): void
@@ -116,9 +128,42 @@ final class APIWrapper
         if ($this->API instanceof Client) {
             return;
         }
-        $this->API->waitForInit();
+        // PHP's serialize() is not reentrant: the objects it has already met are numbered in a context shared by
+        // the whole process, and a serialize() that starts before it returns reuses that context. That happens
+        // when user code runs in the middle of serialize(), outside of __sleep() and __serialize(), and switches
+        // fibers: an error handler, or a destructor (e.g. that of the garbage the GC collects while the large
+        // session is serialized), which can since PHP 8.4 (from {main}, waiting for anything runs the event
+        // loop). Another fiber can then save the session too. The session, the first object met by the outer serialize(), is then serialized as a reference to
+        // it, "r:1;": once stored, the session can't be unserialized anymore, and must be logged in again.
+        // The session file is written while holding a file lock, but the session's database ($sessionDb isn't
+        // cached) is written as serializeSession() is called: only save one session at a time.
+        $fiber = Fiber::getCurrent();
+        if (self::$serializing && self::$serializingFiber === $fiber) {
+            // Called by a destructor run in the middle of the serialize() of this very fiber's save, which
+            // waits for it to return: the session is being saved already.
+            Logger::log('Not saving the session again while this fiber saves a session', Logger::WARNING);
+            return;
+        }
         $API = $this->API;
+        $API->waitForInit();
 
+        $lock = (self::$serializeMutex ??= new LocalMutex)->acquire();
+        self::$serializing = true;
+        self::$serializingFiber = $fiber;
+        try {
+            // Unless the instance was replaced while waiting for the lock
+            if ($this->API === $API) {
+                $this->serializeLocked($API);
+            }
+        } finally {
+            self::$serializing = false;
+            self::$serializingFiber = null;
+            $lock->release();
+        }
+    }
+
+    private function serializeLocked(MTProto $API): void
+    {
         if ($API->getAuthorization() === API::LOGGED_OUT) {
             $API->deleteSession();
             $this->session->delete();
