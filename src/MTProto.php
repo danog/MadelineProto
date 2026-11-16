@@ -524,7 +524,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
         if (!isset($this->sessionDb) || $this->sessionDb instanceof MemoryArray) {
             return $data;
         }
-        $this->sessionDb['data'] = $data;
+        // Serialized here, to an opaque string: when the database settings change, initDb() moves this row
+        // like the others, and a row holding the session itself would be unserialized to be copied, creating
+        // a second copy of this instance (with its connections and calls, running without being woken up).
+        $this->sessionDb['data'] = SessionPaths::serializeToString($data);
 
         $db = [];
         $db []= async($this->referenceDatabase->saveDbProperties(...));
@@ -535,6 +538,14 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $db []= async($this->event_handler_instance->internalSaveDbProperties(...));
         }
         await($db);
+        return $this->getSessionDbLocation();
+    }
+
+    /**
+     * Where the session is saved in the database: the session file points to it.
+     */
+    private function getSessionDbLocation(): DbArrayBuilder
+    {
         return new DbArrayBuilder(
             $this->getDbPrefix().'_MTProto_session',
             $this->getDbSettings(),
@@ -1304,6 +1315,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /** @internal */
     public function initDb(): void
     {
+        $sessionDb = $this->sessionDb ?? null;
+
         $db = [];
         $db []= async($this->referenceDatabase->init(...));
         $db []= async($this->minDatabase->init(...));
@@ -1313,6 +1326,19 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $db []= async($chat->init(...));
         }
         await($db);
+
+        // The session was moved (to another database, or to another table at login): point the session file
+        // to it now, not at the next serialize(), or the session can't be loaded if this process stops before.
+        // Not to a memory array: only serialize() can save the whole session to the session file.
+        if ($sessionDb !== null
+            && $sessionDb !== $this->sessionDb
+            && !$sessionDb instanceof MemoryArray
+            && !$this->sessionDb instanceof MemoryArray
+            && isset($this->wrapper)
+        ) {
+            $session = $this->wrapper->getSession();
+            $session->serialize($this->getSessionDbLocation(), $session->getSessionPath());
+        }
     }
     /**
      * Upgrade MadelineProto instance.

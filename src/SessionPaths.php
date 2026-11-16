@@ -183,6 +183,42 @@ final class SessionPaths
     }
 
     /**
+     * Serialize a session to a string, for the session row of a database (see MTProto::serializeSession()).
+     */
+    public static function serializeToString(object $object): string
+    {
+        return self::serializedToString(
+            Magic::$can_use_igbinary ? igbinary_serialize($object) : serialize($object),
+            Magic::$can_use_igbinary,
+        );
+    }
+
+    /**
+     * The string serializeToString() returns for an object serialized with igbinary or serialize().
+     */
+    public static function serializedToString(string $serialized, bool $igbinary): string
+    {
+        return ($igbinary ? "\1" : "\0").$serialized;
+    }
+
+    /**
+     * Unserialize a session serialized by serializeToString().
+     */
+    public static function unserializeFromString(string $serialized): object
+    {
+        $igbinary = ($serialized[0] ?? '') === "\1";
+        if ($igbinary && !Magic::$can_use_igbinary) {
+            throw Exception::extension('igbinary');
+        }
+        $serialized = substr($serialized, 1);
+        $unserialized = $igbinary ? igbinary_unserialize($serialized) : unserialize($serialized);
+        if (!\is_object($unserialized)) {
+            throw new Exception('Could not unserialize the session!');
+        }
+        return $unserialized;
+    }
+
+    /**
      * Flush a file to disk.
      */
     private static function fsync(string $path): void
