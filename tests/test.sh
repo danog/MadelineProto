@@ -90,21 +90,36 @@ if [ "$1" == "phpunit" ]; then
 fi
 
 if [ "$1" == "phpunit-light" ]; then
-    # The event loop driver of Revolt to test with: most installations have no ext-uv (the image's default). The
-    # extensions of ev and event aren't in the image: they're in the test image (tests/dockerfiles/Dockerfile.test,
-    # danog/madelineproto:next-test).
-    case "${MADELINE_EVENT_LOOP:-uv}" in
-        uv) driver=UvDriver; extension=uv ;;
+    # The event loop to test with: native is the image's, revolt-rs (built into danog/mongo-php-async-driver's
+    # mongodb extension, see tests/dockerfiles/Dockerfile); the others are revolt/event-loop's drivers, of the
+    # installations without it. The extensions of ev and event aren't in the image: they're in the test image
+    # (tests/dockerfiles/Dockerfile.test, danog/madelineproto:next-test).
+    case "${MADELINE_EVENT_LOOP:-native}" in
+        native) driver=NativeDriver; extension=mongodb ;;
         ev) driver=EvDriver; extension=ev ;;
         event) driver=EventDriver; extension=event ;;
         select) driver=StreamSelectDriver; extension= ;;
         *) echo "Unknown event loop: $MADELINE_EVENT_LOOP"; exit 1 ;;
     esac
+    if [ "$driver" != NativeDriver ]; then
+        # revolt-rs replaces revolt/event-loop's drivers (EventLoop::setDriver() throws): leave out the file of
+        # conf.d enabling the mongodb extension, for this process and the ones it starts.
+        scan=$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')
+        filtered=$(mktemp -d)
+        for ini in "$scan"/*.ini; do
+            [ "$(basename "$ini")" == mongodb.ini ] || ln -s "$ini" "$filtered/"
+        done
+        export PHP_INI_SCAN_DIR=$filtered
+        if php -r "exit(extension_loaded('mongodb') ? 0 : 1);"; then
+            echo "The mongodb extension is still loaded: it must be enabled by $scan/mongodb.ini"
+            exit 1
+        fi
+        export REVOLT_DRIVER="Revolt\\EventLoop\\Driver\\$driver"
+    fi
     if [ -n "$extension" ] && ! php -r "exit(extension_loaded('$extension') ? 0 : 1);"; then
         echo "ext-$extension isn't loaded: run the tests in danog/madelineproto:next-test"
         exit 1
     fi
-    export REVOLT_DRIVER="Revolt\\EventLoop\\Driver\\$driver"
     # The driver in use.
     php -r 'require "vendor/autoload.php"; echo get_class(Revolt\EventLoop::getDriver()), PHP_EOL;'
     composer test-light

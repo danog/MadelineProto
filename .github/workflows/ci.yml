@@ -159,9 +159,9 @@ jobs:
           PEER_USER_SESSION_AUTH: ${{ secrets.PEER_USER_SESSION_AUTH }}
         run: tests/test.sh phpunit
 
-  # The tests that need no account, with the other event loop drivers of Revolt than ext-uv's (the default, tested
-  # above): PHP's own (stream_select, without any extension, as on most installations), ext-ev's and ext-event's, whose
-  # extensions are only in the test image.
+  # The tests that need no account, with revolt/event-loop's drivers rather than the image's native event loop
+  # (revolt-rs, of danog/mongo-php-async-driver, tested above): PHP's own (stream_select, without any extension, as on
+  # most installations), ext-ev's and ext-event's, whose extensions are only in the test image.
   test_light:
     name: test_light (${{ matrix.event-loop }})
     needs: docker-merge
@@ -275,6 +275,11 @@ jobs:
         image: redis
         options: >-
           --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      mongo:
+        image: mongo
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping: 1})'"
           --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - name: Install git

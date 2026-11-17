@@ -231,11 +231,7 @@ RUN set -eux; \
 COPY tests/dockerfiles/docker-php-* /usr/local/bin/
 ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.12/.gdbinit /root/.gdbinit
 
-# libuv >= 1.45 (trixie's is 1.50) for ext-uv (Revolt's UvDriver): bookworm's 1.44 ran the due timers before polling in
-# uv_run(UV_RUN_ONCE), then blocked with nothing left to wake it while a handle stayed active (MadelineProto's signal
-# handlers): a timer due when the UvDriver entered its blocking run (a short delay(), often) only ran at the next I/O
-# event, or never. See tests/danog/MadelineProto/EventLoopTimerTest.php.
-RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libuv1t64 libuv1-dev libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get dist-clean
+RUN apt-get update && apt-get -y --no-install-recommends install libjudydebian1 libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get dist-clean
 
 # The extensions are installed with PIE (https://github.com/php/pie), from their packages on Packagist (built from
 # the sources of the tagged release on GitHub), pinned: not with pecl, which made the build fail whenever
@@ -249,15 +245,22 @@ RUN set -eux; \
 
 # The sources are downloaded from the GitHub API, whose anonymous rate limit (60 requests per hour per IP) the CI's
 # runners share: the CI passes its token as the github_token secret (optional).
-# Enabled by tests/dockerfiles/php.ini, not by PIE.
+# Enabled by tests/dockerfiles/php.ini, not by PIE, except mongodb (see below).
+#
+# danog/mongo-php-async-driver is the mongodb extension (for the MongoDB database backend, with async queries), with
+# revolt-rs built in: it registers Revolt's classes itself, so everything in the image runs on its native event loop
+# (Revolt\EventLoop\Driver\NativeDriver), instead of one of revolt/event-loop's drivers (hence no ext-uv). PIE installs
+# its pre-built binary. Enabled in its own file of conf.d, which tests/test.sh phpunit-light leaves out to test
+# revolt/event-loop's drivers.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:3.2.17RC1 amphp/uv:0.3.1 arnaud-lb/memprof:3.1.0; do \
+	for package in igbinary/igbinary:3.2.17RC1 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.0; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
+	echo 'extension=mongodb' > "$PHP_INI_DIR/conf.d/mongodb.ini"; \
 	rm -rf /root/.composer/cache
 
-RUN apt-get -y remove libuv1-dev libjudy-dev $PHPIZE_DEPS
+RUN apt-get -y remove libjudy-dev $PHPIZE_DEPS
 
 ADD tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
@@ -312,6 +315,7 @@ ENV PATH=/composer/vendor/bin:${PATH}
 ENV USE_ZEND_ALLOC=0
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so
 
+RUN php -r 'if ((new ReflectionClass(Revolt\EventLoop::class))->getExtensionName() !== "mongodb" || get_class(Revolt\EventLoop::getDriver()) !== "Revolt\\EventLoop\\Driver\\NativeDriver") { throw new RuntimeException("revolt-rs of danog/mongo-php-async-driver unavailable"); }'
 RUN php -v && php -r 'if (!extension_loaded("madeline_crypto") || version_compare(\danog\MadelineProto\Native\Crypto::version(), "0.6.0", "<") || version_compare(phpversion("madeline_crypto"), getenv("MADELINE_CRYPTO_VERSION"), "<")) { throw new RuntimeException("Native crypto extension unavailable"); }'
 
 

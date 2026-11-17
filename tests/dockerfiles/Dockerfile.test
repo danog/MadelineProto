@@ -24,10 +24,10 @@ RUN set -eux; \
 	rm -rf /tmp/mtg.tar.gz "/tmp/mtg-$MTG_VERSION-linux-$arch"; \
 	mtg --version
 
-# The event loop drivers of Revolt whose extensions the published image doesn't have (it only has ext-uv, Revolt's
-# default): ext-ev (EvDriver) and ext-event (EventDriver), which Revolt prefers to PHP's own stream_select driver but
-# not to ext-uv's, so the full tests still run with UvDriver: tests/test.sh phpunit-light picks the driver with
-# MADELINE_EVENT_LOOP.
+# The event loop drivers of revolt/event-loop whose extensions the published image doesn't have (it runs on revolt-rs,
+# the native event loop of danog/mongo-php-async-driver, which replaces them): ext-ev (EvDriver) and ext-event
+# (EventDriver). tests/test.sh phpunit-light picks the event loop with MADELINE_EVENT_LOOP, leaving out the mongodb
+# extension for revolt/event-loop's drivers; the full tests run on revolt-rs.
 # ext-event is built with its sockets support (the default of its configure, as distributions build it), so it needs
 # ext-sockets (bundled with PHP, so of its version), which the image doesn't have, loaded before it: hence the order
 # of the extension lines.
