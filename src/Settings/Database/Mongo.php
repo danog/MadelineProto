@@ -27,8 +27,8 @@ use danog\AsyncOrm\Settings\MongoSettings;
  * MongoDB backend settings.
  *
  * Requires the mongodb extension of danog/mongo-php-async-driver (`pie install danog/mongo-php-async-driver`, already
- * in the docker image), whose queries suspend only the calling fiber: the official ext-mongodb blocks the event loop
- * for every query.
+ * in the docker image), whose queries suspend only the calling fiber: the official ext-mongodb, which blocks the event
+ * loop for every query, is refused.
  */
 final class Mongo extends DriverDatabaseAbstract
 {
