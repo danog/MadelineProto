@@ -25,9 +25,11 @@ RUN set -eux; \
 	mtg --version
 
 # The event loop drivers of revolt/event-loop whose extensions the published image doesn't have (it runs on revolt-rs,
-# the native event loop of danog/mongo-php-async-driver, which replaces them): ext-ev (EvDriver) and ext-event
-# (EventDriver). tests/test.sh phpunit-light picks the event loop with MADELINE_EVENT_LOOP, leaving out the mongodb
-# extension for revolt/event-loop's drivers; the full tests run on revolt-rs.
+# the native event loop of danog/mongo-php-async-driver, which replaces them): ext-ev (EvDriver), ext-event
+# (EventDriver) and ext-uv (UvDriver, with libuv >= 1.45: bookworm's 1.44 ran the due timers before polling in
+# uv_run(UV_RUN_ONCE), then blocked with nothing left to wake it while a handle stayed active; trixie's is 1.50).
+# tests/test.sh phpunit-light picks the event loop with MADELINE_EVENT_LOOP, leaving out the mongodb extension for
+# revolt/event-loop's drivers; the full tests run on revolt-rs.
 # ext-event is built with its sockets support (the default of its configure, as distributions build it), so it needs
 # ext-sockets (bundled with PHP, so of its version), which the image doesn't have, loaded before it: hence the order
 # of the extension lines.
@@ -37,13 +39,13 @@ RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends autoconf dpkg-dev file g++ gcc libc-dev make pkg-config re2c \
-		libevent-dev libssl-dev; \
-	for package in php/sockets osmanov/pecl-ev:1.2.4 osmanov/pecl-event:3.2.0; do \
+		libevent-dev libssl-dev libuv1-dev; \
+	for package in php/sockets osmanov/pecl-ev:1.2.4 osmanov/pecl-event:3.2.0 amphp/uv:0.3.1; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
-	printf 'extension=sockets\nextension=ev\nextension=event\n' > "$PHP_INI_DIR/conf.d/event-loop-drivers.ini"; \
+	printf 'extension=sockets\nextension=ev\nextension=event\nextension=uv\n' > "$PHP_INI_DIR/conf.d/event-loop-drivers.ini"; \
 	rm -rf /root/.composer/cache; \
 	apt-get dist-clean; \
-	php -r 'foreach (["sockets", "ev", "event"] as $ext) { if (!extension_loaded($ext)) { exit(1); } }'
+	php -r 'foreach (["sockets", "ev", "event", "uv"] as $ext) { if (!extension_loaded($ext)) { exit(1); } }'
 
 USER madeline:madeline

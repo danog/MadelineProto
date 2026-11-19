@@ -92,10 +92,11 @@ fi
 if [ "$1" == "phpunit-light" ]; then
     # The event loop to test with: native is the image's, revolt-rs (built into danog/mongo-php-async-driver's
     # mongodb extension, see tests/dockerfiles/Dockerfile); the others are revolt/event-loop's drivers, of the
-    # installations without it. The extensions of ev and event aren't in the image: they're in the test image
+    # installations without it. The extensions of uv, ev and event aren't in the image: they're in the test image
     # (tests/dockerfiles/Dockerfile.test, danog/madelineproto:next-test).
     case "${MADELINE_EVENT_LOOP:-native}" in
         native) driver=NativeDriver; extension=mongodb ;;
+        uv) driver=UvDriver; extension=uv ;;
         ev) driver=EvDriver; extension=ev ;;
         event) driver=EventDriver; extension=event ;;
         select) driver=StreamSelectDriver; extension= ;;

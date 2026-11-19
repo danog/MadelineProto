@@ -161,7 +161,7 @@ jobs:
 
   # The tests that need no account, with revolt/event-loop's drivers rather than the image's native event loop
   # (revolt-rs, of danog/mongo-php-async-driver, tested above): PHP's own (stream_select, without any extension, as on
-  # most installations), ext-ev's and ext-event's, whose extensions are only in the test image.
+  # most installations), ext-uv's, ext-ev's and ext-event's, whose extensions are only in the test image.
   test_light:
     name: test_light (${{ matrix.event-loop }})
     needs: docker-merge
@@ -170,7 +170,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        event-loop: [select, ev, event]
+        event-loop: [uv, select, ev, event]
     container:
       # The test image (tests/dockerfiles/Dockerfile.test: the image plus what only the tests use).
       image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}-test

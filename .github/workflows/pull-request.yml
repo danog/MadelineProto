@@ -59,7 +59,7 @@ jobs:
 
   # The tests that don't need any secret, with each event loop: the image's native one (revolt-rs, of
   # danog/mongo-php-async-driver), and revolt/event-loop's drivers: PHP's own (stream_select, without any extension, as
-  # on most installations), ext-ev's and ext-event's. In the test image of
+  # on most installations), ext-uv's, ext-ev's and ext-event's. In the test image of
   # the main branch (tests/dockerfiles/Dockerfile.test, which has their extensions): pull requests have no secrets to
   # push one of their own.
   test_light:
@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        event-loop: [native, select, ev, event]
+        event-loop: [native, uv, select, ev, event]
     container:
       image: danog/madelineproto:next-test
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
