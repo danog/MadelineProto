@@ -2,7 +2,8 @@ name: Autobuild
 
 # Runs composer build and rebuilds the web UI every hour, submitting what changed (usually, a new layer) as
 # pull requests to danog/schemas, danog/MadelineProtoDocs and danog/MadelineProto: see tests/autobuild.sh.
-# Also updates the version of PHP of the docker image, submitting it as a pull request: see tests/update_docker.sh.
+# Also updates the versions the docker image pins (PHP, PIE, the extensions, MadelineCrypto, Rust, mtg), submitting
+# them as a pull request: see tests/update_docker.sh.
 #
 # The web UI is built in a job of its own, without any secret or token: the build runs the code of its npm
 # dependencies, which must not reach the token of the app or the sessions. Only the bundle is passed on.
@@ -57,7 +58,7 @@ jobs:
           ref: ${{ github.ref_name }}
           token: ${{ steps.app.outputs.token }}
 
-      - name: Update PHP
+      - name: Update the versions of the docker image
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
           GH_REPO: ${{ github.repository }}
