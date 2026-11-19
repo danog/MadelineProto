@@ -1,15 +1,18 @@
 #!/bin/bash -e
 
 # Update the versions the docker image pins (tests/dockerfiles/Dockerfile, tests/dockerfiles/Dockerfile.test) to their
-# latest releases of the same major version, submitting the changes as one pull request of its own, with a patch
-# release (so that the latest image is rebuilt with them too: its changelog is empty, the change is internal, so it's
-# not announced): once its checks passed, automerge.yml merges it, and the CI rebuilds the image before running in it.
-# Pinned: PHP (new minor versions too), PIE and its sha256, the extensions installed with PIE, danog/MadelineCrypto,
-# the Rust toolchain that builds it, and mtg with the sha256 of its archives (pinned by MtProxyTest.php too).
+# latest releases of the same major version, submitting the changes as pull requests, with a patch release (so that
+# the latest image is rebuilt with them too: their changelog is empty, the change is internal, so it's not announced):
+# - PHP (new minor versions too), on the docker-php branch: once its checks passed, automerge.yml merges it (see
+#   tests/automerge.sh), and the CI rebuilds the image before running in it;
+# - the others, on the docker-pins branch, which a person reviews and merges: PIE and its sha256 (of the phar whose
+#   attestation of php/pie's release workflow was verified), the extensions installed with PIE, danog/MadelineCrypto,
+#   the Rust toolchain that builds it, and mtg with the sha256 of its archives (pinned by MtProxyTest.php too). mtg
+#   publishes no checksums: those are of the archives as downloaded, to be checked before merging.
 # A new major version is only reported, never applied; nothing is ever downgraded.
 #
 # Needs GITHUB_TOKEN, able to push branches and to open pull requests (not to push to the main branch), and
-# RUN_URL, linked by the pull request. With DRY_RUN=1, only updates the files and prints the pull request.
+# RUN_URL, linked by the pull requests. With DRY_RUN=1, only updates the files and prints the pull requests.
 
 source tests/submit_pr.sh
 export GH_TOKEN="$GITHUB_TOKEN"
@@ -17,14 +20,17 @@ dockerfile=tests/dockerfiles/Dockerfile
 testfile=tests/dockerfiles/Dockerfile.test
 mtproxytest=tests/danog/MadelineProto/MtProxyTest.php
 
-changes=()
-summary=()
+start=$(git rev-parse HEAD)
 
 # replace <old> <new> <files...>: every occurrence of old (literally, not followed by a letter or digit, so that a
 # version doesn't match the start of a longer one) becomes new.
 replace() {
     local old=$1 new=$2
     shift 2
+    if [ -z "$old" ] || [ -z "$new" ]; then
+        echo "Nothing to replace: '$old' -> '$new' in $*"
+        exit 1
+    fi
     OLD=$old NEW=$new perl -pi -e 's/\Q$ENV{OLD}\E(?![0-9A-Za-z])/$ENV{NEW}/g' "$@"
 }
 
@@ -68,6 +74,31 @@ sha256() {
     curl -fsSL --retry 5 "$1" | sha256sum | cut -d' ' -f1
 }
 
+# submit <branch> <title> <body>: commits the changes (with the bump of the RELEASE constant) as a pull request.
+submit() {
+    local branch=$1 title=$2 body=$3
+    if [ -n "$DRY_RUN" ]; then
+        echo "Pull request ($branch): $title"
+        echo "$body"
+        git diff --stat
+        git checkout -q -- "$dockerfile" "$testfile" "$mtproxytest"
+        return
+    fi
+    source tests/release_version.sh
+    echo "RELEASE: $(bump_release_constant release:fix)"
+    git add "$dockerfile" "$testfile" "$mtproxytest" src/API.php
+    submit_pr . "${GH_REPO:-danog/MadelineProto}" "$branch" "$title" "$body" release:internal
+    git checkout -q --detach "$start"
+}
+
+if [ -z "$DRY_RUN" ]; then
+    git config --global user.name "${GIT_NAME:-MadelineProto autobuild}"
+    git config --global user.email "${GIT_EMAIL:-autobuild@madelineproto.xyz}"
+    gh auth setup-git
+fi
+
+changes=()
+summary=()
 # PHP: the latest release of its major version.
 current=$(grep -o 'php-[0-9]\+\.[0-9]\+\.[0-9]\+' "$dockerfile" | head -1 | cut -d- -f2)
 latest=$(curl -fsS "https://www.php.net/releases/?json&version=${current%%.*}" | jq -r .version)
@@ -77,12 +108,23 @@ if bump PHP "$current" "$latest" "https://www.php.net/ChangeLog-${latest%%.*}.ph
     replace "php/tree/master/${current%.*}/" "php/tree/master/${latest%.*}/" "$dockerfile"
 fi
 
+if [ ${#changes[@]} -ne 0 ]; then
+    submit docker-php "Update PHP to $latest in the docker image" "PHP $latest was released: https://www.php.net/ChangeLog-${latest%%.*}.php#$latest"
+fi
+
+changes=()
+summary=()
 # PIE.
 current=$(sed -n 's/^ENV PIE_VERSION=//p' "$dockerfile")
 latest=$(gh api repos/php/pie/releases/latest --jq .tag_name)
 if bump PIE "$current" "$latest" "https://github.com/php/pie/releases/tag/$latest"; then
     old_sha=$(sed -n 's/^ENV PIE_SHA256=//p' "$dockerfile")
-    new_sha=$(sha256 "https://github.com/php/pie/releases/download/$latest/pie.phar")
+    phar=$(mktemp)
+    curl -fsSL --retry 5 -o "$phar" "https://github.com/php/pie/releases/download/$latest/pie.phar"
+    # Built by php/pie's release workflow (not only the bytes GitHub serves).
+    gh attestation verify "$phar" --repo php/pie
+    new_sha=$(sha256sum "$phar" | cut -d' ' -f1)
+    rm -f "$phar"
     replace "PIE_VERSION=$current" "PIE_VERSION=$latest" "$dockerfile"
     replace "$old_sha" "$new_sha" "$dockerfile"
 fi
@@ -138,22 +180,7 @@ if [ ${#changes[@]} -eq 0 ]; then
     echo "The docker image pins the latest versions"
     exit 0
 fi
+submit docker-pins "Update the docker image: $(IFS=,; echo "${summary[*]}" | sed 's/,/, /g')" "New releases of what the docker image pins:
+$(printf '%s\n' "${changes[@]}")
 
-title="Update the docker image: $(IFS=,; echo "${summary[*]}" | sed 's/,/, /g')"
-body="New releases of what the docker image pins:
-$(printf '%s\n' "${changes[@]}")"
-if [ -n "$DRY_RUN" ]; then
-    echo "$title"
-    echo "$body"
-    git diff --stat
-    exit 0
-fi
-
-git config --global user.name "${GIT_NAME:-MadelineProto autobuild}"
-git config --global user.email "${GIT_EMAIL:-autobuild@madelineproto.xyz}"
-gh auth setup-git
-
-source tests/release_version.sh
-echo "RELEASE: $(bump_release_constant release:fix)"
-git add "$dockerfile" "$testfile" "$mtproxytest" src/API.php
-submit_pr . "${GH_REPO:-danog/MadelineProto}" docker-update "$title" "$body" release:internal
+Not merged automatically: check the changes before merging$([[ " ${summary[*]}" == *" mtg "* ]] && echo ", in particular the sha256 of the archives of mtg (it publishes no checksums: these are of the archives as this run downloaded them)")."
