@@ -75,7 +75,7 @@ RUN set -eux; \
 	mkdir -p /usr/src; \
 	cd /usr/src; \
 	\
-	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.12 php
+	git clone https://github.com/php/php-src.git --depth 1 --recursive -b php-8.5.13 php
 
 RUN set -eux; \
 	\
@@ -229,7 +229,7 @@ RUN set -eux; \
 	} > "$PHP_INI_DIR/conf.d/docker-fpm.ini"
 
 COPY tests/dockerfiles/docker-php-* /usr/local/bin/
-ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.12/.gdbinit /root/.gdbinit
+ADD https://raw.githubusercontent.com/php/php-src/refs/tags/php-8.5.13/.gdbinit /root/.gdbinit
 
 # libuv >= 1.45 (trixie's is 1.50) for ext-uv (Revolt's UvDriver): bookworm's 1.44 ran the due timers before polling in
 # uv_run(UV_RUN_ONCE), then blocked with nothing left to wake it while a handle stayed active (MadelineProto's signal
