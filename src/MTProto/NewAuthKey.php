@@ -24,6 +24,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\MTProtoTools\Crypt;
 use danog\MadelineProto\Reactive\Publisher;
 use danog\MadelineProto\Reactive\SimpleSubscriber;
+use danog\MadelineProto\RestoresDeclaredProperties;
 use Webmozart\Assert\Assert;
 
 /**
@@ -35,6 +36,8 @@ use Webmozart\Assert\Assert;
  */
 final class NewAuthKey implements SimpleSubscriber
 {
+    use RestoresDeclaredProperties;
+
     private ?string $authKey = null;
     private ?string $id = null;
     private ?string $tempAuthKey = null;
@@ -44,8 +47,6 @@ final class NewAuthKey implements SimpleSubscriber
 
     /** @var Publisher<ConnectionState> */
     public readonly Publisher $connectionState;
-
-    private ?int $authedDcId;
 
     public function __construct(
         public readonly bool $isMedia,
@@ -68,6 +69,20 @@ final class NewAuthKey implements SimpleSubscriber
         $loginState->subscribe($this);
     }
 
+    /**
+     * The versions up to 8.9.0 saved a copy of the authorized DC (authedDcId), dropped: it was set only once the
+     * login state reached the key, so a key saved before that couldn't be inited (#1680).
+     */
+    public function __unserialize(array $data): void
+    {
+        $this->restoreDeclaredProperties($data);
+    }
+
+    private static function getAuthedDcId(LoginState $loginState): ?int
+    {
+        return $loginState->state === API::LOGGED_IN ? $loginState->authorizedDc : null;
+    }
+
     #[\Override]
     public function onSimpleStateChange($state): void
     {
@@ -87,21 +102,19 @@ final class NewAuthKey implements SimpleSubscriber
         }
 
         Assert::isInstanceOf($state, LoginState::class);
-        $this->authedDcId = $state->state === API::LOGGED_IN
-            ? $state->authorizedDc
-            : null;
+        $authedDcId = self::getAuthedDcId($state);
         if ($this->connectionState->getState() === ConnectionState::ENCRYPTED_NOT_AUTHED
             || $this->connectionState->getState() === ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN
         ) {
-            if ($this->authedDcId !== null) {
-                $state = $this->dcId === $this->authedDcId
+            if ($authedDcId !== null) {
+                $state = $this->dcId === $authedDcId
                     ? ConnectionState::ENCRYPTED
                     : ConnectionState::ENCRYPTED_NOT_AUTHED;
             } else {
                 $state = ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN;
             }
             $this->connectionState->publish($state);
-        } elseif ($this->authedDcId === null && $this->connectionState->getState() === ConnectionState::ENCRYPTED) {
+        } elseif ($authedDcId === null && $this->connectionState->getState() === ConnectionState::ENCRYPTED) {
             $this->setTempAuthKey(null, null);
         }
     }
@@ -212,16 +225,22 @@ final class NewAuthKey implements SimpleSubscriber
         $state = ConnectionState::ENCRYPTED_NOT_INITED;
         $this->connectionState->publish($state);
     }
-    public function init(): void
+    /**
+     * @param LoginState $loginState The current login state, not the last one delivered to this key: the
+     *                               subscription delivers it asynchronously, and to a loaded session only once
+     *                               the login state is woken up, after the session may already have connected.
+     */
+    public function init(LoginState $loginState): void
     {
         Assert::eq($this->connectionState->getState(), ConnectionState::ENCRYPTED_NOT_INITED);
+        $authedDcId = self::getAuthedDcId($loginState);
         $state = $this->isCdn
             ? ConnectionState::ENCRYPTED
             : (
-                $this->authedDcId === null
+                $authedDcId === null
                 ? ConnectionState::ENCRYPTED_NOT_AUTHED_NO_LOGIN
                 : (
-                    $this->authedDcId === $this->dcId || $this->isMedia
+                    $authedDcId === $this->dcId || $this->isMedia
                         ? ConnectionState::ENCRYPTED
                         : ConnectionState::ENCRYPTED_NOT_AUTHED
                 )
