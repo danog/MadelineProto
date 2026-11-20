@@ -261,7 +261,7 @@ RUN set -eux; \
 # revolt/event-loop's drivers.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.1; do \
+	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.2; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
 	echo 'extension=mongodb' > "$PHP_INI_DIR/conf.d/mongodb.ini"; \
