@@ -15,16 +15,29 @@ on:
         description: The tag of the release
         required: true
 
-permissions:
-  contents: write
+permissions: {}
 
 concurrency:
   group: release-${{ github.event.release.tag_name || inputs.tag }}
   cancel-in-progress: false
 
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   release:
-    runs-on: ubuntu-latest
+    name: release
+    timeout-minutes: 30
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: release
+      deployment: false
+    runs-on: ubuntu-24.04
+    permissions:
+      # To write the notes of the release.
+      contents: write
     container:
       image: danog/madelineproto:next
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
@@ -40,19 +53,19 @@ jobs:
         run: |
           apt-get update && apt-get install -y git jq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The tags, for the layer of the previous release.
           fetch-depth: 0
       - name: Generate the release notes
         run: tests/test.sh release-notes "$TAG"
       - name: Send the phar to @madelineprotophar
-        if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.action == 'released' }}
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: tests/send_phar.sh "$TAG"
       - name: Send the changelog to Telegram
-        if: github.event_name == 'workflow_dispatch' || github.event.action == 'released'
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.action == 'released' }}
         env:
           PHAR_BOT_TOKEN: ${{ secrets.PHAR_BOT_TOKEN }}
         run: php tests/announce_release.php "$TAG"

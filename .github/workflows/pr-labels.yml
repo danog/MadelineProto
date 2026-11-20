@@ -7,26 +7,40 @@ on:
   pull_request:
     types: [opened, reopened, labeled, unlabeled, synchronize]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
+  # To read the labels of the pull request.
   pull-requests: read
+
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
 
 jobs:
   label:
-    runs-on: ubuntu-latest
+    name: label
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
     steps:
-      - uses: mheap/github-action-required-labels@23e10fde7e062233401931a0eece796cd9bf3177 # v5
+      - uses: mheap/github-action-required-labels@23e10fde7e062233401931a0eece796cd9bf3177 # v5.6.0
         with:
           mode: minimum
           count: 1
           labels: "release:fix, release:feature, release:layer, release:internal"
 
   version:
-    runs-on: ubuntu-latest
+    name: version
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
     steps:
       # The merge commit of the pull request with the main branch, and its first parent (the main branch), for the
       # files it changes.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 2
@@ -34,5 +48,7 @@ jobs:
         env:
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
-        # Split on purpose: the release labels have no spaces.
-        run: tests/release_check.sh $LABELS
+        # One argument per label: the release labels have no spaces.
+        run: |
+          read -ra labels <<< "$LABELS"
+          tests/release_check.sh "${labels[@]}"

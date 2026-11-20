@@ -20,6 +20,8 @@ source tests/release_version.sh
 repository=${GH_REPO:-danog/MadelineProto}
 branch=v8
 export GH_TOKEN="$GITHUB_TOKEN"
+# git fetches and pushes with it too: the checkout doesn't keep a token.
+gh auth setup-git
 
 git fetch -q --tags origin "$branch"
 git checkout -q -B "$branch" "origin/$branch"

@@ -22,10 +22,21 @@ concurrency:
   group: prerelease
   cancel-in-progress: true
 
+defaults:
+  run:
+    # With pipefail, unlike the default shell ("bash -e"): a command failing in a pipeline fails the step.
+    shell: bash
+
 jobs:
   prerelease:
-    if: github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    name: prerelease
+    timeout-minutes: 30
+    # The secrets of the job are the ones of this environment, not of the repository. No deployment is recorded.
+    environment:
+      name: admin-token
+      deployment: false
+    if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
     container:
       image: danog/madelineproto:next
       # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
@@ -37,14 +48,15 @@ jobs:
         run: |
           apt-get update && apt-get install -y git jq
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The tags, for the last release.
           fetch-depth: 0
-          # So that the tag runs the CI (the events of the token of a job don't).
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          # The script pushes the tag with the token of an admin (gh auth setup-git), not with the one of the job.
+          persist-credentials: false
       - name: Release the version
         env:
+          # So that the tag runs the CI (the events of the token of a job don't).
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           # The commit the CI succeeded on.
