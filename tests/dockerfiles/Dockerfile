@@ -43,7 +43,7 @@ RUN set -eux; \
 	apt-get dist-clean; \
 	php -m
 
-RUN apt-get update && apt-get -y --no-install-recommends install $PHPIZE_DEPS libjudydebian1 libjudy-dev ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get dist-clean
+RUN apt-get update && apt-get -y --no-install-recommends install $PHPIZE_DEPS ssh git unzip procps libjemalloc2 ffmpeg nghttp2 && apt-get dist-clean
 
 # The extensions are installed with PIE (https://github.com/php/pie), from their packages on Packagist (built from
 # the sources of the tagged release on GitHub), pinned: not with pecl, which made the build fail whenever
@@ -55,7 +55,8 @@ RUN set -eux; \
 	echo "$PIE_SHA256  /usr/local/bin/pie" | sha256sum -c -; \
 	chmod +x /usr/local/bin/pie
 
-# igbinary is pinned to a commit: its latest release (3.2.17RC1) doesn't build on PHP 8.6.
+# igbinary is pinned to a commit: its latest release (3.2.17RC1) doesn't build on PHP 8.6. No memprof (for the memprof
+# metrics): it doesn't build on thread-safe PHP ("ZTS build not supported (yet)").
 # The sources are downloaded from the GitHub API, whose anonymous rate limit (60 requests per hour per IP) the CI's
 # runners share: the CI passes its token as the github_token secret (optional).
 # Enabled by tests/dockerfiles/php.ini, not by PIE, except mongodb (see below).
@@ -67,13 +68,13 @@ RUN set -eux; \
 # revolt/event-loop's drivers.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.2; do \
+	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 danog/mongo-php-async-driver:0.2.2; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
 	echo 'extension=mongodb' > "$PHP_INI_DIR/conf.d/mongodb.ini"; \
 	rm -rf /root/.composer/cache
 
-RUN apt-get -y remove libjudy-dev $PHPIZE_DEPS
+RUN apt-get -y remove $PHPIZE_DEPS
 
 ADD tests/dockerfiles/php.ini /usr/local/etc/php/php.ini
 
