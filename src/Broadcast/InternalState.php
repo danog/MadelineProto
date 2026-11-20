@@ -203,16 +203,16 @@ final class InternalState
                     }
                     $this->API->logger("An error occurred while broadcasting: $e", Logger::ERROR);
                 } finally {
+                    // No return here: PHP 8.6 deprecates returning from a finally block
                     if ($this->cancellation->isCancelled()) {
                         $this->setStatus(StatusInternal::CANCELLED);
-                        return;
-                    }
-
-                    unset($this->peers[$key]);
-                    if (!$this->peers) {
-                        $this->setStatus(StatusInternal::FINISHED);
                     } else {
-                        $this->notifyProgress();
+                        unset($this->peers[$key]);
+                        if (!$this->peers) {
+                            $this->setStatus(StatusInternal::FINISHED);
+                        } else {
+                            $this->notifyProgress();
+                        }
                     }
                 }
             });
