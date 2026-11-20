@@ -73,10 +73,17 @@ final class IpcReconnectTest extends TestCase
     public function testReconnectingToADyingServerDoesNotSpin(): void
     {
         // The descriptors the event loop creates on first use are no leak: with EvDriver, libev opens its signal
-        // pipe (an eventfd on Linux) when the first signal handler starts, such as the one of the worker.
+        // pipe (an eventfd on Linux) when the first signal handler starts, such as the one of the worker; revolt-rs
+        // (NativeDriver) opens its poller (epoll) with the first stream it watches, and its wait timer (a timerfd)
+        // when it first waits for a timer with streams to watch.
         $signal = EventLoop::onSignal(\SIGUSR2, static fn () => null);
-        delay(0);
+        [$a, $b] = stream_socket_pair(\STREAM_PF_UNIX, \STREAM_SOCK_STREAM, \STREAM_IPPROTO_IP);
+        $readable = EventLoop::onReadable($a, static fn () => null);
+        delay(0.01);
+        EventLoop::cancel($readable);
         EventLoop::cancel($signal);
+        fclose($a);
+        fclose($b);
         $fds = self::countFds();
         $paths = new SessionPaths($this->session);
         $server = listen($paths->getIpcPath());
