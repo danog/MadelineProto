@@ -45,11 +45,11 @@ use function Amp\Socket\listen;
  */
 final class MtProxyTest extends TestCase
 {
-    private const MTG_VERSION = '2.2.8';
+    private const MTG_VERSION = '2.3.0';
     /** sha256 of the release archives (mtg publishes no checksums). */
     private const MTG_SHA256 = [
-        'amd64' => '7ef19d079d85f4e00d4f8334ec1f3f3c8718e3d0ed1f3109ea9a8673138a2102',
-        'arm64' => '562a94dd4cafcb8f179b76cfeafb76da12747c8e230bc76235bf8746cc189644',
+        'amd64' => '11c038ea5eeebd5d49148048975c24f7b0c4fa4c1cf4f15a2410203e2da01812',
+        'arm64' => '86e0fc6f50bfb453b7a6e8b91497c6661a7d64a3f607828e0e42f534d795ac5a',
     ];
     /** The domain of the secret: mtg forwards the connections it doesn't recognize to it. */
     private const DOMAIN = 'www.google.com';
