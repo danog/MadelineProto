@@ -63,8 +63,12 @@ final class RemovedChannelLoopsTest extends TestCase
 
         $feeder = $API->feeders[self::CHANNEL] = new FeedLoop($API, self::CHANNEL);
         $updater = $API->updaters[self::CHANNEL] = new UpdateLoop($API, self::CHANNEL);
-        // Both start once logged in, and the update loop removes the channel.
-        delay(0.1);
+        // Both start once logged in, and the update loop removes the channel: waited for (under load, as with the
+        // parallel light tests, starting them takes more than a fixed delay).
+        $deadline = hrtime(true) + 10_000_000_000;
+        while (($feeder->isRunning() || $updater->isRunning() || isset($API->feeders[self::CHANNEL])) && hrtime(true) < $deadline) {
+            delay(0.01);
+        }
         self::assertArrayNotHasKey(self::CHANNEL, $API->feeders);
         self::assertArrayNotHasKey(self::CHANNEL, $API->updaters);
         self::assertFalse($states->has(self::CHANNEL));
