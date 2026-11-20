@@ -64,12 +64,24 @@ RUN set -eux; \
 # danog/mongo-php-async-driver is the mongodb extension (for the MongoDB database backend, with async queries), with
 # revolt-rs built in: it registers Revolt's classes itself, so everything in the image runs on its native event loop
 # (Revolt\EventLoop\Driver\NativeDriver), instead of one of revolt/event-loop's drivers (hence no ext-uv). PIE installs
-# its pre-built binary. Enabled in its own file of conf.d, which tests/test.sh phpunit-light leaves out to test
-# revolt/event-loop's drivers.
+# its pre-built binary, never its sources (the image has no Rust): PIE looks it up with one request to the GitHub API,
+# and when that request fails it silently builds the sources instead (seen in the CI, failing for want of cargo), so
+# that fallback is suppressed, the lookup retried, and its failures logged (-v). Enabled in its own file of conf.d,
+# which tests/test.sh phpunit-light leaves out to test revolt/event-loop's drivers.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 danog/mongo-php-async-driver:0.2.2; do \
+	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
+	done; \
+	for package in danog/mongo-php-async-driver:0.2.2; do \
+		for attempt in 1 2 3 4 5; do \
+			if pie install -v --no-interaction --skip-enable-extension --suppress-download-url-method composer-default \
+				"$package"; then \
+				break; \
+			fi; \
+			[ "$attempt" != 5 ]; \
+			sleep $((attempt * 10)); \
+		done; \
 	done; \
 	echo 'extension=mongodb' > "$PHP_INI_DIR/conf.d/mongodb.ini"; \
 	rm -rf /root/.composer/cache
