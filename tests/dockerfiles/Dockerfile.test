@@ -31,8 +31,9 @@ RUN set -eux; \
 # tests/test.sh phpunit-light picks the event loop with MADELINE_EVENT_LOOP, leaving out the mongodb extension for
 # revolt/event-loop's drivers; the full tests run on revolt-rs.
 # ext-event is built with its sockets support (the default of its configure, as distributions build it), so it needs
-# ext-sockets (bundled with PHP, so of its version), which the image doesn't have, loaded before it: hence the order
-# of the extension lines.
+# ext-sockets, which the image doesn't have, loaded before it: bundled with PHP, it's installed with docker-library's
+# docker-php-ext-install (PIE refuses bundled extensions), enabled by docker-php-ext-sockets.ini, which PHP loads
+# before event-loop-drivers.ini.
 # The sources are downloaded from the GitHub API, whose anonymous rate limit (60 requests per hour per IP) the CI's
 # runners share: the CI passes its token as the github_token secret (optional).
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
@@ -40,10 +41,11 @@ RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	apt-get update; \
 	apt-get install -y --no-install-recommends autoconf dpkg-dev file g++ gcc libc-dev make pkg-config re2c \
 		libevent-dev libssl-dev libuv1-dev; \
-	for package in php/sockets osmanov/pecl-ev:1.2.4 osmanov/pecl-event:3.2.0 amphp/uv:0.3.1; do \
+	docker-php-ext-install sockets; \
+	for package in osmanov/pecl-ev:1.2.4 osmanov/pecl-event:3.2.0 amphp/uv:0.3.1; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
-	printf 'extension=sockets\nextension=ev\nextension=event\nextension=uv\n' > "$PHP_INI_DIR/conf.d/event-loop-drivers.ini"; \
+	printf 'extension=ev\nextension=event\nextension=uv\n' > "$PHP_INI_DIR/conf.d/event-loop-drivers.ini"; \
 	rm -rf /root/.composer/cache; \
 	apt-get dist-clean; \
 	php -r 'foreach (["sockets", "ev", "event", "uv"] as $ext) { if (!extension_loaded($ext)) { exit(1); } }'
