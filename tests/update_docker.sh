@@ -3,10 +3,11 @@
 # Update the versions the docker image pins (tests/dockerfiles/Dockerfile, tests/dockerfiles/Dockerfile.test) to their
 # latest releases of the same major version, submitting the changes as pull requests, with a patch release (so that
 # the latest image is rebuilt with them too: their changelog is empty, the change is internal, so it's not announced):
-# - the patch releases of PHP, on the docker-php branch: once its checks passed, automerge.yml merges it (see
-#   tests/automerge.sh), and the CI rebuilds the image before running in it;
+# - the patch releases of PHP (docker-library's image of the release, once it's published), on the docker-php branch:
+#   once its checks passed, automerge.yml merges it (see tests/automerge.sh), and the CI rebuilds the image before
+#   running in it;
 # - the others, on the docker-pins branch, which a person reviews and merges: a new minor version of PHP (whose
-#   docker-library recipe, that the Dockerfile follows, may have changed: PHP 8.6's configure refused 8.5's flags),
+#   docker-library image may have other extensions: 8.6's has no mbstring, which the Dockerfile installs),
 #   PIE and its sha256 (of the phar whose attestation of php/pie's release workflow was verified), the extensions
 #   installed with PIE, danog/MadelineCrypto, the Rust toolchain that builds it, and mtg with the sha256 of its
 #   archives (pinned by MtProxyTest.php too). mtg publishes no checksums: those are of the archives as downloaded,
@@ -101,22 +102,33 @@ fi
 
 changes=()
 summary=()
+# The variant of docker-library's images of PHP the Dockerfile is based on.
+variant=fpm-trixie
+
 # update_php <current> <latest>: the versions of PHP of the Dockerfile.
 update_php() {
-    replace "php-$1" "php-$2" "$dockerfile"
-    # The docker-library Dockerfile it's copied from, per minor version.
+    replace "php:$1-$variant" "php:$2-$variant" "$dockerfile"
+    # The docker-library Dockerfile of the image, per minor version.
     replace "php/tree/master/${1%.*}/" "php/tree/master/${2%.*}/" "$dockerfile"
 }
 
 # php_version: the version of PHP of the Dockerfile.
 php_version() {
-    grep -o 'php-[0-9]\+\.[0-9]\+\.[0-9]\+' "$dockerfile" | head -1 | cut -d- -f2
+    grep -o "php:[0-9]\+\.[0-9]\+\.[0-9]\+-$variant" "$dockerfile" | head -1 | sed -E 's/^php:([0-9.]+)-.*/\1/'
 }
 
-# PHP: the latest patch release of its minor version (php.net's list may lag, or be ahead, depending on the mirror:
-# only newer releases are taken).
+# docker_php <prefix>: the latest version of PHP starting with prefix (8.6. for a patch release, 8. for a new minor
+# version) whose docker-library image of the variant is published: php.net announces a release before its image
+# exists.
+docker_php() {
+    curl -fsS "https://hub.docker.com/v2/repositories/library/php/tags?name=$1&page_size=100&ordering=last_updated" \
+        | jq -r '.results[].name' | sed -nE "s/^([0-9]+\.[0-9]+\.[0-9]+)-$variant\$/\1/p" \
+        | grep "^${1//./\\.}" | sort -V | tail -1
+}
+
+# PHP: the latest patch release of its minor version (only newer releases are taken).
 current=$(php_version)
-latest=$(curl -fsS "https://www.php.net/releases/?json&version=${current%.*}" | jq -r .version)
+latest=$(docker_php "${current%.*}.")
 if bump PHP "$current" "$latest" "https://www.php.net/ChangeLog-${latest%%.*}.php#$latest"; then
     update_php "$current" "$latest"
 fi
@@ -130,7 +142,7 @@ summary=()
 # A new minor version of PHP (the latest release of its major version), from the main branch's version (the
 # repository is back at it).
 current=$(php_version)
-latest=$(curl -fsS "https://www.php.net/releases/?json&version=${current%%.*}" | jq -r .version)
+latest=$(docker_php "${current%%.*}.")
 if [ "${latest%.*}" != "${current%.*}" ] && bump PHP "$current" "$latest" "https://www.php.net/ChangeLog-${latest%%.*}.php#$latest"; then
     update_php "$current" "$latest"
     minor_php=$latest
@@ -224,4 +236,4 @@ fi
 submit docker-pins "Update the docker image: $(IFS=,; echo "${summary[*]}" | sed 's/,/, /g')" "New releases of what the docker image pins:
 $(printf '%s\n' "${changes[@]}")
 
-Not merged automatically: check the changes before merging.$([ -n "${minor_php:-}" ] && echo " PHP ${minor_php%.*} is a new minor version: adapt the Dockerfile to [docker-library's recipe of PHP ${minor_php%.*}](https://github.com/docker-library/php/tree/master/${minor_php%.*}/trixie/cli) (its configure flags, its build dependencies).")$([[ " ${summary[*]}" == *" mtg "* ]] && echo " mtg publishes no checksums: check the sha256 of its archives (these are of the archives as this run downloaded them).")"
+Not merged automatically: check the changes before merging.$([ -n "${minor_php:-}" ] && echo " PHP ${minor_php%.*} is a new minor version: check the extensions of [docker-library's image of PHP ${minor_php%.*}](https://github.com/docker-library/php/tree/master/${minor_php%.*}/trixie/fpm) against the ones the Dockerfile installs.")$([[ " ${summary[*]}" == *" mtg "* ]] && echo " mtg publishes no checksums: check the sha256 of its archives (these are of the archives as this run downloaded them).")"
