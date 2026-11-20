@@ -1,0 +1,44 @@
+name: Docker image
+
+# A pull request changing the docker image: builds it, without pushing it (pull requests have no secrets), and runs
+# the light tests in it. The other jobs of pull requests run in the image of the main branch, which is only rebuilt
+# once the pull request is merged. The logic lives in tests/docker_image.sh, not here.
+
+on:
+  pull_request:
+    paths:
+      - tests/dockerfiles/**
+      - tests/docker_image.sh
+      - .github/workflows/docker-image.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_light:
+    name: test_light in the image (${{ matrix.arch }}, ${{ matrix.event-loop }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest]
+        arch: [amd64]
+        event-loop: [native, uv, select, ev, event]
+        include:
+          # The image of the other architecture builds too, on its own event loop.
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            event-loop: native
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the image
+        env:
+          # For the GitHub API, from which PIE downloads the extensions: 60 unauthenticated requests per hour per IP.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: tests/docker_image.sh local "${{ matrix.arch }}"
+      - name: Run the light tests in it
+        run: tests/docker_image.sh local-test "${{ matrix.event-loop }}"

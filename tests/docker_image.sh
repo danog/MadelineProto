@@ -15,6 +15,13 @@
 #   tests/docker_image.sh merge         Push the manifest of the images of the architectures: next and debian, or the
 #                                       version of the tag.
 #   tests/docker_image.sh release       Point latest, <major>.<minor> and <major> to the version of the tag.
+#   tests/docker_image.sh local <arch>  Build the images of the checkout without pushing them (pull requests, which
+#                                       can't push: their other jobs run in the image of the main branch), as
+#                                       madelineproto:local and madelineproto:local-test, with docker's own builder
+#                                       (the test image is built from the local one).
+#   tests/docker_image.sh local-test <event loop>
+#                                       Run tests/test.sh phpunit-light in madelineproto:local-test, with the
+#                                       checkout, on an event loop (native, uv, select, ev, event).
 #
 # CI_COMMIT_TAG is the tag being built, empty for the main branch. Logs in with DOCKER_USERNAME and DOCKER_PASSWORD
 # if set. The build passes GITHUB_TOKEN, if set, as the github_token secret (see the Dockerfile).
@@ -122,8 +129,29 @@ case "$1" in
             fi
         done
         ;;
+    local)
+        arch=$2
+        if ! [[ " ${arches[*]} " == *" $arch "* ]]; then
+            echo "Unknown architecture: $arch"
+            exit 1
+        fi
+        secret=()
+        if [ -n "$GITHUB_TOKEN" ]; then
+            secret=(--secret id=github_token,env=GITHUB_TOKEN)
+        fi
+        run docker build --platform "linux/$arch" . -f tests/dockerfiles/Dockerfile -t madelineproto:local \
+            --cache-from "$image:next-debian-$arch" "${secret[@]}"
+        run docker build --platform "linux/$arch" tests/dockerfiles -f tests/dockerfiles/Dockerfile.test \
+            --build-arg BASE=madelineproto:local -t madelineproto:local-test \
+            --cache-from "$image:next-test-debian-$arch" "${secret[@]}"
+        ;;
+    local-test)
+        # As root, as the jobs running in the image: tests/test.sh installs packages.
+        run docker run --rm --user root -v "$PWD:/app" -w /app -e MADELINE_EVENT_LOOP="$2" \
+            madelineproto:local-test tests/test.sh phpunit-light
+        ;;
     *)
-        echo "Usage: $0 build <arch> | merge | release"
+        echo "Usage: $0 build <arch> | merge | release | local <arch> | local-test <event loop>"
         exit 1
         ;;
 esac
