@@ -14,7 +14,7 @@
 # disassemble the JIT's output), and jemalloc is used instead of the system malloc.
 
 # danog/MadelineCrypto, pinned: built in crypto-build, checked in the final image.
-ARG MADELINE_CRYPTO_VERSION=0.6.1
+ARG MADELINE_CRYPTO_VERSION=0.6.2
 
 FROM debian:trixie-slim AS php-runtime
 
@@ -150,6 +150,10 @@ RUN set -eux; \
 # No pear/pecl (deprecated since PHP 7.4): the extensions are installed with PIE (see below), and pear's installer
 # is downloaded from pear.php.net while installing PHP, which would make the build depend on it being up.
 		--disable-cgi \
+# Thread-safe, as docker-library's images of PHP 8.6 and the pre-built binaries of danog/mongo-php-async-driver for
+# 8.6 (ZTS only), without zend signals (https://externals.io/message/118859)
+		--enable-zts \
+		--disable-zend-signals \
 		--disable-phpdbg \
 		--enable-pcntl \
 		--enable-mbstring \
@@ -245,6 +249,7 @@ RUN set -eux; \
 	echo "$PIE_SHA256  /usr/local/bin/pie" | sha256sum -c -; \
 	chmod +x /usr/local/bin/pie
 
+# igbinary is pinned to a commit: its latest release (3.2.17RC1) doesn't build on PHP 8.6.
 # The sources are downloaded from the GitHub API, whose anonymous rate limit (60 requests per hour per IP) the CI's
 # runners share: the CI passes its token as the github_token secret (optional).
 # Enabled by tests/dockerfiles/php.ini, not by PIE, except mongodb (see below).
@@ -256,7 +261,7 @@ RUN set -eux; \
 # revolt/event-loop's drivers.
 RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	set -eux; \
-	for package in igbinary/igbinary:3.2.17RC1 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.1; do \
+	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40 arnaud-lb/memprof:3.1.0 danog/mongo-php-async-driver:0.2.1; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
 	echo 'extension=mongodb' > "$PHP_INI_DIR/conf.d/mongodb.ini"; \
@@ -290,7 +295,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN git clone --depth 1 --branch "$MADELINE_CRYPTO_VERSION" https://github.com/danog/MadelineCrypto.git /usr/src/madeline-crypto
 WORKDIR /usr/src/madeline-crypto
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.92.0 \
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.100.0 \
     && /root/.cargo/bin/cargo test --release --locked --no-default-features --features const-widths \
     && /root/.cargo/bin/cargo build --release --locked \
     && install -D target/release/libmadeline_crypto.so "/artifacts$(php-config --extension-dir)/madeline_crypto.so" \

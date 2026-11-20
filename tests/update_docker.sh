@@ -157,6 +157,25 @@ for file in "$dockerfile" "$testfile"; do
     for package in $(grep 'for package in' "$file" | grep -oE '[a-z0-9_.-]+/[a-z0-9_.-]+:[^ ;]+'); do
         name=${package%%:*}
         current=${package#*:}
+        # A commit of a branch (dev-<branch>#<sha>, while no release builds on the current PHP): replaced by the first
+        # stable release published after that commit.
+        if [[ "$current" == dev-*'#'* ]]; then
+            meta=$(curl -fsS "https://repo.packagist.org/p2/$name.json")
+            repo=$(echo "$meta" | jq -r --arg p "$name" '.packages[$p][0].source.url' | sed -E 's#^https://github.com/(.*)\.git$#\1#')
+            pinned=$(gh api "repos/$repo/commits/${current#*#}" --jq .commit.committer.date)
+            latest=$(echo "$meta" | jq -r --arg p "$name" --arg t "$pinned" \
+                '.packages[$p] | map(select((.version_normalized | contains("-") | not) and .time > $t)) | .[0].version // empty')
+            if [ -z "$latest" ]; then
+                echo "$name is pinned to $current (of $pinned): no stable release since"
+                continue
+            fi
+            check_version "$name" "$latest"
+            echo "$name: $current -> $latest"
+            changes+=("- $name: ${current%%#*} (${current#*#}) → [$latest](https://packagist.org/packages/$name#$latest)")
+            summary+=("$name $latest")
+            replace "$package" "$name:$latest" "$file"
+            continue
+        fi
         pre=0
         [[ "${current#v}" =~ [A-Za-z] ]] && pre=1
         latest=$(curl -fsS "https://repo.packagist.org/p2/$name.json" | jq -r --arg p "$name" --argjson pre "$pre" \
