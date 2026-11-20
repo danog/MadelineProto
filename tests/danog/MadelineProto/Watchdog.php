@@ -96,7 +96,16 @@ final class Watchdog implements BeforeTestHook
         try {
             $driver = EventLoop::getDriver();
             $abstract = new ReflectionClass(AbstractDriver::class);
-            if ($driver instanceof AbstractDriver) {
+            if (self::isNative($driver)) {
+                // revolt-rs keeps the callbacks and the suspensions in Rust: only the public API sees them, without
+                // their closures
+                $out .= "\n== Event loop callbacks (".$driver::class.": no closures, no suspended fibers)\n";
+                foreach ($driver->getIdentifiers() as $id) {
+                    $out .= "$id ".$driver->getType($id)->name
+                        .($driver->isEnabled($id) ? '' : ' disabled')
+                        .($driver->isReferenced($id) ? ' referenced' : '')."\n";
+                }
+            } elseif ($driver instanceof AbstractDriver) {
                 foreach ($abstract->getProperty('suspensions')->getValue($driver) as $key => $suspension) {
                     if ($key instanceof Fiber && $key->isSuspended() && $suspension->get() !== null) {
                         $out .= "\n== Suspended fiber\n";
@@ -131,6 +140,12 @@ final class Watchdog implements BeforeTestHook
             }
         }
         return $out;
+    }
+
+    /** Whether the driver is revolt-rs's (the revolt extension, or the mongodb one of danog/mongo-php-async-driver). */
+    public static function isNative(Driver $driver): bool
+    {
+        return (new ReflectionClass($driver))->isInternal();
     }
 
     /**

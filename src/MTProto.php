@@ -2044,13 +2044,18 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
                 Magic::$latest_release,
             ));
         }
-        if (!Magic::$hasOpenssl) {
+        // danog/MadelineCrypto does the crypto of the hot paths natively (MTProto transport, AES, hashes, factorization).
+        $nativeCrypto = \extension_loaded('madeline_crypto');
+        if (!$nativeCrypto && !Magic::$hasOpenssl) {
             $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'openssl'));
         }
-        if (!\extension_loaded('gmp')) {
+        if (!$nativeCrypto && !\extension_loaded('gmp')) {
             $alerts[] = Alert::warning(\sprintf(Lang::$current_lang['extensionRecommended'], 'gmp'));
         }
-        if (!\extension_loaded('uv')) {
+        // revolt-rs (the revolt extension, or compiled into danog/mongo-php-async-driver's mongodb extension)
+        // registers Revolt's classes itself, with its own native driver: ext-uv would go unused.
+        $nativeLoop = (new \ReflectionClass(EventLoop::class))->getExtensionName() !== false;
+        if (!$nativeLoop && !\extension_loaded('uv')) {
             $alerts[] = Alert::info(\sprintf(Lang::$current_lang['extensionRecommended'], 'uv'));
         }
         if (Lang::$currentPercentage !== 100) {

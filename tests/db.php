@@ -18,6 +18,7 @@ if (getenv('ACTIONS_PHAR')) {
 
 use danog\MadelineProto\API;
 use danog\MadelineProto\Settings\Database\Memory;
+use danog\MadelineProto\Settings\Database\Mongo;
 use danog\MadelineProto\Settings\Database\Mysql;
 use danog\MadelineProto\Settings\Database\Postgres;
 use danog\MadelineProto\Settings\Database\Redis;
@@ -33,6 +34,7 @@ $map = [
     'postgres' => static fn () => (new Postgres)->setUri('tcp://postgres')->setUsername('MadelineProtoUser')->setPassword('test')->setDatabase('MadelineProtoDb'),
     'redis' => static fn () => (new Redis)->setUri('redis://redis'),
     'sqlite' => static fn () => (new Sqlite)->setPath(dirname(__DIR__).'/testing.madeline.sqlite'),
+    'mongo' => static fn () => (new Mongo)->setUri('mongodb://mongo:27017')->setDatabase('MadelineProtoDb'),
 ];
 
 $settings = $map[$argv[1]]();

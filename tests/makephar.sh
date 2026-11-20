@@ -135,6 +135,7 @@ cycledb()
         db postgres $f
         db redis $f
         db sqlite $f
+        db mongo $f
         db memory $f
     done
 }
