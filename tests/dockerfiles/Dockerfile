@@ -14,7 +14,7 @@
 # disassemble the JIT's output), and jemalloc is used instead of the system malloc.
 
 # danog/MadelineCrypto, pinned: built in crypto-build, checked in the final image.
-ARG MADELINE_CRYPTO_VERSION=0.6.2
+ARG MADELINE_CRYPTO_VERSION=0.6.3
 
 FROM debian:trixie-slim AS php-runtime
 
