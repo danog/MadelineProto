@@ -43,7 +43,7 @@ ships()
 # The paths that ship (see ships) among the ones on stdin.
 ships_list()
 {
-    EXEMPT='^(\.github/|tests/|tools/|webui/|langs/|vendor-bin/|examples/|docs$|schemas$|[^/]+\.md$|extracted\.json$|psalm(-baseline)?\.xml$|phpunit(-light)?\.xml$|phpcs\.xml$|\.php-cs-fixer\.dist\.php$|\.git(ignore|attributes|modules)$|\.env\.example$)' \
+    EXEMPT='^(\.github/|\.claude/|tests/|tools/|webui/|langs/|vendor-bin/|examples/|docs$|schemas$|[^/]+\.md$|extracted\.json$|psalm(-baseline)?\.xml$|phpunit(-light)?\.xml$|phpcs\.xml$|\.php-cs-fixer\.dist\.php$|\.git(ignore|attributes|modules)$|\.env\.example$)' \
         awk '/^tests\/dockerfiles\// || ($0 != "" && $0 !~ ENVIRON["EXEMPT"])'
 }
 

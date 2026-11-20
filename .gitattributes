@@ -10,3 +10,5 @@ webui/ export-ignore
 src/WebUI/templates/assets/tweb/app.js linguist-generated
 src/WebUI/templates/assets/tweb/app.css linguist-generated
 src/WebUI/templates/assets/tweb/tgs/** linguist-vendored
+/.claude export-ignore
+/CLAUDE.md export-ignore
