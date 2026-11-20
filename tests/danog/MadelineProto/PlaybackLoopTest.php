@@ -50,7 +50,7 @@ final class PlaybackLoopTest extends TestCase
     }
 
     /** A Matroska file with a VP8 and an OPUS track, whose audio outlasts its video. */
-    private static function buildFile(int $videoFrames = self::VIDEO_FRAMES, int $audioFrames = self::AUDIO_FRAMES): string
+    private static function buildFile(int $videoFrames = self::VIDEO_FRAMES, int $audioFrames = self::AUDIO_FRAMES, int $keyframeEvery = 1): string
     {
         $video = self::element("\xD7", "\x01").self::element("\x83", "\x01").self::element("\x86", 'V_VP8');
         $audio = self::element("\xD7", "\x02").self::element("\x83", "\x02").self::element("\x86", 'A_OPUS');
@@ -58,7 +58,8 @@ final class PlaybackLoopTest extends TestCase
         $info = self::element("\x15\x49\xA9\x66", self::element("\x2A\xD7\xB1", "\x0F\x42\x40"));
         $blocks = [];
         for ($x = 0; $x < $videoFrames; $x++) {
-            $blocks[] = [$x * 33, self::element("\xA3", "\x81".pack('n', $x * 33)."\x80"."VIDEO$x")];
+            $flags = $x % $keyframeEvery === 0 ? "\x80" : "\x00";
+            $blocks[] = [$x * 33, self::element("\xA3", "\x81".pack('n', $x * 33).$flags."VIDEO$x")];
         }
         for ($x = 0; $x < $audioFrames; $x++) {
             $blocks[] = [$x * 20, self::element("\xA3", "\x82".pack('n', $x * 20)."\x80"."AUDIO$x")];
@@ -197,6 +198,49 @@ final class PlaybackLoopTest extends TestCase
     /**
      * Wait for the DJ to play a file (null for nothing), for less than a file lasts.
      */
+    public function testAnUnwantedVideoIsNotSentAndResumesOnAKeyframe(): void
+    {
+        Magic::start(light: true);
+        $path = tempnam(sys_get_temp_dir(), 'unwanted').'.webm';
+        // 3 seconds of video, a keyframe every 10 frames (330 ms).
+        file_put_contents($path, self::buildFile(90, 150, keyframeEvery: 10));
+        try {
+            $call = new PlaybackLoopTestCall;
+            $dj = new DjLoop($call);
+            $audio = new OpusPlaybackTrack($dj, $call);
+            $video = new VideoPlaybackTrack($dj, $call);
+            $audioSink = self::collect($audio);
+            $videoSink = self::collect($video);
+            $dj->play(new LocalFile($path));
+            delay(0.5);
+
+            $video->setUnwanted(true);
+            // A frame already handed to the sender may still arrive.
+            delay(0.1);
+            $stoppedAt = \count($videoSink->timestamps());
+            delay(0.9);
+            $unwanted = \array_slice($videoSink->timestamps(), $stoppedAt);
+            $resumedAt = \count($videoSink->timestamps());
+            $video->setUnwanted(false);
+            delay(1.0);
+            $keyframes = \array_slice($videoSink->keyframes(), $resumedAt);
+
+            $call->ended = true;
+            $audio->stop();
+            $video->stop();
+            $dj->discard();
+        } finally {
+            unlink($path);
+        }
+        self::assertGreaterThan(0, $stoppedAt, 'video packets sent before');
+        self::assertSame([], $unwanted, 'video packets sent while nobody watched');
+        // The file kept playing meanwhile: the video resumes where it is now, and the audio never stopped.
+        self::assertNotEmpty($keyframes, 'video packets sent once someone watches');
+        self::assertTrue($keyframes[0], 'the first video packet sent again is a keyframe');
+        self::assertEqualsWithDelta(20, \count($keyframes), 12, 'video packets in the next second');
+        self::assertEqualsWithDelta(125, \count($audioSink->timestamps()), 10, 'audio packets');
+    }
+
     private static function assertPlaying(DjLoop $dj, ?string $path, string $message): void
     {
         for ($x = 0; $x < 25; $x++) {
@@ -298,8 +342,14 @@ final class PlaybackLoopTestSink implements MediaStreamTrackSink
     public function onFrame(FrameInterface|EncodedPacket $frame): bool
     {
         \assert($frame instanceof EncodedPacket);
-        $this->packets[] = [hrtime(true) / 1e9, $frame->getTimestamp()];
+        $this->packets[] = [hrtime(true) / 1e9, $frame->getTimestamp(), $frame->isKeyframe()];
         return true;
+    }
+
+    /** @return list<bool> Whether each packet was a keyframe. */
+    public function keyframes(): array
+    {
+        return array_column($this->packets, 2);
     }
 
     /** @return list<int> */

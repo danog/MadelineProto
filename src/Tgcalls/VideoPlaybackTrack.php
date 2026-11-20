@@ -86,6 +86,12 @@ final class VideoPlaybackTrack extends MediaStreamTrack
      */
     private bool $suppressed = false;
     /**
+     * Whether nobody in the call is watching this video, as the SFU reported: like
+     * {@see self::$suppressed}, the frames are consumed at their pace but not transmitted (tgcalls
+     * likewise deactivates its encodings). A separate flag, so that neither reason clears the other.
+     */
+    private bool $unwanted = false;
+    /**
      * Whether to hold non-keyframes until the next keyframe: after the transport was (re)negotiated
      * the peer sets up a fresh decoder, which can only start on a keyframe.
      */
@@ -120,6 +126,12 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         $this->startedAtNs = null;
         $this->nextDueNs = null;
         $this->producing = false;
+        // The SFU reports only changes of who is watching, and one may have been missed while we
+        // were down: transmit until it reports again, as at the start of a call.
+        if ($this->unwanted) {
+            $this->unwanted = false;
+            $this->needKeyframe = true;
+        }
     }
 
     /**
@@ -215,6 +227,35 @@ final class VideoPlaybackTrack extends MediaStreamTrack
     }
 
     /**
+     * Stop (true) or resume (false) transmitting because nobody is watching; see
+     * {@see self::$unwanted}. Transmission resumes on a keyframe, so the new viewers' decoders can
+     * start.
+     */
+    public function setUnwanted(bool $unwanted): void
+    {
+        if ($this->unwanted === $unwanted) {
+            return;
+        }
+        if (!$unwanted) {
+            $this->needKeyframe = true;
+        }
+        $this->unwanted = $unwanted;
+        $this->call->log($unwanted
+            ? "Nobody is watching the {$this->label} video of {$this->call}: not transmitting it"
+            : "Someone is watching the {$this->label} video of {$this->call} again: transmitting it from the next keyframe");
+    }
+
+    /**
+     * Whether transmission is stopped because nobody is watching; see {@see self::$unwanted}.
+     *
+     * @psalm-mutation-free
+     */
+    public function isUnwanted(): bool
+    {
+        return $this->unwanted;
+    }
+
+    /**
      * The file being played is over: the next one starts on a fresh clock, right after this one.
      */
     private function finishFile(): void
@@ -299,7 +340,7 @@ final class VideoPlaybackTrack extends MediaStreamTrack
         // Pull and hold the next frame right away so its own presentation time paces us.
         $this->nextDueNs = $now;
 
-        if ($this->suppressed) {
+        if ($this->suppressed || $this->unwanted) {
             return null;
         }
         if ($this->needKeyframe) {
