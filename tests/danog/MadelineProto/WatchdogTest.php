@@ -65,8 +65,14 @@ final class WatchdogTest extends TestCase
         $this->assertStringContainsString('WATCHDOG: No progress in danog\MadelineProto\Test\Fixtures\WatchdogHangingCase::testWaitsForever', $stderr);
         // The backtrace reaches the test through the event loop
         $this->assertStringContainsString('WatchdogHangingCase->waitForever()', $stderr);
-        // The callback keeping the loop alive
-        $this->assertMatchesRegularExpression('~ Readable referenced \S*WatchdogHangingCase\.php:\d+~', $stderr);
+        // The callback keeping the loop alive: where it was created, except on revolt-rs, whose callbacks only the
+        // public API sees (as the dump of the process says)
+        $this->assertMatchesRegularExpression(
+            str_contains($stderr, 'no closures, no suspended fibers')
+                ? '~\n\w+ Readable referenced\n~'
+                : '~ Readable referenced \S*WatchdogHangingCase\.php:\d+~',
+            $stderr,
+        );
         $this->assertStringContainsString('== Worker pool of amphp/parallel', $stderr);
     }
 }
