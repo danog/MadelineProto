@@ -217,20 +217,46 @@ final class ConferenceChain
      */
     public function verify(array $block): bool
     {
-        $signerKey = $block['signature_public_key'] ?? ($this->participants[array_key_first($this->participants) ?? -1]['public_key'] ?? null);
+        $signerKey = $block['signature_public_key'] ?? null;
+        if (!\is_string($signerKey) && $this->participants !== []) {
+            $signerKey = $this->participants[array_key_first($this->participants)]['public_key'] ?? null;
+        }
         if (!\is_string($signerKey)) {
             return false;
         }
-        return Crypto::verify($block['signature'], $this->codec->signingPayload($block), $signerKey);
+        $signature = $block['signature'] ?? null;
+        if (!\is_string($signature)) {
+            return false;
+        }
+        return Crypto::verify($signature, $this->codec->signingPayload($block), $signerKey);
     }
 
     /**
-     * Apply a block the server echoed back, updating our view of the group state and shared key. The
-     * server has already validated it; we recover state and, when a shared key targets us, decrypt it.
+     * Apply a block the server echoed back, updating our view of the group state and shared key.
+     * We recover state and, when a shared key targets us, decrypt it.
+     *
+     * The block is fully validated before any state is mutated, exactly as tde2e's
+     * `ClientBlockchain::try_apply_block` (validate_signature = true) does:
+     *   - the height must be exactly last+1;
+     *   - the prev-block hash must match the current head;
+     *   - the Ed25519 signature must verify against the block's declared signing key, or — when
+     *     omitted (the "same as first participant" optimization) — against the first participant
+     *     of the current group state.
+     *
+     * The server does NOT validate block signatures: forged blocks (e.g. signed with all-zero
+     * bytes) are accepted, stored and relayed to every participant, permanently wedging the chain
+     * of clients that do verify. Never trust the server echo here.
+     *
+     * The one exception mirrors tde2e's `Blockchain::create_from_block` (also used by the rejoining
+     * non-participant flow): bootstrapping a fresh chain from a server-provided block at height > 0
+     * applies the block as-is, because the block's own embedded state is then the root of trust and
+     * there is no previous head to verify against.
      *
      * @param string $serialized The block bytes exactly as the server returned them (server id).
      *
      * @return bool Whether the block was the next one and was applied (false = duplicate/out of order).
+     *
+     * @throws InvalidBlockException The block failed signature, height or prev-block-hash validation.
      */
     public function applyServerBlock(string $serialized): bool
     {
@@ -244,6 +270,12 @@ final class ConferenceChain
         $bootstrap = $this->height === -1 && (int) $block['height'] > 0;
         if (!$bootstrap && (int) $block['height'] !== $this->height + 1) {
             return false;
+        }
+        if (!$bootstrap && !hash_equals($this->lastBlockHash, (string) ($block['prev_block_hash'] ?? ''))) {
+            throw new InvalidBlockException('Invalid conference chain block: prev_block_hash does not match the current head');
+        }
+        if (!$bootstrap && !$this->verify($block)) {
+            throw new InvalidBlockException('Invalid conference chain block: Ed25519 signature verification failed');
         }
         // Hash the block in its canonical (local-id) form, as tde2e does.
         $canonical = $this->codec->serialize($block);

@@ -25,6 +25,7 @@ use danog\MadelineProto\Tgcalls\E2E\E2EKeyProvider;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptor;
 use danog\MadelineProto\Tgcalls\E2E\FrameCryptorState;
 use danog\MadelineProto\Tgcalls\E2E\Verification;
+use danog\MadelineProto\Tgcalls\E2E\InvalidBlockException;
 use PHPUnit\Framework\TestCase;
 use Webrtc\RTP\Crypto\DropFrameException;
 use Webrtc\RTP\Enum\MediaKind;
@@ -570,5 +571,85 @@ final class E2EConferenceTest extends TestCase
             'height' => 0,
             'state_proof' => ['_' => 'e2e.chain.stateProof', 'kv_hash' => $zero],
         ];
+    }
+
+    /**
+     * The server does not validate conference-chain block signatures: forged blocks (e.g. signed
+     * with all-0x11 bytes) are accepted, stored and relayed to every participant. A verifying client
+     * must reject them instead of applying the poisoned head (which would permanently wedge the
+     * chain, since a valid chain requires height exactly +1).
+     */
+    public function testForgedServerBlockIsRejected(): void
+    {
+        $this->requireCrypto();
+        [$seedA] = Crypto::generateKeyPair();
+        [$seedB] = Crypto::generateKeyPair();
+        $alice = new ConferenceChain(1, $seedA);
+        $genesis = $alice->buildGenesis();
+        $alice->applyServerBlock($genesis['serialized']);
+
+        // A forged self-add block: honest shape, garbage signature — exactly what the server
+        // accepts and relays (docs-26 research; the server does not validate signatures).
+        $bob = new ConferenceChain(2, $seedB);
+        $changes = [$bob->groupStateChange([[2, $bob->getSelfPublicKey(), ConferenceChain::PERMISSION_ADD_USERS]])];
+        $block = $bob->buildBlock(1, $alice->getLastBlockHash(), $changes);
+        $forged = $block['block'];
+        $forged['signature'] = str_repeat("\x11", 64);
+        $serialized = (new BlockCodec())->serialize($forged);
+
+        try {
+            $alice->applyServerBlock($serialized);
+            $this->fail('A forged block was applied to the chain');
+        } catch (InvalidBlockException) {
+            // Expected: the block must be rejected before any state mutation.
+        }
+        $this->assertSame(0, $alice->getHeight(), 'chain state must be unchanged after a forged block');
+        $this->assertSame($genesis['hash'], $alice->getLastBlockHash());
+
+        // The honest variant of the very same block still applies: rejecting the forged block
+        // must not wedge our chain (that is the permanent-DoS failure mode we are preventing).
+        $honest = $bob->buildBlock(1, $alice->getLastBlockHash(), $changes);
+        $this->assertTrue($alice->applyServerBlock($honest['serialized']));
+        $this->assertSame(1, $alice->getHeight());
+        $this->assertArrayHasKey(2, $alice->getParticipants());
+    }
+
+    /**
+     * A block whose prev_block_hash does not match the current head must not apply, even with an
+     * honest signature (tde2e: InvalidBlock_HashMismatch).
+     */
+    public function testTamperedPrevHashIsRejected(): void
+    {
+        $this->requireCrypto();
+        [$seedA] = Crypto::generateKeyPair();
+        $alice = new ConferenceChain(1, $seedA);
+        $genesis = $alice->buildGenesis();
+        $alice->applyServerBlock($genesis['serialized']);
+
+        $stale = $alice->buildBlock(1, str_repeat("\x01", 32), [
+            $alice->groupStateChange([[1, $alice->getSelfPublicKey(), 0]]),
+        ]);
+        try {
+            $alice->applyServerBlock($stale['serialized']);
+            $this->fail('A stale-prev-hash block was applied');
+        } catch (InvalidBlockException $e) {
+            $this->assertStringContainsString('prev_block_hash', $e->getMessage());
+        }
+        $this->assertSame(0, $alice->getHeight());
+    }
+
+    /**
+     * The server may deliver the same block twice (push update + polling backstop): the duplicate
+     * is ignored (false), not an error.
+     */
+    public function testDuplicateServerBlockReturnsFalse(): void
+    {
+        $this->requireCrypto();
+        [$seedA] = Crypto::generateKeyPair();
+        $alice = new ConferenceChain(1, $seedA);
+        $genesis = $alice->buildGenesis();
+        $this->assertTrue($alice->applyServerBlock($genesis['serialized']));
+        $this->assertFalse($alice->applyServerBlock($genesis['serialized']));
+        $this->assertSame(0, $alice->getHeight());
     }
 }
