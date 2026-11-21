@@ -107,9 +107,10 @@ final class ProcessRunner extends RunnerAbstract
         $command = implode(' ', array_map(escapeArgument(...), $command));
         Logger::log("Starting process with $command");
 
+        $cwd = Magic::getcwd();
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => Magic::getcwd(),
+            'cwd' => $cwd,
         ];
         $root = '';
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
@@ -128,12 +129,16 @@ final class ProcessRunner extends RunnerAbstract
         );
 
         $descriptors = self::getWorkerDescriptors();
+        // The working directory is passed explicitly: on thread-safe PHP, the one of the script (chdir(), or the
+        // directory of the script under php-fpm) is only PHP's virtual one, and a null cwd starts the worker in the
+        // working directory of the process instead (php-fpm's, e.g. the WORKDIR of its docker image), where
+        // madeline.php looks for its phar and madeline.version before entry.php changes directory.
         try {
-            $process = proc_open($command, $descriptors, $pipes, null, $envVars);
+            $process = proc_open($command, $descriptors, $pipes, $cwd, $envVars);
         } catch (Throwable $e) {
             // proc_open dup()s one descriptor per hidden one: it can fail close to the descriptor limit
             Logger::log("Could not hide the descriptors of this process from the IPC worker, starting it with them: $e", Logger::WARNING);
-            $process = proc_open($command, \array_slice($descriptors, 0, 3, true), $pipes, null, $envVars);
+            $process = proc_open($command, \array_slice($descriptors, 0, 3, true), $pipes, $cwd, $envVars);
         }
         if ($process === false) {
             throw new Error("Could not start the IPC worker process!");
