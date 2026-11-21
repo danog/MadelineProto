@@ -265,6 +265,11 @@ final class ReadLoop extends Loop
      * The other undeserializable messages are acknowledged (so they aren't resent) and dropped,
      * the rest of their container is still handled.
      *
+     * The schema issues are reported in the background: report() sends messages, maybe on this DC, whose answers
+     * only this loop reads. Waiting for it here blocked this loop until they timed out, one report after the other
+     * (they're serialized), and a reconnection waits for this loop to exit: magnaluna's main DC stayed disconnected
+     * for half an hour, its requests unsent.
+     *
      * @return ?array The message, null if it was dropped.
      */
     private function deserialize(string $data, int $messageId, bool $encrypted, bool $fromContainer = false): ?array
@@ -274,14 +279,22 @@ final class ReadLoop extends Loop
         } catch (\Throwable $e) {
             Logger::log('Error during deserializing message (base64): ' .  base64_encode($data), Logger::ERROR);
             if (!$encrypted) {
-                $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
+                $this->reportSchemaIssue($e);
                 throw $e;
             }
         }
         $constructor = substr($data, 0, 4);
         if ($constructor === self::RPC_RESULT && \strlen($data) >= 12) {
-            $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
-            return ['_' => 'rpc_result', 'req_msg_id' => Tools::unpackSignedLong(substr($data, 4, 8)), 'result' => $e];
+            $reqMsgId = Tools::unpackSignedLong(substr($data, 4, 8));
+            if (!isset($this->connection->new_outgoing[$reqMsgId])) {
+                // The late answer to a request that was already dropped (it timed out): without it, the type of a
+                // bare result (the Vector<int> of phone.checkGroupCall) is unknown, so it can't be deserialized.
+                // Not a schema issue, and nothing waits for it: it's acknowledged as an answer to no request.
+                $this->API->logger("Could not deserialize the answer to the forgotten request $reqMsgId in DC {$this->datacenter}", Logger::VERBOSE);
+            } else {
+                $this->reportSchemaIssue($e);
+            }
+            return ['_' => 'rpc_result', 'req_msg_id' => $reqMsgId, 'result' => $e];
         }
         if ($constructor === self::MSG_CONTAINER && !$fromContainer && \strlen($data) >= 8) {
             $messages = [];
@@ -299,10 +312,14 @@ final class ReadLoop extends Loop
             }
             return ['_' => 'msg_container', 'messages' => $messages];
         }
-        $this->API->report("Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
+        $this->reportSchemaIssue($e);
         $this->API->logger("Dropping undeserializable message $messageId from DC {$this->datacenter}", Logger::ERROR);
         $this->connection->ack_queue []= $messageId;
         return null;
+    }
+    private function reportSchemaIssue(\Throwable $e): void
+    {
+        EventLoop::queue($this->API->report(...), "Schema issues, please report this to @danog_community: ".API::RELEASE.", $e");
     }
     /**
      * Get loop name.
