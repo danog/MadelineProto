@@ -1084,6 +1084,37 @@ trait Files
      */
     public function getDownloadInfo(mixed $messageMedia): array
     {
+        return self::sanitizeDownloadName($this->extractDownloadInfo($messageMedia));
+    }
+    /**
+     * Make the name and extension of a file a single path component.
+     *
+     * They come from attributes the sender controls (the file name, the title and performer of an audio file,
+     * the mime type), and downloadToDir() joins them onto the directory.
+     *
+     * Some cases return the location only, for a caller that names the file itself (and is sanitized in turn).
+     *
+     * @template T of array
+     * @param T $info
+     * @return T
+     */
+    private static function sanitizeDownloadName(array $info): array
+    {
+        if (!isset($info['name'])) {
+            return $info;
+        }
+        $info['name'] = str_replace(['/', '\\', "\0"], '_', (string) $info['name']);
+        if (isset($info['ext'])) {
+            $info['ext'] = str_replace(['/', '\\', "\0"], '_', (string) $info['ext']);
+        }
+        if (trim($info['name'].($info['ext'] ?? ''), '.') === '') {
+            // '', '.', '..' and the like would name the directory itself or its parent.
+            $info['name'] = '_'.$info['name'];
+        }
+        return $info;
+    }
+    private function extractDownloadInfo(mixed $messageMedia): array
+    {
         if ($messageMedia instanceof BotApiFileId) {
             $res = $this->getDownloadInfo($messageMedia->fileId);
             $res['size'] = $messageMedia->size;
