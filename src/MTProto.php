@@ -667,6 +667,21 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     }
 
     /**
+     * The labels of a metric of this session.
+     *
+     * The registry returns the collector registered first for a name, whose labels win over the ones added: they're
+     * added to a collector registered without any, or every connection and session counted into the labels of the
+     * first one (all DCs reported as DC 2, connection 0).
+     *
+     * @param array<string, string> $labels
+     * @return array<string, string>
+     */
+    private function getPromLabels(array $labels): array
+    {
+        return $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')];
+    }
+
+    /**
      * Creates and returns a prometheus gauge.
      *
      * Returns null if prometheus stats are disabled.
@@ -684,8 +699,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $namespace,
             $name,
             $help,
-            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
-        );
+            [],
+        )->addLabels($this->getPromLabels($labels));
     }
 
     /**
@@ -706,8 +721,8 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $namespace,
             $name,
             $help,
-            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
-        );
+            [],
+        )->addLabels($this->getPromLabels($labels));
     }
 
     /**
@@ -729,10 +744,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $namespace,
             $name,
             $help,
-            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            [],
             $maxAgeSeconds,
             $quantiles
-        );
+        )->addLabels($this->getPromLabels($labels));
     }
 
     /**
@@ -754,9 +769,9 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $namespace,
             $name,
             $help,
-            $labels + ['session' => $this->getSessionName(), 'session_id' => (string) ($this->getSelf()['id'] ?? '')],
+            [],
             $buckets
-        );
+        )->addLabels($this->getPromLabels($labels));
     }
 
     /**
