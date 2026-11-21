@@ -1092,15 +1092,22 @@ trait Files
      * They come from attributes the sender controls (the file name, the title and performer of an audio file,
      * the mime type), and downloadToDir() joins them onto the directory.
      *
-     * @template T of array{name: string, ext: string, ...}
+     * Some cases return the location only, for a caller that names the file itself (and is sanitized in turn).
+     *
+     * @template T of array
      * @param T $info
      * @return T
      */
     private static function sanitizeDownloadName(array $info): array
     {
+        if (!isset($info['name'])) {
+            return $info;
+        }
         $info['name'] = str_replace(['/', '\\', "\0"], '_', (string) $info['name']);
-        $info['ext'] = str_replace(['/', '\\', "\0"], '_', (string) $info['ext']);
-        if (trim($info['name'].$info['ext'], '.') === '') {
+        if (isset($info['ext'])) {
+            $info['ext'] = str_replace(['/', '\\', "\0"], '_', (string) $info['ext']);
+        }
+        if (trim($info['name'].($info['ext'] ?? ''), '.') === '') {
             // '', '.', '..' and the like would name the directory itself or its parent.
             $info['name'] = '_'.$info['name'];
         }
