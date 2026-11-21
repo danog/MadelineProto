@@ -1596,6 +1596,13 @@ trait UpdateHandler
                         $this->peerDatabase->expireFull($id);
                     }
                 } catch (ChannelPrivateError|MsgIdInvalidError|PeerNotInDbException|FloodWaitError) {
+                } catch (CancelledException $e) {
+                    // A request that timed out (the DC is slow or unreachable): the cache is refreshed with the next
+                    // update of the peer. Thrown out of this callback, it ended the event loop of the script.
+                    if (!$e->getPrevious() instanceof TimeoutException) {
+                        throw $e;
+                    }
+                    $this->logger->logger("Could not refresh the peer cache of $id: $e", Logger::ERROR);
                 }
             });
         }
