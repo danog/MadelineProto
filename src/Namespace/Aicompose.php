@@ -104,4 +104,17 @@ interface Aicompose
      * @psalm-impure
      */
     public function getToneExample(array $tone, int|null $num = 0, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): array;
+
+    /**
+     * 
+     *
+     * @param array|int|string $peer @see https://docs.madelineproto.xyz/API_docs/types/InputPeer.html
+     * @param array{_: 'inputAiComposeStyle', emojify?: bool, proofread?: bool, tone?: array{_: 'inputAiComposeToneDefault', tone?: string}|array{_: 'inputAiComposeToneID', id?: int, access_hash?: int}|array{_: 'inputAiComposeToneSlug', slug?: string}|array{_: 'inputAiComposeToneSingleUse', custom_prompt?: string}, to_lang?: string} $style @see https://docs.madelineproto.xyz/API_docs/types/InputAiComposeStyle.html
+     * @param ?int $floodWaitLimit Can be used to specify a custom flood wait limit: if a FLOOD_WAIT_ rate limiting error is received with a waiting period bigger than this integer, an RPCErrorException will be thrown; otherwise, MadelineProto will simply wait for the specified amount of time. Defaults to the value specified in the settings: https://docs.madelineproto.xyz/PHP/danog/MadelineProto/Settings/RPC.html#setfloodtimeout-int-floodtimeout-self
+     * @param ?string $queueId If specified, ensures strict server-side execution order of concurrent calls with the same queue ID.
+     * @param ?\Amp\Cancellation $cancellation Cancellation
+     * @return bool 
+     * @psalm-impure
+     */
+    public function setChatStyle(array|int|string|null $peer = null, array|null $style = null, ?int $floodWaitLimit = null, ?string $queueId = null, ?\Amp\Cancellation $cancellation = null): bool;
 }
