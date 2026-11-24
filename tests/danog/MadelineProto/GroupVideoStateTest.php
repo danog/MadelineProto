@@ -25,6 +25,7 @@ use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use PHPUnit\Framework\TestCase;
+use Revolt\EventLoop;
 
 use function Amp\delay;
 
@@ -137,9 +138,9 @@ final class GroupVideoStateTest extends TestCase
         $connection->close();
     }
 
-    private static function constraint(int $idealHeight): string
+    private static function constraint(int|float $idealHeight): string
     {
-        return json_encode(['colibriClass' => 'SenderVideoConstraints', 'videoConstraints' => ['idealHeight' => $idealHeight]], JSON_THROW_ON_ERROR);
+        return json_encode(['colibriClass' => 'SenderVideoConstraints', 'videoConstraints' => ['idealHeight' => $idealHeight]], JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
     }
 
     public function testTheVideoStopsAMomentAfterNobodyWatchesIt(): void
@@ -170,6 +171,41 @@ final class GroupVideoStateTest extends TestCase
         delay(2.0);
         $this->assertFalse($connection->isVideoUnwanted());
         $connection->close();
+    }
+
+    public function testAThumbnailViewerStillGetsTheVideo(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        // We send a single layer: unlike tgcalls' smallest simulcast layer, it is the one a thumbnail shows.
+        $connection->onDataChannelMessage(self::constraint(90));
+        delay(2.5);
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testADecimalHeightIsRead(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage(self::constraint(0.0));
+        delay(2.5);
+        $this->assertTrue($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testClosingCancelsAPendingLowering(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $before = EventLoop::getIdentifiers();
+        $connection->onDataChannelMessage(self::constraint(0));
+        $this->assertCount(1, array_diff(EventLoop::getIdentifiers(), $before), 'the lowering waits on a timer');
+        $connection->close();
+        $this->assertSame([], array_diff(EventLoop::getIdentifiers(), $before), 'the closed connection is not kept alive');
     }
 
     public function testOtherDataChannelMessagesAreIgnored(): void

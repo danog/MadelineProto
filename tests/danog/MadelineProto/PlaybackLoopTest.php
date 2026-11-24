@@ -195,9 +195,6 @@ final class PlaybackLoopTest extends TestCase
         self::assertLessThan(36, \count($videoLateness), 'video packets in the first second');
     }
 
-    /**
-     * Wait for the DJ to play a file (null for nothing), for less than a file lasts.
-     */
     public function testAnUnwantedVideoIsNotSentAndResumesOnAKeyframe(): void
     {
         Magic::start(light: true);
@@ -241,6 +238,9 @@ final class PlaybackLoopTest extends TestCase
         self::assertEqualsWithDelta(125, \count($audioSink->timestamps()), 10, 'audio packets');
     }
 
+    /**
+     * Wait for the DJ to play a file (null for nothing), for less than a file lasts.
+     */
     private static function assertPlaying(DjLoop $dj, ?string $path, string $message): void
     {
         for ($x = 0; $x < 25; $x++) {

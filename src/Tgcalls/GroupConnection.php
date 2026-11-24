@@ -189,8 +189,8 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      * applied to the outgoing video. Like tgcalls, everything is wanted until the SFU says otherwise.
      */
     private int $senderConstraint = self::HEIGHT_FULL;
-    /** Bumped by every SenderVideoConstraints, so that a delayed lowering is dropped once a newer one arrived. */
-    private int $senderConstraintRequest = 0;
+    /** The timer of a lowering not applied yet, cancelled by any newer SenderVideoConstraints and by {@see self::close()}. */
+    private ?string $senderConstraintTimer = null;
 
     private bool $closed = false;
     private bool $renegotiating = false;
@@ -291,6 +291,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
         $this->restoreDeclaredProperties($data);
         // As the outgoing video does, start over transmitting until the SFU reports again.
         $this->senderConstraint = self::HEIGHT_FULL;
+        $this->senderConstraintTimer = null;
     }
 
     /**
@@ -609,8 +610,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
     /**
      * @internal The SFU sends encoder hints (SenderVideoConstraints) and diagnostics (DebugMessage)
      * on the data channel. A demuxed file has a single resolution, so of the hints only "nobody is
-     * watching" (below the smallest layer, usually 0) matters: the video is then not transmitted,
-     * as tgcalls deactivates all of its encodings.
+     * watching" (an ideal height of 0) matters: the video is then not transmitted. tgcalls only
+     * deactivates encodings when it sends three simulcast layers, the smallest one below 180; we send
+     * a single layer, which like tgcalls' single encoding must keep going for any viewer, even one
+     * that only wants a thumbnail smaller than that.
      */
     #[\Override]
     public function onDataChannelMessage(string $data): void
@@ -625,8 +628,10 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             return;
         }
         $constraints = (array) ($message['videoConstraints'] ?? []);
-        if (isset($constraints['idealHeight']) && \is_int($constraints['idealHeight'])) {
-            $this->onSenderVideoConstraint($constraints['idealHeight']);
+        $height = $constraints['idealHeight'] ?? null;
+        // Any JSON number, as tgcalls reads it: 0.0 decodes to a float.
+        if (\is_int($height) || \is_float($height)) {
+            $this->onSenderVideoConstraint((int) $height);
         }
     }
 
@@ -636,25 +641,32 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
      */
     private function onSenderVideoConstraint(int $height): void
     {
-        $request = ++$this->senderConstraintRequest;
-        if ($height === $this->senderConstraint) {
+        $this->cancelSenderConstraintTimer();
+        if ($this->closed || $height === $this->senderConstraint) {
             return;
         }
         if ($height > $this->senderConstraint) {
             $this->applySenderConstraint($height);
             return;
         }
-        EventLoop::delay(self::SENDER_CONSTRAINT_LOWER_DELAY, function () use ($request, $height): void {
-            if (!$this->closed && $request === $this->senderConstraintRequest) {
-                $this->applySenderConstraint($height);
-            }
+        $this->senderConstraintTimer = EventLoop::delay(self::SENDER_CONSTRAINT_LOWER_DELAY, function () use ($height): void {
+            $this->senderConstraintTimer = null;
+            $this->applySenderConstraint($height);
         });
+    }
+
+    private function cancelSenderConstraintTimer(): void
+    {
+        if ($this->senderConstraintTimer !== null) {
+            EventLoop::cancel($this->senderConstraintTimer);
+            $this->senderConstraintTimer = null;
+        }
     }
 
     private function applySenderConstraint(int $height): void
     {
         $this->senderConstraint = $height;
-        $this->outgoingVideo->setUnwanted($height < self::HEIGHT_THUMBNAIL);
+        $this->outgoingVideo->setUnwanted($height <= 0);
     }
 
     /**
@@ -865,6 +877,7 @@ final class GroupConnection implements VideoCodecObserver, PeerConnectionTrackLi
             return;
         }
         $this->closed = true;
+        $this->cancelSenderConstraintTimer();
         foreach ($this->media as $media) {
             try {
                 $media->close();
