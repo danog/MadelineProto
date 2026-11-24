@@ -421,6 +421,7 @@ final class FileRefGenerator
             'fileSourceStickerSet'
         );
         $locations['messages.getDocumentByHash'][] = new CopyMethodCallOp('messages.getDocumentByHash', 'fileSourceDocumentByHash');
+        $locations['messages.getTranscriptionModels'][] = new Noop('Do not store references from speech recognition models, as TDLib does: the models are fetched again when needed');
         $locations['updateServiceNotification'][] = new Noop('Cannot refetch service notifications');
 
         $locations['messages.getWebPagePreview'][] = new Noop("No locations are added for the method call, as it doesn't use persistent IDs as input; the location is instead extracted from the persistent IDs in the returned WebPage object");
