@@ -25,6 +25,9 @@ use danog\MadelineProto\Tgcalls\CallControllerInterface;
 use danog\MadelineProto\Tgcalls\GroupConnection;
 use danog\MadelineProto\Tgcalls\GroupConnectionOwner;
 use PHPUnit\Framework\TestCase;
+use Revolt\EventLoop;
+
+use function Amp\delay;
 
 /**
  * A group call connection tells the server whether our video is stopped (or our screen-share paused) only when
@@ -132,6 +135,89 @@ final class GroupVideoStateTest extends TestCase
         $connection->onVideoCodec('VP8');
 
         $this->assertSame([['video_stopped', false], ['video_stopped', false]], $owner->sent);
+        $connection->close();
+    }
+
+    private static function constraint(int|float $idealHeight): string
+    {
+        return json_encode(['colibriClass' => 'SenderVideoConstraints', 'videoConstraints' => ['idealHeight' => $idealHeight]], JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);
+    }
+
+    public function testTheVideoStopsAMomentAfterNobodyWatchesIt(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->onDataChannelMessage(self::constraint(360));
+        $connection->onDataChannelMessage(self::constraint(0));
+        $this->assertFalse($connection->isVideoUnwanted(), 'not at once: a viewer may only be switching layouts');
+        delay(2.5);
+        $this->assertTrue($connection->isVideoUnwanted());
+
+        $connection->onDataChannelMessage(self::constraint(180));
+        $this->assertFalse($connection->isVideoUnwanted(), 'at once, when someone watches again');
+        $connection->close();
+    }
+
+    public function testALoweringUndoneInTimeIsDropped(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage(self::constraint(0));
+        delay(1.0);
+        $connection->onDataChannelMessage(self::constraint(720));
+        delay(2.0);
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testAThumbnailViewerStillGetsTheVideo(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        // We send a single layer: unlike tgcalls' smallest simulcast layer, it is the one a thumbnail shows.
+        $connection->onDataChannelMessage(self::constraint(90));
+        delay(2.5);
+        $this->assertFalse($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testADecimalHeightIsRead(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage(self::constraint(0.0));
+        delay(2.5);
+        $this->assertTrue($connection->isVideoUnwanted());
+        $connection->close();
+    }
+
+    public function testClosingCancelsAPendingLowering(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $before = EventLoop::getIdentifiers();
+        $connection->onDataChannelMessage(self::constraint(0));
+        $this->assertCount(1, array_diff(EventLoop::getIdentifiers(), $before), 'the lowering waits on a timer');
+        $connection->close();
+        $this->assertSame([], array_diff(EventLoop::getIdentifiers(), $before), 'the closed connection is not kept alive');
+    }
+
+    public function testOtherDataChannelMessagesAreIgnored(): void
+    {
+        $owner = self::owner();
+        $connection = new GroupConnection($owner, new DjLoop($owner));
+
+        $connection->onDataChannelMessage('{"colibriClass":"DebugMessage","message":""}');
+        $connection->onDataChannelMessage('{"colibriClass":"SenderVideoConstraints","videoConstraints":{}}');
+        $connection->onDataChannelMessage('not json');
+        delay(2.5);
+        $this->assertFalse($connection->isVideoUnwanted());
         $connection->close();
     }
 }
