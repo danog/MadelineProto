@@ -421,6 +421,8 @@ final class FileRefGenerator
             'fileSourceStickerSet'
         );
         $locations['messages.getDocumentByHash'][] = new CopyMethodCallOp('messages.getDocumentByHash', 'fileSourceDocumentByHash');
+        // The documents of the speech recognition models: refetched with the same version.
+        $locations['messages.getTranscriptionModels'][] = new CopyMethodCallOp('messages.getTranscriptionModels', 'fileSourceTranscriptionModels');
         $locations['updateServiceNotification'][] = new Noop('Cannot refetch service notifications');
 
         $locations['messages.getWebPagePreview'][] = new Noop("No locations are added for the method call, as it doesn't use persistent IDs as input; the location is instead extracted from the persistent IDs in the returned WebPage object");
