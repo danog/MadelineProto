@@ -72,6 +72,47 @@ final class LoggerTest extends TestCase
         }
     }
 
+    /**
+     * The IPC worker of a bot run by php-fpm ran out of file descriptors after a few hours, all of them open on
+     * MadelineProto.log: every IPC client sends its settings, and unserializing them builds a new global logger,
+     * which opened the file again and kept it open. Out of descriptors, the IPC server then spun on accept() (EMFILE).
+     */
+    public function testLoggersOfAFileShareOneDescriptor(): void
+    {
+        if (!is_dir('/proc/self/fd')) {
+            self::markTestSkipped('Needs /proc/self/fd to count the descriptors');
+        }
+        $path = realpath(sys_get_temp_dir()).'/madeline-logger-'.bin2hex(random_bytes(8)).'.log';
+        $descriptors = static fn (): int => \count(array_filter(
+            glob('/proc/self/fd/*') ?: [],
+            // The descriptor glob() listed its directory with is closed by now
+            static fn (string $fd): bool => is_link($fd) && readlink($fd) === $path,
+        ));
+        $settings = (new LoggerSettings)->setType(Logger::FILE_LOGGER)->setExtra($path);
+        try {
+            for ($x = 0; $x < 20; $x++) {
+                $logger = new Logger($settings, "logger $x");
+                $logger->logger("entry $x");
+            }
+            self::assertSame(1, $descriptors());
+
+            delay(0.1);
+            $log = file_get_contents($path);
+            self::assertStringContainsString('entry 0', $log);
+            self::assertStringContainsString('entry 19', $log);
+
+            // A deleted log file is created again by the next logger
+            unlink($path);
+            $logger = new Logger($settings);
+            $logger->logger('after deletion');
+            delay(0.1);
+            self::assertStringContainsString('after deletion', file_get_contents($path));
+        } finally {
+            unset($logger);
+            unlink($path);
+        }
+    }
+
     public function testHugeExceptionsAreNotLoggedWhole(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'madeline-logger-');

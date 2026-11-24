@@ -113,6 +113,12 @@ final class Logger
      */
     private static array $closePromises = [];
     /**
+     * Buffered and unbuffered stream of each log destination (stdout, stderr or the real path of a file).
+     *
+     * @var array<string, list{WritableStream, WritableStream}>
+     */
+    private static array $streams = [];
+    /**
      * Log rotation loop ID.
      */
     private ?string $rotateId = null;
@@ -295,27 +301,33 @@ final class Logger
         $this->colors[self::FATAL_ERROR] = implode(';', [self::FOREGROUND['red'], self::SET['bold'], self::BACKGROUND['light_gray']]);
         $newline = PHP_EOL;
         if ($this->mode === self::ECHO_LOGGER) {
-            $stdout = getStdout();
+            [$this->stdout, $this->stdoutUnbuffered] = self::stream('stdout', getStdout(...));
             if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
                 $newline = '<br>'.$newline;
             }
         } elseif ($this->mode === self::FILE_LOGGER) {
-            $stdout = new WritableResourceStream(fopen($this->optional, 'a'));
+            $this->realPath = self::realLogPath($this->optional);
+            $optional = $this->optional;
+            [$this->stdout, $stdout] = self::stream(
+                $this->realPath,
+                static fn () => new WritableResourceStream(fopen($optional, 'a')),
+                $optional,
+            );
+            $this->stdoutUnbuffered = $stdout;
             // Only the last logger of a file rotates it: a logger that was replaced (by MTProto::setupLogger) may stay
             // alive, through the reference cycle with its PSR logger or whoever holds that, and would keep truncating
             // the file at its own maximum size.
-            $this->realPath = realpath($this->optional) ?: $this->optional;
             if (isset(self::$rotations[$this->realPath])) {
                 EventLoop::cancel(self::$rotations[$this->realPath]);
                 unset(self::$rotations[$this->realPath]);
             }
             if ($maxSize !== -1) {
-                $optional = $this->optional;
                 $this->rotateId = self::$rotations[$this->realPath] = EventLoop::repeat(
                     10,
                     static function () use ($maxSize, $optional, $stdout): void {
                         clearstatcache(true, $optional);
                         if (file_exists($optional) && filesize($optional) >= $maxSize) {
+                            Assert::true($stdout instanceof WritableResourceStream);
                             ftruncate($stdout->getResource(), 0);
                             self::log("Automatically truncated logfile to $maxSize, MadelineProto ".\danog\MadelineProto\API::RELEASE);
                         }
@@ -325,30 +337,17 @@ final class Logger
             }
         } elseif ($this->mode === self::DEFAULT_LOGGER) {
             $result = \ini_get('error_log');
-            if ($result === 'syslog') {
-                $stdout = getStderr();
-            } elseif ($result) {
-                $stdout = new WritableResourceStream(fopen($result, 'a+'));
+            if ($result && $result !== 'syslog') {
+                [$this->stdout, $this->stdoutUnbuffered] = self::stream(
+                    self::realLogPath($result),
+                    static fn () => new WritableResourceStream(fopen($result, 'a+')),
+                    $result,
+                );
             } else {
-                $stdout = getStderr();
+                [$this->stdout, $this->stdoutUnbuffered] = self::stream('stderr', getStderr(...));
             }
         }
         $this->newline = $newline;
-
-        if (isset($stdout)) {
-            $pipe = new Pipe(PHP_INT_MAX);
-            $this->stdoutUnbuffered = $stdout;
-            $this->stdout = $pipe->getSink();
-            $source = $pipe->getSource();
-            $promise = async(static function () use ($source, $stdout, &$promise): void {
-                try {
-                    pipe($source, $stdout);
-                } finally {
-                    unset(self::$closePromises[spl_object_id($promise)]);
-                }
-            });
-            self::$closePromises[spl_object_id($promise)] = [$this->stdout, $promise];
-        }
 
         self::$default = $this;
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
@@ -377,6 +376,68 @@ final class Logger
             }
             $this->colors[self::NOTICE] = implode(';', [self::FOREGROUND['yellow'], self::SET['bold']]);
         }
+    }
+    /**
+     * Get the buffered and unbuffered streams of a log destination, shared by all the loggers writing to it.
+     *
+     * Every logger used to open its own: settings are unserialized (and a global logger built) on every IPC
+     * connection and session load, so a long-running process kept one more log file descriptor open each time
+     * (the pipe fiber of each logger keeps its stream alive), until it ran out of them.
+     *
+     * @param callable(): WritableStream $open
+     * @param ?string                    $path Path of the log file, reopened if it was deleted or replaced
+     * @return list{WritableStream, WritableStream}
+     */
+    private static function stream(string $key, callable $open, ?string $path = null): array
+    {
+        if (isset(self::$streams[$key])) {
+            [$sink, $stream] = self::$streams[$key];
+            if ($sink->isWritable() && ($path === null || self::isOpenAt($stream, $path))) {
+                return self::$streams[$key];
+            }
+            // Closed by finalize(): reopen it (the process' own stdout and stderr stay open). The stream of a file
+            // that was replaced is left to the loggers still writing to it: closing it would make them throw.
+            if (!$sink->isWritable() && $path !== null) {
+                $stream->close();
+            }
+        }
+        $stream = $open();
+        $pipe = new Pipe(PHP_INT_MAX);
+        $sink = $pipe->getSink();
+        $source = $pipe->getSource();
+        $promise = async(static function () use ($source, $stream, &$promise): void {
+            try {
+                pipe($source, $stream);
+            } finally {
+                unset(self::$closePromises[spl_object_id($promise)]);
+            }
+        });
+        self::$closePromises[spl_object_id($promise)] = [$sink, $promise];
+        return self::$streams[$key] = [$sink, $stream];
+    }
+    /**
+     * Whether a stream is still open on the file at a path.
+     */
+    private static function isOpenAt(WritableStream $stream, string $path): bool
+    {
+        if (!$stream instanceof WritableResourceStream || !\is_resource($resource = $stream->getResource())) {
+            return false;
+        }
+        clearstatcache(true, $path);
+        if (!file_exists($path)) {
+            return false;
+        }
+        $open = fstat($resource);
+        $current = stat($path);
+        return $open !== false && $current !== false && $open['dev'] === $current['dev'] && $open['ino'] === $current['ino'];
+    }
+    /**
+     * Key of a log file: the real path of its directory (the file itself may not exist yet), and its name.
+     */
+    private static function realLogPath(string $path): string
+    {
+        $dir = realpath(\dirname($path));
+        return $dir === false ? $path : $dir.DIRECTORY_SEPARATOR.basename($path);
     }
     /**
      * Truncate logfile.
