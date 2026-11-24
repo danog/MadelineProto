@@ -32,3 +32,8 @@ updates:
       interval: "weekly"
     labels:
       - "release:internal"
+    ignore:
+      # Solid 2 is a rewrite of its API, and solid-transition-group (the latest, 0.3.0) needs solid-js ^1.6.12:
+      # the bump to 2.0.3 broke npm ci (ERESOLVE), and with it the webui job of the CI and the hourly build.
+      - dependency-name: "solid-js"
+        update-types: ["version-update:semver-major"]
