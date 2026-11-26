@@ -18,6 +18,11 @@
     </enableExtensions>
     <stubs>
         <file name="stubs/madeline_crypto.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/Driver.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/DriverFactory.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/FiberLocal.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/Suspension.php" />
     </stubs>
     <projectFiles>
         <directory name="src" />

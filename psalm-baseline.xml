@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@bfe4f116c3d138fda64390012b5a7d3d9c8f0f15">
+<files psalm-version="dev-master@9676b57de1d1081593adb47f987d98fda78a15cb">
   <file src="src/API.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[$settings]]></code>
@@ -5661,9 +5661,6 @@
     <ImplicitToStringCast>
       <code><![CDATA[$url]]></code>
     </ImplicitToStringCast>
-    <InvalidArgument>
-      <code><![CDATA[$basic_param + $offset]]></code>
-    </InvalidArgument>
     <InvalidArrayOffset>
       <code><![CDATA[$messageMedia['data']]]></code>
     </InvalidArrayOffset>
@@ -5753,6 +5750,7 @@
       <code><![CDATA[$url]]></code>
     </MixedArgument>
     <MixedArgumentTypeCoercion>
+      <code><![CDATA[$basic_param + $offset]]></code>
       <code><![CDATA[['file_token' => $messageMedia['file_token'], 'request_token' => $res['request_token'], 'cancellation' => $cancellation]]]></code>
     </MixedArgumentTypeCoercion>
     <MixedArrayAccess>
@@ -5849,12 +5847,15 @@
       <code><![CDATA[$messageMedia['decrypted_message']['media']]]></code>
       <code><![CDATA[$messageMedia['decrypted_message']['media']['_']]]></code>
       <code><![CDATA[$messageMedia['document']['access_hash']]]></code>
+      <code><![CDATA[$messageMedia['document']['access_hash']]]></code>
       <code><![CDATA[$messageMedia['document']['attributes']]]></code>
       <code><![CDATA[$messageMedia['document']['dc_id']]]></code>
       <code><![CDATA[$messageMedia['document']['id']]]></code>
       <code><![CDATA[$messageMedia['document']['id']]]></code>
       <code><![CDATA[$messageMedia['document']['mime_type']]]></code>
       <code><![CDATA[$messageMedia['document']['mime_type']]]></code>
+      <code><![CDATA[$messageMedia['document']['size']]]></code>
+      <code><![CDATA[$messageMedia['document']['version']]]></code>
       <code><![CDATA[$messageMedia['file']]]></code>
       <code><![CDATA[$messageMedia['file']['access_hash']]]></code>
       <code><![CDATA[$messageMedia['file']['access_hash']]]></code>
@@ -6032,9 +6033,6 @@
       <code><![CDATA[array{offset: int, limit: int, length: ?int}]]></code>
     </MixedReturnTypeCoercion>
     <PossiblyInvalidArgument>
-      <code><![CDATA[$messageMedia]]></code>
-      <code><![CDATA[$messageMedia]]></code>
-      <code><![CDATA[$messageMedia['document']]]></code>
       <code><![CDATA[preg_replace('|/+|', '/', $file)]]></code>
     </PossiblyInvalidArgument>
     <PossiblyInvalidArrayOffset>
@@ -6069,11 +6067,8 @@
       <code><![CDATA[getReference]]></code>
     </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
-      <code><![CDATA[$messageMedia['document']]]></code>
-      <code><![CDATA[$messageMedia['document']]]></code>
       <code><![CDATA[$messageMedia['iv']]]></code>
       <code><![CDATA[$messageMedia['key_fingerprint']]]></code>
-      <code><![CDATA[$messageMedia['photo']]]></code>
     </PossiblyUndefinedArrayOffset>
     <PossiblyUndefinedVariable>
       <code><![CDATA[$datacenter]]></code>
@@ -8970,6 +8965,8 @@
       <code><![CDATA[$data['document']['attributes']]]></code>
       <code><![CDATA[$data['document']['dc_id']]]></code>
       <code><![CDATA[$data['document']['file_reference']]]></code>
+      <code><![CDATA[$data['document']['file_reference']]]></code>
+      <code><![CDATA[$data['document']['id']]]></code>
       <code><![CDATA[$data['document']['id']]]></code>
       <code><![CDATA[$data['document']['mime_type']]]></code>
       <code><![CDATA[$data['document']['mime_type']]]></code>
@@ -9144,42 +9141,8 @@
     <PossiblyInvalidIterator>
       <code><![CDATA[$args['entities']]]></code>
     </PossiblyInvalidIterator>
-    <PossiblyNullArgument>
-      <code><![CDATA[$data['document']['access_hash']]]></code>
-      <code><![CDATA[$data['document']['dc_id']]]></code>
-      <code><![CDATA[$data['document']['mime_type']]]></code>
-    </PossiblyNullArgument>
-    <PossiblyNullArrayAccess>
-      <code><![CDATA[$data['document']['access_hash']]]></code>
-      <code><![CDATA[$data['document']['access_hash']]]></code>
-      <code><![CDATA[$data['document']['attributes']]]></code>
-      <code><![CDATA[$data['document']['dc_id']]]></code>
-      <code><![CDATA[$data['document']['file_reference']]]></code>
-      <code><![CDATA[$data['document']['id']]]></code>
-      <code><![CDATA[$data['document']['mime_type']]]></code>
-      <code><![CDATA[$data['document']['mime_type']]]></code>
-      <code><![CDATA[$data['document']['size']]]></code>
-      <code><![CDATA[$data['photo']['sizes']]]></code>
-    </PossiblyNullArrayAccess>
-    <PossiblyNullIterator>
-      <code><![CDATA[$data['document']['attributes']]]></code>
-      <code><![CDATA[$data['photo']['sizes']]]></code>
-    </PossiblyNullIterator>
-    <PossiblyNullReference>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['document']]]></code>
-    </PossiblyNullReference>
     <PossiblyUndefinedArrayOffset>
       <code><![CDATA[$arguments[$key]]]></code>
-      <code><![CDATA[$data['document']]]></code>
-      <code><![CDATA[$data['photo']]]></code>
     </PossiblyUndefinedArrayOffset>
   </file>
   <file src="src/TL/Conversion/BotAPIFiles.php">
@@ -10352,9 +10315,6 @@
     <InvalidOperand>
       <code><![CDATA[$delay * 2]]></code>
     </InvalidOperand>
-    <InvalidPropertyAssignmentValue>
-      <code><![CDATA[$this->chainOffset]]></code>
-    </InvalidPropertyAssignmentValue>
     <MixedArgument>
       <code><![CDATA[$this->getInputCall()['id']]]></code>
       <code><![CDATA[$this->getInputCall()['id']]]></code>
@@ -10446,6 +10406,9 @@
     <PossiblyUndefinedVariable>
       <code><![CDATA[$generation]]></code>
     </PossiblyUndefinedVariable>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$this->chainOffset]]></code>
+    </PropertyTypeCoercion>
     <RedundantCast>
       <code><![CDATA[(int) ($result['call']['participants_count'] ?? PHP_INT_MAX)]]></code>
     </RedundantCast>
@@ -11487,7 +11450,10 @@
     </MixedArgumentTypeCoercion>
   </file>
   <file src="src/Wrappers/DialogHandler.php">
-    <InvalidArgument>
+    <InvalidReturnType>
+      <code><![CDATA[array<int, array>]]></code>
+    </InvalidReturnType>
+    <MixedArgumentTypeCoercion>
       <code><![CDATA[$state + [
                             'cancellation' => Tools::getTimeoutCancellation(
                                 15.0,
@@ -11502,10 +11468,7 @@
                         'floodWaitLimit' => 86400,
                         'specialMethodType' => SpecialMethodType::USER_RELATED,
                     ]]]></code>
-    </InvalidArgument>
-    <InvalidReturnType>
-      <code><![CDATA[array<int, array>]]></code>
-    </InvalidReturnType>
+    </MixedArgumentTypeCoercion>
     <MixedArrayAccess>
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
       <code><![CDATA[$this->authorization['user']['bot']]]></code>
