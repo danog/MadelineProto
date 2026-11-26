@@ -48,8 +48,8 @@ RUN apt-get update && apt-get -y --no-install-recommends install $PHPIZE_DEPS ss
 # The extensions are installed with PIE (https://github.com/php/pie), from their packages on Packagist (built from
 # the sources of the tagged release on GitHub), pinned: not with pecl, which made the build fail whenever
 # pecl.php.net was down. PIE stays in the image, to install other extensions (as root, with the build tools).
-ENV PIE_VERSION=1.6.0
-ENV PIE_SHA256=81041b276f4e23dfdfa6dc941e5745f9adec824a1bcf6141e226181ef43f519e
+ENV PIE_VERSION=1.6.1
+ENV PIE_SHA256=e99400532e25cd3b65cb7b6688df93c9296a689f01bb0a4471869a3cbbac83ba
 RUN set -eux; \
 	curl -fsSL -o /usr/local/bin/pie "https://github.com/php/pie/releases/download/$PIE_VERSION/pie.phar"; \
 	echo "$PIE_SHA256  /usr/local/bin/pie" | sha256sum -c -; \
