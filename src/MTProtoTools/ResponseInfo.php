@@ -136,7 +136,7 @@ final class ResponseInfo
             $this->headers['Content-Security-Policy'] = 'sandbox';
             $this->headers['X-Content-Type-Options'] = 'nosniff';
         } else {
-            $mime = (string) $messageMedia['mime'];
+            $mime = self::sanitizeHeaderValue((string) $messageMedia['mime']);
         }
         $this->headers['Content-Type'] = $mime;
         $this->headers['Cache-Control'] = 'max-age=31556926';
@@ -270,18 +270,30 @@ final class ResponseInfo
     }
 
     /**
+     * Strip CR, LF and NUL bytes from an HTTP header name or value to prevent header injection (CWE-644).
+     *
+     * @psalm-pure
+     * @psalm-taint-escape header
+     */
+    private static function sanitizeHeaderValue(string $value): string
+    {
+        return str_replace(["\r", "\n", "\0"], '', $value);
+    }
+
+    /**
      * Write headers.
      */
     public function writeHeaders(): void
     {
         http_response_code($this->getCode());
         foreach ($this->getHeaders() as $key => $value) {
+            $safeKey = self::sanitizeHeaderValue($key);
             if (\is_array($value)) {
                 foreach ($value as $subValue) {
-                    header("$key: $subValue", false);
+                    header($safeKey.': '.self::sanitizeHeaderValue($subValue), false);
                 }
             } else {
-                header("$key: $value");
+                header($safeKey.': '.self::sanitizeHeaderValue($value));
             }
         }
     }

@@ -234,21 +234,14 @@ final class ReadLoop extends Loop
         $this->API->logger('Received payload from DC '.$this->datacenter, Logger::ULTRA_VERBOSE);
 
         try {
-            $deserialized = $this->deserialize($message_data, $message_id, !$unencrypted);
-            if ($deserialized === null) {
+            $message = $this->deserialize($message_data, $message_id, !$unencrypted);
+            if ($message === null) {
                 return null;
             }
         } finally {
             $this->API->minDatabase->reset();
         }
 
-        $message = new MTProtoIncomingMessage(
-            $this->connection,
-            $deserialized,
-            $message_id,
-            $unencrypted,
-            false
-        );
         if (isset($seq_no)) {
             $message->setSeqNo($seq_no);
         }
@@ -270,12 +263,18 @@ final class ReadLoop extends Loop
      * (they're serialized), and a reconnection waits for this loop to exit: magnaluna's main DC stayed disconnected
      * for half an hour, its requests unsent.
      *
-     * @return ?array The message, null if it was dropped.
+     * @return ?MTProtoIncomingMessage The message, null if it was dropped.
      */
-    private function deserialize(string $data, int $messageId, bool $encrypted, bool $fromContainer = false): ?array
+    private function deserialize(string $data, int $messageId, bool $encrypted, bool $fromContainer = false): ?MTProtoIncomingMessage
     {
         try {
-            return $this->API->getTL()->deserialize($data, ['type' => '', 'connection' => $this->connection, 'encrypted' => $encrypted]);
+            return new MTProtoIncomingMessage(
+                $this->connection,
+                $this->API->getTL()->deserialize($data, ['type' => '', 'connection' => $this->connection, 'encrypted' => $encrypted]),
+                $messageId,
+                !$encrypted,
+                $fromContainer,
+            );
         } catch (\Throwable $e) {
             Logger::log('Error during deserializing message (base64): ' .  base64_encode($data), Logger::ERROR);
             if (!$encrypted) {
@@ -294,7 +293,14 @@ final class ReadLoop extends Loop
             } else {
                 $this->reportSchemaIssue($e);
             }
-            return ['_' => 'rpc_result', 'req_msg_id' => $reqMsgId, 'result' => $e];
+            return new MTProtoIncomingMessage(
+                $this->connection,
+                ['_' => 'rpc_result', 'req_msg_id' => $reqMsgId],
+                $messageId,
+                !$encrypted,
+                $fromContainer,
+                deserializationError: $e,
+            );
         }
         if ($constructor === self::MSG_CONTAINER && !$fromContainer && \strlen($data) >= 8) {
             $messages = [];
@@ -304,13 +310,21 @@ final class ReadLoop extends Loop
                 $innerId = Tools::unpackSignedLong(substr($data, $offset, 8));
                 $seqno = unpack('V', substr($data, $offset + 8, 4))[1];
                 $length = unpack('V', substr($data, $offset + 12, 4))[1];
-                $body = $this->deserialize(substr($data, $offset + 16, $length), $innerId, $encrypted, true);
+                $child = $this->deserialize(substr($data, $offset + 16, $length), $innerId, $encrypted, true);
                 $offset += 16 + $length;
-                if ($body !== null) {
-                    $messages []= ['_' => 'message', 'msg_id' => $innerId, 'seqno' => $seqno, 'bytes' => $length, 'body' => $body];
+                if ($child !== null) {
+                    $child->setSeqNo($seqno);
+                    $messages []= $child;
                 }
             }
-            return ['_' => 'msg_container', 'messages' => $messages];
+            return new MTProtoIncomingMessage(
+                $this->connection,
+                ['_' => 'msg_container', 'messages' => []],
+                $messageId,
+                !$encrypted,
+                false,
+                containerChildren: $messages,
+            );
         }
         $this->reportSchemaIssue($e);
         $this->API->logger("Dropping undeserializable message $messageId from DC {$this->datacenter}", Logger::ERROR);

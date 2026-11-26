@@ -18,7 +18,7 @@ namespace danog\MadelineProto\Ipc\Wrapper;
 
 use Amp\Cancellation as AmpCancellation;
 use Amp\CancelledException;
-use danog\MadelineProto\Ipc\ClientAbstract;
+use danog\MadelineProto\Ipc\Wrapper;
 
 /**
  * @internal
@@ -35,7 +35,7 @@ final class Cancellation implements AmpCancellation
      *
      * @param array<string, int> $methods
      */
-    public function __construct(ClientAbstract $wrapper, array $methods)
+    public function __construct(Wrapper $wrapper, array $methods)
     {
         $this->inner = new CancellationInner($wrapper, $methods);
     }

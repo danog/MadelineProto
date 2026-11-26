@@ -202,6 +202,27 @@ trait Files
         return new Document($this, $media, $protected);
     }
     /**
+     * Parse and validate a MIME type from an untrusted HTTP Content-Type header.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape input
+     */
+    private static function parseMimeType(?string $header): ?string
+    {
+        if ($header === null) {
+            return null;
+        }
+        $mime = strtolower(trim(explode(';', $header, 2)[0]));
+        if (\strlen($mime) > 255
+            || str_contains($mime, '..')
+            || !preg_match('~^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$~D', $mime)
+        ) {
+            return null;
+        }
+        return $mime;
+    }
+
+    /**
      * Upload file from URL.
      *
      * @param  string|FileCallbackInterface $url       URL of file
@@ -225,7 +246,7 @@ trait Files
         if (($status = $response->getStatus()) !== 200) {
             throw new Exception("Wrong status code: {$status} ".$response->getReason());
         }
-        $mime = trim(explode(';', $response->getHeader('content-type') ?? '')[0]) ?: null;
+        $mime = self::parseMimeType($response->getHeader('content-type'));
         $size = (int) ($response->getHeader('content-length') ?? $size);
         $stream = $response->getBody();
         // An interrupted upload can only be resumed if we can tell that the file did not change since.

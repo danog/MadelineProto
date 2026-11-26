@@ -49,10 +49,30 @@ final class SafeHtml implements Stringable, JsonSerializable
         $parts = preg_split('~(https?://[^\s<>"\']+[^\s<>"\'.,;:!?)])~', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $html = '';
         foreach ($parts as $k => $part) {
-            $escaped = self::escape($part)->html;
-            $html .= $k % 2 ? "<a href=\"$escaped\" target=\"_blank\" rel=\"noopener noreferrer\">$escaped</a>" : $escaped;
+            if ($k % 2) {
+                $escaped = self::escapeHttpUrl($part);
+                $html .= "<a href=\"$escaped\" target=\"_blank\" rel=\"noopener noreferrer\">$escaped</a>";
+            } else {
+                $html .= self::escape($part)->html;
+            }
         }
         return new self($html);
+    }
+
+    /**
+     * Escape an http(s) URL for safe use inside a double-quoted HTML `href` attribute and link text.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape html
+     * @psalm-taint-escape has_quotes
+     * @psalm-taint-escape url_scheme
+     */
+    private static function escapeHttpUrl(string $url): string
+    {
+        if (!preg_match('~^https?://~i', $url)) {
+            throw new \AssertionError('URL must use the http or https scheme');
+        }
+        return htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
     }
 
     /**

@@ -18,6 +18,7 @@ namespace danog\MadelineProto\Ipc;
 
 use danog\MadelineProto\Exception as MadelineProtoException;
 use ReflectionClass;
+use ReflectionObject;
 use Throwable;
 
 use function Amp\Parallel\Context\flattenThrowableBacktrace as ContextFlattenThrowableBacktrace;
@@ -36,7 +37,7 @@ final class ExitFailure
     {
         $this->type = $exception::class;
         $props = [];
-        $f = new ReflectionClass($exception);
+        $f = new ReflectionObject($exception);
         do {
             foreach ($f->getProperties() as $prop) {
                 if ($prop->isStatic()) {

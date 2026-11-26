@@ -20,12 +20,14 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Stream;
 
+use Amp\ByteStream\ReadableStream;
 use Amp\Cancellation;
 use Amp\Socket\ConnectContext;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpsStream;
 use danog\MadelineProto\Stream\MTProtoTransport\HttpStream;
 use danog\MadelineProto\Stream\MTProtoTransport\ObfuscatedStream;
 use danog\MadelineProto\Stream\Transport\DefaultStream;
+use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\Tools;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
@@ -56,6 +58,10 @@ final class ConnectionContext
      */
     private UriInterface $uri;
     /**
+     * String form of the connection URI (avoids PSR-7 UriInterface::__toString taint false positives on DC URIs).
+     */
+    private string $uriString = '';
+    /**
      * Whether this connection context will be used by the DNS client.
      *
      */
@@ -81,11 +87,25 @@ final class ConnectionContext
      */
     private bool $ipv6 = false;
     /**
-     * An array of arrays containing an array with the stream name and the extra parameter to pass to it.
+     * Stream classes in the stream chain.
      *
-     * @var list<array{0: class-string, 1: mixed}>
+     * @var list<class-string>
      */
-    private array $nextStreams = [];
+    private array $streamClasses = [];
+    /**
+     * Extra parameters paired by index with $streamClasses.
+     *
+     * @var list<mixed>
+     */
+    private array $streamExtras = [];
+    /**
+     * MTProto inputClientProxy payload for ObfuscatedStream, if present.
+     */
+    private ?array $inputClientProxy = null;
+    /**
+     * Premade stream payload for PremadeStream, kept separate from proxy extras.
+     */
+    private ?ReadableStream $premadeStream = null;
     /**
      * The current stream key.
      */
@@ -113,8 +133,30 @@ final class ConnectionContext
      */
     public function setUri(string|UriInterface $uri): self
     {
-        $this->uri = $uri instanceof UriInterface ? $uri : Http::new($uri);
+        if ($uri instanceof UriInterface) {
+            $this->uri = $uri;
+            $this->uriString = self::uriToString($uri);
+        } else {
+            $this->uri = Http::new($uri);
+            $this->uriString = $uri;
+        }
         return $this;
+    }
+
+    /**
+     * Convert an internal socket/DC UriInterface to string, validating its transport scheme.
+     *
+     * Avoids PSR-7 HTTP request taint false positives on internal Telegram DC/proxy URIs.
+     *
+     * @psalm-taint-escape ssrf
+     */
+    private static function uriToString(UriInterface $uri): string
+    {
+        $scheme = strtolower($uri->getScheme());
+        if ($scheme !== '' && !\in_array($scheme, ['tcp', 'udp', 'tls', 'ssl', 'http', 'https', 'unix'], true)) {
+            throw new \AssertionError("Unsupported connection URI scheme: $scheme");
+        }
+        return (string) $uri;
     }
     /**
      * Get the URI as a string.
@@ -123,7 +165,7 @@ final class ConnectionContext
      */
     public function getStringUri(): string
     {
-        return (string) $this->uri;
+        return $this->uriString;
     }
     /**
      * Get the URI.
@@ -242,10 +284,29 @@ final class ConnectionContext
      */
     public function addStream(string $streamName, $extra = null): self
     {
-        $this->nextStreams[] = [$streamName, $extra];
-        $this->key = \count($this->nextStreams) - 1;
+        $this->streamClasses[] = $streamName;
+        $this->streamExtras[] = $extra;
+        if ($streamName === ObfuscatedStream::class && \is_array($extra) && isset($extra['address'])) {
+            $extra['_'] = 'inputClientProxy';
+            $this->inputClientProxy = $extra;
+        }
+        $this->key = \count($this->streamClasses) - 1;
         return $this;
     }
+    /**
+     * Add a premade readable stream to the stream chain without mixing it into proxy configuration extras.
+     *
+     * @psalm-external-mutation-free
+     */
+    public function addPremadeStream(ReadableStream $stream): self
+    {
+        $this->streamClasses[] = PremadeStream::class;
+        $this->streamExtras[] = null;
+        $this->premadeStream = $stream;
+        $this->key = \count($this->streamClasses) - 1;
+        return $this;
+    }
+
     /**
      * Check if connected via HTTP.
      *
@@ -255,7 +316,7 @@ final class ConnectionContext
      */
     public function isHttp(): bool
     {
-        return \in_array(Tools::end($this->nextStreams)[0], [HttpStream::class, HttpsStream::class], true);
+        return \in_array(Tools::end($this->streamClasses), [HttpStream::class, HttpsStream::class], true);
     }
     /**
      * Check if has stream within stream chain.
@@ -266,19 +327,22 @@ final class ConnectionContext
      */
     public function hasStreamName(string $stream): bool
     {
-        foreach ($this->nextStreams as [$name]) {
-            if ($name === $stream) {
-                return true;
-            }
-        }
-        return false;
+        return \in_array($stream, $this->streamClasses, true);
     }
     /**
      * Get a stream from the stream chain.
      */
     public function getStream(string $buffer = ''): StreamInterface
     {
-        [$clazz, $extra] = $this->nextStreams[$this->key--];
+        $idx = $this->key--;
+        $clazz = $this->streamClasses[$idx];
+        $extra = $this->streamExtras[$idx];
+        if ($clazz === PremadeStream::class) {
+            $obj = new PremadeStream();
+            $obj->setExtra($this->premadeStream);
+            $obj->connect($this, $buffer);
+            return $obj;
+        }
         $obj = new $clazz();
         if ($obj instanceof ProxyStreamInterface) {
             $obj->setExtra($extra);
@@ -293,14 +357,7 @@ final class ConnectionContext
      */
     public function getInputClientProxy(): array|null
     {
-        foreach ($this->nextStreams as $couple) {
-            [$streamName, $extra] = $couple;
-            if ($streamName === ObfuscatedStream::class && isset($extra['address'])) {
-                $extra['_'] = 'inputClientProxy';
-                return $extra;
-            }
-        }
-        return null;
+        return $this->inputClientProxy;
     }
     /**
      * Get a description "name" of the context.
@@ -319,13 +376,15 @@ final class ConnectionContext
         $string .= ', via ';
         $string .= $this->getIpv6() ? 'ipv6' : 'ipv4';
         $string .= ' using ';
-        foreach (array_reverse($this->nextStreams) as $k => $stream) {
-            if ($k) {
+        $count = \count($this->streamClasses);
+        for ($i = $count - 1; $i >= 0; $i--) {
+            if ($i < $count - 1) {
                 $string .= ' => ';
             }
-            $string .= preg_replace('/.*\\\\/', '', $stream[0]);
-            if ($stream[1] && $stream[0] !== DefaultStream::class) {
-                $string .= ' ('.json_encode($stream[1]).')';
+            $class = $this->streamClasses[$i];
+            $string .= preg_replace('/.*\\\\/', '', $class) ?? $class;
+            if (!empty($this->streamExtras[$i]) && $class !== DefaultStream::class) {
+                $string .= ' ('.json_encode($this->streamExtras[$i]).')';
             }
         }
         return $string;

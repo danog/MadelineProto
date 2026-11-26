@@ -98,7 +98,6 @@
         "symfony/yaml": "^6.4.45",
         "dg/bypass-finals": "dev-master",
         "brianium/paratest": "^6.11.1",
-        "vimeo/psalm": "dev-master",
         "sebastian/diff": "^4.0.6"
     },
     "suggest": {
@@ -155,7 +154,10 @@
             "@paratest-light"
         ],
         "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v",
-        "psalm": "psalm --no-cache --threads=10",
+        "psalm": [
+            "Composer\\Config::disableProcessTimeout",
+            "psalm --no-cache --threads=auto"
+        ],
         "docs": "php tools/build_docs.php",
         "fuzz": "php tools/fuzzer.php",
         "file_ref_map": "php tools/gen_filerefmap.php",

@@ -6,9 +6,10 @@
     findUnusedBaselineEntry="false"
     ignoreInternalFunctionFalseReturn="true"
     ignoreInternalFunctionNullReturn="true"
+    loadLibraryPlugins="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor-bin/psalm/vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
     autoloader="vendor/autoload.php"
 >
@@ -17,6 +18,11 @@
     </enableExtensions>
     <stubs>
         <file name="stubs/madeline_crypto.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/Driver.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/DriverFactory.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/FiberLocal.php" />
+        <file name="vendor/revolt/event-loop/src/EventLoop/Suspension.php" />
     </stubs>
     <projectFiles>
         <directory name="src" />
@@ -40,5 +46,6 @@
     </issueHandlers>
     <plugins>
         <pluginClass class="Webmozart\Assert\PsalmPlugin"></pluginClass>
+        <pluginClass class="danog\MadelineProto\Psalm\MethodCallPlugin"></pluginClass>
     </plugins>
 </psalm>

@@ -252,9 +252,34 @@ final class Template
         return $args ? \sprintf($string, ...$args) : $string;
     }
 
+    /**
+     * Validate that every template variable name is a safe PHP identifier and not a reserved local.
+     *
+     * @param array<array-key, mixed> $data
+     * @return array<string, mixed>
+     *
+     * @psalm-taint-escape extract
+     */
+    private static function validateTemplateData(array $data): array
+    {
+        $validated = [];
+        foreach ($data as $name => $value) {
+            if (!\is_string($name)
+                || $name === 'this'
+                || $name === '__file'
+                || $name === '__data'
+                || !preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $name)
+            ) {
+                throw new AssertionError("Invalid template variable name $name");
+            }
+            $validated[$name] = $value;
+        }
+        return $validated;
+    }
+
     private function includeTemplate(string $__file, array $__data): void
     {
-        extract($__data, EXTR_SKIP);
+        extract(self::validateTemplateData($__data), EXTR_SKIP);
         include $__file;
     }
 }

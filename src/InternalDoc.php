@@ -275,6 +275,7 @@ abstract class InternalDoc
      * Convert bot API parameters to MTProto parameters.
      *
      * @param array $arguments Arguments
+     * @psalm-taint-specialize
      */
     final public function botAPIToMTProto(array $arguments): array
     {

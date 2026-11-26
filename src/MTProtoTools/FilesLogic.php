@@ -55,7 +55,6 @@ use danog\MadelineProto\Stream\Common\BufferedRawStream;
 use danog\MadelineProto\Stream\Common\SimpleBufferedRawStream;
 use danog\MadelineProto\Stream\ConnectionContext;
 use danog\MadelineProto\Stream\StreamInterface;
-use danog\MadelineProto\Stream\Transport\PremadeStream;
 use danog\MadelineProto\TL\Conversion\Extension;
 use danog\MadelineProto\Tools;
 use danog\MadelineProto\UploadResumeException;
@@ -447,6 +446,10 @@ trait FilesLogic
      */
     public function uploadFromStream(mixed $stream, int $size = 0, ?string $mime = null, string $fileName = '', ?callable $cb = null, bool $encrypted = false, ?Cancellation $cancellation = null): array
     {
+        if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
+            $cb = $stream;
+            $stream = $stream->getFile();
+        }
         return $this->uploadFromStreamInternal($stream, $size, $mime, $fileName, $cb, $encrypted, $cancellation);
     }
 
@@ -475,10 +478,6 @@ trait FilesLogic
      */
     private function uploadFromStreamInternal(mixed $stream, int $size, ?string $mime, string $fileName, ?callable $cb, bool $encrypted, ?Cancellation $cancellation, ?string $resumeKey = null, ?Closure $reopenAt = null): array
     {
-        if (\is_object($stream) && $stream instanceof FileCallbackInterface) {
-            $cb = $stream;
-            $stream = $stream->getFile();
-        }
         if (!\is_object($stream)) {
             $stream = new ReadableResourceStream($stream);
         }
@@ -569,7 +568,7 @@ trait FilesLogic
                 }
             }
             if ($buffered === null) {
-                $ctx = (new ConnectionContext())->addStream(PremadeStream::class, $stream)->addStream(SimpleBufferedRawStream::class);
+                $ctx = (new ConnectionContext())->addPremadeStream($stream)->addStream(SimpleBufferedRawStream::class);
                 $buffered = $ctx->getStream();
                 \assert($buffered instanceof BufferedRawStream);
                 $created = true;

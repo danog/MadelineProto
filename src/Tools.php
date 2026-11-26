@@ -629,6 +629,7 @@ abstract class Tools extends AsyncTools
      *
      * @param string $file File
      * @internal
+     * @psalm-taint-specialize
      */
     public static function absolute(string $file): string
     {
@@ -1054,10 +1055,58 @@ abstract class Tools extends AsyncTools
      * @psalm-pure
      * @internal
      * @psalm-taint-escape html
-     * @psalm-taint-escape quotes
+     * @psalm-taint-escape has_quotes
      */
     public static function taintEscape(string $s): string
     {
-        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' ? $s : htmlentities($s);
+        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg'
+            ? $s
+            : htmlentities($s, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
+    }
+
+    /**
+     * Validate a server hostname (optionally with :port) from SERVER_NAME or environment config.
+     *
+     * Rejects path, query, fragment, userinfo, scheme and control characters to prevent
+     * CRLF header injection / request smuggling and path injection in self-requests.
+     *
+     * @psalm-pure
+     * @internal
+     * @psalm-taint-escape header
+     * @psalm-taint-escape url_component
+     */
+    public static function validateServerName(string $serverName): string
+    {
+        if ($serverName === '' || preg_match('/[\x00-\x20\x7f\/?#@\\\\]/', $serverName)) {
+            throw new \AssertionError('Invalid server name!');
+        }
+        $host = $serverName;
+        if ($host[0] === '[') {
+            if (!preg_match('/^\[([^\]]+)\](?::(\d{1,5}))?$/', $host, $m)) {
+                throw new \AssertionError('Invalid server name!');
+            }
+            $ip = $m[1];
+            $port = isset($m[2]) ? (int) $m[2] : null;
+            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || ($port !== null && ($port < 1 || $port > 65535))) {
+                throw new \AssertionError('Invalid server name!');
+            }
+            return $serverName;
+        }
+        if (str_contains($host, ':')) {
+            $parts = explode(':', $host, 2);
+            if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                return $serverName;
+            }
+            if (!isset($parts[1]) || !ctype_digit($parts[1]) || (int) $parts[1] < 1 || (int) $parts[1] > 65535) {
+                throw new \AssertionError('Invalid server name!');
+            }
+            $host = $parts[0];
+        }
+        if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+            && !filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)
+        ) {
+            throw new \AssertionError('Invalid server name!');
+        }
+        return $serverName;
     }
 }

@@ -70,6 +70,7 @@ final class RSA
             $instance->n = Tools::getVar($key, 'modulus');
             $instance->e = Tools::getVar($key, 'exponent');
         }
+        /** @psalm-suppress WeakHash RSA public key fingerprint is defined as the lower 64 bits of SHA-1 by Telegram MTProto */
         $instance->fp = substr(sha1(($TL->serializeObject(['type' => 'bytes'], $instance->n->toBytes(), 'key')).($TL->serializeObject(['type' => 'bytes'], $instance->e->toBytes(), 'key')), true), -8);
         return $instance;
     }

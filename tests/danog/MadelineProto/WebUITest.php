@@ -508,4 +508,42 @@ final class WebUITest extends TestCase
         self::assertSame('+391234567890', $wrapper->getPhoneNumber());
         self::assertFalse($wrapper->loggedIn());
     }
+
+    public function testSelfUrlStripsControlCharacters(): void
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? null;
+        try {
+            $_SERVER['REQUEST_URI'] = "/login.php\r\nSet-Cookie: evil=1?bot=a\r\nX-Test: 1&getQrCode=1";
+            self::assertSame('/login.phpSet-Cookie: evil=1', WebUI::getSelfUrl());
+            self::assertSame('/login.phpSet-Cookie: evil=1?bot=aX-Test: 1', WebUI::getSelfUrl(true));
+        } finally {
+            if ($uri === null) {
+                unset($_SERVER['REQUEST_URI']);
+            } else {
+                $_SERVER['REQUEST_URI'] = $uri;
+            }
+        }
+    }
+
+    public function testTemplateRejectsReservedOrInvalidVariableNames(): void
+    {
+        file_put_contents("$this->dir/page.phtml", 'ok');
+        $engine = new TemplateEngine([$this->dir]);
+        foreach (['__file', '__data', 'this', '123invalid', 'a-b'] as $badName) {
+            try {
+                $engine->render('page', [$badName => 'x']);
+                self::fail("Expected AssertionError for template variable '$badName'");
+            } catch (AssertionError) {
+                self::addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function testLinkifyOnlyAllowsHttpSchemes(): void
+    {
+        $html = SafeHtml::linkify('Try javascript:alert(1) or data:text/html,hi or https://example.com/a?b=1&c="2"')->html;
+        self::assertStringNotContainsString('href="javascript:', $html);
+        self::assertStringNotContainsString('href="data:', $html);
+        self::assertStringContainsString('<a href="https://example.com/a?b=1&amp;c=" target="_blank" rel="noopener noreferrer">https://example.com/a?b=1&amp;c=</a>&quot;2&quot;', $html);
+    }
 }
