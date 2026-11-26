@@ -165,8 +165,9 @@ trait Login
         if ($state === API::LOGGED_IN) {
             throw new Exception(Lang::$current_lang['already_loggedIn']);
         }
-        $phone = $this->authorization['phone_number'] ?? null;
-        $hash = $this->authorization['phone_code_hash'] ?? null;
+        $authorization = $this->authorization ?? [];
+        $phone = isset($authorization['phone_number']) && \is_string($authorization['phone_number']) ? $authorization['phone_number'] : null;
+        $hash = isset($authorization['phone_code_hash']) && \is_string($authorization['phone_code_hash']) ? $authorization['phone_code_hash'] : null;
         $this->authorization = null;
         $this->loginQrCode = null;
         $this->qrLoginDeferred?->cancel();
@@ -175,7 +176,7 @@ trait Login
             $this->setLoginState(API::NOT_LOGGED_IN);
             $this->serialize();
         }
-        if ($state === API::WAITING_CODE && \is_string($phone) && \is_string($hash)) {
+        if ($state === API::WAITING_CODE && $phone !== null && $hash !== null) {
             try {
                 $this->methodCallAsyncRead('auth.cancelCode', [
                     'phone_number' => $phone,
