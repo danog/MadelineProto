@@ -133,29 +133,19 @@ final class ConnectionContext
      */
     public function setUri(string|UriInterface $uri): self
     {
-        if ($uri instanceof UriInterface) {
-            $this->uri = $uri;
-            $this->uriString = self::uriToString($uri);
-        } else {
-            $this->uri = Http::new($uri);
-            $this->uriString = $uri;
-        }
+        $this->uri = $uri instanceof UriInterface ? $uri : Http::new($uri);
+        // Normalized, like the host of getUri() (the TLS SNI of DefaultStream)
+        $this->uriString = self::uriToString($this->uri);
         return $this;
     }
 
     /**
-     * Convert an internal socket/DC UriInterface to string, validating its transport scheme.
-     *
-     * Avoids PSR-7 HTTP request taint false positives on internal Telegram DC/proxy URIs.
+     * The addresses of the DCs, the proxies and the DoH servers are the settings, not input: a connection must go there.
      *
      * @psalm-taint-escape ssrf
      */
     private static function uriToString(UriInterface $uri): string
     {
-        $scheme = strtolower($uri->getScheme());
-        if ($scheme !== '' && !\in_array($scheme, ['tcp', 'udp', 'tls', 'ssl', 'http', 'https', 'unix'], true)) {
-            throw new \AssertionError("Unsupported connection URI scheme: $scheme");
-        }
         return (string) $uri;
     }
     /**
@@ -284,6 +274,10 @@ final class ConnectionContext
      */
     public function addStream(string $streamName, $extra = null): self
     {
+        if ($streamName === PremadeStream::class) {
+            \assert($extra instanceof ReadableStream);
+            return $this->addPremadeStream($extra);
+        }
         $this->streamClasses[] = $streamName;
         $this->streamExtras[] = $extra;
         if ($streamName === ObfuscatedStream::class && \is_array($extra) && isset($extra['address'])) {

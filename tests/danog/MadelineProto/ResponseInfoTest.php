@@ -79,12 +79,12 @@ final class ResponseInfoTest extends TestCase
         $this->assertStringContainsString("filename*=UTF-8''%D1%84%D0%BE%D1%82%D0%BE.jpg", self::headers('image/jpeg', 'фото', '.jpg')['Content-Disposition']);
     }
 
-    public function testHeaderInjectionCharactersAreStrippedEvenWithoutSandbox(): void
+    public function testAMimeTypeThatCantBeAHeaderIsNormalizedWithoutSandbox(): void
     {
-        $headers = ResponseInfo::parseHeaders('GET', [], ['mime' => "text/html\r\nX-Injected: 1\0", 'name' => 'page', 'ext' => '.html', 'size' => 10], false)->getHeaders();
-        $this->assertSame('text/htmlX-Injected: 1', $headers['Content-Type']);
-        $this->assertStringNotContainsString("\r", $headers['Content-Type']);
-        $this->assertStringNotContainsString("\n", $headers['Content-Type']);
-        $this->assertStringNotContainsString("\0", $headers['Content-Type']);
+        $headers = static fn (string $mime): array => ResponseInfo::parseHeaders('GET', [], ['mime' => $mime, 'name' => 'page', 'ext' => '.html', 'size' => 10], false)->getHeaders();
+        $this->assertSame('application/octet-stream', $headers("text/html\r\nX-Injected: 1\0")['Content-Type']);
+        $this->assertSame('text/html', $headers("text/html; charset=utf-8\r\n")['Content-Type']);
+        // Otherwise as sent, with its parameters
+        $this->assertSame('text/plain; charset=utf-8', $headers('text/plain; charset=utf-8')['Content-Type']);
     }
 }

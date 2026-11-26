@@ -137,18 +137,6 @@ trait Start
     }
 
     /**
-     * Validate a Telegram API hash (32 lowercase hex characters).
-     *
-     * @psalm-pure
-     * @psalm-taint-escape input
-     */
-    private static function parseApiHash(string $raw): ?string
-    {
-        $hash = strtolower(trim($raw));
-        return preg_match('/^[a-f0-9]{32}$/', $hash) ? $hash : null;
-    }
-
-    /**
      * @return ?array{api_id: int, api_hash: string}
      */
     private function APIStartWeb(Settings $settings): ?array
@@ -171,7 +159,7 @@ trait Start
 
         if (isset($_POST['api_id'], $_POST['api_hash'])) {
             $apiId = \is_string($_POST['api_id']) ? trim($_POST['api_id']) : '';
-            $apiHash = \is_string($_POST['api_hash']) ? self::parseApiHash($_POST['api_hash']) : null;
+            $apiHash = \is_string($_POST['api_hash']) ? Tools::parseApiHash($_POST['api_hash']) : null;
             if (!ctype_digit($apiId) || (int) $apiId <= 0 || $apiHash === null) {
                 WebUI::write($templates, self::getManualApiPage()->addAlert(Alert::error(Lang::$current_lang['apiInvalidWeb'])));
                 return null;

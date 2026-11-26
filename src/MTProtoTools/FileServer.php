@@ -235,10 +235,11 @@ trait FileServer
     private static function buildDownloadScriptUrl(string $serverName, string $path): string
     {
         $serverName = Tools::validateServerName($serverName);
-        if (!str_starts_with($path, '/') || !str_ends_with($path, '/dl.php') || preg_match('/[\x00-\x20\x7f?#]/', $path)) {
+        if (!str_starts_with($path, '/') || !str_ends_with($path, '/dl.php')) {
             throw new AssertionError('Invalid download script path!');
         }
-        return 'https://'.$serverName.$path;
+        // A path of the filesystem: spaces, ? and # in directory names are percent-encoded
+        return 'https://'.$serverName.implode('/', array_map(rawurlencode(...), explode('/', $path)));
     }
 
     private static ?LocalKeyedMutex $checkMutex = null;

@@ -136,7 +136,11 @@ final class ResponseInfo
             $this->headers['Content-Security-Policy'] = 'sandbox';
             $this->headers['X-Content-Type-Options'] = 'nosniff';
         } else {
-            $mime = self::sanitizeHeaderValue((string) $messageMedia['mime']);
+            // As sent, parameters included: a value that can't be a header is reduced to its MIME type
+            $mime = (string) $messageMedia['mime'];
+            if (preg_match('/[\r\n\0]/', $mime)) {
+                $mime = self::normalizeMime($mime);
+            }
         }
         $this->headers['Content-Type'] = $mime;
         $this->headers['Cache-Control'] = 'max-age=31556926';
@@ -162,6 +166,8 @@ final class ResponseInfo
     /**
      * A single type/subtype, lowercase and without parameters, or application/octet-stream: so that the browser
      * can't read the type differently than isInlineSafe().
+     *
+     * @psalm-pure
      */
     private static function normalizeMime(string $mime): string
     {
