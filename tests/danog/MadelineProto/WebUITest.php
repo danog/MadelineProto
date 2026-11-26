@@ -18,9 +18,16 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\Test;
 
+use Amp\DeferredCancellation;
 use AssertionError;
+use danog\MadelineProto\API;
+use danog\MadelineProto\Exception;
 use danog\MadelineProto\Lang;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\MTProto\LoginState;
 use danog\MadelineProto\MyTelegramOrgWrapper;
+use danog\MadelineProto\Reactive\Publisher;
+use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Templates;
 use danog\MadelineProto\WebUI\Action;
@@ -33,6 +40,8 @@ use danog\MadelineProto\WebUI\Step;
 use danog\MadelineProto\WebUI\Template;
 use danog\MadelineProto\WebUI\TemplateEngine;
 use danog\MadelineProto\WebUI\WebUI;
+use danog\MadelineProto\Wrappers\Login;
+use danog\MadelineProto\Wrappers\Start;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -545,5 +554,169 @@ final class WebUITest extends TestCase
         self::assertStringNotContainsString('href="javascript:', $html);
         self::assertStringNotContainsString('href="data:', $html);
         self::assertStringContainsString('<a href="https://example.com/a?b=1&amp;c=" target="_blank" rel="noopener noreferrer">https://example.com/a?b=1&amp;c=</a>&quot;2&quot;', $html);
+    }
+
+    public function testCancelLoginResetsStateAndWebPagesOfferCancelAction(): void
+    {
+        $harness = new class {
+            use Login;
+            use Start;
+
+            /** @var Publisher<LoginState> */
+            public Publisher $loginState;
+            public ?array $authorization = null;
+            public ?object $loginQrCode = null;
+            public Logger $logger;
+            public Settings $settings;
+            /** @var list<array{0: string, 1: array}> */
+            public array $calls = [];
+            public ?\Throwable $nextCallError = null;
+            public int $serialized = 0;
+
+            public function __construct()
+            {
+                $this->loginState = new Publisher(new LoginState(API::NOT_LOGGED_IN, 2));
+                $this->settings = new Settings;
+                $this->logger = Logger::constructorFromSettings((new Settings\Logger)->setType(Logger::CALLABLE_LOGGER)->setExtra(static function (): void {
+                }));
+            }
+
+            public function getAuthorization(): int
+            {
+                return $this->loginState->getState()->state;
+            }
+
+            public function setLoginState(int $state): void
+            {
+                $this->loginState->publish($this->loginState->getState()->setState($state));
+            }
+
+            public function getSettings(): Settings
+            {
+                return $this->settings;
+            }
+
+            public function getHint(): string
+            {
+                return (string) ($this->authorization['hint'] ?? '');
+            }
+
+            public function getWebLoginInfo(): array
+            {
+                $state = $this->getAuthorization();
+                if (($state === API::WAITING_CODE || $state === API::WAITING_SIGNUP) && \is_string($this->authorization['phone_number'] ?? null)) {
+                    return ['phoneNumber' => $this->authorization['phone_number']];
+                }
+                return [];
+            }
+
+            public function serialize(): void
+            {
+                $this->serialized++;
+            }
+
+            public function methodCallAsyncRead(string $method, array $args): mixed
+            {
+                $this->calls[] = [$method, $args];
+                if ($this->nextCallError !== null) {
+                    $e = $this->nextCallError;
+                    $this->nextCallError = null;
+                    throw $e;
+                }
+                return true;
+            }
+
+            public function setQrDeferred(DeferredCancellation $deferred): void
+            {
+                $this->qrLoginDeferred = $deferred;
+            }
+
+            public function loginPage(): ?Page
+            {
+                return $this->getWebLoginPage();
+            }
+
+            public function runWebStep(callable $step): void
+            {
+                $this->webStep($step);
+            }
+        };
+
+        // Initial sign-in page has no cancel action
+        self::assertSame([], $harness->loginPage()?->actions);
+
+        // Code, password, and sign-up pages all expose the cancel action (and render it with formnovalidate)
+        foreach ([API::WAITING_CODE, API::WAITING_PASSWORD, API::WAITING_SIGNUP] as $state) {
+            $harness->setLoginState($state);
+            $harness->authorization = ['phone_number' => '+39 333 1234567', 'phone_code_hash' => 'hash123', 'hint' => 'hint'];
+            $page = $harness->loginPage();
+            self::assertNotNull($page);
+            self::assertCount(1, $page->actions);
+            self::assertSame(Lang::$current_lang['loginCancelWeb'], $page->actions[0]->label);
+            self::assertSame('login_action', $page->actions[0]->name);
+            self::assertSame('cancel', $page->actions[0]->value);
+            $html = WebUI::render(new Templates, $page);
+            self::assertStringContainsString('formnovalidate name="login_action" value="cancel"', $html);
+        }
+
+        // Cancelling from WAITING_CODE calls auth.cancelCode, clears state, cancels QR deferred, and serializes
+        $deferred = new DeferredCancellation;
+        $harness->setQrDeferred($deferred);
+        $harness->setLoginState(API::WAITING_CODE);
+        $harness->authorization = ['phone_number' => '+39 333 1234567', 'phone_code_hash' => 'hash123'];
+        $harness->cancelLogin();
+        self::assertSame(API::NOT_LOGGED_IN, $harness->getAuthorization());
+        self::assertNull($harness->authorization);
+        self::assertTrue($deferred->isCancelled());
+        self::assertSame(1, $harness->serialized);
+        self::assertCount(1, $harness->calls);
+        self::assertSame('auth.cancelCode', $harness->calls[0][0]);
+        self::assertSame('+39 333 1234567', $harness->calls[0][1]['phone_number']);
+        self::assertSame('hash123', $harness->calls[0][1]['phone_code_hash']);
+
+        // A failing auth.cancelCode still resets local state cleanly
+        $harness->setLoginState(API::WAITING_CODE);
+        $harness->authorization = ['phone_number' => '+39 333 1234567', 'phone_code_hash' => 'expired'];
+        $harness->nextCallError = RPCErrorException::make('PHONE_CODE_EXPIRED', 400, '');
+        $harness->cancelLogin();
+        self::assertSame(API::NOT_LOGGED_IN, $harness->getAuthorization());
+        self::assertNull($harness->authorization);
+
+        // Cancelling from WAITING_PASSWORD / WAITING_SIGNUP resets without calling auth.cancelCode
+        $callsBefore = \count($harness->calls);
+        foreach ([API::WAITING_PASSWORD, API::WAITING_SIGNUP] as $state) {
+            $harness->setLoginState($state);
+            $harness->authorization = ['phone_number' => '+39 333 1234567', 'hint' => 'h'];
+            $harness->cancelLogin();
+            self::assertSame(API::NOT_LOGGED_IN, $harness->getAuthorization());
+            self::assertNull($harness->authorization);
+        }
+        self::assertCount($callsBefore, $harness->calls);
+
+        // Cancelling via webStep preserves the phone number on the returned login.signIn page
+        $_SERVER['HTTP_X_MADELINEPROTO_WEBUI'] = 'json';
+        $postBefore = $_POST;
+        try {
+            $harness->setLoginState(API::WAITING_CODE);
+            $harness->authorization = ['phone_number' => '+39 333 1234567', 'phone_code_hash' => 'h'];
+            $phone = $harness->getWebLoginInfo()['phoneNumber'] ?? null;
+            $json = self::capture(static function () use ($harness, $phone): void {
+                $harness->runWebStep(static function () use ($harness, $phone): void {
+                    $harness->cancelLogin();
+                    $_POST = $phone === null ? [] : ['phone_number' => $phone];
+                });
+            });
+            $decoded = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+            self::assertSame('login.signIn', $decoded['state']['page']['view']);
+            self::assertSame('+39 333 1234567', $decoded['state']['page']['fields'][1]['value']);
+        } finally {
+            $_POST = $postBefore;
+            unset($_SERVER['HTTP_X_MADELINEPROTO_WEBUI']);
+        }
+
+        // Cannot cancel once logged in
+        $harness->setLoginState(API::LOGGED_IN);
+        $this->expectException(Exception::class);
+        $harness->cancelLogin();
     }
 }

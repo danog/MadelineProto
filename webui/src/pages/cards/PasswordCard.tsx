@@ -8,7 +8,7 @@
  * the account reset are tweb's own calls, which the script doesn't offer: they're left out.
  */
 
-import {createSignal, JSX, onCleanup, onMount} from 'solid-js';
+import {createSignal, JSX, onCleanup, onMount, Show} from 'solid-js';
 
 import Button from '@components/buttonTsx';
 import PasswordInputField from '@components/passwordInputField';
@@ -37,9 +37,12 @@ export default function PasswordCard(props: {spec: CardSpec}) {
   const monkeySize = mediaSizes.isMobile ? 100 : 130;
   let cancelled = false;
 
+  const cancelAction = props.spec.page.actions.find((action) => action.name === 'login_action' && action.value === 'cancel');
+
   /* ---------- state ---------- */
 
   const [submitting, setSubmitting] = createSignal(false);
+  const [cancelling, setCancelling] = createSignal(false);
   const [nextContent, setNextContent] = createSignal<JSX.Element>(i18n('Login.Next'));
 
   /* ---------- input ---------- */
@@ -69,6 +72,7 @@ export default function PasswordCard(props: {spec: CardSpec}) {
 
   function onSubmit(e?: Event) {
     if(e) cancelEvent(e);
+    if(submitting() || cancelling()) return;
 
     if(!passwordInput.value.length) {
       passwordInput.classList.add('error');
@@ -100,11 +104,30 @@ export default function PasswordCard(props: {spec: CardSpec}) {
     });
   }
 
+  function onCancel() {
+    if(!cancelAction || submitting() || cancelling()) return;
+    setCancelling(true);
+    passwordInput.disabled = true;
+
+    submit({[cancelAction.name]: cancelAction.value}).then((page) => {
+      if(!page || cancelled) return;
+      setCancelling(false);
+      passwordInput.disabled = false;
+      setNextContent(pageErrorText(page) ?? i18n('Error.AnError'));
+    }).catch((err) => {
+      console.error('cancel login error:', err);
+      if(cancelled) return;
+      setCancelling(false);
+      passwordInput.disabled = false;
+      setNextContent(i18n('Error.AnError'));
+    });
+  }
+
   passwordInput.addEventListener('keypress', function(this: HTMLInputElement, e) {
     this.classList.remove('error');
     setNextContent(i18n('Login.Next'));
 
-    if(e.key === 'Enter') {
+    if(e.key === 'Enter' && !e.isComposing) {
       return onSubmit();
     }
   });
@@ -141,20 +164,34 @@ export default function PasswordCard(props: {spec: CardSpec}) {
           <PageNotices alerts={props.spec.page.alerts} />
         </MediaHeader>
       }
+      inputWrapper={false}
     >
-      {passwordInputField.container}
-      <Button
-        class="btn-primary btn-color-primary"
-        disabled={submitting()}
-        onClick={onSubmit}
-      >
-        {nextContent()}
-        {submitting() && (
-          <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
-            <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"/>
-          </svg>
+      <div class="input-wrapper">
+        {passwordInputField.container}
+        <Button
+          class="btn-primary btn-color-primary"
+          disabled={submitting() || cancelling()}
+          onClick={onSubmit}
+        >
+          {nextContent()}
+          {submitting() && (
+            <svg xmlns="http://www.w3.org/2000/svg" class="preloader-circular" viewBox="25 25 50 50">
+              <circle class="preloader-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"/>
+            </svg>
+          )}
+        </Button>
+      </div>
+      <Show when={cancelAction}>
+        {(action) => (
+          <Button
+            class="btn-primary btn-secondary btn-primary-transparent primary"
+            disabled={submitting() || cancelling()}
+            onClick={onCancel}
+          >
+            {cancelling() ? i18n('PleaseWait') : action().label}
+          </Button>
         )}
-      </Button>
+      </Show>
     </AuthCard>
   );
 }

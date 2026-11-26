@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Nie znaleziono hasha tworzenia aplikacji!",
     "myTelegramOrgNoApiId": "Nie znaleziono API ID i API hash na stronie aplikacji w my.telegram.org",
     "myTelegramOrgUnexpected": "Nieoczekiwana odpowiedź z my.telegram.org",
-    "myTelegramOrgEmpty": "Pusta odpowiedź z my.telegram.org"
+    "myTelegramOrgEmpty": "Pusta odpowiedź z my.telegram.org",
+    "loginCancelWeb": "Anuluj logowanie"
 }

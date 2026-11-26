@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "アプリ作成用のハッシュが見つかりません！",
     "myTelegramOrgNoApiId": "my.telegram.org のアプリのページに API ID と API hash が見つかりません",
     "myTelegramOrgUnexpected": "my.telegram.org からの予期しない応答",
-    "myTelegramOrgEmpty": "my.telegram.org からの応答が空です"
+    "myTelegramOrgEmpty": "my.telegram.org からの応答が空です",
+    "loginCancelWeb": "ログインをキャンセル"
 }

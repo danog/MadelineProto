@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Ilova yaratish hash'i topilmadi!",
     "myTelegramOrgNoApiId": "my.telegram.org dagi ilova sahifasida API ID va API hash topilmadi",
     "myTelegramOrgUnexpected": "my.telegram.org dan kutilmagan javob",
-    "myTelegramOrgEmpty": "my.telegram.org dan bo'sh javob"
+    "myTelegramOrgEmpty": "my.telegram.org dan bo'sh javob",
+    "loginCancelWeb": "Kirishni bekor qilish"
 }

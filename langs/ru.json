@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Не найден хеш для создания приложения!",
     "myTelegramOrgNoApiId": "Не удалось найти API ID и API hash на странице приложения на my.telegram.org",
     "myTelegramOrgUnexpected": "Неожиданный ответ от my.telegram.org",
-    "myTelegramOrgEmpty": "Пустой ответ от my.telegram.org"
+    "myTelegramOrgEmpty": "Пустой ответ от my.telegram.org",
+    "loginCancelWeb": "Отменить вход"
 }

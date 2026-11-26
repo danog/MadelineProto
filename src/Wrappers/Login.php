@@ -157,6 +157,37 @@ trait Login
         return $c->getCancellation();
     }
     /**
+     * Cancel a login in progress and return to the initial not-logged-in state.
+     */
+    public function cancelLogin(): void
+    {
+        $state = $this->loginState->getState()->state;
+        if ($state === API::LOGGED_IN) {
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
+        }
+        $phone = $this->authorization['phone_number'] ?? null;
+        $hash = $this->authorization['phone_code_hash'] ?? null;
+        $this->authorization = null;
+        $this->loginQrCode = null;
+        $this->qrLoginDeferred?->cancel();
+        $this->qrLoginDeferred = null;
+        if ($state === API::WAITING_CODE || $state === API::WAITING_PASSWORD || $state === API::WAITING_SIGNUP) {
+            $this->setLoginState(API::NOT_LOGGED_IN);
+            $this->serialize();
+        }
+        if ($state === API::WAITING_CODE && \is_string($phone) && \is_string($hash)) {
+            try {
+                $this->methodCallAsyncRead('auth.cancelCode', [
+                    'phone_number' => $phone,
+                    'phone_code_hash' => $hash,
+                    'specialMethodType' => SpecialMethodType::USER_RELATED,
+                ]);
+            } catch (RPCErrorException|Exception|CancelledException $e) {
+                $this->logger->logger("Could not cancel login code: $e", Logger::NOTICE);
+            }
+        }
+    }
+    /**
      * Logout the session.
      */
     public function logout(): void

@@ -67,9 +67,9 @@ interface Sessions {
 | `api.create` | Create the app | `app_title`, `app_shortname`, `app_url` (optional), `app_desc` (optional) | |
 | `api.manual` | Enter API ID and hash | `api_id`, `api_hash`; action `api_setup=reset` | |
 | `login.signIn` | Phone number (or bot token), QR code login | `type=phone` + `phone_number`, or `type=bot` + `token` | |
-| `login.code` | Login code | `phone_code` | `phoneNumber`, `sentCode: {type, length, nextType, timeout}` (`type` like `auth.sentCodeTypeApp`) |
-| `login.password` | 2FA password | `password` | `hint` (may be empty) |
-| `login.signUp` | First and last name of a new account | `first_name`, `last_name` | `phoneNumber` |
+| `login.code` | Login code | `phone_code`; action `login_action=cancel` | `phoneNumber`, `sentCode: {type, length, nextType, timeout}` (`type` like `auth.sentCodeTypeApp`) |
+| `login.password` | 2FA password | `password`; action `login_action=cancel` | `hint` (may be empty) |
+| `login.signUp` | First and last name of a new account | `first_name`, `last_name`; action `login_action=cancel` | `phoneNumber` |
 | `status` | Status message (the bot was started...), no form | | |
 
 Unknown views: render `page` generically (title, lead, alerts, fields, submit, actions).

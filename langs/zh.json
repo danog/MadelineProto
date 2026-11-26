@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "找不到创建应用所需的哈希！",
     "myTelegramOrgNoApiId": "在 my.telegram.org 的应用页面中找不到 API ID 和 API hash",
     "myTelegramOrgUnexpected": "来自 my.telegram.org 的意外响应",
-    "myTelegramOrgEmpty": "来自 my.telegram.org 的空响应"
+    "myTelegramOrgEmpty": "来自 my.telegram.org 的空响应",
+    "loginCancelWeb": "取消登录"
 }

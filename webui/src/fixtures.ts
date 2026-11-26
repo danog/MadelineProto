@@ -101,12 +101,14 @@ export const pages: Record<string, Page> = {
     step: 'verify',
     fields: [field('phone_code', 'Code', {type: 'code', maxLength: 12})],
     submit: 'Log in',
+    actions: [{label: 'Cancel login', name: 'login_action', value: 'cancel'}],
     data: {phoneNumber: '+39 333 1234567', sentCode: {type: 'auth.sentCodeTypeApp', length: 5, nextType: 'auth.codeTypeSms', timeout: 60}}
   }),
   'login.password': base('login.password', 'Two-step verification', {
     step: 'verify',
     fields: [field('password', 'Password', {type: 'password'})],
     submit: 'Log in',
+    actions: [{label: 'Cancel login', name: 'login_action', value: 'cancel'}],
     data: {hint: 'the usual one'}
   }),
   'login.signUp': base('login.signUp', 'Create your account', {
@@ -116,6 +118,7 @@ export const pages: Record<string, Page> = {
       field('last_name', 'Last name', {required: false, autocomplete: 'family-name'})
     ],
     submit: 'Continue',
+    actions: [{label: 'Cancel login', name: 'login_action', value: 'cancel'}],
     data: {phoneNumber: '+39 333 1234567'}
   }),
   'status': base('status', 'The bot was started!', {

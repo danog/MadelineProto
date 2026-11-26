@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Le hash de création de l'application est introuvable !",
     "myTelegramOrgNoApiId": "L'API ID et l'API hash sont introuvables sur la page de l'application sur my.telegram.org",
     "myTelegramOrgUnexpected": "Réponse inattendue de my.telegram.org",
-    "myTelegramOrgEmpty": "Réponse vide de my.telegram.org"
+    "myTelegramOrgEmpty": "Réponse vide de my.telegram.org",
+    "loginCancelWeb": "Annuler la connexion"
 }
