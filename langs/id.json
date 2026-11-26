@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Hash pembuatan aplikasi tidak ditemukan!",
     "myTelegramOrgNoApiId": "API ID dan API hash tidak ditemukan di halaman aplikasi di my.telegram.org",
     "myTelegramOrgUnexpected": "Respons tak terduga dari my.telegram.org",
-    "myTelegramOrgEmpty": "Respons kosong dari my.telegram.org"
+    "myTelegramOrgEmpty": "Respons kosong dari my.telegram.org",
+    "loginCancelWeb": "Batalkan login"
 }

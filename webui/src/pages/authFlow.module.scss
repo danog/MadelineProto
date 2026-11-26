@@ -199,8 +199,15 @@ $corner-button-size: 2.5rem;
 
   // Pencil icon next to the phone number; click → back to SignIn.
   .phoneEdit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
     margin-inline-start: .4rem;
     opacity: .5;
     transition: .2s opacity;
@@ -209,6 +216,18 @@ $corner-button-size: 2.5rem;
     line-height: 1;
 
     @include hover() {
+      opacity: 1;
+    }
+
+    &:disabled {
+      pointer-events: none;
+      opacity: var(--disabled-opacity);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+      border-radius: .25rem;
       opacity: 1;
     }
   }

@@ -157,6 +157,38 @@ trait Login
         return $c->getCancellation();
     }
     /**
+     * Cancel a login in progress and return to the initial not-logged-in state.
+     */
+    public function cancelLogin(): void
+    {
+        $state = $this->loginState->getState()->state;
+        if ($state === API::LOGGED_IN) {
+            throw new Exception(Lang::$current_lang['already_loggedIn']);
+        }
+        $authorization = $this->authorization ?? [];
+        $phone = isset($authorization['phone_number']) && \is_string($authorization['phone_number']) ? $authorization['phone_number'] : null;
+        $hash = isset($authorization['phone_code_hash']) && \is_string($authorization['phone_code_hash']) ? $authorization['phone_code_hash'] : null;
+        $this->authorization = null;
+        $this->loginQrCode = null;
+        $this->qrLoginDeferred?->cancel();
+        $this->qrLoginDeferred = null;
+        if ($state === API::WAITING_CODE || $state === API::WAITING_PASSWORD || $state === API::WAITING_SIGNUP) {
+            $this->setLoginState(API::NOT_LOGGED_IN);
+            $this->serialize();
+        }
+        if ($state === API::WAITING_CODE && $phone !== null && $hash !== null) {
+            try {
+                $this->methodCallAsyncRead('auth.cancelCode', [
+                    'phone_number' => $phone,
+                    'phone_code_hash' => $hash,
+                    'specialMethodType' => SpecialMethodType::USER_RELATED,
+                ]);
+            } catch (RPCErrorException|Exception|CancelledException $e) {
+                $this->logger->logger("Could not cancel login code: $e", Logger::NOTICE);
+            }
+        }
+    }
+    /**
      * Logout the session.
      */
     public function logout(): void

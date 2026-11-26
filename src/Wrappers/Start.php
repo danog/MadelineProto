@@ -30,6 +30,7 @@ use danog\MadelineProto\MTProto;
 use danog\MadelineProto\RPCErrorException;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Tools;
+use danog\MadelineProto\WebUI\Action;
 use danog\MadelineProto\WebUI\Alert;
 use danog\MadelineProto\WebUI\Field;
 use danog\MadelineProto\WebUI\FieldType;
@@ -127,7 +128,14 @@ trait Start
         }
         $auth = $this->getAuthorization();
         $post = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
-        if ($auth === API::NOT_LOGGED_IN) {
+        if ($post && ($_POST['login_action'] ?? null) === 'cancel') {
+            $phone = $this->getWebLoginInfo()['phoneNumber'] ?? null;
+            $this->webStep(function () use ($phone): void {
+                $this->cancelLogin();
+                // Ignore the fields of the cancelled form, keeping the phone number so a typo can be fixed
+                $_POST = $phone === null ? [] : ['phone_number' => $phone];
+            });
+        } elseif ($auth === API::NOT_LOGGED_IN) {
             $type = $_POST['type'] ?? (isset($_POST['token']) ? 'bot' : 'phone');
             if ($type === 'bot' && isset($_POST['token']) && \is_string($_POST['token'])) {
                 $token = $_POST['token'];
@@ -343,6 +351,7 @@ trait Start
                     ],
                     submit: Lang::$current_lang['webLogin'],
                     alerts: $alerts,
+                    actions: [new Action(Lang::$current_lang['loginCancelWeb'], 'login_action', 'cancel')],
                 );
             case API::WAITING_PASSWORD:
                 $hint = $this->getHint();
@@ -363,6 +372,7 @@ trait Start
                     ],
                     submit: Lang::$current_lang['webLogin'],
                     alerts: $alerts,
+                    actions: [new Action(Lang::$current_lang['loginCancelWeb'], 'login_action', 'cancel')],
                 );
             case API::WAITING_SIGNUP:
                 return new Page(
@@ -389,6 +399,7 @@ trait Start
                     ],
                     submit: Lang::$current_lang['webContinue'],
                     alerts: $alerts,
+                    actions: [new Action(Lang::$current_lang['loginCancelWeb'], 'login_action', 'cancel')],
                 );
         }
         return null;

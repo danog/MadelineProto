@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "هش ساخت برنامه پیدا نشد!",
     "myTelegramOrgNoApiId": "API ID و API HASH در صفحه برنامه در my.telegram.org پیدا نشد",
     "myTelegramOrgUnexpected": "پاسخ غیرمنتظره از my.telegram.org",
-    "myTelegramOrgEmpty": "پاسخ خالی از my.telegram.org"
+    "myTelegramOrgEmpty": "پاسخ خالی از my.telegram.org",
+    "loginCancelWeb": "لغو ورود"
 }

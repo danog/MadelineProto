@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "앱 생성 해시를 찾을 수 없습니다!",
     "myTelegramOrgNoApiId": "my.telegram.org의 앱 페이지에서 API ID와 API hash를 찾을 수 없습니다",
     "myTelegramOrgUnexpected": "my.telegram.org의 예기치 않은 응답",
-    "myTelegramOrgEmpty": "my.telegram.org의 빈 응답"
+    "myTelegramOrgEmpty": "my.telegram.org의 빈 응답",
+    "loginCancelWeb": "로그인 취소"
 }

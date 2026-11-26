@@ -217,6 +217,36 @@ describe('the cards', () => {
     expect(posts).toEqual([{first_name: 'Daniil', last_name: ''}]);
   });
 
+  it('cancel login: posts login_action=cancel from code (edit icon), password, and sign up, returning to sign in', async() => {
+    const signInWithPhone = state('login.signIn');
+    signInWithPhone.page.fields.find((field) => field.name === 'phone_number')!.value = '+39 333 1234567';
+
+    // From code card via the pencil icon next to the phone number (like tweb)
+    let posts = server([signInWithPhone]);
+    mount('login.code');
+    const editButton = screen.getByRole('button', {name: 'Cancel login'}) as HTMLButtonElement;
+    editButton.click();
+    await waitFor(() => expect(screen.getByText('Sign in to MadelineProto')).toBeTruthy());
+    expect(posts).toEqual([{login_action: 'cancel'}]);
+    expect((screen.getByLabelText('Phone Number') as HTMLInputElement).value).toBe('+39 333 123 4567');
+    cleanup();
+
+    // From password card
+    posts = server([state('login.signIn')]);
+    mount('login.password');
+    clickButton(/^Cancel login$/);
+    await waitFor(() => expect(screen.getByText('Sign in to MadelineProto')).toBeTruthy());
+    expect(posts).toEqual([{login_action: 'cancel'}]);
+    cleanup();
+
+    // From sign up card
+    posts = server([state('login.signIn')]);
+    mount('login.signUp');
+    clickButton(/^Cancel login$/);
+    await waitFor(() => expect(screen.getByText('Sign in to MadelineProto')).toBeTruthy());
+    expect(posts).toEqual([{login_action: 'cancel'}]);
+  });
+
   it('API ID setup: the fields, the actions, and the errors of the server', async() => {
     const vps = 'ERROR. Telegram doesn\'t let VPS, VPN and other datacenter IP ranges create new apps';
     const posts = server([state('api.create', {message: vps}), state('api.manual')]);

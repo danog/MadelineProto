@@ -7,6 +7,13 @@ import type {State} from '@/types';
 
 (window as any).__MADELINE_DEV__ = true;
 
+function signInWithPhone(phone?: string): State {
+  const s = state('login.signIn');
+  const field = s.page.fields.find((f) => f.name === 'phone_number');
+  if(field && phone) field.value = phone;
+  return s;
+}
+
 const next: Record<string, (fields: Record<string, string>) => State | {loggedIn: true}> = {
   'api.auto': (f) => f.api_setup === 'manual' ? state('api.manual') : state('api.code'),
   'api.code': (f) => f.api_setup === 'manual' ? state('api.manual') :
@@ -21,10 +28,12 @@ const next: Record<string, (fields: Record<string, string>) => State | {loggedIn
   'login.signIn': (f) => f.type === 'bot' ?
     (/^\d+:\w{10,}$/.test(f.token) ? {loggedIn: true} : state('login.signIn', {rpcError: 'ACCESS_TOKEN_INVALID'})) :
     state('login.code'),
-  'login.code': (f) => f.phone_code === '12345' ? state('login.password') :
+  'login.code': (f) => f.login_action === 'cancel' ? signInWithPhone(pages['login.code'].data.phoneNumber) :
+    f.phone_code === '12345' ? state('login.password') :
     f.phone_code === '11111' ? state('login.signUp') : state('login.code', {rpcError: 'PHONE_CODE_INVALID'}),
-  'login.password': (f) => f.password === 'hunter2' ? {loggedIn: true} : state('login.password', {rpcError: 'PASSWORD_HASH_INVALID'}),
-  'login.signUp': () => ({loggedIn: true})
+  'login.password': (f) => f.login_action === 'cancel' ? state('login.signIn') :
+    f.password === 'hunter2' ? {loggedIn: true} : state('login.password', {rpcError: 'PASSWORD_HASH_INVALID'}),
+  'login.signUp': (f) => f.login_action === 'cancel' ? signInWithPhone(pages['login.signUp'].data.phoneNumber) : ({loggedIn: true})
 };
 
 let view = new URLSearchParams(location.search).get('view') ?? 'login.signIn';

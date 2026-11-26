@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "هاشی دروستکردنی ئەپ نەدۆزرایەوە!",
     "myTelegramOrgNoApiId": "API ID و هاش لە پەڕەی ئەپەکە لە my.telegram.org نەدۆزرانەوە",
     "myTelegramOrgUnexpected": "وەڵامێکی چاوەڕواننەکراو لە my.telegram.org",
-    "myTelegramOrgEmpty": "وەڵامێکی بەتاڵ لە my.telegram.org"
+    "myTelegramOrgEmpty": "وەڵامێکی بەتاڵ لە my.telegram.org",
+    "loginCancelWeb": "هەڵوەشاندنەوەی چوونەژوورەوە"
 }

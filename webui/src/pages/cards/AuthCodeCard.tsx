@@ -5,14 +5,15 @@
  *
  * Adapted for MadelineProto: the code goes to the script (`phone_code`, tweb: `auth.signIn`), which answers
  * with the next page (password, signup) or the end of the login. What it sent is `page.data.sentCode`. The
- * resend, the login email reset and the way back to the phone number are tweb's own calls, which the script
- * doesn't offer: they're left out.
+ * resend and the login email reset are tweb's own calls, which the script doesn't offer: they're left out.
+ * Going back / cancelling posts the `login_action=cancel` action when the server offers it.
  */
 
 import {JSX, Show, createSignal, onCleanup, onMount} from 'solid-js';
 
 import Button from '@components/buttonTsx';
 import CodeInputFieldCompat from '@components/codeInputField';
+import {IconTsx} from '@components/iconTsx';
 import InputField, {InputState} from '@components/inputField';
 import TrackingMonkey, {preloadTrackingMonkey} from '@components/monkeys/tracking';
 import MediaHeader from '@components/mediaHeader';
@@ -113,8 +114,10 @@ export default function AuthCodeCard(props: {spec: CardSpec}) {
 
   const sentCode = fromSentCodeInfo(props.spec.page.data?.sentCode, props.spec.page.data?.phoneNumber);
   const kind: CodeInputKind = getCodeInputKind(sentCode.type);
+  const cancelAction = props.spec.page.actions.find((action) => action.name === 'login_action' && action.value === 'cancel');
 
   const [submitting, setSubmitting] = createSignal(false);
+  const [cancelling, setCancelling] = createSignal(false);
   const [errorContent, setErrorContent] = createSignal<JSX.Element>();
 
   const stickerHost = document.createElement('div');
@@ -179,7 +182,7 @@ export default function AuthCodeCard(props: {spec: CardSpec}) {
 
   function submitTextCode() {
     const value = textInputField?.value.trim();
-    if(!value || submitting()) return;
+    if(!value || submitting() || cancelling()) return;
     submitCode(value);
   }
 
@@ -188,7 +191,28 @@ export default function AuthCodeCard(props: {spec: CardSpec}) {
     textInputField?.input.toggleAttribute('disabled', disabled);
   }
 
+  function onCancel() {
+    if(!cancelAction || submitting() || cancelling()) return;
+    setCancelling(true);
+    setInputDisabled(true);
+    clearError();
+
+    submit({[cancelAction.name]: cancelAction.value}).then((page) => {
+      if(!page || cancelled) return;
+      setCancelling(false);
+      setInputDisabled(false);
+      markError(pageError(page) ?? i18n('Error.AnError'));
+    }).catch((err) => {
+      console.error('cancel login error:', err);
+      if(cancelled) return;
+      setCancelling(false);
+      setInputDisabled(false);
+      markError(i18n('Error.AnError'));
+    });
+  }
+
   function submitCode(code: string) {
+    if(submitting() || cancelling()) return;
     // the word/phrase types disclose how the secret starts: a typo is caught here, not by the server
     if(kind === 'text' && !beginsOk(code, getCodeBeginning(sentCode.type))) {
       markError(i18n('Login.Code.WordBeginningInvalid'));
@@ -254,7 +278,22 @@ export default function AuthCodeCard(props: {spec: CardSpec}) {
         <MediaHeader>
           <MediaHeader.Sticker element={stickerHost} size={stickerSize}/>
           <MediaHeader.Title>
-            <div class={styles.phoneWrapper}>{phoneEl}</div>
+            <div class={styles.phoneWrapper}>
+              {phoneEl}
+              <Show when={cancelAction}>
+                {(action) => (
+                  <button
+                    type="button"
+                    class={styles.phoneEdit}
+                    disabled={submitting() || cancelling()}
+                    onClick={onCancel}
+                    aria-label={action().label}
+                  >
+                    <IconTsx icon="edit" />
+                  </button>
+                )}
+              </Show>
+            </div>
           </MediaHeader.Title>
           <MediaHeader.Subtitle class="secondary">{sentTypeContent(sentCode)}</MediaHeader.Subtitle>
           <PageNotices alerts={props.spec.page.alerts} />
@@ -267,7 +306,7 @@ export default function AuthCodeCard(props: {spec: CardSpec}) {
       <Show when={kind === 'text'}>
         <Button
           class={classNames('btn-primary btn-color-primary', styles.wordSubmit)}
-          disabled={submitting()}
+          disabled={submitting() || cancelling()}
           onClick={submitTextCode}
           text="Login.Next"
         />

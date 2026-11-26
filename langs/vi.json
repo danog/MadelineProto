@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Không tìm thấy hash tạo ứng dụng!",
     "myTelegramOrgNoApiId": "Không tìm thấy API ID và API hash trong trang ứng dụng trên my.telegram.org",
     "myTelegramOrgUnexpected": "Phản hồi không mong đợi từ my.telegram.org",
-    "myTelegramOrgEmpty": "Phản hồi trống từ my.telegram.org"
+    "myTelegramOrgEmpty": "Phản hồi trống từ my.telegram.org",
+    "loginCancelWeb": "Hủy đăng nhập"
 }

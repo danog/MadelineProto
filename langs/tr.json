@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "Uygulama oluşturma hash'i bulunamadı!",
     "myTelegramOrgNoApiId": "my.telegram.org'daki uygulama sayfasında API ID ve API hash bulunamadı",
     "myTelegramOrgUnexpected": "my.telegram.org'dan beklenmeyen yanıt",
-    "myTelegramOrgEmpty": "my.telegram.org'dan boş yanıt"
+    "myTelegramOrgEmpty": "my.telegram.org'dan boş yanıt",
+    "loginCancelWeb": "Girişi iptal et"
 }

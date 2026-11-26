@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "تعذر العثور على رمز إنشاء التطبيق!",
     "myTelegramOrgNoApiId": "تعذر العثور على API ID وAPI hash في صفحة التطبيق على my.telegram.org",
     "myTelegramOrgUnexpected": "استجابة غير متوقعة من my.telegram.org",
-    "myTelegramOrgEmpty": "استجابة فارغة من my.telegram.org"
+    "myTelegramOrgEmpty": "استجابة فارغة من my.telegram.org",
+    "loginCancelWeb": "إلغاء تسجيل الدخول"
 }

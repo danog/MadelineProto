@@ -281,5 +281,6 @@
     "myTelegramOrgNoCreationHash": "לא נמצא ה-hash ליצירת האפליקציה!",
     "myTelegramOrgNoApiId": "לא נמצאו API ID ו-API hash בעמוד האפליקציה ב-my.telegram.org",
     "myTelegramOrgUnexpected": "תגובה לא צפויה מ-my.telegram.org",
-    "myTelegramOrgEmpty": "תגובה ריקה מ-my.telegram.org"
+    "myTelegramOrgEmpty": "תגובה ריקה מ-my.telegram.org",
+    "loginCancelWeb": "ביטול ההתחברות"
 }

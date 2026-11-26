@@ -439,6 +439,13 @@ abstract class InternalDoc
         $this->wrapper->getAPI()->cancelBroadcast($id);
     }
     /**
+     * Cancel a login in progress and return to the initial not-logged-in state.
+     */
+    final public function cancelLogin(): void
+    {
+        $this->wrapper->getAPI()->cancelLogin();
+    }
+    /**
      * Close connection with client, connected via web.
      *
      * @param string $message Message
