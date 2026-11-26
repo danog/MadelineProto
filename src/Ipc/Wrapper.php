@@ -116,30 +116,6 @@ final class Wrapper extends ClientAbstract
         return ['data', 'callbackIds', 'remoteId'];
     }
     /**
-     * Wrap a Cancellation object specifically without touching generic callback/file wrapping paths.
-     *
-     * @param-out list{class-string<WrapperCancellation>, array<string, int>} $cancellation
-     */
-    public function wrapCancellation(Cancellation &$cancellation): void
-    {
-        if ($cancellation->isRequested()) {
-            // The IPC server only learns about cancellations asynchronously: don't even start the call.
-            $this->disconnect();
-            $cancellation->throwIfRequested();
-        }
-        $wrapped = new WrappedCancellation($cancellation);
-        $this->cancellations[] = $wrapped;
-        $ids = [];
-        foreach (get_class_methods($wrapped) as $method) {
-            $id = $this->id++;
-            $this->callbacks[$id] = [$wrapped, $method];
-            $ids[$method] = $id;
-        }
-        $cancellation = [WrapperCancellation::class, $ids]; // Will be re-filled later
-        $this->callbackIds[] = &$cancellation;
-    }
-
-    /**
      * Wrap a certain callback object.
      *
      * @param mixed $callback    Callback to wrap

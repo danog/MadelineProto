@@ -108,10 +108,12 @@ final class ProcessRunner extends RunnerAbstract
         Logger::log("Starting process with $command");
 
         $cwd = Magic::getcwd();
-        $params = [
-            'argv' => ['madeline-ipc', $session, $startupId],
-            'cwd' => $cwd,
-        ];
+        // For a php binary that is a CGI one (some shared hosts): it gets the arguments from the query string, and
+        // entry.php requires the startup token of the web runner, shared with the one started at once
+        $params = ['argv' => ['madeline-ipc', $session, $startupId]];
+        if (PHP_SAPI !== 'cli') {
+            $params['token'] = WebRunner::createStartupToken($session, $startupId);
+        }
         $root = '';
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             try {

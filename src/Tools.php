@@ -1061,7 +1061,21 @@ abstract class Tools extends AsyncTools
     {
         return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg'
             ? $s
-            : htmlentities($s, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
+            // Only the HTML special characters: ENT_HTML5 entities (&period;, &lpar;...) make text unreadable
+            : htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * Parse a Telegram API hash: 32 hex characters, lowercase.
+     *
+     * @internal
+     * @psalm-pure
+     * @psalm-taint-escape input
+     */
+    public static function parseApiHash(string $raw): ?string
+    {
+        $hash = strtolower(trim($raw));
+        return preg_match('/^[a-f0-9]{32}$/D', $hash) ? $hash : null;
     }
 
     /**
@@ -1102,8 +1116,9 @@ abstract class Tools extends AsyncTools
             }
             $host = $parts[0];
         }
+        // Labels of letters, digits, hyphens and underscores (docker service names, nginx's server_name _)
         if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
-            && !filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)
+            && !preg_match('/^(?=.{1,253}\.?$)[a-z0-9_](?:[a-z0-9_-]{0,61}[a-z0-9_])?(?:\.[a-z0-9_](?:[a-z0-9_-]{0,61}[a-z0-9_])?)*\.?$/iD', $host)
         ) {
             throw new \AssertionError('Invalid server name!');
         }

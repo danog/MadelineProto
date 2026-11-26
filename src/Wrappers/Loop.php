@@ -67,6 +67,10 @@ trait Loop
             $id = Shutdown::addCallback(static function () use (&$logger): void {
                 $params = $_GET;
                 $params['MadelineSelfRestart'] = Tools::randomInt();
+                if (isset($params['token']) && \defined('MADELINE_WORKER_TYPE') && MADELINE_WORKER_TYPE === 'madeline-ipc') {
+                    // A worker started over HTTP: its startup token was used up
+                    $params['token'] = WebRunner::createStartupToken((string) MADELINE_WORKER_ARGS[0], (int) MADELINE_WORKER_ARGS[1]);
+                }
                 $url = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2)[0] ?? '';
                 $query = http_build_query($params);
 

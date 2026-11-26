@@ -40,7 +40,10 @@ use Webmozart\Assert\Assert;
         return;
     }
     \define('MADELINE_ENTRY', 1);
-    $fromWeb = false;
+    // Only the command line of the CLI binary is trusted: arguments from a request (here, or in madeline.php, which
+    // defines MADELINE_WORKER_TYPE itself) need the startup token of the runner (WebRunner::createStartupToken()).
+    // A web SAPI may also fill argv from the query string (register_argc_argv).
+    $fromWeb = !((PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg') && !empty($GLOBALS['argv']));
     if (!\defined('MADELINE_WORKER_TYPE')) {
         if (\count(debug_backtrace(0)) !== 1) {
             // We're not being included directly
@@ -51,7 +54,6 @@ use Webmozart\Assert\Assert;
             $arguments = \array_slice($GLOBALS['argv'], 1);
         } elseif (isset($_GET['argv']) && \is_array($_GET['argv']) && !empty($_GET['argv'])) {
             $arguments = $_GET['argv'];
-            $fromWeb = true;
         }
         if (\count($arguments) < 2) {
             trigger_error('Not enough arguments!', E_USER_ERROR);
@@ -122,6 +124,7 @@ use Webmozart\Assert\Assert;
                             && abs(time() - $tokenTime) <= WebRunner::TOKEN_TTL
                         ) {
                             $valid = true;
+                            $tokenCwd = \is_string($tokenCwd) ? base64_decode($tokenCwd, true) : false;
                             if (\is_string($tokenCwd) && $tokenCwd !== '' && is_dir($tokenCwd)) {
                                 $webCwd = $tokenCwd;
                             }
@@ -137,6 +140,13 @@ use Webmozart\Assert\Assert;
                     http_response_code(403);
                 }
                 exit(1);
+            }
+            // The request that started the worker ends with the script that sent it, and the web server then aborts
+            // this one: PHP would end the worker at its next output (before its self-restart, say). The response
+            // ends now, also before the timeouts of the web server (nginx: fastcgi_read_timeout).
+            ignore_user_abort(true);
+            if (\function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
             }
         }
 
@@ -184,6 +194,10 @@ use Webmozart\Assert\Assert;
 
             Logger::log("$e", Logger::FATAL_ERROR);
             Logger::log('Got exception in IPC server, exiting...', Logger::FATAL_ERROR);
+            if (!$session instanceof SessionPaths) {
+                // Before the session was opened: nowhere to report it
+                exit(1);
+            }
             $ipc = $session->getIpcState();
             if (!($ipc && $ipc->getStartupId() === $runnerId && !$ipc->getException())
                 && !(

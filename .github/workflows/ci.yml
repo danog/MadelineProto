@@ -265,6 +265,36 @@ jobs:
       - name: Test the handshake
         run: tests/test.sh handshake
 
+  fpm:
+    needs: docker-merge
+    runs-on: ubuntu-latest
+    container:
+      # The image of the version, for a tag.
+      image: danog/madelineproto:${{ github.ref_type == 'tag' && github.ref_name || 'next' }}
+      # The image runs as an unprivileged user by default: the steps install packages, and the checkout and the
+      # caches are written to directories of the runner, mounted in the container.
+      options: --user root
+      # Pulled as the account of the image: anonymous pulls share the rate limit of Docker Hub with every
+      # other user of the IP of the runner.
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+      - name: Install git
+        # The checkout belongs to the user of the runner, not to the one of the container: trust it.
+        run: |
+          command -v git > /dev/null || { apt-get update && apt-get install -y git; }
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v7
+      # The packages downloaded by composer, between runs.
+      - uses: actions/cache@v6
+        with:
+          path: /github/home/composer-cache
+          key: composer-${{ hashFiles('composer.json') }}-${{ github.run_id }}
+          restore-keys: composer-
+      - name: Test the IPC worker under php-fpm
+        run: tests/test.sh fpm
+
   build:
     # At once with the other tests: the release job publishes the phar once all of them passed.
     needs: docker-merge
@@ -351,7 +381,7 @@ jobs:
   release:
     # Once every test passed (the test job is skipped for tags). Skipped for the main branch: it needs the results of
     # this run, so it can't be in a workflow of its own.
-    needs: [cs, psalm, webui, test, test_light, handshake, build]
+    needs: [cs, psalm, webui, test, test_light, handshake, fpm, build]
     if: ${{ !cancelled() && !failure() && github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     permissions:

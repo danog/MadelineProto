@@ -110,12 +110,14 @@ final class Client extends ClientAbstract
         if (\is_array($arguments) && $arguments) {
             foreach ($arguments as &$arg) {
                 if ($arg instanceof Cancellation) {
-                    $wrapper = Wrapper::create($arguments, $this->session, $this->logger);
-                    $wrapper->wrapCancellation($arg);
-                    unset($arg, $arguments);
-                    $arguments = $wrapper;
                     break;
                 }
+            }
+            if ($arg instanceof Cancellation) {
+                $wrapper = Wrapper::create($arguments, $this->session, $this->logger);
+                $wrapper->wrap($arg);
+                unset($arg, $arguments);
+                $arguments = $wrapper;
             }
             unset($arg);
         }
