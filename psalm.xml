@@ -41,5 +41,6 @@
     </issueHandlers>
     <plugins>
         <pluginClass class="Webmozart\Assert\PsalmPlugin"></pluginClass>
+        <pluginClass class="danog\MadelineProto\Psalm\MethodCallPlugin"></pluginClass>
     </plugins>
 </psalm>
