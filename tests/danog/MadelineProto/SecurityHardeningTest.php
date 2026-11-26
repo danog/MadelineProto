@@ -123,85 +123,115 @@ final class SecurityHardeningTest extends TestCase
         self::assertNull($parse->invoke(null, 'image/'.str_repeat('a', 300)));
     }
 
-    public function testWebEntryRejectsUnauthenticatedOrInvalidTokenRequests(): void
+    public function testWebEntryRequiresTheStartupTokenOfTheRunner(): void
     {
         $sessionDir = sys_get_temp_dir().'/madeline-entry-sec-'.bin2hex(random_bytes(8));
         mkdir($sessionDir, 0o700, true);
+        $tokenFile = $sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE;
         $entryPath = realpath(\dirname(__DIR__, 3).'/src/Ipc/Runner/entry.php');
+        $autoload = realpath(\dirname(__DIR__, 3).'/vendor/autoload.php');
         self::assertIsString($entryPath);
+        self::assertIsString($autoload);
 
         $prependFile = $sessionDir.DIRECTORY_SEPARATOR.'prepend.php';
-        $runEntry = static function (array $get) use ($entryPath, $prependFile): int {
-            file_put_contents(
-                $prependFile,
-                \sprintf('<?php unset($argv, $GLOBALS["argv"]); $_GET = %s;', var_export($get, true)),
-            );
+        /**
+         * Run entry.php as a request would: no command line, the arguments in $_GET (or, with $phar, already
+         * defined by madeline.php). An accepted worker gets as far as opening the session, which here exits with 42.
+         *
+         * @return array{0: int, 1: string} The exit code, and what the worker reported
+         */
+        $runEntry = static function (array $get, bool $phar = false) use ($entryPath, $autoload, $prependFile): array {
+            $define = $phar
+                ? \sprintf('define("MADELINE_WORKER_TYPE", %s); define("MADELINE_WORKER_ARGS", %s);', var_export(array_shift($get['argv']), true), var_export($get['argv'], true))
+                : '';
+            file_put_contents($prependFile, \sprintf(
+                '<?php namespace danog\MadelineProto { require %s; final class SessionPaths { public function __construct() { fwrite(STDERR, "ACCEPTED ".getcwd()); exit(42); } } }
+                namespace { unset($argv, $GLOBALS["argv"]); $_GET = %s; %s
+                register_shutdown_function(static function () { if (http_response_code() === 403) { fwrite(STDERR, "FORBIDDEN"); } }); }',
+                var_export($autoload, true),
+                var_export($get, true),
+                $define,
+            ));
             $cmd = escapeshellarg(PHP_BINARY).' -d '.escapeshellarg("auto_prepend_file=$prependFile").' '.escapeshellarg($entryPath);
             $descriptors = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-            $proc = proc_open($cmd, $descriptors, $pipes);
+            $proc = proc_open($cmd, $descriptors, $pipes, sys_get_temp_dir());
             self::assertIsResource($proc);
             fclose($pipes[0]);
             stream_get_contents($pipes[1]);
-            stream_get_contents($pipes[2]);
+            $stderr = stream_get_contents($pipes[2]);
             fclose($pipes[1]);
             fclose($pipes[2]);
-            return proc_close($proc);
+            return [proc_close($proc), $stderr];
         };
+        $writeToken = static function (string $token, int $startupId, int $time) use ($tokenFile, $sessionDir): void {
+            file_put_contents($tokenFile, WebRunner::TOKEN_HEADER.json_encode([
+                'token' => $token,
+                'cwd' => base64_encode($sessionDir),
+                'startupId' => $startupId,
+                'time' => $time,
+            ], JSON_THROW_ON_ERROR));
+        };
+        $forbidden = [1, 'FORBIDDEN'];
 
         try {
-            // 1. Missing token
-            self::assertNotSame(0, $runEntry([
-                'argv' => ['madeline-ipc', $sessionDir, '123'],
-                'cwd' => '/tmp',
-            ]));
+            foreach ([false, true] as $phar) {
+                // Missing token
+                self::assertSame($forbidden, $runEntry(['argv' => ['madeline-ipc', $sessionDir, '123']], $phar));
 
-            // 2. Wrong token
-            file_put_contents(
-                $sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE,
-                WebRunner::TOKEN_HEADER.json_encode([
-                    'token' => str_repeat('a', 64),
-                    'cwd' => $sessionDir,
-                    'startupId' => 123,
-                    'time' => time(),
-                ], JSON_THROW_ON_ERROR),
-            );
-            self::assertNotSame(0, $runEntry([
-                'argv' => ['madeline-ipc', $sessionDir, '123'],
-                'token' => str_repeat('b', 64),
-            ]));
-            // Token file must not be deleted on failed auth
-            self::assertFileExists($sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE);
+                // Wrong token: the file stays
+                $writeToken(str_repeat('a', 64), 123, time());
+                self::assertSame($forbidden, $runEntry(['argv' => ['madeline-ipc', $sessionDir, '123'], 'token' => str_repeat('b', 64)], $phar));
+                self::assertFileExists($tokenFile);
 
-            // 3. Mismatched startupId
-            self::assertNotSame(0, $runEntry([
-                'argv' => ['madeline-ipc', $sessionDir, '999'],
-                'token' => str_repeat('a', 64),
-            ]));
+                // Token of another startup
+                self::assertSame($forbidden, $runEntry(['argv' => ['madeline-ipc', $sessionDir, '999'], 'token' => str_repeat('a', 64)], $phar));
 
-            // 4. Expired token
-            file_put_contents(
-                $sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE,
-                WebRunner::TOKEN_HEADER.json_encode([
-                    'token' => str_repeat('c', 64),
-                    'cwd' => $sessionDir,
-                    'startupId' => 123,
-                    'time' => time() - WebRunner::TOKEN_TTL - 10,
-                ], JSON_THROW_ON_ERROR),
-            );
-            self::assertNotSame(0, $runEntry([
-                'argv' => ['madeline-ipc', $sessionDir, '123'],
-                'token' => str_repeat('c', 64),
-            ]));
+                // Expired token
+                $writeToken(str_repeat('c', 64), 123, time() - WebRunner::TOKEN_TTL - 10);
+                self::assertSame($forbidden, $runEntry(['argv' => ['madeline-ipc', $sessionDir, '123'], 'token' => str_repeat('c', 64)], $phar));
 
-            // 5. Stream wrapper in session path
-            self::assertNotSame(0, $runEntry([
-                'argv' => ['madeline-ipc', 'phar:///tmp/evil.phar', '123'],
-                'token' => str_repeat('c', 64),
-            ]));
+                // The token of the runner: used up, and the worker runs in the directory it stored, not the request's
+                $writeToken(str_repeat('d', 64), 123, time());
+                self::assertSame([42, 'ACCEPTED '.realpath($sessionDir)], $runEntry(['argv' => ['madeline-ipc', $sessionDir, '123'], 'token' => str_repeat('d', 64)], $phar));
+                self::assertFileDoesNotExist($tokenFile);
+                self::assertSame($forbidden, $runEntry(['argv' => ['madeline-ipc', $sessionDir, '123'], 'token' => str_repeat('d', 64)], $phar));
+            }
+
+            // A stream wrapper as the session path
+            [$code] = $runEntry(['argv' => ['madeline-ipc', 'phar:///tmp/evil.phar', '123'], 'token' => str_repeat('c', 64)]);
+            self::assertNotSame(0, $code);
+            self::assertNotSame(42, $code);
         } finally {
-            @unlink($prependFile);
-            @unlink($sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE);
-            @rmdir($sessionDir);
+            foreach (glob($sessionDir.DIRECTORY_SEPARATOR.'*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($sessionDir);
+        }
+    }
+
+    public function testTheRunnersOfAStartupShareItsToken(): void
+    {
+        $sessionDir = sys_get_temp_dir().'/madeline-token-'.bin2hex(random_bytes(8));
+        mkdir($sessionDir, 0o700, true);
+        try {
+            $token = WebRunner::createStartupToken($sessionDir, 1);
+            self::assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $token);
+            self::assertSame($token, WebRunner::createStartupToken($sessionDir, 1));
+            $other = WebRunner::createStartupToken($sessionDir, 2);
+            self::assertNotSame($token, $other);
+            // Written whole, under its final name only
+            self::assertSame([WebRunner::TOKEN_FILE], array_values(array_diff(scandir($sessionDir), ['.', '..'])));
+            $raw = file_get_contents($sessionDir.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE);
+            self::assertStringStartsWith(WebRunner::TOKEN_HEADER, $raw);
+            $data = json_decode(substr($raw, \strlen(WebRunner::TOKEN_HEADER)), true, flags: JSON_THROW_ON_ERROR);
+            self::assertSame($other, $data['token']);
+            self::assertSame(2, $data['startupId']);
+            self::assertSame(getcwd(), base64_decode($data['cwd'], true));
+        } finally {
+            foreach (glob($sessionDir.DIRECTORY_SEPARATOR.'*') ?: [] as $file) {
+                unlink($file);
+            }
+            rmdir($sessionDir);
         }
     }
 }

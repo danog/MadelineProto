@@ -78,19 +78,9 @@ final class WebRunner extends RunnerAbstract
             self::$runPath = str_replace('//', '/', self::$runPath);
         }
 
-        $token = bin2hex(random_bytes(32));
-        $tokenPayload = self::TOKEN_HEADER.json_encode([
-            'token' => $token,
-            'cwd' => Magic::getcwd(),
-            'startupId' => $startupId,
-            'time' => time(),
-        ], JSON_THROW_ON_ERROR);
-        $tokenFile = $session.DIRECTORY_SEPARATOR.self::TOKEN_FILE;
-        file_put_contents($tokenFile, $tokenPayload, LOCK_EX);
-
         $params = [
             'argv' => ['madeline-ipc', $session, $startupId],
-            'token' => $token,
+            'token' => self::createStartupToken($session, $startupId),
             'MadelineSelfRestart' => 1,
         ];
         if (\function_exists('memprof_enabled') && memprof_enabled()) {
@@ -102,6 +92,42 @@ final class WebRunner extends RunnerAbstract
         return true;
     }
 
+    /**
+     * Startup tokens by session and startup ID: the runners of a startup share one, so a runner doesn't replace the
+     * token of the worker of the other.
+     *
+     * @var array<string, string>
+     */
+    private static array $startupTokens = [];
+    /**
+     * Get the one-time token that lets entry.php start a worker that didn't get its arguments from the command line
+     * of the CLI binary: one started over HTTP, a CGI binary started by the process runner, a self-restart.
+     *
+     * It's stored in the session directory with the working directory of the worker, which a request can't choose.
+     *
+     * @internal
+     */
+    public static function createStartupToken(string $session, int $startupId): string
+    {
+        $key = "$session\0$startupId";
+        if (isset(self::$startupTokens[$key])) {
+            return self::$startupTokens[$key];
+        }
+        $token = bin2hex(random_bytes(32));
+        $payload = self::TOKEN_HEADER.json_encode([
+            'token' => $token,
+            // Not necessarily UTF-8
+            'cwd' => base64_encode(Magic::getcwd()),
+            'startupId' => $startupId,
+            'time' => time(),
+        ], JSON_THROW_ON_ERROR);
+        // Renamed into place: entry.php never reads a partially written file
+        $temp = $session.DIRECTORY_SEPARATOR.'ipcStart.'.bin2hex(random_bytes(8)).'.php';
+        file_put_contents($temp, $payload);
+        rename($temp, $session.DIRECTORY_SEPARATOR.self::TOKEN_FILE);
+        return self::$startupTokens[$key] = $token;
+    }
+
     private static ?string $absoluteRootDir = null;
     public static function getAbsoluteRootDir(): string
     {
@@ -109,8 +135,8 @@ final class WebRunner extends RunnerAbstract
             return self::$absoluteRootDir;
         }
 
-        $serverName = Tools::validateServerName($_SERVER['SERVER_NAME'] ?? '');
-        $uri = parse_url('tcp://'.$serverName.($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+        // Only the path of the request: the host is a placeholder
+        $uri = parse_url('tcp://localhost'.($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
         if (substr($uri, -1) === '/') { // http://example.com/path/ (assumed index.php)
             $uri .= 'index'; // Add fake file name
         }
@@ -141,11 +167,16 @@ final class WebRunner extends RunnerAbstract
         if (preg_match('/[\r\n\0]/', $uri)) {
             throw new AssertionError('Invalid self-start URI!');
         }
-        // Without Connection: close, the server keeps the connection open after the response, until its idle timeout
-        $payload = "GET $uri HTTP/1.1\r\nHost: {$serverName}\r\nConnection: close\r\n\r\n";
+        // Whether SERVER_NAME already has a port (not an IPv6 address)
+        $hasPort = preg_match('/^(\[[^\]]+\]|[^:]+):\d+$/', $serverName) === 1;
 
         foreach (($_SERVER['HTTPS'] ?? 'off') === 'on' ? ['tls', 'tcp'] : ['tcp', 'tls'] as $proto) {
             foreach (array_unique([(int) $_SERVER['SERVER_PORT'], ($proto === 'tls' ? 443 : 80)]) as $port) {
+                // With the port, unless it's the default one: Caddy (and Apache, by default) take SERVER_PORT from the
+                // Host header, and the worker connects to itself there to restart.
+                $host = $hasPort || $port === ($proto === 'tls' ? 443 : 80) ? $serverName : "$serverName:$port";
+                // Without Connection: close, the server keeps the connection open after the response, until its idle timeout
+                $payload = "GET $uri HTTP/1.1\r\nHost: $host\r\nConnection: close\r\n\r\n";
                 try {
                     $address = $proto.'://'.$serverName;
                     $res = fsockopen($address, (int) $port);
