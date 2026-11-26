@@ -73,7 +73,7 @@ RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN \
 	for package in igbinary/igbinary:dev-master#2b1f5d62e3037b07c2a46499ac32091cdb41fb40; do \
 		pie install --no-interaction --skip-enable-extension "$package"; \
 	done; \
-	for package in danog/mongo-php-async-driver:0.2.3; do \
+	for package in danog/mongo-php-async-driver:0.2.4; do \
 		for attempt in 1 2 3 4 5; do \
 			if pie install -v --no-interaction --skip-enable-extension --suppress-download-url-method composer-default \
 				"$package"; then \
