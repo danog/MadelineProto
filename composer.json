@@ -98,7 +98,6 @@
         "symfony/yaml": "^6.4.45",
         "dg/bypass-finals": "dev-master",
         "brianium/paratest": "^6.11.1",
-        "vimeo/psalm": "dev-master",
         "sebastian/diff": "^4.0.6"
     },
     "suggest": {

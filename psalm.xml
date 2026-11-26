@@ -6,9 +6,10 @@
     findUnusedBaselineEntry="false"
     ignoreInternalFunctionFalseReturn="true"
     ignoreInternalFunctionNullReturn="true"
+    loadLibraryPlugins="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor-bin/psalm/vendor/vimeo/psalm/config.xsd"
     errorBaseline="psalm-baseline.xml"
     autoloader="vendor/autoload.php"
 >
