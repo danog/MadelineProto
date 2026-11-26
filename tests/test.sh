@@ -64,6 +64,14 @@ if [ "$1" == "handshake" ]; then
     exit 0
 fi
 
+if [ "$1" == "fpm" ]; then
+    # The IPC worker of a script run by php-fpm (the image's), behind Caddy (Debian's): started by the web runner and
+    # by the process runner, and restarted by itself (tests/danog/MadelineProto/FpmIpcTest.php).
+    apt-get install -y caddy
+    MADELINE_FPM_TEST=1 php -dzend.assertions=1 vendor/bin/phpunit -c phpunit-light.xml tests/danog/MadelineProto/FpmIpcTest.php
+    exit 0
+fi
+
 if [ "$1" == "psalm" ]; then
     composer psalm
     exit 0
