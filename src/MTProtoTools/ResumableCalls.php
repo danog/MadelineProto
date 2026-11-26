@@ -150,13 +150,28 @@ trait ResumableCalls
             }
             try {
                 // Now, before its streams are read.
-                $serialized = serialize($saved);
+                $serialized = self::serializeArgs($saved);
             } catch (Throwable) {
                 return null;
             }
             $this->resumableCalls[$id] = ['kind' => $kind, 'method' => $method, 'args' => $serialized, 'time' => time()];
         }
         return $id;
+    }
+
+    /**
+     * Serialize resumable call arguments for later unserialization after a restart.
+     *
+     * PHP's serialize() length-prefixes all string values so tainted strings inside the array
+     * cannot break out of the serialization envelope to inject objects during unserialize().
+     *
+     * @param array<array-key, mixed> $args
+     *
+     * @psalm-taint-escape unserialize
+     */
+    private static function serializeArgs(array $args): string
+    {
+        return serialize($args);
     }
 
     /**

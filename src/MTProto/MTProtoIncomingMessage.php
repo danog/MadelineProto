@@ -69,8 +69,10 @@ final class MTProtoIncomingMessage extends MTProtoMessage
     /**
      * Constructor.
      *
-     * @param array   $content       Content
-     * @param boolean $fromContainer Whether this message was in a container
+     * @param array                         $content              Content
+     * @param boolean                       $fromContainer        Whether this message was in a container
+     * @param ?\Throwable                   $deserializationError Deserialization error when an rpc_result failed to deserialize
+     * @param ?list<MTProtoIncomingMessage> $containerChildren    Partially deserialized children when a msg_container failed to deserialize as a whole
      *
      * @psalm-mutation-free
      */
@@ -80,6 +82,8 @@ final class MTProtoIncomingMessage extends MTProtoMessage
         int $msgId,
         public readonly bool $unencrypted,
         public readonly bool $fromContainer,
+        public readonly ?\Throwable $deserializationError = null,
+        public readonly ?array $containerChildren = null,
     ) {
         $this->content = $content;
         $this->msgId = $msgId;

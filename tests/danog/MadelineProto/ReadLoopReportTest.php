@@ -23,6 +23,7 @@ use Amp\TimeoutCancellation;
 use danog\MadelineProto\Connection;
 use danog\MadelineProto\Loop\Connection\ReadLoop;
 use danog\MadelineProto\MTProto;
+use danog\MadelineProto\MTProto\MTProtoIncomingMessage;
 use danog\MadelineProto\MTProto\MTProtoOutgoingMessage;
 use danog\MadelineProto\TL\TL;
 use DG\BypassFinals;
@@ -76,9 +77,10 @@ final class ReadLoopReportTest extends TestCase
         $deserialize = $reflection->getMethod('deserialize');
         $result = async(static fn () => $deserialize->invoke($loop, $data, 1, true))
             ->await(new TimeoutCancellation(5, 'The read loop waited for the report'));
-        self::assertSame('rpc_result', $result['_']);
-        self::assertSame(self::REQ_MSG_ID, $result['req_msg_id']);
-        self::assertInstanceOf(\Throwable::class, $result['result']);
+        self::assertInstanceOf(MTProtoIncomingMessage::class, $result);
+        self::assertSame('rpc_result', $result->getPredicate());
+        self::assertSame(self::REQ_MSG_ID, $result->getRequestId());
+        self::assertInstanceOf(\Throwable::class, $result->deserializationError);
         delay(0.01);
         return $reports;
     }

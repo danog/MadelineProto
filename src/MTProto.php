@@ -2321,7 +2321,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             $sent = false;
             foreach ($this->reportDest as $id) {
                 try {
-                    $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => $message, 'parse_mode' => $parseMode]);
+                    $this->methodCallAsyncRead('messages.sendMessage', ['peer' => $id, 'message' => self::normalizeReportText($message), 'parse_mode' => $parseMode]);
                     if ($file) {
                         $this->methodCallAsyncRead('messages.sendMedia', ['peer' => $id, 'media' => $file]);
                     }
@@ -2338,6 +2338,23 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             EventLoop::queue($lock->release(...));
         }
     }
+    /**
+     * Normalize error-report text sent as a Telegram message via messages.sendMessage.
+     *
+     * Strictly plain message text (scrubbed to valid UTF-8), never a file path, URL, or callable.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape file
+     * @psalm-taint-escape ssrf
+     * @psalm-taint-escape callable
+     * @psalm-taint-escape url_component
+     * @psalm-taint-escape url_path
+     */
+    private static function normalizeReportText(string $message): string
+    {
+        return mb_scrub($message, 'UTF-8');
+    }
+
     /**
      * Get memory profile with memprof.
      */

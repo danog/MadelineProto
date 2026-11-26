@@ -78,4 +78,13 @@ final class ResponseInfoTest extends TestCase
         $this->assertSame("inline; filename=\"x_; filename=_evil.html.jpg\"; filename*=UTF-8''x%22%3B%20filename%3D%22evil.html.jpg", $disposition);
         $this->assertStringContainsString("filename*=UTF-8''%D1%84%D0%BE%D1%82%D0%BE.jpg", self::headers('image/jpeg', 'фото', '.jpg')['Content-Disposition']);
     }
+
+    public function testHeaderInjectionCharactersAreStrippedEvenWithoutSandbox(): void
+    {
+        $headers = ResponseInfo::parseHeaders('GET', [], ['mime' => "text/html\r\nX-Injected: 1\0", 'name' => 'page', 'ext' => '.html', 'size' => 10], false)->getHeaders();
+        $this->assertSame('text/htmlX-Injected: 1', $headers['Content-Type']);
+        $this->assertStringNotContainsString("\r", $headers['Content-Type']);
+        $this->assertStringNotContainsString("\n", $headers['Content-Type']);
+        $this->assertStringNotContainsString("\0", $headers['Content-Type']);
+    }
 }

@@ -77,6 +77,8 @@ final class TemplateEngine
      * Check whether a template or asset exists.
      *
      * @param string $file File name relative to the template directories, including the extension
+     *
+     * @psalm-taint-specialize
      */
     public function exists(string $file): bool
     {
@@ -87,6 +89,8 @@ final class TemplateEngine
      * Get the path of a template or asset.
      *
      * @param string $file File name relative to the template directories, including the extension
+     *
+     * @psalm-taint-specialize
      */
     public function resolve(string $file): string
     {
@@ -94,9 +98,55 @@ final class TemplateEngine
     }
 
     /**
+     * Resolve a user-requested asset path strictly inside the `assets/` subdirectory of the template directories.
+     *
+     * Enforces the `assets/` prefix, an explicit extension allowlist, traversal rejection, and symlink containment
+     * via `realpath()` (for non-PHAR paths).
+     *
+     * @param list<string> $allowedExtensions Lowercase extensions allowed to be served
+     *
+     * @internal
+     * @psalm-taint-escape file
+     * @psalm-taint-escape ssrf
+     * @psalm-taint-escape url_component
+     * @psalm-taint-escape url_path
+     */
+    public function resolveAsset(string $file, array $allowedExtensions): ?string
+    {
+        $normalized = str_replace('\\', '/', $file);
+        if (!str_starts_with($normalized, 'assets/')
+            || preg_match('~(^|/)\.\.?(/|$)|[\0:]~', $normalized)
+            || !\in_array(strtolower(pathinfo($normalized, PATHINFO_EXTENSION)), $allowedExtensions, true)
+        ) {
+            return null;
+        }
+        $relative = substr($normalized, \strlen('assets/'));
+        foreach ($this->directories as $dir) {
+            $assetsDir = $dir.DIRECTORY_SEPARATOR.'assets';
+            $candidate = $assetsDir.DIRECTORY_SEPARATOR.$relative;
+            if (!is_file($candidate)) {
+                continue;
+            }
+            // The name can't leave the directories, but a symlink in them could; phars have no symlinks, and
+            // realpath() doesn't support them
+            if (str_starts_with($candidate, 'phar://')) {
+                return $candidate;
+            }
+            $real = realpath($candidate);
+            $realAssets = realpath($assetsDir);
+            if ($real !== false && $realAssets !== false && str_starts_with($real, $realAssets.DIRECTORY_SEPARATOR)) {
+                return $real;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the contents of an asset (stylesheet, script, image...).
      *
      * @param string $file File name relative to the template directories, including the extension
+     *
+     * @psalm-taint-specialize
      */
     public function asset(string $file): string
     {
@@ -107,6 +157,9 @@ final class TemplateEngine
         return $contents;
     }
 
+    /**
+     * @psalm-taint-specialize
+     */
     private function find(string $file): ?string
     {
         $file = str_replace('\\', '/', $file);

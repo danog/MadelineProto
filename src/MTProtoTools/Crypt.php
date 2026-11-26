@@ -66,9 +66,12 @@ final class Crypt
 
     /**
      * SHA-1, raw (SHA-NI with the extension; PHP's sha1() has no hardware path).
+     *
+     * Mandated by the Telegram MTProto wire protocol (auth key ID, RSA fingerprint, MTProto 1.0/secret chat msg_key).
      */
     public static function sha1(string $data): string
     {
+        /** @psalm-suppress WeakHash Required by Telegram MTProto protocol */
         return self::native() ? NativeHash::digest('sha1', $data) : sha1($data, true);
     }
 
@@ -82,9 +85,12 @@ final class Crypt
 
     /**
      * MD5, raw.
+     *
+     * Mandated by the Telegram MTProto wire protocol (inputFile.md5_checksum).
      */
     public static function md5(string $data): string
     {
+        /** @psalm-suppress WeakHash Required by Telegram MTProto protocol */
         return self::native() ? NativeHash::digest('md5', $data) : md5($data, true);
     }
 

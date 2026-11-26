@@ -177,8 +177,12 @@ final class PasswordCalculator
     /**
      * Get the InputCheckPassword object for checking the validity of a password using account.checkPassword.
      *
+     * Output contains only the SRP ID and cryptographic SHA-256 / modular-exponentiation values derived from the password.
+     *
      * @param  string $password The password
      * @return array  InputCheckPassword object
+     *
+     * @psalm-taint-escape input
      */
     public function getCheckPassword(#[\SensitiveParameter] string $password): array
     {

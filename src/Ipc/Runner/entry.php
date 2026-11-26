@@ -30,6 +30,7 @@ use danog\MadelineProto\Magic;
 use danog\MadelineProto\SecurityException;
 use danog\MadelineProto\SessionPaths;
 use danog\MadelineProto\Settings\Ipc;
+use danog\MadelineProto\Tools;
 use Revolt\EventLoop\UncaughtThrowable;
 use Webmozart\Assert\Assert;
 
@@ -39,6 +40,7 @@ use Webmozart\Assert\Assert;
         return;
     }
     \define('MADELINE_ENTRY', 1);
+    $fromWeb = false;
     if (!\defined('MADELINE_WORKER_TYPE')) {
         if (\count(debug_backtrace(0)) !== 1) {
             // We're not being included directly
@@ -47,8 +49,9 @@ use Webmozart\Assert\Assert;
         $arguments = [];
         if (isset($GLOBALS['argv']) && !empty($GLOBALS['argv'])) {
             $arguments = \array_slice($GLOBALS['argv'], 1);
-        } elseif (isset($_GET['argv']) && !empty($_GET['argv'])) {
+        } elseif (isset($_GET['argv']) && \is_array($_GET['argv']) && !empty($_GET['argv'])) {
             $arguments = $_GET['argv'];
+            $fromWeb = true;
         }
         if (\count($arguments) < 2) {
             trigger_error('Not enough arguments!', E_USER_ERROR);
@@ -89,28 +92,68 @@ use Webmozart\Assert\Assert;
     }
     if (MADELINE_WORKER_TYPE === 'madeline-ipc') {
         $session = MADELINE_WORKER_ARGS[0];
-        if (!file_exists($session)) {
-            trigger_error("IPC session $session does not exist!", E_USER_ERROR);
+        if (!\is_string($session) || $session === '' || str_contains($session, "\0") || str_contains($session, '://') || !file_exists($session)) {
+            trigger_error('IPC session does not exist!', E_USER_ERROR);
             exit(1);
         }
+
+        $runnerId = MADELINE_WORKER_ARGS[1];
+        Assert::numeric($runnerId);
+        $runnerId = (int) $runnerId;
+
+        $webCwd = null;
+        if ($fromWeb) {
+            $providedToken = $_GET['token'] ?? null;
+            $tokenFile = $session.DIRECTORY_SEPARATOR.WebRunner::TOKEN_FILE;
+            $valid = false;
+            if (\is_string($providedToken) && $providedToken !== '' && is_dir($session) && is_file($tokenFile)) {
+                $raw = file_get_contents($tokenFile);
+                if (\is_string($raw) && str_starts_with($raw, WebRunner::TOKEN_HEADER)) {
+                    $tokenData = json_decode(substr($raw, \strlen(WebRunner::TOKEN_HEADER)), true);
+                    if (\is_array($tokenData)) {
+                        $expectedToken = $tokenData['token'] ?? null;
+                        $tokenStartupId = $tokenData['startupId'] ?? null;
+                        $tokenTime = $tokenData['time'] ?? null;
+                        $tokenCwd = $tokenData['cwd'] ?? null;
+                        if (\is_string($expectedToken)
+                            && hash_equals($expectedToken, $providedToken)
+                            && $tokenStartupId === $runnerId
+                            && \is_int($tokenTime)
+                            && abs(time() - $tokenTime) <= WebRunner::TOKEN_TTL
+                        ) {
+                            $valid = true;
+                            if (\is_string($tokenCwd) && $tokenCwd !== '' && is_dir($tokenCwd)) {
+                                $webCwd = $tokenCwd;
+                            }
+                            if (is_file($tokenFile)) {
+                                unlink($tokenFile);
+                            }
+                        }
+                    }
+                }
+            }
+            if (!$valid) {
+                if (!headers_sent()) {
+                    http_response_code(403);
+                }
+                exit(1);
+            }
+        }
+
         if (\function_exists('cli_set_process_title')) {
             @cli_set_process_title("MadelineProto worker $session");
         }
         if (\function_exists('posix_setsid')) {
             @posix_setsid();
         }
-        if (isset($_GET['cwd'])) {
-            @chdir($_GET['cwd']);
+        if ($webCwd !== null) {
+            @chdir($webCwd);
         }
         \define('MADELINE_WORKER', 1);
 
-        $runnerId = MADELINE_WORKER_ARGS[1];
-        Assert::numeric($runnerId);
-        $runnerId = (int) $runnerId;
-
         try {
             Magic::start(light: false);
-            Magic::$script_cwd = $_GET['cwd'] ?? Magic::getcwd();
+            Magic::$script_cwd = $webCwd ?? Magic::getcwd();
 
             $session = new SessionPaths($session);
             $API = new API((string) $session, new Ipc);
@@ -136,7 +179,7 @@ use Webmozart\Assert\Assert;
             // Started concurrently with the server that won the session lock: nothing to report
             Logger::log($e->getMessage().', exiting...');
         } catch (\Throwable $e) {
-            echo "$e";
+            echo Tools::taintEscape((string) $e);
             echo 'Got exception in IPC server, exiting...';
 
             Logger::log("$e", Logger::FATAL_ERROR);

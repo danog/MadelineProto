@@ -240,7 +240,10 @@ final class MyTelegramOrgWrapper
             && preg_match('~App api_id\b.*?\b(\d{3,})\b~s', $page, $id)
             && preg_match('~App api_hash\b.*?\b([a-f0-9]{32})\b~s', $page, $hash)
         ) {
-            return ['api_id' => (int) $id[1], 'api_hash' => $hash[1]];
+            $apiHash = self::validateApiHash($hash[1]);
+            if ($apiHash !== null) {
+                return ['api_id' => (int) $id[1], 'api_hash' => $apiHash];
+            }
         }
         if ($title === 'App configuration') {
             // Logged in, with an app: its page changed again
@@ -250,6 +253,17 @@ final class MyTelegramOrgWrapper
         $this->logged = false;
         throw new Exception($title === '' ? Lang::$current_lang['myTelegramOrgUnexpected'] : $title);
     }
+    /**
+     * Validate a 32-character lowercase hex Telegram API hash scraped from my.telegram.org.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape input
+     */
+    private static function validateApiHash(string $hash): ?string
+    {
+        return preg_match('/^[a-f0-9]{32}$/', $hash) ? $hash : null;
+    }
+
     /**
      * Make a request to my.telegram.org.
      *

@@ -432,6 +432,7 @@ trait BotAPI
      * Convert bot API parameters to MTProto parameters.
      *
      * @param array $arguments Arguments
+     * @psalm-taint-specialize
      */
     public function botAPIToMTProto(array $arguments): array
     {
@@ -511,6 +512,7 @@ trait BotAPI
      *
      * @param array $arguments Arguments
      * @internal
+     * @psalm-taint-specialize
      */
     public static function parseMode(array $arguments): array
     {

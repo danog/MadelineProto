@@ -138,21 +138,32 @@ trait ResponseHandler
     {
         $tmp = new SplQueue;
         $tmp->setIteratorMode(SplQueue::IT_MODE_DELETE);
-        foreach ($message->read()['messages'] as $msg) {
-            $this->msgIdHandler->checkIncomingMessageId($msg['msg_id'], true);
-            $newMessage = new MTProtoIncomingMessage(
-                $this,
-                $msg['body'],
-                $msg['msg_id'],
-                $message->unencrypted,
-                true
-            );
-            $newMessage->setSeqNo($msg['seqno']);
-            $this->checkInSeqNo($newMessage);
-            $newMessage->setSeqNo(null);
-            $tmp->enqueue($newMessage);
-            $this->incomingCtr?->inc();
-            //$this->incoming_messages[$msg['msg_id']] = $newMessage;
+        if ($message->containerChildren !== null) {
+            $message->read();
+            foreach ($message->containerChildren as $newMessage) {
+                $this->msgIdHandler->checkIncomingMessageId($newMessage->getMsgId(), true);
+                $this->checkInSeqNo($newMessage);
+                $newMessage->setSeqNo(null);
+                $tmp->enqueue($newMessage);
+                $this->incomingCtr?->inc();
+            }
+        } else {
+            foreach ($message->read()['messages'] as $msg) {
+                $this->msgIdHandler->checkIncomingMessageId($msg['msg_id'], true);
+                $newMessage = new MTProtoIncomingMessage(
+                    $this,
+                    $msg['body'],
+                    $msg['msg_id'],
+                    $message->unencrypted,
+                    true
+                );
+                $newMessage->setSeqNo($msg['seqno']);
+                $this->checkInSeqNo($newMessage);
+                $newMessage->setSeqNo(null);
+                $tmp->enqueue($newMessage);
+                $this->incomingCtr?->inc();
+                //$this->incoming_messages[$msg['msg_id']] = $newMessage;
+            }
         }
         $this->checkInSeqNo($message);
         $this->handleMessages($tmp);
@@ -185,11 +196,8 @@ trait ResponseHandler
     {
         $requestId ??= $message->getRequestId();
         $response = $message->read();
-        if ($response['_'] === 'rpc_result') {
-            if ($message->unencrypted) {
-                throw new SecurityException("Can't accept unencrypted result!");
-            }
-            $response = $response['result'];
+        if ($response['_'] === 'rpc_result' && $message->unencrypted) {
+            throw new SecurityException("Can't accept unencrypted result!");
         }
         $arr = $message->unencrypted ? $this->unencrypted_new_outgoing : $this->new_outgoing;
         if (!isset($arr[$requestId])) {
@@ -202,10 +210,14 @@ trait ResponseHandler
             $this->API->logger("Already got a response to $request, but there is another reply $message with message ID $requestId!", Logger::FATAL_ERROR);
             return;
         }
-        if ($response instanceof Throwable) {
+        if ($message->deserializationError !== null) {
             // The result couldn't be deserialized, see ReadLoop::deserialize.
-            $request->reply(static fn (): Throwable => $response);
+            $error = $message->deserializationError;
+            $request->reply(static fn (): Throwable => $error);
             return;
+        }
+        if ($response['_'] === 'rpc_result') {
+            $response = $response['result'];
         }
         $constructor = $response['_'] ?? '';
         if ($request->specialMethodType === SpecialMethodType::USER_RELATED) {

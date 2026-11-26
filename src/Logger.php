@@ -482,7 +482,7 @@ final class Logger
         if (!\is_null(self::$default)) {
             self::$default->logger($param, $level, basename(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'], '.php'));
         } else {
-            echo $param.PHP_EOL;
+            echo Tools::taintEscape((string) $param).PHP_EOL;
         }
     }
     /**
@@ -508,9 +508,6 @@ final class Logger
      * @param mixed  $param Message to log
      * @param int    $level Logging level
      * @param string $file  File that originated the message
-     *
-     * @psalm-taint-escape html
-     * @psalm-taint-escape quotes
      */
     public function logger(mixed $param, int $level = self::NOTICE, string $file = ''): void
     {
@@ -545,17 +542,22 @@ final class Logger
             }
             return;
         }
+        if ($this->mode === self::ECHO_LOGGER) {
+            $escaped = Tools::taintEscape($param);
+            $escaped = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$escaped."\33[0m".$this->newline : $escaped.$this->newline;
+            try {
+                $this->stdout->write($escaped);
+            } catch (\Throwable) {
+                echo $escaped;
+            }
+            return;
+        }
         $param = Magic::$isatty ? "\33[".$this->colors[$level].'m'.$param."\33[0m".$this->newline : $param.$this->newline;
         try {
             $this->stdout->write($param);
         } catch (\Throwable) {
-            switch ($this->mode) {
-                case self::ECHO_LOGGER:
-                    echo $param;
-                    break;
-                case self::FILE_LOGGER:
-                    file_put_contents($this->optional, $param, FILE_APPEND);
-                    break;
+            if ($this->mode === self::FILE_LOGGER) {
+                file_put_contents($this->optional, $param, FILE_APPEND);
             }
         }
     }

@@ -215,12 +215,30 @@ trait FileServer
             $f = substr($f, \strlen($absoluteRootDir)-1);
             $f = str_replace(DIRECTORY_SEPARATOR, '/', $f);
             $f = str_replace('//', '/', $f);
-            $f = 'https://'.($isCli ? $_ENV['serverName'] : $_SERVER['SERVER_NAME']).$f;
+            $f = self::buildDownloadScriptUrl($isCli ? ($_ENV['serverName'] ?? '') : ($_SERVER['SERVER_NAME'] ?? ''), $f);
             $this->checkDownloadScript($f);
             return self::$checkedAutoload[$autoloadPath] = $f;
         } finally {
             EventLoop::queue($lock->release(...));
         }
+    }
+
+    /**
+     * Build the server's own dl.php self-check URL from the configured server name and relative script path.
+     *
+     * Validates that the server name is a pure hostname/IP (no path/query/fragment/userinfo/CRLF) and that the
+     * path targets `dl.php`, which {@see self::checkDownloadScript()} verifies against this session's user ID.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape ssrf
+     */
+    private static function buildDownloadScriptUrl(string $serverName, string $path): string
+    {
+        $serverName = Tools::validateServerName($serverName);
+        if (!str_starts_with($path, '/') || !str_ends_with($path, '/dl.php') || preg_match('/[\x00-\x20\x7f?#]/', $path)) {
+            throw new AssertionError('Invalid download script path!');
+        }
+        return 'https://'.$serverName.$path;
     }
 
     private static ?LocalKeyedMutex $checkMutex = null;

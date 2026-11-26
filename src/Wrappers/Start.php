@@ -129,28 +129,37 @@ trait Start
         $post = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
         if ($auth === API::NOT_LOGGED_IN) {
             $type = $_POST['type'] ?? (isset($_POST['token']) ? 'bot' : 'phone');
-            if ($type === 'bot' && isset($_POST['token'])) {
-                $this->webStep(fn () => $this->botLogin(trim((string) $_POST['token'])));
-            } elseif ($type === 'phone' && isset($_POST['phone_number'])) {
-                $this->webStep(fn () => $this->phoneLogin(trim((string) $_POST['phone_number'])));
+            if ($type === 'bot' && isset($_POST['token']) && \is_string($_POST['token'])) {
+                $token = $_POST['token'];
+                $this->webStep(fn () => $this->botLogin(self::normalizeAuthField($token)));
+            } elseif ($type === 'phone' && isset($_POST['phone_number']) && \is_string($_POST['phone_number'])) {
+                $phoneNumber = $_POST['phone_number'];
+                $this->webStep(fn () => $this->phoneLogin(self::normalizeAuthField($phoneNumber)));
             } else {
                 $this->webEcho();
             }
         } elseif ($auth === API::WAITING_CODE) {
-            if (isset($_POST['phone_code'])) {
-                $this->webStep(fn () => $this->completePhoneLogin(trim((string) $_POST['phone_code'])));
+            if (isset($_POST['phone_code']) && \is_string($_POST['phone_code'])) {
+                $phoneCode = $_POST['phone_code'];
+                $this->webStep(fn () => $this->completePhoneLogin(self::normalizeAuthField($phoneCode)));
             } else {
                 $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoCode']) : null);
             }
         } elseif ($auth === API::WAITING_PASSWORD) {
-            if (isset($_POST['password'])) {
-                $this->webStep(fn () => $this->complete2faLogin((string) $_POST['password']));
+            if (isset($_POST['password']) && \is_string($_POST['password'])) {
+                $password = $_POST['password'];
+                $this->webStep(fn () => $this->complete2faLogin($password));
             } else {
                 $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoPass']) : null);
             }
         } elseif ($auth === API::WAITING_SIGNUP) {
-            if (isset($_POST['first_name'])) {
-                $this->webStep(fn () => $this->completeSignup(trim((string) $_POST['first_name']), trim((string) ($_POST['last_name'] ?? ''))));
+            if (isset($_POST['first_name']) && \is_string($_POST['first_name'])) {
+                $firstName = $_POST['first_name'];
+                $lastName = isset($_POST['last_name']) && \is_string($_POST['last_name']) ? $_POST['last_name'] : '';
+                $this->webStep(fn () => $this->completeSignup(
+                    self::normalizeAuthField($firstName),
+                    self::normalizeAuthField($lastName),
+                ));
             } else {
                 $this->webEcho($post ? Alert::error(Lang::$current_lang['loginNoName']) : null);
             }
@@ -161,6 +170,24 @@ trait Start
         }
         die;
     }
+    /**
+     * Trim and scrub invalid UTF-8 / NUL bytes from a web login form field sent to Telegram auth.* RPCs.
+     *
+     * Preserves HTML/quote/header taints for output safety, while marking that Telegram auth RPC strings
+     * do not represent local file paths, URLs, or callables.
+     *
+     * @psalm-pure
+     * @psalm-taint-escape file
+     * @psalm-taint-escape ssrf
+     * @psalm-taint-escape callable
+     * @psalm-taint-escape url_component
+     * @psalm-taint-escape url_path
+     */
+    private static function normalizeAuthField(string $value): string
+    {
+        return trim(str_replace("\0", '', mb_scrub($value, 'UTF-8')));
+    }
+
     /**
      * Run a login step submitted from the web UI, then show the next one.
      *

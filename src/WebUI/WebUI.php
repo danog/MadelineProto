@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace danog\MadelineProto\WebUI;
 
-use AssertionError;
 use danog\MadelineProto\Lang;
 use danog\MadelineProto\Settings\Templates;
 
@@ -238,8 +237,7 @@ final class WebUI
         if (self::isJsonRequest() || headers_sent() || ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !isset($_SERVER['REQUEST_URI'])) {
             return false;
         }
-        $query = explode('?', $_SERVER['REQUEST_URI'], 2)[1] ?? null;
-        header('Location: '.self::getSelfUrl().($query === null ? '' : "?$query"), true, 303);
+        header('Location: '.self::getSelfUrl(true), true, 303);
         header('Cache-Control: no-store');
         return true;
     }
@@ -280,27 +278,9 @@ final class WebUI
         }
         $path = $_GET[self::ASSET_PARAMETER];
         $type = self::ASSET_TYPES[strtolower(pathinfo($path, PATHINFO_EXTENSION))] ?? null;
-        try {
-            // Only assets: never the templates, nor anything outside the template directories
-            $file = str_starts_with($path, 'assets/') && $type !== null && $templates->getEngine()->exists($path)
-                ? $templates->getEngine()->resolve($path)
-                : null;
-        } catch (AssertionError) {
-            $file = null;
-        }
-        // The name can't leave the directories (see TemplateEngine), but a symlink in them could; phars have no
-        // symlinks, and realpath() doesn't support them
-        if ($file !== null && !str_starts_with($file, 'phar://')) {
-            $real = realpath($file);
-            $file = null;
-            foreach ($templates->getEngine()->getDirectories() as $dir) {
-                $assets = realpath($dir.DIRECTORY_SEPARATOR.'assets');
-                if ($real !== false && $assets !== false && str_starts_with($real, $assets.DIRECTORY_SEPARATOR)) {
-                    $file = $real;
-                    break;
-                }
-            }
-        }
+        $file = $type !== null
+            ? $templates->getEngine()->resolveAsset($path, array_keys(self::ASSET_TYPES))
+            : null;
         if ($file === null) {
             if (!headers_sent()) {
                 http_response_code(404);
@@ -343,11 +323,17 @@ final class WebUI
      *
      * Always same-origin: a request for `//evil.example/` (which a front controller may route to the script)
      * would otherwise give a protocol-relative URL, pointing redirects and the QR code requests to another
-     * host.
+     * host. Control characters are stripped to prevent header injection.
+     *
+     * @psalm-taint-escape redirect
+     * @psalm-taint-escape header
+     * @psalm-taint-escape url_component
+     * @psalm-taint-escape url_path
      */
     public static function getSelfUrl(bool $withQuery = false): string
     {
-        [$path, $query] = explode('?', $_SERVER['REQUEST_URI'] ?? '', 2) + [1 => ''];
+        $requestUri = preg_replace('/[\x00-\x1f\x7f]/', '', $_SERVER['REQUEST_URI'] ?? '');
+        [$path, $query] = explode('?', $requestUri, 2) + [1 => ''];
         $path = '/'.ltrim(str_replace('\\', '/', $path), '/');
         if (!$withQuery) {
             return $path;

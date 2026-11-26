@@ -88,17 +88,32 @@ final class AppInfo extends SettingsAbstract
         // "ckb-IQ,en;q=0.8", "zh" of "zh_CN.UTF-8".
         $code = '';
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && \is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $code = preg_split('/[-_;,.\s]/', trim($_SERVER['HTTP_ACCEPT_LANGUAGE']), 2)[0];
+            $code = self::parseLangCode($_SERVER['HTTP_ACCEPT_LANGUAGE'], '/[-_;,.\s]/');
         } elseif (isset($_SERVER['LANG']) && \is_string($_SERVER['LANG'])) {
-            $code = preg_split('/[-_.@]/', $_SERVER['LANG'], 2)[0];
+            $code = self::parseLangCode($_SERVER['LANG'], '/[-_.@]/');
         }
-        $code = strtolower($code);
-        // "C" and "POSIX" are the default locale, not a language.
-        if ($code !== '' && $code !== '*' && $code !== 'c' && $code !== 'posix') {
+        if ($code !== '') {
             $this->setLangCode($code);
         }
         $this->init();
         $this->appVersion = \danog\MadelineProto\API::RELEASE;
+    }
+
+    /**
+     * Extract and validate a BCP-47 primary language subtag (2-8 ASCII letters, excluding "c" and "posix").
+     *
+     * @param non-empty-string $delimiterPattern
+     *
+     * @psalm-pure
+     * @psalm-taint-escape input
+     */
+    private static function parseLangCode(string $raw, string $delimiterPattern): string
+    {
+        $code = strtolower(preg_split($delimiterPattern, trim($raw), 2)[0] ?? '');
+        if ($code === 'posix' || !preg_match('/^[a-z]{2,8}$/', $code)) {
+            return '';
+        }
+        return $code;
     }
     public function __wakeup(): void
     {

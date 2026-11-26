@@ -345,9 +345,9 @@ trait Login
         }
         $this->logger->logger(Lang::$current_lang['login_user'], Logger::NOTICE);
         try {
-            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password, 'specialMethodType' => SpecialMethodType::USER_RELATED]);
+            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $this->getPasswordSRP($password), 'specialMethodType' => SpecialMethodType::USER_RELATED]);
         } catch (PasswordHashInvalidError) {
-            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $password, 'specialMethodType' => SpecialMethodType::USER_RELATED]);
+            $res = $this->methodCallAsyncRead('auth.checkPassword', ['password' => $this->getPasswordSRP($password), 'specialMethodType' => SpecialMethodType::USER_RELATED]);
         }
         $this->authFuture?->await();
         return $res;
