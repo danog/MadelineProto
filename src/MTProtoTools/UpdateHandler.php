@@ -1173,7 +1173,7 @@ trait UpdateHandler
                 $last = end($media);
                 if (!isset($media['media']) && !isset($media['file_id']) && \is_array($last) && isset($last['file_id'])) {
                     // Bot API photo (list of PhotoSize), as in the output of MTProtoToBotAPI: its largest size
-                    $media = end($media)['file_id'];
+                    $media = $last['file_id'];
                 } elseif (isset($media['file_id']) && !isset($media['media'])) {
                     // Bot API Video, Animation, Audio, Voice or Document, as in the output of MTProtoToBotAPI
                     $media = $media['file_id'];

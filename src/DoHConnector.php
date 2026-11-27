@@ -39,7 +39,6 @@ use Revolt\EventLoop;
 use const STREAM_CLIENT_ASYNC_CONNECT;
 
 use const STREAM_CLIENT_CONNECT;
-use function Amp\Socket\Internal\parseUri;
 
 /** @internal */
 final class DoHConnector implements SocketConnector
@@ -49,6 +48,30 @@ final class DoHConnector implements SocketConnector
      */
     public function __construct(private DoHWrapper $dataCenter, private ConnectionContext $ctx)
     {
+    }
+    /**
+     * Split a socket URI into scheme, host (IPv6 addresses in brackets) and port (0 if none), as amphp/socket does
+     * internally.
+     *
+     * @return array{string, string, int}
+     */
+    private static function parseUri(string $uri): array
+    {
+        if (stripos($uri, 'unix://') === 0) {
+            return ['unix', ltrim(substr($uri, 7), '/'), 0];
+        }
+        if (!str_contains($uri, '://')) {
+            $uri = 'tcp://'.$uri;
+        }
+        $parts = parse_url($uri);
+        if ($parts === false || !isset($parts['scheme'], $parts['host']) || $parts['host'] === '') {
+            throw new \Error("Invalid URI: $uri");
+        }
+        $scheme = strtolower($parts['scheme']);
+        if ($scheme !== 'tcp' && $scheme !== 'udp') {
+            throw new \Error("Invalid URI scheme ($scheme); tcp, udp, or unix scheme expected");
+        }
+        return [$scheme, $parts['host'], $parts['port'] ?? 0];
     }
     #[\Override]
     public function connect(
@@ -60,7 +83,7 @@ final class DoHConnector implements SocketConnector
         $token ??= new NullCancellation();
         $uris = [];
         $failures = [];
-        [$scheme, $host, $port] = parseUri($uri);
+        [$scheme, $host, $port] = self::parseUri((string) $uri);
         if ($host[0] === '[') {
             $host = substr($host, 1, -1);
         }

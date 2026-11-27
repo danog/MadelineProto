@@ -382,7 +382,10 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     private Snitch $snitch;
 
     /**
-     * DC list.
+     * DC list: DC options (without id, ipv6 and media_only) by test/main, IP family and DC ID (negative for
+     * media-only DCs).
+     *
+     * @var array<'test'|'main', array<'ipv4'|'ipv6', array<int, array<string, mixed>>>>
      */
     public array $dcList = [
         'test' => [
@@ -1831,7 +1834,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
     /**
      * Parse DC options from config.
      *
-     * @param array $dc_options DC options
+     * @param list<array<string, mixed>> $dc_options DC options (dcOption constructors)
      *
      * @psalm-external-mutation-free
      */
@@ -1844,7 +1847,7 @@ final class MTProto implements TLCallback, LoggerGetter, SettingsGetter
             }
 
             $test = $this->config['test_mode'] ? 'test' : 'main';
-            $id = $dc['id'];
+            $id = (int) $dc['id'];
             if ($this->config['test_mode']) {
                 $id += 10000;
             }

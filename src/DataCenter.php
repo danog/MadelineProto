@@ -258,10 +258,12 @@ final class DataCenter
             UdpBufferedStream::class =>
                 [[DefaultStream::class, []], [UdpBufferedStream::class, []]],
         };
-        if ($settings->getObfuscated() && !\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
+        // Obfuscation and websockets wrap a TCP byte stream: not HTTP requests or UDP datagrams.
+        $wrappable = !\in_array(end($default)[0], [HttpsStream::class, HttpStream::class, UdpBufferedStream::class], true);
+        if ($settings->getObfuscated() && $wrappable) {
             $default = [[DefaultStream::class, []], [BufferedRawStream::class, []], [ObfuscatedStream::class, []], end($default)];
         }
-        if (!\in_array($default[2][0], [HttpsStream::class, HttpStream::class], true)) {
+        if ($wrappable) {
             switch ($settings->getTransport()) {
                 case DefaultStream::class:
                     if ($settings->getObfuscated()) {
@@ -288,8 +290,9 @@ final class DataCenter
                 $combos []= $combo;
             }
         }
+        $proxies = $settings->getProxies();
         $proxyCombos = [];
-        foreach ($settings->getProxies() as $proxy => $extras) {
+        foreach ($proxies as $proxy => $extras) {
             foreach ($extras as $extra) {
                 if ($proxy === ObfuscatedStream::class && isset($extra['secret'])) {
                     $secret = ObfuscatedStream::decodeSecret($extra['secret']);
@@ -303,7 +306,10 @@ final class DataCenter
                     }
                 }
                 foreach ($combos as $orig) {
-                    $combo = [];
+                    if (end($orig)[0] === UdpBufferedStream::class) {
+                        // Proxies only tunnel TCP connections: UDP datagrams can't go through them.
+                        continue;
+                    }
                     if ($proxy === ObfuscatedStream::class) {
                         $combo = $orig;
                         if ($combo[\count($combo) - 2][0] === ObfuscatedStream::class) {
@@ -323,17 +329,22 @@ final class DataCenter
                             $first[] = [BufferedRawStream::class, []];
                             $first[] = [$proxy, $extra];
                             $combo = array_merge($first, $second);
+                        } else {
+                            throw new AssertionError('Unexpected stream combination: '.json_encode($orig));
                         }
                     }
                     $proxyCombos []= $combo;
                 }
             }
         }
-        if ($proxyCombos) {
+        if ($proxies) {
             // Only through the proxies unless allowed: a direct connection would bypass them.
             $combos = $settings->getDirectFallback() ? array_merge($proxyCombos, $combos) : $proxyCombos;
+            if (!$combos) {
+                throw new Exception('None of the configured proxies can carry the '.$settings->getProtocol().' transport, and direct connections are not allowed (see setDirectFallback)');
+            }
         }
-        if ($settings->getRetry() && (!$proxyCombos || $settings->getDirectFallback())) {
+        if ($settings->getRetry() && (!$proxies || $settings->getDirectFallback())) {
             $combos[] = [[DefaultStream::class, []], [BufferedRawStream::class, []], [HttpsStream::class, []]];
         }
         $combos = array_unique($combos, SORT_REGULAR);
